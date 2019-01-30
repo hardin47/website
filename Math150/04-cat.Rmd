@@ -1,5 +1,7 @@
 # Analysis of Categorical Data (section 6.3) 
 
+## Categorical Inference {#cat}
+
 ##### Agenda {-}
 1. Randomization test (binary response)
 2. Fisher's Exact test (binary response)
@@ -46,7 +48,7 @@ text(backpain.bp, c(backpain[1,]-1,backpain[2,]+backpain[1,]-1),t(backpain))
 
 
 
-5. If there was no association between the treatment and the back pain relief, about how many of the 11 ``successes" would you expect to see in each group?  Did the researchers observe more successes in the saline group than expected (if the drug had no effect) or fewer successes than expected?  Is this in the direction conjectured by the researchers?
+5. If there was no association between the treatment and the back pain relief, about how many of the 11 "successes" would you expect to see in each group?  Did the researchers observe more successes in the saline group than expected (if the drug had no effect) or fewer successes than expected?  Is this in the direction conjectured by the researchers?
 
 6. Is is *possible* that the drug has absolutely no effect on back pain?  That the differences were simply due to chance or random variability?  How likely is that?
 
@@ -91,7 +93,7 @@ Notice that regardless of whether or not the drug has an effect, the data will b
 
 
 
-## Fisher's Exact Test (section 6.4)
+## Fisher's Exact Test (section 6.4) {#fisher}
 
 Because we have a fixed sample, we can't use the Binomial distribution to figure out associated probabilities. Instead, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.
 
@@ -140,7 +142,7 @@ Note also that we get an exact probability with no assumptions about sample size
 1. Chi-square test
 2. Comparing rates
 
-## Testing independence of two categorical variables (sections 6.5, 6.6, 6.7)
+## Testing independence of two categorical variables (sections 6.5, 6.6, 6.7) {#chisq}
 
 
 ### $\chi^2$ tests (section 6.6)
@@ -234,7 +236,7 @@ use chi-square if you have multiple populations
 use z-test if you want one-sided tests or confidence intervals.
 
 
-## Parameter Estimation (section 6.8)
+## Parameter Estimation (section 6.8) {#catest}
 
 ```{definition}
 **Data Types** Data are often classified as
@@ -338,10 +340,10 @@ SE(\ln (\hat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac
 
 ### Odds Ratios
 
-A related concept to risk is odds.  It is often used in horse racing, where ``success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.
+A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.
 
 ```{definition}
-**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is {\sc or} times higher for those in group 1 compared to those group 2."
+**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."
 ```
 
 \begin{eqnarray*}
@@ -354,7 +356,7 @@ A related concept to risk is odds.  It is often used in horse racing, where ``su
 \end{eqnarray*}
 
 
-$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02$.  We say, ``The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
+$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02$.  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
 
 Other considerations:
 
@@ -601,4 +603,34 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 
 (no goodness of fit, section 6.11)
 
+## R Example (categorical data): Botox and back pain
 
+
+###  Entering and visualizing the data
+
+```{r}
+backpain <- matrix(c(2,14,9,6),ncol=2,byrow=F)
+backpain
+
+backpain.bp <- barplot(backpain, plot=FALSE)
+barplot(backpain, names.arg=c("placebo","botulinum toxin A"))
+text(backpain.bp, c(backpain[1,]-1,backpain[2,]+backpain[1,]-1),t(backpain))
+```
+
+
+### Fisher's Exact Test
+
+```{r}
+fisher.test(backpain)
+
+# their CI is an inversion of the HT
+# an approximate SE for the ln(OR) is given by:
+se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
+se.lnOR
+```
+
+### Chi-squared Analysis
+
+```{r}
+chisq.test(backpain)
+```
