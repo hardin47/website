@@ -438,7 +438,7 @@ glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% glance() %>%
 ```
 
 \begin{eqnarray*}
-\mbox{test stat} &=& \chi^2\\
+\mbox{test stat} &=& G\\
 &=& -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
 &=& -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
 &=& \mbox{deviance}_0 - \mbox{deviance}_{model}\\
@@ -448,7 +448,7 @@ glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% glance() %>%
 
 So, the LRT here is (see columns of `null deviance` and `deviance`):
 \begin{eqnarray*}
-\chi^2 &=& 525.39 - 335.23 = 190.16\\
+G &=& 525.39 - 335.23 = 190.16\\
 p-value &=& P(\chi^2_1 \geq 190.16) = 0
 \end{eqnarray*}
 
@@ -603,7 +603,7 @@ Write out a few models *by hand*, does any of the significance change with respe
 
 
 
-## Multicolinearity
+## Multicolinearity {#multicol}
 
 Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
 
@@ -1148,11 +1148,10 @@ With logistic regression, we don't have residuals, so we don't have a value like
 #### back to the burn data \@ref(exm:burnexamp):
 Consider looking at all the pairs of successes and failures.  In the burn data we have 308 survivors and 127 deaths = 39,116 pairs of people.  Given a particular pair, if the observation corresponding to a survivor has a *higher* probability of success than the observation corresponding to a death, we call the pair *concordant*.  If the observation corresponding to a survivor has a *lower* probability of success than the observation corresponding to a death, we call the pair *discordant*.  Tied pairs occur when the observed survivor has the same estimated probability as the observed death.
 
-\begin{itemize}
-\item[$D_{xy}$:] Somers' D is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.
-\item[gamma:] Goodman-Kruskal gamma is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.
-\item[tau-a:] Kendall's tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
-\end{itemize}
+* $D_{xy}$: Somers' D is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.  
+* gamma: Goodman-Kruskal gamma is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.  
+* tau-a: Kendall's tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
+
 
 
 For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
