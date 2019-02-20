@@ -7,7 +7,7 @@
 
 
 
-## Motivation for Logistic Regression
+## Motivation for Logistic Regression {#logmodel}
 
 During investigation of the US space shuttle *Challenger* disaster, it was learned that project managers had judged the probability of mission failure to be 0.00001, whereas engineers working on the project had estimated failure probability at 0.005.  The difference between these two probabilities, 0.00499 was discounted as being too small to worry about.  Is a different picture provided by considering odds?  How is it interpreted?
 
@@ -223,7 +223,7 @@ As long as we do not have a case-control study, we can model the risk using a lo
 The regression coefficient, $\beta_1$, has the interpretation of the **logarithm of the relative risk associated with a unit increase in $x$**.  Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]).  As a result, convergence of standard fitting algorithms may be unreliable in some cases.
 
 
-## Inference for coefficients in logistic regression 
+## Estimating coefficients in logistic regression  {#logMLE}
 
 ### Maximum Likelihood Estimation
 
@@ -288,7 +288,7 @@ Why use maximum likelihood estimates?
 * The estimates have an approximately normal sampling distribution for large sample sizes because they are maximum likelihood estimates.  
 * Though it is important to note that we cannot find estimates in closed form.  
 
-## Formal Inference
+## Formal Inference {#loginf}
 
 ### Wald Tests & Intervals
 
@@ -493,7 +493,7 @@ We can use the drop-in-deviance test to test the effect of any or all of the par
 
 See the birdnest example, \@ref{birdexamp}
 
-## Multiple Logistic Regression
+## Multiple Logistic Regression {#multlog}
 
 ### Interaction
 
@@ -818,7 +818,7 @@ What does it mean that the interaction terms are not significant in the last mod
 
 
 
-## Model Building
+## Model Building {#logstep}
 
 \BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-18"><strong>(\#exm:unnamed-chunk-18) </strong></span>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Mary who knows 85 topics.  With two consultants you might choose Mary first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example David, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects David knows are already included in the 85 that Mary knows, and therefore, David does not provide any knowledge beyond that of Mary.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
 <!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
@@ -1195,7 +1195,7 @@ The summary contains the following elements:
 >number of observations used in the fit, maximum absolute value of first derivative of log likelihood, model likelihood ratio chi2, d.f., P-value, $c$ index (area under ROC curve), Somers' Dxy, Goodman-Kruskal gamma, Kendall's tau-a rank correlations between predicted probabilities and observed response, the Nagelkerke $R^2$ index, the Brier score computed with respect to Y $>$ its lowest level, the $g$-index, $gr$ (the $g$-index on the odds ratio scale), and $gp$ (the $g$-index on the probability scale using the same cutoff used for the Brier score).
 
 
-## Receiver Operating Characteristic Curves
+## Receiver Operating Characteristic Curves {#roc}
 
 Recall that logistic regression can be used to predict the outcome of a binary event (your response variable).  A Receiver Operating Characteristic (ROC) Curve is a graphical representation of the relationship between
 
@@ -1293,7 +1293,7 @@ H: is worse than random guessing.  Note that the opposite classifier to (H) migh
 
 
 
-## Cross Validation
+## Cross Validation {#cv}
 
 ### Overfitting
 
