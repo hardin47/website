@@ -25,7 +25,7 @@
 <meta name="author" content="Jo Hardin">
 
 
-<meta name="date" content="2019-02-20">
+<meta name="date" content="2019-02-21">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -195,6 +195,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="5.9" data-path="logistic-regression.html"><a href="logistic-regression.html#birdexamp"><i class="fa fa-check"></i><b>5.9</b> R: Birdnest Example</a><ul>
 <li class="chapter" data-level="5.9.1" data-path="logistic-regression.html"><a href="logistic-regression.html#drop-in-deviance-likelihood-ratio-test-lrt"><i class="fa fa-check"></i><b>5.9.1</b> Drop-in-deviance (Likelihood Ratio Test, LRT)</a></li>
+<li class="chapter" data-level="5.9.2" data-path="logistic-regression.html"><a href="logistic-regression.html#difference-between-tidy-and-augment-and-glance"><i class="fa fa-check"></i><b>5.9.2</b> Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></a></li>
+<li class="chapter" data-level="5.9.3" data-path="logistic-regression.html"><a href="logistic-regression.html#looking-at-variables-in-a-few-different-ways."><i class="fa fa-check"></i><b>5.9.3</b> Looking at variables in a few different ways.</a></li>
+<li class="chapter" data-level="5.9.4" data-path="logistic-regression.html"><a href="logistic-regression.html#measues-of-association"><i class="fa fa-check"></i><b>5.9.4</b> Measues of association</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="survival-analysis.html"><a href="survival-analysis.html"><i class="fa fa-check"></i><b>6</b> Survival Analysis</a></li>
@@ -1601,6 +1604,50 @@ G &amp;\sim&amp; \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 <span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
 <pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
 ## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+</div>
+<div id="difference-between-tidy-and-augment-and-glance" class="section level3">
+<h3><span class="header-section-number">5.9.2</span> Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></h3>
+<p>Note that <code>tidy</code> contains the same number of rows as the number of coefficients. <code>augment</code> contains the same number of rows as number of observations. <code>glance</code> always has one row (containing overall model information).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>()</code></pre></div>
+<pre><code>## # A tibble: 95 x 10
+##    .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##    &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+##  1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+##  2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+##  5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+##  6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+##  7 8               0   17    -0.693   0.222 -0.900 0.0110   1.12 0.00280
+##  8 9               0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+##  9 10              0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+## 10 11              1   11    -0.287   0.336  1.30  0.0276   1.12 0.0194 
+## # … with 85 more rows, and 1 more variable: .std.resid &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+</div>
+<div id="looking-at-variables-in-a-few-different-ways." class="section level3">
+<h3><span class="header-section-number">5.9.3</span> Looking at variables in a few different ways.</h3>
+<p>Length as a continuous explanatory variable:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+<p>Length as a categorical explanatory variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span><span class="kw">as.factor</span>(Length), <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
 <pre><code>## # A tibble: 34 x 5
 ##    term                       estimate std.error statistic p.value
@@ -1620,6 +1667,7 @@ G &amp;\sim&amp; \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 <span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
 <pre><code>##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
 ## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61</code></pre>
+<p>Length plus a few other explanatory variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length <span class="op">+</span><span class="st"> </span>Incubate <span class="op">+</span><span class="st">  </span>Color, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
 <pre><code>## # A tibble: 4 x 5
 ##   term        estimate std.error statistic p.value
@@ -1632,6 +1680,35 @@ G &amp;\sim&amp; \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 <span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
 <pre><code>##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
 ## 1       110.086      87 -51.6633 111.327 121.236  103.327          84</code></pre>
+</div>
+<div id="measues-of-association" class="section level3">
+<h3><span class="header-section-number">5.9.4</span> Measues of association</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(c(&quot;Hmisc&quot;, &quot;rms&quot;))</span>
+
+<span class="kw">library</span>(rms)   <span class="co"># you need this line!!</span>
+birds.glm &lt;-<span class="st"> </span><span class="kw">lrm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests)
+<span class="kw">print</span>(birds.glm)</code></pre></div>
+<pre><code>## Frequencies of Missing Values Due to Each Variable
+## Closed?  Length 
+##       0       4 
+## 
+## Logistic Regression Model
+##  
+##  lrm(formula = `Closed?` ~ Length, data = nests)
+##  
+##  
+##                       Model Likelihood     Discrimination    Rank Discrim.    
+##                          Ratio Test           Indexes           Indexes       
+##  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
+##   0             64    d.f.            1    g        0.455    Dxy     0.276    
+##   1             31    Pr(&gt; chi2) 0.0777    gr       1.576    gamma   0.288    
+##  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
+##                                            Brier    0.210                     
+##  
+##            Coef    S.E.   Wald Z Pr(&gt;|Z|)
+##  Intercept  0.4571 0.7530  0.61  0.5438  
+##  Length    -0.0677 0.0425 -1.59  0.1117  
+## </code></pre>
 
 </div>
 </div>

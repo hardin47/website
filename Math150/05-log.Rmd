@@ -1153,18 +1153,56 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
   print.data.frame(digits=6)
 ```
 
+###  Difference between `tidy` and `augment` and `glance`
+
+Note that `tidy` contains the same number of rows as the number of coefficients.  `augment` contains the same number of rows as number of observations.  `glance` always has one row (containing overall model information).
+
+```{r}
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
+  print.data.frame(digits=6)
+```
+
+
+###  Looking at variables in a few different ways.
+
+
+Length as a continuous explanatory variable:
+
+```{r}
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
+  print.data.frame(digits=6)
+```
+
+
+Length as a categorical explanatory variables:
+
 ```{r}
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance() %>%
   print.data.frame(digits=6)
+```
 
+Length plus a few other explanatory variables:
+```{r}
 glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% tidy()
 glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% glance() %>% 
   print.data.frame(digits=6)
 ```
 
 
+### Measues of association
 
+
+```{r}
+# install.packages(c("Hmisc", "rms"))
+
+library(rms)   # you need this line!!
+birds.glm <- lrm(`Closed?` ~ Length, data = nests)
+print(birds.glm)
+```
 
 
 

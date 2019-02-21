@@ -1370,6 +1370,86 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 ## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
 ```
 
+###  Difference between `tidy` and `augment` and `glance`
+
+Note that `tidy` contains the same number of rows as the number of coefficients.  `augment` contains the same number of rows as number of observations.  `glance` always has one row (containing overall model information).
+
+
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112
+```
+
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
+```
+
+```
+## # A tibble: 95 x 10
+##    .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##    <chr>       <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+##  1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+##  2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+##  5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+##  6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+##  7 8               0   17    -0.693   0.222 -0.900 0.0110   1.12 0.00280
+##  8 9               0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+##  9 10              0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+## 10 11              1   11    -0.287   0.336  1.30  0.0276   1.12 0.0194 
+## # … with 85 more rows, and 1 more variable: .std.resid <dbl>
+```
+
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
+  print.data.frame(digits=6)
+```
+
+```
+##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
+```
+
+
+###  Looking at variables in a few different ways.
+
+
+Length as a continuous explanatory variable:
+
+
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112
+```
+
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
+  print.data.frame(digits=6)
+```
+
+```
+##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
+```
+
+
+Length as a categorical explanatory variables:
+
 
 ```r
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
@@ -1402,6 +1482,8 @@ glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance()
 ## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61
 ```
 
+Length plus a few other explanatory variables:
+
 ```r
 glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% tidy()
 ```
@@ -1427,7 +1509,41 @@ glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>%
 ```
 
 
+### Measues of association
 
+
+
+```r
+# install.packages(c("Hmisc", "rms"))
+
+library(rms)   # you need this line!!
+birds.glm <- lrm(`Closed?` ~ Length, data = nests)
+print(birds.glm)
+```
+
+```
+## Frequencies of Missing Values Due to Each Variable
+## Closed?  Length 
+##       0       4 
+## 
+## Logistic Regression Model
+##  
+##  lrm(formula = `Closed?` ~ Length, data = nests)
+##  
+##  
+##                       Model Likelihood     Discrimination    Rank Discrim.    
+##                          Ratio Test           Indexes           Indexes       
+##  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
+##   0             64    d.f.            1    g        0.455    Dxy     0.276    
+##   1             31    Pr(> chi2) 0.0777    gr       1.576    gamma   0.288    
+##  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
+##                                            Brier    0.210                     
+##  
+##            Coef    S.E.   Wald Z Pr(>|Z|)
+##  Intercept  0.4571 0.7530  0.61  0.5438  
+##  Length    -0.0677 0.0425 -1.59  0.1117  
+## 
+```
 
 
 
