@@ -522,7 +522,7 @@ Our new model becomes:
 We can use the drop-in-deviance test to test the effect of any or all of the parameters (of which there are now *four*) in the model.
 
 
-See the birdnest example, \@ref{birdexamp}
+See the birdnest example, \@ref(birdexamp)
 
 ## Multiple Logistic Regression {#multlog}
 
@@ -679,12 +679,12 @@ Consider the example on smoking and 20-year mortality (case) from section 3.4 of
 | 45-64 	| case 	| 34 	| 66 	| 0.340 	| 0.515 	| 1.308 	|
 | 65+ 	| case 	| 44 	| 132 	| 0.250 	| 0.333 	| 1.019 	|
 
-What we see is that the vast majority of the controls were young, and they had a high rate of smoking.  A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group.  However, within each group, the cases were more likely to smoke than the controls.\\
+What we see is that the vast majority of the controls were young, and they had a high rate of smoking.  A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group.  However, within each group, the cases were more likely to smoke than the controls.
 
-After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson's Paradox.  Note that the effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.\\
+After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson's Paradox.  Note that the effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 
 
-What would it mean to *adjust* for age in this context?  It means that we have to include it in the model:\\
+What would it mean to *adjust* for age in this context?  It means that we have to include it in the model:
 ```
 
 ```{r}
@@ -742,7 +742,7 @@ What does it mean that the interaction terms are not significant in the last mod
 ## Model Building {#logstep}
 
 ```{example}
-Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Mary who knows 85 topics.  With two consultants you might choose Mary first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example David, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects David knows are already included in the 85 that Mary knows, and therefore, David does not provide any knowledge beyond that of Mary.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
+Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
 <!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
 
 ```
@@ -978,7 +978,7 @@ For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
 p(x=1.75) &=& \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
 p(x=2.35) &=& \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
 \end{eqnarray*}
-The pairs would be concordant if the first individual survived and the second didn't.  The pairs would be discordant if the first individual died and the second survived.\\
+The pairs would be concordant if the first individual survived and the second didn't.  The pairs would be discordant if the first individual died and the second survived.
 
 ```{r}
 # install.packages(c("Hmisc", "rms"))
@@ -1192,6 +1192,22 @@ glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>%
   print.data.frame(digits=6)
 ```
 
+### Predicting Response
+
+
+```{r}
+bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+bird.glm %>% tidy()
+
+# predicting the linear part:
+# reasonable to use the SE to create CIs
+predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
+
+# predicting the probability of success (on the `scale` of the response variable):
+# do NOT use the SE to create a CI for the predicted value
+# instead, use the SE from `type="link" ` and transform the interval
+predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
+```
 
 ### Measues of association
 

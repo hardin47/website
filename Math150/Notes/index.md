@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2019-02-21"
+date: "2019-02-27"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -47,7 +47,7 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 2/13/19 	|        	|                	| \@ref(chisq) |
 | 2/18/19 	| Logistic Regression        	|         7        	| \@ref(logmodel) |
 | 2/20/19 	|        	|                 	| \@ref(logMLE), \@ref(loginf) |
-| 2/25/19 	| Logistic Regression        	|         7        	| \@ref(multlog), \@ref{multicol}  |
+| 2/25/19 	| Logistic Regression        	|         7        	| \@ref(multlog), \@ref(multicol)  |
 | 2/27/19 	|         	|                 	| \@ref(logstep)  |
 | 3/4/19  	| Logistic Regression        	|         7        	| \@ref(roc) |
 | 3/6/19  	|         	|                 	| \@ref(cv) | 
