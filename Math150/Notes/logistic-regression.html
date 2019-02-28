@@ -179,10 +179,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="logistic-regression.html"><a href="logistic-regression.html#multlog"><i class="fa fa-check"></i><b>5.4</b> Multiple Logistic Regression</a><ul>
 <li class="chapter" data-level="5.4.1" data-path="logistic-regression.html"><a href="logistic-regression.html#interaction"><i class="fa fa-check"></i><b>5.4.1</b> Interaction</a></li>
+<li class="chapter" data-level="5.4.2" data-path="logistic-regression.html"><a href="logistic-regression.html#simpsons-paradox"><i class="fa fa-check"></i><b>5.4.2</b> Simpson’s Paradox</a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="logistic-regression.html"><a href="logistic-regression.html#multicol"><i class="fa fa-check"></i><b>5.5</b> Multicolinearity</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="logistic-regression.html"><a href="logistic-regression.html#simpsons-paradox"><i class="fa fa-check"></i><b>5.5.1</b> Simpson’s Paradox</a></li>
-</ul></li>
+<li class="chapter" data-level="5.5" data-path="logistic-regression.html"><a href="logistic-regression.html#multicol"><i class="fa fa-check"></i><b>5.5</b> Multicolinearity</a></li>
 <li class="chapter" data-level="5.6" data-path="logistic-regression.html"><a href="logistic-regression.html#logstep"><i class="fa fa-check"></i><b>5.6</b> Model Building</a><ul>
 <li class="chapter" data-level="5.6.1" data-path="logistic-regression.html"><a href="logistic-regression.html#formal-model-building"><i class="fa fa-check"></i><b>5.6.1</b> Formal Model Building</a></li>
 <li class="chapter" data-level="5.6.2" data-path="logistic-regression.html"><a href="logistic-regression.html#getting-the-model-right"><i class="fa fa-check"></i><b>5.6.2</b> Getting the Model Right</a></li>
@@ -800,37 +799,12 @@ Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata
 ## 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
 <p>Write out a few models <em>by hand</em>, does any of the significance change with respect to interaction? Does the interpretation change with interaction? In the last model, we might want to remove all the age information. Age seems to be less important than drinking status. How do we decide? How do we model?</p>
 </div>
-</div>
-<div id="multicol" class="section level2">
-<h2><span class="header-section-number">5.5</span> Multicolinearity</h2>
-<p>Consider the following data set collected from church offering plates in 62 consecutive Sundays. Also noted is whether there was enough change to buy a candy bar for $1.25.</p>
-<p><img src="05-log_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
-<pre><code>## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
-## 2 Coins          0.286    0.0772      3.70 0.000213</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
-<pre><code>## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
-## 2 Small          0.184    0.0576      3.19 0.00142</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins <span class="op">+</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
-<pre><code>## # A tibble: 3 x 5
-##   term        estimate std.error statistic p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
-## 2 Coins           3.49      1.75      1.99  0.0461
-## 3 Small          -3.04      1.57     -1.93  0.0531</code></pre>
-<p>Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total. Lesson of the story: be very very very careful interpreting coefficients when you have multiple explanatory variables.</p>
 <div id="simpsons-paradox" class="section level3">
-<h3><span class="header-section-number">5.5.1</span> Simpson’s Paradox</h3>
+<h3><span class="header-section-number">5.4.2</span> Simpson’s Paradox</h3>
 <p><strong>Simpson’s paradox</strong> is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.</p>
 
 <div class="example">
-<span id="exm:unnamed-chunk-14" class="example"><strong>Example 5.3  </strong></span>Back to linear regression to consider Simpson’s Paradox. Consider data on SAT scores across different states with information on educational expenditure. Note that the correlation between SAT score and average teacher salary is negative with the combined data. However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam. Note that the fewer students who take the exam, the higher the SAT score. That’s because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
+<span id="exm:unnamed-chunk-12" class="example"><strong>Example 4.5  </strong></span>Back to linear regression to consider Simpson’s Paradox. Consider data on SAT scores across different states with information on educational expenditure. Note that the correlation between SAT score and average teacher salary is negative with the combined data. However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam. Note that the fewer students who take the exam, the higher the SAT score. That’s because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
 </div>
 
 <pre><code>## # A tibble: 2 x 5
@@ -844,7 +818,7 @@ Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata
 ## 1 (Intercept)   988.      31.9       31.0  6.20e-33
 ## 2 salary          2.18     1.03       2.12 3.94e- 2
 ## 3 frac           -2.78     0.228    -12.2  4.00e-16</code></pre>
-<p><img src="05-log_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" /></p>
 <!--
 %Consider the following data on twenty-year vital status by smoking behavior: %(pgs 52-53 in VGSM)
 %\begin{center}
@@ -874,7 +848,7 @@ Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata
 -->
 
 <div class="example">
-<p><span id="exm:unnamed-chunk-16" class="example"><strong>Example 5.4  </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of <em>Regression Methods in Biostatistics</em>, pg 52-53.</p>
+<p><span id="exm:unnamed-chunk-14" class="example"><strong>Example 5.3  </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of <em>Regression Methods in Biostatistics</em>, pg 52-53.</p>
 <table>
 <thead>
 <tr class="header">
@@ -1030,18 +1004,43 @@ x_2 &amp;=&amp; \begin{cases}
 \mbox{young, middle, old OR} &amp;=&amp; e^{ 0.3122} = 1.3664\\
 &amp;&amp; \\
 \mbox{interaction model} &amp;&amp;\\
-\mbox{old OR} &amp;=&amp; e^{0.2689 + 0.2177} = 1.626776\\
+\mbox{young OR} &amp;=&amp; e^{0.2689 + 0.2177} = 1.626776\\
 \mbox{middle OR} &amp;=&amp; e^{0.2689} = 1.308524\\
 \mbox{old OR} &amp;=&amp; e^{0.2689 + -0.2505} = 1.018570\\
 \end{eqnarray*}\]</span>
 <p>What does it mean that the interaction terms are not significant in the last model?</p>
 </div>
 </div>
+<div id="multicol" class="section level2">
+<h2><span class="header-section-number">5.5</span> Multicolinearity</h2>
+<p>Consider the following data set collected from church offering plates in 62 consecutive Sundays. Also noted is whether there was enough change to buy a candy bar for $1.25.</p>
+<p><img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+## 2 Coins          0.286    0.0772      3.70 0.000213</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+## 2 Small          0.184    0.0576      3.19 0.00142</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins <span class="op">+</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
+## 2 Coins           3.49      1.75      1.99  0.0461
+## 3 Small          -3.04      1.57     -1.93  0.0531</code></pre>
+<p>Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total. Lesson of the story: be very very very careful interpreting coefficients when you have multiple explanatory variables.</p>
+</div>
 <div id="logstep" class="section level2">
 <h2><span class="header-section-number">5.6</span> Model Building</h2>
 
 <div class="example">
-<p><span id="exm:unnamed-chunk-18" class="example"><strong>Example 5.5  </strong></span>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Sage who knows 85 topics. With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics. The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage. A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.<br />
+<p><span id="exm:unnamed-chunk-18" class="example"><strong>Example 5.4  </strong></span>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Sage who knows 85 topics. With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics. The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage. A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.<br />
 <!-- %(Taken from American Statistician article that I refereed, August 2012.) --></p>
 </div>
 
@@ -1433,7 +1432,7 @@ burn.glm &lt;-<span class="st"> </span><span class="kw">lrm</span>(burnresp<span
 </ul>
 
 <div class="example">
-<span id="exm:unnamed-chunk-22" class="example"><strong>Example 5.6  </strong></span>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+<span id="exm:unnamed-chunk-22" class="example"><strong>Example 5.5  </strong></span>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
 <span class="math display">\[\begin{eqnarray*}
 p(x=1.75) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
 p(x=2.35) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087\\

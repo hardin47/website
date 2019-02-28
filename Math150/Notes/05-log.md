@@ -601,59 +601,11 @@ glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
 
 Write out a few models *by hand*, does any of the significance change with respect to interaction?  Does the interpretation change with interaction?  In the last model, we might want to remove all the age information.  Age seems to be less important than drinking status. How do we decide?  How do we model?
 
-
-
-## Multicolinearity {#multicol}
-
-Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
-
-<img src="05-log_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
-
-
-```r
-glm(CandyYes ~ Coins, data = Offering, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
-## 2 Coins          0.286    0.0772      3.70 0.000213
-```
-
-```r
-glm(CandyYes ~ Small, data = Offering, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
-## 2 Small          0.184    0.0576      3.19 0.00142
-```
-
-```r
-glm(CandyYes ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
-## 2 Coins           3.49      1.75      1.99  0.0461
-## 3 Small          -3.04      1.57     -1.93  0.0531
-```
-
-Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.
-
 ### Simpson's Paradox
 
 **Simpson's paradox** is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-14"><strong>(\#exm:unnamed-chunk-14) </strong></span>Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  Note that the correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  Note that the fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).</div>\EndKnitrBlock{example}
+\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-12"><strong>(\#exm:unnamed-chunk-12) </strong></span>Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  Note that the correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  Note that the fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).</div>\EndKnitrBlock{example}
 
 
 ```
@@ -673,7 +625,7 @@ Notice that the directionality of the low coins changes when it is included in t
 ## 3 frac           -2.78     0.228    -12.2  4.00e-16
 ```
 
-<img src="05-log_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
 
 
 <!--
@@ -704,7 +656,7 @@ Notice that the directionality of the low coins changes when it is included in t
 %After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  Note that the effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 -->
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-16"><strong>(\#exm:unnamed-chunk-16) </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of *Regression Methods in Biostatistics*, pg 52-53.
+\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-14"><strong>(\#exm:unnamed-chunk-14) </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of *Regression Methods in Biostatistics*, pg 52-53.
 
 | age 	| test 	| smoker 	| nonsmoker 	| prob smoke 	| odds smoke 	| empirical OR 	|
 |---------	|---------	|:------:	|:---------:	|:----------:	|:----------:	|:------------:	|
@@ -814,11 +766,59 @@ where we are modeling the probability of 20-year mortality using smoking status 
 \mbox{young, middle, old OR} &=& e^{ 0.3122} = 1.3664\\
 && \\
 \mbox{interaction model} &&\\
-\mbox{old OR} &=& e^{0.2689 + 0.2177} = 1.626776\\
+\mbox{young OR} &=& e^{0.2689 + 0.2177} = 1.626776\\
 \mbox{middle OR} &=& e^{0.2689} = 1.308524\\
 \mbox{old OR} &=& e^{0.2689 + -0.2505} = 1.018570\\
 \end{eqnarray*}
 What does it mean that the interaction terms are not significant in the last model?
+
+
+
+## Multicolinearity {#multicol}
+
+Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
+
+<img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+
+
+```r
+glm(CandyYes ~ Coins, data = Offering, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+## 2 Coins          0.286    0.0772      3.70 0.000213
+```
+
+```r
+glm(CandyYes ~ Small, data = Offering, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+## 2 Small          0.184    0.0576      3.19 0.00142
+```
+
+```r
+glm(CandyYes ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term        estimate std.error statistic p.value
+##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
+## 2 Coins           3.49      1.75      1.99  0.0461
+## 3 Small          -3.04      1.57     -1.93  0.0531
+```
+
+Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.
 
 
 
