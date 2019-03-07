@@ -1682,7 +1682,7 @@ head(bird.indiv)
 
 ```r
 bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$Closed.)
-bird.perf <- ROCR:: performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
+bird.perf <- ROCR::performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
 plot(bird.perf, colorize = TRUE)
 abline(a=0, b=1)
 ```
