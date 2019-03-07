@@ -944,6 +944,69 @@ glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
 ## 4 age:drinkany  0.0168    0.0124       1.36  0.175
 ```
 
+```r
+glm(medcond ~ age + weight + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 5 x 5
+##   term        estimate std.error statistic    p.value
+##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
+## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
+## 2 age          0.0184    0.00620     2.96  0.00304   
+## 3 weight       0.00143   0.00285     0.500 0.617     
+## 4 diabetes     0.432     0.0924      4.68  0.00000288
+## 5 drinkany    -0.253     0.0835     -3.03  0.00248
+```
+
+```r
+glm(medcond ~ age , data = HERS, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+## 2 age           0.0162   0.00597      2.71 0.00664
+```
+
+```r
+glm(medcond ~ weight , data = HERS, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept) -0.769     0.198       -3.88 0.000106
+## 2 weight       0.00339   0.00267      1.27 0.204
+```
+
+```r
+glm(medcond ~ diabetes , data = HERS, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+## 2 diabetes       0.468    0.0878      5.34 9.55e- 8
+```
+
+```r
+glm(medcond ~ drinkany, data = HERS, family="binomial") %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+## 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5
+```
+
 
 ##### Forward Selection
 One idea is to start with an empty model and adding the best available variable at each iteration, checking for needs for transformations. We should also look at interactions which we might suspect.  However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.
@@ -971,39 +1034,25 @@ How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, 
 
 
 ```r
-glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% glance()
 ```
 
 ```
-## # A tibble: 11 x 5
-##    term               estimate std.error statistic p.value
-##    <chr>                 <dbl>     <dbl>     <dbl>   <dbl>
-##  1 (Intercept)       -1.11      2.16        -0.512  0.609 
-##  2 age                0.00851   0.0317       0.269  0.788 
-##  3 diabetes           1.89      1.17         1.61   0.107 
-##  4 weight            -0.0143    0.0290      -0.492  0.623 
-##  5 drinkany          -0.587     1.08        -0.546  0.585 
-##  6 age:diabetes      -0.0304    0.0148      -2.06   0.0395
-##  7 age:weight         0.000208  0.000429     0.486  0.627 
-##  8 age:drinkany       0.00734   0.0132       0.557  0.578 
-##  9 diabetes:weight    0.00787   0.00624      1.26   0.207 
-## 10 diabetes:drinkany -0.136     0.205       -0.663  0.507 
-## 11 weight:drinkany   -0.00161   0.00614     -0.262  0.793
+## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
+## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748
 ```
 
 ```r
-glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% glance()
 ```
 
 ```
-## # A tibble: 5 x 5
-##   term        estimate std.error statistic    p.value
-##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
-## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
-## 2 age          0.0184    0.00620     2.96  0.00304   
-## 3 diabetes     0.432     0.0924      4.68  0.00000288
-## 4 weight       0.00143   0.00285     0.500 0.617     
-## 5 drinkany    -0.253     0.0835     -3.03  0.00248
+## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
+## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754
 ```
 
 ```r
@@ -1576,8 +1625,8 @@ predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 # install.packages(c("Hmisc", "rms"))
 
 library(rms)   # you need this line!!
-birds.glm <- lrm(`Closed?` ~ Length, data = nests)
-print(birds.glm)
+bird.lrm <- lrm(`Closed?` ~ Length, data = nests)
+print(bird.lrm)
 ```
 
 ```
@@ -1605,5 +1654,39 @@ print(birds.glm)
 ```
 
 
+###  ROC curves
+
+
+```r
+library(ROCR)
+
+bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+
+bird.indiv <- bird.glm %>% augment() %>% 
+  mutate(probs = predict(bird.glm, type = "response"))
+head(bird.indiv)
+```
+
+```
+## # A tibble: 6 x 11
+##   .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##   <chr>       <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+## 1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+## 2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+## 5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+## 6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+## # … with 2 more variables: .std.resid <dbl>, probs <dbl>
+```
+
+```r
+bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$Closed.)
+bird.perf <- ROCR:: performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
+plot(bird.perf, colorize = TRUE)
+abline(a=0, b=1)
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
 
 

@@ -806,6 +806,14 @@ glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
 glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
 glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
 glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
+
+
+glm(medcond ~ age + weight + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ age , data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ weight , data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ diabetes , data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ drinkany, data = HERS, family="binomial") %>% tidy()
+
 ```
 
 
@@ -834,8 +842,8 @@ How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, 
 3. Continue removing variables until all variables are significant at the chosen $\alpha$ level.  
 
 ```{r}
-glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% tidy()
-glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% tidy()
+glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% glance()
+glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% glance()
 glm(medcond ~ age + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
 ```
 
@@ -1221,10 +1229,27 @@ predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 # install.packages(c("Hmisc", "rms"))
 
 library(rms)   # you need this line!!
-birds.glm <- lrm(`Closed?` ~ Length, data = nests)
-print(birds.glm)
+bird.lrm <- lrm(`Closed?` ~ Length, data = nests)
+print(bird.lrm)
 ```
 
 
+###  ROC curves
+
+```{r}
+library(ROCR)
+
+bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+
+bird.indiv <- bird.glm %>% augment() %>% 
+  mutate(probs = predict(bird.glm, type = "response"))
+head(bird.indiv)
+
+bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$Closed.)
+bird.perf <- ROCR:: performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
+plot(bird.perf, colorize = TRUE)
+abline(a=0, b=1)
+
+```
 
 

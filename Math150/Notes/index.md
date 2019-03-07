@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2019-03-04"
+date: "2019-03-07"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:

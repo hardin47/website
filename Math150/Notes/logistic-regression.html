@@ -25,7 +25,7 @@
 <meta name="author" content="Jo Hardin">
 
 
-<meta name="date" content="2019-03-04">
+<meta name="date" content="2019-03-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -197,6 +197,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.8.3" data-path="logistic-regression.html"><a href="logistic-regression.html#looking-at-variables-in-a-few-different-ways."><i class="fa fa-check"></i><b>5.8.3</b> Looking at variables in a few different ways.</a></li>
 <li class="chapter" data-level="5.8.4" data-path="logistic-regression.html"><a href="logistic-regression.html#predicting-response"><i class="fa fa-check"></i><b>5.8.4</b> Predicting Response</a></li>
 <li class="chapter" data-level="5.8.5" data-path="logistic-regression.html"><a href="logistic-regression.html#measues-of-association"><i class="fa fa-check"></i><b>5.8.5</b> Measues of association</a></li>
+<li class="chapter" data-level="5.8.6" data-path="logistic-regression.html"><a href="logistic-regression.html#roc-curves"><i class="fa fa-check"></i><b>5.8.6</b> ROC curves</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="survival-analysis.html"><a href="survival-analysis.html"><i class="fa fa-check"></i><b>6</b> Survival Analysis</a></li>
@@ -1120,6 +1121,39 @@ BIC: Bayesian Information Criteria = <span class="math inline">\(-2 \ln\)</span>
 ## 2 age           0.00885   0.00759      1.17  0.244 
 ## 3 drinkany     -1.44      0.831       -1.73  0.0833
 ## 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 5 x 5
+##   term        estimate std.error statistic    p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
+## 2 age          0.0184    0.00620     2.96  0.00304   
+## 3 weight       0.00143   0.00285     0.500 0.617     
+## 4 diabetes     0.432     0.0924      4.68  0.00000288
+## 5 drinkany    -0.253     0.0835     -3.03  0.00248</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+## 2 age           0.0162   0.00597      2.71 0.00664</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>weight , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept) -0.769     0.198       -3.88 0.000106
+## 2 weight       0.00339   0.00267      1.27 0.204</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>diabetes , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+## 2 diabetes       0.468    0.0878      5.34 9.55e- 8</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+## 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5</code></pre>
 <div id="forward-selection" class="section level5">
 <h5><span class="header-section-number">5.6.1.1.1</span> Forward Selection</h5>
 <p>One idea is to start with an empty model and adding the best available variable at each iteration, checking for needs for transformations. We should also look at interactions which we might suspect. However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.</p>
@@ -1154,30 +1188,16 @@ BIC: Bayesian Information Criteria = <span class="math inline">\(-2 \ln\)</span>
 </li>
 <li>Continue removing variables until all variables are significant at the chosen <span class="math inline">\(\alpha\)</span> level.</li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>(age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany)<span class="op">^</span><span class="dv">2</span>, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
-<pre><code>## # A tibble: 11 x 5
-##    term               estimate std.error statistic p.value
-##    &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)       -1.11      2.16        -0.512  0.609 
-##  2 age                0.00851   0.0317       0.269  0.788 
-##  3 diabetes           1.89      1.17         1.61   0.107 
-##  4 weight            -0.0143    0.0290      -0.492  0.623 
-##  5 drinkany          -0.587     1.08        -0.546  0.585 
-##  6 age:diabetes      -0.0304    0.0148      -2.06   0.0395
-##  7 age:weight         0.000208  0.000429     0.486  0.627 
-##  8 age:drinkany       0.00734   0.0132       0.557  0.578 
-##  9 diabetes:weight    0.00787   0.00624      1.26   0.207 
-## 10 diabetes:drinkany -0.136     0.205       -0.663  0.507 
-## 11 weight:drinkany   -0.00161   0.00614     -0.262  0.793</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
-<pre><code>## # A tibble: 5 x 5
-##   term        estimate std.error statistic    p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
-## 2 age          0.0184    0.00620     2.96  0.00304   
-## 3 diabetes     0.432     0.0924      4.68  0.00000288
-## 4 weight       0.00143   0.00285     0.500 0.617     
-## 5 drinkany    -0.253     0.0835     -3.03  0.00248</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>(age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany)<span class="op">^</span><span class="dv">2</span>, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;
+## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;
+## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
 <pre><code>## # A tibble: 4 x 5
 ##   term        estimate std.error statistic     p.value
@@ -1760,8 +1780,8 @@ bird.glm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(c(&quot;Hmisc&quot;, &quot;rms&quot;))</span>
 
 <span class="kw">library</span>(rms)   <span class="co"># you need this line!!</span>
-birds.glm &lt;-<span class="st"> </span><span class="kw">lrm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests)
-<span class="kw">print</span>(birds.glm)</code></pre></div>
+bird.lrm &lt;-<span class="st"> </span><span class="kw">lrm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests)
+<span class="kw">print</span>(bird.lrm)</code></pre></div>
 <pre><code>## Frequencies of Missing Values Due to Each Variable
 ## Closed?  Length 
 ##       0       4 
@@ -1783,6 +1803,31 @@ birds.glm &lt;-<span class="st"> </span><span class="kw">lrm</span>(<span class=
 ##  Intercept  0.4571 0.7530  0.61  0.5438  
 ##  Length    -0.0677 0.0425 -1.59  0.1117  
 ## </code></pre>
+</div>
+<div id="roc-curves" class="section level3">
+<h3><span class="header-section-number">5.8.6</span> ROC curves</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ROCR)
+
+bird.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>)
+
+bird.indiv &lt;-<span class="st"> </span>bird.glm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">probs =</span> <span class="kw">predict</span>(bird.glm, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>))
+<span class="kw">head</span>(bird.indiv)</code></pre></div>
+<pre><code>## # A tibble: 6 x 11
+##   .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##   &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+## 1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+## 2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+## 5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+## 6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+## # … with 2 more variables: .std.resid &lt;dbl&gt;, probs &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bird.ROC.info &lt;-<span class="st"> </span>ROCR<span class="op">::</span><span class="kw">prediction</span>(bird.indiv<span class="op">$</span>probs, bird.indiv<span class="op">$</span>Closed.)
+bird.perf &lt;-<span class="st"> </span>ROCR<span class="op">::</span><span class="st"> </span><span class="kw">performance</span>(bird.ROC.info, <span class="dt">measure =</span> <span class="st">&quot;tpr&quot;</span>, <span class="dt">x.measure =</span> <span class="st">&quot;fpr&quot;</span>)
+<span class="kw">plot</span>(bird.perf, <span class="dt">colorize =</span> <span class="ot">TRUE</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>)</code></pre></div>
+<p><img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </div>
 </div>
