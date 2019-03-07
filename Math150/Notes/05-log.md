@@ -1075,7 +1075,7 @@ glm(medcond ~ age + diabetes + drinkany, data = HERS, family="binomial") %>% tid
 * The big model (with all of the interaction terms) has a deviance of 3585.7; the additive model has a deviance of 3594.8.
 
 \begin{eqnarray*}
-\chi^2_6 &=& 3594.8 - 3585.7= 9.1\\
+G &=& 3594.8 - 3585.7= 9.1\\
 p-value &=& P(\chi^2_6 \geq 9.1)= 1 - pchisq(9.1, 6) = 0.1680318
 \end{eqnarray*}
 We cannot reject the null hypothesis, so we know that we don't need the 6 interaction terms.  Next we will check whether we need weight.
@@ -1083,7 +1083,7 @@ We cannot reject the null hypothesis, so we know that we don't need the 6 intera
 * The additive model has a deviance of 3594.8; the model without weight is 3597.3.
 
 \begin{eqnarray*}
-\chi^2_1 &=& 3597.3 - 3594.8 =2.5\\
+G &=& 3597.3 - 3594.8 =2.5\\
 p-value &=& P(\chi^2_1 \geq 2.5)= 1 - pchisq(2.5, 1) = 0.1138463
 \end{eqnarray*}
 We cannot reject the null hypothesis, so we know that we don't need the weight in the model either.
