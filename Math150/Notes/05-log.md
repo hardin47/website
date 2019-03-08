@@ -1348,6 +1348,10 @@ H: is worse than random guessing.  Note that the opposite classifier to (H) migh
 
 ### Cross Validation {#cv}
 
+Before reading the notes here, look through the following visualization.  Don't worry about building the model (classification trees are not a topic for class), but check out the end where they talk about predicting on test and training data.
+
+http://www.r2d3.us/visual-intro-to-machine-learning-part-1/
+
 #### Overfitting
 
 Imagine you are preparing for your statistics exam. Helpfully, Professor Hardin has made previous exam papers and their worked answers available online. You begin by trying to answer the questions from previous papers and comparing your answers with the model answers provided. Unfortunately, you get carried away and spend all your time on memorizing the model answers to all past questions.
