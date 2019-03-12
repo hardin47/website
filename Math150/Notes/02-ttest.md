@@ -133,7 +133,8 @@ surgery %>%
 * What are the model assumptions? (independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2)$, ... basically all the assumptions are given in the original linear model)
 
  
-Considerations when running a t-test:
+Considerations when running a t-test:  
+
 * one-sample vs two-sample t-test  
 * one-sided vs. two-sided hypotheses  
 * t-test with unequal variance (less powerful, more conservative)  
