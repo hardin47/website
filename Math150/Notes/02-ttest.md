@@ -134,9 +134,9 @@ surgery %>%
 
  
 Considerations when running a t-test:
-* one-sample t-test
-* one-sided vs. two-sided hypotheses
-* t-test with unequal variance (less powerful, more conservative)
+* one-sample vs two-sample t-test  
+* one-sided vs. two-sided hypotheses  
+* t-test with unequal variance (less powerful, more conservative)  
 \begin{align}
   t &= \frac{(\overline{y}_1 - \overline{y}_2) - (\mu_1 - \mu_2)}{ \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}}\\
   df &= \min(n_1-1, n_2-1)\\
