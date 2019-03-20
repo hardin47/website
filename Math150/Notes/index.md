@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2019-03-12"
+date: "2019-03-20"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -53,10 +53,14 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 3/6/19  	|         	|                 	| \@ref(cv) | 
 | 3/11/19 	| Catch-up / Review      	|                	|
 | 3/13/19 	| Midterm (Wednesday)        	|  (2, 6, 7) 	|
-| 3/25/19 	| Survival Analysis          	|         9        	|
-| 4/1/19  	| Survival Analysis          	|         9        	|
-| 4/8/19  	| Survival Analysis          	|         9        	|
-| 4/15/19 	| Survival Analysis          	|         9        	|
+| 3/25/19 	| Survival Analysis          	|         9        	| \@ref(timedata), \@ref(KM)  |
+| 3/27/19 	|          	|                 	| \@ref(KMCI)   |
+| 4/1/19  	| Survival Analysis          	|         9        	|  \@ref(logrank) |
+| 4/3/19  	|          	|         9       	|  \@ref(hazfunc) |
+| 4/8/19  	| Survival Analysis          	|         9        	| \@ref(coxph)  |
+| 4/10/19  	|           	|                	| \@ref(multcoxph)   |
+| 4/15/19 	| Survival Analysis          	|         9        	|  \@ref(testingph)  |
+| 4/15/19 	|          	|               	|  \@ref(othersurv)   |
 | 4/22/19 	| Ioannidis & mult. compar. 	| handouts & 1.13 	|
 | 4/29/19 	| Poisson Regression         	|         8        	|
 | 5/6/19  	| Poisson Regression         	|         8        	|
