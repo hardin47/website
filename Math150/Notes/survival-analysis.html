@@ -25,7 +25,7 @@
 <meta name="author" content="Jo Hardin">
 
 
-<meta name="date" content="2019-03-20">
+<meta name="date" content="2019-03-31">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -219,6 +219,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="6.4.1" data-path="survival-analysis.html"><a href="survival-analysis.html#sample-size-calculation"><i class="fa fa-check"></i><b>6.4.1</b> Sample Size Calculation</a></li>
 <li class="chapter" data-level="6.4.2" data-path="survival-analysis.html"><a href="survival-analysis.html#study-design"><i class="fa fa-check"></i><b>6.4.2</b> Study Design</a></li>
 </ul></li>
+<li class="chapter" data-level="6.5" data-path="survival-analysis.html"><a href="survival-analysis.html#Rsurv"><i class="fa fa-check"></i><b>6.5</b> R example: ProPublica Analysis</a><ul>
+<li class="chapter" data-level="6.5.1" data-path="survival-analysis.html"><a href="survival-analysis.html#recidivism-in-florida"><i class="fa fa-check"></i><b>6.5.1</b> Recidivism in Florida</a></li>
+<li class="chapter" data-level="6.5.2" data-path="survival-analysis.html"><a href="survival-analysis.html#kaplan-meier-survival-curve"><i class="fa fa-check"></i><b>6.5.2</b> Kaplan-Meier survival curve</a></li>
+<li class="chapter" data-level="6.5.3" data-path="survival-analysis.html"><a href="survival-analysis.html#log-rank-test-rho0-and-the-wilcoxon-test-rho1"><i class="fa fa-check"></i><b>6.5.3</b> Log-rank test [rho=0] and the Wilcoxon test [rho=1]</a></li>
+<li class="chapter" data-level="6.5.4" data-path="survival-analysis.html"><a href="survival-analysis.html#cox-proportional-hazards-models"><i class="fa fa-check"></i><b>6.5.4</b> Cox Proportional Hazards models</a></li>
+<li class="chapter" data-level="6.5.5" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-the-plot-of-ln-lnst"><i class="fa fa-check"></i><b>6.5.5</b> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span></a></li>
+<li class="chapter" data-level="6.5.6" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-cox.zph"><i class="fa fa-check"></i><b>6.5.6</b> Checking proportional hazards with cox.zph</a></li>
+<li class="chapter" data-level="6.5.7" data-path="survival-analysis.html"><a href="survival-analysis.html#coxph-diagnostics-look-into-all-the-different-arguments-of-the-function"><i class="fa fa-check"></i><b>6.5.7</b> Coxph diagnostics … look into all the different arguments of the function!</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html"><i class="fa fa-check"></i><b>7</b> Multiple Comparisons</a></li>
 <li class="chapter" data-level="8" data-path="poisson-regression.html"><a href="poisson-regression.html"><i class="fa fa-check"></i><b>8</b> Poisson Regression</a></li>
@@ -245,14 +254,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="survival-analysis" class="section level1">
 <h1><span class="header-section-number">Chapter 6</span> Survival Analysis</h1>
-<p>To motivate the technical details which are vital to understanding surival anlaysis, consider the following example <span class="citation">(Gerds <a href="#ref-gerds">2016</a>)</span>.</p>
+<p>To motivate the technical details which are vital to understanding survival analysis, consider the following example <span class="citation">(Gerds <a href="#ref-gerds">2016</a>)</span>.</p>
 
 <div class="example">
 <p><span id="exm:unnamed-chunk-2" class="example"><strong>Example 4.1  </strong></span>In class – experience the Titanic going down.</p>
 <ul>
 <li>The Titanic is sinking. How long can you hold your breath?<br />
 </li>
-<li>Every other person is sinking, the person next to them is the time keeper (number of seconds the sinker can hold their breath).<br />
+<li>Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).<br />
 </li>
 <li>Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).<br />
 </li>
@@ -260,9 +269,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </li>
 <li>When I say “stop” (about another minute), everyone should end their time clocks (this is the end of the follow-up period).<br />
 </li>
-<li>Each participant will have a recorded time as well as an indicator as to whether or not they have died.<br />
-</li>
-<li>Participants will come to the front of the room with their times and censoring information written in large numbers.</li>
+<li>Each participant will have a recorded time as well as an indicator as to whether or not they have died.</li>
 </ul>
 Based on the data, we would like to calculate:<br />
 1. What is the probability of surviving 40 seconds?<br />
@@ -445,8 +452,8 @@ The probability of surviving the first t days is:
 &amp;=&amp; \prod_{i:t_i &lt; t} p_i\\
 \hat{D}(t)_{KM} = 1 - \hat{S}(t)_{KM}\\
 \end{eqnarray*}\]</span>
-<p>If there are no deaths, <span class="math inline">\((n_i -d_i) / n_i = 1\)</span>.</p>
-<p>If there is no censoring, <span class="math inline">\(n_i - d_i = n_{i+1}\)</span>. The Kaplan-Meier survival curve will be equivalent to the empirical survival curve:</p>
+<p>If there are no deaths at time <span class="math inline">\(t_i\)</span>, then <span class="math inline">\((n_i -d_i) / n_i = 1\)</span>.</p>
+<p>If there is no censoring at time <span class="math inline">\(t_i\)</span>, then <span class="math inline">\(n_i - d_i = n_{i+1}\)</span>. The Kaplan-Meier survival curve will be equivalent to the empirical survival curve:</p>
 <span class="math display">\[\begin{eqnarray*}
 \hat{S}(t)_{KM} &amp;=&amp; \prod_{i:t_i &lt; t} \frac{n_i - d_i}{n_i}\\
 &amp;=&amp; \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
@@ -577,6 +584,7 @@ We can also find a CI for <span class="math inline">\(D(t) = 1- S(t)\)</span> us
 <blockquote>
 <p>Mean survival time is estimated as the area under the survival curve. The estimator is based upon the entire range of data. Some software uses only the data up to the last observed event <span class="citation">(Hosmer, Lemeshow, and May <a href="#ref-SurvHL">2008</a>)</span> point out that this biases the estimate of the mean downwards, and they recommend that the entire range of data be used. A large sample method is used to estimate the variance of the mean survival time and thus to construct a confidence interval <span class="citation">(Andersen et al. <a href="#ref-Andersen">1996</a>)</span>. <span class="citation">(StatsDirect Limited <a href="#ref-KMmean">2016</a>)</span></p>
 </blockquote>
+<p>In some ways, it is easier to conceptualize the mean as the average under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths. See the example here: <a href="http://blog.data-miners.com/2010/06/why-is-area-under-survival-curve-equal.html" class="uri">http://blog.data-miners.com/2010/06/why-is-area-under-survival-curve-equal.html</a></p>
 <span class="math display">\[\begin{eqnarray*}
 \hat{\mu} = \left\{
     \begin{array}{ll}
@@ -774,7 +782,7 @@ L(\beta) &amp;=&amp;  \prod_{i=1}^n \Bigg( \frac{e^{\beta x_i}}{\sum_{k:t_k \geq
 <p><span class="math inline">\(b\)</span> is found using numerical methods (as it was with logistic regression).</p>
 
 <div class="example">
-<p><span id="exm:unnamed-chunk-8" class="example"><strong>Example 4.3  </strong></span>Consider the following data from a prostate cancer study. The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran’s Administration Cooperative Urological Research Group. The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES). The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer. The full data set is given in <span class="citation">Andrews and Herzberg (<a href="#ref-AndHerz">1985</a>)</span>, but the data used in this example are from patients presenting with Stage III cancer and given in <span class="citation">Collett (<a href="#ref-Collett">2015</a>)</span> (page 8).</p>
+<span id="exm:unnamed-chunk-8" class="example"><strong>Example 4.3  </strong></span>Consider the following data from a prostate cancer study. The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran’s Administration Cooperative Urological Research Group. The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES). The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer. The full data set is given in <span class="citation">Andrews and Herzberg (<a href="#ref-AndHerz">1985</a>)</span>, but the data used in this example are from patients presenting with Stage III cancer and given in <span class="citation">Collett (<a href="#ref-Collett">2015</a>)</span> (page 8).
 </div>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(survival)
@@ -833,8 +841,7 @@ H_1: h_1(t) = R h_2(t)
 </li>
 <li>Proportional hazards: the hazard ratios are not dependent on time.<br />
 </li>
-<li>Independent censoring: the censored observations have the same survival prospects as the non-censored participants.<br />
-```</li>
+<li>Independent censoring: the censored observations have the same survival prospects as the non-censored participants.</li>
 </ul></li>
 </ul>
 </div>
@@ -932,7 +939,9 @@ As before, we can consider nested models and compare their likelihoods.
 </tr>
 </tbody>
 </table>
-<p>We look at the K-M survival curves broken down by diastolic blood pressure. The logrank statistic comparing all 7 groups is highly significant (<span class="math inline">\(p &lt; 10^{-52}\)</span>), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).</p>
+We look at the K-M survival curves broken down by diastolic blood pressure. The logrank statistic comparing all 7 groups is highly significant (<span class="math inline">\(p &lt; 10^{-52}\)</span>), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).
+</div>
+
 <span class="math display">\[\begin{eqnarray*}
 dbp_{ij} &amp;=&amp; \left\{
 \begin{array}{ll}
@@ -995,9 +1004,7 @@ h_i(t) &amp;=&amp; h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma ma
 <ul>
 <li><strong>continuous</strong> If we believe that the relationship is linear in log(HR)<br />
 </li>
-<li><strong>factor</strong> There are lots of coefficients to estimate, so we lose df
-</div>
-</li>
+<li><strong>factor</strong> There are lots of coefficients to estimate, so we lose df</li>
 </ul>
 </div>
 </div>
@@ -1183,7 +1190,7 @@ d = \frac{(z_{\alpha/2} + z_\beta)^2}{\pi_1 \pi_2 \theta^2_R}
 <ul>
 <li>Random allocation (within a factorial design) allows for estimation of interaction between treatments<br />
 </li>
-<li>Physicians’ health study was factorial with aspirin (to measure myocaridal infarction) and beta carotene (cancer)<br />
+<li>Physicians’ health study was factorial with aspirin (to measure myocardial infarction) and beta carotene (cancer)<br />
 </li>
 <li>Can include 3 or more treatments (but would need large sample sizes to measure anything)</li>
 </ul></li>
@@ -1301,8 +1308,222 @@ d = \frac{(z_{\alpha/2} + z_\beta)^2}{\pi_1 \pi_2 \theta^2_R}
 </li>
 <li>Investigating time-varying effects <span class="citation">(Bellera et al. <a href="#ref-timevar">2010</a>)</span></li>
 </ul>
-
 </div>
+</div>
+</div>
+<div id="Rsurv" class="section level2">
+<h2><span class="header-section-number">6.5</span> R example: ProPublica Analysis</h2>
+<div id="recidivism-in-florida" class="section level3">
+<h3><span class="header-section-number">6.5.1</span> Recidivism in Florida</h3>
+<blockquote>
+<p>[The ProPublica] analysis of Northpointe’s tool, called COMPAS (which stands for Correctional Offender Management Profiling for Alternative Sanctions), found that black defendants were far more likely than white defendants to be incorrectly judged to be at a higher risk of recidivism, while white defendants were more likely than black defendants to be incorrectly flagged as low risk.</p>
+</blockquote>
+<blockquote>
+<p>[ProPublica] looked at more than 10,000 criminal defendants in Broward County, Florida, and compared their predicted recidivism rates with the rate that actually occurred over a two-year period. When most defendants are booked in jail, they respond to a COMPAS questionnaire. Their answers are fed into the COMPAS software to generate several scores including predictions of “Risk of Recidivism” and “Risk of Violent Recidivism.” <span class="citation">(Larson et al. {May 23, 2016})</span></p>
+</blockquote>
+<p>The original article is here: <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" class="uri">https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing</a></p>
+<p>The data analysis is here: <a href="https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm" class="uri">https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm</a></p>
+<p>The GitHub repo with data and code is here: <a href="https://github.com/propublica/compas-analysis" class="uri">https://github.com/propublica/compas-analysis</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(survival)
+recid &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv&quot;</span>)
+
+recid &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(recid, age, c_charge_degree, race, age_cat, score_text, sex, priors_count, 
+                    days_b_screening_arrest, decile_score, is_recid, two_year_recid, 
+                    c_jail_in, c_jail_out) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">filter</span>(days_b_screening_arrest <span class="op">&lt;=</span><span class="st"> </span><span class="dv">30</span>) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">filter</span>(days_b_screening_arrest <span class="op">&gt;=</span><span class="st"> </span><span class="op">-</span><span class="dv">30</span>) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">filter</span>(is_recid <span class="op">!=</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span>) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">filter</span>(c_charge_degree <span class="op">!=</span><span class="st"> &quot;O&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">filter</span>(score_text <span class="op">!=</span><span class="st"> &#39;N/A&#39;</span>)
+        
+recid &lt;-<span class="st"> </span>recid <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">length_of_stay =</span> <span class="kw">as.numeric</span>(<span class="kw">as.Date</span>(c_jail_out) <span class="op">-</span><span class="st"> </span><span class="kw">as.Date</span>(c_jail_in))) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">crime_factor =</span> <span class="kw">factor</span>(c_charge_degree)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">age_factor =</span> <span class="kw">as.factor</span>(age_cat)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">within</span>(age_factor &lt;-<span class="st"> </span><span class="kw">relevel</span>(age_factor, <span class="dt">ref =</span> <span class="dv">1</span>)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">race_factor =</span> <span class="kw">factor</span>(race,
+                                  <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;African-American&quot;</span>, 
+                                             <span class="st">&quot;Asian&quot;</span>,
+                                             <span class="st">&quot;Caucasian&quot;</span>, 
+                                             <span class="st">&quot;Hispanic&quot;</span>, 
+                                             <span class="st">&quot;Native American&quot;</span>,
+                                             <span class="st">&quot;Other&quot;</span>))) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">within</span>(race_factor &lt;-<span class="st"> </span><span class="kw">relevel</span>(race_factor, <span class="dt">ref =</span> <span class="dv">3</span>)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">gender_factor =</span> <span class="kw">factor</span>(sex, <span class="dt">labels=</span> <span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>))) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">within</span>(gender_factor &lt;-<span class="st"> </span><span class="kw">relevel</span>(gender_factor, <span class="dt">ref =</span> <span class="dv">2</span>)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">score_factor =</span> <span class="kw">factor</span>(score_text <span class="op">!=</span><span class="st"> &quot;Low&quot;</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;LowScore&quot;</span>,<span class="st">&quot;HighScore&quot;</span>)))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">recidKM &lt;-<span class="st"> </span><span class="kw">filter</span>(<span class="kw">filter</span>(<span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv&quot;</span>), score_text <span class="op">!=</span><span class="st"> &quot;N/A&quot;</span>), end <span class="op">&gt;</span><span class="st"> </span>start) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">race_factor =</span> <span class="kw">factor</span>(race,
+                                  <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;African-American&quot;</span>, 
+                                             <span class="st">&quot;Asian&quot;</span>,
+                                             <span class="st">&quot;Caucasian&quot;</span>, 
+                                             <span class="st">&quot;Hispanic&quot;</span>, 
+                                             <span class="st">&quot;Native American&quot;</span>,
+                                             <span class="st">&quot;Other&quot;</span>))) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">within</span>(race_factor &lt;-<span class="st"> </span><span class="kw">relevel</span>(race_factor, <span class="dt">ref =</span> <span class="dv">3</span>)) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">score_factor =</span> <span class="kw">factor</span>(score_text)) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">within</span>(score_factor &lt;-<span class="st"> </span><span class="kw">relevel</span>(score_factor, <span class="dt">ref=</span><span class="dv">2</span>)) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">timefollow =</span> end <span class="op">-</span><span class="st"> </span>start)</code></pre></div>
+</div>
+<div id="kaplan-meier-survival-curve" class="section level3">
+<h3><span class="header-section-number">6.5.2</span> Kaplan-Meier survival curve</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">recid.surv &lt;-<span class="st"> </span><span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM)
+<span class="kw">plot</span>(recid.surv, <span class="dt">lty=</span><span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">xlab=</span><span class="st">&quot;time&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;survival function&quot;</span>)
+<span class="kw">legend</span>(<span class="dv">10</span>,.<span class="dv">4</span>, <span class="kw">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;high&quot;</span>, <span class="st">&quot;medium&quot;</span>),<span class="dt">lty=</span><span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)
+
+survminer<span class="op">::</span><span class="kw">ggsurvplot</span>(recid.surv, <span class="dt">conf.int=</span><span class="ot">TRUE</span>, <span class="dt">censor=</span>F) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Overall&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(recid.surv[<span class="dv">1</span>], <span class="dt">conf.int=</span><span class="ot">TRUE</span>, <span class="dt">censor=</span>F) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Low Only&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(recid.surv, <span class="dt">conf.int=</span><span class="ot">TRUE</span>, <span class="dt">censor=</span>F, <span class="dt">risk.table =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>different options for CI</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">4747</span>)
+recidKM2 &lt;-<span class="st"> </span>recidKM <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_n</span>(<span class="dv">200</span>)  <span class="co"># CI on a smaller random sample just to see the different CIs</span>
+<span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2), 
+           <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>F) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;No CI&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2,
+                   <span class="dt">conf.type=</span><span class="st">&quot;log&quot;</span>), <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>T) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Log CI&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2,
+                   <span class="dt">conf.type=</span><span class="st">&quot;log-log&quot;</span>), <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>T) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Log-Log CI&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2,
+                   <span class="dt">conf.type=</span><span class="st">&quot;plain&quot;</span>), <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>T) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Plain CI&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-15-4.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot_facet</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2), 
+                 <span class="dt">data=</span>recidKM2, <span class="dt">facet.by =</span> <span class="st">&quot;sex&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="log-rank-test-rho0-and-the-wilcoxon-test-rho1" class="section level3">
+<h3><span class="header-section-number">6.5.3</span> Log-rank test [rho=0] and the Wilcoxon test [rho=1]</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">survdiff</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2, <span class="dt">rho=</span><span class="dv">0</span>)</code></pre></div>
+<pre><code>## Call:
+## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
+##     rho = 0)
+## 
+##                       N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    104       19    29.10      3.50      8.70
+## score_factor=High    42       13     7.29      4.48      5.33
+## score_factor=Medium  54       17    12.61      1.52      2.05
+## 
+##  Chisq= 9.6  on 2 degrees of freedom, p= 0.008</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">survdiff</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2, <span class="dt">rho=</span><span class="dv">1</span>)</code></pre></div>
+<pre><code>## Call:
+## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
+##     rho = 1)
+## 
+##                       N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    104     16.1    24.85      3.06      8.59
+## score_factor=High    42     11.3     6.44      3.66      4.92
+## score_factor=Medium  54     14.7    10.88      1.37      2.12
+## 
+##  Chisq= 9.3  on 2 degrees of freedom, p= 0.01</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM2), 
+           <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>F, <span class="dt">pval=</span><span class="ot">TRUE</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;No CI&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cox-proportional-hazards-models" class="section level3">
+<h3><span class="header-section-number">6.5.4</span> Cox Proportional Hazards models</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Just score_factor</span>
+<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 7
+##   term            estimate std.error statistic   p.value conf.low conf.high
+##   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 score_factorHi…    1.11     0.0418      26.6 5.26e-156    1.03      1.20 
+## 2 score_factorMe…    0.724    0.0409      17.7 2.66e- 70    0.644     0.805</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 15
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc
+##   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+## 1 13344   3469          747.   4.91e-163         808.  3.03e-176
+## # … with 9 more variables: statistic.wald &lt;dbl&gt;, p.value.wald &lt;dbl&gt;,
+## #   r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;, concordance &lt;dbl&gt;,
+## #   std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># score_factor and race</span>
+<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 7 x 7
+##   term            estimate std.error statistic   p.value conf.low conf.high
+##   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 score_factorHi…  1.05       0.0437   24.0    1.11e-127    0.966   1.14   
+## 2 score_factorMe…  0.686      0.0416   16.5    4.35e- 61    0.605   0.768  
+## 3 raceAsian       -0.380      0.303    -1.25   2.10e-  1   -0.973   0.213  
+## 4 raceCaucasian   -0.165      0.0395   -4.17   3.10e-  5   -0.242  -0.0871 
+## 5 raceHispanic    -0.225      0.0686   -3.28   1.05e-  3   -0.359  -0.0904 
+## 6 raceNative Ame… -0.00943    0.302    -0.0312 9.75e-  1   -0.602   0.583  
+## 7 raceOther       -0.169      0.0877   -1.93   5.34e-  2   -0.341   0.00247</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 15
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc
+##   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+## 1 13344   3469          773.   1.26e-162         833.  1.52e-175
+## # … with 9 more variables: statistic.wald &lt;dbl&gt;, p.value.wald &lt;dbl&gt;,
+## #   r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;, concordance &lt;dbl&gt;,
+## #   std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># score_factor, race, age, sex</span>
+<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 9 x 7
+##   term             estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 score_factorHigh   0.938    0.0448    20.9    3.30e-97   0.850     1.03  
+## 2 score_factorMed…   0.612    0.0424    14.4    3.80e-47   0.528     0.695 
+## 3 raceAsian         -0.408    0.303     -1.35   1.78e- 1  -1.00      0.185 
+## 4 raceCaucasian     -0.115    0.0396    -2.91   3.60e- 3  -0.193    -0.0377
+## 5 raceHispanic      -0.245    0.0685    -3.58   3.50e- 4  -0.379    -0.111 
+## 6 raceNative Amer…  -0.0145   0.302     -0.0479 9.62e- 1  -0.607     0.578 
+## 7 raceOther         -0.183    0.0876    -2.09   3.66e- 2  -0.355    -0.0114
+## 8 age               -0.0145   0.00165   -8.75   2.14e-18  -0.0177   -0.0112
+## 9 sexMale            0.392    0.0475     8.25   1.53e-16   0.299     0.485</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 15
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc
+##   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+## 1 13344   3469          922.   1.25e-192         962.  2.49e-201
+## # … with 9 more variables: statistic.wald &lt;dbl&gt;, p.value.wald &lt;dbl&gt;,
+## #   r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;, concordance &lt;dbl&gt;,
+## #   std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;</code></pre>
+</div>
+<div id="checking-proportional-hazards-with-the-plot-of-ln-lnst" class="section level3">
+<h3><span class="header-section-number">6.5.5</span> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span></h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM), 
+           <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>T, <span class="dt">fun=</span><span class="st">&quot;cloglog&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Complementary Log-Log&quot;</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.</p>
+</div>
+<div id="checking-proportional-hazards-with-cox.zph" class="section level3">
+<h3><span class="header-section-number">6.5.6</span> Checking proportional hazards with cox.zph</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cox.zph</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM))</code></pre></div>
+<pre><code>##                        rho chisq     p
+## score_factorHigh   0.00987 0.338 0.561
+## score_factorMedium 0.00773 0.207 0.649
+## GLOBAL                  NA 0.385 0.825</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cox.zph</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM), <span class="dt">transform=</span><span class="st">&quot;log&quot;</span>)</code></pre></div>
+<pre><code>##                       rho chisq      p
+## score_factorHigh   0.0351  4.29 0.0384
+## score_factorMedium 0.0165  0.95 0.3298
+## GLOBAL                 NA  4.29 0.1170</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cox.zph</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM))</code></pre></div>
+<pre><code>##                          rho   chisq       p
+## score_factorHigh    -0.01243  0.5504 0.45815
+## score_factorMedium  -0.01000  0.3546 0.55153
+## raceAsian            0.00153  0.0081 0.92830
+## raceCaucasian       -0.04143  5.9888 0.01440
+## raceHispanic        -0.01576  0.8661 0.35205
+## raceNative American -0.01798  1.1233 0.28921
+## raceOther           -0.00966  0.3254 0.56840
+## age                 -0.04533  7.2429 0.00712
+## sexMale              0.01009  0.3535 0.55213
+## GLOBAL                    NA 16.2137 0.06255</code></pre>
+<p>Note the big p-values. We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards. If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.</p>
+<p>The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggcoxzph</span>(<span class="kw">cox.zph</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM))) </code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="coxph-diagnostics-look-into-all-the-different-arguments-of-the-function" class="section level3">
+<h3><span class="header-section-number">6.5.7</span> Coxph diagnostics … look into all the different arguments of the function!</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggcoxdiagnostics</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM))</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+
 </div>
 </div>
 </div>
@@ -1339,7 +1560,7 @@ d = \frac{(z_{\alpha/2} + z_\beta)^2}{\pi_1 \pi_2 \theta^2_R}
 <p>Vittinghoff, Eric, David V. Glidden, Stephen C. Shiboski, and Charles E. McCulloch. 2012. <em>Regression Methods in Biostatistics</em>. Springer-Verlag.</p>
 </div>
 <div id="ref-timevar">
-<p>Bellera, Carine A, Gaetan MacGrogan, Marc Debled, Christine Tunon de Lara, Veronique Brouste, and Simone Mathoulin-Pelissier. 2010. “Variables with Time-Varying Effects and the Cox Model: Some Statistical Concepts Illustrated with a Prognostic Factor Study in Breast Cancer.” <em>BMC Medical Research Methodology</em>, 20. <a href="https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-10-20" class="uri">https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-10-20</a>.</p>
+<p>Bellera, Carine A, Gaetan MacGrogan, Marc Debled, Christine Tunon de Lara, Veronique Brouste, and Simone Mathoulin-Pelissier. 2010. “Variables with Time-Varying Effects and the Cox Model: Some Statistical Concepts Illustrated with a Prognostic Factor Study in Breast Cancer.” <em>BMC Medical Research Methodology</em> 10: 20. <a href="https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-10-20" class="uri">https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-10-20</a>.</p>
 </div>
 </div>
             </section>

@@ -7,20 +7,23 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=5, fig.width=7,
 library(tidyverse)
 library(broom)
 library(survival)
+library(ggplot2)
+library(GGally)
+library(survminer)
 ```
 
-To motivate the technical details which are vital to understanding surival anlaysis, consider the following example [@gerds].
+To motivate the technical details which are vital to understanding survival analysis, consider the following example [@gerds].
 
 ```{example}
 In class -- experience the Titanic going down.
 
 * The Titanic is sinking.  How long can you hold your breath?  
-* Every other person is sinking, the person next to them is the time keeper (number of seconds the sinker can hold their breath).  
+* Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).  
 * Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).  
 * Accrual period will last about a minute.  
 * When I say "stop" (about another minute), everyone should end their time clocks (this is the end of the follow-up period).  
 * Each participant will have a recorded time as well as an indicator as to whether or not they have died.  
-* Participants will come to the front of the room with their times and censoring information written in large numbers.  
+  
 
 Based on the data, we would like to calculate:  
 1. What is the probability of surviving 40 seconds?  
@@ -172,10 +175,10 @@ The probability of surviving the first t days is:
 &=& \prod_{i:t_i < t} p_i\\
 \hat{D}(t)_{KM} = 1 - \hat{S}(t)_{KM}\\
 \end{eqnarray*}
-If there are no deaths, $(n_i -d_i) / n_i = 1$.  
+If there are no deaths at time $t_i$, then $(n_i -d_i) / n_i = 1$.  
 
 
-If there is no censoring, $n_i - d_i = n_{i+1}$.  The Kaplan-Meier survival curve will be equivalent to the empirical survival curve:
+If there is no censoring at time $t_i$, then $n_i - d_i = n_{i+1}$.  The Kaplan-Meier survival curve will be equivalent to the empirical survival curve:
 
 \begin{eqnarray*}
 \hat{S}(t)_{KM} &=& \prod_{i:t_i < t} \frac{n_i - d_i}{n_i}\\
@@ -249,6 +252,7 @@ We can also find a CI for $D(t) = 1- S(t)$ using:
 
 > Mean survival time is estimated as the area under the survival curve. The estimator is based upon the entire range of data. Some software uses only the data up to the last observed event [@SurvHL] point out that this biases the estimate of the mean downwards, and they recommend that the entire range of data be used. A large sample method is used to estimate the variance of the mean survival time and thus to construct a confidence interval [@Andersen]. [@KMmean]
 
+In some ways, it is easier to conceptualize the mean as the average under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths.  See the example here: http://blog.data-miners.com/2010/06/why-is-area-under-survival-curve-equal.html
 
 \begin{eqnarray*}
 \hat{\mu} = \left\{
@@ -485,6 +489,7 @@ $b$ is found using numerical methods (as it was with logistic regression).
 
 ```{example}
 Consider the following data from a prostate cancer study.  The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group.  The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES).  The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer.  The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).
+```
 
 ```{r}
 library(survival)
@@ -515,7 +520,7 @@ If there are covariates, the estimation gets much more complicated.
     * Observations are independent  (this is almost always an important assumption in all of statistical inference)  
     * Proportional hazards:  the hazard ratios are not dependent on time.  
     * Independent censoring: the censored observations have the same survival prospects as the non-censored participants.  
-```
+
 
 
 #### Cox PH Multiple Regression Analysis  {#multcoxph}
@@ -559,6 +564,7 @@ As before, we can consider nested models and compare their likelihoods.
 | id 	| = 	| a patient identification variable (numbered 1 to 4699) 	|
   
 We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).
+```
 
 \begin{eqnarray*}
 dbp_{ij} &=& \left\{
@@ -623,7 +629,7 @@ When should we transform a continuous variable into a factor variable?
 
 * **continuous** If we believe that the relationship is linear in log(HR)  
 * **factor** There are lots of coefficients to estimate, so we lose df  
-```
+
 
 
 ### Testing Proportional Hazards {#testingph}
@@ -807,7 +813,7 @@ http://powerandsamplesize.com/Calculators/Test-Time-To-Event-Data/Cox-PH-Equival
 
 * Factorial design    
      * Random allocation (within a factorial design) allows for estimation of interaction between treatments    
-     * Physicians' health study was factorial with aspirin (to measure myocaridal infarction) and beta carotene (cancer)    
+     * Physicians' health study was factorial with aspirin (to measure myocardial infarction) and beta carotene (cancer)    
      * Can include 3 or more treatments (but would need large sample sizes to measure anything)     
 
 |  	|  	| treatment A 	|  	|
@@ -856,4 +862,158 @@ http://powerandsamplesize.com/Calculators/Test-Time-To-Event-Data/Cox-PH-Equival
 
 
 
+## R example: ProPublica Analysis {#Rsurv}
+
+### Recidivism in Florida  
+
+> [The ProPublica] analysis of Northpointe’s tool, called COMPAS (which stands for Correctional Offender Management Profiling for Alternative Sanctions), found that black defendants were far more likely than white defendants to be incorrectly judged to be at a higher risk of recidivism, while white defendants were more likely than black defendants to be incorrectly flagged as low risk.
+
+> [ProPublica] looked at more than 10,000 criminal defendants in Broward County, Florida, and compared their predicted recidivism rates with the rate that actually occurred over a two-year period. When most defendants are booked in jail, they respond to a COMPAS questionnaire. Their answers are fed into the COMPAS software to generate several scores including predictions of “Risk of Recidivism” and “Risk of Violent Recidivism.”  [@angwin]
+
+The original article is here:  https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing
+
+The data analysis is here: https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm
+
+The GitHub repo with data and code is here: https://github.com/propublica/compas-analysis
+
+
+```{r}
+library(survival)
+recid <- readr::read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv")
+
+recid <- dplyr::select(recid, age, c_charge_degree, race, age_cat, score_text, sex, priors_count, 
+                    days_b_screening_arrest, decile_score, is_recid, two_year_recid, 
+                    c_jail_in, c_jail_out) %>% 
+        filter(days_b_screening_arrest <= 30) %>%
+        filter(days_b_screening_arrest >= -30) %>%
+        filter(is_recid != -1) %>%
+        filter(c_charge_degree != "O") %>%
+        filter(score_text != 'N/A')
+        
+recid <- recid %>% mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) %>%
+      mutate(crime_factor = factor(c_charge_degree)) %>%
+      mutate(age_factor = as.factor(age_cat)) %>%
+      within(age_factor <- relevel(age_factor, ref = 1)) %>%
+      mutate(race_factor = factor(race,
+                                  labels = c("African-American", 
+                                             "Asian",
+                                             "Caucasian", 
+                                             "Hispanic", 
+                                             "Native American",
+                                             "Other"))) %>%
+      within(race_factor <- relevel(race_factor, ref = 3)) %>%
+      mutate(gender_factor = factor(sex, labels= c("Female","Male"))) %>%
+      within(gender_factor <- relevel(gender_factor, ref = 2)) %>%
+      mutate(score_factor = factor(score_text != "Low", labels = c("LowScore","HighScore")))
+      
+```
+
+```{r}
+recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv"), score_text != "N/A"), end > start) %>%
+        mutate(race_factor = factor(race,
+                                  labels = c("African-American", 
+                                             "Asian",
+                                             "Caucasian", 
+                                             "Hispanic", 
+                                             "Native American",
+                                             "Other"))) %>%
+        within(race_factor <- relevel(race_factor, ref = 3)) %>%
+        mutate(score_factor = factor(score_text)) %>%
+        within(score_factor <- relevel(score_factor, ref=2)) %>%
+        mutate(timefollow = end - start)
+```
+
+
+### Kaplan-Meier survival curve
+```{r}
+recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
+plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
+legend(10,.4, c("low", "high", "medium"),lty=2:4)
+
+survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
+```
+
+```{r}
+ggsurvplot(recid.surv[1], conf.int=TRUE, censor=F) + ggtitle("Low Only")
+
+ggsurvplot(recid.surv, conf.int=TRUE, censor=F, risk.table = TRUE)
+```
+
+different options for CI
+```{r}
+set.seed(4747)
+recidKM2 <- recidKM %>% sample_n(200)  # CI on a smaller random sample just to see the different CIs
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
+           censor=F, conf.int=F) + ggtitle("No CI")
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
+                   conf.type="log"), censor=F, conf.int=T) + ggtitle("Log CI")
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
+                   conf.type="log-log"), censor=F, conf.int=T) + ggtitle("Log-Log CI")
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
+                   conf.type="plain"), censor=F, conf.int=T) + ggtitle("Plain CI")
+
+ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
+                 data=recidKM2, facet.by = "sex")
+
+```
+
+### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
+
+```{r}
+survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
+survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
+
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
+           censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
+```
+
+### Cox Proportional Hazards models
+
+```{r}
+# Just score_factor
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
+
+# score_factor and race
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
+
+# score_factor, race, age, sex
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% glance()
+```
+
+### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
+
+```{r}
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
+           censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
+```
+
+The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
+
+### Checking proportional hazards with cox.zph
+
+```{r}
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="log")
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+```
+
+Note the big p-values.  We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards.  If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.
+
+
+The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals.  The ordering of the residuals in the list is the same order as the predictors were entered in the cox model.  So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function.  By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors.  Leaving out the list number results in plots for all the predictors being generated at one time.  In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.
+
+```{r}
+ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
+```
+
+
+###  Coxph diagnostics ... look into all the different arguments of the function!
+
+```{r}
+ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+
+```
 
