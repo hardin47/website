@@ -244,9 +244,23 @@ We can also find a CI for $D(t) = 1- S(t)$ using:
 \bigg(1 - \hat{S}(t)_{KM}^{\exp(-1.96\hat{\sigma}(t))}, 1 - \hat{S}(t)_{KM}^{\exp(1.96\hat{\sigma}(t))} \bigg)
 \end{eqnarray*}
 
+#####  Derivation of the above confidence intervals.  {-}
 
+Remember that $\exp(a \cdot b) = (\exp(a))^b$, we'll need that below.  A CI is an interval of values that captures the true parameter in 95 of samples.  Let's say that the complementary log-log interval from above happens to catch the true value of $S(t)$.  Then, 
 
-####Mean and Median values
+\begin{eqnarray*}
+ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq & llS(t) & \leq ll\hat{S}(t) + 1.96 \hat{\sigma}(t) \\
+\exp(ll\hat{S}(t) - 1.96 \hat{\sigma}(t)) \leq & -lS(t) & \leq \exp(ll\hat{S}(t) + 1.96 \hat{\sigma}(t)) \\
+-l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\leq & -lS(t) & \leq -l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq & lS(t) & \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq & lS(t) & \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
+\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
+\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
+\exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
+(\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
+\end{eqnarray*}
+
+#### Mean and Median values
 
 **Mean**    
 
@@ -920,7 +934,23 @@ recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/
         within(race_factor <- relevel(race_factor, ref = 3)) %>%
         mutate(score_factor = factor(score_text)) %>%
         within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start)
+        mutate(timefollow = end - start) %>%
+        filter(race %in% c("African-American", "Caucasian"))
+
+recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-violent-parsed.csv"), score_text != "N/A"), end > start) %>%
+        mutate(race_factor = factor(race,
+                                  labels = c("African-American", 
+                                             "Asian",
+                                             "Caucasian", 
+                                             "Hispanic", 
+                                             "Native American",
+                                             "Other"))) %>%
+        within(race_factor <- relevel(race_factor, ref = 3)) %>%
+        mutate(score_factor = factor(score_text)) %>%
+        within(score_factor <- relevel(score_factor, ref=2)) %>%
+        mutate(timefollow = end - start) %>%
+        filter(race %in% c("African-American", "Caucasian"))
+
 ```
 
 
@@ -953,12 +983,13 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
                    conf.type="plain"), censor=F, conf.int=T) + ggtitle("Plain CI")
 
 ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-                 data=recidKM2, facet.by = "sex")
+                 data=recidKM2, facet.by = "race")
 
 ```
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
+General recidivism
 ```{r}
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
@@ -966,6 +997,34 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
            censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
 ```
+
+Violent recidivism
+```{r}
+set.seed(4747)
+recidKMV2 <- recidKMV %>%
+  sample_n(500)
+
+recidKMV2 %>% filter(race == "Caucasian") %>%
+  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+
+recidKMV2 %>% filter(race == "African-American") %>%
+  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+
+survdiff(Surv(timefollow,event) ~ score_factor, data=recidKMV2, rho=1)
+
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
+           censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
+
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
+                 data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
+  ggtitle("Violent Recidivism")
+
+as.data.frame(recidKMV2) %>%  # must be a data.frame see "." below:
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .), 
+                 data = ., censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
+  ggtitle("Violent Recidivism")
+```
+
 
 ### Cox Proportional Hazards models
 

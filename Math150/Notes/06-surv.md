@@ -226,9 +226,23 @@ We can also find a CI for $D(t) = 1- S(t)$ using:
 \bigg(1 - \hat{S}(t)_{KM}^{\exp(-1.96\hat{\sigma}(t))}, 1 - \hat{S}(t)_{KM}^{\exp(1.96\hat{\sigma}(t))} \bigg)
 \end{eqnarray*}
 
+#####  Derivation of the above confidence intervals.  {-}
 
+Remember that $\exp(a \cdot b) = (\exp(a))^b$, we'll need that below.  A CI is an interval of values that captures the true parameter in 95 of samples.  Let's say that the complementary log-log interval from above happens to catch the true value of $S(t)$.  Then, 
 
-####Mean and Median values
+\begin{eqnarray*}
+ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq & llS(t) & \leq ll\hat{S}(t) + 1.96 \hat{\sigma}(t) \\
+\exp(ll\hat{S}(t) - 1.96 \hat{\sigma}(t)) \leq & -lS(t) & \leq \exp(ll\hat{S}(t) + 1.96 \hat{\sigma}(t)) \\
+-l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\leq & -lS(t) & \leq -l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq & lS(t) & \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq & lS(t) & \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
+\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
+\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
+\exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
+(\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
+\end{eqnarray*}
+
+#### Mean and Median values
 
 **Mean**    
 
@@ -918,7 +932,22 @@ recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/
         within(race_factor <- relevel(race_factor, ref = 3)) %>%
         mutate(score_factor = factor(score_text)) %>%
         within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start)
+        mutate(timefollow = end - start) %>%
+        filter(race %in% c("African-American", "Caucasian"))
+
+recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-violent-parsed.csv"), score_text != "N/A"), end > start) %>%
+        mutate(race_factor = factor(race,
+                                  labels = c("African-American", 
+                                             "Asian",
+                                             "Caucasian", 
+                                             "Hispanic", 
+                                             "Native American",
+                                             "Other"))) %>%
+        within(race_factor <- relevel(race_factor, ref = 3)) %>%
+        mutate(score_factor = factor(score_text)) %>%
+        within(score_factor <- relevel(score_factor, ref=2)) %>%
+        mutate(timefollow = end - start) %>%
+        filter(race %in% c("African-American", "Caucasian"))
 ```
 
 
@@ -981,13 +1010,14 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
 
 ```r
 ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-                 data=recidKM2, facet.by = "sex")
+                 data=recidKM2, facet.by = "race")
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
+General recidivism
 
 ```r
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
@@ -999,11 +1029,11 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 ##     rho = 0)
 ## 
 ##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    104       19    29.10      3.50      8.70
-## score_factor=High    42       13     7.29      4.48      5.33
-## score_factor=Medium  54       17    12.61      1.52      2.05
+## score_factor=Low    106       16    32.66      8.50     22.70
+## score_factor=High    31       13     5.94      8.39      9.53
+## score_factor=Medium  63       24    14.40      6.41      8.93
 ## 
-##  Chisq= 9.6  on 2 degrees of freedom, p= 0.008
+##  Chisq= 23.9  on 2 degrees of freedom, p= 7e-06
 ```
 
 ```r
@@ -1016,11 +1046,11 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 ##     rho = 1)
 ## 
 ##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    104     16.1    24.85      3.06      8.59
-## score_factor=High    42     11.3     6.44      3.66      4.92
-## score_factor=Medium  54     14.7    10.88      1.37      2.12
+## score_factor=Low    106     13.6    27.70      7.22     21.61
+## score_factor=High    31     11.6     5.21      7.73      9.97
+## score_factor=Medium  63     20.4    12.59      4.83      7.72
 ## 
-##  Chisq= 9.3  on 2 degrees of freedom, p= 0.01
+##  Chisq= 23.1  on 2 degrees of freedom, p= 1e-05
 ```
 
 ```r
@@ -1029,6 +1059,90 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+
+Violent recidivism
+
+```r
+set.seed(4747)
+recidKMV2 <- recidKMV %>%
+  sample_n(500)
+
+recidKMV2 %>% filter(race == "Caucasian") %>%
+  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+```
+
+```
+## Call:
+## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+##     rho = 0)
+## 
+##                       N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    111        3    3.554    0.0862     0.214
+## score_factor=High    31        2    0.759    2.0263     2.334
+## score_factor=Medium  64        1    1.687    0.2798     0.390
+## 
+##  Chisq= 2.4  on 2 degrees of freedom, p= 0.3
+```
+
+```r
+recidKMV2 %>% filter(race == "African-American") %>%
+  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+```
+
+```
+## Call:
+## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+##     rho = 0)
+## 
+##                       N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low     97        4     6.49     0.954     1.626
+## score_factor=High   107        6     4.44     0.550     0.776
+## score_factor=Medium  90        6     5.07     0.169     0.247
+## 
+##  Chisq= 1.7  on 2 degrees of freedom, p= 0.4
+```
+
+```r
+survdiff(Surv(timefollow,event) ~ score_factor, data=recidKMV2, rho=1)
+```
+
+```
+## Call:
+## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKMV2, 
+##     rho = 1)
+## 
+##                       N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    208     6.77    10.43     1.284    2.6070
+## score_factor=High   138     7.85     4.45     2.585    3.3914
+## score_factor=Medium 154     6.78     6.51     0.011    0.0163
+## 
+##  Chisq= 4  on 2 degrees of freedom, p= 0.1
+```
+
+```r
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
+           censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
+```
+
+<img src="06-surv_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+
+```r
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
+                 data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
+  ggtitle("Violent Recidivism")
+```
+
+<img src="06-surv_files/figure-html/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" />
+
+```r
+as.data.frame(recidKMV2) %>%  # must be a data.frame see "." below:
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .), 
+                 data = ., censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
+  ggtitle("Violent Recidivism")
+```
+
+<img src="06-surv_files/figure-html/unnamed-chunk-17-3.png" width="672" style="display: block; margin: auto;" />
+
 
 ### Cox Proportional Hazards models
 
@@ -1042,8 +1156,8 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
 ## # A tibble: 2 x 7
 ##   term            estimate std.error statistic   p.value conf.low conf.high
 ##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…    1.11     0.0418      26.6 5.26e-156    1.03      1.20 
-## 2 score_factorMe…    0.724    0.0409      17.7 2.66e- 70    0.644     0.805
+## 1 score_factorHi…    1.08     0.0446      24.1 7.67e-129    0.990     1.16 
+## 2 score_factorMe…    0.704    0.0439      16.0 9.78e- 58    0.617     0.790
 ```
 
 ```r
@@ -1054,7 +1168,7 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
 ## # A tibble: 1 x 15
 ##       n nevent statistic.log p.value.log statistic.sc p.value.sc
 ##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 13344   3469          747.   4.91e-163         808.  3.03e-176
+## 1 11426   3058          617.   9.39e-135         654.  1.15e-142
 ## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
 ## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
 ## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
@@ -1066,16 +1180,12 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
 ```
 
 ```
-## # A tibble: 7 x 7
+## # A tibble: 3 x 7
 ##   term            estimate std.error statistic   p.value conf.low conf.high
 ##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…  1.05       0.0437   24.0    1.11e-127    0.966   1.14   
-## 2 score_factorMe…  0.686      0.0416   16.5    4.35e- 61    0.605   0.768  
-## 3 raceAsian       -0.380      0.303    -1.25   2.10e-  1   -0.973   0.213  
-## 4 raceCaucasian   -0.165      0.0395   -4.17   3.10e-  5   -0.242  -0.0871 
-## 5 raceHispanic    -0.225      0.0686   -3.28   1.05e-  3   -0.359  -0.0904 
-## 6 raceNative Ame… -0.00943    0.302    -0.0312 9.75e-  1   -0.602   0.583  
-## 7 raceOther       -0.169      0.0877   -1.93   5.34e-  2   -0.341   0.00247
+## 1 score_factorHi…    1.03     0.0460     22.3  3.96e-110    0.936    1.12  
+## 2 score_factorMe…    0.674    0.0445     15.2  7.45e- 52    0.586    0.761 
+## 3 raceCaucasian     -0.170    0.0396     -4.29 1.78e-  5   -0.248   -0.0924
 ```
 
 ```r
@@ -1086,7 +1196,7 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
 ## # A tibble: 1 x 15
 ##       n nevent statistic.log p.value.log statistic.sc p.value.sc
 ##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 13344   3469          773.   1.26e-162         833.  1.52e-175
+## 1 11426   3058          636.   1.65e-137         671.  3.72e-145
 ## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
 ## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
 ## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
@@ -1098,18 +1208,14 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 ```
 
 ```
-## # A tibble: 9 x 7
+## # A tibble: 5 x 7
 ##   term             estimate std.error statistic  p.value conf.low conf.high
 ##   <chr>               <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 score_factorHigh   0.938    0.0448    20.9    3.30e-97   0.850     1.03  
-## 2 score_factorMed…   0.612    0.0424    14.4    3.80e-47   0.528     0.695 
-## 3 raceAsian         -0.408    0.303     -1.35   1.78e- 1  -1.00      0.185 
-## 4 raceCaucasian     -0.115    0.0396    -2.91   3.60e- 3  -0.193    -0.0377
-## 5 raceHispanic      -0.245    0.0685    -3.58   3.50e- 4  -0.379    -0.111 
-## 6 raceNative Amer…  -0.0145   0.302     -0.0479 9.62e- 1  -0.607     0.578 
-## 7 raceOther         -0.183    0.0876    -2.09   3.66e- 2  -0.355    -0.0114
-## 8 age               -0.0145   0.00165   -8.75   2.14e-18  -0.0177   -0.0112
-## 9 sexMale            0.392    0.0475     8.25   1.53e-16   0.299     0.485
+## 1 score_factorHigh   0.926    0.0471      19.6  7.63e-86   0.833     1.02  
+## 2 score_factorMed…   0.611    0.0452      13.5  1.54e-41   0.522     0.699 
+## 3 raceCaucasian     -0.120    0.0398      -3.01 2.63e- 3  -0.198    -0.0417
+## 4 age               -0.0137   0.00175     -7.82 5.38e-15  -0.0171   -0.0103
+## 5 sexMale            0.411    0.0502       8.19 2.53e-16   0.313     0.510
 ```
 
 ```r
@@ -1120,7 +1226,7 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 ## # A tibble: 1 x 15
 ##       n nevent statistic.log p.value.log statistic.sc p.value.sc
 ##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 13344   3469          922.   1.25e-192         962.  2.49e-201
+## 1 11426   3058          768.   8.91e-164         787.  7.45e-168
 ## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
 ## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
 ## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
@@ -1134,7 +1240,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1146,10 +1252,10 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
 ```
 
 ```
-##                        rho chisq     p
-## score_factorHigh   0.00987 0.338 0.561
-## score_factorMedium 0.00773 0.207 0.649
-## GLOBAL                  NA 0.385 0.825
+##                          rho    chisq     p
+## score_factorHigh    0.010310 3.26e-01 0.568
+## score_factorMedium -0.000149 6.79e-05 0.993
+## GLOBAL                    NA 4.28e-01 0.807
 ```
 
 ```r
@@ -1157,10 +1263,10 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="l
 ```
 
 ```
-##                       rho chisq      p
-## score_factorHigh   0.0351  4.29 0.0384
-## score_factorMedium 0.0165  0.95 0.3298
-## GLOBAL                 NA  4.29 0.1170
+##                        rho chisq      p
+## score_factorHigh   0.03092 2.930 0.0869
+## score_factorMedium 0.00944 0.272 0.6019
+## GLOBAL                  NA 3.045 0.2182
 ```
 
 ```r
@@ -1168,17 +1274,13 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=rec
 ```
 
 ```
-##                          rho   chisq       p
-## score_factorHigh    -0.01243  0.5504 0.45815
-## score_factorMedium  -0.01000  0.3546 0.55153
-## raceAsian            0.00153  0.0081 0.92830
-## raceCaucasian       -0.04143  5.9888 0.01440
-## raceHispanic        -0.01576  0.8661 0.35205
-## raceNative American -0.01798  1.1233 0.28921
-## raceOther           -0.00966  0.3254 0.56840
-## age                 -0.04533  7.2429 0.00712
-## sexMale              0.01009  0.3535 0.55213
-## GLOBAL                    NA 16.2137 0.06255
+##                        rho   chisq      p
+## score_factorHigh   -0.0113  0.3962 0.5291
+## score_factorMedium -0.0174  0.9433 0.3314
+## raceCaucasian      -0.0454  6.3353 0.0118
+## age                -0.0429  5.6270 0.0177
+## sexMale            -0.0056  0.0958 0.7570
+## GLOBAL                  NA 13.7513 0.0173
 ```
 
 Note the big p-values.  We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards.  If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.
@@ -1191,7 +1293,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
 
 
 ###  Coxph diagnostics ... look into all the different arguments of the function!
@@ -1201,5 +1303,5 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
 
