@@ -237,7 +237,6 @@ ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq & llS(t) & \leq ll\hat{S}(t) + 1.96 \ha
 l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq & lS(t) & \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
 l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq & lS(t) & \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
 \exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
-\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
 \exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
 (\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
 \end{eqnarray*}
@@ -460,7 +459,7 @@ $b$ is found using numerical methods (as it was with logistic regression).
 
 ```r
 library(survival)
-prostate <- readr::read_csv("~/Dropbox/teaching/math150/PROSTATE.csv")
+prostate <- readr::read_csv("PROSTATE.csv")
 head(prostate)
 ```
 
@@ -577,6 +576,21 @@ As before, we can consider nested models and compare their likelihoods.
   
 We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).</div>\EndKnitrBlock{example}
 
+
+```r
+heart <- readr::read_csv("framingham.csv")
+
+heart <- heart %>% 
+  mutate(dbpf = ifelse(dbp <= 60, "under60", 
+                             ifelse(dbp <=70, "60-70",
+                                    ifelse(dbp <= 80, "70-80",
+                                           ifelse(dbp <=90, "80-90",
+                                                 ifelse(dbp <=100, "90-100",
+                                                        ifelse(dbp <=110, "100-110", "over110"))))))) %>%
+  mutate(dbpf = factor(dbpf,
+                       levels = c("under60", "60-70", "70-80","80-90", "90-100","100-110","over110")))
+```
+
 \begin{eqnarray*}
 dbp_{ij} &=& \left\{
 \begin{array}{ll}
@@ -601,6 +615,23 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\}
 
 We can use the model with dbp as categorical to check whether dbp could be used as a continuous variable.  Indeed, it seems that the model is linear (in ln(HR)) with respect to dbp.  One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.
 
+
+```r
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
+```
+
+```
+## # A tibble: 6 x 7
+##   term        estimate std.error statistic  p.value conf.low conf.high
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+## 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3    0.193      1.16
+## 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5    0.467      1.41
+## 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6    0.645      1.59
+## 4 dbpf90-100     1.51      0.243      6.22 4.97e-10    1.04       1.99
+## 5 dbpf100-110    1.84      0.254      7.23 4.86e-13    1.34       2.34
+## 6 dbpfover110    2.25      0.271      8.29 1.18e-16    1.72       2.78
+```
+
 * **Table 7.2**  
 As our next step, we can consider adding gender as a *multiplicative effect* to our model.
 \begin{eqnarray*}
@@ -612,6 +643,23 @@ We say the effects are multiplicative because we are adding in the exponent, so 
      * The change in deviance is 133 ($H_0: \gamma =0$), so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0$, so we need gender in the model.
 
 
+```r
+coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
+```
+
+```
+## # A tibble: 7 x 7
+##   term        estimate std.error statistic  p.value conf.low conf.high
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+## 1 dbpf60-70      0.648    0.247       2.62 8.74e- 3    0.164     1.13 
+## 2 dbpf70-80      0.888    0.241       3.69 2.27e- 4    0.416     1.36 
+## 3 dbpf80-90      1.02     0.241       4.24 2.25e- 5    0.549     1.49 
+## 4 dbpf90-100     1.40     0.243       5.76 8.48e- 9    0.924     1.88 
+## 5 dbpf100-110    1.79     0.254       7.02 2.29e-12    1.29      2.28 
+## 6 dbpfover110    2.22     0.271       8.17 2.97e-16    1.69      2.75 
+## 7 sex           -0.606    0.0528    -11.5  1.54e-30   -0.710    -0.503
+```
+
 * **Table 7.3** 
 Considering gender and dbp interacting.
 \begin{eqnarray*}
@@ -619,8 +667,33 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma male_i + \
 \end{eqnarray*}
 
 
-    8 The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002.  The evidence of interaction is statistically significant.  
+    * The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002.  The evidence of interaction is statistically significant.  
     * Note the marked differences between the estimates in table 7.2 and 7.3.  The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises.  Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.  
+
+
+```r
+coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
+```
+
+```
+## # A tibble: 13 x 7
+##    term            estimate std.error statistic p.value conf.low conf.high
+##    <chr>              <dbl>     <dbl>     <dbl>   <dbl>    <dbl>     <dbl>
+##  1 dbpf60-70         0.717      0.779    0.920   0.358    -0.810    2.24  
+##  2 dbpf70-80         0.811      0.760    1.07    0.286    -0.678    2.30  
+##  3 dbpf80-90         0.342      0.761    0.449   0.654    -1.15     1.83  
+##  4 dbpf90-100        0.954      0.767    1.24    0.213    -0.548    2.46  
+##  5 dbpf100-110       1.02       0.806    1.26    0.207    -0.563    2.60  
+##  6 dbpfover110       0.786      0.891    0.883   0.377    -0.959    2.53  
+##  7 sex              -0.864      0.471   -1.83    0.0668   -1.79     0.0599
+##  8 dbpf60-70:sex    -0.0570     0.495   -0.115   0.908    -1.03     0.912 
+##  9 dbpf70-80:sex     0.0379     0.482    0.0787  0.937    -0.906    0.982 
+## 10 dbpf80-90:sex     0.458      0.482    0.951   0.342    -0.486    1.40  
+## 11 dbpf90-100:sex    0.296      0.487    0.608   0.543    -0.658    1.25  
+## 12 dbpf100-110:sex   0.508      0.509    0.999   0.318    -0.489    1.51  
+## 13 dbpfover110:sex   0.913      0.549    1.66    0.0966   -0.164    1.99
+```
+
 
 * **Table 7.4**  
 Adjusting for confounding variables.  Of particular interest is age at baseline exam.  We know that age varied widely among study subjects, and both DBP and risk of CHD increase with age.  We will also consider the effect of body mass index and serum cholesterol.
@@ -642,6 +715,31 @@ When should we transform a continuous variable into a factor variable?
 * **factor** There are lots of coefficients to estimate, so we lose df  
 
 
+```r
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
+```
+
+```
+## # A tibble: 16 x 7
+##    term            estimate std.error statistic  p.value conf.low conf.high
+##    <chr>              <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+##  1 dbpf60-70        0.735    0.779       0.943  3.46e- 1 -0.793     2.26   
+##  2 dbpf70-80        0.837    0.760       1.10   2.71e- 1 -0.653     2.33   
+##  3 dbpf80-90        0.385    0.761       0.506  6.13e- 1 -1.11      1.88   
+##  4 dbpf90-100       1.13     0.767       1.48   1.40e- 1 -0.371     2.64   
+##  5 dbpf100-110      1.18     0.806       1.46   1.44e- 1 -0.404     2.76   
+##  6 dbpfover110      0.682    0.891       0.765  4.44e- 1 -1.06      2.43   
+##  7 sex             -0.685    0.472      -1.45   1.46e- 1 -1.61      0.239  
+##  8 age              0.0475   0.00339    14.0    1.76e-44  0.0408    0.0541 
+##  9 bmi              0.0379   0.00675     5.62   1.94e- 8  0.0247    0.0512 
+## 10 scl              0.00577  0.000585    9.87   5.80e-23  0.00462   0.00692
+## 11 dbpf60-70:sex   -0.160    0.495      -0.323  7.47e- 1 -1.13      0.810  
+## 12 dbpf70-80:sex   -0.167    0.482      -0.346  7.29e- 1 -1.11      0.778  
+## 13 dbpf80-90:sex    0.131    0.482       0.272  7.85e- 1 -0.814     1.08   
+## 14 dbpf90-100:sex  -0.236    0.488      -0.483  6.29e- 1 -1.19      0.721  
+## 15 dbpf100-110:sex -0.0232   0.510      -0.0455 9.64e- 1 -1.02      0.976  
+## 16 dbpfover110:sex  0.490    0.550       0.891  3.73e- 1 -0.589     1.57
+```
 
 ### Testing Proportional Hazards {#testingph}
 
@@ -961,20 +1059,20 @@ legend(10,.4, c("low", "high", "medium"),lty=2:4)
 survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" />
 
 
 ```r
 ggsurvplot(recid.surv[1], conf.int=TRUE, censor=F) + ggtitle("Low Only")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot(recid.surv, conf.int=TRUE, censor=F, risk.table = TRUE)
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" />
 
 different options for CI
 
@@ -985,35 +1083,35 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
            censor=F, conf.int=F) + ggtitle("No CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
                    conf.type="log"), censor=F, conf.int=T) + ggtitle("Log CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
                    conf.type="log-log"), censor=F, conf.int=T) + ggtitle("Log-Log CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
                    conf.type="plain"), censor=F, conf.int=T) + ggtitle("Plain CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-4.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-4.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
                  data=recidKM2, facet.by = "race")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-5.png" width="672" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
@@ -1058,7 +1156,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
            censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
 
 Violent recidivism
 
@@ -1124,7 +1222,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2),
            censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
@@ -1132,7 +1230,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2),
   ggtitle("Violent Recidivism")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-2.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 as.data.frame(recidKMV2) %>%  # must be a data.frame see "." below:
@@ -1141,7 +1239,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
   ggtitle("Violent Recidivism")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-17-3.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-3.png" width="672" style="display: block; margin: auto;" />
 
 
 ### Cox Proportional Hazards models
@@ -1240,7 +1338,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1293,7 +1391,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" />
 
 
 ###  Coxph diagnostics ... look into all the different arguments of the function!
@@ -1303,5 +1401,5 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" />
 

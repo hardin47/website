@@ -10,6 +10,7 @@ library(survival)
 library(ggplot2)
 library(GGally)
 library(survminer)
+library(forcats)
 ```
 
 To motivate the technical details which are vital to understanding survival analysis, consider the following example [@gerds].
@@ -254,7 +255,6 @@ ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq & llS(t) & \leq ll\hat{S}(t) + 1.96 \ha
 -l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\leq & -lS(t) & \leq -l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
 l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq & lS(t) & \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
 l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq & lS(t) & \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
-\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
 \exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq & S(t) & \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
 \exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
 (\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq & S(t) & \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
@@ -507,7 +507,7 @@ Consider the following data from a prostate cancer study.  The study was perform
 
 ```{r}
 library(survival)
-prostate <- readr::read_csv("~/Dropbox/teaching/math150/PROSTATE.csv")
+prostate <- readr::read_csv("PROSTATE.csv")
 head(prostate)
 
 coxph(Surv(Time,Status) ~ Treatment, data = prostate)
@@ -580,6 +580,20 @@ As before, we can consider nested models and compare their likelihoods.
 We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).
 ```
 
+```{r}
+heart <- readr::read_csv("framingham.csv")
+
+heart <- heart %>% 
+  mutate(dbpf = ifelse(dbp <= 60, "under60", 
+                             ifelse(dbp <=70, "60-70",
+                                    ifelse(dbp <= 80, "70-80",
+                                           ifelse(dbp <=90, "80-90",
+                                                 ifelse(dbp <=100, "90-100",
+                                                        ifelse(dbp <=110, "100-110", "over110"))))))) %>%
+  mutate(dbpf = factor(dbpf,
+                       levels = c("under60", "60-70", "70-80","80-90", "90-100","100-110","over110")))
+```
+
 \begin{eqnarray*}
 dbp_{ij} &=& \left\{
 \begin{array}{ll}
@@ -604,6 +618,10 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\}
 
 We can use the model with dbp as categorical to check whether dbp could be used as a continuous variable.  Indeed, it seems that the model is linear (in ln(HR)) with respect to dbp.  One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.
 
+```{r}
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
+```
+
 * **Table 7.2**  
 As our next step, we can consider adding gender as a *multiplicative effect* to our model.
 \begin{eqnarray*}
@@ -614,6 +632,9 @@ We say the effects are multiplicative because we are adding in the exponent, so 
 
      * The change in deviance is 133 ($H_0: \gamma =0$), so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0$, so we need gender in the model.
 
+```{r}
+coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
+```
 
 * **Table 7.3** 
 Considering gender and dbp interacting.
@@ -622,8 +643,13 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma male_i + \
 \end{eqnarray*}
 
 
-    8 The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002.  The evidence of interaction is statistically significant.  
+    * The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002.  The evidence of interaction is statistically significant.  
     * Note the marked differences between the estimates in table 7.2 and 7.3.  The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises.  Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.  
+
+```{r}
+coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
+```
+
 
 * **Table 7.4**  
 Adjusting for confounding variables.  Of particular interest is age at baseline exam.  We know that age varied widely among study subjects, and both DBP and risk of CHD increase with age.  We will also consider the effect of body mass index and serum cholesterol.
@@ -644,7 +670,9 @@ When should we transform a continuous variable into a factor variable?
 * **continuous** If we believe that the relationship is linear in log(HR)  
 * **factor** There are lots of coefficients to estimate, so we lose df  
 
-
+```{r}
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
+```
 
 ### Testing Proportional Hazards {#testingph}
 
