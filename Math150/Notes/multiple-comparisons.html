@@ -25,7 +25,7 @@
 <meta name="author" content="Jo Hardin">
 
 
-<meta name="date" content="2019-04-28">
+<meta name="date" content="2019-04-29">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -593,9 +593,13 @@ Notice that p-values from null hypotheses will be distributed uniformly from zer
 \tilde{p}_j = \min [ (m/i) p_i, \tilde{p}_{j+1} ]
 \end{eqnarray*}\]</span>
 <p>Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \delta\)</span> to control the FDR at <span class="math inline">\(\delta\)</span>.</p>
-<p>Intuition: suppose <span class="math inline">\(p_{250} &lt; 0.1\)</span>. Show that FDR <span class="math inline">\(&lt; 0.4\)</span>. [Because <span class="math inline">\(\tilde{p}_j &lt; 0.1 \cdot 100 / 250\)</span>.] Let <span class="math inline">\(m=100\)</span>.</p>
-<p>If 250 genes are rejected, 750 are null (presumably). That is, there are 750 genes with p-values between 0.1 and 1. Which gives <span class="math inline">\(m_0 \cdot 0.9 = 750 \rightarrow m_0 = 833.33\)</span>.</p>
-Putting it all together, the number of null hypotheses which were rejected is 833.33 - 750 = 83.33.
+<p>Intuition: let <span class="math inline">\(m=1000\)</span>, and suppose the <span class="math inline">\(\tilde{p}_{250} &lt; 0.4\)</span>. Show that FDR <span class="math inline">\(&lt; 0.4\)</span>.</p>
+<p><span class="math inline">\(\tilde{p}_{250} &lt; 0.4\)</span> implies two different things:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(p_{250} \leq \frac{0.4\cdot 250}{1000} = 0.1\)</span></li>
+<li>and <span class="math inline">\(\approx 750\)</span> null tests have p-values between 0.1 and 1.</li>
+</ol>
+<p>If 750 null tests have p-values between 0.1 and 1, then <span class="math inline">\(m_0 \cdot 0.9 = 750 \rightarrow m_0 = 833.33\)</span>. Therefore, the number of null hypotheses which were rejected is 833.33 - 750 = 83.33.</p>
 <span class="math display">\[\begin{eqnarray*}
 FDR = \frac{83.33}{250} = 0.33 &lt; 0.4
 \end{eqnarray*}\]</span>
@@ -648,17 +652,17 @@ Storey defines the q-value to be the FDR associated with a given test of signifi
 <ul>
 <li><strong>step 1</strong> let
 <span class="math display">\[\begin{eqnarray*}
-\hat{q}(p_{(m)}) = \hat{\pi}_0 p_{(m)}
+\hat{q}(p_{m}) = \hat{\pi}_0 p_{m}
 \end{eqnarray*}\]</span>
-Note that <span class="math inline">\(\hat{q}(p_{(m)})\)</span> is the biggest q-value and $ p_{(m)}$ is the biggest p-value.</li>
+Note that <span class="math inline">\(\hat{q}(p_{m})\)</span> is the biggest q-value and $ p_{m}$ is the biggest p-value.</li>
 <li><strong>step 2</strong>
 <span class="math display">\[\begin{eqnarray*}
-\hat{q}(p_{(m-1)}) = \min( \hat{\pi}_0 p_{(m-1)} \frac{m}{m-1}, \hat{q}( p_{(m)}))
+\hat{q}(p_{m-1}) = \min( \hat{\pi}_0 p_{m-1} \frac{m}{m-1}, \hat{q}( p_{m}))
 \end{eqnarray*}\]</span>
-If <span class="math inline">\(\hat{q}(p_{(m)}) = 0.7\)</span> and <span class="math inline">\(\hat{\pi}_0 p_{(m-1)} \frac{m}{m-1} = 0.8\)</span>, then the next smallest q-value would be 0.7 because the FDR can be as low as 0.7 (see the definition of FDR).</li>
+If <span class="math inline">\(\hat{q}(p_{m}) = 0.7\)</span> and <span class="math inline">\(\hat{\pi}_0 p_{m-1} \frac{m}{m-1} = 0.8\)</span>, then the next smallest q-value would be 0.7 because the FDR can be as low as 0.7 (see the definition of FDR).</li>
 <li><strong>step 3</strong> more generally,
 <span class="math display">\[\begin{eqnarray*}
-\hat{q}(p_{(i)}) = \min( \hat{\pi}_0 p_{(i)} \frac{m}{i}, \hat{q}( p_{(i+1)}))
+\hat{q}(p_{i}) = \min( \hat{\pi}_0 p_{i} \frac{m}{i}, \hat{q}( p_{i+1}))
 \end{eqnarray*}\]</span></li>
 </ul>
 <p>Can a q-value be less than a p-value? Sure! If the number of null hypotheses is small and the test is powerful. For example, consider testing 1000 hypotheses with 20% null tests (<span class="math inline">\(\pi_0=0.2\)</span>). Assume 500 of the p-values are less than 0.05 (very powerful!). With 200 null we would expect 10 to be less than 0.05. So, the FDR is 10/500 = 0.02 (which is smaller than the p-value of 0.05 at the cutoff for the <span class="math inline">\(500^{th}\)</span> test).</p>
