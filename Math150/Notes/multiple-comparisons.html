@@ -492,8 +492,9 @@ PPV &amp;=&amp; \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
 <h2><span class="header-section-number">7.2</span> Multiple Comparisons</h2>
 <p>As you might expect, if you have 10 groups, <strong>all of which come from the same population</strong>, you might wrongly conclude that some of the means are <em>significantly</em> different. If you try pairwise comparisons on all 10 groups, you’ll have <span class="math inline">\({10 \choose 2} = 45\)</span> comparisons. Out of the 45 CI, you’d expect 2.25 of them to not contain the true difference (of zero); equivalently, you’d expect 2.25 tests to reject the true <span class="math inline">\(H_0\)</span>. In an overall test of comparing all 10 groups simultaneously, you can’t use size as a performance measure anymore.</p>
 <ul>
-<li><strong>FWER</strong> = <span class="math inline">\(P(V\geq1)\)</span>\ The Familywise Error Rate (FWER) is the probability of making one or more type I errors in a series of multiple tests. In the example above (with 10 comparisons), you would almost always make at least one type I error if you used a size of <span class="math inline">\(\alpha = 0.05\)</span>. So, your FWER would be close to 1. Methods exist for controlling the FWER instead of the size (<span class="math inline">\(\alpha\)</span>).</li>
+<li><strong>FWER</strong> = <span class="math inline">\(P(V\geq1)\)</span></li>
 </ul>
+<p>The Familywise Error Rate (FWER) is the probability of making one or more type I errors in a series of multiple tests. In the example above (with 10 comparisons), you would almost always make at least one type I error if you used a size of <span class="math inline">\(\alpha = 0.05\)</span>. So, your FWER would be close to 1. Methods exist for controlling the FWER instead of the size (<span class="math inline">\(\alpha\)</span>).</p>
 <div id="bonferroni" class="section level3">
 <h3><span class="header-section-number">7.2.1</span> Bonferroni</h3>
 <p>The Bonferroni method of adjusting for multiple comparisons is used to control the FWER.</p>
@@ -582,15 +583,15 @@ FWER &amp;\leq&amp; \alpha
 <p>When running experiments that have many many tests of significance, it is often more desirable to worry about the <em>number</em> of false discoveries as opposed to the probability of getting <em>one</em> false discovery. That is, we are typically comfortable with a few false positives (i.e., a very HIGH FWER) as long as the rate of false positives is low.</p>
 <p>Define the estimated false discovery proportion at a cutoff t (<span class="math inline">\(\hat{FDR}(t)\)</span>) to be the number of false discoveries at a given cutoff. Again, to control the FDR at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span>.</p>
 <span class="math display">\[\begin{eqnarray*}
-\hat{FDR}(t)&amp;=&amp; \frac{\# \{ p_i \leq t \mbox{ out of the null tests } \}}{ \# \{p_i \leq t\} + (1 \mbox{ if all } p_i &gt; t)}
+\hat{FDR}(t)&amp;=&amp; \frac{\# \{ p_j \leq t \mbox{ out of the null tests } \}}{ \# \{p_j \leq t\} + (1 \mbox{ if all } p_j &gt; t)}
 \end{eqnarray*}\]</span>
 Notice that p-values from null hypotheses will be distributed uniformly from zero to one. That means that a good estimate of the numerator is <span class="math inline">\(t\cdot\)</span> # of null tests.
 <span class="math display">\[\begin{eqnarray*}
-\hat{FDR}(p_i) &amp;=&amp; \frac{p_i \cdot m \cdot \pi_0}{i} &lt; \frac{p_i m}{i}
+\hat{FDR}(p_j) &amp;=&amp; \frac{p_j \cdot m \cdot \pi_0}{j} &lt; \frac{p_j m}{j}
 \end{eqnarray*}\]</span>
 <p>where <span class="math inline">\(\pi_0\)</span> is the proportion of tests which are truly null (<span class="math inline">\(m_0/m\)</span>). Consider the adjusted p-values,</p>
 <span class="math display">\[\begin{eqnarray*}
-\tilde{p}_j = \min [ (m/i) p_i, \tilde{p}_{j+1} ]
+\tilde{p}_j = \min [ (m/j) p_j, \tilde{p}_{j+1} ]
 \end{eqnarray*}\]</span>
 <p>Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \delta\)</span> to control the FDR at <span class="math inline">\(\delta\)</span>.</p>
 <p>Intuition: let <span class="math inline">\(m=1000\)</span>, and suppose the <span class="math inline">\(\tilde{p}_{250} &lt; 0.4\)</span>. Show that FDR <span class="math inline">\(&lt; 0.4\)</span>.</p>
@@ -662,7 +663,7 @@ Note that <span class="math inline">\(\hat{q}(p_{m})\)</span> is the biggest q-v
 If <span class="math inline">\(\hat{q}(p_{m}) = 0.7\)</span> and <span class="math inline">\(\hat{\pi}_0 p_{m-1} \frac{m}{m-1} = 0.8\)</span>, then the next smallest q-value would be 0.7 because the FDR can be as low as 0.7 (see the definition of FDR).</li>
 <li><strong>step 3</strong> more generally,
 <span class="math display">\[\begin{eqnarray*}
-\hat{q}(p_{i}) = \min( \hat{\pi}_0 p_{i} \frac{m}{i}, \hat{q}( p_{i+1}))
+\hat{q}(p_{j}) = \min( \hat{\pi}_0 p_{j} \frac{m}{j}, \hat{q}( p_{j+1}))
 \end{eqnarray*}\]</span></li>
 </ul>
 <p>Can a q-value be less than a p-value? Sure! If the number of null hypotheses is small and the test is powerful. For example, consider testing 1000 hypotheses with 20% null tests (<span class="math inline">\(\pi_0=0.2\)</span>). Assume 500 of the p-values are less than 0.05 (very powerful!). With 200 null we would expect 10 to be less than 0.05. So, the FDR is 10/500 = 0.02 (which is smaller than the p-value of 0.05 at the cutoff for the <span class="math inline">\(500^{th}\)</span> test).</p>
