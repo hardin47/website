@@ -11,7 +11,7 @@ library(ggplot2)
 library(readr)
 ```
 
-## Regression Models
+## Regression Models {#regPois}
 
 Consider the following example from @poole (described in @sleuth) on age and mating success (number of successful matings) in male African Elephants.
 
@@ -30,7 +30,7 @@ While it does seem like there is an increasing trend in the two variables, there
 3. The model appears to have increasing variance as a function of X.
 
 
-For the setting above, it is often preferable to use Poisson regression instead of the nomal errors linear regression.  
+For the setting above, it is often preferable to use Poisson regression instead of the normal errors linear regression.  
 
 ### The Poisson Regression Model
 
@@ -53,7 +53,7 @@ where the observed counts come from a Poisson model:  $Y_i \sim Pois(\mu_i)$ and
 Like every model, there are technical conditions associated with Poisson Regression.  The closer the data (population) conform to the conditions, the more useful the model will be at describing the context at hand.  Remember, 
  > All models are wrong, but some models are useful."  -George Box.  
  
- So, assessing whether the technical conditions are reasonable will help in determing whether the analysis performed under a particular model was a good thing to do.
+ So, assessing whether the technical conditions are reasonable will help in determining whether the analysis performed under a particular model was a good thing to do.
  
 1. Line:  The log of the mean is a linear function of $X$:  $\ln(\mu_i) = \beta_0 + \beta_1 X_i.$
 2. Independence: The observations are independent (often characterized by a simple random sample or something approximating a simple random sample).
@@ -97,14 +97,14 @@ Consider $X$ and $X+1$.
 
 $$\frac{E(Y|X+1)}{E(Y|X)} = \frac{e^{\beta_0 + \beta_1 (X+1)}}{e^{\beta_0 + \beta_1 (X)}} = e^{\beta_1}$$
 
-That is, $e^{\beta_1}$ represents the ratio of means for a one unit increase in $X$.  In the elephant example, for every additional year of life, we expect the elephant's mating success, on average, to change by a factor of $e^{\beta_1}$.  [For the saavy consumer, you might note that this is an additional contrast to normal error regression on the log transformed Y where it was required to interpret the multiplicative change in *median*.  Because with Poisson, the log is taken after the average, taking th inverse of the log gives the mean directly.  Previously, it was necessary to use the identity:  $median(log(Y)) - log(median(Y))$.]
+That is, $e^{\beta_1}$ represents the ratio of means for a one unit increase in $X$.  In the elephant example, for every additional year of life, we expect the elephant's mating success, on average, to change by a factor of $e^{\beta_1}$.  [For the savvy consumer, you might note that this is an additional contrast to normal error regression on the log transformed Y where it was required to interpret the multiplicative change in *median*.  Because with Poisson, the log is taken after the average, taking the inverse of the log gives the mean directly.  Previously, it was necessary to use the identity:  $median(\ln(Y)) = \ln(median(Y))$.]
 
 ###  Assessing Model Validity
 
-Just as with linear regression we used scatterplots to give a sense of whether or not a linear regression was appropriate, we can use exploratory data anlaysis (including scatterplot!) to give a sense of whether or not Poisson regression is an appropriate model.  [The EDA steps here are based on excellent descriptions of Poisson model building in @bysh.]
+Just as with linear regression we used scatterplots to give a sense of whether or not a linear regression was appropriate, we can use exploratory data analysis (including scatterplot!) to give a sense of whether or not Poisson regression is an appropriate model.  [The EDA steps here are based on excellent descriptions of Poisson model building in @bysh.]
 
 
-**Technical Condition 3, Poisson:** Let's first look at the respone variable.  A histogram of the number of successful matings shows a right skew which is typically not acceptable for normal errors regression (although, remember, the value of the response variable is dependent on the value of the explanatory variable!)
+**Technical Condition 3, Poisson:** Let's first look at the response variable.  A histogram of the number of successful matings shows a right skew which is typically not acceptable for normal errors regression (although, remember, the value of the response variable is dependent on the value of the explanatory variable!)
 ```{r echo=FALSE}
 ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30)
 ```
@@ -118,7 +118,7 @@ ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30) + facet_grid(~AGEgro
 
 ```
 
-**Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in the following section \@ref{overdis}.
+**Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in the following section \@ref(overdis).
 
 ```{r echo=FALSE}
 elephants %>% group_by(AGEgroups) %>%
@@ -145,21 +145,10 @@ elephantsGRP %>% ggplot(aes(x=age, y=logmate)) + geom_point()
 ```
 
 
-#### Residuals
 
-Pearson residual:
+## Inference in Poisson Regression {#inferPois}
 
-$$res_{pi} = \frac{y_i - \hat{\mu}_i}{\hat{\mu}_i}$$
-
-Deviance residual:
-
-$$res_{di} = [-\hat{\mu}_i + y_i \ln(\hat{\mu}_i) - \ln(y_i!) ] - [-y_i + y_i \ln(y_i) - \ln(y_i!) ] = y_i-\hat{\mu}_i + y_i \ln\bigg(\frac{\hat{\mu}_i}{y_i}\bigg) $$
-
-#### Dealing with Overdispersion {#overdis}
-
-## Inference in Poisson Regression
-
-Recall that in Poisson regression, $E(Y_i) = \mu_i = e^{\beta_0 + \beta_1 X_i}$.  Therefore, the probability fuction for the $i^{th}$ observation is:
+Recall that in Poisson regression, $E(Y_i) = \mu_i = e^{\beta_0 + \beta_1 X_i}$.  Therefore, the probability function for the $i^{th}$ observation is:
 
 $$f(y_i) = \frac{e^{-\mu_i} \mu_i^{y_i}}{y_i!} = \frac{e^{-e^{\beta_0 + \beta_1 X_i}} \bigg(e^{\beta_0 + \beta_1 X_i}\bigg)^{y_i}}{y_i!}.$$
 Which gives the resulting likelihood of:
@@ -169,11 +158,170 @@ $$L(\beta_0, \beta_1) = \prod_{i=1}^n f(y_i) = \prod_{i=1}^n \frac{e^{-\mu_i} \m
 
 And the log likelihood becomes:
 
-$$l(\beta_0, \beta_1) = \ln L(\beta_0, \beta_1) = \sum_{i=1}^n \bigg(-\mu_i + y_i \ln(\mu_i) - \ln(y_i!) \bigg) = \sum_{i=1}^n \bigg(-e^{\beta_0 + \beta_1 X_i} + y_i (\beta_0 + \beta_1 X_i) - \ln(y_i!) \bigg).$$
+\begin{eqnarray*}
+l(\beta_0, \beta_1) &=& \ln L(\beta_0, \beta_1) = \sum_{i=1}^n \bigg(-\mu_i + y_i \ln(\mu_i) - \ln(y_i!) \bigg) \\
+&=& \sum_{i=1}^n \bigg(-e^{\beta_0 + \beta_1 X_i} + y_i (\beta_0 + \beta_1 X_i) - \ln(y_i!) \bigg).
+\end{eqnarray*}
 
 ### Maximum Likelihood 
 
+As with other probabilistic models we've encountered, the joint likelihood of the entire sample represents the product of the individual likelihoods for each data value.  The likelihood (or more typically, the $\ln$-likelihood) is maximized to find estimates for $\beta_0$ and $\beta_1$.
+
+The parameter estimates maximize the $\ln$-likelihood, and the SE of the estimates are given by the Fisher Information from the likelihood (roughly the second derivative).
+
+Given $b_0$ and $b_1$ as estimates of the parameter values, $\beta_0$ and $\beta_1$, we can estimate the average count value:
+
+$$\hat{\mu}_i = e^{b_0 + b_1 X_i}$$
+
+#### Residuals
+
+Note that we *expect* the residuals of a Poisson model to have larger variability for larger values of the prediction.  That makes interpreting the residuals slightly different that previously for a linear regression model.
+
+Pearson residual:
+
+$$res_{pi} = \frac{y_i - \hat{\mu}_i}{\hat{\mu}_i}$$
+
+Deviance residual:
+
+\begin{eqnarray*}
+res_{di} &=& [-\hat{\mu}_i + y_i \ln(\hat{\mu}_i) - \ln(y_i!) ] - [-y_i + y_i \ln(y_i) - \ln(y_i!) ] \\
+&=& y_i-\hat{\mu}_i + y_i \ln\bigg(\frac{\hat{\mu}_i}{y_i}\bigg)
+\end{eqnarray*}
+
+
+Along with giving information about individual residual values, the sum of the Deviance residuals is also a way to test for goodness-of-fit of the model.  Given the null hypothesis that the Poisson is the appropriate model, the test of goodness-of-fit for the Poisson model is given by:
+
+$$\sum_{i=1}^n res_{di} \stackrel{H_0}{\sim} \chi_{n-p}^2.$$
+
+
+#### Dealing with Overdispersion {#overdis}
+
+A probability structure that is given by a variance which is larger than the mean, may end up with:
+
+\begin{eqnarray*}
+E(Y_i) &=& \mu_i\\
+Var(Y_i) &=& \phi \mu_i\\
+\end{eqnarray*}
+
+If we can estimate $\phi$, then a more appropriate SE to use is adjusted by $\phi$:  $SE_Q(\hat{\beta}) = \sqrt{\phi} SE(\hat{\beta})$.  ($Q$ stands for "quasiPoisson".)
+
+When $Y$ comes from a setting where the sample size is large, then we can use normal (sums of standard normal random variables are distributed according to a $\chi^2$ distribution) theory to assess the residuals:
+
+$$\sum_{i=1}^n res_{pi}^2 = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{Var(Y_i)} = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{\phi \mu_i} \sim \chi^2_{n-p}$$
+
+The expected value of $\chi^2_{n-p}$ is $n-p$, which gives an estimator of $\phi$ to be:
+
+$$\hat{\phi} =  \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{\mu_i} /(n-p).$$
+
+
+Note that your text uses the Deviance residual instead of the Pearson residual to estimate $\phi$.  Both are reasonable things to do.
+
 ### Wald Tests
 
+As before, Wald tests are given by standardizing the coefficients and finding p-values using normal theory:
+
+$$\frac{b_i - 0}{SE(b_i)} \stackrel{H_0}{\sim} N(0,1).$$
+
+If overdispersion is expected, then the SE is adjusted and the t-distribution is used for calculating p-values:
+
+$$\frac{b_i - 0}{SE_Q(b_i)} =  \frac{b_i - 0}{\sqrt{\hat{\phi}} SE(b_i)} \stackrel{H_0}{\sim} t_{n-p}.$$
+
+
 ### Drop-in-Deviance Tests
+
+
+The deviance for a Poisson is reasonably straightforward and comes directly from the likelihood, it is twice the sum of the deviance residuals:
+
+$$D = 2 \sum_{i=1}^n [Y_i \ln(Y_i / \hat{\mu_i}) - (Y_i - \hat{\mu_i})].$$
+
+
+For two nested models (that is, the smaller one is obtained by forcing some of the coefficients in the larger model to be zero), a drop-in-deviance test can be calculated using:
+
+$$D_{reduced} - D_{full} \stackrel{H_0}{\sim} \chi^2_{d}$$
+
+where $d$ is the difference in the number of parameters estimated in the two models.
+
+The drop-in-deviance test can also be adjusted for overdispersion:  $F_Q =  (D_{reduced} - D_{full}) / \hat{\phi} \sim F_{d, n-p}$ where $d$ is the difference in the number of parameters estimated in the two models, and $p$ is the total number of parameters estimated in the full model.
+
+## R Poisson Example
+
+The R example is taken from data given in the textbook.  The scientific question relates to predicting the total number of observed `species` on the Galapagos archipelago related to island `area` (km$^2$), `elevation` (m), distance (km) to the `nearest` neighbor and to the largest island (km$^2$) in the archipelago Santa Cruz (`scruz`), and the area of the `adjacent` island (km$^2$).  We could also consider an additional response variable which is the island `endemic` species count.
+
+```{r}
+galap <- readr::read_csv("Galapagos.csv")
+head(galap)
+```
+
+
+```{r}
+ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
+```
+
+###  glm
+
+```{r}
+glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
+    data= galap, family="poisson") %>% tidy()
+```
+
+### drop in deviance
+
+It seems like we might not need either `log(elevation)` or `nearest`.  A drop in deviance test will help:
+
+```{r}
+glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
+    data= galap, family="poisson") %>% glance()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="poisson") %>% glance()
+
+431.11 - 427.48
+1 - pchisq(3.63, 2)
+```
+
+The relatively large p-value suggests that we do not need either of the variables `log(elevation)` or `nearest`
+
+### residuals
+
+Keep in mind that the expectation of a Poisson model is that the residuals will be more variable for larger predicted values.  The `broom` package provides `.resid`uals which are the observed value minus the fitted value.  I *think* that `.std.resid` is the Pearson residual.
+
+```{r}
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="poisson") %>% augment() %>% head()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="poisson") %>% augment() %>%
+  ggplot(aes(x=.fitted, y=.resid)) + geom_point()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="poisson") %>% augment() %>%
+  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
+```
+
+
+###  quasiPoisson
+
+Note that all of the above analyses can be done using the overdispersed quasiPoisson model.
+
+```{r}
+glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
+    data= galap, family="quasipoisson") %>% tidy()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="quasipoisson") %>% tidy()
+```
+
+
+```{r}
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="quasipoisson") %>% augment() %>% head()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="quasipoisson") %>% augment() %>%
+  ggplot(aes(x=.fitted, y=.resid)) + geom_point()
+
+glm(species ~ log(area) + scruz + adjacent, 
+    data= galap, family="quasipoisson") %>% augment() %>%
+  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
+```
 

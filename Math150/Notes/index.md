@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2019-05-01"
+date: "2019-05-06"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -61,8 +61,8 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 4/10/19  	| | | \@ref(multcoxph) [Multiple Cox PH]  |
 | 4/15/19 	| Survival Analysis | 9 |  \@ref(testingph) [Assessing PH] |
 | 4/17/19 	| | |  \@ref(othersurv) [Other surv topics]  |
-| 4/22/19 	| Ioannidis & mult. compar. | 1.13 | \@ref(Ioannidis)
-| 4/22/19 	| |  | \@ref(multcomp)
-| 4/29/19 	| Ioannidis & mult. compar. | 1.13 | \@ref(qvals)
-| 5/1/19 	| Poisson Regression | 8 |
-| 5/6/19  	| Poisson Regression | 8 |
+| 4/22/19 	| Ioannidis & mult. compar. | 1.13 | \@ref(Ioannidis) [False Published]
+| 4/22/19 	| |  | \@ref(multcomp) [Mult Comp]
+| 4/29/19 	| Ioannidis & mult. compar. | 1.13 | \@ref(qvals) [qvalues]
+| 5/1/19 	| Poisson Regression | 8 | \@ref(regPois) [Poisson model]
+| 5/6/19  	| Poisson Regression | 8 | \@ref(inferPois) [Poisson inference]
