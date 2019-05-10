@@ -25,7 +25,7 @@
 <meta name="author" content="Jo Hardin">
 
 
-<meta name="date" content="2019-05-06">
+<meta name="date" content="2019-05-10">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1686,12 +1686,20 @@ recidKMV2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw
 ## # … with 9 more variables: statistic.wald &lt;dbl&gt;, p.value.wald &lt;dbl&gt;,
 ## #   r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;, concordance &lt;dbl&gt;,
 ## #   std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;</code></pre>
+<p>Using the <code>rms</code> package, we can plot CIs for each of the relevant HRs for the model at hand:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">recid.data &lt;-<span class="st"> </span>recidKM <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(timefollow, event, score_factor, race, age, sex)
+recid.final &lt;-<span class="st"> </span>rms<span class="op">::</span><span class="kw">cph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recid.data)
+ddist &lt;-<span class="st"> </span><span class="kw">datadist</span>(recid.data)
+<span class="kw">options</span>(<span class="dt">datadist =</span> <span class="st">&#39;ddist&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">summary</span>(recid.final), <span class="dt">log =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="checking-proportional-hazards-with-the-plot-of-ln-lnst" class="section level3">
 <h3><span class="header-section-number">6.5.5</span> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span></h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggsurvplot</span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor, <span class="dt">data=</span>recidKM), 
            <span class="dt">censor=</span>F, <span class="dt">conf.int=</span>T, <span class="dt">fun=</span><span class="st">&quot;cloglog&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Complementary Log-Log&quot;</span>)</code></pre></div>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.</p>
 </div>
 <div id="checking-proportional-hazards-with-cox.zph" class="section level3">
@@ -1717,12 +1725,12 @@ recidKMV2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw
 <p>Note the big p-values. We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards. If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.</p>
 <p>The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggcoxzph</span>(<span class="kw">cox.zph</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM))) </code></pre></div>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="coxph-diagnostics-look-into-all-the-different-arguments-of-the-function" class="section level3">
 <h3><span class="header-section-number">6.5.7</span> Coxph diagnostics … look into all the different arguments of the function!</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggcoxdiagnostics</span>(<span class="kw">coxph</span>(<span class="kw">Surv</span>(timefollow,event) <span class="op">~</span><span class="st"> </span>score_factor <span class="op">+</span><span class="st"> </span>race <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>sex, <span class="dt">data=</span>recidKM))</code></pre></div>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </div>
 </div>

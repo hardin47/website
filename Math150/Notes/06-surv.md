@@ -1351,6 +1351,21 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 ## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
 ```
 
+
+Using the `rms` package, we can plot CIs for each of the relevant HRs for the model at hand:
+
+```r
+recid.data <- recidKM %>%
+  select(timefollow, event, score_factor, race, age, sex)
+recid.final <- rms::cph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recid.data)
+ddist <- datadist(recid.data)
+options(datadist = 'ddist')
+plot(summary(recid.final), log = TRUE)
+```
+
+<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" />
+
+
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
 
@@ -1359,7 +1374,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1412,7 +1427,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" />
 
 
 ###  Coxph diagnostics ... look into all the different arguments of the function!
@@ -1422,5 +1437,5 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" />
 
