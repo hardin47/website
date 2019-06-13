@@ -41,7 +41,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 
 
-![Image credit:  Jessica Ward @JKRWard, PhD student at Newcastle University](cookingRstudio.jpg)
+![Image credit:  Jessica Ward, https://jkrward.github.io/, PhD student at Newcastle University](cookingRstudio.jpg)
 
 
 
