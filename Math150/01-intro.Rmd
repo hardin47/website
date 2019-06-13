@@ -20,6 +20,31 @@ Our goals in this course are:
 ![Probability vs. Statistics](probstat.jpg)
 
 
+
+## Using R
+
+Much work will be done in R using RStudio as a front end.  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  
+
+
+* You may use R on the Pomona server:  https://rstudio.campus.pomona.edu/  (All Pomona students will be able to log in immediately.  Non-Pomona students need to go to ITS at Pomona to get Pomona login information.)
+
+* If you want to use R on your own machine, you may.  Please make sure all components are updated:
+R is freely available at http://www.r-project.org/ and is already installed on college computers. Additionally, installing R Studio is required http://rstudio.org/.
+
+
+* http://swirlstats.com/ is a great way to walk through learning the basics of R.
+
+* All computing assignments should be turned in using R Markdown compiled to pdf.
+
+
+![Taken from *Modern Drive: An introduction to statistical and data sciences via R*, by Ismay and Kim, https://ismayc.github.io/moderndiver-book/](RRstudio.jpg)
+
+
+
+![Image credit:  Jessica Ward @JKRWard, PhD student at Newcastle University](cookingRstudio.jpg)
+
+
+
 ### Experimental Design {-}
 In this class we'll talk about techniques used to analyze data from medical studies.  Along with the computational methods, however, we'll continue to think about issues of experimental design and interpretation.
 
