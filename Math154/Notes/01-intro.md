@@ -1,5 +1,12 @@
 # Introduction {#intro}
 
+## Agenda {#Sep2}
+1. Questionnaire
+2. Syllabus & Course Outline
+3. Stitch Fix Algorithm
+4. College Rankings
+5. Can Twitter predict election results?
+  
 ## Course Logistics
 
 **What is Statistics?**
@@ -149,7 +156,12 @@ During the discussion, Temple Lang proposed computing statistics on visualizatio
 A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship's changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.
 
 
-## Reproducibility
+## Agenda {#Sep4}
+1. Design Challenge [Not So Standard Deviations](https://overcast.fm/+FMBuKdMEI/00:30)
+2. Reproducibility & GitHub
+
+ 
+## Reproducibility {#repro}
 
 ### Need for Reproducibility
 
