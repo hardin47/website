@@ -7,7 +7,7 @@ Generally, statistics is the academic discipline which uses data to make claims 
 
 <center>
 <figure>
-<img width='400' src='figs/probstat.jpg' />
+<img width='500' src='figs/probstat.jpg' />
 <figcaption> Probability vs. Statistics</figcaption> 
 </figure>
 </center>
@@ -50,7 +50,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 <center>
 <figure>
-<img width='400' src='figs/RRstudio.jpg' />
+<img width='500' src='figs/RRstudio.jpg' />
 <figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
 </figure>
 </center>
@@ -58,7 +58,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 <center>
 <figure>
-<img width='400' src='figs/cookingRstudio.jpg' />
+<img width='500' src='figs/cookingRstudio.jpg' />
 <figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
 </figure>
 </center>
@@ -81,14 +81,14 @@ With thanks to Ben Baumer for perspective and sharing course materials. [@Baumer
 
 <center>
 <figure>
-<img width='400' src='figs/AnalysisProcessBaumer.jpg' />
+<img width='500' src='figs/AnalysisProcessBaumer.jpg' />
 <figcaption> A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]</figcaption> 
 </figure>
 </center>
 
 <center>
 <figure>
-<img width='400' src='figs/SFalg.pdf' />
+<img width='500' src='figs/SFalg.jpg' />
 <figcaption> [Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</figcaption> 
 </figure>
 </center>
@@ -156,7 +156,7 @@ A workshop participant noted the difference between a data error and a data blun
 
 <center>
 <figure>
-<img width='400' src='figs/reproducibility.pdf' />
+<img width='500' src='figs/reproducibility.jpg' />
 <figcaption> slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016 </figcaption> 
 </figure>
 </center>
@@ -239,7 +239,7 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 
 <center>
 <figure>
-<img width='400' src='figs/RRstudio.jpg' />
+<img width='500' src='figs/RRstudio.jpg' />
 <figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
 </figure>
 </center>
@@ -247,7 +247,7 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 
 <center>
 <figure>
-<img width='400' src='figs/cookingRstudio.jpg' />
+<img width='500' src='figs/cookingRstudio.jpg' />
 <figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
 </figure>
 </center>
@@ -363,14 +363,8 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 
 <center>
 <figure>
-<img width='400' src='figs/twitterscat.pdf' />
-</figure>
-</center>
-
-
-<center>
-<figure>
-<img width='400' src='figs/twitterreg.pdf' />
+<img width='500' src='figs/twitterscat.jpg' />
+<img width='500' src='figs/twitterreg.jpg' />
 </figure>
 </center>
 
@@ -404,14 +398,8 @@ How much storage  *does* it take to download 3.5 billion tweets? = 2000+ Gb = 2+
 
 <center>
 <figure>
-<img width='400' src='figs/twitter_rojas.pdf' />
-</figure>
-</center>
-
-
-<center>
-<figure>
-<img width='400' src='figs/twitter_linkins.pdf' />
+<img width='500' src='figs/twitter_rojas.jpg' />
+<img width='500' src='figs/twitter_linkins.jpg' />
 </figure>
 </center>
 
