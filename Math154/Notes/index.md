@@ -37,8 +37,8 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 
 | Day    	| Topic                      	|  Book Chp   	|   Notes Section |
 |:---------	|:---------------------------	|:----------------:	|:----------------:	|
-| 1/23/19 	| t-tests / SLR / Intro to R | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr) [t-test] |
-| 1/28/19 	| SLR | 2 |  \@ref(SLR)  [SLR]   |
+| 1/23/19 	| Intro to Data / R | 2 | \@ref(intro) [intro] |
+| 1/28/19 	| Intro to GitHub | 2 |  \@ref(intro)  [intro]   |
 | 1/30/19 	| | | \@ref(intervals), \@ref(cat) [SLR CI] |
 | 2/4/19  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [.Fisher's Exact Test] |
 | 2/6/19 	| | |  \@ref(studies) [Types of studies]

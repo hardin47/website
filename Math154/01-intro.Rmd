@@ -157,7 +157,7 @@ A workshop participant noted the difference between a data error and a data blun
 <center>
 <figure>
 <img width='400' src='figs/reproducibility.pdf' />
-<figcaption> slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016</figcaption> 
+<figcaption> slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016 </figcaption> 
 </figure>
 </center>
 
@@ -209,8 +209,7 @@ http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-
 * Version control $\rightarrow$ Git / GitHub
 
  
-#### {-} Scripting and literate programming
-
+#### Scripting and literate programming {-}
 
 Donald Knuth "Literate Programming" (1983) 
 > Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer- what to do, let us concentrate rather on explaining to human beings- what we want a computer to do.
@@ -219,7 +218,7 @@ Donald Knuth "Literate Programming" (1983)
 * and tools for putting them to practice have also been around
 * but they have never been as accessible as the current tools
 
-#### {-} Reproducibility checklist
+#### Reproducibility checklist {-}
 
 * Are the tables and figures reproducible from the code and data?
 * Does the code actually do what you think it does?
@@ -227,7 +226,7 @@ Donald Knuth "Literate Programming" (1983)
 * Can the code be used for other data?
 * Can you extend the code to do other things?
 
-#### {-} Tools: R & R Studio
+#### Tools: R & R Studio {-}
 
 See this great video (less than 2 min) on a reproducible workflow: https://www.youtube.com/watch?v=s3JldKoA0zw&feature=youtu.be
 
@@ -237,14 +236,30 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * You may use Pomona's server: https://rstudio.pomona.edu/
 * See course website for getting started: http://research.pomona.edu/johardin/math154f19/
 
-#### {-} Tools: GitHub
 
+<center>
+<figure>
+<img width='400' src='figs/RRstudio.jpg' />
+<figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
+</figure>
+</center>
+
+
+<center>
+<figure>
+<img width='400' src='figs/cookingRstudio.jpg' />
+<figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
+</figure>
+</center>
+
+
+#### Tools: GitHub {-}
 
 * You must submit your assignments via GitHub
 * Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
 * Follow Jacob Fiksel's advice on how to connect to our classroom: https://github.com/jfiksel/github-classroom-for-students
 
-#### {-} Tools: a GitHub merge conflict (demo)
+#### Tools: a GitHub merge conflict (demo) {-}
 
 * On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
 * Then, in RStudio also edit the README document with a different change.
@@ -254,7 +269,7 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
     * Resolve the merge conflict and then commit and push
 * As you work in teams you will run into merge conflicts, learning how to resolve them properly will be very important.
 
-#### {-} Steps for weekly homework
+#### Steps for weekly homework {-}
 
 1. You will get a link to the new assignment (clicking on the link will create a new private repo)  
 2. Use R Studio  
@@ -269,14 +284,14 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 ## Data Examples
 
 
-#### {-} What can/can't Data Science Do?
+#### What can/can't Data Science Do? {-}
 * Can model the data at hand!
 * Can find patterns & visualizations in large datasets.
 * Can't establish causation.
 * Can't represent data if it isn't there.
 
 
-#### {-} Stats / Data Science / Math are not apolitical
+#### Stats / Data Science / Math are not apolitical {-}
 
 * "Inner city crime is reaching record levels"  (Donald Trump, 8/30/16)
 * "The unemployment rate for African-American youth is 59 percent" (Donald Trump 6/20/16)
@@ -337,7 +352,7 @@ What makes using Tweets to predict elections relevant to our class? (See @Baumer
 3. The dataset was quite large!  3.5 billion tweets were collected and a random sample of 500,000 tweets were analyzed.
 4. The researchers were from sociology and computer science - a truly collaborative endeavor, and one that is often quite efficient at producing high quality analyses.
 
-#### {-} Activity
+#### Activity {-}
 
 Spend a few minutes reading the Rojas editorial and skimming the actual paper. Be sure to consider Figure 1 and Table 1 carefully, and address the following questions.
 * working paper: http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2235423 
@@ -346,10 +361,21 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 * editorial in the Huffington Post by Linkins: http://www.huffingtonpost.com/2013/08/14/twitter-predict-elections_n_3755326.html
 * editorial blog by Gelman: http://andrewgelman.com/2013/04/24/the-tweets-votes-curve/
 
-![](figs/twitterscat.pdf)
-![](figs/twitterreg.pdf)
+<center>
+<figure>
+<img width='400' src='figs/twitterscat.pdf' />
+</figure>
+</center>
 
-#### {-} Statistics Hat
+
+<center>
+<figure>
+<img width='400' src='figs/twitterreg.pdf' />
+</figure>
+</center>
+
+
+#### Statistics Hat {-}
 1. Write a sentence summarizing the findings of the paper.
 2. Discuss Figure 1 with your neighbor. What is its purpose? What does it convey? Think critically about this data visualization. What would you do differently? 
     * should be proportion for the response variable. The bizarre scaling could dramatically change the results 
@@ -367,7 +393,7 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 6. Do you think the study holds water? Why or why not? What are the shortcomings of this study? 
     * Not really. First of all, how many of these races are actually competitive? It's not 406, it's probably fewer than 100. If you redid the study on that sample, would the tweet share still be statistically significant in the full model?
 
-#### {-} Data Scientist Hat
+#### Data Scientist Hat {-}
 Imagine that your boss, who does not have advanced technical skills or knowledge, asked you to reproduce the study you just read. Discuss the following with your neighbor.
 
 1. What steps are necessary to reproduce this study? Be as specific as you can! Try to list the subtasks that you would have to perform.
@@ -376,30 +402,40 @@ Identify all the steps necessary to conduct the study.  Could you do it given yo
 
 How much storage  *does* it take to download 3.5 billion tweets? = 2000+ Gb = 2+ Tb (your hard drive is likely 1Tb, unless you have a small computer).  Can you explain the billions of tweets stored at Indiana University?  How would you randomly sample from the database?  One tweet is about 2/3 of a Kb.
 
+<center>
+<figure>
+<img width='400' src='figs/twitter_rojas.pdf' />
+</figure>
+</center>
 
-![](figs/twitter_rojas.pdf)
-![](figs/twitter_linkins.pdf)
+
+<center>
+<figure>
+<img width='400' src='figs/twitter_linkins.pdf' />
+</figure>
+</center>
 
 
-#### {-} Advantages
+
+#### Advantages {-}
 * Cheap
 * Can measure any political race (not just the wealthy ones).
 
-#### {-} Disadvantages
+#### Disadvantages {-}
 * Is it really reflective of the voting populace?  Who would it bias toward?
 * Does simple mention of a candidate always reflect voting patterns?  When wouldn't it?
 * Margin of error of 2.7%.  How is that number typically calculated in a poll?  Note: $2 \cdot \sqrt{(1/2)(1/2)/1000} = 0.0316$.
 * Tweets feel more free in terms of what you are able to say - is that a good thing or a bad thing with respect to polling?
 * Can't measure any demographic information.
 
-#### {-} What could be done differently?
+#### What could be done differently? {-}
 * Gelman:  look only at close races
 * Gelman: "It might make sense to flip it around and predict twitter mentions given candidate popularity. That is, rotate the graph 90 degrees, and see how much variation there is in tweet shares for elections of different degrees of closeness."
 * Gelman: "And scale the size of each dot to the total number of tweets for the two candidates in the election."
 * Gelman: Make the data publicly available so that others can try to reproduce the results
 
 
-#### {-} Tweeting and R
+#### Tweeting and R {-} 
 
 The twitter analysis requires a twitter password, and sorry, I won't give you mine.  If you want to download tweets, follow the instructions at http://stats.seandolinar.com/collecting-twitter-data-introduction/  or maybe one of these: https://www.credera.com/blog/business-intelligence/twitter-analytics-using-r-part-1-extract-tweets/ and  http://davetang.org/muse/2013/04/06/using-the-r_twitter-package/  and ask me if you have any questions.
 
