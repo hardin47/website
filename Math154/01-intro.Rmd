@@ -7,7 +7,7 @@ Generally, statistics is the academic discipline which uses data to make claims 
 
 <center>
 <figure>
-<img width='400' src='/figs/probstat.jpg' />
+<img width='400' src='figs/probstat.jpg' />
 <figcaption> Probability vs. Statistics)</figcaption> 
 </figure>
 </center>
@@ -50,7 +50,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 <center>
 <figure>
-<img width='400' src='/figs/RRstudio.jpg' />
+<img width='400' src='figs/RRstudio.jpg' />
 <figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
 </figure>
 </center>
@@ -58,16 +58,16 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 <center>
 <figure>
-<img width='400' src='/figs/cookingRstudio.jpg' />
+<img width='400' src='figs/cookingRstudio.jpg' />
 <figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
 </figure>
 </center>
 
-### Vocuabulary
+### Vocabulary
 * A  **statistic** is a numerical measurement we get from the sample, a function of the data.
 * A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.
 * An  **estimator** is a function of the unobserved data that tries to approximate the unknown parameter value.
-*An  **estimate** is the value of the estimator for a given set of data.  [Estimate and statistic can be used interchangeably.]
+* An  **estimate** is the value of the estimator for a given set of data.  [Estimate and statistic can be used interchangeably.]
 
 
 > One of my goals for this course was to convince students that there are two major kinds of skills one must have in order to be a successful data scientist: technical skills to actually do the analyses; and communication skills in order to present one's findings to a presumably non-technical audience.  
@@ -93,14 +93,10 @@ With thanks to Ben Baumer for perspective and sharing course materials. [@Baumer
 </figure>
 </center>
 
-### Principiles for the Data Science Process
+### Principles for the Data Science Process
 Duncan Temple Lang, University of California, Davis 
 
-Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally.  Recently, he was invited to participate in a workshop,  *Training Students to Extract Value from Big Data*.  The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge.  http://www.nap.edu/catalog.php?record_id=18981 
-
-
-
-National Research Council.  *Training Students to Extract Value from Big Data: Summary of a Workshop*. Washington, DC: The National Academies Press, 2014.
+Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally.  Recently, he was invited to participate in a workshop,  *Training Students to Extract Value from Big Data*.  The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge.  http://www.nap.edu/catalog.php?record_id=18981  [National Research Council.  *Training Students to Extract Value from Big Data: Summary of a Workshop*. Washington, DC: The National Academies Press, 2014.]
 
 
 
@@ -140,6 +136,7 @@ students do not understand sampling variability.
 * Statistical accuracy versus computational complexity and efficiency.
 
 Temple Lang then briefly discussed some of the practical aspects of computing, including the following:
+
 * Accessing data.
 * Manipulating raw data.
 * Data structures and storage, including correlated data.
@@ -161,6 +158,7 @@ A workshop participant noted the difference between a data error and a data blun
 
 ##### Example 1
 Science retracts gay marriage paper without agreement of lead author LaCour
+
 * In May 2015 Science retracted a study of how canvassers can sway people's opinions about gay marriage published just 5 months prior.
 * Science Editor-in-Chief Marcia McNutt: 
     * Original survey data not made available for independent reproduction of results. 
@@ -279,7 +277,7 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * "Two million more Latinos are in poverty today than when President Obama took his oath of office less than eight years ago" (Donald Trump 8/25/16)
 * "We are now, for the first time ever, energy independent" (Hillary Clinton 8/10/16)
 * "If you look worldwide, the number of terrorist incidents have not substantially increased" (Barack Obama 10/13/16)
-* "lllegal immigration is lower than it's been in 40 years" (Barack Obama, 3/17/16)
+* "Illegal immigration is lower than it's been in 40 years" (Barack Obama, 3/17/16)
 
 Source: http://www.politifact.com/truth-o-meter/statements/
 
@@ -313,7 +311,7 @@ Analysis of Trump's tweets with evidence that someone else tweets from his accou
 
 > *There is a year of new data, with over 2700 more tweets. And quite notably, Trump stopped using the Android in March 2017.} This is why machine learning approaches like http://didtrumptweetit.com/ are useful, since they can still distinguish Trump?s tweets from his campaign?s by training on the kinds of features I used in my original post.
 
-> *I've found a better dataset:} in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump?s tweets. I since learned there?s a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
+> *I've found a better dataset: in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump?s tweets. I since learned there?s a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
 
 > *I've heard some interesting questions that I wanted to follow up on: These come from the comments on the original post and other conversations I've had since. Two questions included what device Trump tended to use before the campaign, and what types of tweets tended to lead to high engagement.
 
