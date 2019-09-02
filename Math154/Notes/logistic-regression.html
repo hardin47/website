@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 5 Logistic Regression | Methods in Biostatistics</title>
+  <meta name="description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 5 Logistic Regression | Methods in Biostatistics" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar" />
+  <meta name="github-repo" content="hardin47/website/Math150/" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 5 Logistic Regression | Methods in Biostatistics" />
+  
+  <meta name="twitter:description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar" />
+  
+
+<meta name="author" content="Jo Hardin">
+
+
+<meta name="date" content="2019-06-13">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="analysis-of-categorical-data-section-6-3.html">
+<link rel="next" href="survival-analysis.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Methods in Biostatistics</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Class Information</a></li>
+<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="intro.html"><a href="intro.html#course-goals"><i class="fa fa-check"></i><b>1.1</b> Course Goals</a></li>
+<li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#using-r"><i class="fa fa-check"></i><b>1.2</b> Using R</a><ul>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#experimental-design"><i class="fa fa-check"></i>Experimental Design</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html"><i class="fa fa-check"></i><b>2</b> t-tests vs. SLR</a><ul>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#surgery-timing"><i class="fa fa-check"></i>Surgery Timing</a></li>
+<li class="chapter" data-level="2.1" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#ttest"><i class="fa fa-check"></i><b>2.1</b> t-test (book: 2.1)</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#what-is-an-alternative-hypothesis"><i class="fa fa-check"></i><b>2.1.1</b> What is an Alternative Hypothesis?</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#anova"><i class="fa fa-check"></i>ANOVA</a></li>
+<li class="chapter" data-level="2.2" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#tslr"><i class="fa fa-check"></i><b>2.2</b> Simple Linear Regression (book: 2.3)</a><ul>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#why-are-they-the-same"><i class="fa fa-check"></i>Why are they the same?</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#confidence-intervals-section-2.11"><i class="fa fa-check"></i><b>2.3</b> Confidence Intervals (section 2.11)</a></li>
+<li class="chapter" data-level="2.4" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#random-sample-vs.random-allocation"><i class="fa fa-check"></i><b>2.4</b> Random Sample vs. Random allocation</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="SLR.html"><a href="SLR.html"><i class="fa fa-check"></i><b>3</b> Simple Linear Regression</a><ul>
+<li class="chapter" data-level="3.1" data-path="SLR.html"><a href="SLR.html#transformations"><i class="fa fa-check"></i><b>3.1</b> Transformations</a><ul>
+<li class="chapter" data-level="" data-path="SLR.html"><a href="SLR.html#model-assumptions"><i class="fa fa-check"></i>Model assumptions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="SLR.html"><a href="SLR.html#fitting-the-regression-line"><i class="fa fa-check"></i><b>3.2</b> Fitting the regression line</a></li>
+<li class="chapter" data-level="3.3" data-path="SLR.html"><a href="SLR.html#correlation"><i class="fa fa-check"></i><b>3.3</b> Correlation</a></li>
+<li class="chapter" data-level="3.4" data-path="SLR.html"><a href="SLR.html#errors"><i class="fa fa-check"></i><b>3.4</b> Errors</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="SLR.html"><a href="SLR.html#testing-beta_1"><i class="fa fa-check"></i><b>3.4.1</b> Testing <span class="math inline">\(\beta_1\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="SLR.html"><a href="SLR.html#intervals"><i class="fa fa-check"></i><b>3.5</b> Intervals</a><ul>
+<li class="chapter" data-level="3.5.1" data-path="SLR.html"><a href="SLR.html#confidence-intervals"><i class="fa fa-check"></i><b>3.5.1</b> Confidence Intervals</a></li>
+<li class="chapter" data-level="3.5.2" data-path="SLR.html"><a href="SLR.html#slope"><i class="fa fa-check"></i><b>3.5.2</b> Slope</a></li>
+<li class="chapter" data-level="3.5.3" data-path="SLR.html"><a href="SLR.html#mean-response"><i class="fa fa-check"></i><b>3.5.3</b> Mean Response</a></li>
+<li class="chapter" data-level="3.5.4" data-path="SLR.html"><a href="SLR.html#prediction-of-an-individual-response"><i class="fa fa-check"></i><b>3.5.4</b> Prediction of an Individual Response</a></li>
+<li class="chapter" data-level="3.5.5" data-path="SLR.html"><a href="SLR.html#outlying-high-leverage-and-influential-points"><i class="fa fa-check"></i><b>3.5.5</b> Outlying, High Leverage, and Influential Points</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="SLR.html"><a href="SLR.html#r-example-slr-happy-planet"><i class="fa fa-check"></i><b>3.6</b> R Example (SLR): Happy Planet</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="SLR.html"><a href="SLR.html#reading-the-data-into-r"><i class="fa fa-check"></i><b>3.6.1</b> Reading the data into R</a></li>
+<li class="chapter" data-level="3.6.2" data-path="SLR.html"><a href="SLR.html#running-the-linear-model-lm"><i class="fa fa-check"></i><b>3.6.2</b> Running the linear model (lm)</a></li>
+<li class="chapter" data-level="3.6.3" data-path="SLR.html"><a href="SLR.html#ouptut"><i class="fa fa-check"></i><b>3.6.3</b> Ouptut</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html"><i class="fa fa-check"></i><b>4</b> Analysis of Categorical Data (section 6.3)</a><ul>
+<li class="chapter" data-level="4.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#cat"><i class="fa fa-check"></i><b>4.1</b> Categorical Inference</a></li>
+<li class="chapter" data-level="4.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#fisher"><i class="fa fa-check"></i><b>4.2</b> Fisher’s Exact Test (section 6.4)</a></li>
+<li class="chapter" data-level="4.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chisq"><i class="fa fa-check"></i><b>4.3</b> Testing independence of two categorical variables (sections 6.5, 6.6, 6.7)</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chi2-tests-section-6.6"><i class="fa fa-check"></i><b>4.3.1</b> <span class="math inline">\(\chi^2\)</span> tests (section 6.6)</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#catest"><i class="fa fa-check"></i><b>4.4</b> Parameter Estimation (section 6.8)</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#ci-for-differences-in-proportions"><i class="fa fa-check"></i><b>4.4.1</b> CI for differences in proportions</a></li>
+<li class="chapter" data-level="4.4.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#relative-risk"><i class="fa fa-check"></i><b>4.4.2</b> Relative Risk</a></li>
+<li class="chapter" data-level="4.4.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#odds-ratios"><i class="fa fa-check"></i><b>4.4.3</b> Odds Ratios</a></li>
+<li class="chapter" data-level="4.4.4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#confidence-interval-for-or"><i class="fa fa-check"></i><b>4.4.4</b> Confidence Interval for OR</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#studies"><i class="fa fa-check"></i><b>4.5</b> Types of Studies (section 6.9)</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#retrospective-versus-prospective-studies"><i class="fa fa-check"></i><b>4.5.1</b> Retrospective versus Prospective Studies</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#r-example-categorical-data-botox-and-back-pain"><i class="fa fa-check"></i><b>4.6</b> R Example (categorical data): Botox and back pain</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#entering-and-visualizing-the-data"><i class="fa fa-check"></i><b>4.6.1</b> Entering and visualizing the data</a></li>
+<li class="chapter" data-level="4.6.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#fishers-exact-test"><i class="fa fa-check"></i><b>4.6.2</b> Fisher’s Exact Test</a></li>
+<li class="chapter" data-level="4.6.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chi-squared-analysis"><i class="fa fa-check"></i><b>4.6.3</b> Chi-squared Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="logistic-regression.html"><a href="logistic-regression.html"><i class="fa fa-check"></i><b>5</b> Logistic Regression</a><ul>
+<li class="chapter" data-level="5.1" data-path="logistic-regression.html"><a href="logistic-regression.html#logmodel"><i class="fa fa-check"></i><b>5.1</b> Motivation for Logistic Regression</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="logistic-regression.html"><a href="logistic-regression.html#the-logistic-model"><i class="fa fa-check"></i><b>5.1.1</b> The logistic model</a></li>
+<li class="chapter" data-level="5.1.2" data-path="logistic-regression.html"><a href="logistic-regression.html#constant-or-varying-rr"><i class="fa fa-check"></i><b>5.1.2</b> constant OR, varying RR</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="logistic-regression.html"><a href="logistic-regression.html#logMLE"><i class="fa fa-check"></i><b>5.2</b> Estimating coefficients in logistic regression</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="logistic-regression.html"><a href="logistic-regression.html#maximum-likelihood-estimation"><i class="fa fa-check"></i><b>5.2.1</b> Maximum Likelihood Estimation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="logistic-regression.html"><a href="logistic-regression.html#loginf"><i class="fa fa-check"></i><b>5.3</b> Formal Inference</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="logistic-regression.html"><a href="logistic-regression.html#wald-tests-intervals"><i class="fa fa-check"></i><b>5.3.1</b> Wald Tests &amp; Intervals</a></li>
+<li class="chapter" data-level="5.3.2" data-path="logistic-regression.html"><a href="logistic-regression.html#likelihood-ratio-tests"><i class="fa fa-check"></i><b>5.3.2</b> Likelihood Ratio Tests</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="logistic-regression.html"><a href="logistic-regression.html#multlog"><i class="fa fa-check"></i><b>5.4</b> Multiple Logistic Regression</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="logistic-regression.html"><a href="logistic-regression.html#interaction"><i class="fa fa-check"></i><b>5.4.1</b> Interaction</a></li>
+<li class="chapter" data-level="5.4.2" data-path="logistic-regression.html"><a href="logistic-regression.html#simpsons-paradox"><i class="fa fa-check"></i><b>5.4.2</b> Simpson’s Paradox</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="logistic-regression.html"><a href="logistic-regression.html#multicol"><i class="fa fa-check"></i><b>5.5</b> Multicolinearity</a></li>
+<li class="chapter" data-level="5.6" data-path="logistic-regression.html"><a href="logistic-regression.html#logstep"><i class="fa fa-check"></i><b>5.6</b> Model Building</a><ul>
+<li class="chapter" data-level="5.6.1" data-path="logistic-regression.html"><a href="logistic-regression.html#formal-model-building"><i class="fa fa-check"></i><b>5.6.1</b> Formal Model Building</a></li>
+<li class="chapter" data-level="5.6.2" data-path="logistic-regression.html"><a href="logistic-regression.html#getting-the-model-right"><i class="fa fa-check"></i><b>5.6.2</b> Getting the Model Right</a></li>
+</ul></li>
+<li class="chapter" data-level="5.7" data-path="logistic-regression.html"><a href="logistic-regression.html#model-assessment"><i class="fa fa-check"></i><b>5.7</b> Model Assessment</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="logistic-regression.html"><a href="logistic-regression.html#measures-of-association"><i class="fa fa-check"></i><b>5.7.1</b> Measures of Association</a></li>
+<li class="chapter" data-level="5.7.2" data-path="logistic-regression.html"><a href="logistic-regression.html#roc"><i class="fa fa-check"></i><b>5.7.2</b> Receiver Operating Characteristic Curves</a></li>
+<li class="chapter" data-level="5.7.3" data-path="logistic-regression.html"><a href="logistic-regression.html#cv"><i class="fa fa-check"></i><b>5.7.3</b> Cross Validation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="logistic-regression.html"><a href="logistic-regression.html#birdexamp"><i class="fa fa-check"></i><b>5.8</b> R: Birdnest Example</a><ul>
+<li class="chapter" data-level="5.8.1" data-path="logistic-regression.html"><a href="logistic-regression.html#drop-in-deviance-likelihood-ratio-test-lrt"><i class="fa fa-check"></i><b>5.8.1</b> Drop-in-deviance (Likelihood Ratio Test, LRT)</a></li>
+<li class="chapter" data-level="5.8.2" data-path="logistic-regression.html"><a href="logistic-regression.html#difference-between-tidy-and-augment-and-glance"><i class="fa fa-check"></i><b>5.8.2</b> Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></a></li>
+<li class="chapter" data-level="5.8.3" data-path="logistic-regression.html"><a href="logistic-regression.html#looking-at-variables-in-a-few-different-ways."><i class="fa fa-check"></i><b>5.8.3</b> Looking at variables in a few different ways.</a></li>
+<li class="chapter" data-level="5.8.4" data-path="logistic-regression.html"><a href="logistic-regression.html#predicting-response"><i class="fa fa-check"></i><b>5.8.4</b> Predicting Response</a></li>
+<li class="chapter" data-level="5.8.5" data-path="logistic-regression.html"><a href="logistic-regression.html#measues-of-association"><i class="fa fa-check"></i><b>5.8.5</b> Measues of association</a></li>
+<li class="chapter" data-level="5.8.6" data-path="logistic-regression.html"><a href="logistic-regression.html#roc-curves"><i class="fa fa-check"></i><b>5.8.6</b> ROC curves</a></li>
+<li class="chapter" data-level="5.8.7" data-path="logistic-regression.html"><a href="logistic-regression.html#drawing-interactions"><i class="fa fa-check"></i><b>5.8.7</b> Drawing interactions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="survival-analysis.html"><a href="survival-analysis.html"><i class="fa fa-check"></i><b>6</b> Survival Analysis</a><ul>
+<li class="chapter" data-level="6.1" data-path="survival-analysis.html"><a href="survival-analysis.html#timedata"><i class="fa fa-check"></i><b>6.1</b> Time-to-event data</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="survival-analysis.html"><a href="survival-analysis.html#survival-function"><i class="fa fa-check"></i><b>6.1.1</b> Survival Function</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="survival-analysis.html"><a href="survival-analysis.html#KM"><i class="fa fa-check"></i><b>6.2</b> Kaplan-Meier Curves</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="survival-analysis.html"><a href="survival-analysis.html#KMCI"><i class="fa fa-check"></i><b>6.2.1</b> CI for KM curve</a></li>
+<li class="chapter" data-level="6.2.2" data-path="survival-analysis.html"><a href="survival-analysis.html#logrank"><i class="fa fa-check"></i><b>6.2.2</b> Log-rank Test</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="survival-analysis.html"><a href="survival-analysis.html#hazfunc"><i class="fa fa-check"></i><b>6.3</b> Hazard Functions</a><ul>
+<li class="chapter" data-level="6.3.1" data-path="survival-analysis.html"><a href="survival-analysis.html#estimating-ht-ala-kaplan-meier"><i class="fa fa-check"></i><b>6.3.1</b> Estimating <span class="math inline">\(h(t)\)</span> ala Kaplan-Meier</a></li>
+<li class="chapter" data-level="6.3.2" data-path="survival-analysis.html"><a href="survival-analysis.html#proportional-hazards"><i class="fa fa-check"></i><b>6.3.2</b> Proportional Hazards</a></li>
+<li class="chapter" data-level="6.3.3" data-path="survival-analysis.html"><a href="survival-analysis.html#coxph"><i class="fa fa-check"></i><b>6.3.3</b> Cox PH Regression Analysis</a></li>
+<li class="chapter" data-level="6.3.4" data-path="survival-analysis.html"><a href="survival-analysis.html#testingph"><i class="fa fa-check"></i><b>6.3.4</b> Testing Proportional Hazards</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="survival-analysis.html"><a href="survival-analysis.html#othersurv"><i class="fa fa-check"></i><b>6.4</b> Other stuff</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="survival-analysis.html"><a href="survival-analysis.html#sample-size-calculation"><i class="fa fa-check"></i><b>6.4.1</b> Sample Size Calculation</a></li>
+<li class="chapter" data-level="6.4.2" data-path="survival-analysis.html"><a href="survival-analysis.html#study-design"><i class="fa fa-check"></i><b>6.4.2</b> Study Design</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="survival-analysis.html"><a href="survival-analysis.html#Rsurv"><i class="fa fa-check"></i><b>6.5</b> R example: ProPublica Analysis</a><ul>
+<li class="chapter" data-level="6.5.1" data-path="survival-analysis.html"><a href="survival-analysis.html#recidivism-in-florida"><i class="fa fa-check"></i><b>6.5.1</b> Recidivism in Florida</a></li>
+<li class="chapter" data-level="6.5.2" data-path="survival-analysis.html"><a href="survival-analysis.html#kaplan-meier-survival-curve"><i class="fa fa-check"></i><b>6.5.2</b> Kaplan-Meier survival curve</a></li>
+<li class="chapter" data-level="6.5.3" data-path="survival-analysis.html"><a href="survival-analysis.html#log-rank-test-rho0-and-the-wilcoxon-test-rho1"><i class="fa fa-check"></i><b>6.5.3</b> Log-rank test [rho=0] and the Wilcoxon test [rho=1]</a></li>
+<li class="chapter" data-level="6.5.4" data-path="survival-analysis.html"><a href="survival-analysis.html#cox-proportional-hazards-models"><i class="fa fa-check"></i><b>6.5.4</b> Cox Proportional Hazards models</a></li>
+<li class="chapter" data-level="6.5.5" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-the-plot-of-ln-lnst"><i class="fa fa-check"></i><b>6.5.5</b> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span></a></li>
+<li class="chapter" data-level="6.5.6" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-cox.zph"><i class="fa fa-check"></i><b>6.5.6</b> Checking proportional hazards with cox.zph</a></li>
+<li class="chapter" data-level="6.5.7" data-path="survival-analysis.html"><a href="survival-analysis.html#coxph-diagnostics-look-into-all-the-different-arguments-of-the-function"><i class="fa fa-check"></i><b>6.5.7</b> Coxph diagnostics … look into all the different arguments of the function!</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html"><i class="fa fa-check"></i><b>7</b> Multiple Comparisons</a><ul>
+<li class="chapter" data-level="7.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#Ioannidis"><i class="fa fa-check"></i><b>7.1</b> Why Most Published Research Findings are False</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#positive-predictive-value-ppv"><i class="fa fa-check"></i><b>7.1.1</b> Positive Predictive Value (PPV)</a></li>
+<li class="chapter" data-level="7.1.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#bias"><i class="fa fa-check"></i><b>7.1.2</b> Bias</a></li>
+<li class="chapter" data-level="7.1.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#multiple-studies"><i class="fa fa-check"></i><b>7.1.3</b> Multiple Studies</a></li>
+<li class="chapter" data-level="7.1.4" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#corollaries"><i class="fa fa-check"></i><b>7.1.4</b> Corollaries</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#multcomp"><i class="fa fa-check"></i><b>7.2</b> Multiple Comparisons</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#bonferroni"><i class="fa fa-check"></i><b>7.2.1</b> Bonferroni</a></li>
+<li class="chapter" data-level="7.2.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#holm"><i class="fa fa-check"></i><b>7.2.2</b> Holm</a></li>
+<li class="chapter" data-level="7.2.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#benjamini-hochberg"><i class="fa fa-check"></i><b>7.2.3</b> Benjamini-Hochberg</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#qvals"><i class="fa fa-check"></i><b>7.3</b> Storey &amp; q-values</a></li>
+<li class="chapter" data-level="7.4" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#interim-analyses"><i class="fa fa-check"></i><b>7.4</b> Interim Analyses</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#pocock"><i class="fa fa-check"></i><b>7.4.1</b> Pocock</a></li>
+<li class="chapter" data-level="7.4.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#obrien-flemming"><i class="fa fa-check"></i><b>7.4.2</b> O’Brien-Flemming</a></li>
+<li class="chapter" data-level="7.4.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#some-parting-thoughts"><i class="fa fa-check"></i><b>7.4.3</b> Some parting thoughts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression.html"><a href="poisson-regression.html"><i class="fa fa-check"></i><b>8</b> Poisson Regression</a><ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression.html"><a href="poisson-regression.html#regPois"><i class="fa fa-check"></i><b>8.1</b> Regression Models</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="poisson-regression.html"><a href="poisson-regression.html#the-poisson-regression-model"><i class="fa fa-check"></i><b>8.1.1</b> The Poisson Regression Model</a></li>
+<li class="chapter" data-level="8.1.2" data-path="poisson-regression.html"><a href="poisson-regression.html#comparison-to-linear-regression"><i class="fa fa-check"></i><b>8.1.2</b> Comparison to Linear Regression</a></li>
+<li class="chapter" data-level="8.1.3" data-path="poisson-regression.html"><a href="poisson-regression.html#interpreting-poisson-regression-coefficients"><i class="fa fa-check"></i><b>8.1.3</b> Interpreting Poisson Regression Coefficients</a></li>
+<li class="chapter" data-level="8.1.4" data-path="poisson-regression.html"><a href="poisson-regression.html#assessing-model-validity"><i class="fa fa-check"></i><b>8.1.4</b> Assessing Model Validity</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression.html"><a href="poisson-regression.html#inferPois"><i class="fa fa-check"></i><b>8.2</b> Inference in Poisson Regression</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="poisson-regression.html"><a href="poisson-regression.html#maximum-likelihood"><i class="fa fa-check"></i><b>8.2.1</b> Maximum Likelihood</a></li>
+<li class="chapter" data-level="8.2.2" data-path="poisson-regression.html"><a href="poisson-regression.html#wald-tests"><i class="fa fa-check"></i><b>8.2.2</b> Wald Tests</a></li>
+<li class="chapter" data-level="8.2.3" data-path="poisson-regression.html"><a href="poisson-regression.html#drop-in-deviance-tests"><i class="fa fa-check"></i><b>8.2.3</b> Drop-in-Deviance Tests</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression.html"><a href="poisson-regression.html#r-poisson-example"><i class="fa fa-check"></i><b>8.3</b> R Poisson Example</a><ul>
+<li class="chapter" data-level="8.3.1" data-path="poisson-regression.html"><a href="poisson-regression.html#glm"><i class="fa fa-check"></i><b>8.3.1</b> glm</a></li>
+<li class="chapter" data-level="8.3.2" data-path="poisson-regression.html"><a href="poisson-regression.html#drop-in-deviance"><i class="fa fa-check"></i><b>8.3.2</b> drop in deviance</a></li>
+<li class="chapter" data-level="8.3.3" data-path="poisson-regression.html"><a href="poisson-regression.html#residuals-1"><i class="fa fa-check"></i><b>8.3.3</b> residuals</a></li>
+<li class="chapter" data-level="8.3.4" data-path="poisson-regression.html"><a href="poisson-regression.html#quasipoisson"><i class="fa fa-check"></i><b>8.3.4</b> quasiPoisson</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://st47s.com/Math150" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Methods in Biostatistics</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="logistic-regression" class="section level1">
+<h1><span class="header-section-number">Chapter 5</span> Logistic Regression</h1>
+<div id="logmodel" class="section level2">
+<h2><span class="header-section-number">5.1</span> Motivation for Logistic Regression</h2>
+<p>During investigation of the US space shuttle <em>Challenger</em> disaster, it was learned that project managers had judged the probability of mission failure to be 0.00001, whereas engineers working on the project had estimated failure probability at 0.005. The difference between these two probabilities, 0.00499 was discounted as being too small to worry about. Is a different picture provided by considering odds? How is it interpreted?</p>
+The logistic regression model is a <em>generalized</em> linear model. That is, a linear model as a function of the expected value of the response variable. We can now model binary response variables.
+<span class="math display">\[\begin{eqnarray*}
+GLM: g(E[Y | X]) = \beta_0 + \beta_1 X
+\end{eqnarray*}\]</span>
+where <span class="math inline">\(g(\cdot)\)</span> is the link function. For logistic regression, we use the logit link function:
+<span class="math display">\[\begin{eqnarray*}
+\logit (p) = \ln \bigg( \frac{p}{1-p} \bigg)
+\end{eqnarray*}\]</span>
+
+<div class="example">
+<p><span id="exm:burnexamp" class="example"><strong>Example 5.1  </strong></span>Surviving third-degree burns<br />
+These data refer to 435 adults who were treated for third-degree burns by the University of Southern California General Hospital Burn Center. The patients were grouped according to the area of third-degree burns on the body (measured in square cm). In the table below are recorded, for each midpoint of the groupings <code>log(area +1)</code>, the number of patients in the corresponding group who survived, and the number who died from the burns. <span class="citation">(Fan, Heckman, and Wand <a href="#ref-burn">1995</a>)</span></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">log(area+1) midpoint</th>
+<th align="center">survived</th>
+<th align="center">died</th>
+<th align="center">prop surv</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1.35</td>
+<td align="center">13</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">1.60</td>
+<td align="center">19</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">1.75</td>
+<td align="center">67</td>
+<td align="center">2</td>
+<td align="center">0.971</td>
+</tr>
+<tr class="even">
+<td align="center">1.85</td>
+<td align="center">45</td>
+<td align="center">5</td>
+<td align="center">0.900</td>
+</tr>
+<tr class="odd">
+<td align="center">1.95</td>
+<td align="center">71</td>
+<td align="center">8</td>
+<td align="center">0.899</td>
+</tr>
+<tr class="even">
+<td align="center">2.05</td>
+<td align="center">50</td>
+<td align="center">20</td>
+<td align="center">0.714</td>
+</tr>
+<tr class="odd">
+<td align="center">2.15</td>
+<td align="center">35</td>
+<td align="center">31</td>
+<td align="center">0.530</td>
+</tr>
+<tr class="even">
+<td align="center">2.25</td>
+<td align="center">7</td>
+<td align="center">49</td>
+<td align="center">0.125</td>
+</tr>
+<tr class="odd">
+<td align="center">2.35</td>
+<td align="center">1</td>
+<td align="center">12</td>
+<td align="center">0.077</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>We can see that the logit transformation linearizes the relationship.</p>
+<p>A first idea might be to model the relationship between the probability of success (that the patient survives) and the explanatory variable <code>log(area +1)</code> as a simple linear regression model. However, the scatterplot of the proportions of patients surviving a third-degree burn against the explanatory variable shows a distinct curved relationship between the two variables, rather than a linear one. It seems that a transformation of the data is in place.</p>
+<p>The functional form relating x and the probability of success looks like it could be an <code>S</code> shape. But we’d have to do some work to figure out what the form of that <code>S</code> looks like. Below I’ve given some different relationships between x and the probability of success using <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> values that are yet to be defined. Regardless, we can see that by tuning the functional relationship of the <code>S</code> curve, we can get a good fit to the data.</p>
+<p><img src="05-log_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>S-curves ( <code>y = exp(linear) / (1+exp(linear))</code> ) for a variety of different parameter settings. Note that the x-axis is some continuous variable <code>x</code> while the y-axis is the probability of success at that value of <code>x</code>. More on this as we move through this model.</p>
+<p>Why doesn’t linear regression work here?</p>
+<ul>
+<li>The response isn’t normal<br />
+</li>
+<li>The response isn’t linear (until we transform)<br />
+</li>
+<li>The predicted values go outside the bounds of (0,1)<br />
+</li>
+<li>Note: it <em>does</em> work to think about values inside (0,1) as probabilities</li>
+</ul>
+<div id="the-logistic-model" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> The logistic model</h3>
+<p>Instead of trying to model the using <em>linear regression</em>, let’s say that we consider the relationship between the variable <span class="math inline">\(x\)</span> and the probability of success to be given by the following generalized linear model. (The logistic model is just one model, there isn’t anything magical about it. We do have good reasons for how we defined it, but that doesn’t mean there aren’t other good ways to model the relationship.)</p>
+<span class="math display">\[\begin{eqnarray*}
+p(x) = \frac{e^{\beta_0 + \beta_1 x}}{1+e^{\beta_0 + \beta_1 x}}
+\end{eqnarray*}\]</span>
+<p>Where <span class="math inline">\(p(x)\)</span> is the probability of success (here surviving a burn). <span class="math inline">\(\beta_1\)</span> still determines the direction and <em>slope</em> of the line. <span class="math inline">\(\beta_0\)</span> now determines the location (median survival).</p>
+<ul>
+<li><strong>Note 1</strong> What is the probability of success for a patient with covariate of <span class="math inline">\(x = -\beta_0 / \beta_1\)</span>?<br />
+
+<span class="math display">\[\begin{eqnarray*}
+x &amp;=&amp; - \beta_0 / \beta_1\\
+\beta_0 + \beta_1 x &amp;=&amp; 0\\
+e^{0} &amp;=&amp; 1\\
+p(-\beta_0 / \beta_1) &amp;=&amp; p(x) = 0.5
+\end{eqnarray*}\]</span>
+(for a given <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_0\)</span> determines the median survival value)</li>
+<li><strong>Note 2</strong> If <span class="math inline">\(x=0\)</span>,
+<span class="math display">\[\begin{eqnarray*}
+p(0) = \frac{e^{\beta_0}}{1+e^{\beta_0}}
+\end{eqnarray*}\]</span>
+<span class="math inline">\(x=0\)</span> can often be thought of as the baseline condition, and the probability at <span class="math inline">\(x=0\)</span> takes the place of thinking about the intercept in a linear regression.</li>
+<li><strong>Note 3</strong><br />
+
+<span class="math display">\[\begin{eqnarray*}
+1 - p(x) = \frac{1}{1+e^{\beta_0 + \beta_1 x}}
+\end{eqnarray*}\]</span>
+gives the probability of failure.
+<span class="math display">\[\begin{eqnarray*}
+\frac{p(x)}{1-p(x)} = e^{\beta_0 + \beta_1 x}
+\end{eqnarray*}\]</span>
+gives the odds of success.
+<span class="math display">\[\begin{eqnarray*}
+\ln \bigg( \frac{p(x)}{1-p(x)} \bigg) = \beta_0 + \beta_1 x
+\end{eqnarray*}\]</span>
+<p>gives the <span class="math inline">\(\ln\)</span> odds of success .</p></li>
+<li><strong>Note 4</strong> Every type of generalized linear model has a link function. Ours is called the <em>logit</em>. The link is the relationship between the response variable and the <em>linear</em> function in x.
+<span class="math display">\[\begin{eqnarray*}
+\logit(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 &lt; \star &lt; 1
+\end{eqnarray*}\]</span></li>
+</ul>
+<div id="model-assumptions-1" class="section level4">
+<h4><span class="header-section-number">5.1.1.1</span> model assumptions</h4>
+<p>Just like in linear regression, our <code>Y</code> response is the only random component.</p>
+<span class="math display">\[\begin{eqnarray*}
+y &amp;=&amp; \begin{cases}
+1 &amp; \mbox{ died}\\
+0 &amp; \mbox{ survived}
+\end{cases}
+\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{eqnarray*}
+Y &amp;\sim&amp; \mbox{Bernoulli}(p)\\
+P(Y=y) &amp;=&amp; p^y(1-p)^{1-y}
+\end{eqnarray*}\]</span>
+<!--
+%\begin{eqnarray*}
+%Y &\sim& \mbox{Binomial}(m,p)\\
+%P(Y=y) &=& {m \choose y}p^y(1-p)^{m-y}\\
+%E(Y/m) &=& p\\
+%E(Y) &=& m p\\
+%Var(Y) &=& m p (1-p)
+%\end{eqnarray*}
+-->
+When each person is at risk for a different covariate (i.e., explanatory variable), they each end up with a different probability of success.
+<span class="math display">\[\begin{eqnarray*}
+Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^{\beta_0 + \beta_1 x_i}}\bigg)
+\end{eqnarray*}\]</span>
+<ul>
+<li>independent trials<br />
+</li>
+<li>success / failure<br />
+</li>
+<li>probability of success is constant for a particular <span class="math inline">\(X\)</span>.<br />
+</li>
+<li><span class="math inline">\(E[Y|x] = p(x)\)</span> is given by the logistic function</li>
+</ul>
+</div>
+<div id="interpreting-coefficients" class="section level4">
+<h4><span class="header-section-number">5.1.1.2</span> interpreting coefficients</h4>
+Let’s say the log odds of survival for given observed (log) burn areas <span class="math inline">\(x\)</span> and <span class="math inline">\(x+1\)</span> are:
+<span class="math display">\[\begin{eqnarray*}
+\logit(p(x)) &amp;=&amp; \beta_0 + \beta_1 x\\
+\logit(p(x+1)) &amp;=&amp; \beta_0 + \beta_1 (x+1)\\
+\beta_1 &amp;=&amp; \logit(p(x+1)) - \logit(p(x))\\
+&amp;=&amp; \ln \bigg(\frac{p(x+1)}{1-p(x+1)} - \frac{p(x)}{1-p(x)} \bigg)\\
+&amp;=&amp; \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+e^{\beta_1} &amp;=&amp; \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+\end{eqnarray*}\]</span>
+<p><span class="math inline">\(e^{\beta_1}\)</span> is the <em>odds ratio</em> for dying associated with a one unit increase in x. [<span class="math inline">\(\beta_1\)</span> is the change in log-odds associated with a one unit increase in x.</p>
+<span class="math display">\[\begin{eqnarray*}
+\logit (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
+\end{eqnarray*}\]</span>
+(Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to <code>log(area +1)= 1.90</code>, and patients with burns corresponding to <code>log(area +1)= 2.00</code>. The odds ratio <span class="math inline">\(\hat{OR}_{1.90, 2.00}\)</span> is given by
+<span class="math display">\[\begin{eqnarray*}
+\hat{OR}_{1.90, 2.00} = e^{-10.662} (1.90-2.00) = e^{1.0662} = 2.904
+\end{eqnarray*}\]</span>
+<p>That is, the odds of survival for a patient with <code>log(area+1)= 1.90</code> is 2.9 times higher than the odds of survival for a patient with <code>log(area+1)= 2.0</code>.)</p>
+<p>What about the RR (relative risk) or difference in risks? It won’t be constant for a given <span class="math inline">\(X\)</span>, so it must be calculated as a function of <span class="math inline">\(X\)</span>.</p>
+</div>
+</div>
+<div id="constant-or-varying-rr" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> constant OR, varying RR</h3>
+The previous model specifies that the OR is constant for any value of <span class="math inline">\(X\)</span> which is not true about RR. Using the burn data, convince yourself that the RR isn’t constant. Try computing the RR at 1.5 versus 2.5, then again at 1 versus 2.
+<span class="math display">\[\begin{eqnarray*}
+\logit (\hat{p}) &amp;=&amp; 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
+\hat{p(x)} &amp;=&amp; \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
+\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{eqnarray*}
+\hat{p}(1) &amp;=&amp; 0.9999941\\
+\hat{p}(1.5) &amp;=&amp; 0.9987889\\
+\hat{p}(2) &amp;=&amp; 0.7996326\\
+\hat{p}(2.5) &amp;=&amp; 0.01894664\\
+\hat{RR}_{1, 2} &amp;=&amp; 1.250567\\
+\hat{RR}_{1.5, 2.5} &amp;=&amp; 52.71587\\
+\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{eqnarray*}
+\hat{RR} &amp;=&amp; \frac{\frac{e^{b_0 + b_1 x}}{1+e^{b_0 + b_1 x}}}{\frac{e^{b_0 + b_1 (x+1)}}{1+e^{b_0 + b_1 (x+1)}}}\\
+&amp;=&amp; \frac{\frac{e^{b_0}e^{b_1 x}}{1+e^{b_0}e^{b_1 x}}}{\frac{e^{b_0} e^{b_1 x} e^{b_1}}{1+e^{b_0}e^{b_1 x} e^{b_1}}}\\
+&amp;=&amp; \frac{1+e^{b_0}e^{b_1 x}e^{b_1}}{e^{b_1}(1+e^{b_0}e^{b_1 x})}\\
+\end{eqnarray*}\]</span>
+<p>(see log-linear model below, <a href="logistic-regression.html#altmodels">5.1.2.1</a> )</p>
+<div id="altmodels" class="section level4">
+<h4><span class="header-section-number">5.1.2.1</span> Alternative strategies for binary outcomes</h4>
+<p>It is quite common to have binary outcomes (response variable) in the medical literature. However, the logit link (logistic regression) is only one of a variety of models that we can use. We see above that the logistic model imposes a constant OR for any value of <span class="math inline">\(X\)</span> (and <em>not</em> a constant RR).</p>
+<ul>
+<li><strong>complementary log-log</strong><br />
+The complementary log-log model is used when you have a rate of, for example, infection, model by instances of contact (based on a Poisson model).
+<span class="math display">\[\begin{eqnarray*}
+p(k) &amp;=&amp; 1-(1-\lambda)^k\\
+\ln[ - \ln (1-p(k))] &amp;=&amp; \ln[-\ln(1-\lambda)] + \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;=&amp; \beta_0 + 1 \cdot \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;=&amp; \beta_0 + \beta_1 x\\
+p(x) &amp;=&amp; 1 - \exp [ -\exp(\beta_0 + \beta_1 x) ]
+\end{eqnarray*}\]</span></li>
+<li><strong>linear</strong><br />
+The excess (or additive) risk model can modeled by using simple linear regression:
+<span class="math display">\[\begin{eqnarray*}
+p(x) &amp;=&amp; \beta_0 + \beta_1 x
+\end{eqnarray*}\]</span>
+which we have already seen is problematic for a variety of reasons. However, any <strong>unit increase in <span class="math inline">\(x\)</span> gives a <span class="math inline">\(\beta_1\)</span> increase in the risk</strong> (for <em>all</em> values of <span class="math inline">\(x\)</span>).</li>
+<li><strong>log-linear</strong><br />
+As long as we do not have a case-control study, we can model the risk using a log-linear model.
+<span class="math display">\[\begin{eqnarray*}
+\ln (p(x)) = \beta_0 + \beta_1 x
+\end{eqnarray*}\]</span>
+The regression coefficient, <span class="math inline">\(\beta_1\)</span>, has the interpretation of the <strong>logarithm of the relative risk associated with a unit increase in <span class="math inline">\(x\)</span></strong>. Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]). As a result, convergence of standard fitting algorithms may be unreliable in some cases.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="logMLE" class="section level2">
+<h2><span class="header-section-number">5.2</span> Estimating coefficients in logistic regression</h2>
+<div id="maximum-likelihood-estimation" class="section level3">
+<h3><span class="header-section-number">5.2.1</span> Maximum Likelihood Estimation</h3>
+Recall how we estimated the coefficients for linear regression. We minimized the residual sum of squares:
+<span class="math display">\[\begin{eqnarray*}
+RSS &amp;=&amp; \sum_i (Y_i - \hat{Y}_i)^2\\
+ &amp;=&amp; \sum_i (Y_i - (b_0 + b_1 X_i))^2
+\end{eqnarray*}\]</span>
+That is, we take derivatives with respect to both <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span>, set them equal to zero (take second derivatives to ensure minimums), and solve for <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span>. It turns out that we’ve also <em>maximized the normal likelihood</em>.
+<span class="math display">\[\begin{eqnarray*}
+L(\underline{y} | b_0, b_1, \underline{x}) &amp;=&amp; \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
+&amp;=&amp; \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
+\end{eqnarray*}\]</span>
+<p>What does that even mean? Likelihood? Maximizing the likelihood? WHY??? The likelihood is the probability distribution of the data given <em>specific</em> values of the unknown parameters.</p>
+Consider a toy example describing, for example, flipping coins. Let’s say <span class="math inline">\(X \sim Bin(p, n=4).\)</span> We have 4 trials and <span class="math inline">\(X=1\)</span>. Would you guess <span class="math inline">\(p=0.49\)</span>?? No, you would guess <span class="math inline">\(p=0.25\)</span>… you <em>maximized</em> the likelihood of <strong>seeing your data</strong>.
+<span class="math display">\[\begin{eqnarray*}
+P(X=1 | p) &amp;=&amp; {4 \choose 1} p^1 (1-p)^{4-1}\\
+P(X=1 | p = 0.9) &amp;=&amp; 0.0036 \\
+P(X=1 | p = 0.75) &amp;=&amp; 0.047 \\
+P(X=1 | p = 0.5) &amp;=&amp; 0.25\\
+P(X=1 | p = 0.05) &amp;=&amp; 0.171\\
+P(X=1 | p = 0.15) &amp;=&amp; 0.368\\
+P(X=1 | p = 0.25) &amp;=&amp; 0.422\\
+\end{eqnarray*}\]</span>
+Or, we can think about it as a set of independent binary responses, <span class="math inline">\(Y_1, Y_2, \ldots Y_n\)</span>. Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
+<span class="math display">\[\begin{eqnarray*}
+P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &amp;=&amp; P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
+&amp;=&amp; p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
+&amp;=&amp; p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
+\end{eqnarray*}\]</span>
+<p>where <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> represents a particular observed series of 0 or 1 outcomes and <span class="math inline">\(p\)</span> is a probability <span class="math inline">\(0 \leq p \leq 1\)</span>. Once <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> have been observed, they are fixed values. Maximum likelihood estimates are functions of sample data that are derived by finding the value of <span class="math inline">\(p\)</span> that maximizes the likelihood functions.</p>
+To maximize the likelihood, we use the natural log of the likelihood (because we know we’ll get the same answer):
+<span class="math display">\[\begin{eqnarray*}
+\ln L(p) &amp;=&amp; \ln \Bigg(p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)} \Bigg)\\
+&amp;=&amp; \sum_i y_i \ln(p) + (n- \sum_i y_i) \ln (1-p)\\
+\frac{ \partial \ln L(p)}{\partial p} &amp;=&amp; \sum_i y_i \frac{1}{p} + (n - \sum_i y_i) \frac{-1}{(1-p)} = 0\\
+0 &amp;=&amp; (1-p) \sum_i y_i + p (n-\sum_i y_i) \\
+\hat{p} &amp;=&amp; \frac{ \sum_i y_i}{n}
+\end{eqnarray*}\]</span>
+Using the logistic regression model makes the likelihood substantially more complicated because the probability of success changes for each individual. Recall:
+<span class="math display">\[\begin{eqnarray*}
+p_i = p(x_i) &amp;=&amp; \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
+\end{eqnarray*}\]</span>
+which gives a likelihood of:
+<span class="math display">\[\begin{eqnarray*}
+L(\underline{p}) &amp;=&amp; \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
+\mbox{&amp; a loglikelihood of}: &amp;&amp;\\
+\ln L(\underline{p}) &amp;=&amp; \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
+\end{eqnarray*}\]</span>
+<p>Why use maximum likelihood estimates?</p>
+<ul>
+<li>Estimates are essentially unbiased.<br />
+</li>
+<li>We can estimate the SE (Wald estimates via Fisher Information).<br />
+</li>
+<li>The estimates have low variability.<br />
+</li>
+<li>The estimates have an approximately normal sampling distribution for large sample sizes because they are maximum likelihood estimates.<br />
+</li>
+<li>Though it is important to realize that we cannot find estimates in closed form.</li>
+</ul>
+</div>
+</div>
+<div id="loginf" class="section level2">
+<h2><span class="header-section-number">5.3</span> Formal Inference</h2>
+<div id="wald-tests-intervals" class="section level3">
+<h3><span class="header-section-number">5.3.1</span> Wald Tests &amp; Intervals</h3>
+<p>Because we will use maximum likelihood parameter estimates, we can also use large sample theory to find the SEs and consider the estimates to have normal distributions (for large sample sizes). However, <span class="citation">(Menard <a href="#ref-menard">1995</a>)</span> warns that for large coefficients, standard error is inflated, lowering the Wald statistic (chi-square) value. <span class="citation">(Agresti <a href="#ref-agresti">1996</a>)</span> states that the likelihood-ratio test is more reliable for small sample sizes than the Wald test.</p>
+<span class="math display">\[\begin{eqnarray*}
+z = \frac{b_1 - \beta_1}{SE(b_1)}
+\end{eqnarray*}\]</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(broom)
+<span class="kw">glm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>)</code></pre></div>
+<pre><code>## 
+## Call:  glm(formula = burnresp ~ burnexpl, family = &quot;binomial&quot;, data = burnglm)
+## 
+## Coefficients:
+## (Intercept)     burnexpl  
+##       22.71       -10.66  
+## 
+## Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
+## Null Deviance:       525.4 
+## Residual Deviance: 335.2     AIC: 339.2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)     22.7      2.27     10.0  1.23e-23
+## 2 burnexpl       -10.7      1.08     -9.85 6.95e-23</code></pre>
+</div>
+<div id="likelihood-ratio-tests" class="section level3">
+<h3><span class="header-section-number">5.3.2</span> Likelihood Ratio Tests</h3>
+<span class="math inline">\(\frac{L(p_0)}{L(\hat{p})}\)</span> gives us a sense of whether the null value or the observed value produces a higher likelihood. Recall:
+<span class="math display">\[\begin{eqnarray*}
+L(\hat{\underline{p}}) &gt; L(p_0)
+\end{eqnarray*}\]</span>
+<p>always. [Where <span class="math inline">\(\hat{\underline{p}}\)</span> is the maximum likelihood estimate for the probability of success (here it will be a vector of probabilities, each based on the same MLE estimates of the linear parameters). ] The above inequality holds because <span class="math inline">\(\hat{\underline{p}}\)</span> maximizes the likelihood.</p>
+We can show that if <span class="math inline">\(H_0\)</span> is true,
+<span class="math display">\[\begin{eqnarray*}
+-2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) \sim \chi^2_1
+\end{eqnarray*}\]</span>
+If we are testing only one parameter value. More generally,
+<span class="math display">\[\begin{eqnarray*}
+-2 \ln \bigg( \frac{\max L_0}{\max L} \bigg) \sim \chi^2_\nu
+\end{eqnarray*}\]</span>
+<p>where <span class="math inline">\(\nu\)</span> is the number of extra parameters we estimate using the unconstrained likelihood (as compared to the constrained null likelihood).</p>
+
+<div class="example">
+<span id="exm:unnamed-chunk-6" class="example"><strong>Example 4.2  </strong></span>Consider a data set with 147 people. 49 got cancer and 98 didn’t. Let’s test whether the true proportion of people who get cancer is <span class="math inline">\(p=0.25\)</span>.
+<span class="math display">\[\begin{eqnarray*}
+H_0:&amp;&amp; p=0.25\\
+H_1:&amp;&amp; p \ne 0.25\\
+\hat{p} &amp;=&amp; \frac{49}{147}\\
+-2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &amp;=&amp; -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
+&amp;=&amp; -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
+&amp;=&amp; -2 \Bigg[ \ln \bigg( (0.25)^{49} (0.75)^{98} \bigg) - \ln \Bigg( \bigg( \frac{1}{3} \bigg)^{49} \bigg( \frac{2}{3} \bigg)^{98} \Bigg) \Bigg]\\
+&amp;=&amp; -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
+P( \chi^2_1 \geq 5.11) &amp;=&amp; 0.0238
+\end{eqnarray*}\]</span>
+</div>
+
+<p>But really, usually likelihood ratio tests are more interesting. In fact, usually, we use them to test whether the coefficients are zero:</p>
+<span class="math display">\[\begin{eqnarray*}
+H_0: &amp;&amp; \beta_1 =0\\
+H_1: &amp;&amp; \beta_1 \ne 0\\
+p_0 &amp;=&amp; \frac{e^{\hat{\beta}_0}}{1 + e^{\hat{\beta}_0}}
+\end{eqnarray*}\]</span>
+<p>where <span class="math inline">\(\hat{\beta}_0\)</span> is fit from a model without any explanatory variable, <span class="math inline">\(x\)</span>.</p>
+<strong>Important note:</strong>
+<span class="math display">\[\begin{eqnarray*}
+\mbox{deviance} = \mbox{constant} - 2 \ln(\mbox{likelihood})
+\end{eqnarray*}\]</span>
+That is, the difference in log likelihoods will be the opposite difference in deviances:
+<span class="math display">\[\begin{eqnarray*}
+\mbox{test stat} &amp;=&amp; \chi^2\\
+&amp;=&amp; -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
+&amp;=&amp; -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&amp;=&amp; \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;=&amp; \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;=&amp; \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{eqnarray*}\]</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(<span class="kw">glm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>))</code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = burnresp ~ burnexpl, family = &quot;binomial&quot;, data = burnglm)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.8518  -0.6998   0.1859   0.5239   2.2089  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   22.708      2.266  10.021   &lt;2e-16 ***
+## burnexpl     -10.662      1.083  -9.849   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 525.39  on 434  degrees of freedom
+## Residual deviance: 335.23  on 433  degrees of freedom
+## AIC: 339.23
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)     22.7      2.27     10.0  1.23e-23
+## 2 burnexpl       -10.7      1.08     -9.85 6.95e-23</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
+## 1       525.386     434 -167.616 339.231 347.382  335.231         433</code></pre>
+<span class="math display">\[\begin{eqnarray*}
+\mbox{test stat} &amp;=&amp; G\\
+&amp;=&amp; -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
+&amp;=&amp; -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&amp;=&amp; \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;=&amp; \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;=&amp; \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{eqnarray*}\]</span>
+So, the LRT here is (see columns of <code>null deviance</code> and <code>deviance</code>):
+<span class="math display">\[\begin{eqnarray*}
+G &amp;=&amp; 525.39 - 335.23 = 190.16\\
+p-value &amp;=&amp; P(\chi^2_1 \geq 190.16) = 0
+\end{eqnarray*}\]</span>
+<div id="modeling-categorical-predictors-with-multiple-levels" class="section level4">
+<h4><span class="header-section-number">5.3.2.1</span> modeling categorical predictors with multiple levels</h4>
+<div id="snoring" class="section level5">
+<h5><span class="header-section-number">5.3.2.1.1</span> Snoring</h5>
+<p>A study was undertaken to investigate whether snoring is related to a heart disease. In the survey, 2484 people were classified according to their proneness to snoring (never, occasionally, often, always) and whether or not they had the heart disease.</p>
+<table style="width:100%;">
+<colgroup>
+<col width="39%" />
+<col width="60%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>disease (response variable)</td>
+<td>Binary variable: having disease=1,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>not having disease=0</td>
+</tr>
+<tr class="odd">
+<td>snoring (explanatory variable)</td>
+<td>Categorical variable indicating level of snoring</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(never=1, occasionally=2, often=3 and always=4)</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <span class="citation">(Norton and Dunn <a href="#ref-snoring">1985</a>)</span></p>
+<span class="math display">\[\begin{eqnarray*}
+X_1 = \begin{cases}
+  1 &amp; \text{for occasionally} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_2 = \begin{cases}
+  1 &amp; \text{for often} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_3 = \begin{cases}
+  1 &amp; \text{for always} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+\end{eqnarray*}\]</span>
+Our new model becomes:
+<span class="math display">\[\begin{eqnarray*}
+\logit(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
+\end{eqnarray*}\]</span>
+<p>We can use the drop-in-deviance test to test the effect of any or all of the parameters (of which there are now <em>four</em>) in the model.</p>
+<p>See the birdnest example, <a href="logistic-regression.html#birdexamp">5.8</a></p>
+</div>
+</div>
+</div>
+</div>
+<div id="multlog" class="section level2">
+<h2><span class="header-section-number">5.4</span> Multiple Logistic Regression</h2>
+<div id="interaction" class="section level3">
+<h3><span class="header-section-number">5.4.1</span> Interaction</h3>
+<p>Another worry when building models with multiple explanatory variables has to do with variables interacting. That is, for one level of a variable, the relationship of the main predictor on the response is different.</p>
+
+<div class="example">
+<p><span id="exm:unnamed-chunk-8" class="example"><strong>Example 4.3  </strong></span>Consider a simple linear regression model on number of hours studied and exam grade. Then addclass year to the model. There would probably be a different slope for each class year in order to model the two variables most effectively. For simplicity, consider only first year students and seniors.</p>
+<span class="math display">\[\begin{eqnarray*}
+E[\mbox{grade seniors}| \mbox{hours studied}] &amp;=&amp; \beta_{0s} + \beta_{1s} \mbox{hrs}\\
+E[\mbox{grade first years}| \mbox{hours studied}] &amp;=&amp; \beta_{0f} + \beta_{1f} \mbox{hrs}\\
+E[\mbox{grade}| \mbox{hours studied}] &amp;=&amp; \beta_{0} + \beta_{1} \mbox{hrs} + \beta_2 I(\mbox{year=senior}) + \beta_{3} \mbox{hrs} I(\mbox{year = senior})\\
+\beta_{0f} &amp;=&amp; \beta_{0}\\
+\beta_{0s} &amp;=&amp; \beta_0 + \beta_2\\
+\beta_{1f} &amp;=&amp; \beta_1\\
+\beta_{1s} &amp;=&amp; \beta_1 + \beta_3
+\end{eqnarray*}\]</span>
+</div>
+
+<p>Why do we need the <span class="math inline">\(I(\mbox{year=seniors})\)</span> variable?</p>
+
+<div class="definition">
+<span id="def:unnamed-chunk-9" class="definition"><strong>Definition 4.3  </strong></span><em>Interaction</em> means that the effect of an explanatory variable on the outcome differs according to the level of another explanatory variable. (Not the case with age on smoking and lung cancer above. With the smoking example, age is a significant variable, but it does not interact with lung cancer.)
+</div>
+
+<!--
+Recall the homework assignment where APACHE score was a significant predictor of the odds of dying for treated black patients but not for untreated.  This is interaction.  The relationship between the explanatory variable (APACHE score) and the response (survival) changes depending on a 3rd variables (treated vs. untreated).
+-->
+
+<div class="example">
+<p><span id="exm:unnamed-chunk-10" class="example"><strong>Example 5.2  </strong></span>The Heart and Estrogen/progestin Replacement Study (HERS) is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD. Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo. The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 <span class="citation">(Hulley et al. <a href="#ref-HERS">1998</a>)</span>.</p>
+<p>The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.</p>
+<p>The hormone replacement regimen also increased the risk of clots in the veins (deep vein thrombosis) and lungs (pulmonary embolism). The results of HERS are surprising in light of previous observational studies, which found lower rates of CHD in women who take postmenopausal estrogen.</p>
+Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls" class="uri">http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls</a> For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), <code>medcond</code>. We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.
+</div>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">HERS &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;~/Dropbox/teaching/math150/HERS.csv&quot;</span>, 
+                   <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>, <span class="dt">header=</span>T, <span class="dt">na.strings=</span><span class="st">&quot;.&quot;</span>)
+
+<span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+## 2 age           0.0162   0.00597      2.71 0.00664</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>weight, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+## 2 age          0.0189    0.00613      3.09 0.00203  
+## 3 weight       0.00528   0.00274      1.93 0.0542</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">+</span>diabetes, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic      p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+## 2 age           0.0185   0.00603      3.07 0.00217     
+## 3 diabetes      0.487    0.0882       5.52 0.0000000330</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">*</span>diabetes, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term         estimate std.error statistic     p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+## 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+## 2 age            0.0278   0.00707      3.93 0.0000844  
+## 3 diabetes       2.83     0.914        3.10 0.00192    
+## 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">*</span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term         estimate std.error statistic p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+## 2 age           0.00885   0.00759      1.17  0.244 
+## 3 drinkany     -1.44      0.831       -1.73  0.0833
+## 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
+<p>Write out a few models <em>by hand</em>, does any of the significance change with respect to interaction? Does the interpretation change with interaction? In the last model, we might want to remove all the age information. Age seems to be less important than drinking status. How do we decide? How do we model?</p>
+</div>
+<div id="simpsons-paradox" class="section level3">
+<h3><span class="header-section-number">5.4.2</span> Simpson’s Paradox</h3>
+<p><strong>Simpson’s paradox</strong> is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.</p>
+
+<div class="example">
+<span id="exm:unnamed-chunk-12" class="example"><strong>Example 4.5  </strong></span>Back to linear regression to consider Simpson’s Paradox. Consider data on SAT scores across different states with information on educational expenditure. The correlation between SAT score and average teacher salary is negative with the combined data. However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam. The fewer students who take the exam, the higher the SAT score. That’s because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
+</div>
+
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)  1159.       57.7      20.1  5.13e-25
+## 2 salary         -5.54      1.63     -3.39 1.39e- 3</code></pre>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   988.      31.9       31.0  6.20e-33
+## 2 salary          2.18     1.03       2.12 3.94e- 2
+## 3 frac           -2.78     0.228    -12.2  4.00e-16</code></pre>
+<p><img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" /></p>
+<!--
+%Consider the following data on twenty-year vital status by smoking behavior: %(pgs 52-53 in VGSM)
+%\begin{center}
+%\begin{tabular}{r|cc|r}
+%& smoker & nonsmoker & total\\
+%\hline
+%cases & 139 & 230 & 369\\
+%non cases & 443 & 502 & 945\\
+%\hline
+%total & 582 & 502 & 1314
+%\end{tabular}
+%\end{center}
+
+%Just as we have before, we can calculate the OR of cancer given the person was a smoker.  We could also break down the relationship between smoking and cancer using the age variable.
+
+%\begin{center}
+%\begin{tabular}{lccc}
+%& OR & \multicolumn{2}{c}{CI}\\
+%overall & 0.685 & 0.439 & 0.931\\
+%18-44 & 1.777 & 0.873 & 3.615\\
+%45-64 & 1.320 & 0.873 & 1.997\\
+%65+ & 1.018 & 0.424 & 2.434\\
+%\end{tabular}
+%\end{center}
+
+%After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
+-->
+
+<div class="example">
+<p><span id="exm:unnamed-chunk-14" class="example"><strong>Example 5.3  </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of <em>Regression Methods in Biostatistics</em>, pg 52-53.</p>
+<table>
+<thead>
+<tr class="header">
+<th>age</th>
+<th>test</th>
+<th align="center">smoker</th>
+<th align="center">nonsmoker</th>
+<th align="center">prob smoke</th>
+<th align="center">odds smoke</th>
+<th align="center">empirical OR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>all</td>
+<td>case</td>
+<td align="center">139</td>
+<td align="center">230</td>
+<td align="center">0.377</td>
+<td align="center">0.604</td>
+<td align="center">0.685</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">443</td>
+<td align="center">502</td>
+<td align="center">0.469</td>
+<td align="center">0.882</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>18-44</td>
+<td>case</td>
+<td align="center">61</td>
+<td align="center">32</td>
+<td align="center">0.656</td>
+<td align="center">1.906</td>
+<td align="center">1.627</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">375</td>
+<td align="center">320</td>
+<td align="center">0.540</td>
+<td align="center">1.172</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>45-64</td>
+<td>case</td>
+<td align="center">34</td>
+<td align="center">66</td>
+<td align="center">0.340</td>
+<td align="center">0.515</td>
+<td align="center">1.308</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">50</td>
+<td align="center">127</td>
+<td align="center">0.282</td>
+<td align="center">0.394</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>65+</td>
+<td>case</td>
+<td align="center">44</td>
+<td align="center">132</td>
+<td align="center">0.250</td>
+<td align="center">0.333</td>
+<td align="center">1.019</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">18</td>
+<td align="center">55</td>
+<td align="center">0.247</td>
+<td align="center">0.327</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p>What we see is that the vast majority of the controls were young, and they had a high rate of smoking. A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group. However, within each group, the cases were more likely to smoke than the controls.</p>
+<p>After <em>adjusting</em> for age, smoking is no longer significant. But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson’s Paradox. The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.</p>
+What would it mean to <em>adjust</em> for age in this context? It means that we have to include it in the model:
+</div>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">death &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">93</span>),<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">695</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">100</span>),<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">177</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">176</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">73</span>))
+smoke &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">61</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">32</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">375</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">320</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">34</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">66</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">50</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">127</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">44</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">132</span>), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">18</span>), <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">55</span>))
+age &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;young&quot;</span>, <span class="dv">788</span>), <span class="kw">rep</span>(<span class="st">&quot;middle&quot;</span>, <span class="dv">277</span>), <span class="kw">rep</span>(<span class="st">&quot;old&quot;</span>, <span class="dv">249</span>) )
+
+
+<span class="kw">glm</span>( death <span class="op">~</span><span class="st"> </span>smoke, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
+## 2 smoke         -0.379    0.126      -3.01 2.59e- 3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>( death <span class="op">~</span><span class="st"> </span><span class="kw">as.factor</span>(age), <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term                estimate std.error statistic  p.value
+##   &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)           -0.571     0.125     -4.56 5.01e- 6
+## 2 as.factor(age)old      1.45      0.187      7.75 9.00e-15
+## 3 as.factor(age)young   -1.44      0.167     -8.63 6.02e-18</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>( death <span class="op">~</span><span class="st"> </span>smoke <span class="op">+</span><span class="st"> </span><span class="kw">as.factor</span>(age), <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term                estimate std.error statistic  p.value
+##   &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)           -0.668     0.135     -4.96 7.03e- 7
+## 2 smoke                  0.312     0.154      2.03 4.25e- 2
+## 3 as.factor(age)old      1.47      0.188      7.84 4.59e-15
+## 4 as.factor(age)young   -1.52      0.173     -8.81 1.26e-18</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>( death <span class="op">~</span><span class="st"> </span>smoke <span class="op">*</span><span class="st"> </span><span class="kw">as.factor</span>(age), <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 6 x 5
+##   term                      estimate std.error statistic  p.value
+##   &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)                 -0.655     0.152    -4.31  1.61e- 5
+## 2 smoke                        0.269     0.269     0.999 3.18e- 1
+## 3 as.factor(age)old            1.53      0.221     6.93  4.29e-12
+## 4 as.factor(age)young         -1.65      0.240    -6.88  6.00e-12
+## 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
+## 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1</code></pre>
+Using the additive model above:
+<span class="math display">\[\begin{eqnarray*}
+\logit (p(x_1, x_2) ) &amp;=&amp; \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
+OR &amp;=&amp; \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
+x_1 &amp;=&amp; \begin{cases}
+0 &amp; \mbox{ don&#39;t smoke}\\
+1 &amp; \mbox{ smoke}\\
+\end{cases}\\
+x_2 &amp;=&amp; \begin{cases}
+\mbox{young} &amp; \mbox{18-44 years old}\\
+\mbox{middle} &amp; \mbox{45-64 years old}\\
+\mbox{old} &amp; \mbox{65+ years old}\\
+\end{cases}
+\end{eqnarray*}\]</span>
+<p>where we are modeling the probability of 20-year mortality using smoking status and age group.</p>
+<strong>Note 1:</strong> We can see from above that the coefficients for each variable are significantly different from zero. That is, the variables are important in predicting odds of survival.<br />
+<strong>Note 2:</strong> We can see that smoking becomes less significant as we add age into the model. That is because age and smoking status are so highly associated (think of the coin example).<br />
+<strong>Note 3:</strong> We can estimate any of the OR (of dying for smoke vs not smoke) from the given coefficients:<br />
+
+<span class="math display">\[\begin{eqnarray*}
+\mbox{simple model} &amp;&amp;\\
+\mbox{overall OR} &amp;=&amp; e^{-0.37858 } = 0.6848332\\
+&amp;&amp; \\
+\mbox{additive model} &amp;&amp;\\
+\mbox{young, middle, old OR} &amp;=&amp; e^{ 0.3122} = 1.3664\\
+&amp;&amp; \\
+\mbox{interaction model} &amp;&amp;\\
+\mbox{young OR} &amp;=&amp; e^{0.2689 + 0.2177} = 1.626776\\
+\mbox{middle OR} &amp;=&amp; e^{0.2689} = 1.308524\\
+\mbox{old OR} &amp;=&amp; e^{0.2689 + -0.2505} = 1.018570\\
+\end{eqnarray*}\]</span>
+<p>What does it mean that the interaction terms are not significant in the last model?</p>
+</div>
+</div>
+<div id="multicol" class="section level2">
+<h2><span class="header-section-number">5.5</span> Multicolinearity</h2>
+<p>Consider the following data set collected from church offering plates in 62 consecutive Sundays. Also noted is whether there was enough change to buy a candy bar for $1.25.</p>
+<p><img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+## 2 Coins          0.286    0.0772      3.70 0.000213</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+## 2 Small          0.184    0.0576      3.19 0.00142</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(CandyYes <span class="op">~</span><span class="st"> </span>Coins <span class="op">+</span><span class="st"> </span>Small, <span class="dt">data =</span> Offering, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
+## 2 Coins           3.49      1.75      1.99  0.0461
+## 3 Small          -3.04      1.57     -1.93  0.0531</code></pre>
+<p>Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total. Lesson of the story: be very very very careful interpreting coefficients when you have multiple explanatory variables.</p>
+</div>
+<div id="logstep" class="section level2">
+<h2><span class="header-section-number">5.6</span> Model Building</h2>
+
+<div class="example">
+<p><span id="exm:unnamed-chunk-18" class="example"><strong>Example 5.4  </strong></span>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Sage who knows 85 topics. With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics. The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage. A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.<br />
+<!-- %(Taken from American Statistician article that I refereed, August 2012.) --></p>
+</div>
+
+<!--
+% added January 2019 ...  I need to read through, edit, etc.
+
+#### More thoughts on Model Selection...
+
+Question: Did females receive lower starting salaries than males?  @sleuth
+
+model:  y = log(salary), x's: seniority, age, experience, education, sex.
+
+In Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex)  In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in.  What are the pluses/minuses of these approaches?
+
+\begin{itemize}
+\item[Resp1]
+It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn't start with sex would be more likely to include those associated covariates to start with.
+
+I do like both of those methods in that they both end up with sex in the model; one of my pet peeves is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn't matter.  But my preference is actually to try to avoid model selection as much as possible. What I tell the people I work with is that each model you build answers a different question, and so try to get them to decide ahead of time what question they are interested in. I also find Frank Harrell's comments on model selection (in his Regression Modeling Strategies book) to be particularly helpful.
+
+In this case I really think there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. It bugs me when people try to explain away the wage gap between men and women by saying that men just go into higher-paying jobs, when really, that's part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one "best" model can be misleading.
+\item[Resp2]
+If you know (or are willing to assume) the covariates that you want to adjust for and their form in the model (non-linearity, interactions) and you have enough data relative to the number of covariates, then you should not do any model selection, just compare the model with the variable of interest to the model without.  Which covariates are significant or not does not matter in this case.
+
+See here: https://stats.stackexchange.com/questions/37564/r-code-question-model-selection-based-on-individual-significance-in-regression/37609#37609 for simulation examples where screening/model selection can either include meaningless variables, or leave out important ones.
+\end{itemize}
+-->
+<div id="formal-model-building" class="section level3">
+<h3><span class="header-section-number">5.6.1</span> Formal Model Building</h3>
+<p>We are going to discuss how to add (or subtract) variables from a model. Before we do that, we can define two criteria used for suggesting an optimal model.</p>
+<blockquote>
+<p>AIC: Akaike’s Information Criteria = <span class="math inline">\(-2 \ln\)</span> likelihood + <span class="math inline">\(2p\)</span><br />
+BIC: Bayesian Information Criteria = <span class="math inline">\(-2 \ln\)</span> likelihood <span class="math inline">\(+p \ln(n)\)</span></p>
+</blockquote>
+<p>Both techniques suggest choosing a model with the smallest AIC and BIC value; both adjust for the number of parameters in the model and are more likely to select models with fewer variables than the drop-in-deviance test.</p>
+<div id="stepwise-regression" class="section level4">
+<h4><span class="header-section-number">5.6.1.1</span> Stepwise Regression</h4>
+<p>As done previously, we can add and remove variables based on the deviance. Recall, when comparing two nested models, the differences in the deviances can be modeled by a <span class="math inline">\(\chi^2_\nu\)</span> variable where <span class="math inline">\(\nu = \Delta p\)</span>.</p>
+<p>Consider the HERS data described in your book (page 30); variable description also given on the book website <a href="http://www.epibiostat.ucsf.edu/biostat/vgsm/data/hersdata.codebook.txt" class="uri">http://www.epibiostat.ucsf.edu/biostat/vgsm/data/hersdata.codebook.txt</a></p>
+<p>For now, we will try to predict whether the individuals had a medical condition, <code>medcond</code> (defined as a pre-existing and self-reported medical condition). We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">HERS &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;~/Dropbox/teaching/math150/HERS.csv&quot;</span>, 
+                   <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>, <span class="dt">header=</span>T, <span class="dt">na.strings=</span><span class="st">&quot;.&quot;</span>)
+
+
+<span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+## 2 age           0.0162   0.00597      2.71 0.00664</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>weight, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+## 2 age          0.0189    0.00613      3.09 0.00203  
+## 3 weight       0.00528   0.00274      1.93 0.0542</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">+</span>diabetes, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term        estimate std.error statistic      p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+## 2 age           0.0185   0.00603      3.07 0.00217     
+## 3 diabetes      0.487    0.0882       5.52 0.0000000330</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">*</span>diabetes, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term         estimate std.error statistic     p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+## 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+## 2 age            0.0278   0.00707      3.93 0.0000844  
+## 3 diabetes       2.83     0.914        3.10 0.00192    
+## 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age<span class="op">*</span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term         estimate std.error statistic p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+## 2 age           0.00885   0.00759      1.17  0.244 
+## 3 drinkany     -1.44      0.831       -1.73  0.0833
+## 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 5 x 5
+##   term        estimate std.error statistic    p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
+## 2 age          0.0184    0.00620     2.96  0.00304   
+## 3 weight       0.00143   0.00285     0.500 0.617     
+## 4 diabetes     0.432     0.0924      4.68  0.00000288
+## 5 drinkany    -0.253     0.0835     -3.03  0.00248</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+## 2 age           0.0162   0.00597      2.71 0.00664</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>weight , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept) -0.769     0.198       -3.88 0.000106
+## 2 weight       0.00339   0.00267      1.27 0.204</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>diabetes , <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+## 2 diabetes       0.468    0.0878      5.34 9.55e- 8</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+## 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5</code></pre>
+<div id="forward-selection" class="section level5">
+<h5><span class="header-section-number">5.6.1.1.1</span> Forward Selection</h5>
+<p>One idea is to start with an empty model and adding the best available variable at each iteration, checking for needs for transformations. We should also look at interactions which we might suspect. However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.</p>
+<ol style="list-style-type: decimal">
+<li>We start with the response variable versus all variables and find the best predictor. If there are too many, we might just look at the correlation matrix. However, we may miss out of variables that are good predictors but aren’t linearly related. Therefore, if its possible, a scatter plot matrix would be best.<br />
+</li>
+<li>We locate the best variable, and regress the response variable on it.<br />
+</li>
+<li>If the variable seems to be useful, we keep it and move on to looking for a second.<br />
+</li>
+<li>If not, we stop.</li>
+</ol>
+</div>
+<div id="forward-stepwise-selection" class="section level5">
+<h5><span class="header-section-number">5.6.1.1.2</span> Forward Stepwise Selection</h5>
+<p>This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed. This is done by specifying two values, <span class="math inline">\(\alpha_e\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>enter</strong> the model, and <span class="math inline">\(\alpha_l\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>leave</strong> the model. We require that <span class="math inline">\(\alpha_e&lt;\alpha_l\)</span>, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum. This is bad.</p>
+<ol style="list-style-type: decimal">
+<li>We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than <span class="math inline">\(\alpha_e\)</span>.<br />
+</li>
+<li>Now, we find the best of the remaining variables, and add it if the p-value is smaller than <span class="math inline">\(\alpha_e\)</span>. If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model). If its p-value is greater than <span class="math inline">\(\alpha_l\)</span>, we remove the variable.<br />
+</li>
+<li>We continue with this process until there are no more variables that meet either requirements. In many situations, this will help us from stopping at a less than desirable model.</li>
+</ol>
+<p>How do you choose the <span class="math inline">\(\alpha\)</span> values? If you set <span class="math inline">\(\alpha_e\)</span> to be very small, you might walk away with no variables in your model, or at least not many. If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren’t necessary.</p>
+</div>
+<div id="backward-selection" class="section level5">
+<h5><span class="header-section-number">5.6.1.1.3</span> Backward Selection</h5>
+<ol style="list-style-type: decimal">
+<li>Start with the full model including every term (and possibly every interaction, etc.).<br />
+</li>
+<li>Remove the variable that is <em>least</em> significant (biggest p-value) in the model.<br />
+</li>
+<li>Continue removing variables until all variables are significant at the chosen <span class="math inline">\(\alpha\)</span> level.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>(age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany)<span class="op">^</span><span class="dv">2</span>, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;
+## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>weight <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</code></pre></div>
+<pre><code>## # A tibble: 1 x 7
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual
+##           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;
+## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(medcond <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>diabetes <span class="op">+</span><span class="st"> </span>drinkany, <span class="dt">data =</span> HERS, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term        estimate std.error statistic     p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+## 1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
+## 2 age           0.0176   0.00605      2.90 0.00369    
+## 3 diabetes      0.442    0.0895       4.94 0.000000786
+## 4 drinkany     -0.252    0.0834      -3.01 0.00257</code></pre>
+<ul>
+<li>The big model (with all of the interaction terms) has a deviance of 3585.7; the additive model has a deviance of 3594.8.</li>
+</ul>
+<span class="math display">\[\begin{eqnarray*}
+G &amp;=&amp; 3594.8 - 3585.7= 9.1\\
+p-value &amp;=&amp; P(\chi^2_6 \geq 9.1)= 1 - pchisq(9.1, 6) = 0.1680318
+\end{eqnarray*}\]</span>
+<p>We cannot reject the null hypothesis, so we know that we don’t need the 6 interaction terms. Next we will check whether we need weight.</p>
+<ul>
+<li>The additive model has a deviance of 3594.8; the model without weight is 3597.3.</li>
+</ul>
+<span class="math display">\[\begin{eqnarray*}
+G &amp;=&amp; 3597.3 - 3594.8 =2.5\\
+p-value &amp;=&amp; P(\chi^2_1 \geq 2.5)= 1 - pchisq(2.5, 1) = 0.1138463
+\end{eqnarray*}\]</span>
+<p>We cannot reject the null hypothesis, so we know that we don’t need the weight in the model either.</p>
+</div>
+</div>
+</div>
+<div id="getting-the-model-right" class="section level3">
+<h3><span class="header-section-number">5.6.2</span> Getting the Model Right</h3>
+<p>In terms of selecting the variables to model a particular response, four things can happen:</p>
+<ul>
+<li>The logistic regression model is correct!<br />
+</li>
+<li>The logistic regression model is underspecified.<br />
+</li>
+<li>The logistic regression model contains extraneous variables.<br />
+</li>
+<li>The logistic regression model is overspecified.</li>
+</ul>
+<div id="underspecified" class="section level5 unnumbered">
+<h5>Underspecified</h5>
+<p>A regression model is underspecified if it is missing one or more important predictor variables. Being underspecified is the worst case scenario because the model ends up being biased and predictions are wrong for virtually every observation. (Think about Simpson’s Paradox and the need for interaction.)</p>
+</div>
+<div id="extraneous" class="section level5 unnumbered">
+<h5>Extraneous</h5>
+<p>The third type of variable situation comes when extra variables are included in the model but the variables are neither related to the response nor are they correlated with the other explanatory variables. Generally, extraneous variables are not so problematic because they produce models with unbiased coefficient estimators, unbiased predictions, and unbiased variance estimates. The worst thing that happens is that the error degrees of freedom is lowered which makes confidence intervals wider and p-values bigger (lower power). Also problematic is that the model becomes unnecessarily complicated and harder to interpret.</p>
+</div>
+<div id="overspecified" class="section level5 unnumbered">
+<h5>Overspecified</h5>
+<p>When a model is overspecified, there are one or more redundant variables. That is, the variables contain the same information as other variables (i.e., are correlated!). As we’ve seen, correlated variables cause trouble because they inflate the variance of the coefficient estimates. With correlated variables it is still possible to get unbiased prediction estimates, but the coefficients themselves are so variable that they cannot be interpreted (nor can inference be easily performed).</p>
+<p>Generally: the idea is to use a model building strategy with some criteria (<span class="math inline">\(\chi^2\)</span>-tests, AIC, BIC, ROC, AUC) to find the middle ground between an underspecified model and an overspecified model.</p>
+</div>
+<div id="one-model-building-strategy" class="section level4">
+<h4><span class="header-section-number">5.6.2.1</span> One Model Building Strategy</h4>
+<p>Taken from <a href="https://onlinecourses.science.psu.edu/stat501/node/332" class="uri">https://onlinecourses.science.psu.edu/stat501/node/332</a>.</p>
+<p>Model building is definitely an ``art.&quot; Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.</p>
+</div>
+<div id="the-first-step" class="section level4 unnumbered">
+<h4>The first step</h4>
+<p>Decide on the type of model that is needed in order to achieve the goals of the study. In general, there are five reasons one might want to build a regression model. They are:</p>
+<ul>
+<li>For predictive reasons - that is, the model will be used to predict the response variable from a chosen set of predictors.<br />
+</li>
+<li>For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors.<br />
+</li>
+<li>For control purposes - that is, the model will be used to control a response variable by manipulating the values of the predictor variables.<br />
+</li>
+<li>For inferential reasons - that is, the model will be used to explore the strength of the relationships between the response and the predictors.<br />
+</li>
+<li>For data summary reasons - that is, the model will be used merely as a way to summarize a large set of data by a single equation.</li>
+</ul>
+</div>
+<div id="the-second-step" class="section level4 unnumbered">
+<h4>The second step</h4>
+<p>Decide which explanatory variables and response variable on which to collect the data. Collect the data.</p>
+</div>
+<div id="the-third-step" class="section level4 unnumbered">
+<h4>The third step</h4>
+<p>Explore the data. That is:</p>
+<ul>
+<li>On a univariate basis, check for outliers, gross data errors, and missing values.<br />
+</li>
+<li>Study bivariate relationships to reveal other outliers, to suggest possible transformations, and to identify possible multicollinearities.</li>
+</ul>
+<p>I can’t possibly over-emphasize the data exploration step. There’s not a data analyst out there who hasn’t made the mistake of skipping this step and later regretting it when a data point was found in error, thereby nullifying hours of work.</p>
+</div>
+<div id="the-fourth-step" class="section level4 unnumbered">
+<h4>The fourth step</h4>
+<p>(The fourth step is very good modeling practice. It gives you a sense of whether or not you’ve overfit the model in the building process.) Randomly divide the data into a training set and a validation set:</p>
+<ul>
+<li>The training set, with at least 15-20 error degrees of freedom, is used to estimate the model.<br />
+</li>
+<li>The validation set is used for cross-validation of the fitted model.</li>
+</ul>
+</div>
+<div id="the-fifth-step" class="section level4 unnumbered">
+<h4>The fifth step</h4>
+<p>Using the training set, identify several candidate models:</p>
+<ul>
+<li>Use best subsets regression.<br />
+</li>
+<li>Use stepwise regression, which of course only yields one model unless different alpha-to-remove and alpha-to-enter values are specified.</li>
+</ul>
+</div>
+<div id="the-sixth-step" class="section level4 unnumbered">
+<h4>The sixth step</h4>
+<p>Select and evaluate a few “good” models:</p>
+<ul>
+<li>Select the models based on the criteria we learned, as well as the number and nature of the predictors.<br />
+</li>
+<li>Evaluate the selected models for violation of the model conditions.<br />
+</li>
+<li>If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.</li>
+</ul>
+</div>
+<div id="the-seventh-and-final-step" class="section level4 unnumbered">
+<h4>The seventh and final step</h4>
+<p>Select the final model:</p>
+<ul>
+<li>A large cross-validation AUC on the validation data is indicative of a good predictive model (for your population of interest).<br />
+</li>
+<li>Consider false positive rate, false negative rate, outliers, parsimony, relevance, and ease of measurement of predictors.</li>
+</ul>
+<p>And, most of all, don’t forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.</p>
+</div>
+<div id="another-model-building-strategy" class="section level4">
+<h4><span class="header-section-number">5.6.2.2</span> Another Model Building Strategy</h4>
+<div class="figure">
+<img src="sleuthmodelbuild.jpg" alt="Another strategy for model building. Figure taken from (Ramsey and Schafer 2012)" />
+<p class="caption">Another strategy for model building. Figure taken from <span class="citation">(Ramsey and Schafer <a href="#ref-sleuth">2012</a>)</span></p>
+</div>
+<!--
+% add a bit on stepwise regression??? add1, drop1 in R
+
+% use the binomial model for pearson residuals $\frac{Y_i - n_i \hat{p}_i}{\sqrt{n_i \hat{p}_i (1-\hat{p}_i)} and for chi-square test goodness-of-fit
+
+% see notes from 2008 on yellow pad of paper
+-->
+</div>
+</div>
+</div>
+<div id="model-assessment" class="section level2">
+<h2><span class="header-section-number">5.7</span> Model Assessment</h2>
+<div id="measures-of-association" class="section level3">
+<h3><span class="header-section-number">5.7.1</span> Measures of Association</h3>
+<p>With logistic regression, we don’t have residuals, so we don’t have a value like <span class="math inline">\(R^2\)</span>. We can, however, measure whether or not the estimated model is consistent with the data. That is, is the model able to discriminate between successes and failures.</p>
+<div id="back-to-the-burn-data-refexmburnexamp" class="section level4">
+<h4><span class="header-section-number">5.7.1.1</span> back to the burn data <a href="logistic-regression.html#exm:burnexamp">5.1</a>:</h4>
+<p>Consider looking at all the pairs of successes and failures. In the burn data we have 308 survivors and 127 deaths = 39,116 pairs of people. Given a particular pair, if the observation corresponding to a survivor has a <em>higher</em> probability of success than the observation corresponding to a death, we call the pair <em>concordant</em>. If the observation corresponding to a survivor has a <em>lower</em> probability of success than the observation corresponding to a death, we call the pair <em>discordant</em>. Tied pairs occur when the observed survivor has the same estimated probability as the observed death.</p>
+<ul>
+<li><span class="math inline">\(D_{xy}\)</span>: Somers’ D is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.<br />
+</li>
+<li>gamma: Goodman-Kruskal gamma is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.<br />
+</li>
+<li>tau-a: Kendall’s tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).</li>
+</ul>
+For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+<span class="math display">\[\begin{eqnarray*}
+p(x=1.75) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
+\end{eqnarray*}\]</span>
+<p>The pairs would be concordant if the first individual survived and the second didn’t. The pairs would be discordant if the first individual died and the second survived.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(c(&quot;Hmisc&quot;, &quot;rms&quot;))</span>
+
+<span class="kw">library</span>(rms)   <span class="co"># you need this line!!</span>
+burn.glm &lt;-<span class="st"> </span><span class="kw">lrm</span>(burnresp<span class="op">~</span>burnexpl, <span class="dt">data =</span> burnglm)
+<span class="kw">print</span>(burn.glm)</code></pre></div>
+<pre><code>## Logistic Regression Model
+##  
+##  lrm(formula = burnresp ~ burnexpl, data = burnglm)
+##  
+##                        Model Likelihood     Discrimination    Rank Discrim.    
+##                           Ratio Test           Indexes           Indexes       
+##  Obs           435    LR chi2     190.15    R2       0.505    C       0.877    
+##   0            127    d.f.             1    g        2.576    Dxy     0.753    
+##   1            308    Pr(&gt; chi2) &lt;0.0001    gr      13.146    gamma   0.824    
+##  max |deriv| 8e-11                          gp       0.313    tau-a   0.312    
+##                                             Brier    0.121                     
+##  
+##            Coef     S.E.   Wald Z Pr(&gt;|Z|)
+##  Intercept  22.7083 2.2661 10.02  &lt;0.0001 
+##  burnexpl  -10.6624 1.0826 -9.85  &lt;0.0001 
+## </code></pre>
+<p>The summary contains the following elements:</p>
+<blockquote>
+<p>number of observations used in the fit, maximum absolute value of first derivative of log likelihood, model likelihood ratio chi2, d.f., P-value, <span class="math inline">\(c\)</span> index (area under ROC curve), Somers’ Dxy, Goodman-Kruskal gamma, Kendall’s tau-a rank correlations between predicted probabilities and observed response, the Nagelkerke <span class="math inline">\(R^2\)</span> index, the Brier score computed with respect to Y <span class="math inline">\(&gt;\)</span> its lowest level, the <span class="math inline">\(g\)</span>-index, <span class="math inline">\(gr\)</span> (the <span class="math inline">\(g\)</span>-index on the odds ratio scale), and <span class="math inline">\(gp\)</span> (the <span class="math inline">\(g\)</span>-index on the probability scale using the same cutoff used for the Brier score).</p>
+</blockquote>
+</div>
+</div>
+<div id="roc" class="section level3">
+<h3><span class="header-section-number">5.7.2</span> Receiver Operating Characteristic Curves</h3>
+<p>Recall that logistic regression can be used to predict the outcome of a binary event (your response variable). A Receiver Operating Characteristic (ROC) Curve is a graphical representation of the relationship between</p>
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th align="center">Truth</th>
+<th align="center"></th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center">positive</td>
+<td align="center">negative</td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td>Predicted</td>
+<td>positive</td>
+<td align="center">true positive</td>
+<td align="center">false positive</td>
+<td align="center"><span class="math inline">\(P&#39;\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>negative</td>
+<td align="center">false negative</td>
+<td align="center">true negative</td>
+<td align="center"><span class="math inline">\(N&#39;\)</span></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td align="center"><span class="math inline">\(P\)</span></td>
+<td align="center"><span class="math inline">\(N\)</span></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>type I error = FP<br />
+</li>
+<li>type II error = FN<br />
+</li>
+<li>sensitivity = power = true positive rate (TPR) = TP / P = TP / (TP+FN)<br />
+</li>
+<li>false positive rate (FPR) = FP / N = FP / (FP + TN)<br />
+</li>
+<li>specificity = 1 - FPR = TN / (FP + TN)<br />
+</li>
+<li>accuracy (acc) = (TP+TN) / (P+N)<br />
+</li>
+<li>positive predictive value (PPV) = precision = TP / (TP + FP)<br />
+</li>
+<li>negative predictive value (NPV) = TN / (TN + FN)<br />
+</li>
+<li>false discovery rate = 1 - PPV = FP / (FP + TP)</li>
+</ul>
+
+<div class="example">
+<span id="exm:unnamed-chunk-22" class="example"><strong>Example 5.5  </strong></span>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+<span class="math display">\[\begin{eqnarray*}
+p(x=1.75) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087\\
+x &amp;=&amp; \mbox{log area burned}
+\end{eqnarray*}\]</span>
+What value would we assign to 1.75 or 2.35 or 15 for log(area) burned? By changing our cutoff, we can fit an entire curve. We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1). Notice that the color band represents the probability cutoff for predicting a ``success.“
+</div>
+
+<div class="figure">
+<img src="ROCcurve_burn.jpg" />
+
+</div>
+<p>A: Let’s say we use prob=0.25 as a cutoff:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th align="center">truth</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center">yes</td>
+<td align="center">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td align="center">300</td>
+<td align="center">66</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td align="center">8</td>
+<td align="center">61</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td align="center">308</td>
+<td align="center">127</td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+\mbox{sensitivity} &amp;=&amp; TPR = 300/308 = 0.974\\
+\mbox{specificity} &amp;=&amp; 61 / 127 = 0.480, \mbox{1 - specificity} =  FPR = 0.520\\
+\end{eqnarray*}\]</span>
+<p>B: Let’s say we use prob=0.7 as a cutoff:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th align="center">truth</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center">yes</td>
+<td align="center">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td align="center">265</td>
+<td align="center">35</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td align="center">43</td>
+<td align="center">92</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td align="center">308</td>
+<td align="center">127</td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+\mbox{sensitivity} &amp;=&amp; TPR = 265/308 = 0.860\\
+\mbox{specificity} &amp;=&amp; 92/127 = 0.724, \mbox{1 - specificity} = FPR = 0.276\\
+\end{eqnarray*}\]</span>
+<p>C: Let’s say we use prob=0.9 as a cutoff:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th align="center">truth</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center">yes</td>
+<td align="center">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td align="center">144</td>
+<td align="center">7</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td align="center">164</td>
+<td align="center">120</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td align="center">308</td>
+<td align="center">127</td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+\mbox{sensitivity} &amp;=&amp; TPR = 144/308 = 0.467\\
+\mbox{specificity} &amp;=&amp; 120/127 = 0.945, \mbox{1 - specificity} = FPR = 0.055\\
+\end{eqnarray*}\]</span>
+<p>D: all models will go through (0,0) <span class="math inline">\(\rightarrow\)</span> predict everything negative, prob=1 as your cutoff</p>
+<p>E: all models will go through (1,1) <span class="math inline">\(\rightarrow\)</span> predict everything positive, prob=0 as your cutoff</p>
+<p>F: you have a model that gives perfect sensitivity (no FN!) and specificity (no FP)</p>
+<p>G: random guessing. If classifier randomly guess, it should get half the positives correct and half the negatives correct. If it guesses 90% of the positives correctly, it will also guess 90% of the negatives to be positive.</p>
+<p>H: is worse than random guessing. Note that the opposite classifier to (H) might be quite good!</p>
+</div>
+<div id="cv" class="section level3">
+<h3><span class="header-section-number">5.7.3</span> Cross Validation</h3>
+<p>Before reading the notes here, look through the following visualization. Don’t worry about building the model (classification trees are not a topic for class), but check out the end where they talk about predicting on test and training data.</p>
+<p><a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-1/</a></p>
+<div id="overfitting" class="section level4">
+<h4><span class="header-section-number">5.7.3.1</span> Overfitting</h4>
+<p>Imagine you are preparing for your statistics exam. Helpfully, Professor Hardin has made previous exam papers and their worked answers available online. You begin by trying to answer the questions from previous papers and comparing your answers with the model answers provided. Unfortunately, you get carried away and spend all your time on memorizing the model answers to all past questions.</p>
+<p>Now, if the upcoming exam completely consists of past questions, you are certain to do very well. But if the new exam asks different questions about the same material, you would be ill-prepared and get a much lower mark than with a more traditional preparation. In this case, one could say that you were <strong>overfitting</strong> the past exam papers and that the knowledge gained didn’t generalize to future exam questions.</p>
+</div>
+<div id="cv-model-assessment" class="section level4">
+<h4><span class="header-section-number">5.7.3.2</span> CV Model Assessment</h4>
+<p>Cross validation is commonly used to perform two different tasks:<br />
+1. To assess a model’s accuracy (<strong>model assessment</strong>).<br />
+2. To build a model (<strong>model selection</strong>).</p>
+<p>We will focus here only on model assessment.</p>
+<p>Suppose that we build a classifier (logistic regression model) on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]<br />
+</li>
+<li>leave one out cross validation (LOOCV) [LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span>]<br />
+</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation<br />
+</li>
+<li>build the model using the remaining n-1 points<br />
+</li>
+<li>predict class membership for the observation which was removed<br />
+</li>
+<li>repeat by removing each observation one at a time (time consuming to keep building models)<br />
+</li>
+</ol>
+<ul>
+<li><span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.<br />
+</li>
+<li>advantage of <span class="math inline">\(k\)</span>-fold is computational<br />
+</li>
+<li><span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are all basically the same, the variability will be higher. with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="birdexamp" class="section level2">
+<h2><span class="header-section-number">5.8</span> R: Birdnest Example</h2>
+<p><strong>Length of Bird Nest</strong> This example is from problem E1 in your text and includes 99 species of N. American passerine birds. Recall that the response variable is binary and represents whether there is a small opening (<code>closed=1</code>) or a large opening (<code>closed=0</code>) for the nest. The explanatory variable of interest was the length of the bird.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nests &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;~/Dropbox/teaching/math150/PracStatCD/Data Sets/Chapter 07/CSV Files/C7 Birdnest.csv&quot;</span>,
+                  <span class="dt">na=</span><span class="st">&quot;*&quot;</span>)</code></pre></div>
+<div id="drop-in-deviance-likelihood-ratio-test-lrt" class="section level3">
+<h3><span class="header-section-number">5.8.1</span> Drop-in-deviance (Likelihood Ratio Test, LRT)</h3>
+<span class="math inline">\(\chi^2\)</span>: The Likelihood ratio test also tests whether the response is explained by the explanatory variable. We can output the deviance ( = K - 2 * log-likelihood) for both the full (maximum likelihood!) and reduced (null) models.
+<span class="math display">\[\begin{eqnarray*}
+G &amp;=&amp; 2 \cdot \ln(L(MLE)) - 2 \cdot \ln(L(null))\\
+&amp;=&amp; \mbox{null (restricted) deviance - residual (full model) deviance}\\
+G &amp;\sim&amp; \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
+\end{eqnarray*}\]</span>
+<p>where <span class="math inline">\(\nu\)</span> represents the difference in the number of parameters needed to estimate in the full model versus the null model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+</div>
+<div id="difference-between-tidy-and-augment-and-glance" class="section level3">
+<h3><span class="header-section-number">5.8.2</span> Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></h3>
+<p>Note that <code>tidy</code> contains the same number of rows as the number of coefficients. <code>augment</code> contains the same number of rows as number of observations. <code>glance</code> always has one row (containing overall model information).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>()</code></pre></div>
+<pre><code>## # A tibble: 95 x 10
+##    .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##    &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+##  1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+##  2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+##  4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+##  5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+##  6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+##  7 8               0   17    -0.693   0.222 -0.900 0.0110   1.12 0.00280
+##  8 9               0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+##  9 10              0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
+## 10 11              1   11    -0.287   0.336  1.30  0.0276   1.12 0.0194 
+## # … with 85 more rows, and 1 more variable: .std.resid &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+</div>
+<div id="looking-at-variables-in-a-few-different-ways." class="section level3">
+<h3><span class="header-section-number">5.8.3</span> Looking at variables in a few different ways.</h3>
+<p>Length as a continuous explanatory variable:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93</code></pre>
+<p>Length as a categorical explanatory variables:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span><span class="kw">as.factor</span>(Length), <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 34 x 5
+##    term                       estimate std.error statistic p.value
+##    &lt;chr&gt;                         &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)            19.6            10754.  1.82e- 3   0.999
+##  2 as.factor(Length)10     0.000000432    13171.  3.28e-11   1.000
+##  3 as.factor(Length)10.5   0.000000430    15208.  2.82e-11   1.000
+##  4 as.factor(Length)11   -18.9            10754. -1.75e- 3   0.999
+##  5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
+##  6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.000
+##  7 as.factor(Length)13   -20.3            10754. -1.88e- 3   0.998
+##  8 as.factor(Length)13.5 -20.7            10754. -1.92e- 3   0.998
+##  9 as.factor(Length)14   -19.3            10754. -1.79e- 3   0.999
+## 10 as.factor(Length)14.5 -39.1            13171. -2.97e- 3   0.998
+## # … with 24 more rows</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span><span class="kw">as.factor</span>(Length), <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
+## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61</code></pre>
+<p>Length plus a few other explanatory variables:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length <span class="op">+</span><span class="st"> </span>Incubate <span class="op">+</span><span class="st">  </span>Color, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 4 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   -2.64     2.06      -1.28   0.201 
+## 2 Length        -0.114    0.0527    -2.17   0.0302
+## 3 Incubate       0.314    0.172      1.82   0.0684
+## 4 Color         -0.420    0.609     -0.690  0.490</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length <span class="op">+</span><span class="st"> </span>Incubate <span class="op">+</span><span class="st">  </span>Color, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">print.data.frame</span>(<span class="dt">digits=</span><span class="dv">6</span>)</code></pre></div>
+<pre><code>##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
+## 1       110.086      87 -51.6633 111.327 121.236  103.327          84</code></pre>
+</div>
+<div id="predicting-response" class="section level3">
+<h3><span class="header-section-number">5.8.4</span> Predicting Response</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bird.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>)
+bird.glm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   0.457     0.753      0.607   0.544
+## 2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># predicting the linear part:</span>
+<span class="co"># reasonable to use the SE to create CIs</span>
+<span class="kw">predict</span>(bird.glm, <span class="dt">newdata =</span> <span class="kw">list</span>(<span class="dt">Length =</span> <span class="dv">47</span>), <span class="dt">se.fit =</span> <span class="ot">TRUE</span>, <span class="dt">type =</span> <span class="st">&quot;link&quot;</span>)</code></pre></div>
+<pre><code>## $fit
+##     1 
+## -2.72 
+## 
+## $se.fit
+## [1] 1.3
+## 
+## $residual.scale
+## [1] 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># predicting the probability of success (on the `scale` of the response variable):</span>
+<span class="co"># do NOT use the SE to create a CI for the predicted value</span>
+<span class="co"># instead, use the SE from `type=&quot;link&quot; ` and transform the interval</span>
+<span class="kw">predict</span>(bird.glm, <span class="dt">newdata =</span> <span class="kw">list</span>(<span class="dt">Length =</span> <span class="dv">47</span>), <span class="dt">se.fit =</span> <span class="ot">TRUE</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)</code></pre></div>
+<pre><code>## $fit
+##      1 
+## 0.0616 
+## 
+## $se.fit
+##      1 
+## 0.0751 
+## 
+## $residual.scale
+## [1] 1</code></pre>
+</div>
+<div id="measues-of-association" class="section level3">
+<h3><span class="header-section-number">5.8.5</span> Measues of association</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(c(&quot;Hmisc&quot;, &quot;rms&quot;))</span>
+
+<span class="kw">library</span>(rms)   <span class="co"># you need this line!!</span>
+bird.lrm &lt;-<span class="st"> </span><span class="kw">lrm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests)
+<span class="kw">print</span>(bird.lrm)</code></pre></div>
+<pre><code>## Frequencies of Missing Values Due to Each Variable
+## Closed?  Length 
+##       0       4 
+## 
+## Logistic Regression Model
+##  
+##  lrm(formula = `Closed?` ~ Length, data = nests)
+##  
+##  
+##                       Model Likelihood     Discrimination    Rank Discrim.    
+##                          Ratio Test           Indexes           Indexes       
+##  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
+##   0             64    d.f.            1    g        0.455    Dxy     0.276    
+##   1             31    Pr(&gt; chi2) 0.0777    gr       1.576    gamma   0.288    
+##  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
+##                                            Brier    0.210                     
+##  
+##            Coef    S.E.   Wald Z Pr(&gt;|Z|)
+##  Intercept  0.4571 0.7530  0.61  0.5438  
+##  Length    -0.0677 0.0425 -1.59  0.1117  
+## </code></pre>
+</div>
+<div id="roc-curves" class="section level3">
+<h3><span class="header-section-number">5.8.6</span> ROC curves</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ROCR)
+
+bird.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="st">`</span><span class="dt">Closed?</span><span class="st">`</span> <span class="op">~</span><span class="st"> </span>Length, <span class="dt">data =</span> nests, <span class="dt">family=</span><span class="st">&quot;binomial&quot;</span>)
+
+bird.indiv &lt;-<span class="st"> </span>bird.glm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">probs =</span> <span class="kw">predict</span>(bird.glm, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>))
+<span class="kw">head</span>(bird.indiv)</code></pre></div>
+<pre><code>## # A tibble: 6 x 11
+##   .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
+##   &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+## 1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
+## 2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
+## 4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
+## 5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
+## 6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
+## # … with 2 more variables: .std.resid &lt;dbl&gt;, probs &lt;dbl&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bird.ROC.info &lt;-<span class="st"> </span>ROCR<span class="op">::</span><span class="kw">prediction</span>(bird.indiv<span class="op">$</span>probs, bird.indiv<span class="op">$</span>Closed.)
+bird.perf &lt;-<span class="st"> </span>ROCR<span class="op">::</span><span class="kw">performance</span>(bird.ROC.info, <span class="dt">measure =</span> <span class="st">&quot;tpr&quot;</span>, <span class="dt">x.measure =</span> <span class="st">&quot;fpr&quot;</span>)
+<span class="kw">plot</span>(bird.perf, <span class="dt">colorize =</span> <span class="ot">TRUE</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>)</code></pre></div>
+<p><img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="drawing-interactions" class="section level3">
+<h3><span class="header-section-number">5.8.7</span> Drawing interactions</h3>
+<p><a href="https://interactions.jacob-long.com/index.html" class="uri">https://interactions.jacob-long.com/index.html</a></p>
+
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-burn">
+<p>Fan, J., N.E. Heckman, and M.P. Wand. 1995. “Local Polynomial Kernel Regression for Generalized Linear Models and Quasi-Likelihood Functions.” <em>Journal of the American Statistical Association</em>, 141–50. <a href="http://statmaster.sdu.dk/courses/st111" class="uri">http://statmaster.sdu.dk/courses/st111</a>.</p>
+</div>
+<div id="ref-menard">
+<p>Menard, S. 1995. <em>Applied Logistic Regression Analysis</em>. 2nd ed. Sage.</p>
+</div>
+<div id="ref-agresti">
+<p>Agresti, A. 1996. <em>An Introduction to Categorical Data Analysis</em>. John Wiley; Sons, New York.</p>
+</div>
+<div id="ref-snoring">
+<p>Norton, P.G., and E.V. Dunn. 1985. “Snoring as a Risk Factor for Disease: An Epidemiological Survey” 291: 630–32.</p>
+</div>
+<div id="ref-HERS">
+<p>Hulley, S., D. Grady, T. Bush, C. Furberg, D. Herrington, B. Riggs, and E. Vittinghoff. 1998. “Randomized Trial of Estrogen Plus Progestin for Secondary Prevention of Coronary Heart Disease in Postmenopausal Women.” <em>Journal of the American Medical Association</em> 280: 605–13.</p>
+</div>
+<div id="ref-sleuth">
+<p>Ramsey, F., and D. Schafer. 2012. <em>The Statistical Sleuth</em>. 3rd ed. Cengage Learning.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="analysis-of-categorical-data-section-6-3.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="survival-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/05-log.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Math-150-Notes.pdf", "Math-150-Notes.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 7 Multiple Comparisons | Methods in Biostatistics</title>
+  <meta name="description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 7 Multiple Comparisons | Methods in Biostatistics" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar" />
+  <meta name="github-repo" content="hardin47/website/Math150/" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Multiple Comparisons | Methods in Biostatistics" />
+  
+  <meta name="twitter:description" content="Class notes for Math 150 at Pomona College: Methods in Biostatistics. The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar" />
+  
+
+<meta name="author" content="Jo Hardin">
+
+
+<meta name="date" content="2019-06-13">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="survival-analysis.html">
+<link rel="next" href="poisson-regression.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Methods in Biostatistics</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Class Information</a></li>
+<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="intro.html"><a href="intro.html#course-goals"><i class="fa fa-check"></i><b>1.1</b> Course Goals</a></li>
+<li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#using-r"><i class="fa fa-check"></i><b>1.2</b> Using R</a><ul>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#experimental-design"><i class="fa fa-check"></i>Experimental Design</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html"><i class="fa fa-check"></i><b>2</b> t-tests vs. SLR</a><ul>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#surgery-timing"><i class="fa fa-check"></i>Surgery Timing</a></li>
+<li class="chapter" data-level="2.1" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#ttest"><i class="fa fa-check"></i><b>2.1</b> t-test (book: 2.1)</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#what-is-an-alternative-hypothesis"><i class="fa fa-check"></i><b>2.1.1</b> What is an Alternative Hypothesis?</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#anova"><i class="fa fa-check"></i>ANOVA</a></li>
+<li class="chapter" data-level="2.2" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#tslr"><i class="fa fa-check"></i><b>2.2</b> Simple Linear Regression (book: 2.3)</a><ul>
+<li class="chapter" data-level="" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#why-are-they-the-same"><i class="fa fa-check"></i>Why are they the same?</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#confidence-intervals-section-2.11"><i class="fa fa-check"></i><b>2.3</b> Confidence Intervals (section 2.11)</a></li>
+<li class="chapter" data-level="2.4" data-path="t-tests-vs-slr.html"><a href="t-tests-vs-slr.html#random-sample-vs.random-allocation"><i class="fa fa-check"></i><b>2.4</b> Random Sample vs. Random allocation</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="SLR.html"><a href="SLR.html"><i class="fa fa-check"></i><b>3</b> Simple Linear Regression</a><ul>
+<li class="chapter" data-level="3.1" data-path="SLR.html"><a href="SLR.html#transformations"><i class="fa fa-check"></i><b>3.1</b> Transformations</a><ul>
+<li class="chapter" data-level="" data-path="SLR.html"><a href="SLR.html#model-assumptions"><i class="fa fa-check"></i>Model assumptions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="SLR.html"><a href="SLR.html#fitting-the-regression-line"><i class="fa fa-check"></i><b>3.2</b> Fitting the regression line</a></li>
+<li class="chapter" data-level="3.3" data-path="SLR.html"><a href="SLR.html#correlation"><i class="fa fa-check"></i><b>3.3</b> Correlation</a></li>
+<li class="chapter" data-level="3.4" data-path="SLR.html"><a href="SLR.html#errors"><i class="fa fa-check"></i><b>3.4</b> Errors</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="SLR.html"><a href="SLR.html#testing-beta_1"><i class="fa fa-check"></i><b>3.4.1</b> Testing <span class="math inline">\(\beta_1\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="SLR.html"><a href="SLR.html#intervals"><i class="fa fa-check"></i><b>3.5</b> Intervals</a><ul>
+<li class="chapter" data-level="3.5.1" data-path="SLR.html"><a href="SLR.html#confidence-intervals"><i class="fa fa-check"></i><b>3.5.1</b> Confidence Intervals</a></li>
+<li class="chapter" data-level="3.5.2" data-path="SLR.html"><a href="SLR.html#slope"><i class="fa fa-check"></i><b>3.5.2</b> Slope</a></li>
+<li class="chapter" data-level="3.5.3" data-path="SLR.html"><a href="SLR.html#mean-response"><i class="fa fa-check"></i><b>3.5.3</b> Mean Response</a></li>
+<li class="chapter" data-level="3.5.4" data-path="SLR.html"><a href="SLR.html#prediction-of-an-individual-response"><i class="fa fa-check"></i><b>3.5.4</b> Prediction of an Individual Response</a></li>
+<li class="chapter" data-level="3.5.5" data-path="SLR.html"><a href="SLR.html#outlying-high-leverage-and-influential-points"><i class="fa fa-check"></i><b>3.5.5</b> Outlying, High Leverage, and Influential Points</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="SLR.html"><a href="SLR.html#r-example-slr-happy-planet"><i class="fa fa-check"></i><b>3.6</b> R Example (SLR): Happy Planet</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="SLR.html"><a href="SLR.html#reading-the-data-into-r"><i class="fa fa-check"></i><b>3.6.1</b> Reading the data into R</a></li>
+<li class="chapter" data-level="3.6.2" data-path="SLR.html"><a href="SLR.html#running-the-linear-model-lm"><i class="fa fa-check"></i><b>3.6.2</b> Running the linear model (lm)</a></li>
+<li class="chapter" data-level="3.6.3" data-path="SLR.html"><a href="SLR.html#ouptut"><i class="fa fa-check"></i><b>3.6.3</b> Ouptut</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html"><i class="fa fa-check"></i><b>4</b> Analysis of Categorical Data (section 6.3)</a><ul>
+<li class="chapter" data-level="4.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#cat"><i class="fa fa-check"></i><b>4.1</b> Categorical Inference</a></li>
+<li class="chapter" data-level="4.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#fisher"><i class="fa fa-check"></i><b>4.2</b> Fisher’s Exact Test (section 6.4)</a></li>
+<li class="chapter" data-level="4.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chisq"><i class="fa fa-check"></i><b>4.3</b> Testing independence of two categorical variables (sections 6.5, 6.6, 6.7)</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chi2-tests-section-6.6"><i class="fa fa-check"></i><b>4.3.1</b> <span class="math inline">\(\chi^2\)</span> tests (section 6.6)</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#catest"><i class="fa fa-check"></i><b>4.4</b> Parameter Estimation (section 6.8)</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#ci-for-differences-in-proportions"><i class="fa fa-check"></i><b>4.4.1</b> CI for differences in proportions</a></li>
+<li class="chapter" data-level="4.4.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#relative-risk"><i class="fa fa-check"></i><b>4.4.2</b> Relative Risk</a></li>
+<li class="chapter" data-level="4.4.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#odds-ratios"><i class="fa fa-check"></i><b>4.4.3</b> Odds Ratios</a></li>
+<li class="chapter" data-level="4.4.4" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#confidence-interval-for-or"><i class="fa fa-check"></i><b>4.4.4</b> Confidence Interval for OR</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#studies"><i class="fa fa-check"></i><b>4.5</b> Types of Studies (section 6.9)</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#retrospective-versus-prospective-studies"><i class="fa fa-check"></i><b>4.5.1</b> Retrospective versus Prospective Studies</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#r-example-categorical-data-botox-and-back-pain"><i class="fa fa-check"></i><b>4.6</b> R Example (categorical data): Botox and back pain</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#entering-and-visualizing-the-data"><i class="fa fa-check"></i><b>4.6.1</b> Entering and visualizing the data</a></li>
+<li class="chapter" data-level="4.6.2" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#fishers-exact-test"><i class="fa fa-check"></i><b>4.6.2</b> Fisher’s Exact Test</a></li>
+<li class="chapter" data-level="4.6.3" data-path="analysis-of-categorical-data-section-6-3.html"><a href="analysis-of-categorical-data-section-6-3.html#chi-squared-analysis"><i class="fa fa-check"></i><b>4.6.3</b> Chi-squared Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="logistic-regression.html"><a href="logistic-regression.html"><i class="fa fa-check"></i><b>5</b> Logistic Regression</a><ul>
+<li class="chapter" data-level="5.1" data-path="logistic-regression.html"><a href="logistic-regression.html#logmodel"><i class="fa fa-check"></i><b>5.1</b> Motivation for Logistic Regression</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="logistic-regression.html"><a href="logistic-regression.html#the-logistic-model"><i class="fa fa-check"></i><b>5.1.1</b> The logistic model</a></li>
+<li class="chapter" data-level="5.1.2" data-path="logistic-regression.html"><a href="logistic-regression.html#constant-or-varying-rr"><i class="fa fa-check"></i><b>5.1.2</b> constant OR, varying RR</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="logistic-regression.html"><a href="logistic-regression.html#logMLE"><i class="fa fa-check"></i><b>5.2</b> Estimating coefficients in logistic regression</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="logistic-regression.html"><a href="logistic-regression.html#maximum-likelihood-estimation"><i class="fa fa-check"></i><b>5.2.1</b> Maximum Likelihood Estimation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="logistic-regression.html"><a href="logistic-regression.html#loginf"><i class="fa fa-check"></i><b>5.3</b> Formal Inference</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="logistic-regression.html"><a href="logistic-regression.html#wald-tests-intervals"><i class="fa fa-check"></i><b>5.3.1</b> Wald Tests &amp; Intervals</a></li>
+<li class="chapter" data-level="5.3.2" data-path="logistic-regression.html"><a href="logistic-regression.html#likelihood-ratio-tests"><i class="fa fa-check"></i><b>5.3.2</b> Likelihood Ratio Tests</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="logistic-regression.html"><a href="logistic-regression.html#multlog"><i class="fa fa-check"></i><b>5.4</b> Multiple Logistic Regression</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="logistic-regression.html"><a href="logistic-regression.html#interaction"><i class="fa fa-check"></i><b>5.4.1</b> Interaction</a></li>
+<li class="chapter" data-level="5.4.2" data-path="logistic-regression.html"><a href="logistic-regression.html#simpsons-paradox"><i class="fa fa-check"></i><b>5.4.2</b> Simpson’s Paradox</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="logistic-regression.html"><a href="logistic-regression.html#multicol"><i class="fa fa-check"></i><b>5.5</b> Multicolinearity</a></li>
+<li class="chapter" data-level="5.6" data-path="logistic-regression.html"><a href="logistic-regression.html#logstep"><i class="fa fa-check"></i><b>5.6</b> Model Building</a><ul>
+<li class="chapter" data-level="5.6.1" data-path="logistic-regression.html"><a href="logistic-regression.html#formal-model-building"><i class="fa fa-check"></i><b>5.6.1</b> Formal Model Building</a></li>
+<li class="chapter" data-level="5.6.2" data-path="logistic-regression.html"><a href="logistic-regression.html#getting-the-model-right"><i class="fa fa-check"></i><b>5.6.2</b> Getting the Model Right</a></li>
+</ul></li>
+<li class="chapter" data-level="5.7" data-path="logistic-regression.html"><a href="logistic-regression.html#model-assessment"><i class="fa fa-check"></i><b>5.7</b> Model Assessment</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="logistic-regression.html"><a href="logistic-regression.html#measures-of-association"><i class="fa fa-check"></i><b>5.7.1</b> Measures of Association</a></li>
+<li class="chapter" data-level="5.7.2" data-path="logistic-regression.html"><a href="logistic-regression.html#roc"><i class="fa fa-check"></i><b>5.7.2</b> Receiver Operating Characteristic Curves</a></li>
+<li class="chapter" data-level="5.7.3" data-path="logistic-regression.html"><a href="logistic-regression.html#cv"><i class="fa fa-check"></i><b>5.7.3</b> Cross Validation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="logistic-regression.html"><a href="logistic-regression.html#birdexamp"><i class="fa fa-check"></i><b>5.8</b> R: Birdnest Example</a><ul>
+<li class="chapter" data-level="5.8.1" data-path="logistic-regression.html"><a href="logistic-regression.html#drop-in-deviance-likelihood-ratio-test-lrt"><i class="fa fa-check"></i><b>5.8.1</b> Drop-in-deviance (Likelihood Ratio Test, LRT)</a></li>
+<li class="chapter" data-level="5.8.2" data-path="logistic-regression.html"><a href="logistic-regression.html#difference-between-tidy-and-augment-and-glance"><i class="fa fa-check"></i><b>5.8.2</b> Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></a></li>
+<li class="chapter" data-level="5.8.3" data-path="logistic-regression.html"><a href="logistic-regression.html#looking-at-variables-in-a-few-different-ways."><i class="fa fa-check"></i><b>5.8.3</b> Looking at variables in a few different ways.</a></li>
+<li class="chapter" data-level="5.8.4" data-path="logistic-regression.html"><a href="logistic-regression.html#predicting-response"><i class="fa fa-check"></i><b>5.8.4</b> Predicting Response</a></li>
+<li class="chapter" data-level="5.8.5" data-path="logistic-regression.html"><a href="logistic-regression.html#measues-of-association"><i class="fa fa-check"></i><b>5.8.5</b> Measues of association</a></li>
+<li class="chapter" data-level="5.8.6" data-path="logistic-regression.html"><a href="logistic-regression.html#roc-curves"><i class="fa fa-check"></i><b>5.8.6</b> ROC curves</a></li>
+<li class="chapter" data-level="5.8.7" data-path="logistic-regression.html"><a href="logistic-regression.html#drawing-interactions"><i class="fa fa-check"></i><b>5.8.7</b> Drawing interactions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="survival-analysis.html"><a href="survival-analysis.html"><i class="fa fa-check"></i><b>6</b> Survival Analysis</a><ul>
+<li class="chapter" data-level="6.1" data-path="survival-analysis.html"><a href="survival-analysis.html#timedata"><i class="fa fa-check"></i><b>6.1</b> Time-to-event data</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="survival-analysis.html"><a href="survival-analysis.html#survival-function"><i class="fa fa-check"></i><b>6.1.1</b> Survival Function</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="survival-analysis.html"><a href="survival-analysis.html#KM"><i class="fa fa-check"></i><b>6.2</b> Kaplan-Meier Curves</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="survival-analysis.html"><a href="survival-analysis.html#KMCI"><i class="fa fa-check"></i><b>6.2.1</b> CI for KM curve</a></li>
+<li class="chapter" data-level="6.2.2" data-path="survival-analysis.html"><a href="survival-analysis.html#logrank"><i class="fa fa-check"></i><b>6.2.2</b> Log-rank Test</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="survival-analysis.html"><a href="survival-analysis.html#hazfunc"><i class="fa fa-check"></i><b>6.3</b> Hazard Functions</a><ul>
+<li class="chapter" data-level="6.3.1" data-path="survival-analysis.html"><a href="survival-analysis.html#estimating-ht-ala-kaplan-meier"><i class="fa fa-check"></i><b>6.3.1</b> Estimating <span class="math inline">\(h(t)\)</span> ala Kaplan-Meier</a></li>
+<li class="chapter" data-level="6.3.2" data-path="survival-analysis.html"><a href="survival-analysis.html#proportional-hazards"><i class="fa fa-check"></i><b>6.3.2</b> Proportional Hazards</a></li>
+<li class="chapter" data-level="6.3.3" data-path="survival-analysis.html"><a href="survival-analysis.html#coxph"><i class="fa fa-check"></i><b>6.3.3</b> Cox PH Regression Analysis</a></li>
+<li class="chapter" data-level="6.3.4" data-path="survival-analysis.html"><a href="survival-analysis.html#testingph"><i class="fa fa-check"></i><b>6.3.4</b> Testing Proportional Hazards</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="survival-analysis.html"><a href="survival-analysis.html#othersurv"><i class="fa fa-check"></i><b>6.4</b> Other stuff</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="survival-analysis.html"><a href="survival-analysis.html#sample-size-calculation"><i class="fa fa-check"></i><b>6.4.1</b> Sample Size Calculation</a></li>
+<li class="chapter" data-level="6.4.2" data-path="survival-analysis.html"><a href="survival-analysis.html#study-design"><i class="fa fa-check"></i><b>6.4.2</b> Study Design</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="survival-analysis.html"><a href="survival-analysis.html#Rsurv"><i class="fa fa-check"></i><b>6.5</b> R example: ProPublica Analysis</a><ul>
+<li class="chapter" data-level="6.5.1" data-path="survival-analysis.html"><a href="survival-analysis.html#recidivism-in-florida"><i class="fa fa-check"></i><b>6.5.1</b> Recidivism in Florida</a></li>
+<li class="chapter" data-level="6.5.2" data-path="survival-analysis.html"><a href="survival-analysis.html#kaplan-meier-survival-curve"><i class="fa fa-check"></i><b>6.5.2</b> Kaplan-Meier survival curve</a></li>
+<li class="chapter" data-level="6.5.3" data-path="survival-analysis.html"><a href="survival-analysis.html#log-rank-test-rho0-and-the-wilcoxon-test-rho1"><i class="fa fa-check"></i><b>6.5.3</b> Log-rank test [rho=0] and the Wilcoxon test [rho=1]</a></li>
+<li class="chapter" data-level="6.5.4" data-path="survival-analysis.html"><a href="survival-analysis.html#cox-proportional-hazards-models"><i class="fa fa-check"></i><b>6.5.4</b> Cox Proportional Hazards models</a></li>
+<li class="chapter" data-level="6.5.5" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-the-plot-of-ln-lnst"><i class="fa fa-check"></i><b>6.5.5</b> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span></a></li>
+<li class="chapter" data-level="6.5.6" data-path="survival-analysis.html"><a href="survival-analysis.html#checking-proportional-hazards-with-cox.zph"><i class="fa fa-check"></i><b>6.5.6</b> Checking proportional hazards with cox.zph</a></li>
+<li class="chapter" data-level="6.5.7" data-path="survival-analysis.html"><a href="survival-analysis.html#coxph-diagnostics-look-into-all-the-different-arguments-of-the-function"><i class="fa fa-check"></i><b>6.5.7</b> Coxph diagnostics … look into all the different arguments of the function!</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html"><i class="fa fa-check"></i><b>7</b> Multiple Comparisons</a><ul>
+<li class="chapter" data-level="7.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#Ioannidis"><i class="fa fa-check"></i><b>7.1</b> Why Most Published Research Findings are False</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#positive-predictive-value-ppv"><i class="fa fa-check"></i><b>7.1.1</b> Positive Predictive Value (PPV)</a></li>
+<li class="chapter" data-level="7.1.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#bias"><i class="fa fa-check"></i><b>7.1.2</b> Bias</a></li>
+<li class="chapter" data-level="7.1.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#multiple-studies"><i class="fa fa-check"></i><b>7.1.3</b> Multiple Studies</a></li>
+<li class="chapter" data-level="7.1.4" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#corollaries"><i class="fa fa-check"></i><b>7.1.4</b> Corollaries</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#multcomp"><i class="fa fa-check"></i><b>7.2</b> Multiple Comparisons</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#bonferroni"><i class="fa fa-check"></i><b>7.2.1</b> Bonferroni</a></li>
+<li class="chapter" data-level="7.2.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#holm"><i class="fa fa-check"></i><b>7.2.2</b> Holm</a></li>
+<li class="chapter" data-level="7.2.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#benjamini-hochberg"><i class="fa fa-check"></i><b>7.2.3</b> Benjamini-Hochberg</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#qvals"><i class="fa fa-check"></i><b>7.3</b> Storey &amp; q-values</a></li>
+<li class="chapter" data-level="7.4" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#interim-analyses"><i class="fa fa-check"></i><b>7.4</b> Interim Analyses</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#pocock"><i class="fa fa-check"></i><b>7.4.1</b> Pocock</a></li>
+<li class="chapter" data-level="7.4.2" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#obrien-flemming"><i class="fa fa-check"></i><b>7.4.2</b> O’Brien-Flemming</a></li>
+<li class="chapter" data-level="7.4.3" data-path="multiple-comparisons.html"><a href="multiple-comparisons.html#some-parting-thoughts"><i class="fa fa-check"></i><b>7.4.3</b> Some parting thoughts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression.html"><a href="poisson-regression.html"><i class="fa fa-check"></i><b>8</b> Poisson Regression</a><ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression.html"><a href="poisson-regression.html#regPois"><i class="fa fa-check"></i><b>8.1</b> Regression Models</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="poisson-regression.html"><a href="poisson-regression.html#the-poisson-regression-model"><i class="fa fa-check"></i><b>8.1.1</b> The Poisson Regression Model</a></li>
+<li class="chapter" data-level="8.1.2" data-path="poisson-regression.html"><a href="poisson-regression.html#comparison-to-linear-regression"><i class="fa fa-check"></i><b>8.1.2</b> Comparison to Linear Regression</a></li>
+<li class="chapter" data-level="8.1.3" data-path="poisson-regression.html"><a href="poisson-regression.html#interpreting-poisson-regression-coefficients"><i class="fa fa-check"></i><b>8.1.3</b> Interpreting Poisson Regression Coefficients</a></li>
+<li class="chapter" data-level="8.1.4" data-path="poisson-regression.html"><a href="poisson-regression.html#assessing-model-validity"><i class="fa fa-check"></i><b>8.1.4</b> Assessing Model Validity</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression.html"><a href="poisson-regression.html#inferPois"><i class="fa fa-check"></i><b>8.2</b> Inference in Poisson Regression</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="poisson-regression.html"><a href="poisson-regression.html#maximum-likelihood"><i class="fa fa-check"></i><b>8.2.1</b> Maximum Likelihood</a></li>
+<li class="chapter" data-level="8.2.2" data-path="poisson-regression.html"><a href="poisson-regression.html#wald-tests"><i class="fa fa-check"></i><b>8.2.2</b> Wald Tests</a></li>
+<li class="chapter" data-level="8.2.3" data-path="poisson-regression.html"><a href="poisson-regression.html#drop-in-deviance-tests"><i class="fa fa-check"></i><b>8.2.3</b> Drop-in-Deviance Tests</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression.html"><a href="poisson-regression.html#r-poisson-example"><i class="fa fa-check"></i><b>8.3</b> R Poisson Example</a><ul>
+<li class="chapter" data-level="8.3.1" data-path="poisson-regression.html"><a href="poisson-regression.html#glm"><i class="fa fa-check"></i><b>8.3.1</b> glm</a></li>
+<li class="chapter" data-level="8.3.2" data-path="poisson-regression.html"><a href="poisson-regression.html#drop-in-deviance"><i class="fa fa-check"></i><b>8.3.2</b> drop in deviance</a></li>
+<li class="chapter" data-level="8.3.3" data-path="poisson-regression.html"><a href="poisson-regression.html#residuals-1"><i class="fa fa-check"></i><b>8.3.3</b> residuals</a></li>
+<li class="chapter" data-level="8.3.4" data-path="poisson-regression.html"><a href="poisson-regression.html#quasipoisson"><i class="fa fa-check"></i><b>8.3.4</b> quasiPoisson</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://st47s.com/Math150" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Methods in Biostatistics</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="multiple-comparisons" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> Multiple Comparisons</h1>
+<div id="Ioannidis" class="section level2">
+<h2><span class="header-section-number">7.1</span> Why Most Published Research Findings are False</h2>
+<p>The Ioannidis article <span class="citation">(Ioannidis <a href="#ref-Ioannidis">2005</a>)</span>, and our related discussion, focuses on multiple testing. We’d like to understand the effect of testing in three different contexts:</p>
+<ol style="list-style-type: decimal">
+<li>When looking for as many possible significant findings as possible (publish or perish)</li>
+<li>When bias exists in our work</li>
+<li>When (many) researchers study the same effect</li>
+</ol>
+<div id="definitions" class="section level4">
+<h4><span class="header-section-number">7.1.0.1</span> Definitions</h4>
+<ul>
+<li><strong>R</strong>
+<span class="math display">\[\begin{eqnarray*}
+R = \frac{ \mbox{# true relationships}}{\mbox{# null relationships}} \ \ \ \mbox{ in the population}
+\end{eqnarray*}\]</span></li>
+<li><strong>TRUE</strong>
+<span class="math display">\[\begin{eqnarray*}
+P(\mbox{study is true}) &amp;=&amp; \frac{ \mbox{# true relationships}}{\mbox{# total}}\\
+&amp;=&amp; \frac{ \mbox{# true relationships}}{\mbox{# true + # null}}\\
+&amp;=&amp; \frac{ \mbox{R(# null relationships)}}{\mbox{R (# null) + # null}}\\
+&amp;=&amp; \frac{R}{R+1}
+\end{eqnarray*}\]</span></li>
+<li><strong>size</strong>
+<span class="math display">\[\begin{eqnarray*}
+\alpha &amp;=&amp; P(\mbox{type I error})\\
+&amp;=&amp; P(\mbox{reject } H_0 | H_0 \mbox{ true})\\
+\end{eqnarray*}\]</span></li>
+<li><strong>power</strong>
+<span class="math display">\[\begin{eqnarray*}
+1 - \beta &amp;=&amp; P(\mbox{reject } H_0 | H_0 \mbox{ false})\\
+\beta &amp;=&amp; P(\mbox{type II error})\\
+&amp;=&amp; P(\mbox{not reject } H_0 | H_0 \mbox{ false})\\
+\end{eqnarray*}\]</span></li>
+<li><strong>tests</strong>
+<span class="math display">\[\begin{eqnarray*}
+c &amp;=&amp; \mbox{# of tests run}
+\end{eqnarray*}\]</span></li>
+</ul>
+<p>Baseball power simulation applet <span class="citation">(Chance and Rossman <a href="#ref-iscam">2018</a>)</span> <a href="http://www.rossmanchance.com/applets/power.html" class="uri">http://www.rossmanchance.com/applets/power.html</a></p>
+</div>
+<div id="positive-predictive-value-ppv" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> Positive Predictive Value (PPV)</h3>
+<p>We’ll focus here on the Positive Predictive Value (PPV). That is, what is the probability that the positive result you found is actually true?</p>
+<table>
+<thead>
+<tr class="header">
+<th>Research Finding</th>
+<th>Yes</th>
+<th>No</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Yes</td>
+<td><span class="math inline">\(c(1-\beta)R / (R+1)\)</span></td>
+<td><span class="math inline">\(c \alpha / (R+1)\)</span></td>
+<td><span class="math inline">\(c(R+\alpha - \beta R)/(R+1)\)</span></td>
+</tr>
+<tr class="even">
+<td>No</td>
+<td><span class="math inline">\(c \beta R / (R+1)\)</span></td>
+<td><span class="math inline">\(c(1-\alpha)/(R+1)\)</span></td>
+<td><span class="math inline">\(c(1-\alpha + \beta R)/(R+1)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td><span class="math inline">\(cR/(R+1)\)</span></td>
+<td><span class="math inline">\(c/(R+1)\)</span></td>
+<td><span class="math inline">\(c\)</span></td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+PPV &amp;=&amp; \frac{c(1-\beta)R / (R+1)}{c(1-\beta)R / (R+1) + c \alpha / (R+1)}\\
+&amp;=&amp; \frac{c(1-\beta)R}{c(1-\beta)R + c \alpha}\\
+&amp;=&amp; \frac{(1-\beta)R}{(1-\beta)R +  \alpha}\\
+&amp;=&amp; \frac{1}{1 + \alpha / (1-\beta) R}\\
+&amp;&amp; \\
+PPV &amp;&gt;&amp; 0.5 \mbox{ more likely true}\\
+\mbox{iff   } (1-\beta)R &amp;&gt;&amp; (R-\beta R + \alpha) 0.5\\
+(1-\beta) R 0.5 &amp;&gt;&amp; \alpha 0.5\\
+(1-\beta) R &amp;&gt;&amp; \alpha \\
+&amp;&amp; \\
+PPV &amp;&lt;&amp; 0.5  \mbox{ more likely false}\\
+\mbox{iff   } (1-\beta) R &amp;&lt;&amp; \alpha \\
+\end{eqnarray*}\]</span>
+</div>
+<div id="bias" class="section level3">
+<h3><span class="header-section-number">7.1.2</span> Bias</h3>
+<ul>
+<li><strong>bias</strong>
+<span class="math display">\[\begin{eqnarray*}
+u &amp;=&amp; \mbox{proportion of results that would not have been research findings but ended up}\\
+ &amp;&amp; \mbox{reported as such because of bias}
+\end{eqnarray*}\]</span></li>
+</ul>
+<p>Note: bias simply moves <span class="math inline">\(u\)</span>% of the findings from the <code>No</code> row to the <code>Yes</code> row.</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="25%" />
+<col width="25%" />
+<col width="36%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Research Finding</th>
+<th>Yes</th>
+<th>No</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Yes</td>
+<td><span class="math inline">\([c(1-\beta)R +uc \beta R] / (R+1)\)</span></td>
+<td><span class="math inline">\([c \alpha + u c(1-\alpha)] / (R+1)\)</span></td>
+<td><span class="math inline">\(c[R+\alpha - \beta R + u(1-\alpha + \beta R)]/(R+1)\)</span></td>
+</tr>
+<tr class="even">
+<td>No</td>
+<td><span class="math inline">\((1-u)c \beta R / (R+1)\)</span></td>
+<td><span class="math inline">\((1-u)c(1-\alpha)/(R+1)\)</span></td>
+<td><span class="math inline">\(c(1-u)(1-\alpha + \beta R)/(R+1)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td><span class="math inline">\(cR/(R+1)\)</span></td>
+<td><span class="math inline">\(c/(R+1)\)</span></td>
+<td><span class="math inline">\(c\)</span></td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+PPV &amp;=&amp; \frac{[c(1-\beta)R +uc \beta R] / (R+1)}{c[R+\alpha - \beta R + u(1-\alpha + \beta R)]/(R+1)}\\
+ &amp;=&amp; \frac{[(1-\beta)R +u \beta R]}{[R+\alpha - \beta R + u(1-\alpha + \beta R)]}\\
+&amp;=&amp; \frac{1}{1 + \frac{\alpha + u(1-\alpha)}{(1-\beta)R + u\beta R}}
+\end{eqnarray*}\]</span>
+<p>Note that <span class="math inline">\(PPV \uparrow\)</span> as <span class="math inline">\(u \uparrow\)</span> as long as <span class="math inline">\((1-\beta) \leq \alpha\)</span>. Or really, it is probably easier to think about if <span class="math inline">\((1-\beta) &gt; \alpha\)</span>, then <span class="math inline">\(PPV \uparrow\)</span> as <span class="math inline">\(u \downarrow\)</span>. The second sentence is more realistic, e.g., <span class="math inline">\(\beta &lt; .95\)</span> means that we have more true results in our list of significant findings as the bias goes down. [To understand the direction of the relationships, find <span class="math inline">\(\partial PPV / \partial u &lt; 0\)</span> if <span class="math inline">\((1-\beta) &gt; \alpha\)</span> (decreasing with u).]</p>
+</div>
+<div id="multiple-studies" class="section level3">
+<h3><span class="header-section-number">7.1.3</span> Multiple Studies</h3>
+<ul>
+<li><span class="math inline">\(\alpha\)</span>
+<ul>
+<li>If a study is null, the probability of seeing null is <span class="math inline">\((1-\alpha)\)</span></li>
+<li>If 3 of us test the same thing, the probability that we will all see null is <span class="math inline">\((1-\alpha)^3\)</span></li>
+<li><em>and</em> the probability that at least one of use will see significance goes from <span class="math inline">\(\alpha\)</span> to <span class="math inline">\(1 - (1-\alpha)^3\)</span></li>
+<li>As <span class="math inline">\(n \uparrow\)</span> someone will definitely see significance (bad!)</li>
+</ul></li>
+<li><span class="math inline">\(\beta\)</span>
+<ul>
+<li>If a study is significant, the probability of seeing null is <span class="math inline">\(\beta\)</span></li>
+<li>If 3 of us test the same thing, the probability that we’ll all see null is <span class="math inline">\(\beta^3\)</span></li>
+<li><em>and</em> the probability that at least one of us will see significance goes from <span class="math inline">\((1-\beta)\)</span> to <span class="math inline">\((1-\beta^3)\)</span></li>
+<li>As <span class="math inline">\(n \uparrow\)</span>, someone will definitely see significance (good!)</li>
+</ul></li>
+</ul>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="22%" />
+<col width="26%" />
+<col width="35%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Research Finding</th>
+<th>Yes</th>
+<th>No</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Yes</td>
+<td><span class="math inline">\(c(1-\beta^n)R / (R+1)\)</span></td>
+<td><span class="math inline">\(c(1-[1- \alpha]^n) / (R+1)\)</span></td>
+<td><span class="math inline">\(c(R+1-[1-\alpha]^n - \beta^n R)/(R+1)\)</span></td>
+</tr>
+<tr class="even">
+<td>No</td>
+<td><span class="math inline">\(c \beta^n R / (R+1)\)</span></td>
+<td><span class="math inline">\(c(1-\alpha)^n/(R+1)\)</span></td>
+<td><span class="math inline">\(c([1-\alpha]^n + \beta^n R)/(R+1)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td><span class="math inline">\(cR/(R+1)\)</span></td>
+<td><span class="math inline">\(c/(R+1)\)</span></td>
+<td><span class="math inline">\(c\)</span></td>
+</tr>
+</tbody>
+</table>
+<span class="math display">\[\begin{eqnarray*}
+PPV &amp;=&amp; \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
+\end{eqnarray*}\]</span>
+<p><span class="math inline">\(PPV \downarrow\)</span> as <span class="math inline">\(n \uparrow\)</span> unless <span class="math inline">\((1-\beta) &lt; \alpha\)</span> that is, <span class="math inline">\(\beta &gt; 0.95\)</span> !!</p>
+</div>
+<div id="corollaries" class="section level3">
+<h3><span class="header-section-number">7.1.4</span> Corollaries</h3>
+<ul>
+<li><strong>Corollary 1</strong> The smaller the studies conducted in a scientific field, the less likely the research findings are to be true. (low power)<br />
+</li>
+<li><strong>Corollary 2</strong> The smaller the effect sizes in a scientific field, the less likely the research findings are to be true. (also low power)<br />
+</li>
+<li><strong>Corollary 3</strong> The greater the number and the lesser the selection of tested relationships in a scientific field, the less likely the research findings are to be true. (pre-study odds: R; phase III trials have better odds than microarray studies)<br />
+</li>
+<li><strong>Corollary 4</strong> The greater the flexibility in designs, definitions, outcomes, and analytical modes in a scientific field, the less likely the research findings are to be true. (increased bias)<br />
+</li>
+<li><strong>Corollary 5</strong> The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true. (increased bias)</li>
+<li><strong>Corollary 6</strong> The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true. (increased <span class="math inline">\(n\)</span>)</li>
+</ul>
+</div>
+</div>
+<div id="multcomp" class="section level2">
+<h2><span class="header-section-number">7.2</span> Multiple Comparisons</h2>
+<p>As you might expect, if you have 10 groups, <strong>all of which come from the same population</strong>, you might wrongly conclude that some of the means are <em>significantly</em> different. If you try pairwise comparisons on all 10 groups, you’ll have <span class="math inline">\({10 \choose 2} = 45\)</span> comparisons. Out of the 45 CI, you’d expect 2.25 of them to not contain the true difference (of zero); equivalently, you’d expect 2.25 tests to reject the true <span class="math inline">\(H_0\)</span>. In an overall test of comparing all 10 groups simultaneously, you can’t use size as a performance measure anymore.</p>
+<ul>
+<li><strong>FWER</strong> = <span class="math inline">\(P(V\geq1)\)</span></li>
+</ul>
+<p>The Familywise Error Rate (FWER) is the probability of making one or more type I errors in a series of multiple tests. In the example above (with 10 comparisons), you would almost always make at least one type I error if you used a size of <span class="math inline">\(\alpha = 0.05\)</span>. So, your FWER would be close to 1. Methods exist for controlling the FWER instead of the size (<span class="math inline">\(\alpha\)</span>).</p>
+<div id="bonferroni" class="section level3">
+<h3><span class="header-section-number">7.2.1</span> Bonferroni</h3>
+<p>The Bonferroni method of adjusting for multiple comparisons is used to control the FWER.</p>
+Assume all our tests are null
+<span class="math display">\[\begin{eqnarray*}
+A_1 &amp;=&amp; \mbox{event reject test 1}\\
+P(A_1) &amp;=&amp; \alpha^*\\
+A_2 &amp;=&amp; \mbox{event reject test 2}\\
+P(A_2) &amp;=&amp; \alpha^*\\
+\end{eqnarray*}\]</span>
+We want to bound the probability that all our tests don’t commit a type 1 error (that is, none of them reject).
+<span class="math display">\[\begin{eqnarray*}
+P( A_1 \mbox{ or } A_2) &amp;=&amp; P(A_1) + P(A_2) - P(A_1 \mbox{ and } A_2)\\
+&amp;=&amp; \alpha^* + \alpha^* - ???\\
+&amp; \leq&amp; 2 \alpha^* \\
+FWER = P(\mbox{at least one rejects}) &amp;\leq&amp; 2 \alpha^*\\
+\mbox{let} &amp;&amp; P(A_1) = P(A_2) = \alpha^* = \frac{\alpha}{2}\\
+FWER &amp;\leq&amp; \alpha
+\end{eqnarray*}\]</span>
+<p>That is, with <span class="math inline">\(m\)</span> tests, rejecting any test whose p-value is less than or equal to <span class="math inline">\(\alpha/m\)</span> will control the FWER at <span class="math inline">\(\alpha\)</span>. Alternatively, rejecting adjusted p-values less than <span class="math inline">\(\alpha\)</span> will also control the FWER at <span class="math inline">\(\alpha\)</span>. Where the adjusted p-values are defined as:</p>
+<span class="math display">\[\begin{eqnarray*}
+\tilde{p}_j = \min(m p_j, 1)
+\end{eqnarray*}\]</span>
+<p>Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
+<ul>
+<li>Note that interpretations depend heavily on the number of tests (which is true about most multiple comparison adjustments).<br />
+</li>
+<li>Bonferroni is extremely conservative, and therefore it has very high type II error rates (low power).<br />
+</li>
+<li>We aren’t really interested in the situation where “all true null tests don’t get rejected.”</li>
+</ul>
+</div>
+<div id="holm" class="section level3">
+<h3><span class="header-section-number">7.2.2</span> Holm</h3>
+<p>Holm is a less conservative (than Bonferroni) method for controlling the FWER. Because each p-value is considered sequentially, the Holm adjustment is referred to as “step-up”. The intuition is that on the first step, the bound assumes up to <span class="math inline">\(m\)</span> null hypotheses. But on the second step, there are only <span class="math inline">\(m-1\)</span> null hypotheses (assuming the first p-value is rejected).</p>
+<p>To control the FWER at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span> and define the adjusted p-values to be:</p>
+<span class="math display">\[\begin{eqnarray*}
+\tilde{p}_j = \max_{i \leq j} [ \min((m-i+1) p_i, 1) ]
+\end{eqnarray*}\]</span>
+<p>Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
+<ul>
+<li><strong>FDR</strong> = <span class="math inline">\(E[V/R]\)</span></li>
+</ul>
+<p>The FDR (false discovery rate) is the expected proportion of false discoveries out of all the discoveries.</p>
+<ul>
+<li><strong>PPV</strong> = <span class="math inline">\(E[S/R]\)</span></li>
+</ul>
+<p>Consider <span class="math inline">\(m\)</span> hypotheses:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th align="center">Null True</th>
+<th align="center">Alt True</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Research</td>
+<td>not significant</td>
+<td align="center"><span class="math inline">\(U\)</span></td>
+<td align="center"><span class="math inline">\(T\)</span></td>
+<td align="center"><span class="math inline">\(m-R\)</span></td>
+</tr>
+<tr class="even">
+<td>Finding</td>
+<td>significant</td>
+<td align="center"><span class="math inline">\(V\)</span></td>
+<td align="center"><span class="math inline">\(S\)</span></td>
+<td align="center"><span class="math inline">\(R\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center"><span class="math inline">\(m_0\)</span></td>
+<td align="center"><span class="math inline">\(m-m_0\)</span></td>
+<td align="center"><span class="math inline">\(m\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="benjamini-hochberg" class="section level3">
+<h3><span class="header-section-number">7.2.3</span> Benjamini-Hochberg</h3>
+<p>When running experiments that have many many tests of significance, it is often more desirable to worry about the <em>number</em> of false discoveries as opposed to the probability of getting <em>one</em> false discovery. That is, we are typically comfortable with a few false positives (i.e., a very HIGH FWER) as long as the rate of false positives is low.</p>
+<p>Define the estimated false discovery proportion at a cutoff t (<span class="math inline">\(\hat{FDR}(t)\)</span>) to be the number of false discoveries at a given cutoff. Again, to control the FDR at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span>.</p>
+<span class="math display">\[\begin{eqnarray*}
+\hat{FDR}(t)&amp;=&amp; \frac{\# \{ p_j \leq t \mbox{ out of the null tests } \}}{ \# \{p_j \leq t\} + (1 \mbox{ if all } p_j &gt; t)}
+\end{eqnarray*}\]</span>
+Notice that p-values from null hypotheses will be distributed uniformly from zero to one. That means that a good estimate of the numerator is <span class="math inline">\(t\cdot\)</span> # of null tests.
+<span class="math display">\[\begin{eqnarray*}
+\hat{FDR}(p_j) &amp;=&amp; \frac{p_j \cdot m \cdot \pi_0}{j} &lt; \frac{p_j m}{j}
+\end{eqnarray*}\]</span>
+<p>where <span class="math inline">\(\pi_0\)</span> is the proportion of tests which are truly null (<span class="math inline">\(m_0/m\)</span>). Consider the adjusted p-values,</p>
+<span class="math display">\[\begin{eqnarray*}
+\tilde{p}_j = \min [ (m/j) p_j, \tilde{p}_{j+1} ]
+\end{eqnarray*}\]</span>
+<p>Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \delta\)</span> to control the FDR at <span class="math inline">\(\delta\)</span>.</p>
+<p>Intuition: let <span class="math inline">\(m=1000\)</span>, and suppose the <span class="math inline">\(\tilde{p}_{250} &lt; 0.4\)</span>. Show that FDR <span class="math inline">\(&lt; 0.4\)</span>.</p>
+<p><span class="math inline">\(\tilde{p}_{250} &lt; 0.4\)</span> implies two different things:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(p_{250} \leq \frac{0.4\cdot 250}{1000} = 0.1\)</span></li>
+<li>and <span class="math inline">\(\approx 750\)</span> null tests have p-values between 0.1 and 1.</li>
+</ol>
+<p>If 750 null tests have p-values between 0.1 and 1, then <span class="math inline">\(m_0 \cdot 0.9 = 750 \rightarrow m_0 = 833.33\)</span>. Therefore, the number of null hypotheses which were rejected is 833.33 - 750 = 83.33.</p>
+<span class="math display">\[\begin{eqnarray*}
+FDR = \frac{83.33}{250} = 0.33 &lt; 0.4
+\end{eqnarray*}\]</span>
+More generally if <span class="math inline">\(\tilde{p}_k = \frac{p_k \cdot m}{k} \leq \delta\)</span>:
+<span class="math display">\[\begin{eqnarray*}
+p_k &amp;&lt;&amp; \frac{k}{m} \delta\\
+\# \mbox{ null not rejected} &amp;=&amp; \mbox{length of null interval }\bigg[\frac{k}{m}\delta,1\bigg] \cdot \mbox{ total } \# \mbox{ of null}\\
+(m-k) &amp;=&amp; \bigg(1-\frac{k}{m} \delta\bigg) m_0\\
+m_0 &amp;=&amp; \frac{(m-k) m}{(m-k \delta)}\\
+&amp; &amp;\\
+FDR &amp;=&amp; \frac{\# \mbox{ null rejected}}{\# \mbox{ rejected}}\\
+&amp;=&amp; \frac{\frac{m(m-k)}{(m-k\delta)} - (m-k)}{k}\\
+&amp;=&amp; \frac{m^2 - mk - (m-k) (m-k \delta)}{(m-k \delta)k}\\
+&amp;=&amp; \frac{k(m \delta - k \delta)}{k(m-k \delta)} = \delta\bigg(\frac{m-k}{m/\delta - k}\bigg)\\
+FDR &amp;&lt;&amp; \delta
+\end{eqnarray*}\]</span>
+<p>because <span class="math inline">\(m/\delta &gt; m\)</span> so <span class="math inline">\(\frac{m-k}{m/\delta -k} &lt; 1\)</span>.</p>
+Consider a one sample t-test. The population is normal centered at 47 with <span class="math inline">\(\sigma=3\)</span>; samples of size 20 are taken from the population. The following hypotheses are tested:
+<span class="math display">\[\begin{eqnarray*}
+H_0: \mu = 47\\
+H_{0_1}: \mu = 40\\
+H_{0_2}: \mu = 48\\
+H_{0_3}: \mu = 50\\
+\end{eqnarray*}\]</span>
+<p>In the null setting, the p-values are uniformly distributed from 0 to 1. When the data are not consistent with the null, there are more p-values close to zero (and even closer to zero as the data become more and more distinct from the null).</p>
+<div id="distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis." class="section level4">
+<h4><span class="header-section-number">7.2.3.1</span> Distribution of p-values under different amounts of divergence from the null hypothesis.</h4>
+<p><img src="07-MC_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The previous example considered the situation where all the p-values came from the distribution. In reality, p-values will come from many different distributions. For simplification, consider the situation where g100% of the tests come from the null distribution, and (1-g)100% of the tests come from a distribution where the p-values are much closer to one and skewed right.</p>
+</div>
+<div id="distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests." class="section level4">
+<h4><span class="header-section-number">7.2.3.2</span> Distribution of p-values under differing proportions of null versus significant tests.</h4>
+<p><img src="07-MC_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="qvals" class="section level2">
+<h2><span class="header-section-number">7.3</span> Storey &amp; q-values</h2>
+<p>The previous methods allowed the larger family of tests to control either the FWER or the FDR (global measures of accuracy). However, for a given test, there was no measure to quantify FDR for a given test.</p>
+<ul>
+<li><strong>p-value</strong> Recall that the p-value is the smallest level of significance (P(type I error)) possible to reject <span class="math inline">\(H_0\)</span>.</li>
+<li><strong>q-value</strong> Akin to the p-value, the q-value is the minimum FDR at that score which can be attained when calling the test significant.</li>
+</ul>
+Storey defines the q-value to be the FDR associated with a given test of significance. For example, say a q-value = 0.013 for test X. Then at most 1.3% of tests with p-values at least as small as test X are false positives. In particular, let
+<span class="math display">\[\begin{eqnarray*}
+\hat{\pi}_0 = \frac{\# \{ p_j &gt; \lambda \} }{m(1-\lambda)} \ \ \  \mbox{ for some } \lambda
+\end{eqnarray*}\]</span>
+<p>(though there are many ways to estimate <span class="math inline">\(\pi_0\)</span>.)</p>
+<p>In a step-down algorithm, the q-value is defined using the p-value at hand and the next {} p-value. Additionally, the <span class="math inline">\(\pi_0\)</span> is implemented as seen in the original intuition behind FDR control.</p>
+<ul>
+<li><strong>step 1</strong> let
+<span class="math display">\[\begin{eqnarray*}
+\hat{q}(p_{m}) = \hat{\pi}_0 p_{m}
+\end{eqnarray*}\]</span>
+Note that <span class="math inline">\(\hat{q}(p_{m})\)</span> is the biggest q-value and $ p_{m}$ is the biggest p-value.</li>
+<li><strong>step 2</strong>
+<span class="math display">\[\begin{eqnarray*}
+\hat{q}(p_{m-1}) = \min( \hat{\pi}_0 p_{m-1} \frac{m}{m-1}, \hat{q}( p_{m}))
+\end{eqnarray*}\]</span>
+If <span class="math inline">\(\hat{q}(p_{m}) = 0.7\)</span> and <span class="math inline">\(\hat{\pi}_0 p_{m-1} \frac{m}{m-1} = 0.8\)</span>, then the next smallest q-value would be 0.7 because the FDR can be as low as 0.7 (see the definition of FDR).</li>
+<li><strong>step 3</strong> more generally,
+<span class="math display">\[\begin{eqnarray*}
+\hat{q}(p_{j}) = \min( \hat{\pi}_0 p_{j} \frac{m}{j}, \hat{q}( p_{j+1}))
+\end{eqnarray*}\]</span></li>
+</ul>
+<p>Can a q-value be less than a p-value? Sure! If the number of null hypotheses is small and the test is powerful. For example, consider testing 1000 hypotheses with 20% null tests (<span class="math inline">\(\pi_0=0.2\)</span>). Assume 500 of the p-values are less than 0.05 (very powerful!). With 200 null we would expect 10 to be less than 0.05. So, the FDR is 10/500 = 0.02 (which is smaller than the p-value of 0.05 at the cutoff for the <span class="math inline">\(500^{th}\)</span> test).</p>
+<div id="how-are-fwer-and-fdr-related" class="section level4">
+<h4><span class="header-section-number">7.3.0.1</span> How are FWER and FDR related?</h4>
+<p>First note that for both FDR and FWER, the procedure is to <em>control</em> the errors not to compute or estimate the errors (except in the case of the q-value).</p>
+<p>Recall that <span class="math inline">\(FDR = E[V/R]\)</span> and is defined to equal zero if R=0</p>
+<span class="math display">\[\begin{eqnarray*}
+FDR &amp;=&amp; E\bigg[\frac{V}{R} \bigg]\\
+&amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0) + E\bigg[\frac{V}{R} | R=0 \bigg] P(R=0)\\
+&amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0)
+\end{eqnarray*}\]</span>
+<ul>
+<li><strong>case 1</strong> In the first case, consider <span class="math inline">\(V=R\)</span> such that all significant hypotheses are null.
+<span class="math display">\[\begin{eqnarray*}
+FDR &amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0)\\
+&amp;=&amp; 1 P(R&gt;0) = 1 P(V \geq 1)\\
+&amp;=&amp; FWER
+\end{eqnarray*}\]</span></li>
+<li><strong>case 2</strong> In the second case, consider <span class="math inline">\(V &lt; R\)</span> such that some of the significant hypotheses are null and some are not. (<span class="math inline">\(V/R &lt; 1\)</span>)
+<span class="math display">\[\begin{eqnarray*}
+FDR &amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0)\\
+&amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0, V\geq 1 \bigg] P(R &gt;0, V \geq 1) + E\bigg[\frac{V}{R} | R &gt; 0, V=0 \bigg] P(R &gt;0, V =0)\\ 
+&amp;&amp; \mbox{ (note: } V/R \equiv 0 \mbox{ if } V = 0)\\
+&amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0, V\geq 1 \bigg] P(R &gt;0, V \geq 1) \\
+&amp;&lt;&amp; P(V \geq 1) = FWER \ \ \mbox{ because } V/R &lt; 1
+\end{eqnarray*}\]</span></li>
+</ul>
+<p>The proof above shows that FWER controls the FDR when not all significant tests are null. When all significant tests are null, FWER=FDR.</p>
+</div>
+</div>
+<div id="interim-analyses" class="section level2">
+<h2><span class="header-section-number">7.4</span> Interim Analyses</h2>
+<p>An important application of multiple comparisons issues comes when deciding whether or not to stop a clinical trial early due to either positive or negative results. Looking too often will create many false positives which can be quite problematic. <span class="citation">(Schulz and Grimes <a href="#ref-subgroup">2005</a>)</span></p>
+<p>Consider the following case studies:</p>
+<ul>
+<li>HIV – Indinavir was stopped early due to positive results <span class="citation">(Scott M. Hammer et al. <a href="#ref-hiv">1997</a>)</span></li>
+<li>HVTN 505 was stopped early due to negative results <span class="citation">(Yunda Huang et al. <a href="#ref-hvtn">2015</a>)</span></li>
+<li>Truvada &amp; Tenofovir were also stopped early <span class="citation">(Dyer <a href="#ref-hrt">2004</a>)</span></li>
+</ul>
+What happens when the research performs <span class="math inline">\(k\)</span> interim analyses and the research scenario is truly null?
+<span class="math display">\[\begin{eqnarray*}
+P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or }  testk &lt; \alpha ) &gt; \alpha
+\end{eqnarray*}\]</span>
+<p>The researcher has two options:</p>
+<ol style="list-style-type: decimal">
+<li>Let <span class="math inline">\(\alpha^* &lt; &lt; &lt; \alpha\)</span></li>
+<li>Change <span class="math inline">\(\alpha\)</span> at each step along the way so that the total probability of a type I error is <span class="math inline">\(\alpha\)</span></li>
+</ol>
+<div class="figure">
+<img src="alphaInterim.png" alt="Different \alpha^* values for three different stopping criteria. Note that Peto does not control the test at an overall \alpha=0.05, although it is close." />
+<p class="caption">Different <span class="math inline">\(\alpha^*\)</span> values for three different stopping criteria. Note that Peto does not control the test at an overall <span class="math inline">\(\alpha=0.05\)</span>, although it is close.</p>
+</div>
+<div id="pocock" class="section level3">
+<h3><span class="header-section-number">7.4.1</span> Pocock</h3>
+<p>Advantages:</p>
+<ul>
+<li>simple</li>
+<li>aggressive with respect to stopping early. that is, there is a small expected sample size (when the effect size is large)</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li>low power and therefore large maximum sample size (when the effect size is small)</li>
+</ul>
+</div>
+<div id="obrien-flemming" class="section level3">
+<h3><span class="header-section-number">7.4.2</span> O’Brien-Flemming</h3>
+<p>Advantages:</p>
+<ul>
+<li>final <span class="math inline">\(\alpha\)</span> is close to desired <span class="math inline">\(\alpha\)</span></li>
+<li>more power than Pocock, so smaller max sample size</li>
+</ul>
+<p>Disadvantage:</p>
+<ul>
+<li>less likely to stop early, so larger expected sample size</li>
+</ul>
+</div>
+<div id="some-parting-thoughts" class="section level3">
+<h3><span class="header-section-number">7.4.3</span> Some parting thoughts</h3>
+<ul>
+<li>If <span class="math inline">\(H_a\)</span> is true, the effect size is likely overestimated (true in general, not just for interim analyses).</li>
+<li>Symmetry: which is more important, harm or good?</li>
+<li>Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O’Brien-Flemming) to stopping early for negative reasons.</li>
+</ul>
+<div id="advice-1" class="section level4">
+<h4><span class="header-section-number">7.4.3.1</span> Advice 1</h4>
+<p>The following quote is general advice from statistical researchers doing clinical oncology. <span class="citation">(Green et al. <a href="#ref-crowley">2016</a>)</span></p>
+<blockquote>
+<p>Even the specifics of the most basic task of the data monitoring committee, evaluation of interim results for evidence of benefit or harm, are not necessarily obvious. Questions (and our personal answers) include:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>How often should the data monitoring committee review interim data? (The answer to this should depend on how fast additional information becomes available on a trial. we generally recommend monitoring advanced disease studies, or any other study with rapidly accumulating events, every 6 months. Yearly monitoring may be sufficient for adjuvant or slowly accruing studies.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Should the primary outcome data be reviewed each time or should they be reviewed only at times of planned interim analyses? (All data, including primary outcome data, should be reviewed at each time, since the unexpected does occur.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Should treatment arms be blinded to the data monitoring committee or not? (Definitely not. If A looks better than B, the decision to continue could well be different if A is the control arm instead of the experimental arm.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Should a data monitoring committee decision that evidence is sufficient to close a trail be final, or should it be advisory only? (We would say advisory, but rarely overturned.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>If advisory, advisory to whom - the funding agency? an executive group? the investigators? (Reports should go to the individuals with ultimate responsibility for the integrity of the trial.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Should a data monitoring committee be able to make major design changes to a trial? (No, the data monitoring committee may offer suggestions but design is the responsibility of the principal investigators. On the other hand, major design changes initiated by the principal investigators should be approved by the committee.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Are data monitoring committee duties over when study accrual is complete, or should the data monitoring committee also decide when results are to be reported? (It should also decide when results are to be reported - additional follow-up generates additional data that still need to be monitored.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>How much weight should be accorded to outside information versus current information on the study being monitored? (Definitive outside information cannot be ignored - but this begs the question of what is definitive. A single trial of moderate size probably is not definitive; two large trials probably are; a meta-analysis probably is not.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>How much should results of secondary endpoints influence the decision to continue or not? (Not much unless toxic death is considered secondary.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>How scary do results have to be to stop at a time other than a planned interim analysis? (Very scary, or the purpose of interim analyses is defeated.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>When do accrual problems justify early closure? (When results won’t be available until after they are no longer of interest.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Should confidential information ever be provided to other data monitoring committees or planning groups? (Sometimes. If study conduct will not be compromised by limited release of information, it might be reasonable to let investigators planning new trials know of potential problems or benefits to treatment arms they are considering. Risk to the ongoing trial includes leaked information or intelligent guesses as to the current status; risk to the new trial includes choosing an inappropriate arm based on early results that don’t hold up.)</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Every monitoring committee functions differently because no two people have the same ethical, scientific, or practical perspectives. This means different committees might well come up with different answers to the same monitoring issues. To ensure some balance of opinions, it is best to have a variety of knowledgeable people as members of the committee.</p>
+</blockquote>
+</div>
+<div id="advice-2" class="section level4">
+<h4><span class="header-section-number">7.4.3.2</span> Advice 2</h4>
+<p>Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally. Recently, he was invited to participate in a workshop, <em>Training Students to Extract Value from Big Data</em>. The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge. <a href="http://www.nap.edu/catalog.php?record_id=18981" class="uri">http://www.nap.edu/catalog.php?record_id=18981</a></p>
+<p><strong>Principles for the Data Science Process</strong>, Duncan Temple Lang, University of California, Davis <span class="citation">(<em>National Research Council: Training Students to Extract Value from Big Data</em> <a href="#ref-duncanTL">2014</a>)</span></p>
+<p>Duncan Temple Lang began by listing the core concepts of data science - items that will need to be taught: statistics and machine learning, computing and technologies, and domain knowledge of each problem. He stressed the importance of interpretation and reasoning - not only methods - in addressing data. Students who work in data science will have to have a broad set of skills - including knowledge of randomness and uncertainty, statistical methods, programming, and technology - and practical experience in them. Students tend to have had few computing and statistics classes on entering graduate school in a domain science.</p>
+<p>Temple Lang then described the data analysis pipeline, outlining the steps in one example of a data analysis and exploration process:</p>
+<ol style="list-style-type: decimal">
+<li><p>Asking a general question.</p></li>
+<li><p>Refining the question, identifying data, and understanding data and metadata. Temple Lang noted that the data used are usually not collected for the specific question at hand, so the original experiment and data set should be understood.</p></li>
+<li><p>Access to data. This is unrelated to the science but does require computational skill.</p></li>
+<li><p>Transforming to data structures.</p></li>
+<li><p>Exploratory data analyses to understand the data and determine whether the results will scale. This is a critical step; Temple Lang noted that 80 percent of a data scientist’s time can be spent in cleaning and preparing the data.</p></li>
+<li><p>Dimension reduction. Temple Lang stressed that it can be difficult or impossible to automate this step.</p></li>
+<li><p>Modeling and estimation. Temple Lang noted that computer and machine learning scientists tend to focus more on predictive models than on modeling of physical behavior or characteristics.</p></li>
+<li><p>Diagnostics. This helps to understand how well the model fits the data and identifies anomalies and aspects for further study. This step has similarities to exploratory data analysis.</p></li>
+<li><p>Quantifying uncertainty. Temple Lang indicated that quantifying uncertainty with statistical techniques is important for understanding and interpreting models and results.</p></li>
+<li><p>Conveying results.</p></li>
+</ol>
+<p>Temple Lang stressed that the data analysis process is highly interactive and iterative and requires the presence of a human in the loop. The next step in data processing is often not clear until the results of the current step are clear, and often something unexpected is uncovered. He also emphasized the importance of abstract skills and concepts and said that people need to be exposed to authentic data analyses, not only to the methods used. Data scientists also need to have a statistical understanding, and Temple Lang described the statistical concepts that should be taught to a student:</p>
+<ul>
+<li>Mapping the general question to a statistical framework.</li>
+<li>Understanding the scope of inference, sampling, biases, and limitations.</li>
+<li>Exploratory data analyses, including missing values, data quality, cleaning, matching, and fusing.</li>
+<li>Understanding randomness, variability, and uncertainty. Temple Lang noted that many students do not understand sampling variability.</li>
+<li>Conditional dependence and heterogeneity.</li>
+<li>Dimension reduction, variable selection, and sparsity.</li>
+<li>Spurious relationships and multiple testing.</li>
+<li>Parameter estimation versus “black box” prediction and classification.</li>
+<li>Diagnostics, residuals, and comparing models.</li>
+<li>Quantifying the uncertainty of a model.</li>
+<li>Sampling structure and dependence for data reduction. Temple Lang noted that modeling of data becomes complicated when variables are not independent, identically distributed.</li>
+<li>Statistical accuracy versus computational complexity and efficiency.</li>
+</ul>
+<p>Temple Lang then briefly discussed some of the practical aspects of computing, including the following:</p>
+<ul>
+<li>Accessing data.</li>
+<li>Manipulating raw data.</li>
+<li>Data structures and storage, including correlated data.</li>
+<li>Visualization at all stages (particularly in exploratory data analyses and conveying the results).</li>
+<li>Parallel computing, which can be challenging for a new student.</li>
+<li>Translating high-level descriptions to optimal programs.</li>
+</ul>
+<p>During the discussion, Temple Lang proposed computing statistics on visualizations to examine data rigorously in a statistical and automated way. He explained that “scagnostics” (from scatter plot diagnostics) is a data analysis technique for graphically exploring the relationships among variables. A small set of statistical measures can characterize scatter plots, and exploratory data analysis can be conducted on the residuals.</p>
+<p>(More information about scagnostics can be found in <span class="citation">Wilkinson and Wills (<a href="#ref-scagnostics">2007</a>)</span>.)</p>
+<p>A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship’s changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.</p>
+
+</div>
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-Ioannidis">
+<p>Ioannidis, John. 2005. “Why Most Published Research Findings Are False.” <em>PLoS Medicine</em> 2: e124.</p>
+</div>
+<div id="ref-iscam">
+<p>Chance, Beth, and Allan Rossman. 2018. <em>Investigating Statistics, Concepts, Applications, and Methods</em>. 3rd ed. <a href="http://www.rossmanchance.com/iscam3/" class="uri">http://www.rossmanchance.com/iscam3/</a>.</p>
+</div>
+<div id="ref-subgroup">
+<p>Schulz, K, and D Grimes. 2005. “Multiplicity in Randomized Trials Ii: Subgroup and Interim Analyses.” <em>Lancet</em> 365: 1657–61.</p>
+</div>
+<div id="ref-hiv">
+<p>Scott M. Hammer et al. 1997. “A Controlled Trial of Two Nucleoside Analogues Plus Indinavir in Persons with Human Immunodeficiency Virus Infection and Cd4 Cell Counts of 200 Per Cubic Millimeter or Less.” <em>New England Journal of Medicine</em> 337: 725–33.</p>
+</div>
+<div id="ref-hvtn">
+<p>Yunda Huang et al. 2015. “Effect of rAd5-Vector HIV-1 Preventive Vaccines on HIV-1 Acquisition: A Participant-Level Meta-Analysis of Randomized Trials” 10: e0136626.</p>
+</div>
+<div id="ref-hrt">
+<p>Dyer, Owen. 2004. “Another HRT Trial Is Stopped Early.” <em>British Medical Journal</em>.</p>
+</div>
+<div id="ref-crowley">
+<p>Green, Stephanie, Jacqueline Benedetti, Angela Smith, and John Crowley. 2016. <em>Clinical Trials in Oncology</em>. CRC Press.</p>
+</div>
+<div id="ref-duncanTL">
+<p><em>National Research Council: Training Students to Extract Value from Big Data</em>. 2014. Washington, D.C.: The National Academies Press.</p>
+</div>
+<div id="ref-scagnostics">
+<p>Wilkinson, L., and G. Wills. 2007. “Scagnostics Distributions.” <em>Journal of Computational and Graphical Statistics</em> 17: 473–91.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="survival-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="poisson-regression.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/07-MC.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Math-150-Notes.pdf", "Math-150-Notes.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
