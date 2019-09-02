@@ -50,7 +50,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 <center>
 <figure>
-<img width='500' src='figs/RRstudio.jpg' />
+<img width='600' src='figs/RRstudio.jpg' />
 <figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
 </figure>
 </center>
@@ -162,8 +162,14 @@ A workshop participant noted the difference between a data error and a data blun
 </center>
 
 
-####  Example 1
+###  Example 1 {-}
 Science retracts gay marriage paper without agreement of lead author LaCour
+
+<center>
+<figure>
+<img width='500' src='figs/lacour.jpg' />
+</figure>
+</center>
 
 * In May 2015 Science retracted a study of how canvassers can sway people's opinions about gay marriage published just 5 months prior.
 * Science Editor-in-Chief Marcia McNutt: 
@@ -174,8 +180,14 @@ Science retracts gay marriage paper without agreement of lead author LaCour
 * Methods we'll discuss can't prevent this, but they can make it easier to discover issues.
 * Source: http://news.sciencemag.org/policy/2015/05/science-retracts-gay-marriage-paper-without-lead-author-s-consent
 
-### Example 2
+### Example 2 {-}
 Seizure study retracted after authors realize data got "terribly mixed"
+
+<center>
+<figure>
+<img width='500' src='figs/chakrabarti.jpg' />
+</figure>
+</center>
 
 * From the authors of Low Dose Lidocaine for Refractory Seizures in Preterm Neonates:
 
@@ -184,8 +196,15 @@ Seizure study retracted after authors realize data got "terribly mixed"
 * Source: http://retractionwatch.com/2013/02/01/seizure-study-retracted-after-authors-realize-data-got-terribly-mixed/
 
 
-### Example 3
+### Example 3 {-}
 Bad spreadsheet merge kills depression paper, quick fix resurrects it
+
+<center>
+<figure>
+<img width='500' src='figs/kern.jpg' />
+</figure>
+</center>
+
 
 * The authors informed the journal that the merge of lab results and other survey data used in the paper resulted in an error regarding the identification codes. Results of the analyses were based on the data set in which this error occurred. Further analyses established the results reported in this manuscript and interpretation of the data are not correct.
 
@@ -196,13 +215,19 @@ Bad spreadsheet merge kills depression paper, quick fix resurrects it
 * Source: http://retractionwatch.com/2014/07/01/bad-spreadsheet-merge-kills-depression-paper-quick-fix-resurrects-it/
 
 
-### Example 4
+### Example 4 {-}
 
 PNAS paper retracted due to problems with figure and reproducibility (April 2016):
 http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-retracted/
 
+<center>
+<figure>
+<img width='500' src='figs/goldschmidt.jpg' />
+</figure>
+</center>
 
-### Reproducible data analysis process
+
+### The reproducible data analysis process
 
 * Scriptability $\rightarrow$ R
 * Literate programming $\rightarrow$ R Markdown
