@@ -5,8 +5,12 @@
 **What is Statistics?**
 Generally, statistics is the academic discipline which uses data to make claims and predictions about larger populations of interest.  It is the science of collecting, wrangling, visualizing, and analyzing data as a representation of a larger whole.  It is worth noting that probability represents the majority of mathematical tools used in statistics, but probability as a discipline does not work with data.  Having taken a probability class may help you with some of the mathematics covered in the course, but it is not a substitute for understanding the basics of introductory statistics.
 
-![Probability vs. Statistics](figs/probstat.jpg)
-
+<center>
+<figure>
+<img width='400' src='/figs/probstat.jpg' />
+<figcaption> Probability vs. Statistics)</figcaption> 
+</figure>
+</center>
 
 * *descriptive statistics* describe the sample at hand with no intent on making generalizations.
 * *inferential statistics* use a sample to make claims about a population
@@ -43,12 +47,21 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 * All assignments should be turned in using R Markdown compiled to pdf.
 
 
-![Taken from *Modern Drive: An introduction to statistical and data sciences via R*, by Ismay and Kim, https://ismayc.github.io/moderndiver-book/](figs/RRstudio.jpg)
+
+<center>
+<figure>
+<img width='400' src='/figs/RRstudio.jpg' />
+<figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
+</figure>
+</center>
 
 
-
-![Image credit:  Jessica Ward, https://jkrward.github.io/, PhD student at Newcastle University](figs/cookingRstudio.jpg)
-
+<center>
+<figure>
+<img width='400' src='/figs/cookingRstudio.jpg' />
+<figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
+</figure>
+</center>
 
 ### Vocuabulary
 * A  **statistic** is a numerical measurement we get from the sample, a function of the data.
@@ -66,8 +79,19 @@ With thanks to Ben Baumer for perspective and sharing course materials. [@Baumer
 
 ![A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]](figs/AnalysisProcessBaumer.jpg)
 
-![http://algorithms-tour.stitchfix.com/](figs/SFalg.pdf)
+<center>
+<figure>
+<img width='400' src='/figs/AnalysisProcessBaumer.jpg' />
+<figcaption> [A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]</figcaption> 
+</figure>
+</center>
 
+<center>
+<figure>
+<img width='400' src='/figs/SFalg.pdf' />
+<figcaption> [Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</figcaption> 
+</figure>
+</center>
 
 ### Principiles for the Data Science Process
 Duncan Temple Lang, University of California, Davis 
