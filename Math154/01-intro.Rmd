@@ -79,9 +79,9 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 * An  **estimate** is the value of the estimator for a given set of data.  [Estimate and statistic can be used interchangeably.]
 
 
-> One of my goals for this course was to convince students that there are two major kinds of skills one must have in order to be a successful data scientist: technical skills to actually do the analyses; and communication skills in order to present one's findings to a presumably non-technical audience.  
+> One of my goals for this course was to convince students that there are two major kinds of skills one must have in order to be a successful data scientist: technical skills to actually do the analyses; and communication skills in order to present one's findings to a presumably non-technical audience.  [@Baumer15]
 
-With thanks to Ben Baumer for perspective and sharing course materials. [@Baumer15]
+With thanks to Ben Baumer for perspective and sharing course materials. 
 
 
 ### The Workflow
