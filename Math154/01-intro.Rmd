@@ -1,6 +1,6 @@
 # Introduction {#intro}
 
-## Agenda {#Sep2}
+## Agenda {#Sep3}
 1. Questionnaire
 2. Syllabus & Course Outline
 3. Stitch Fix Algorithm
@@ -156,7 +156,7 @@ During the discussion, Temple Lang proposed computing statistics on visualizatio
 A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship's changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.
 
 
-## Agenda {#Sep4}
+## Agenda {#Sep5}
 1. Design Challenge [Not So Standard Deviations](https://overcast.fm/+FMBuKdMEI/00:30)
 2. Reproducibility & GitHub
 
@@ -359,19 +359,20 @@ What is "best"?  A big part of the ranking system has to do with peer-assessed r
 
 ### Trump and Twitter
 
-Analysis of Trump's tweets with evidence that someone else tweets from his account using an iPhone
-*  http://varianceexplained.org/r/trump-tweets/
+Analysis of Trump's tweets with evidence that someone else tweets from his account using an iPhone.
+
+* Aug 9, 2016 http://varianceexplained.org/r/trump-tweets/
 
 > My analysis, shown below, concludes that the Android and iPhone tweets are clearly from different people, posting during different times of day and using hashtags, links, and retweets in distinct ways. What?s more, we can see that the Android tweets are angrier and more negative, while the iPhone tweets tend to be benign announcements and pictures.
 
-* http://varianceexplained.org/r/trump-followup/
+* Aug 9, 2017 http://varianceexplained.org/r/trump-followup/
 
 
-> *There is a year of new data, with over 2700 more tweets. And quite notably, Trump stopped using the Android in March 2017.} This is why machine learning approaches like http://didtrumptweetit.com/ are useful, since they can still distinguish Trump?s tweets from his campaign?s by training on the kinds of features I used in my original post.
+> There is a year of new data, with over 2700 more tweets. And quite notably, Trump stopped using the Android in March 2017.} This is why machine learning approaches like http://didtrumptweetit.com/ are useful, since they can still distinguish Trump?s tweets from his campaign?s by training on the kinds of features I used in my original post.
 
-> *I've found a better dataset: in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump?s tweets. I since learned there?s a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
+> I've found a better dataset: in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump?s tweets. I since learned there?s a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
 
-> *I've heard some interesting questions that I wanted to follow up on: These come from the comments on the original post and other conversations I've had since. Two questions included what device Trump tended to use before the campaign, and what types of tweets tended to lead to high engagement.
+> I've heard some interesting questions that I wanted to follow up on: These come from the comments on the original post and other conversations I've had since. Two questions included what device Trump tended to use before the campaign, and what types of tweets tended to lead to high engagement.
 
 
 ### Can Twitter Predict Election Results?

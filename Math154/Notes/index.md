@@ -37,10 +37,8 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 
 | Day    	| Topic                      	|  Book Chp   	|   Notes Section |
 |:---------	|:---------------------------	|:----------------:	|:----------------:	|
-| 1/23/19 	| Intro to Data / R | 2 | \@ref(intro) [intro],  \@ref(Sep2) [Sep2]|
-| 1/28/19 	| Intro to GitHub | 2 |  \@ref(repro)  [repro], \@ref(Sep4) [Sep4]  |
-| 1/30/19 	| | | \@ref(intervals), \@ref(cat) [SLR CI] |
-| 2/4/19  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [.Fisher's Exact Test] |
-| 2/6/19 	| | |  \@ref(studies) [Types of studies]
-| 2/11/19 	| Contingency Analysis | 6 | \@ref(catest) [RR and OR] |
+| 9/3/19 	| Intro to Data / R | ISL1 | \@ref(intro) [intro],  \@ref(Sep3) [Sep3]|
+| 9/5/19	| Intro to GitHub |  |  \@ref(repro)  [repro], \@ref(Sep5) [Sep5]  |
+| 9/10/19	| Data Viz| VST | \@ref(), \@ref() [] |
+| 9/12/19  	|  | MDS2 | \@ref(), \@ref()   [] |
 
