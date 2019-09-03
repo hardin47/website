@@ -1,6 +1,6 @@
 # Introduction {#intro}
 
-## Agenda {#Sep3}
+## 9/3/19 Agenda {#Sep3}
 1. Questionnaire
 2. Syllabus & Course Outline
 3. Stitch Fix Algorithm
@@ -95,8 +95,8 @@ With thanks to Ben Baumer for perspective and sharing course materials. [@Baumer
 
 <center>
 <figure>
-<img width='500' src='figs/SFalg.jpg' />
-<figcaption> [Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</figcaption> 
+<img width='500' src='figs/SFalg.png' />
+<figcaption> [Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/) </figcaption> 
 </figure>
 </center>
 
@@ -156,7 +156,7 @@ During the discussion, Temple Lang proposed computing statistics on visualizatio
 A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship's changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.
 
 
-## Agenda {#Sep5}
+## 9/5/19 Agenda {#Sep5}
 1. Design Challenge [Not So Standard Deviations](https://overcast.fm/+FMBuKdMEI/00:30)
 2. Reproducibility & GitHub
 
@@ -363,14 +363,14 @@ Analysis of Trump's tweets with evidence that someone else tweets from his accou
 
 * Aug 9, 2016 http://varianceexplained.org/r/trump-tweets/
 
-> My analysis, shown below, concludes that the Android and iPhone tweets are clearly from different people, posting during different times of day and using hashtags, links, and retweets in distinct ways. What?s more, we can see that the Android tweets are angrier and more negative, while the iPhone tweets tend to be benign announcements and pictures.
+> My analysis, shown below, concludes that the Android and iPhone tweets are clearly from different people, posting during different times of day and using hashtags, links, and retweets in distinct ways. What's more, we can see that the Android tweets are angrier and more negative, while the iPhone tweets tend to be benign announcements and pictures.
 
 * Aug 9, 2017 http://varianceexplained.org/r/trump-followup/
 
 
-> There is a year of new data, with over 2700 more tweets. And quite notably, Trump stopped using the Android in March 2017.} This is why machine learning approaches like http://didtrumptweetit.com/ are useful, since they can still distinguish Trump?s tweets from his campaign?s by training on the kinds of features I used in my original post.
+> There is a year of new data, with over 2700 more tweets. And quite notably, Trump stopped using the Android in March 2017. This is why machine learning approaches like http://didtrumptweetit.com/ are useful, since they can still distinguish Trump's tweets from his campaign's by training on the kinds of features I used in my original post.
 
-> I've found a better dataset: in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump?s tweets. I since learned there?s a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
+> I've found a better dataset: in my original analysis, I was working quickly and used the `twitteR` package (https://cran.r-project.org/web/packages/twitteR/) to query Trump's tweets. I since learned there's a bug in the package that caused it to retrieve only about half the tweets that could have been retrieved, and in any case I was able to go back only to January 2016. I've since found the truly excellent Trump Twitter Archive (http://www.trumptwitterarchive.com/), which contains all of Trump's tweets going back to 2009. Below I show some R code for querying it.
 
 > I've heard some interesting questions that I wanted to follow up on: These come from the comments on the original post and other conversations I've had since. Two questions included what device Trump tended to use before the campaign, and what types of tweets tended to lead to high engagement.
 
@@ -381,11 +381,11 @@ Analysis of Trump's tweets with evidence that someone else tweets from his accou
 http://www.math.smith.edu/~bbaumer/mth292-f14/
 -->
 
-In 2013, @DiGrazia13 published a provocative paper suggesting that polling could now be replaced by analyzing social media data.  They analyzed 406 competitive US congressional races using over 3.5 billion tweets.  In an article in  *The Washington Post* one of the co-authors, Rojas, writes: ``Anyone with programming skills can write a program that will harvest tweets, sort them for content and analyze the results.  This can be done with nothing more than a laptop computer." [@Rojas13]
+In 2013, @DiGrazia13 published a provocative paper suggesting that polling could now be replaced by analyzing social media data.  They analyzed 406 competitive US congressional races using over 3.5 billion tweets.  In an article in  *The Washington Post* one of the co-authors, Rojas, writes: "Anyone with programming skills can write a program that will harvest tweets, sort them for content and analyze the results.  This can be done with nothing more than a laptop computer." [@Rojas13]
 
 What makes using Tweets to predict elections relevant to our class? (See @Baumer15.)
 
-1. The data come from neither an experiment nor a random sample - there must be careful thought applied to the question of  *to whom} the analysis can be generalized.  The data were also scraped from the internet.
+1. The data come from neither an experiment nor a random sample - there must be careful thought applied to the question of  *to whom* the analysis can be generalized.  The data were also scraped from the internet.
 2. The analysis was done combining domain knowledge (about congressional races) with a data source that seems completely irrelevant at the outset (tweets).
 3. The dataset was quite large!  3.5 billion tweets were collected and a random sample of 500,000 tweets were analyzed.
 4. The researchers were from sociology and computer science - a truly collaborative endeavor, and one that is often quite efficient at producing high quality analyses.
