@@ -100,6 +100,15 @@ With thanks to Ben Baumer for perspective and sharing course materials.
 </figure>
 </center>
 
+
+```r
+knitr::include_graphics("figs/SFalg.png")
+```
+
+<div class="figure">
+<img src="figs/SFalg.png" alt="[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)" width="889" />
+<p class="caption">(\#fig:unnamed-chunk-1)[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</p>
+</div>
 ### Principles for the Data Science Process
 Duncan Temple Lang, University of California, Davis 
 
