@@ -12,11 +12,6 @@
 **What is Statistics?**
 Generally, statistics is the academic discipline which uses data to make claims and predictions about larger populations of interest.  It is the science of collecting, wrangling, visualizing, and analyzing data as a representation of a larger whole.  It is worth noting that probability represents the majority of mathematical tools used in statistics, but probability as a discipline does not work with data.  Having taken a probability class may help you with some of the mathematics covered in the course, but it is not a substitute for understanding the basics of introductory statistics.
 
-
-```r
-knitr::include_graphics("figs/probstat.jpg")
-```
-
 <div class="figure" style="text-align: center">
 <img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="228" />
 <p class="caption">(\#fig:unnamed-chunk-1)Probability vs. Statistics</p>
@@ -57,20 +52,10 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 * All assignments should be turned in using R Markdown compiled to pdf.
 
 
-
-```r
-knitr::include_graphics("figs/RRstudio.jpg")
-```
-
 <div class="figure" style="text-align: center">
 <img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="796" />
 <p class="caption">(\#fig:unnamed-chunk-2)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
 </div>
-
-
-```r
-knitr::include_graphics("figs/cookingRstudio.jpg")
-```
 
 <div class="figure" style="text-align: center">
 <img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="484" />
@@ -94,28 +79,21 @@ With thanks to Ben Baumer for perspective and sharing course materials.
 ### The Workflow
 
 
-
-```r
-knitr::include_graphics("figs/AnalysisProcessBaumer.jpg")
-```
-
 <div class="figure" style="text-align: center">
 <img src="figs/AnalysisProcessBaumer.jpg" alt="A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]" width="475" />
 <p class="caption">(\#fig:unnamed-chunk-4)A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]</p>
 </div>
 
 
-
-```r
-knitr::include_graphics("figs/SFalg.png")
-```
-
 <div class="figure" style="text-align: center">
 <img src="figs/SFalg.png" alt="[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)" width="889" />
 <p class="caption">(\#fig:unnamed-chunk-5)[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</p>
 </div>
 
-### Principles for the Data Science Process
+### Principles for the Data Science Process tl;dr
+
+(Below are some very good thoughts on the DS Process, but you are not responsible for any of the content in this section.)
+
 Duncan Temple Lang, University of California, Davis 
 
 Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally.  Recently, he was invited to participate in a workshop,  *Training Students to Extract Value from Big Data*.  The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge.  http://www.nap.edu/catalog.php?record_id=18981  [National Research Council.  *Training Students to Extract Value from Big Data: Summary of a Workshop*. Washington, DC: The National Academies Press, 2014.]
