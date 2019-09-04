@@ -12,12 +12,15 @@
 **What is Statistics?**
 Generally, statistics is the academic discipline which uses data to make claims and predictions about larger populations of interest.  It is the science of collecting, wrangling, visualizing, and analyzing data as a representation of a larger whole.  It is worth noting that probability represents the majority of mathematical tools used in statistics, but probability as a discipline does not work with data.  Having taken a probability class may help you with some of the mathematics covered in the course, but it is not a substitute for understanding the basics of introductory statistics.
 
-<center>
-<figure>
-<img width='500' src='figs/probstat.jpg' />
-<figcaption> Probability vs. Statistics</figcaption> 
-</figure>
-</center>
+
+```r
+knitr::include_graphics("figs/probstat.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="228" />
+<p class="caption">(\#fig:unnamed-chunk-1)Probability vs. Statistics</p>
+</div>
 
 * *descriptive statistics* describe the sample at hand with no intent on making generalizations.
 * *inferential statistics* use a sample to make claims about a population
@@ -55,20 +58,24 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 
 
-<center>
-<figure>
-<img width='600' src='figs/RRstudio.jpg' />
-<figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
-</figure>
-</center>
+```r
+knitr::include_graphics("figs/RRstudio.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="796" />
+<p class="caption">(\#fig:unnamed-chunk-2)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
+</div>
 
 
-<center>
-<figure>
-<img width='500' src='figs/cookingRstudio.jpg' />
-<figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
-</figure>
-</center>
+```r
+knitr::include_graphics("figs/cookingRstudio.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="484" />
+<p class="caption">(\#fig:unnamed-chunk-3)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
+</div>
 
 ## Course Content
 
@@ -86,29 +93,28 @@ With thanks to Ben Baumer for perspective and sharing course materials.
 
 ### The Workflow
 
-<center>
-<figure>
-<img width='500' src='figs/AnalysisProcessBaumer.jpg' />
-<figcaption> A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]</figcaption> 
-</figure>
-</center>
 
-<center>
-<figure>
-<img width='500' src='figs/SFalg.png' />
-<figcaption> [Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/) </figcaption> 
-</figure>
-</center>
+
+```r
+knitr::include_graphics("figs/AnalysisProcessBaumer.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/AnalysisProcessBaumer.jpg" alt="A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]" width="475" />
+<p class="caption">(\#fig:unnamed-chunk-4)A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]</p>
+</div>
+
 
 
 ```r
 knitr::include_graphics("figs/SFalg.png")
 ```
 
-<div class="figure">
+<div class="figure" style="text-align: center">
 <img src="figs/SFalg.png" alt="[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)" width="889" />
-<p class="caption">(\#fig:unnamed-chunk-1)[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</p>
+<p class="caption">(\#fig:unnamed-chunk-5)[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)</p>
 </div>
+
 ### Principles for the Data Science Process
 Duncan Temple Lang, University of California, Davis 
 
