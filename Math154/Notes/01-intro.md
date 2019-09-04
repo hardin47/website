@@ -299,7 +299,7 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * Can't represent data if it isn't there.
 
 
-#### Stats / Data Science / Math are not apolitical {-}
+#### Stats / Data Science / Math are not apolitical/agnostic {-}
 
 * "Inner city crime is reaching record levels"  (Donald Trump, 8/30/16)
 * "The unemployment rate for African-American youth is 59 percent" (Donald Trump 6/20/16)
@@ -371,7 +371,7 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 * editorial blog by Gelman: http://andrewgelman.com/2013/04/24/the-tweets-votes-curve/
 
 
-<img src="figs/twitterscat.jpg" style="display: block; margin: auto;" /><img src="figs/twitterreg.jpg" width="650" style="display: block; margin: auto;" />
+<img src="figs/twitterscatter.jpg" width="1547" style="display: block; margin: auto;" /><img src="figs/twitterreg.jpg" width="650" style="display: block; margin: auto;" />
 
 
 #### Statistics Hat {-}
