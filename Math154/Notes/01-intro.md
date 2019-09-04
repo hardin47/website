@@ -159,22 +159,17 @@ A workshop participant noted the difference between a data error and a data blun
 ### Need for Reproducibility
 
 
-<center>
-<figure>
-<img width='500' src='figs/reproducibility.jpg' />
-<figcaption> slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016 </figcaption> 
-</figure>
-</center>
-
+<div class="figure" style="text-align: center">
+<img src="figs/reproducibility.jpg" alt="slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016" width="1275" />
+<p class="caption">(\#fig:unnamed-chunk-6)slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016</p>
+</div>
 
 ###  Example 1 {-}
 Science retracts gay marriage paper without agreement of lead author LaCour
 
-<center>
-<figure>
-<img width='500' src='figs/lacour.jpg' />
-</figure>
-</center>
+
+<img src="figs/lacour.jpg" width="850" style="display: block; margin: auto;" />
+
 
 * In May 2015 Science retracted a study of how canvassers can sway people's opinions about gay marriage published just 5 months prior.
 * Science Editor-in-Chief Marcia McNutt: 
@@ -188,12 +183,7 @@ Science retracts gay marriage paper without agreement of lead author LaCour
 ### Example 2 {-}
 Seizure study retracted after authors realize data got "terribly mixed"
 
-<center>
-<figure>
-<img width='500' src='figs/chakrabarti.jpg' />
-</figure>
-</center>
-
+<img src="figs/chakrabarti.jpg" width="682" style="display: block; margin: auto;" />
 * From the authors of Low Dose Lidocaine for Refractory Seizures in Preterm Neonates:
 
 > The article has been retracted at the request of the authors. After carefully re-examining the data presented in the article, they identified that data of two different hospitals got terribly mixed. The published results cannot be reproduced in accordance with scientific and clinical correctness.
@@ -204,11 +194,8 @@ Seizure study retracted after authors realize data got "terribly mixed"
 ### Example 3 {-}
 Bad spreadsheet merge kills depression paper, quick fix resurrects it
 
-<center>
-<figure>
-<img width='500' src='figs/kern.jpg' />
-</figure>
-</center>
+
+<img src="figs/kern.jpg" width="550" style="display: block; margin: auto;" />
 
 
 * The authors informed the journal that the merge of lab results and other survey data used in the paper resulted in an error regarding the identification codes. Results of the analyses were based on the data set in which this error occurred. Further analyses established the results reported in this manuscript and interpretation of the data are not correct.
@@ -225,11 +212,8 @@ Bad spreadsheet merge kills depression paper, quick fix resurrects it
 PNAS paper retracted due to problems with figure and reproducibility (April 2016):
 http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-retracted/
 
-<center>
-<figure>
-<img width='500' src='figs/goldschmidt.jpg' />
-</figure>
-</center>
+
+<img src="figs/goldschmidt.jpg" width="1340" style="display: block; margin: auto;" />
 
 
 ### The reproducible data analysis process
@@ -267,21 +251,15 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * See course website for getting started: http://research.pomona.edu/johardin/math154f19/
 
 
-<center>
-<figure>
-<img width='500' src='figs/RRstudio.jpg' />
-<figcaption> Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</figcaption> 
-</figure>
-</center>
+<div class="figure" style="text-align: center">
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="796" />
+<p class="caption">(\#fig:unnamed-chunk-11)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
+</div>
 
-
-<center>
-<figure>
-<img width='500' src='figs/cookingRstudio.jpg' />
-<figcaption> [Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</figcaption> 
-</figure>
-</center>
-
+<div class="figure" style="text-align: center">
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="484" />
+<p class="caption">(\#fig:unnamed-chunk-12)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
+</div>
 
 #### Tools: GitHub {-}
 
@@ -392,12 +370,8 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 * editorial in the Huffington Post by Linkins: http://www.huffingtonpost.com/2013/08/14/twitter-predict-elections_n_3755326.html
 * editorial blog by Gelman: http://andrewgelman.com/2013/04/24/the-tweets-votes-curve/
 
-<center>
-<figure>
-<img width='500' src='figs/twitterscat.jpg' />
-<img width='500' src='figs/twitterreg.jpg' />
-</figure>
-</center>
+
+<img src="figs/twitterscat.jpg" style="display: block; margin: auto;" /><img src="figs/twitterreg.jpg" width="650" style="display: block; margin: auto;" />
 
 
 #### Statistics Hat {-}
@@ -427,13 +401,7 @@ Identify all the steps necessary to conduct the study.  Could you do it given yo
 
 How much storage  *does* it take to download 3.5 billion tweets? = 2000+ Gb = 2+ Tb (your hard drive is likely 1Tb, unless you have a small computer).  Can you explain the billions of tweets stored at Indiana University?  How would you randomly sample from the database?  One tweet is about 2/3 of a Kb.
 
-<center>
-<figure>
-<img width='500' src='figs/twitter_rojas.jpg' />
-<img width='500' src='figs/twitter_linkins.jpg' />
-</figure>
-</center>
-
+<img src="figs/twitter_rojas.jpg" width="1275" style="display: block; margin: auto;" /><img src="figs/twitter_linkins.jpg" width="850" style="display: block; margin: auto;" />
 
 
 #### Advantages {-}
