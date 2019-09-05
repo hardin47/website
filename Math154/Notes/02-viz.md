@@ -12,7 +12,7 @@
 
 Depending on the introductory (or other) statistics classes you've had, your instructor may have focused more or less on visualizations in class.  They (I) may have even said something like *making visualizations are incredibly important to the entire data analysis process.*  But even if you buy this perspective, why is it that we don't see more good graphics in our analyses?   Andrew Gelman [@Gelman11] responds to this point by stating, "Good statistical graphics are hard to do, much harder than running regressions and making tables."   **Our goal will be to create graphics and visualizations that convey statistical information.**
 
-Nolan [@Nolan16] describes three important ways that graphics can be used to convey statistical information.  These ``guiding principles" will be used as a way of evaluating others' figures as well as a metric for creating our own visualizations to help with statistical analysis.
+Nolan [@Nolan16] describes three important ways that graphics can be used to convey statistical information.  These "guiding principles" will be used as a way of evaluating others' figures as well as a metric for creating our own visualizations to help with statistical analysis.
 
 1.  *Make the data stand out* 
 
@@ -28,6 +28,7 @@ Plots should also add context to the comparison.  Figure legends, axes scales, a
 
 
 Randy Pruim asks the following question to decide whether or not a plot is good:  *Does my plot make the comparisons I am interested in...*
+
 * easily? and
 * accurately?
 
@@ -42,6 +43,7 @@ Generally, the better your graphics are, the better able you will be to communic
 
 
 As mentioned in the booklet we are using, there are two main motivational steps to working with graphics as part of an argument [@Tufte97].
+
 1. "An essential analytic task in making decisions based on evidence is to understand how things work."
 2. Making decisions based on evidence requires the appropriate display of that evidence."
 
@@ -92,7 +94,12 @@ The biggest problem (existing in many of the bullet points below) is that the en
 
 6. Tufte goes on to describe many ways which the final presentation by the engineers to the administrators was inadequate:  disappearing legend (labels), chartjunk, lack of clarity depicting cause and effect, and wrong order.
 
-As with the cholera outbreak, a persuasive argument could have been made if the visualizations had (1) been in context *plot data versus temperature not time!*, (2) used appropriate comparisons: *as compared with what?*, (3) consider alternative scenarios * when else did O-rings fail?  What is the science behind O-ring failure?*, and (4) the graphics had been assessed *what is all of the extra noise?  are the words being used accessible to non-engineers?*. 
+As with the cholera outbreak, a persuasive argument could have been made if the visualizations had
+
+(1) been in context *plot data versus temperature not time!*, 
+(2) used appropriate comparisons: *as compared with what?*, 
+(3) consider alternative scenarios *when else did O-rings fail?  What is the science behind O-ring failure?*, and 
+(4) the graphics had been assessed *what is all of the extra noise?  are the words being used accessible to non-engineers?*. 
 
 Tufte [@Tufte97] created the graphic below which should have been used before the launch to convince others to postpone.  As you can see, the graphic is extremely convincing.  An aside: the O-ring data are well suited for an analysis using logistic regression.  At this point, most scientists believe that the temperature *caused* the O-ring failure, however, the data do not speak to the causal relationship because they were not collected using a randomized experiment.  That is, there could have been other confounding variables (e.g., humidity) which were possible causal mechanisms.
 
@@ -170,7 +177,7 @@ I have removed the vertical and horizontal lines which detracted from the idea o
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/Math154_HW2_viz-ggdrink.pdf" alt="Calories and Caffeine for drinks from various drinks and other items.  Data source is: World Cancer Research Fund, Starbucks Beverage Nutrition Guide, Calorie Counter Database.  Seemingly, the observational units (rows) are not a random sample of anything.  As such, we should be careful of summarizing the data in any way - what would the 'average' calories even mean?  Note, from the entire dataset give, the average calories is 179.8 and the average caffeine is 134.43.  How do those numbers compare to the original plot?"  />
+<img src="figs/Math154_HW2_viz-ggdrink.png" alt="Calories and Caffeine for drinks from various drinks and other items.  Data source is: World Cancer Research Fund, Starbucks Beverage Nutrition Guide, Calorie Counter Database.  Seemingly, the observational units (rows) are not a random sample of anything.  As such, we should be careful of summarizing the data in any way - what would the 'average' calories even mean?  Note, from the entire dataset give, the average calories is 179.8 and the average caffeine is 134.43.  How do those numbers compare to the original plot?" width="600" />
 <p class="caption">(\#fig:unnamed-chunk-4)Calories and Caffeine for drinks from various drinks and other items.  Data source is: World Cancer Research Fund, Starbucks Beverage Nutrition Guide, Calorie Counter Database.  Seemingly, the observational units (rows) are not a random sample of anything.  As such, we should be careful of summarizing the data in any way - what would the 'average' calories even mean?  Note, from the entire dataset give, the average calories is 179.8 and the average caffeine is 134.43.  How do those numbers compare to the original plot?</p>
 </div>
 
@@ -179,27 +186,15 @@ https://docs.google.com/spreadsheets/d/1KYMUjrCulPtpUHwep9bVvsBvmVsDEbucdyRZ5uHC
 
 ### Assessing Graphics
 
-\begin{table}[H]
-\begin{center}
-\begin{tabular}{p{0.2\linewidth}|p{0.2\linewidth}p{0.2\linewidth}p{0.2\linewidth}}
-& \multicolumn{3}{c}{Competency Level} 
-Critical Task & Needs Improvement & Basic & Surpassed 
-\hline
-\hline
-**Computation} perform computations &  Computations contain errors and extraneous code & Computations are correct but contain extraneous / unnecessary computations & Computations are correct and properly identified and labeled 
-\hline
-**Analysis} Choose and carry out analysis appropriate for data and content(s) & Choice of analysis is overly simplistic, irrelevant, or missing key component & Analysis appropriate, but incomplete, or not important features and assumptions not made explicit & Analysis appropriate, complete, advanced, relevant, and informative 
-\hline
-**Synthesis} Identify key features of the analysis, and interpret results (including context) & Conclusions are missing, incorrect, or not made based on results of analysis & Conclusions reasonable, but is partially correct or partially complete & Make relevant conclusions explicitly connect to analysis and to context 
-\hline
-**Visual presentation} Communicate findings graphically clearly, precisely, and concisely & Inappropriate choice of plots; poorly labeled plots; plots missing & Plots convey information correctly but lack context for interpretation & Plots convey information correctly with adequate / appropriate reference information 
-\hline
-**Written} Communicate findings clearly, precisely, and concisely & Explanation is illogical, incorrect, or incoherent & Explanation is partially correct but incomplete or unconvincing & Explanation is correct, complete, and convincing 
-\hline
-\end{tabular}
-\caption{\label{vizrubric} A rubric for assessing analysis and corresponding visualization.  Note that there can be a large amount of information gained in moving from basic competency to surpassed competency.  Table taken from \citet{Nolan16}.}
-\end{center}
-\end{table}
+| Critical Task 	| Needs Improvement 	| Basic 	| Surpassed 	|
+|------------------------------------------------------------------------------------------------	|-------------------------------------------------------------------------------	|---------------------------------------------------------------------------------------------------	|--------------------------------------------------------------------------------------	|
+| **Computation** perform computations 	| Computations contain errors and extraneous code 	| Computations are correct but contain extraneous / unnecessary computations 	| Computations are correct and properly identified and labeled 	|
+| **Analysis** Choose and carry out analysis appropriate for data and content(s) 	| Choice of analysis is overly simplistic, irrelevant, or missing key component 	| Analysis appropriate, but incomplete, or not important features and assumptions not made explicit 	| Analysis appropriate, complete, advanced, relevant, and informative 	|
+| **Synthesis** Identify key features of the analysis, and interpret results (including context) 	| Conclusions are missing, incorrect, or not made based on results of analysis 	| Conclusions reasonable, but is partially correct or partially complete 	| Make relevant conclusions explicitly connect to analysis and to context 	|
+| **Visual presentation** Communicate findings graphically clearly, precisely, and concisely 	| Inappropriate choice of plots; poorly labeled plots; plots missing 	| Plots convey information correctly but lack context for interpretation 	| Plots convey information correctly with adequate / appropriate reference information 	|
+| **Written** Communicate findings clearly, precisely, and concisely 	| Explanation is illogical, incorrect, or incoherent 	| Explanation is partially correct but incomplete or unconvincing 	| Explanation is correct, complete, and convincing 	|
+
+A rubric for assessing analysis and corresponding visualization.  Note that there can be a large amount of information gained in moving from basic competency to surpassed competency.  Table taken from @Nolan16.
 
 
 
@@ -214,7 +209,7 @@ Critical Task & Needs Improvement & Basic & Surpassed
 
 ## Pieces of a Data Graphic
 
-Yau [@Yau] ({\em Data Points}, 2013) and Wickham [@Wickham] (**Tidy Data}, {\em Journal of Statistical Software}, 2014) have come up with a *taxonomy* and a *grammar* for thinking about the parts of a figure just like we conceptualize the parts of a body or the parts of a sentence.
+@Yau and @Wickham  have come up with a *taxonomy* and a *grammar* for thinking about the parts of a figure just like we conceptualize the parts of a body or the parts of a sentence.
 
 One great way of thinking of this new process:  it is not longer necessary to talk about the name of the graph (e.g., boxplot).  Instead we now think in glyphs (geoms), and so we can put whatever we want on the plot.  Note also that this transition leads you from a passive consumer (I need to make plot XXX because everyone else does, so I just plug in the data) into an active participant (what do I want my data to say?  and how can I put that information onto my graphic?)
 

@@ -184,6 +184,7 @@ Science retracts gay marriage paper without agreement of lead author LaCour
 Seizure study retracted after authors realize data got "terribly mixed"
 
 <img src="figs/chakrabarti.jpg" width="682" style="display: block; margin: auto;" />
+
 * From the authors of Low Dose Lidocaine for Refractory Seizures in Preterm Neonates:
 
 > The article has been retracted at the request of the authors. After carefully re-examining the data presented in the article, they identified that data of two different hospitals got terribly mixed. The published results cannot be reproduced in accordance with scientific and clinical correctness.
@@ -226,6 +227,7 @@ http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-
 #### Scripting and literate programming {-}
 
 Donald Knuth "Literate Programming" (1983) 
+
 > Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer- what to do, let us concentrate rather on explaining to human beings- what we want a computer to do.
 
 * The ideas of literate programming have been around for many years!
@@ -272,10 +274,15 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
 * Then, in RStudio also edit the README document with a different change.
     * Commit your changes
-    * Try to push $rightarrow$ you'll get an error!
+    * Try to push $\rightarrow$ you'll get an error!
     * Try pulling
     * Resolve the merge conflict and then commit and push
 * As you work in teams you will run into merge conflicts, learning how to resolve them properly will be very important.
+
+<div class="figure" style="text-align: center">
+<img src="figs/git_xkcd.png" alt="https://xkcd.com/1597/" width="330" />
+<p class="caption">(\#fig:unnamed-chunk-13)https://xkcd.com/1597/</p>
+</div>
 
 #### Steps for weekly homework {-}
 
@@ -364,6 +371,7 @@ What makes using Tweets to predict elections relevant to our class? (See @Baumer
 #### Activity {-}
 
 Spend a few minutes reading the Rojas editorial and skimming the actual paper. Be sure to consider Figure 1 and Table 1 carefully, and address the following questions.
+
 * working paper: http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2235423 
 * published in  *PLoS ONE*: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0079449   DiGrazia J, McKelvey K, Bollen J, Rojas F (2013) More Tweets, More Votes: Social Media as a Quantitative Indicator of Political Behavior.  *PLoS ONE 8* (11): e79449. 
 * editorial in  *The Washington Post* by Rojas: http://www.washingtonpost.com/opinions/how-twitter-can-predict-an-election/2013/08/11/35ef885a-0108-11e3-96a8-d3b921c0924a_story.html
