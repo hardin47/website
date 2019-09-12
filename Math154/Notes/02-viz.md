@@ -109,7 +109,7 @@ Tufte [@Tufte97] created the graphic below which should have been used before th
 <p class="caption">(\#fig:unnamed-chunk-2)The graphic the engineers should have led with in trying to persuade the administrators not to launch.  It is evident that the number of O-ring failures is quite highly associated with the ambient temperature.  Note the *vital* information on the x-axis associated with the large number of launches at warm temperatures that had *zero* O-ring failures. [@Tufte97]</p>
 </div>
 
-## Details of a Plot
+## Thoughts on Plotting
 
 ### Advice
 
@@ -242,6 +242,53 @@ The most important questions you can ask with respect to creating figures are:
 4. Context: in comparison to what (think back to ideas from Tufte)
 
 
+##### What are the visual cues on this plot? {-}
+
+<img src="02-viz_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+
+
+*  position
+*  length
+*  shape
+*  area/volume
+*  shade/color
+
+Coordinate System?  Scale?
+
+##### What are the visual cues on this plot? {-}
+
+<img src="02-viz_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+
+*  position
+*  length
+*  shape
+*  area/volume
+*  shade/color
+
+
+
+Coordinate System?  Scale?
+
+
+##### What are the visual cues on this plot? {-}
+
+<img src="02-viz_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+
+
+*  position
+*  length
+*  shape
+*  area/volume
+*  shade/color
+
+
+Coordinate System?  Scale?
+
+
+
+
+
+
 #### The grammar of graphics in `ggplot2`
 
 **geom**: the geometric "shape" used to display data
@@ -328,7 +375,7 @@ head(Births78, 3)
 ##### How can we make this plot? {-}
 
 
-<img src="02-viz_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 
 Two Questions:
@@ -343,7 +390,7 @@ Two Questions:
  
         * `date -> x`
         * `births -> y`
-        * default color (same for all points) 
+        * points (!) 
 
 
  1. Goal: scatterplot = a plot with points
@@ -355,51 +402,6 @@ Two Questions:
     * data source: `data = Births78`
 
     * aesthetics: `aes(x = date, y = births)`
-
-
-
-##### What are the visual cues on this plot? {-}
-
-<img src="02-viz_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
-
-
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-Coordinate System?  Scale?
-
-##### What are the visual cues on this plot? {-}
-
-<img src="02-viz_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
-
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-
-
-Coordinate System?  Scale?
-
-
-##### What are the visual cues on this plot? {-}
-
-<img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
-
-
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-
-Coordinate System?  Scale?
-
 
 
 
@@ -504,9 +506,7 @@ Births78 %>%
 
 <img src="02-viz_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
 
-This is *mapping* the color aesthetic to a new variable with 
-only one value ("navy").  
-So all the dots get set to the same color, but it's not navy.
+This is *mapping* the color aesthetic to a new variable with  only one value ("navy").   So all the dots get set to the same color, but it's not navy.
 
 ##### Setting vs. Mapping {-}
 
@@ -1068,18 +1068,21 @@ ggplot( data=HELPrct, aes(x=sex, y=age)) +
 
 ##### Things I haven't mentioned (much) {-}
 
- * scales (fine tuning mapping from data to plot)
- 
- * guides (so reader can map from plot to data)
- 
+
  * coords (`coord_flip()` is good to know about)
  
  * themes (for customizing appearance)
 
+ * position (`position_dodge()`, `position_jitterdodge()`,
+ `position_stack()`, etc.)
+ 
+ * transforming axes
+
 
 ```r
 require(ggthemes)
-qplot( x=date, y=births, data=Births78) + theme_wsj()
+ggplot(Births78, aes(x=date, y=births)) + geom_point() + 
+          theme_wsj()
 ```
 
 <img src="02-viz_files/figure-html/unnamed-chunk-56-1.png" width="1344" style="display: block; margin: auto;" />
@@ -1087,15 +1090,14 @@ qplot( x=date, y=births, data=Births78) + theme_wsj()
 
 ##### Things I haven't mentioned (much) {-}
 
- * scales (fine tuning mapping from data to plot)
- 
- * guides (so reader can map from plot to data)
- 
  * coords (`coord_flip()` is good to know about)
  
  * themes (for customizing appearance)
  
- * position (`position_dodge()` can be used for side by side bars)
+ * position (`position_dodge()`, `position_jitterdodge()`,
+ `position_stack()`, etc.)
+ 
+ * transforming axes
  
 
 ```r
@@ -1107,19 +1109,6 @@ ggplot(data=HELPrct, aes(x=substance, y=age, color=sex)) +
 
 <img src="02-viz_files/figure-html/unnamed-chunk-57-1.png" width="1344" style="display: block; margin: auto;" />
 
-
-##### Things I haven't mentioned (much) {-}
-
- * scales (fine tuning mapping from data to plot)
- 
- * guides (so reader can map from plot to data)
- 
- * themes (for customizing appearance)
- 
- * position (`position_dodge()`, `position_jitterdodge()`,
- `position_stack()`, etc.)
- 
- * transforming axes
 
 ##### A little bit of everything {-}
 
@@ -1147,20 +1136,21 @@ ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
 
 #### What else can we do? {-}
 
+
 `shiny`
 
 * interactive graphics / modeling
 
-`ggvis` 
+* https://shiny.rstudio.com/
 
- * dynamic graphics (brushing, sliders, tooltips, etc.)
+`plotly` 
+
+> `Plotly` is an R package for creating interactive web-based graphs via plotly's JavaScript graphing library, `plotly.js`. The `plotly` R libary contains the `ggplotly` function , which will convert `ggplot2` figures into a Plotly object. Furthermore, you have the option of manipulating the Plotly object with the `style` function.
  
-     * uses Vega (D3) to animate plots in a browser
- 
- * similar structure to `ggplot2` but different syntax and names
+ * https://plot.ly/ggplot2/getting-started/
  
 Dynamic documents
 
  * combination of `RMarkdown`, `ggvis`, and `shiny`
  
-
+ 
