@@ -208,7 +208,9 @@ A rubric for assessing analysis and corresponding visualization.  Note that ther
 % (2) ideas of null plots
 --->
 
-## Pieces of a Data Graphic
+## Deconstructing a graph
+
+###  The Grammar of Graphics (`gg`)
 
 @Yau and @Wickham  have come up with a *taxonomy* and a *grammar* for thinking about the parts of a figure just like we conceptualize the parts of a body or the parts of a sentence.
 
@@ -239,6 +241,26 @@ The most important questions you can ask with respect to creating figures are:
 4. Context: in comparison to what (think back to ideas from Tufte)
 
 
+#### The grammar of graphics in `ggplot2`
+
+**geom**: the geometric "shape" used to display data
+ 
+  * bar, point, line, ribbon, text, etc.
+ 
+**aesthetic**: an attribute controlling how geom is displayed wih respect to variables
+
+  * x position, y position, color, fill, shape, size, etc.
+
+**scale**: adjust information in the aesthetic to map onto the plot
+
+  * *particular* assignment of colors, shapes, sizes, etc.; making axes continuous or constrained to a particular range of values.
+ 
+**guide**: helps user convert visual data back into raw data (legends, axes)
+
+**stat**: a transformation applied to data before geom gets it
+
+  * example: histograms work on binned data
+ 
 
 
 ### `ggplot2`
@@ -283,27 +305,6 @@ What I can't do in one session
 
 
 
-##### Pieces of the graph {-}
-Yau gives us nine visual cues, and Wickham translates them into a language using `ggplot2`.  (The items below are from @MDSR, chapter 2.)
-
-
-1. Visual Cues:  the aspects of the figure where we should focus.  
-**Position** (numerical) where in relation to other things?  
-**Length** (numerical) how big (in one dimension)?  
-**Angle** (numerical) how wide? parallel to something else?  
-**Direction** (numerical) at what slope?  In a time series, going up or down?  
-**Shape** (categorical) belonging to what group?  
-**Area** (numerical) how big (in two dimensions)?  Beware of improper scaling!  
-**Volume** (numerical) how big (in three dimensions)?  Beware of improper scaling!  
-**Shade** (either) to what extent?  how severely?  
-**Color** (either) to what extent? how severely? Beware of red/green color blindness.  
-
-2. Coordinate System: rectangular, polar, geographic, etc.
-
-3. Scale: numeric (linear? logarithmic?), categorical (ordered?), time
-
-4. Context: in comparison to what (think back to ideas from Tufte)
-
 
 
 
@@ -322,26 +323,6 @@ head(Births78, 3)
 ```
 
 
-#### The grammar of graphics {-}
-
-**geom**: the geometric "shape" used to display data
- 
-  * bar, point, line, ribbon, text, etc.
- 
-**aesthetic**: an attribute controlling how geom is displayed wih respect to variables
-
-  * x position, y position, color, fill, shape, size, etc.
-
-**scale**: adjust information in the aesthetic to map onto the plot
-
-  * *particular* assignment of colors, shapes, sizes, etc.; making axes continuous or constrained to a particular range of values.
- 
-**guide**: helps user convert visual data back into raw data (legends, axes)
-
-**stat**: a transformation applied to data before geom gets it
-
-  * example: histograms work on binned data
- 
 
 ##### How can we make this plot? {-}
 
@@ -1117,7 +1098,7 @@ qplot( x=date, y=births, data=Births78) + theme_wsj()
  
 
 ```r
-ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
+ggplot(data=HELPrct, aes(x=substance, y=age, color=sex)) +
   geom_boxplot(coef = 10, position=position_dodge()) +
   geom_point(aes(color=sex, fill=sex), position=position_jitterdodge()) +
   ggtitle("HELP clinical trial at detoxification unit")
