@@ -204,8 +204,7 @@ A rubric for assessing analysis and corresponding visualization.  Note that ther
 
 ## 9/12/19 Agenda {#Sep12}
 1. Grammar of graphics
-2. Null plots
-3. ggplot
+2. ggplot
 
 <!---
 % look at Di's plenary talk from rstudio::conf 2018
@@ -284,6 +283,11 @@ What I can't do in one session
 2. Look at the end of this presentation.  More help options there.
 
 
+```{r fig.width = 7, fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/plotly.png")
+```
+
+
 
 ##### Pieces of the graph {-}
 Yau gives us nine visual cues, and Wickham translates them into a language using `ggplot2`.  (The items below are from @MDSR, chapter 2.)
@@ -343,7 +347,8 @@ head(Births78, 3)
 ```{r, echo=FALSE}
 ggplot(
   data=Births78, aes(x=date, y=births)) + 
-  geom_point()
+  geom_point() +
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -404,7 +409,8 @@ SwimRecords %>%
   ggplot(aes(x=year, y=time, color = sex)) + 
   geom_point() + 
   geom_line() +
-  ylab("World Record Time (seconds)")
+  ylab("World Record Time (seconds)") +
+  ggtitle("100m Swimming World Records")
 ```
 
 *  position
@@ -429,7 +435,8 @@ HELPrct %>% group_by(substance) %>%
   coord_polar("y", start = 0)+
   geom_text(aes(y = lab.ypos, label = count), color = "white") +
   scale_fill_brewer(palette = "Greens") +
-  theme_void()
+  theme_void() +
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -450,9 +457,10 @@ Coordinate System?  Scale?
 
 ```{r, echo=FALSE}
 Births78 <- 
-  Births78 %>% mutate(wday = wday(date, label=TRUE))
+  Births78 %>% mutate(wday = lubridate::wday(date, label=TRUE))
 ggplot(data=Births78) +
-  geom_point(aes(x=date, y=births, color=wday)) 
+  geom_point(aes(x=date, y=births, color=wday)) +
+  ggtitle("US Births in 1978")
 ```
 
 What has changed?  
@@ -467,14 +475,15 @@ The `wday()` function in the `lubridate` package computes  the day of the week f
 ```{r}
 Births78 <-  
   Births78 %>% 
-  mutate(wday = wday(date, label=TRUE))
+  mutate(wday = lubridate::wday(date, label=TRUE))
 ```
 
 
 
 ```{r, fig.height=2.0}
 ggplot(data=Births78) +
-  geom_point(aes(x=date, y=births, color=wday))
+  geom_point(aes(x=date, y=births, color=wday))+
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -482,7 +491,8 @@ ggplot(data=Births78) +
 
 ```{r, echo=FALSE}
 ggplot(data=Births78) +
-  geom_line(aes(x=date, y=births, color=wday)) 
+  geom_line(aes(x=date, y=births, color=wday)) +
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -491,7 +501,8 @@ This time we use lines instead of dots
 
 ```{r, eval=FALSE}
 ggplot(data=Births78) +
-  geom_line(aes(x=date, y=births, color=wday)) 
+  geom_line(aes(x=date, y=births, color=wday)) +
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -500,7 +511,8 @@ ggplot(data=Births78) +
 ```{r, echo=FALSE}
 ggplot(data=Births78, aes(x=date, y=births, color=wday)) + 
   geom_point() + 
-  geom_line()
+  geom_line()+
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -511,7 +523,8 @@ lines
 ```{r, eval=FALSE}
 ggplot(data=Births78, 
        aes(x=date, y=births, color=wday)) + 
-  geom_point() +  geom_line()
+  geom_point() +  geom_line()+
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -527,7 +540,8 @@ are *below* and the lines are *above*.
 Births78 %>% 
   ggplot(aes(x=date, y=births, color=wday)) + 
   geom_point() + 
-  geom_line()
+  geom_line()+
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -536,7 +550,8 @@ Births78 %>%
 ```{r, eval=FALSE}
 Births78 %>%
   ggplot(aes(x=date, y=births, color="navy")) + 
-  geom_point()  
+  geom_point()  +
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -544,7 +559,8 @@ Births78 %>%
 ```{r, echo=FALSE}
 Births78 %>% 
   ggplot(aes(x=date, y=births, color="navy")) + 
-  geom_point()  
+  geom_point()  +
+  ggtitle("US Births in 1978")
 ```
 
 This is *mapping* the color aesthetic to a new variable with 
@@ -560,7 +576,8 @@ it this way:
 ```{r}
 Births78 %>%
   ggplot(aes(x=date, y=births)) +   # map these 
-  geom_point(color = "navy")        # set this
+  geom_point(color = "navy")   +     # set this
+  ggtitle("US Births in 1978")
 ```
 
 * Note that `color = "navy"` is now outside of the aesthetics list.  That's how `ggplot2` distinguishes between mapping and setting.
@@ -572,7 +589,8 @@ Births78 %>%
 Births78 %>%
   ggplot(aes(x=date, y=births)) + 
   geom_line(aes(color=wday)) +        # map color here
-  geom_point(color="navy")            # set color here
+  geom_point(color="navy")    +        # set color here
+  ggtitle("US Births in 1978")
 ```
 
 
@@ -580,7 +598,8 @@ Births78 %>%
 Births78 %>%
   ggplot(aes(x=date, y=births)) + 
   geom_line(aes(color=wday)) +       # map color here
-  geom_point(color="navy")           # set color here
+  geom_point(color="navy") +          # set color here
+  ggtitle("US Births in 1978")
 ```
 
 * `ggplot()` establishes the default data and aesthetics
@@ -590,12 +609,11 @@ for the geoms, but each geom may change these defaults.
 
 ##### Setting vs. Mapping (again) {-}
 
+Information gets passed to the plot via:
 
-If I want information to be passed to all data points (not variable):
+a. `map` the **variable** information inside the aes (aesthetic) command
 
-a. map the information inside the aes (aesthetic) command
-
-a. set the information outside the aes (aesthetic) command
+a. `set` the **non-variable** information outside the aes (aesthetic) command
 
 ##### Other geoms {-}
 
@@ -610,16 +628,16 @@ help pages will tell you their aesthetics, default stats, etc.
 ```
 
 
-##### Let's try geom_area {-}
+##### Let's try `geom_area` {-}
 
 ```{r, eval=TRUE}
 Births78 %>%
   ggplot(aes(x=date, y=births, fill=wday)) + 
-  geom_area()
+  geom_area()+
+  ggtitle("US Births in 1978")
 ```
 
 This is not a good plot
-
 
 * overplotting is hiding much of the data
 * extending y-axis to 0 may or may not be desirable.
@@ -650,13 +668,14 @@ head(HELPrct)
 Subjects admitted for treatment for addiction to one 
 of three substances.
 
-##### Why are these people in the study? {-}
+##### Who are the people in the study? {-}
 
 
 ```{r}
 HELPrct %>% 
   ggplot(aes(x=substance)) + 
-  geom_bar()
+  geom_bar()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -668,33 +687,36 @@ HELPrct %>%
     `geom_bar()` gets to do its thing.  Binning creates the
     `y` values.
 
-##### Why are these people in the study? {-}
+##### Who are the people in the study? {-}
 
 
 ```{r message=FALSE, warning=FALSE}
 HELPrct %>% 
   ggplot(aes(x=substance, fill=sex)) + 
-  geom_bar()
+  geom_bar()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-##### Why are these people in the study? {-}
+##### Who are the people in the study? {-}
 
 ```{r message=FALSE, warning=FALSE}
 library(scales)
 HELPrct %>% 
   ggplot(aes(x=substance, fill=sex)) + 
   geom_bar() +
-  scale_y_continuous(labels = percent)
+  scale_y_continuous(labels = percent)+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
-##### Why are these people in the study? {-}
+##### Who are the people in the study? {-}
 
 ```{r message=FALSE, warning=FALSE}
 HELPrct %>% 
   ggplot(aes(x=substance, fill=sex)) + 
   geom_bar(position="fill") +
-  scale_y_continuous("actually, percent")
+  scale_y_continuous("actually, percent")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -704,7 +726,8 @@ HELPrct %>%
 ```{r, fig.height=1.5, message=TRUE}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_histogram()
+  geom_histogram()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 Notice the messages
@@ -722,7 +745,8 @@ really choose our own.
 ```{r}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_histogram(binwidth=2)
+  geom_histogram(binwidth=2)+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -731,13 +755,15 @@ HELPrct %>%
 ```{r, fig.height=1.7}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_freqpoly(binwidth=2)
+  geom_freqpoly(binwidth=2)+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ```{r, fig.height=1.7}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_density()
+  geom_density()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### Selecting stat and geom manually {-}
@@ -750,7 +776,8 @@ Every geom comes with a default stat
 ```{r, fig.height=2.0}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_line(stat="density")
+  geom_line(stat="density")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### Selecting stat and geom manually {-}
@@ -763,7 +790,8 @@ Every stat comes with a default geom, every geom with a default stat
 ```{r, fig.height=2.0}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  stat_density( geom="line")
+  stat_density( geom="line")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### More combinations {-}
@@ -772,37 +800,43 @@ HELPrct %>%
 HELPrct %>% 
   ggplot(aes(x=age)) + 
   geom_point(stat="bin", binwidth=3) + 
-  geom_line(stat="bin", binwidth=3)  
+  geom_line(stat="bin", binwidth=3)  +
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ```{r, fig.height=1.7}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
-  geom_area(stat="bin", binwidth=3)  
+  geom_area(stat="bin", binwidth=3) +
+  ggtitle("HELP clinical trial at detoxification unit") 
 ```
 
 ```{r}
 HELPrct %>% 
   ggplot(aes(x=age)) + 
   geom_point(stat="bin", binwidth=3, aes(size=..count..)) +
-  geom_line(stat="bin", binwidth=3) 
+  geom_line(stat="bin", binwidth=3) +
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### How much do they drink? (i1) {-}
 
 ```{r, fig.height=1.5}
 HELPrct %>% 
-  ggplot(aes(x=i1)) + geom_histogram()
+  ggplot(aes(x=i1)) + geom_histogram()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ```{r, fig.height=1.5}
 HELPrct %>% 
-  ggplot(aes(x=i1)) + geom_density()
+  ggplot(aes(x=i1)) + geom_density()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ```{r, fig.height=1.5}
 HELPrct %>% 
-  ggplot(aes(x=i1)) + geom_area(stat="density")
+  ggplot(aes(x=i1)) + geom_area(stat="density")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -814,7 +848,8 @@ Using color and linetype:
 ```{r, fig.height=1.6}
 HELPrct %>% 
   ggplot(aes(x=i1, color=substance, linetype=sex)) + 
-  geom_line(stat="density")
+  geom_line(stat="density")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 Using color and facets
@@ -822,13 +857,15 @@ Using color and facets
 ```{r, fig.height=1.6}
 HELPrct %>% 
   ggplot(aes(x=i1, color=substance)) + 
-  geom_line(stat="density") + facet_grid( . ~ sex )
+  geom_line(stat="density") + facet_grid( . ~ sex )+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ```{r, fig.height=1.6}
 HELPrct %>% 
   ggplot(aes(x=i1, color=substance)) + 
-  geom_line(stat="density") + facet_grid( sex ~ . )
+  geom_line(stat="density") + facet_grid( sex ~ . )+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -840,7 +877,8 @@ The quantitative variable must be `y`, and there must be an additional `x` varia
 ```{r}
 HELPrct %>% 
   ggplot(aes(x=substance, y=age, color=sex)) + 
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### Horizontal boxplots {-}
@@ -850,7 +888,8 @@ Horizontal boxplots are obtained by flipping the coordinate system:
 HELPrct %>% 
   ggplot(aes(x=substance, y=age, color=sex)) + 
   geom_boxplot() +
-  coord_flip()
+  coord_flip()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 * `coord_flip()` may be used with other plots as well to reverse the roles
@@ -864,7 +903,8 @@ We can scale the continuous axis
 HELPrct %>% 
   ggplot(aes(x=substance, y=age, color=sex)) + 
   geom_boxplot() +
-  coord_trans(y="log")
+  coord_trans(y="log")+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -875,7 +915,8 @@ We've triggered a new feature: `dodge` (for dodging things left/right). We can c
 ```{r}
 HELPrct %>% 
   ggplot(aes(x=substance, y=age, color=sex)) + 
-  geom_boxplot(position=position_dodge(width=1)) 
+  geom_boxplot(position=position_dodge(width=1)) +
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -885,7 +926,8 @@ HELPrct %>%
 require(NHANES)
 dim(NHANES)
 NHANES %>%  ggplot(aes(x=Height, y=Weight)) +
-  geom_point() + facet_grid( Gender ~ PregnantNow )
+  geom_point() + facet_grid( Gender ~ PregnantNow ) +
+  ggtitle("National Health and Nutrition Examination Survey")
 ```
 
 * Although we can see a generally positive association (as we would 
@@ -898,7 +940,8 @@ One way to deal with overplotting is to set the opacity low.
 ```{r}
 NHANES %>% 
   ggplot(aes(x=Height, y=Weight)) +
-  geom_point(alpha=0.01) + facet_grid( Gender ~ PregnantNow )
+  geom_point(alpha=0.01) + facet_grid( Gender ~ PregnantNow ) +
+  ggtitle("National Health and Nutrition Examination Survey")
 ```
 
 ##### geom_density2d {-}
@@ -909,7 +952,8 @@ geom altogether.
 ```{r}
 NHANES %>% 
   ggplot(aes(x=Height, y=Weight)) +
-  geom_density2d() + facet_grid( Gender ~ PregnantNow )
+  geom_density2d() + facet_grid( Gender ~ PregnantNow ) +
+  ggtitle("National Health and Nutrition Examination Survey")
 ```
 
 
@@ -920,7 +964,8 @@ NHANES %>%
 ggplot( data=HELPrct, aes(x=sex, y=age)) +
   geom_boxplot(outlier.size=0) +
   geom_jitter(alpha=.6) +
-  coord_flip()
+  coord_flip()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 ##### Multiple layers {-}
@@ -929,7 +974,8 @@ ggplot( data=HELPrct, aes(x=sex, y=age)) +
 ggplot( data=HELPrct, aes(x=sex, y=age)) +
   geom_boxplot(outlier.size=0) +
   geom_point(alpha=.6, position=position_jitter(width=.1, height=0)) +
-  coord_flip()
+  coord_flip()+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -964,7 +1010,8 @@ qplot( x=date, y=births, data=Births78) + theme_wsj()
 ```{r, fig.width=14}
 ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
   geom_boxplot(coef = 10, position=position_dodge()) +
-  geom_point(aes(color=sex, fill=sex), position=position_jitterdodge()) 
+  geom_point(aes(color=sex, fill=sex), position=position_jitterdodge()) +
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
@@ -988,7 +1035,8 @@ ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
   geom_boxplot(coef = 10, position=position_dodge(width=1)) +
   geom_point(aes(fill=sex), alpha=.5, 
              position=position_jitterdodge(dodge.width=1)) + 
-  facet_wrap(~homeless)
+  facet_wrap(~homeless)+
+  ggtitle("HELP clinical trial at detoxification unit")
 ```
 
 
