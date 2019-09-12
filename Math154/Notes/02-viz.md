@@ -109,7 +109,7 @@ Tufte [@Tufte97] created the graphic below which should have been used before th
 <p class="caption">(\#fig:unnamed-chunk-2)The graphic the engineers should have led with in trying to persuade the administrators not to launch.  It is evident that the number of O-ring failures is quite highly associated with the ambient temperature.  Note the *vital* information on the x-axis associated with the large number of launches at warm temperatures that had *zero* O-ring failures. [@Tufte97]</p>
 </div>
 
-## Deconstructing / Creating Plots
+## Details of a Plot
 
 ### Advice
 
@@ -217,6 +217,7 @@ A rubric for assessing analysis and corresponding visualization.  Note that ther
 One great way of thinking of this new process:  it is not longer necessary to talk about the name of the graph (e.g., boxplot).  Instead we now think in glyphs (geoms), and so we can put whatever we want on the plot.  Note also that this transition leads you from a passive consumer (I need to make plot XXX because everyone else does, so I just plug in the data) into an active participant (what do I want my data to say?  and how can I put that information onto my graphic?)
 
 The most important questions you can ask with respect to creating figures are:
+
 1. What do we want R to do? (What is the goal?)
 2. What does R need to know?
 
