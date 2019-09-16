@@ -5,14 +5,14 @@
 ## 9/10/19 Agenda {#Sep10}
 1. Cholera: what went (didn't go) well with the graphics?
 2. Challenger: what didn't go (went) well with the graphics?
-3. Deconstructing a plot (with example(s))
+3. Thoughts on plotting (with example(s))
 4. Should have read: @VST
 5. One more great reference is the following text: **Fundamentals of Data Visualization** by Wilke at http://serialmentor.com/dataviz/
 
 
-Depending on the introductory (or other) statistics classes you've had, your instructor may have focused more or less on visualizations in class.  They (I) may have even said something like *making visualizations are incredibly important to the entire data analysis process.*  But even if you buy this perspective, why is it that we don't see more good graphics in our analyses?   Andrew Gelman [@Gelman11] responds to this point by stating, "Good statistical graphics are hard to do, much harder than running regressions and making tables."   **Our goal will be to create graphics and visualizations that convey statistical information.**
+Depending on the introductory (or other) statistics classes you've had, your instructor may have focused more or less on visualizations in class.  They (I) may have even said something like *making visualizations are incredibly important to the entire data analysis process.*  But even if you buy the perspective, why is it that we don't see more good graphics in our analyses?   Andrew Gelman [@Gelman11] responds by stating, "Good statistical graphics are hard to do, much harder than running regressions and making tables."   **Our goal will be to create graphics and visualizations that convey statistical information.**
 
-Nolan [@Nolan16] describes three important ways that graphics can be used to convey statistical information.  These "guiding principles" will be used as a way of evaluating others' figures as well as a metric for creating our own visualizations to help with statistical analysis.
+Nolan [@Nolan16] describes three important ways that graphics can be used to convey statistical information.  The "guiding principles" will be used as a way of evaluating others' figures as well as a metric for creating our own visualizations to help with statistical analysis.
 
 1.  *Make the data stand out* 
 
@@ -20,7 +20,7 @@ The important idea here is to find anything unusual in the data.  Are there patt
 
 2. *Facilitate comparison*
 
-The second item allows us to consider the research questions at hand. What are the important variables?  How do we emphasize them?  Which variables should be plotted together?  Can they be super-imposed?  Does color, plotting character, size of plot character help to bring out the important relationships?  Be aware of overplotting and issues of color blindness! http://colorbrewer2.org/
+The second item allows us to consider the research questions at hand. What are the important variables?  How do we emphasize them?  Which variables should be plotted together?  Can they be super-imposed?  Does color, plotting character, size of plot character help to bring out the important relationships?  Be aware of over plotting and issues of color blindness! http://colorbrewer2.org/
 
 3. *Add information*
 
@@ -101,7 +101,7 @@ As with the cholera outbreak, a persuasive argument could have been made if the 
 (3) consider alternative scenarios *when else did O-rings fail?  What is the science behind O-ring failure?*, and 
 (4) the graphics had been assessed *what is all of the extra noise?  are the words being used accessible to non-engineers?*. 
 
-Tufte [@Tufte97] created the graphic below which should have been used before the launch to convince others to postpone.  As you can see, the graphic is extremely convincing.  An aside: the O-ring data are well suited for an analysis using logistic regression.  At this point, most scientists believe that the temperature *caused* the O-ring failure, however, the data do not speak to the causal relationship because they were not collected using a randomized experiment.  That is, there could have been other confounding variables (e.g., humidity) which were possible causal mechanisms.
+Tufte [@Tufte97] created the graphic below which should have been used before the launch to convince others to postpone.  As you can see, the graphic is extremely convincing.  An aside: the O-ring data are well suited for an analysis using logistic regression.  Today, most scientists believe that the temperature *caused* the O-ring failure, however, the data do not speak to the causal relationship because they were not collected using a randomized experiment.  That is, there could have been other confounding variables (e.g., humidity) which were possible causal mechanisms.
 
 
 <div class="figure" style="text-align: center">
@@ -109,7 +109,7 @@ Tufte [@Tufte97] created the graphic below which should have been used before th
 <p class="caption">(\#fig:unnamed-chunk-2)The graphic the engineers should have led with in trying to persuade the administrators not to launch.  It is evident that the number of O-ring failures is quite highly associated with the ambient temperature.  Note the *vital* information on the x-axis associated with the large number of launches at warm temperatures that had *zero* O-ring failures. [@Tufte97]</p>
 </div>
 
-## Thoughts on Plotting
+## Thoughts on Plotting {#thoughts}
 
 ### Advice
 
@@ -130,7 +130,7 @@ Tufte [@Tufte97] created the graphic below which should have been used before th
     - Make it easy to distinguish elements of  superposed plots (e.g. color)
     - Emphasizes the important difference
     - Comparison: volume, area, height  (be careful, volume can seem bigger than you mean it to)
-* Choosing the Scale (n.b., some of these principles may go counter to one another, use your judgment.)
+* Choosing the Scale (n.b., some of the principles may go counter to one another, use your judgment.)
     - Keep scales on x and y axes the same for both plots to facilitate the comparison
     - Zoom in to focus on the region that contains the bulk of the data
     - Keep the scale the same throughout the plot (i.e. don't change it mid-axis)
@@ -159,13 +159,13 @@ Tufte [@Tufte97] created the graphic below which should have been used before th
     - Make plots data rich
 
 
-Creating a statistical graphic is an iterative process of discovery and fine tuning. We try to model this process in the course by dedicating class time to an interactive iterative creation of a plot. We begin either with a plot that screams for correction, and we transform it step-by-step, always thinking about the goal of a graph that is data rich and presents a clear vision of the important features of the data.
+Creating a statistical graphic is an iterative process of discovery and fine tuning. We try to model the process of creating visualizations in the course by dedicating class time to an iterative creation of a plot. We begin either with a plot that screams for correction, and we transform it step-by-step, always thinking about the goal of a graph that is data rich and presents a clear vision of the important features of the data.
 
 ### An example from Information is Beautiful
 
 (See HW2 for details on R code)
 
-Consider the plot at http://www.informationisbeautiful.net/visualizations/caffeine-and-calories/.  Note that the origin is at the point (150,150).  While we can get over this hurdle, it is not what is expected when looking at a graph.
+Consider the plot at http://www.informationisbeautiful.net/visualizations/caffeine-and-calories/.  Note that the origin is at the point (150,150).  While we can get over the hurdle, it is not what is expected when looking at a graph.
 
 
 <div class="figure" style="text-align: center">
@@ -208,20 +208,20 @@ A rubric for assessing analysis and corresponding visualization.  Note that ther
 % (2) ideas of null plots
 --->
 
-## Deconstructing a graph
+## Deconstructing a graph {#deconstruct}
 
-###  The Grammar of Graphics (`gg`)
+###  The Grammar of Graphics (`gg`) {#gg}
 
-@Yau and @Wickham  have come up with a *taxonomy* and a *grammar* for thinking about the parts of a figure just like we conceptualize the parts of a body or the parts of a sentence.
+@Yau and @Wickham14  have come up with a *taxonomy* and a *grammar* for thinking about the parts of a figure just like we conceptualize the parts of a body or the parts of a sentence.
 
-One great way of thinking of this new process:  it is not longer necessary to talk about the name of the graph (e.g., boxplot).  Instead we now think in glyphs (geoms), and so we can put whatever we want on the plot.  Note also that this transition leads you from a passive consumer (I need to make plot XXX because everyone else does, so I just plug in the data) into an active participant (what do I want my data to say?  and how can I put that information onto my graphic?)
+One great way of thinking of the new process:  it is not longer necessary to talk about the name of the graph (e.g., boxplot).  Instead we now think in glyphs (geoms), and so we can put whatever we want on the plot.  Note also that the transition leads you from a passive consumer (I need to make plot XXX because everyone else does, so I just plug in the data) into an active participant (what do I want my data to say?  and how can I put that information onto my graphic?)
 
 The most important questions you can ask with respect to creating figures are:
 
 1. What do we want R to do? (What is the goal?)
 2. What does R need to know?
 
-@Yau gives us nine visual cues, and @Wickham translates them into a language using `ggplot2`.  (The items below are from @MDSR, chapter 2.)
+@Yau gives us nine visual cues, and @Wickham14 translates them into a language using `ggplot2`.  (The items below are from @MDSR, chapter 2.)
 
 
 1. Visual Cues:  the aspects of the figure where we should focus.  
@@ -242,7 +242,7 @@ The most important questions you can ask with respect to creating figures are:
 4. Context: in comparison to what (think back to ideas from Tufte)
 
 
-##### What are the visual cues on this plot? {-}
+##### What are the visual cues on the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -255,7 +255,7 @@ The most important questions you can ask with respect to creating figures are:
 
 Coordinate System?  Scale?
 
-##### What are the visual cues on this plot? {-}
+##### What are the visual cues on the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -270,7 +270,7 @@ Coordinate System?  Scale?
 Coordinate System?  Scale?
 
 
-##### What are the visual cues on this plot? {-}
+##### What are the visual cues on the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -295,7 +295,7 @@ Coordinate System?  Scale?
  
   * bar, point, line, ribbon, text, etc.
  
-**aesthetic**: an attribute controlling how geom is displayed wih respect to variables
+**aesthetic**: an attribute controlling how geom is displayed with respect to variables
 
   * x position, y position, color, fill, shape, size, etc.
 
@@ -346,7 +346,9 @@ What I can't do in one session
 
 1.  One of the best ways to get started with ggplot is to google what you want to do with the word ggplot.  Then look through the images that come up.  More often than not, the associated code is there.  There are also ggplot galleries of images, one of them is here: https://plot.ly/ggplot2/
 
-2. Look at the end of this presentation.  More help options there.
+2. `ggplot2` cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
+3. Look at the end of the presentation.  More help options there.
 
 
 <img src="figs/plotly.png" width="476" style="display: block; margin: auto;" />
@@ -372,7 +374,7 @@ head(Births78, 3)
 
 
 
-##### How can we make this plot? {-}
+##### How can we make the plot? {-}
 
 
 <img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
@@ -406,7 +408,7 @@ Two Questions:
 
 
 
-##### How can we make this plot? {-}
+##### How can we make the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -438,13 +440,13 @@ ggplot(data=Births78) +
 <img src="02-viz_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 
-##### How can we make this plot? {-}
+##### How can we make the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
-This time we use lines instead of dots
+Now we use lines instead of dots
 
 
 ```r
@@ -454,13 +456,11 @@ ggplot(data=Births78) +
 ```
 
 
-##### How can we make this plot? {-}
+##### How can we make the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
 
-
-
-This time we have two **layers**, one with points and one with
+Now we have two **layers**, one with points and one with
 lines
 
 
@@ -492,7 +492,7 @@ Births78 %>%
 <img src="02-viz_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
 
 
-##### What does this do? {-}
+##### What does adding the color argument do? {-}
 
 
 ```r
@@ -506,19 +506,18 @@ Births78 %>%
 
 <img src="02-viz_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
 
-This is *mapping* the color aesthetic to a new variable with  only one value ("navy").   So all the dots get set to the same color, but it's not navy.
+Because there is no variable, we have *mapped* the color aesthetic to a new variable with only one value ("navy").   So all the dots get set to the same color, but it's not navy.
 
 ##### Setting vs. Mapping {-}
 
 
-If we want to *set* the color to be navy for all of the dots, we do 
-it this way:
+If we want to *set* the color to be navy for all of the dots, we do it outside the aesthetic, without a dataset variable:
 
 
 ```r
 Births78 %>%
-  ggplot(aes(x=date, y=births)) +   # map these 
-  geom_point(color = "navy")   +     # set this
+  ggplot(aes(x=date, y=births)) +   # map x & y 
+  geom_point(color = "navy")   +     # set color
   ggtitle("US Births in 1978")
 ```
 
@@ -527,7 +526,7 @@ Births78 %>%
 * Note that `color = "navy"` is now outside of the aesthetics list.  That's how `ggplot2` distinguishes between mapping and setting.
 
 
-##### How can we make this plot? {-}
+##### How can we make the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -541,8 +540,7 @@ Births78 %>%
   ggtitle("US Births in 1978")
 ```
 
-* `ggplot()` establishes the default data and aesthetics
-for the geoms, but each geom may change these defaults.
+* `ggplot()` establishes the default data and aesthetics for the geoms, but each geom may change the defaults.
 
 * good practice: put into `ggplot()` the things that affect all (or most) of the layers; rest in `geom_blah()`
 
@@ -604,9 +602,9 @@ Births78 %>%
 
 <img src="02-viz_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
-This is not a good plot
+Using area does not produce a good plot
 
-* overplotting is hiding much of the data
+* over plotting is hiding much of the data
 * extending y-axis to 0 may or may not be desirable.
 
 ##### Side note: what makes a plot good? {-}
@@ -617,8 +615,7 @@ Most (all?) graphics are intended to help us make comparisons
 * Do my treatments matter?  How much?
 * Do men and women respond the same way?
 
-**Key plot metric:** Does my plot make the comparisions 
-I am interested in 
+**Key plot metric:** Does my plot make the comparisonsI am interested in 
 
 * easily, and 
 * accurately?
@@ -626,8 +623,8 @@ I am interested in
 ##### Time for some different data {-}
 
 
-HELPrct: Health Evaluation and Linkage to Primary care randomized
-clinical trial
+`HELPrct`: Health Evaluation and Linkage to Primary care randomized clinical trial
+
 
 ```r
 head(HELPrct)
@@ -657,8 +654,7 @@ head(HELPrct)
 ## 6      5   black      no       5   cocaine   yes          4          4
 ```
 
-Subjects admitted for treatment for addiction to one 
-of three substances.
+Subjects admitted for treatment for addiction to oneof three substances.
 
 ##### Who are the people in the study? {-}
 
@@ -673,10 +669,7 @@ HELPrct %>%
 
 <img src="02-viz_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
 
-
-
 * Hmm.  What's up with `y`?
-
 
     * `stat_bin()` is being applied to the data before the 
     `geom_bar()` gets to do its thing.  Binning creates the
@@ -743,12 +736,10 @@ HELPrct %>%
 
 Notice the messages
 
-* `stat_bin`:  Histograms are not mapping the raw data but
-binned data.  
+* `stat_bin`:  Histograms are not mapping the raw data but binned data.  
 `stat_bin()` performs the data transformation.
 
-* `binwidth`: a default binwidth has been selected, but we should
-really choose our own.
+* `binwidth`: a default `binwidth` has been selected, but we should really choose our own.
 
 ##### Setting the binwidth manually {-}
 
@@ -805,9 +796,9 @@ HELPrct %>%
 
 ##### Selecting stat and geom manually {-}
 
-Every stat comes with a default geom, every geom with a default stat
+Every stat comes with a default `geom`, every geom with a default stat
 
-* we can specify stats instead of geom, if we prefer
+* we can specify stats instead of `geom`, if we prefer
 * we can mix and match geoms and stats however we like
 
 
@@ -887,7 +878,7 @@ HELPrct %>%
 ##### Covariates: Adding in more variables {-}
 
 
-Using color and linetype:
+Using `color` and `linetype`:
 
 
 ```r
@@ -899,7 +890,7 @@ HELPrct %>%
 
 <img src="02-viz_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
 
-Using color and facets
+Using `color` and `facet`s
 
 
 ```r
@@ -1005,12 +996,11 @@ NHANES %>%  ggplot(aes(x=Height, y=Weight)) +
 
 <img src="02-viz_files/figure-html/unnamed-chunk-51-1.png" width="480" style="display: block; margin: auto;" />
 
-* Although we can see a generally positive association (as we would 
-expect), the overplotting may be hiding information.
+* Although we can see a generally positive association (as we would expect), the over plotting may be hiding information.
 
 ##### Using alpha (opacity) {-}
 
-One way to deal with overplotting is to set the opacity low.
+One way to deal with over plotting is to set the opacity low.
 
 
 ```r
@@ -1024,8 +1014,7 @@ NHANES %>%
 
 ##### geom_density2d {-}
 
-Alternatively (or simultaneously) we might prefere a different 
-geom altogether.
+Alternatively (or simultaneously) we might prefer a different `geom` altogether.
 
 
 ```r
@@ -1073,8 +1062,7 @@ ggplot( data=HELPrct, aes(x=sex, y=age)) +
  
  * themes (for customizing appearance)
 
- * position (`position_dodge()`, `position_jitterdodge()`,
- `position_stack()`, etc.)
+ * position (`position_dodge()`, `position_jitterdodge()`, `position_stack()`, etc.)
  
  * transforming axes
 
@@ -1087,17 +1075,6 @@ ggplot(Births78, aes(x=date, y=births)) + geom_point() +
 
 <img src="02-viz_files/figure-html/unnamed-chunk-56-1.png" width="1344" style="display: block; margin: auto;" />
 
-
-##### Things I haven't mentioned (much) {-}
-
- * coords (`coord_flip()` is good to know about)
- 
- * themes (for customizing appearance)
- 
- * position (`position_dodge()`, `position_jitterdodge()`,
- `position_stack()`, etc.)
- 
- * transforming axes
  
 
 ```r
@@ -1145,7 +1122,7 @@ ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
 
 `plotly` 
 
-> `Plotly` is an R package for creating interactive web-based graphs via plotly's JavaScript graphing library, `plotly.js`. The `plotly` R libary contains the `ggplotly` function , which will convert `ggplot2` figures into a Plotly object. Furthermore, you have the option of manipulating the Plotly object with the `style` function.
+> `Plotly` is an R package for creating interactive web-based graphs via plotly's JavaScript graphing library, `plotly.js`. The `plotly` R library contains the `ggplotly` function , which will convert `ggplot2` figures into a Plotly object. Furthermore, you have the option of manipulating the Plotly object with the `style` function.
  
  * https://plot.ly/ggplot2/getting-started/
  

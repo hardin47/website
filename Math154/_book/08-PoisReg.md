@@ -1,4 +1,0 @@
-# Poisson Regression
-
-more soon
-
