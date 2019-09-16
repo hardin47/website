@@ -5,8 +5,9 @@
 
 ## 9/17/19 Agenda {#Sep17}
 1. Tidy Data (structure of data)
-2. Data Verbs
-3. babynames / NHANES examples
+2. Piping / chaining
+3. Basic data Verbs
+4. babynames / NHANES examples
 
 >Information is what we want, but data are what we've got. [@Kaplan15]
 
@@ -140,10 +141,8 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 -->
 
 ## 9/19/19 Agenda {#Sep19}
-1. gather
-2. spread
-3. join
-4. lubridate
+1. Higher level data verbs: `gather`, `spread`, `join`
+2. `lubridate`
 
 ## Higher Level Data Verbs {#highverb}
 
