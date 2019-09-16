@@ -1,0 +1,239 @@
+
+# Data Wrangling {#wrang}
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
+                      fig.height=3, fig.width=5,  
+                      cache=TRUE, fig.align = "center")
+
+library(tidyverse)
+```
+
+## 9/17/19 Agenda {#Sep17}
+1. Tidy Data (structure of data)
+2. Data Verbs
+3. babynames / NHANES examples
+
+>Information is what we want, but data are what we've got. [@Kaplan15]
+
+## Structure of Data
+
+For plotting, analyses, model building, etc., it's important that the data be structured in a very particular way.   Hadley Wickham provides a thorough discussion and advice for cleaning up the data in @Wickham14.
+
+* *Tidy Data*: rows (cases/observational units) and columns (variables).  The key is that *every* row is a case and *every} column is a variable.  No exceptions.
+* Creating tidy data is not trivial.  We work with objects (often data tables), functions, and arguments (often variables).
+
+
+These data are not tidy!  What are the cases?  How are the data not tidy?  What might these data look like in tidy form?  Suppose that the case was "an individual in the armed forces."  What variables would you use to capture the information in this table?
+
+https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1811988794
+
+![](figs/activedutyTidy.png)
+
+**Problem:** totals and different sheets
+
+**Better for R:** longer format with columns - grade, gender, status, service, count (case is still the total pay grade)
+
+**Case is individual (?)**:  grade, gender, status, service (no count because each row does the counting)
+
+### Building Tidy Data
+
+Within R (really within any type of computing language, Python, SQL, Java, etc.), we need to understand how to build data using the patterns of the language.  Some things to consider:
+
+
+* `object_name` = `function_name` (`arguments`) is a way of using a function to create a new object.
+* `object_name` = `data_table` `%>%` `function_name` (`arguments`) uses chaining syntax as an extension of the ideas of functions.  In chaining, the value on the left side of `%>%` becomes the *first argument* to the function on the right side.
+* `object_name` = `data_table` `%>%`
+ `function_name` (`arguments`) `%>%` 
+ `function_name` (`arguments`)
+is extended chaining.  `%>%` is never at the front of the line, it is always connecting one idea with the continuation of that idea on the next line.
+* In R, all functions take arguments in round parentheses (as opposed to subsetting observations or variables from data objects which happen with square parentheses).  Additionally, the spot to the left of `%>%` is always a data table.
+* The pipe syntax should be read as *then*, `%>%`.
+
+### Examples of Chaining
+
+The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the argument of a function.  The mapping goes to the first available argument in the function.  For example:
+
+`x %>% f(y)` is the same as `f(x, y)`
+` y %>% f(x, ., z)` is the same as `f(x,y,z)`
+
+#### Little Bunny Foo Foo
+
+From Hadley Wickham, how to think about tidy data.
+
+> Little bunny Foo Foo
+> Went hopping through the forest
+> Scooping up the field mice
+> And bopping them on the head
+
+The nursery rhyme could be created by a series of steps where the output from each step is saved as an object along the way.
+
+```
+foo_foo <- little_bunny()
+foo_foo_1 <- hop(foo_foo, through = forest)
+foo_foo_2 <- scoop(foo_foo_2, up = field_mice)
+foo_foo_3 <- bop(foo_foo_2, on = head)
+```
+
+Another approach is to concatenate the functions so that there is only one output.  
+
+```
+bop(
+   scoop(
+      hop(foo_foo, through = forest),
+      up = field_mice),
+   on = head)
+```
+
+Or even worse, as one line:
+
+```
+bop(scoop(hop(foo_foo, through = forest), up = field_mice), on = head)))
+```
+
+Instead, the code can be written using the pipe in the **order** in which the function is evaluated:
+
+```
+foo_foo %>%
+   hop(through = forest) %>%
+       scoop(up = field_mice) %>%
+           bop(on = head)
+```
+
+**babynames**  Each year, the US Social Security Administration publishes a list of the most popular names given to babies.  In 2014, http://www.ssa.gov/oact/babynames/#ht=2 shows Emma and Olivia leading for girls, Noah and Liam for boys.
+
+The `babynames` data table in the `babynames` package comes from the Social Security Administration's listing of the names givens to babies in each year, and the number of babies of each sex given that name. (Only names with 5 or more babies are published by the SSA.)
+
+See wrangExamp.pdf for more examples.
+
+### Data Verbs (on single data frames)
+
+**Data verbs take data tables as input and give data tables as output (that's how we can use the chaining syntax!).**  We will use the R package `dplyr` to do much of our data wrangling.  Below is a list of verbs which will be helpful in wrangling many different types of data.  See the Data Wrangling cheat sheet from RStudio for additional help.   https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf}
+
+* `sample_n()` take a random row(s)
+ * `head()`  grab the first few rows
+ * `tail()` grab the last few rows
+ * `filter()`  removes unwanted *cases}
+ *  `arrange()` reorders the cases
+ *  `select()` removes unwanted *variables}   (and `rename()` )
+ *  `distinct()` returns the unique values in a table
+ * `mutate()` transforms the variable (and `transmute()` like mutate, returns only new variables)
+ *  `group_by()` 
+`group_by` tells R that SUCCESSIVE functions keep in mind that there are groups of items.  So `group_by` only makes sense with variables later on (like `summarise`).
+ *  `summarise()`  collapses a data frame to a single row.  Not useful yet (will be useful with `group_by()`).  Some functions that are used within `summarise()` include:
+\begin{itemize}
+* `min(), max(), mean(), sum(), sd(), median()`, and `IQR()`
+* `n()`: number of observations in the current group
+* `n_distinct(x)`: count the number of unique values in `x`
+* `first_value(x), last_value(x)` and `nth_value(x, n)`: these work similarly to `x[1], x[length(x)]`, and `x[n]` 
+
+
+### Examples of Data Verbs in Use
+
+**NHANES** From `?NHANES`:  This is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination centre (MEC).
+
+See  http://pages.pomona.edu/~jsh04747/courses/math154/wrangExamp.pdf for more examples.
+
+
+The following Shiny app ("Visualizing data manipulation operations") is for demonstrating how to work with dplyr/tidyr data manipulation.  It includes tabs for data selection, `filter` and `select`, `mutate`, `group_by` and `summarise`, `group_by` and `mutate`, and `join`.   http://rstudio.calvin.edu:3838/rpruim/dataOps/
+
+## 9/19/19 Agenda {#Sep19}
+1. gather
+2. spread
+3. join
+4. lubridate
+
+## Building on to Higher Level Data Verbs
+
+There are more complicated verbs which may be important for more sophisticated analyses.  See the RStudio `dplyr` cheat sheet,  https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf}.
+
+
+* `gather` makes many columns into 2 columns: gather(data, key, value, columns)
+* `spread` makes one column into multiple columns: spread(data, key, value)
+* `left_join` returns all rows from the left table, and any rows with matching keys from the right table.
+* `inner_join` returns only the rows in which the left table have matching keys in the right table (i.e., matching rows in both sets).
+* `full_join` returns all rows from both tables, join records from the left which have matching keys in the right table.
+
+
+Good practice:  always specify the `by` argument when joining data frames.
+
+### Examples of Data Verbs in Use (more sophisticated)}
+
+See wrangExamp.pdf for more examples.
+
+In class example on babynames via Nick  http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane.Rmd   http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane-answers.pdf
+
+#### lubridate
+
+`lubridate` is a another R package meant for data wrangling [@lubridate].  In particular, `lubridate` makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.  The linked table is from the original paper and provides many of the basic `lubridate` commands:  http://blog.yhathq.com/static/pdf/R_date_cheat_sheet.pdf}.
+
+Example from  https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html
+
+#### If anyone drove a time machine, they would crash
+
+The length of months and years change so often that doing arithmetic with them can be unintuitive. Consider a simple operation, January 31st + one month. Should the answer be:
+
+
+1. February 31st (which doesn't exist)
+2. March 4th (31 days after January 31), or
+3. February 28th (assuming its not a leap year)
+
+A basic property of arithmetic is that a + b - b = a. Only solution 1 obeys this property, but it is an invalid date. Wickham wants to  make lubridate as consistent as possible by invoking the following rule: if adding or subtracting a month or a year creates an invalid date, lubridate will return an NA. 
+
+If you thought solution 2 or 3 was more useful, no problem. You can still get those results with clever arithmetic, or by using the special `%m+%` and `%m-%` operators. `%m+%` and `%m-%` automatically roll dates back to the last day of the month, should that be necessary.
+
+
+##### Some basics in lubridate {-}
+
+(See wrangExamp.pdf for output/worked out examples.)
+
+```{r}
+require(lubridate)
+rightnow <- now()
+
+day(rightnow)
+week(rightnow)
+month(rightnow, label=FALSE)
+month(rightnow, label=TRUE)
+year(rightnow)
+
+minute(rightnow)
+hour(rightnow)
+
+yday(rightnow)
+mday(rightnow)
+wday(rightnow, label=FALSE)
+wday(rightnow, label=TRUE)
+```
+
+##### But how do I create a date object? {-}
+
+```{r}
+jan31 <- ymd("2013-01-31")
+jan31 + months(0:11)
+
+floor_date(jan31, "month") + months(0:11) + days(31)
+jan31 + months(0:11) + days(31)
+
+jan31 %m+% months(0:11)
+
+library(nycflights13)
+names(flights)
+flightsWK <- flights %>% mutate(ymdday = ymd(paste(year, month,day, sep="-"))) %>%
+  mutate(weekdy = wday(ymdday, label=TRUE), whichweek = week(ymdday))
+head(flightsWK)
+```
+
+
+<!--
+## Scraping Data
+
+Need to talk about this!  Scraping from HTML. 
+
+* Example / instructions:  Beginner's Guide on Web Scraping in R (using rvest) with hands-on example
+by Saurav Kaushik   https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/
+* Mine Dogucu at eCOTS18  https://www.causeweb.org/cause/ecots/ecots18/tech-talk/1
+* La Quinta vs. Dennys (Colin Rundel & Mine Cetinkaya-Rundel )  https://github.com/rundel/Dennys_LaQuinta_Chance Webinar about the study:  https://www.rstudio.com/resources/webinars/data-science-case-study/  OR what if you look at Holiday Inn???)
+-->
+
+
