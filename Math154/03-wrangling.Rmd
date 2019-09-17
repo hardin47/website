@@ -17,6 +17,13 @@ library(tidyverse)
 
 >Information is what we want, but data are what we've got. [@Kaplan15]
 
+**Embrace all the ways to get help!**
+
+1. cheat sheets: https://www.rstudio.com/resources/cheatsheets/
+2. tidyverse vignettes: https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/
+3. pivoting: https://tidyr.tidyverse.org/articles/pivot.html
+4. google what you need and include `R tidy` or `tidyverse`
+
 ## Structure of Data {#datastruc}
 
 For plotting, analyses, model building, etc., it's important that the data be structured in a very particular way.   Hadley Wickham provides a thorough discussion and advice for cleaning up the data in @Wickham14.
@@ -136,15 +143,179 @@ See wrangExamp.pdf for more examples.
 * `first_value(x), last_value(x)` and `nth_value(x, n)`: work similarly to `x[1], x[length(x)]`, and `x[n]` 
 
 
-### Examples of Data Verbs in Use
-
-**NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination centre (MEC).
-
-See  http://pages.pomona.edu/~jsh04747/courses/math154/wrangExamp.pdf for more examples.
 
 <!--
 The following Shiny app ("Visualizing data manipulation operations") is for demonstrating how to work with dplyr/tidyr data manipulation.  It includes tabs for data selection, `filter` and `select`, `mutate`, `group_by` and `summarize`, `group_by` and `mutate`, and `join`.   http://rstudio.calvin.edu:3838/rpruim/dataOps/
 -->
+
+## R examples, basic verbs
+
+  
+### Datasets
+
+
+**starwars** is from `dplyr`, although originally from SWAPI, the Star Wars API, http://swapi.co/.
+
+**NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination centre (MEC).
+
+**babynames**  Each year, the US Social Security Administration publishes a list of the most popular names given to babies.  In 2018, http://www.ssa.gov/oact/babynames/#ht=2 shows Emma and Olivia leading for girls, Noah and Liam for boys. (Only names with 5 or more babies are published by the SSA.)
+
+  
+### Examples of Chaining
+
+
+```{r}
+library(babynames)
+babynames %>% nrow()
+babynames %>% names()
+babynames %>% glimpse()
+babynames %>% head()
+babynames %>% tail()
+babynames %>% sample_n(size=5)
+babynames %>% mosaic::favstats(n ~ sex, data = .)
+```
+
+
+### Data Verbs
+
+Taken from the dplyr tutorial: http://dplyr.tidyverse.org/
+
+#### Starwars
+```{r}
+library(dplyr)
+
+starwars %>% dim()
+starwars %>% names()
+starwars %>% head()
+
+starwars %>%
+  mosaic::favstats(mass~gender, data = .)
+
+starwars %>% 
+  dplyr::filter(species == "Droid")
+
+starwars %>% 
+  dplyr::filter(species != "Droid") %>%
+  mosaic::favstats(mass~gender, data = .)
+
+starwars %>% 
+  dplyr::select(name, ends_with("color"))
+
+
+starwars %>% 
+  dplyr::mutate(name, bmi = mass / ((height / 100)  ^ 2)) %>%
+  dplyr::select(name:mass, bmi)
+
+starwars %>% 
+  dplyr::arrange(desc(mass))
+
+
+starwars %>%
+  dplyr::group_by(species) %>%
+  dplyr::summarise(
+    n = n(),
+    mass = mean(mass, na.rm = TRUE)
+  ) %>%
+  dplyr::filter(n > 1)
+```
+
+
+#### NHANES
+```{r}
+require(NHANES)
+names(NHANES)
+
+# find the sleep variables
+NHANESsleep <- NHANES %>% select(Gender, Age, Weight, Race1, Race3, Education, SleepTrouble, 
+                                 SleepHrsNight, TVHrsDay, TVHrsDayChild, PhysActive)
+names(NHANESsleep)
+dim(NHANESsleep)
+
+# subset for college students
+NHANESsleep <- NHANESsleep %>% filter(Age %in% c(18:22)) %>% 
+  mutate(Weightlb = Weight*2.2)
+
+names(NHANESsleep)
+dim(NHANESsleep)
+
+NHANESsleep %>% ggplot(aes(x=Age, y=SleepHrsNight, color=Gender)) + 
+  geom_point(position=position_jitter(width=.25, height=0) ) + 
+  facet_grid(SleepTrouble ~ TVHrsDay) 
+```
+  
+### `summarise` and `group_by`
+```{r}
+# number of people (cases) in NHANES
+NHANES %>% summarise(n())
+
+# total weight of all the people in NHANES (silly)
+NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(sum(Weightlb, na.rm=TRUE))
+
+# mean weight of all the people in NHANES
+NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(mean(Weightlb, na.rm=TRUE))
+
+
+# repeat the above but for groups
+
+# males versus females
+NHANES %>% group_by(Gender) %>% summarise(n())
+
+NHANES %>% group_by(Gender) %>% mutate(Weightlb = Weight*2.2) %>% 
+  summarise(mean(Weightlb, na.rm=TRUE))
+
+
+# smokers and non-smokers
+NHANES %>% group_by(SmokeNow) %>% summarise(n())
+NHANES %>% group_by(SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>% 
+  summarise(mean(Weightlb, na.rm=TRUE))
+
+# people with and without diabetes
+NHANES %>% group_by(Diabetes) %>% summarise(n())
+NHANES %>% group_by(Diabetes) %>% mutate(Weightlb = Weight*2.2) %>% 
+  summarise(mean(Weightlb, na.rm=TRUE))
+
+# break down the smokers versus non-smokers further, by sex
+NHANES %>% group_by(SmokeNow, Gender) %>% summarise(n())
+NHANES %>% group_by(SmokeNow, Gender) %>% mutate(Weightlb = Weight*2.2) %>% 
+  summarise(mean(Weightlb, na.rm=TRUE))
+
+# break down the people with diabetes further, by smoking
+NHANES %>% group_by(Diabetes, SmokeNow) %>% summarise(n())
+NHANES %>% group_by(Diabetes, SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>% 
+  summarise(mean(Weightlb, na.rm=TRUE))
+```
+  
+### babynames
+
+```{r}  
+babynames %>% group_by(sex) %>%
+  summarise(total=sum(n))
+
+babynames %>% group_by(year, sex) %>%
+  summarise(name_count = n_distinct(name)) %>% head()
+
+babynames %>% group_by(year, sex) %>%
+  summarise(name_count = n_distinct(name)) %>% tail()
+
+babysamp <- babynames %>% sample_n(size=50)
+babysamp %>% select(year) %>% distinct() %>% table()
+babysamp %>% distinct() %>% select(year) %>% table()
+
+
+Frances <- babynames %>%
+  filter(name== "Frances") %>%
+  group_by(year, sex) %>%
+  summarise(yrTot = sum(n))
+
+Frances %>% ggplot(aes(x=year, y=yrTot)) +
+  geom_point(aes(color=sex)) + 
+  geom_vline(xintercept=2006) + scale_y_log10() +
+  ylab("Yearly total on log10 scale")
+```
+  
+
+
+
 
 ## 9/19/19 Agenda {#Sep19}
 1. Higher level data verbs: `gather`, `spread`, `join`
@@ -164,11 +335,133 @@ There are more complicated verbs which may be important for more sophisticated a
 
 Good practice:  always specify the `by` argument when joining data frames.
 
-### Examples of Data Verbs in Use (more sophisticated)
 
-See wrangExamp.pdf for more examples.
+## R examples, higher level verbs
 
+<!--
 In class example on babynames via Nick  http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane.Rmd   http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane-answers.pdf
+-->
+
+`tidyr 1.0.0` has just been released!  The new release means that you need to update `tidyr`.  You will know if you have the latest version if the following command works in the console (window below):
+
+```
+?tidyr::pivot_longer
+```
+
+If you are familiar with `spread` and `gather`, you should acquaint yourself with `pivot_longer()` and `pivot_wider()`.  The idea is to go from very wide dataframes to very long dataframes and vice versa.
+
+### `pivot_longer`
+
+`pivot` the military paygrade to become longer? 
+
+![https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#
+  gid=1811988794](figs/activedutyTidy.png)
+
+
+
+```{r}
+library(googlesheets4)
+sheets_auth()
+
+navy_gs = read_sheet("https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408", 
+                     col_types = "ccnnnnnnnnnnnnnnn")
+```
+
+```{r}
+dplyr::glimpse(navy_gs)
+names(navy_gs) = c("X","pay.grade", "male.sing.wo", "female.sing.wo",
+                   "tot.sing.wo", "male.sing.w", "female.sing.w", 
+                   "tot.sing.w", "male.joint.NA", "female.joint.NA",
+                   "tot.joint.NA", "male.civ.NA", "female.civ.NA",
+                   "tot.civ.NA", "male.tot.NA", "female.tot.NA", 
+                   "tot.tot.NA")
+navy = navy_gs[-c(1:8), -1]
+dplyr::glimpse(navy)
+
+# get rid of total columns & rows:
+
+navyWR = navy %>% dplyr::select(-contains("tot")) %>%
+   dplyr::filter(substr(pay.grade, 1, 5) != "TOTAL" & substr(pay.grade, 1, 5) != "GRAND" ) %>%
+   tidyr::pivot_longer(-pay.grade, values_to = "numPeople", names_to = "status") %>%
+   tidyr::separate(status, into = c("sex", "marital", "kids"))
+
+navyWR %>% head()
+```
+
+Does a graph tell us if we did it right?  what if we had done it wrong...?
+```{r}
+navyWR %>% ggplot(aes(x=pay.grade, y=numPeople, color=sex)) + 
+  geom_point()  + facet_grid(kids~marital)
+```
+
+### `pivot_wider`
+
+```{r}
+library(babynames)
+babynames %>% dplyr::select(-prop) %>%
+   tidyr::pivot_wider(names_from = sex, values_from = n) %>% 
+   head()
+```
+
+
+```{r}
+babynames %>% 
+  dplyr::select(-prop) %>% 
+  tidyr::pivot_wider(names_from = sex, values_from = n) %>%
+  dplyr::filter(!is.na(F) & !is.na(M)) %>%
+  arrange(desc(year), desc(M))
+```
+
+```{r}
+babynames %>% 
+  tidyr::pivot_wider(names_from = sex, values_from = n) %>%
+  dplyr::filter(!is.na(F) & !is.na(M)) %>%
+  arrange(desc(prop))
+```
+
+### `join` (use `join` to **merge** two datasets)
+
+#### First get the data (GapMinder)
+
+Both of the following datasets come from GapMinder.  The first represents country, year, and female literacy rate.  The second represents country, year, and GDP (in fixed 2000 US$).
+
+```{r}
+litF = read_sheet("https://docs.google.com/spreadsheets/d/1hDinTIRHQIaZg1RUn6Z_6mo12PtKwEPFIz_mJVF6P5I/pub?gid=0")
+
+litF = litF %>% dplyr::select(country=starts_with("Adult"), starts_with("1"), starts_with("2")) %>%
+  tidyr::pivot_longer(-country, names_to = "year", values_to = "litRateF") %>%
+  dplyr::filter(!is.na(litRateF))
+```
+
+
+```{r}
+gdp = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
+
+gdp = gdp %>% dplyr::select(country = starts_with("Income"), starts_with("1"), starts_with("2")) %>%
+  tidyr::pivot_longer(-country, names_to = "year", values_to = "gdp") %>%
+  dplyr::filter(!is.na(gdp))
+```
+  
+```{r}
+head(litF)
+head(gdp)
+
+# left
+litGDPleft = dplyr::left_join(litF, gdp, by=c("country", "year"))
+dim(litGDPleft)
+sum(is.na(litGDPleft$gdp))
+
+# inner
+litGDPinner = dplyr::inner_join(litF, gdp, by=c("country", "year"))
+dim(litGDPinner)
+sum(is.na(litGDPinner$gdp))
+
+# full
+litGDPfull = dplyr::full_join(litF, gdp, by=c("country", "year"))
+dim(litGDPfull)
+sum(is.na(litGDPfull$gdp))
+```
+
 
 #### lubridate
 
@@ -189,6 +482,7 @@ A basic property of arithmetic is that a + b - b = a. Only solution 1 obeys the 
 
 If you thought solution 2 or 3 was more useful, no problem. You can still get those results with clever arithmetic, or by using the special `%m+%` and `%m-%` operators. `%m+%` and `%m-%` automatically roll dates back to the last day of the month, should that be necessary.
 
+#### R examples, `lubridate`
 
 ##### Some basics in lubridate {-}
 
@@ -223,12 +517,27 @@ floor_date(jan31, "month") + months(0:11) + days(31)
 jan31 + months(0:11) + days(31)
 
 jan31 %m+% months(0:11)
+```
 
+
+##### NYC flights {-}
+```{r}
 library(nycflights13)
 names(flights)
-flightsWK <- flights %>% mutate(ymdday = ymd(paste(year, month,day, sep="-"))) %>%
-  mutate(weekdy = wday(ymdday, label=TRUE), whichweek = week(ymdday))
+flightsWK <- flights %>% 
+   mutate(ymdday = ymd(paste(year, month,day, sep="-"))) %>%
+   mutate(weekdy = wday(ymdday, label=TRUE), 
+          whichweek = week(ymdday))
+
 head(flightsWK)
+
+flightsWK <- flights %>% 
+   mutate(ymdday = ymd(paste(year,"-", month,"-",day))) %>%
+   mutate(weekdy = wday(ymdday, label=TRUE), whichweek = week(ymdday))
+
+flightsWK %>% select(year, month, day, ymdday, weekdy, whichweek, dep_time, 
+                     arr_time, air_time) %>%  
+   head()
 ```
 
 
