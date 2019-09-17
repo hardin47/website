@@ -46,7 +46,7 @@ Within R (really within any type of computing language, Python, SQL, Java, etc.)
 * `object_name = function_name(arguments)` is a way of using a function to create a new object.
 * `object_name = data_table %>% function_name(arguments)` uses chaining syntax as an extension of the ideas of functions.  In chaining, the value on the left side of `%>%` becomes the *first argument* to the function on the right side.
 
-* 
+
 ``` 
 object_name = data_table %>%
 function_name(arguments) %>% 
@@ -148,7 +148,7 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 ### Datasets
 
 
-**starwars** is from `dplyr`, although originally from SWAPI, the Star Wars API, http://swapi.co/.
+**starwars** is from `dplyr` , although originally from SWAPI, the Star Wars API, http://swapi.co/.
 
 **NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination centre (MEC).
 
@@ -417,15 +417,15 @@ starwars %>%
 starwars %>%
   dplyr::group_by(species) %>%
   dplyr::summarise(
-    n = n(),
+    num = n(),
     mass = mean(mass, na.rm = TRUE)
   ) %>%
-  dplyr::filter(n > 1)
+  dplyr::filter(num > 1)
 ```
 
 ```
 ## # A tibble: 9 x 3
-##   species      n  mass
+##   species    num  mass
 ##   <chr>    <int> <dbl>
 ## 1 Droid        5  69.8
 ## 2 Gungan       3  74  
