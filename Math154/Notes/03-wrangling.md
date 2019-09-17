@@ -416,7 +416,7 @@ starwars %>%
 ```r
 starwars %>%
   dplyr::group_by(species) %>%
-  dplyr::summarise(
+  dplyr::summarize(
     num = n(),
     mass = mean(mass, na.rm = TRUE)
   ) %>%
@@ -526,11 +526,11 @@ NHANESsleep %>% ggplot(aes(x=Age, y=SleepHrsNight, color=Gender)) +
 
 <img src="03-wrangling_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
   
-### `summarise` and `group_by`
+### `summarize` and `group_by`
 
 ```r
 # number of people (cases) in NHANES
-NHANES %>% summarise(n())
+NHANES %>% summarize(n())
 ```
 
 ```
@@ -542,7 +542,7 @@ NHANES %>% summarise(n())
 
 ```r
 # total weight of all the people in NHANES (silly)
-NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(sum(Weightlb, na.rm=TRUE))
+NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarize(sum(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -554,7 +554,7 @@ NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(sum(Weightlb, na.rm=TRUE)
 
 ```r
 # mean weight of all the people in NHANES
-NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(mean(Weightlb, na.rm=TRUE))
+NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -568,7 +568,7 @@ NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarise(mean(Weightlb, na.rm=TRUE
 # repeat the above but for groups
 
 # males versus females
-NHANES %>% group_by(Gender) %>% summarise(n())
+NHANES %>% group_by(Gender) %>% summarize(n())
 ```
 
 ```
@@ -581,7 +581,7 @@ NHANES %>% group_by(Gender) %>% summarise(n())
 
 ```r
 NHANES %>% group_by(Gender) %>% mutate(Weightlb = Weight*2.2) %>% 
-  summarise(mean(Weightlb, na.rm=TRUE))
+  summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -594,7 +594,7 @@ NHANES %>% group_by(Gender) %>% mutate(Weightlb = Weight*2.2) %>%
 
 ```r
 # smokers and non-smokers
-NHANES %>% group_by(SmokeNow) %>% summarise(n())
+NHANES %>% group_by(SmokeNow) %>% summarize(n())
 ```
 
 ```
@@ -608,7 +608,7 @@ NHANES %>% group_by(SmokeNow) %>% summarise(n())
 
 ```r
 NHANES %>% group_by(SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>% 
-  summarise(mean(Weightlb, na.rm=TRUE))
+  summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -622,7 +622,7 @@ NHANES %>% group_by(SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>%
 
 ```r
 # people with and without diabetes
-NHANES %>% group_by(Diabetes) %>% summarise(n())
+NHANES %>% group_by(Diabetes) %>% summarize(n())
 ```
 
 ```
@@ -636,7 +636,7 @@ NHANES %>% group_by(Diabetes) %>% summarise(n())
 
 ```r
 NHANES %>% group_by(Diabetes) %>% mutate(Weightlb = Weight*2.2) %>% 
-  summarise(mean(Weightlb, na.rm=TRUE))
+  summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -650,7 +650,7 @@ NHANES %>% group_by(Diabetes) %>% mutate(Weightlb = Weight*2.2) %>%
 
 ```r
 # break down the smokers versus non-smokers further, by sex
-NHANES %>% group_by(SmokeNow, Gender) %>% summarise(n())
+NHANES %>% group_by(SmokeNow, Gender) %>% summarize(n())
 ```
 
 ```
@@ -668,7 +668,7 @@ NHANES %>% group_by(SmokeNow, Gender) %>% summarise(n())
 
 ```r
 NHANES %>% group_by(SmokeNow, Gender) %>% mutate(Weightlb = Weight*2.2) %>% 
-  summarise(mean(Weightlb, na.rm=TRUE))
+  summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -686,7 +686,7 @@ NHANES %>% group_by(SmokeNow, Gender) %>% mutate(Weightlb = Weight*2.2) %>%
 
 ```r
 # break down the people with diabetes further, by smoking
-NHANES %>% group_by(Diabetes, SmokeNow) %>% summarise(n())
+NHANES %>% group_by(Diabetes, SmokeNow) %>% summarize(n())
 ```
 
 ```
@@ -706,7 +706,7 @@ NHANES %>% group_by(Diabetes, SmokeNow) %>% summarise(n())
 
 ```r
 NHANES %>% group_by(Diabetes, SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>% 
-  summarise(mean(Weightlb, na.rm=TRUE))
+  summarize(mean(Weightlb, na.rm=TRUE))
 ```
 
 ```
@@ -729,7 +729,7 @@ NHANES %>% group_by(Diabetes, SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>%
 
 ```r
 babynames %>% group_by(sex) %>%
-  summarise(total=sum(n))
+  summarize(total=sum(n))
 ```
 
 ```
@@ -742,7 +742,7 @@ babynames %>% group_by(sex) %>%
 
 ```r
 babynames %>% group_by(year, sex) %>%
-  summarise(name_count = n_distinct(name)) %>% head()
+  summarize(name_count = n_distinct(name)) %>% head()
 ```
 
 ```
@@ -760,7 +760,7 @@ babynames %>% group_by(year, sex) %>%
 
 ```r
 babynames %>% group_by(year, sex) %>%
-  summarise(name_count = n_distinct(name)) %>% tail()
+  summarize(name_count = n_distinct(name)) %>% tail()
 ```
 
 ```
@@ -809,7 +809,7 @@ babysamp %>% distinct() %>% select(year) %>% table()
 Frances <- babynames %>%
   filter(name== "Frances") %>%
   group_by(year, sex) %>%
-  summarise(yrTot = sum(n))
+  summarize(yrTot = sum(n))
 
 Frances %>% ggplot(aes(x=year, y=yrTot)) +
   geom_point(aes(color=sex)) + 
