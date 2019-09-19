@@ -824,7 +824,7 @@ Frances %>% ggplot(aes(x=year, y=yrTot)) +
 
 
 ## 9/19/19 Agenda {#Sep19}
-1. Higher level data verbs: `gather`, `spread`, `join`
+1. Higher level data verbs: `pivot_longer`, `pivot_wider`, `join`
 2. `lubridate`
 
 ## Higher Level Data Verbs {#highverb}
@@ -832,8 +832,8 @@ Frances %>% ggplot(aes(x=year, y=yrTot)) +
 There are more complicated verbs which may be important for more sophisticated analyses.  See the RStudio `dplyr` cheat sheet,  https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf}.
 
 
-* `gather` makes many columns into 2 columns: gather(data, key, value, columns)
-* `spread` makes one column into multiple columns: spread(data, key, value)
+* `pivot_longer` makes many columns into 2 columns: `pivot_longer(data, cols,  names_to = , value_to = )`
+* `pivot_wider` makes one column into multiple columns: `pivot_wider(data, names_from = , values_from = )`
 * `left_join` returns all rows from the left table, and any rows with matching keys from the right table.
 * `inner_join` returns only the rows in which the left table have matching keys in the right table (i.e., matching rows in both sets).
 * `full_join` returns all rows from both tables, join records from the left which have matching keys in the right table.
@@ -868,7 +868,7 @@ If you are familiar with `spread` and `gather`, you should acquaint yourself wit
 
 ```r
 library(googlesheets4)
-sheets_auth()
+sheets_deauth()
 
 navy_gs = read_sheet("https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408", 
                      col_types = "ccnnnnnnnnnnnnnnn")
@@ -1058,9 +1058,9 @@ litF = litF %>% dplyr::select(country=starts_with("Adult"), starts_with("1"), st
 
 
 ```r
-gdp = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
+GDP = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
 
-gdp = gdp %>% dplyr::select(country = starts_with("Income"), starts_with("1"), starts_with("2")) %>%
+GDP = GDP %>% dplyr::select(country = starts_with("Income"), starts_with("1"), starts_with("2")) %>%
   tidyr::pivot_longer(-country, names_to = "year", values_to = "gdp") %>%
   dplyr::filter(!is.na(gdp))
 ```
@@ -1083,7 +1083,7 @@ head(litF)
 ```
 
 ```r
-head(gdp)
+head(GDP)
 ```
 
 ```
@@ -1100,7 +1100,7 @@ head(gdp)
 
 ```r
 # left
-litGDPleft = dplyr::left_join(litF, gdp, by=c("country", "year"))
+litGDPleft = dplyr::left_join(litF, GDP, by=c("country", "year"))
 dim(litGDPleft)
 ```
 
@@ -1117,8 +1117,58 @@ sum(is.na(litGDPleft$gdp))
 ```
 
 ```r
+head(litGDPleft)
+```
+
+```
+## # A tibble: 6 x 4
+##   country     year  litRateF   gdp
+##   <chr>       <chr>    <dbl> <dbl>
+## 1 Afghanistan 1979      4.99   NA 
+## 2 Afghanistan 2011     13      NA 
+## 3 Albania     2001     98.3  1282.
+## 4 Albania     2008     94.7  1804.
+## 5 Albania     2011     95.7  1966.
+## 6 Algeria     1987     35.8  1902.
+```
+
+```r
+# right
+litGDPright = dplyr::right_join(litF, GDP, by=c("country", "year"))
+dim(litGDPright)
+```
+
+```
+## [1] 7988    4
+```
+
+```r
+sum(is.na(litGDPright$gdp))
+```
+
+```
+## [1] 0
+```
+
+```r
+head(litGDPright)
+```
+
+```
+## # A tibble: 6 x 4
+##   country year  litRateF   gdp
+##   <chr>   <chr>    <dbl> <dbl>
+## 1 Albania 1980        NA 1061.
+## 2 Albania 1981        NA 1100.
+## 3 Albania 1982        NA 1111.
+## 4 Albania 1983        NA 1101.
+## 5 Albania 1984        NA 1065.
+## 6 Albania 1985        NA 1060.
+```
+
+```r
 # inner
-litGDPinner = dplyr::inner_join(litF, gdp, by=c("country", "year"))
+litGDPinner = dplyr::inner_join(litF, GDP, by=c("country", "year"))
 dim(litGDPinner)
 ```
 
@@ -1135,8 +1185,24 @@ sum(is.na(litGDPinner$gdp))
 ```
 
 ```r
+head(litGDPinner)
+```
+
+```
+## # A tibble: 6 x 4
+##   country year  litRateF   gdp
+##   <chr>   <chr>    <dbl> <dbl>
+## 1 Albania 2001      98.3 1282.
+## 2 Albania 2008      94.7 1804.
+## 3 Albania 2011      95.7 1966.
+## 4 Algeria 1987      35.8 1902.
+## 5 Algeria 2002      60.1 1872.
+## 6 Algeria 2006      63.9 2125.
+```
+
+```r
 # full
-litGDPfull = dplyr::full_join(litF, gdp, by=c("country", "year"))
+litGDPfull = dplyr::full_join(litF, GDP, by=c("country", "year"))
 dim(litGDPfull)
 ```
 
@@ -1150,6 +1216,22 @@ sum(is.na(litGDPfull$gdp))
 
 ```
 ## [1] 66
+```
+
+```r
+head(litGDPfull)
+```
+
+```
+## # A tibble: 6 x 4
+##   country     year  litRateF   gdp
+##   <chr>       <chr>    <dbl> <dbl>
+## 1 Afghanistan 1979      4.99   NA 
+## 2 Afghanistan 2011     13      NA 
+## 3 Albania     2001     98.3  1282.
+## 4 Albania     2008     94.7  1804.
+## 5 Albania     2011     95.7  1966.
+## 6 Algeria     1987     35.8  1902.
 ```
 
 

@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-09-17" />
+<meta name="date" content="2019-09-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -754,7 +754,7 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 <div id="Sep19" class="section level2">
 <h2><span class="header-section-number">3.4</span> 9/19/19 Agenda</h2>
 <ol style="list-style-type: decimal">
-<li>Higher level data verbs: <code>gather</code>, <code>spread</code>, <code>join</code></li>
+<li>Higher level data verbs: <code>pivot_longer</code>, <code>pivot_wider</code>, <code>join</code></li>
 <li><code>lubridate</code></li>
 </ol>
 </div>
@@ -762,8 +762,8 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 <h2><span class="header-section-number">3.5</span> Higher Level Data Verbs</h2>
 <p>There are more complicated verbs which may be important for more sophisticated analyses. See the RStudio <code>dplyr</code> cheat sheet, <a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf" class="uri">https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf</a>}.</p>
 <ul>
-<li><code>gather</code> makes many columns into 2 columns: gather(data, key, value, columns)</li>
-<li><code>spread</code> makes one column into multiple columns: spread(data, key, value)</li>
+<li><code>pivot_longer</code> makes many columns into 2 columns: <code>pivot_longer(data, cols,  names_to = , value_to = )</code></li>
+<li><code>pivot_wider</code> makes one column into multiple columns: <code>pivot_wider(data, names_from = , values_from = )</code></li>
 <li><code>left_join</code> returns all rows from the left table, and any rows with matching keys from the right table.</li>
 <li><code>inner_join</code> returns only the rows in which the left table have matching keys in the right table (i.e., matching rows in both sets).</li>
 <li><code>full_join</code> returns all rows from both tables, join records from the left which have matching keys in the right table.</li>
@@ -787,7 +787,7 @@ In class example on babynames via Nick  http://dtkaplan.github.io/CVC/Summer2015
 gid=1811988794</p>
 </div>
 <div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1"><span class="kw">library</span>(googlesheets4)</a>
-<a class="sourceLine" id="cb139-2" data-line-number="2"><span class="kw">sheets_auth</span>()</a>
+<a class="sourceLine" id="cb139-2" data-line-number="2"><span class="kw">sheets_deauth</span>()</a>
 <a class="sourceLine" id="cb139-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb139-4" data-line-number="4">navy_gs =<span class="st"> </span><span class="kw">read_sheet</span>(<span class="st">&quot;https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408&quot;</span>, </a>
 <a class="sourceLine" id="cb139-5" data-line-number="5">                     <span class="dt">col_types =</span> <span class="st">&quot;ccnnnnnnnnnnnnnnn&quot;</span>)</a></code></pre></div>
@@ -923,9 +923,9 @@ gid=1811988794</p>
 <a class="sourceLine" id="cb153-3" data-line-number="3">litF =<span class="st"> </span>litF <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="dt">country=</span><span class="kw">starts_with</span>(<span class="st">&quot;Adult&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;1&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;2&quot;</span>)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb153-4" data-line-number="4"><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_longer</span>(<span class="op">-</span>country, <span class="dt">names_to =</span> <span class="st">&quot;year&quot;</span>, <span class="dt">values_to =</span> <span class="st">&quot;litRateF&quot;</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb153-5" data-line-number="5"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(litRateF))</a></code></pre></div>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1">gdp =<span class="st"> </span><span class="kw">read_sheet</span>(<span class="st">&quot;https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0&quot;</span>)</a>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1">GDP =<span class="st"> </span><span class="kw">read_sheet</span>(<span class="st">&quot;https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0&quot;</span>)</a>
 <a class="sourceLine" id="cb154-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb154-3" data-line-number="3">gdp =<span class="st"> </span>gdp <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="dt">country =</span> <span class="kw">starts_with</span>(<span class="st">&quot;Income&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;1&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;2&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb154-3" data-line-number="3">GDP =<span class="st"> </span>GDP <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="dt">country =</span> <span class="kw">starts_with</span>(<span class="st">&quot;Income&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;1&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;2&quot;</span>)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb154-4" data-line-number="4"><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_longer</span>(<span class="op">-</span>country, <span class="dt">names_to =</span> <span class="st">&quot;year&quot;</span>, <span class="dt">values_to =</span> <span class="st">&quot;gdp&quot;</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb154-5" data-line-number="5"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(gdp))</a></code></pre></div>
 <div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1"><span class="kw">head</span>(litF)</a></code></pre></div>
@@ -938,7 +938,7 @@ gid=1811988794</p>
 ## 4 Albania     2008     94.7 
 ## 5 Albania     2011     95.7 
 ## 6 Algeria     1987     35.8</code></pre>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="kw">head</span>(gdp)</a></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="kw">head</span>(GDP)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 3
 ##   country year    gdp
 ##   &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;
@@ -949,23 +949,69 @@ gid=1811988794</p>
 ## 5 Albania 1984  1065.
 ## 6 Albania 1985  1060.</code></pre>
 <div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1"><span class="co"># left</span></a>
-<a class="sourceLine" id="cb159-2" data-line-number="2">litGDPleft =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(litF, gdp, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
+<a class="sourceLine" id="cb159-2" data-line-number="2">litGDPleft =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(litF, GDP, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
 <a class="sourceLine" id="cb159-3" data-line-number="3"><span class="kw">dim</span>(litGDPleft)</a></code></pre></div>
 <pre><code>## [1] 571   4</code></pre>
 <div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPleft<span class="op">$</span>gdp))</a></code></pre></div>
 <pre><code>## [1] 66</code></pre>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="co"># inner</span></a>
-<a class="sourceLine" id="cb163-2" data-line-number="2">litGDPinner =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">inner_join</span>(litF, gdp, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
-<a class="sourceLine" id="cb163-3" data-line-number="3"><span class="kw">dim</span>(litGDPinner)</a></code></pre></div>
-<pre><code>## [1] 505   4</code></pre>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPinner<span class="op">$</span>gdp))</a></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">head</span>(litGDPleft)</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 4
+##   country     year  litRateF   gdp
+##   &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+## 1 Afghanistan 1979      4.99   NA 
+## 2 Afghanistan 2011     13      NA 
+## 3 Albania     2001     98.3  1282.
+## 4 Albania     2008     94.7  1804.
+## 5 Albania     2011     95.7  1966.
+## 6 Algeria     1987     35.8  1902.</code></pre>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="co"># right</span></a>
+<a class="sourceLine" id="cb165-2" data-line-number="2">litGDPright =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">right_join</span>(litF, GDP, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
+<a class="sourceLine" id="cb165-3" data-line-number="3"><span class="kw">dim</span>(litGDPright)</a></code></pre></div>
+<pre><code>## [1] 7988    4</code></pre>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPright<span class="op">$</span>gdp))</a></code></pre></div>
 <pre><code>## [1] 0</code></pre>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1"><span class="co"># full</span></a>
-<a class="sourceLine" id="cb167-2" data-line-number="2">litGDPfull =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">full_join</span>(litF, gdp, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
-<a class="sourceLine" id="cb167-3" data-line-number="3"><span class="kw">dim</span>(litGDPfull)</a></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1"><span class="kw">head</span>(litGDPright)</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 4
+##   country year  litRateF   gdp
+##   &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+## 1 Albania 1980        NA 1061.
+## 2 Albania 1981        NA 1100.
+## 3 Albania 1982        NA 1111.
+## 4 Albania 1983        NA 1101.
+## 5 Albania 1984        NA 1065.
+## 6 Albania 1985        NA 1060.</code></pre>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1"><span class="co"># inner</span></a>
+<a class="sourceLine" id="cb171-2" data-line-number="2">litGDPinner =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">inner_join</span>(litF, GDP, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
+<a class="sourceLine" id="cb171-3" data-line-number="3"><span class="kw">dim</span>(litGDPinner)</a></code></pre></div>
+<pre><code>## [1] 505   4</code></pre>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPinner<span class="op">$</span>gdp))</a></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1"><span class="kw">head</span>(litGDPinner)</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 4
+##   country year  litRateF   gdp
+##   &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+## 1 Albania 2001      98.3 1282.
+## 2 Albania 2008      94.7 1804.
+## 3 Albania 2011      95.7 1966.
+## 4 Algeria 1987      35.8 1902.
+## 5 Algeria 2002      60.1 1872.
+## 6 Algeria 2006      63.9 2125.</code></pre>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1"><span class="co"># full</span></a>
+<a class="sourceLine" id="cb177-2" data-line-number="2">litGDPfull =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">full_join</span>(litF, GDP, <span class="dt">by=</span><span class="kw">c</span>(<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>))</a>
+<a class="sourceLine" id="cb177-3" data-line-number="3"><span class="kw">dim</span>(litGDPfull)</a></code></pre></div>
 <pre><code>## [1] 8054    4</code></pre>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPfull<span class="op">$</span>gdp))</a></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(litGDPfull<span class="op">$</span>gdp))</a></code></pre></div>
 <pre><code>## [1] 66</code></pre>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1"><span class="kw">head</span>(litGDPfull)</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 4
+##   country     year  litRateF   gdp
+##   &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+## 1 Afghanistan 1979      4.99   NA 
+## 2 Afghanistan 2011     13      NA 
+## 3 Albania     2001     98.3  1282.
+## 4 Albania     2008     94.7  1804.
+## 5 Albania     2011     95.7  1966.
+## 6 Algeria     1987     35.8  1902.</code></pre>
 </div>
 <div id="lubridate" class="section level4">
 <h4><span class="header-section-number">3.6.3.2</span> lubridate</h4>
@@ -988,69 +1034,69 @@ gid=1811988794</p>
 <div id="some-basics-in-lubridate" class="section level5 unnumbered">
 <h5>Some basics in lubridate</h5>
 <p>(See wrangExamp.pdf for output/worked out examples.)</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1"><span class="kw">require</span>(lubridate)</a>
-<a class="sourceLine" id="cb171-2" data-line-number="2">rightnow &lt;-<span class="st"> </span><span class="kw">now</span>()</a>
-<a class="sourceLine" id="cb171-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb171-4" data-line-number="4"><span class="kw">day</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1"><span class="kw">require</span>(lubridate)</a>
+<a class="sourceLine" id="cb183-2" data-line-number="2">rightnow &lt;-<span class="st"> </span><span class="kw">now</span>()</a>
+<a class="sourceLine" id="cb183-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb183-4" data-line-number="4"><span class="kw">day</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 17</code></pre>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="kw">week</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1"><span class="kw">week</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 38</code></pre>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1"><span class="kw">month</span>(rightnow, <span class="dt">label=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1"><span class="kw">month</span>(rightnow, <span class="dt">label=</span><span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## [1] 9</code></pre>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1"><span class="kw">month</span>(rightnow, <span class="dt">label=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1"><span class="kw">month</span>(rightnow, <span class="dt">label=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## [1] Sep
 ## 12 Levels: Jan &lt; Feb &lt; Mar &lt; Apr &lt; May &lt; Jun &lt; Jul &lt; Aug &lt; Sep &lt; ... &lt; Dec</code></pre>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1"><span class="kw">year</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb191-1" data-line-number="1"><span class="kw">year</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 2019</code></pre>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1"><span class="kw">minute</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1"><span class="kw">minute</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 54</code></pre>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1"><span class="kw">hour</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="kw">hour</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 4</code></pre>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1"><span class="kw">yday</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1"><span class="kw">yday</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 260</code></pre>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1"><span class="kw">mday</span>(rightnow)</a></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1"><span class="kw">mday</span>(rightnow)</a></code></pre></div>
 <pre><code>## [1] 17</code></pre>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1"><span class="kw">wday</span>(rightnow, <span class="dt">label=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1"><span class="kw">wday</span>(rightnow, <span class="dt">label=</span><span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb191-1" data-line-number="1"><span class="kw">wday</span>(rightnow, <span class="dt">label=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb203-1" data-line-number="1"><span class="kw">wday</span>(rightnow, <span class="dt">label=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## [1] Tue
 ## Levels: Sun &lt; Mon &lt; Tue &lt; Wed &lt; Thu &lt; Fri &lt; Sat</code></pre>
 </div>
 <div id="but-how-do-i-create-a-date-object" class="section level5 unnumbered">
 <h5>But how do I create a date object?</h5>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1">jan31 &lt;-<span class="st"> </span><span class="kw">ymd</span>(<span class="st">&quot;2013-01-31&quot;</span>)</a>
-<a class="sourceLine" id="cb193-2" data-line-number="2">jan31 <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb205-1" data-line-number="1">jan31 &lt;-<span class="st"> </span><span class="kw">ymd</span>(<span class="st">&quot;2013-01-31&quot;</span>)</a>
+<a class="sourceLine" id="cb205-2" data-line-number="2">jan31 <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>)</a></code></pre></div>
 <pre><code>##  [1] &quot;2013-01-31&quot; NA           &quot;2013-03-31&quot; NA           &quot;2013-05-31&quot;
 ##  [6] NA           &quot;2013-07-31&quot; &quot;2013-08-31&quot; NA           &quot;2013-10-31&quot;
 ## [11] NA           &quot;2013-12-31&quot;</code></pre>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="kw">floor_date</span>(jan31, <span class="st">&quot;month&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>) <span class="op">+</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">31</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb207-1" data-line-number="1"><span class="kw">floor_date</span>(jan31, <span class="st">&quot;month&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>) <span class="op">+</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">31</span>)</a></code></pre></div>
 <pre><code>##  [1] &quot;2013-02-01&quot; &quot;2013-03-04&quot; &quot;2013-04-01&quot; &quot;2013-05-02&quot; &quot;2013-06-01&quot;
 ##  [6] &quot;2013-07-02&quot; &quot;2013-08-01&quot; &quot;2013-09-01&quot; &quot;2013-10-02&quot; &quot;2013-11-01&quot;
 ## [11] &quot;2013-12-02&quot; &quot;2014-01-01&quot;</code></pre>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1">jan31 <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>) <span class="op">+</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">31</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb209-1" data-line-number="1">jan31 <span class="op">+</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>) <span class="op">+</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">31</span>)</a></code></pre></div>
 <pre><code>##  [1] &quot;2013-03-03&quot; NA           &quot;2013-05-01&quot; NA           &quot;2013-07-01&quot;
 ##  [6] NA           &quot;2013-08-31&quot; &quot;2013-10-01&quot; NA           &quot;2013-12-01&quot;
 ## [11] NA           &quot;2014-01-31&quot;</code></pre>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1">jan31 <span class="op">%m+%</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1">jan31 <span class="op">%m+%</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">11</span>)</a></code></pre></div>
 <pre><code>##  [1] &quot;2013-01-31&quot; &quot;2013-02-28&quot; &quot;2013-03-31&quot; &quot;2013-04-30&quot; &quot;2013-05-31&quot;
 ##  [6] &quot;2013-06-30&quot; &quot;2013-07-31&quot; &quot;2013-08-31&quot; &quot;2013-09-30&quot; &quot;2013-10-31&quot;
 ## [11] &quot;2013-11-30&quot; &quot;2013-12-31&quot;</code></pre>
 </div>
 <div id="nyc-flights" class="section level5 unnumbered">
 <h5>NYC flights</h5>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1"><span class="kw">library</span>(nycflights13)</a>
-<a class="sourceLine" id="cb201-2" data-line-number="2"><span class="kw">names</span>(flights)</a></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb213-1" data-line-number="1"><span class="kw">library</span>(nycflights13)</a>
+<a class="sourceLine" id="cb213-2" data-line-number="2"><span class="kw">names</span>(flights)</a></code></pre></div>
 <pre><code>##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
 ##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
 ##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
 ## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
 ## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;</code></pre>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb203-1" data-line-number="1">flightsWK &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb203-2" data-line-number="2"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">ymdday =</span> <span class="kw">ymd</span>(<span class="kw">paste</span>(year, month,day, <span class="dt">sep=</span><span class="st">&quot;-&quot;</span>))) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb203-3" data-line-number="3"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">weekdy =</span> <span class="kw">wday</span>(ymdday, <span class="dt">label=</span><span class="ot">TRUE</span>), </a>
-<a class="sourceLine" id="cb203-4" data-line-number="4">          <span class="dt">whichweek =</span> <span class="kw">week</span>(ymdday))</a>
-<a class="sourceLine" id="cb203-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb203-6" data-line-number="6"><span class="kw">head</span>(flightsWK)</a></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1">flightsWK &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb215-2" data-line-number="2"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">ymdday =</span> <span class="kw">ymd</span>(<span class="kw">paste</span>(year, month,day, <span class="dt">sep=</span><span class="st">&quot;-&quot;</span>))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb215-3" data-line-number="3"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">weekdy =</span> <span class="kw">wday</span>(ymdday, <span class="dt">label=</span><span class="ot">TRUE</span>), </a>
+<a class="sourceLine" id="cb215-4" data-line-number="4">          <span class="dt">whichweek =</span> <span class="kw">week</span>(ymdday))</a>
+<a class="sourceLine" id="cb215-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb215-6" data-line-number="6"><span class="kw">head</span>(flightsWK)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 22
 ##    year month   day dep_time sched_dep_time dep_delay arr_time
 ##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
@@ -1064,13 +1110,13 @@ gid=1811988794</p>
 ## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
 ## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
 ## #   time_hour &lt;dttm&gt;, ymdday &lt;date&gt;, weekdy &lt;ord&gt;, whichweek &lt;dbl&gt;</code></pre>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb205-1" data-line-number="1">flightsWK &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb205-2" data-line-number="2"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">ymdday =</span> <span class="kw">ymd</span>(<span class="kw">paste</span>(year,<span class="st">&quot;-&quot;</span>, month,<span class="st">&quot;-&quot;</span>,day))) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb205-3" data-line-number="3"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">weekdy =</span> <span class="kw">wday</span>(ymdday, <span class="dt">label=</span><span class="ot">TRUE</span>), <span class="dt">whichweek =</span> <span class="kw">week</span>(ymdday))</a>
-<a class="sourceLine" id="cb205-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb205-5" data-line-number="5">flightsWK <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(year, month, day, ymdday, weekdy, whichweek, dep_time, </a>
-<a class="sourceLine" id="cb205-6" data-line-number="6">                     arr_time, air_time) <span class="op">%&gt;%</span><span class="st">  </span></a>
-<a class="sourceLine" id="cb205-7" data-line-number="7"><span class="st">   </span><span class="kw">head</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1">flightsWK &lt;-<span class="st"> </span>flights <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb217-2" data-line-number="2"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">ymdday =</span> <span class="kw">ymd</span>(<span class="kw">paste</span>(year,<span class="st">&quot;-&quot;</span>, month,<span class="st">&quot;-&quot;</span>,day))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb217-3" data-line-number="3"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">weekdy =</span> <span class="kw">wday</span>(ymdday, <span class="dt">label=</span><span class="ot">TRUE</span>), <span class="dt">whichweek =</span> <span class="kw">week</span>(ymdday))</a>
+<a class="sourceLine" id="cb217-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb217-5" data-line-number="5">flightsWK <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(year, month, day, ymdday, weekdy, whichweek, dep_time, </a>
+<a class="sourceLine" id="cb217-6" data-line-number="6">                     arr_time, air_time) <span class="op">%&gt;%</span><span class="st">  </span></a>
+<a class="sourceLine" id="cb217-7" data-line-number="7"><span class="st">   </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 9
 ##    year month   day ymdday     weekdy whichweek dep_time arr_time air_time
 ##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;date&gt;     &lt;ord&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;int&gt;    &lt;dbl&gt;
