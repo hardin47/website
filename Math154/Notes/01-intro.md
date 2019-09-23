@@ -64,6 +64,19 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 ## Course Content
 
+### Topics
+
+Computational Statistics can be a very large umbrella for many ideas.  Indeed, sometimes the topics can seem somewhat disjointed.  Below, I've categorized the topics we will cover into four groups.  The four different broad topics all play different roles and can be more or less important depending on the problem at hand.  None of the topics should exist on their own, because only with the bigger focus on all topics will any sort of data analysis / interpretation be accurate and compelling.
+
+**Letting the computer help:**  R, RStudio, GitHub, Reproducibility, Data Viz, Data Wrangling
+
+**Statistics:**  Simulating, Randomization / Permutation Tests, Bootstrapping, Ethics
+
+**Machine Learning:** Classification, Clustering, Regular Expressions
+
+**Mathematics:**  Support Vector Machines
+
+
 ### Vocabulary
 * A  **statistic** is a numerical measurement we get from the sample, a function of the data.
 * A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.

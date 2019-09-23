@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-09-19"
+date: "2019-09-22"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -41,7 +41,9 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 9/5/19	| Intro to GitHub |  |  \@ref(Sep5) [Sep5], \@ref(repro)  [repro] |
 | 9/10/19	| Data Viz| VST | \@ref(Sep10) [Sep10], \@ref(thoughts) [thoughts]  |
 | 9/12/19  	|  | MDS2 |  \@ref(Sep12)   [Sep12], \@ref(deconstruct) [decon], \@ref(gg) [gg]|
-| 9/17/19	| Data Wrangling| MDS4 | \@ref(Sep17) [Sep17], \@ref(datastruc) [Structure] |
+| 9/17/19	| Data Wrangling | [MDS4](http://mdsr-book.github.io/) | \@ref(Sep17) [Sep17], \@ref(datastruc) [Structure] |
 | 9/19/19  	|  |  | \@ref(Sep17) [Sep17], \@ref(highverb)   [highverb] |
+| 9/24/19	| Simulating |  | \@ref(Sep24) [Sep24], \@ref(datastruc) [Structure] |
+| 9/26/19  	|  |  | \@ref(Sep26) [Sep26], \@ref(highverb)   [highverb] |
 
 

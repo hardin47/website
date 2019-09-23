@@ -1,6 +1,9 @@
 
 # Data Wrangling {#wrang}
 
+As with data visualization, data wrangling is a fundamental part of being able to accurately, reproducibly, and efficiently work with data.  The approach taken in the following chapter is based on the philosophy of tidy data and takes many of its precepts from database theory.  If you have done much work in SQL, the functionality and approach of tidy data will feel very familiar.  The more adept you are at data wrangling, the more effective you will be at data analysis.
+
+
 
 
 ## 9/17/19 Agenda {#Sep17}
@@ -111,8 +114,6 @@ foo_foo %>%
 
 The `babynames` data table in the `babynames` package comes from the Social Security Administration's listing of the names givens to babies in each year, and the number of babies of each sex given that name. (Only names with 5 or more babies are published by the SSA.)
 
-See wrangExamp.pdf for more examples.
-
 ### Data Verbs (on single data frames)
 
 > Super important resource:  The RStudio `dplyr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf
@@ -150,7 +151,7 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 
 **starwars** is from `dplyr` , although originally from SWAPI, the Star Wars API, http://swapi.co/.
 
-**NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination centre (MEC).
+**NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination center (MEC).
 
 **babynames**  Each year, the US Social Security Administration publishes a list of the most popular names given to babies.  In 2018, http://www.ssa.gov/oact/babynames/#ht=2 shows Emma and Olivia leading for girls, Noah and Liam for boys. (Only names with 5 or more babies are published by the SSA.)
 
@@ -477,8 +478,9 @@ names(NHANES)
 
 ```r
 # find the sleep variables
-NHANESsleep <- NHANES %>% select(Gender, Age, Weight, Race1, Race3, Education, SleepTrouble, 
-                                 SleepHrsNight, TVHrsDay, TVHrsDayChild, PhysActive)
+NHANESsleep <- NHANES %>% select(Gender, Age, Weight, Race1, Race3, 
+                                 Education, SleepTrouble, SleepHrsNight, 
+                                 TVHrsDay, TVHrsDayChild, PhysActive)
 names(NHANESsleep)
 ```
 
@@ -858,7 +860,7 @@ If you are familiar with `spread` and `gather`, you should acquaint yourself wit
 
 ### `pivot_longer`
 
-`pivot` the military paygrade to become longer? 
+`pivot` the military pay grade to become longer? 
 
 ![https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#
   gid=1811988794](figs/activedutyTidy.png)
@@ -937,8 +939,11 @@ dplyr::glimpse(navy)
 # get rid of total columns & rows:
 
 navyWR = navy %>% dplyr::select(-contains("tot")) %>%
-   dplyr::filter(substr(pay.grade, 1, 5) != "TOTAL" & substr(pay.grade, 1, 5) != "GRAND" ) %>%
-   tidyr::pivot_longer(-pay.grade, values_to = "numPeople", names_to = "status") %>%
+   dplyr::filter(substr(pay.grade, 1, 5) != "TOTAL" & 
+                   substr(pay.grade, 1, 5) != "GRAND" ) %>%
+   tidyr::pivot_longer(-pay.grade, 
+                       values_to = "numPeople", 
+                       names_to = "status") %>%
    tidyr::separate(status, into = c("sex", "marital", "kids"))
 
 navyWR %>% head()
@@ -1048,20 +1053,28 @@ Both of the following datasets come from GapMinder.  The first represents countr
 
 
 ```r
+sheets_deauth()
 litF = read_sheet("https://docs.google.com/spreadsheets/d/1hDinTIRHQIaZg1RUn6Z_6mo12PtKwEPFIz_mJVF6P5I/pub?gid=0")
 
-litF = litF %>% dplyr::select(country=starts_with("Adult"), starts_with("1"), starts_with("2")) %>%
-  tidyr::pivot_longer(-country, names_to = "year", values_to = "litRateF") %>%
+litF = litF %>% dplyr::select(country=starts_with("Adult"), 
+                              starts_with("1"), starts_with("2")) %>%
+  tidyr::pivot_longer(-country, 
+                      names_to = "year", 
+                      values_to = "litRateF") %>%
   dplyr::filter(!is.na(litRateF))
 ```
 
 
 
 ```r
+sheets_deauth()
 GDP = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
 
-GDP = GDP %>% dplyr::select(country = starts_with("Income"), starts_with("1"), starts_with("2")) %>%
-  tidyr::pivot_longer(-country, names_to = "year", values_to = "gdp") %>%
+GDP = GDP %>% dplyr::select(country = starts_with("Income"), 
+                            starts_with("1"), starts_with("2")) %>%
+  tidyr::pivot_longer(-country, 
+                      names_to = "year", 
+                      values_to = "gdp") %>%
   dplyr::filter(!is.na(gdp))
 ```
   
@@ -1235,7 +1248,7 @@ head(litGDPfull)
 ```
 
 
-#### lubridate
+#### `lubridate`
 
 `lubridate` is a another R package meant for data wrangling [@lubridate].  In particular, `lubridate` makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.  The linked table is from the original paper and provides many of the basic `lubridate` commands:  http://blog.yhathq.com/static/pdf/R_date_cheat_sheet.pdf}.
 
@@ -1258,7 +1271,6 @@ If you thought solution 2 or 3 was more useful, no problem. You can still get th
 
 ##### Some basics in lubridate {-}
 
-(See wrangExamp.pdf for output/worked out examples.)
 
 
 ```r
@@ -1473,4 +1485,49 @@ by Saurav Kaushik   https://www.analyticsvidhya.com/blog/2017/03/beginners-guide
 * La Quinta vs. Dennys (Colin Rundel & Mine Cetinkaya-Rundel )  https://github.com/rundel/Dennys_LaQuinta_Chance Webinar about the study:  https://www.rstudio.com/resources/webinars/data-science-case-study/  OR what if you look at Holiday Inn???)
 -->
 
+## `reprex`
+
+> Help me help you
+
+In order to create a `repr`oducible `ex`ample ...
+
+Step 1.  Copy code onto the clipboard
+
+Step 2.  Type `reprex()` into the Console
+
+Step 3.  Look at the Viewer to the right.  Copy the Viewer output into GitHub, Piazza, an email, stackexchange, etc.
+
+
+Some places to learn more about `reprex` include
+
+* A blog about it: https://teachdatascience.com/reprex/
+* The `reprex` vignette: https://reprex.tidyverse.org/index.html
+* `reprex` dos and donts: https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html
+* Jenny Bryan webinar on `reprex`: "Help me help you. Creating reproducible examples" https://resources.rstudio.com/webinars/help-me-help-you-creating-reproducible-examples-jenny-bryan
+
+
+
+####  `reprex` demo
+
+```
+reprex(
+  jan31 + months(0:11) + days(31)
+)
+```
+multiple lines of code:
+
+```
+reprex({
+  jan31 <- ymd("2013-01-31")
+  jan31 + months(0:11) + days(31)
+})
+```
+
+```
+reprex({
+  library(lubridate)
+  jan31 <- ymd("2013-01-31")
+  jan31 + months(0:11) + days(31)
+})
+```
 

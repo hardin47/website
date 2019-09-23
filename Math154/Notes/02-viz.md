@@ -1,5 +1,8 @@
 # Visualization
 
+Data visualization is integral to understanding both data and models.  Computational statistics and data science sometimes focus on models or resulting predictions from the models.  But there is no doubt that the structure and format of the data are the key to whether or not a model is appropriate or good.  A good data analyst will always spend a lot of time and effort on exploratory data analysis, much of which includes making as many visualizations of the data as possible.
+
+
 
 
 ## 9/10/19 Agenda {#Sep10}
@@ -615,7 +618,7 @@ Most (all?) graphics are intended to help us make comparisons
 * Do my treatments matter?  How much?
 * Do men and women respond the same way?
 
-**Key plot metric:** Does my plot make the comparisonsI am interested in 
+**Key plot metric:** Does my plot make the comparisons I am interested in 
 
 * easily, and 
 * accurately?
@@ -654,7 +657,7 @@ head(HELPrct)
 ## 6      5   black      no       5   cocaine   yes          4          4
 ```
 
-Subjects admitted for treatment for addiction to oneof three substances.
+Subjects admitted for treatment for addiction to one of three substances.
 
 ##### Who are the people in the study? {-}
 
