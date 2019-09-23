@@ -584,6 +584,7 @@ Note that $F$ is just the area function describing the density (histogram) of th
 *****
 1. Generate a uniform random variable $U$
 2. Set $X = F^{-1}(U)$
+
 *****
 
 **Proof:** that the algorithm above generates variables that come from the probability distribution represented by $F$.
@@ -600,10 +601,7 @@ P(X \leq x) &=& P(F^{-1}(U) \leq x)\\
 *Note:* This is known as a \textcolor{red}{Weibull}($\lambda=1$, $k=2$) distribution.
 
 <div class="figure" style="text-align: center">
-<img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
-<p class="caption">(\#fig:unnamed-chunk-17)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
+<img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
 <p class="caption">(\#fig:unnamed-chunk-17)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
 </div>
 
@@ -656,6 +654,7 @@ $$ P(X = x_i) = p_i, i=1, \ldots, m$$
 1. Generate a uniform random variable $U$
 2. Transform $U$ into $X$ as follows,
 $$X = x_j \mbox{ if } \sum_{i=1}^{j-1} p_i \leq U \leq \sum_{i=1}^j p_i$$
+
 *****
 
 **Proof:** that the algorithm above generates variables that come from the probability mass function $\{p_1, p_2, \ldots, p_m\}$.
