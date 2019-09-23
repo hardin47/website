@@ -304,7 +304,7 @@ The example below is taken directly from a blog by [Aaron Roth](http://aaronsadv
 
 >In this scenario, the college has a simple, optimal decision rule: It should run a linear regression to try and predict student talent from grades and SAT scores, and then it should admit the students whose predicted talent is at least 115. This is indeed "driven by math" -- since we assumed everything was normally distributed here, this turns out to correspond to the Bayesian optimal decision rule for the college.
 
-####  The data 
+####  The data {-}
 
 >Ok. Now lets suppose there are two populations of students, which we will call Reds and Blues. Reds are the majority population, and Blues are a small minority population -- the Blues only make up about 1% of the student body. But the Reds and the Blues are no different when it comes to talent: they both have the same talent distribution, as described above. And there is no bias baked into the grading or the exams: both the Reds and the Blues also have exactly the same grade and exam score distributions, as described above.
 
@@ -339,7 +339,7 @@ ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
 
 <img src="04-simulating_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
-#### The model
+#### Two separate models {-}
 
 >So what is the effect of this when we use our reasonable inference procedure? First, lets consider what happens when we learn two different regression models: one for the Blues, and a different one for the Reds. We don't see much difference:
 
@@ -466,6 +466,8 @@ error.rates
 
 >So how do we fare on this metric? Not so badly! The Blue model has a false negative rate of 47.4358974% on the blues, and the Red model has a false negative rate of 50.1709293% on the reds --- so the difference between these two is a satisfyingly small 2.7350319%.
 
+#### One global model {-}
+
 >But you might reasonably object: because we have learned separate models for the Blues and the Reds, we are explicitly making admissions decisions as a function of a student's color! This might sound like a form of discrimination, baked in by the algorithm designer --- and if the two populations represent e.g. racial groups, then its explicitly illegal in a number of settings, including lending.
 
 
@@ -514,6 +516,8 @@ error.rates
 ```
 
 >So what happens if we don't allow our classifier to see group membership, and just train one classifier on the whole student body? The gap in false negative rates between the two populations balloons to 9.9572433%, and the overall error rate ticks up. This means if you are a qualified member of the Red population, you are substantially more likely to be mistakenly rejected by our classifier than if you are a qualified member of the Blue population.
+
+#### What happened????  {-}
 
 >What happened? There wasn't any malice anywhere in this data pipeline. Its just that the Red population was much larger than the Blue population, so when we trained a classifier to minimize its average error over the entire student body, it naturally fit the Red population -- which contributed much more to the average. But this means that the classifier was no longer compensating for the artificially inflated SAT scores of the Blues, and so was making a disproportionate number of errors on them -- all in their favor.
 
