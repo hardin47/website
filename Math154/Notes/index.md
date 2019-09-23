@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-09-22"
+date: "2019-09-23"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:

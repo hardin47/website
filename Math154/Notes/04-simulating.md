@@ -160,7 +160,7 @@ The goal of simulating a complicated model is not only to create a program which
 ## 9/26/19 Agenda {#Sep26}
 1. Sensitivity of mathematical procedures to technical conditions
 2. Understanding bias in modeling
-3. Generating random numbers
+3. (Not responsible for: Generating random numbers)
 
 
 
@@ -531,7 +531,7 @@ error.rates
 
 ### Generating random numbers
 
-(you are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.)
+(You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.)
 
 #### How do we generate uniform[0,1] numbers?
 
@@ -539,6 +539,7 @@ LCG - linear congruence generators.  Set $a,b,m$ to be large integers.  The sequ
 $$ X_{n+1} = (aX_n + b) \mod m $$
 
 where
+
 * $m$ and $b$ are relatively prime,
 * $a - 1$ is divisible by all prime factors of $m$,
 * $a - 1$ is divisible by 4 if $m$ is divisible by 4.
@@ -577,14 +578,13 @@ Use the inverse of the cumulative distribution function to generate data that co
 $$F(x) = P(X \leq x)$$
 Note that $F$ is just the area function describing the density (histogram) of the data.
 
-\begin{algorithm}
-\caption{Generate Continuous RV}
-\label{array-sum-cont}
-\begin{algorithmic}[]
-\State 1. Generate a uniform random variable $U$
-\State 2. Set $X = F^{-1}(U)$
-\end{algorithmic}
-\end{algorithm}
+*****
+**Algorithm:** Generate Continuous RV
+
+*****
+1. Generate a uniform random variable $U$
+2. Set $X = F^{-1}(U)$
+*****
 
 **Proof:** that the algorithm above generates variables that come from the probability distribution represented by $F$.
 
@@ -597,15 +597,16 @@ P(X \leq x) &=& P(F^{-1}(U) \leq x)\\
 **Example:**
  $$ f(x) = \begin{cases}
  2x e^{-x^2} & 0 < x \\ 0 & x < 0 \end{cases}$$
- *Note:} This is known as a \textcolor{red}{Weibull}($\lambda=1$, $k=2$) distribution.
+*Note:* This is known as a \textcolor{red}{Weibull}($\lambda=1$, $k=2$) distribution.
 
- \begin{figure}[H]
-\begin{center}
- \includegraphics[scale=.5]{Weibull_PDF.png}
- \includegraphics[scale=.5]{Weibull_CDF.png}
- \caption{``Weibull PDF" by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons}
-\end{center}
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
+<p class="caption">(\#fig:unnamed-chunk-17)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
+<p class="caption">(\#fig:unnamed-chunk-17)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+</div>
+
 
 * What is $F(x)$?
  $$ F(x) = \int_0^x 2w e^{-w^2} dw = 1 - e^{-x^2}$$
@@ -639,7 +640,7 @@ ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) +
   facet_grid(~sim.method)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Discrete RVs {-}
@@ -648,15 +649,14 @@ A similar algorithm is used to generate data that come from a particular discret
 $$ P(X = x_i) = p_i, i=1, \ldots, m$$
 
 
-\begin{algorithm}
-\caption{Generate Discrete RV}
-\label{array-sum-dis}
-\begin{algorithmic}[]
-\State 1. Generate a uniform random variable $U$
-\State 2. Transform $U$ into $X$ as follows,
+*****
+**Algorithm:** Generate Discrete RV
+
+*****
+1. Generate a uniform random variable $U$
+2. Transform $U$ into $X$ as follows,
 $$X = x_j \mbox{ if } \sum_{i=1}^{j-1} p_i \leq U \leq \sum_{i=1}^j p_i$$
-\end{algorithmic}
-\end{algorithm}
+*****
 
 **Proof:** that the algorithm above generates variables that come from the probability mass function $\{p_1, p_2, \ldots, p_m\}$.
 
