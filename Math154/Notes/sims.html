@@ -447,7 +447,7 @@ Figure 1.5: For the 2016 election the Republican primary debates allowed only th
 </div>
 <div id="bias-in-models" class="section level3">
 <h3><span class="header-section-number">4.4.2</span> Bias in Models</h3>
-<p>The example below is taken directly from a blog by <a href="http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html">Aaron Roth</a>.</p>
+<p>The example below is taken directly (and mostly verbatim) from a blog by Aaron Roth <a href="http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html">Algorithmic Unfairness Without Any Bias Baked In</a>.</p>
 <blockquote>
 <p>Bias in the data is certainly a problem, especially when labels are gathered by human beings. But its far from being the only problem. In this post, I want to walk through a very simple example in which the algorithm designer is being entirely reasonable, there are no human beings injecting bias into the labels, and yet the resulting outcome is “unfair”. Here is the (toy) scenario – the specifics aren’t important. High school students are applying to college, and each student has some innate “talent” <span class="math inline">\(I\)</span>, which we will imagine is normally distributed, with mean 100 and standard deviation 15: <span class="math inline">\(I \sim N(100,15)\)</span>. The college would like to admit students who are sufficiently talented — say one standard deviation above the mean (so, it would like to admit students with <span class="math inline">\(I \geq 115\)</span>). The problem is that talent isn’t directly observable. Instead, the college can observe grades <span class="math inline">\(g\)</span> and SAT scores <span class="math inline">\(s\)</span>, which are a noisy estimate of talent. For simplicity, lets imagine that both grades and SAT scores are independently and normally distributed, centered at a student’s talent level, and also with standard deviation 15: <span class="math inline">\(g \sim N(I, 15)\)</span>, <span class="math inline">\(s \sim N(I, 15)\)</span>.</p>
 </blockquote>
@@ -658,13 +658,14 @@ Figure 1.5: For the 2016 election the Republican primary debates allowed only th
 <a class="sourceLine" id="cb249-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb249-5" data-line-number="5">xval &lt;-<span class="st"> </span><span class="dv">47</span> </a>
 <a class="sourceLine" id="cb249-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb249-7" data-line-number="7">xval.all &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb249-7" data-line-number="7">unif.val &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
 <a class="sourceLine" id="cb249-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb249-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
 <a class="sourceLine" id="cb249-10" data-line-number="10">  xval &lt;-<span class="st"> </span>(a<span class="op">*</span>xval <span class="op">+</span><span class="st"> </span>b) <span class="op">%%</span><span class="st"> </span>m</a>
-<a class="sourceLine" id="cb249-11" data-line-number="11">  xval.all &lt;-<span class="st"> </span><span class="kw">c</span>(xval.all, xval)   }</a>
+<a class="sourceLine" id="cb249-11" data-line-number="11">  unif.val &lt;-<span class="st"> </span><span class="kw">c</span>(unif.val, xval<span class="op">/</span>m)   }</a>
 <a class="sourceLine" id="cb249-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb249-13" data-line-number="13"><span class="kw">hist</span>(xval.all<span class="op">/</span>m)</a></code></pre></div>
+<a class="sourceLine" id="cb249-13" data-line-number="13"><span class="kw">data.frame</span>(<span class="dt">uniformRVs =</span> unif.val) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb249-14" data-line-number="14"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> uniformRVs)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>)</a></code></pre></div>
 <p><img src="04-simulating_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 </div>
@@ -711,9 +712,13 @@ could you use these to simulate RV’s with the Weibull density, <span class="ma
 <div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1">unifdata =<span class="st"> </span><span class="kw">runif</span>(<span class="dv">10000</span>,<span class="dv">0</span>,<span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb250-2" data-line-number="2">weib1data =<span class="st"> </span><span class="kw">sqrt</span>(<span class="op">-</span><span class="kw">log</span>(<span class="dv">1</span><span class="op">-</span>unifdata))</a>
 <a class="sourceLine" id="cb250-3" data-line-number="3">weib2data =<span class="st"> </span><span class="kw">rweibull</span>(<span class="dv">10000</span>,<span class="dv">2</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb250-4" data-line-number="4"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb250-5" data-line-number="5"><span class="kw">hist</span>(weib1data, <span class="dt">freq=</span><span class="ot">FALSE</span>, <span class="dt">xlab=</span><span class="st">&quot;Weibull(2,1)&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Using Inverse Transform&quot;</span>)</a>
-<a class="sourceLine" id="cb250-6" data-line-number="6"><span class="kw">hist</span>(weib2data, <span class="dt">freq=</span><span class="ot">FALSE</span>, <span class="dt">xlab=</span><span class="st">&quot;Weibull(2,1)&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Using R Function&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb250-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb250-5" data-line-number="5">weibdata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">weibull =</span> <span class="kw">c</span>(weib1data, weib2data),</a>
+<a class="sourceLine" id="cb250-6" data-line-number="6">                       <span class="dt">sim.method =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;InvTrans&quot;</span>, <span class="dv">10000</span>), </a>
+<a class="sourceLine" id="cb250-7" data-line-number="7">                                      <span class="kw">rep</span>(<span class="st">&quot;rweibull&quot;</span>, <span class="dv">10000</span>)))</a>
+<a class="sourceLine" id="cb250-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb250-9" data-line-number="9"><span class="kw">ggplot</span>(weibdata, <span class="kw">aes</span>(<span class="dt">x =</span> weibull)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb250-10" data-line-number="10"><span class="st">  </span><span class="kw">facet_grid</span>(<span class="op">~</span>sim.method)</a></code></pre></div>
 <p><img src="04-simulating_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="discrete-rvs" class="section level4 unnumbered">

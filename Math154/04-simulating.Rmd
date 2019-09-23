@@ -490,13 +490,14 @@ m <- 423514351351
 
 xval <- 47 
 reps <- 10000
-xval.all <- c()
+unif.val <- c()
 
 for(i in 1:reps){
   xval <- (a*xval + b) %% m
-  xval.all <- c(xval.all, xval)   }
+  unif.val <- c(unif.val, xval/m)   }
 
-hist(xval.all/m)
+data.frame(uniformRVs = unif.val) %>%
+  ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
 
@@ -565,9 +566,13 @@ F^{-1}(u) &=& \sqrt{-\ln(1-u)}
 unifdata = runif(10000,0,1)
 weib1data = sqrt(-log(1-unifdata))
 weib2data = rweibull(10000,2,1)
-par(mfrow=c(1,2))
-hist(weib1data, freq=FALSE, xlab="Weibull(2,1)", main="Using Inverse Transform")
-hist(weib2data, freq=FALSE, xlab="Weibull(2,1)", main="Using R Function")
+
+weibdata <- data.frame(weibull = c(weib1data, weib2data),
+                       sim.method = c(rep("InvTrans", 10000), 
+                                      rep("rweibull", 10000)))
+
+ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) + 
+  facet_grid(~sim.method)
 ```
 
 

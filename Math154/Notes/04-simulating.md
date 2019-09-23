@@ -298,7 +298,7 @@ sum(beta2.in)/reps
 
 ### Bias in Models
 
-The example below is taken directly from a blog by [Aaron Roth](http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html).  
+The example below is taken directly (and mostly verbatim) from a blog by Aaron Roth [Algorithmic Unfairness Without Any Bias Baked In](http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html).  
 
 >Bias in the data is certainly a problem, especially when labels are gathered by human beings. But its far from being the only problem. In this post, I want to walk through a very simple example in which the algorithm designer is being entirely reasonable, there are no human beings injecting bias into the labels, and yet the resulting outcome is "unfair". Here is the (toy) scenario -- the specifics aren't important. High school students are applying to college, and each student has some innate "talent" $I$, which we will imagine is normally distributed, with mean 100 and standard deviation 15: $I \sim N(100,15)$. The college would like to admit students who are sufficiently talented --- say one standard deviation above the mean (so, it would like to admit students with $I \geq 115$). The problem is that talent isn't directly observable. Instead, the college can observe grades $g$ and SAT scores $s$, which are a noisy estimate of talent. For simplicity, lets imagine that both grades and SAT scores are independently and normally distributed, centered at a student's talent level, and also with standard deviation 15: $g \sim N(I, 15)$, $s \sim N(I, 15)$.
 
@@ -551,13 +551,14 @@ m <- 423514351351
 
 xval <- 47 
 reps <- 10000
-xval.all <- c()
+unif.val <- c()
 
 for(i in 1:reps){
   xval <- (a*xval + b) %% m
-  xval.all <- c(xval.all, xval)   }
+  unif.val <- c(unif.val, xval/m)   }
 
-hist(xval.all/m)
+data.frame(uniformRVs = unif.val) %>%
+  ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
 <img src="04-simulating_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
@@ -629,9 +630,13 @@ F^{-1}(u) &=& \sqrt{-\ln(1-u)}
 unifdata = runif(10000,0,1)
 weib1data = sqrt(-log(1-unifdata))
 weib2data = rweibull(10000,2,1)
-par(mfrow=c(1,2))
-hist(weib1data, freq=FALSE, xlab="Weibull(2,1)", main="Using Inverse Transform")
-hist(weib2data, freq=FALSE, xlab="Weibull(2,1)", main="Using R Function")
+
+weibdata <- data.frame(weibull = c(weib1data, weib2data),
+                       sim.method = c(rep("InvTrans", 10000), 
+                                      rep("rweibull", 10000)))
+
+ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) + 
+  facet_grid(~sim.method)
 ```
 
 <img src="04-simulating_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
