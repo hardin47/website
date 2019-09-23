@@ -190,6 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.6.1" data-path="wrang.html"><a href="wrang.html#pivot_longer"><i class="fa fa-check"></i><b>3.6.1</b> <code>pivot_longer</code></a></li>
 <li class="chapter" data-level="3.6.2" data-path="wrang.html"><a href="wrang.html#pivot_wider"><i class="fa fa-check"></i><b>3.6.2</b> <code>pivot_wider</code></a></li>
 <li class="chapter" data-level="3.6.3" data-path="wrang.html"><a href="wrang.html#join-use-join-to-merge-two-datasets"><i class="fa fa-check"></i><b>3.6.3</b> <code>join</code> (use <code>join</code> to <strong>merge</strong> two datasets)</a></li>
+<li class="chapter" data-level="3.6.4" data-path="wrang.html"><a href="wrang.html#lubridate"><i class="fa fa-check"></i><b>3.6.4</b> <code>lubridate</code></a></li>
 </ul></li>
 <li class="chapter" data-level="3.7" data-path="wrang.html"><a href="wrang.html#reprex"><i class="fa fa-check"></i><b>3.7</b> <code>reprex</code></a></li>
 </ul></li>
@@ -201,8 +202,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="4.3" data-path="sims.html"><a href="sims.html#Sep26"><i class="fa fa-check"></i><b>4.3</b> 9/26/19 Agenda</a></li>
 <li class="chapter" data-level="4.4" data-path="sims.html"><a href="sims.html#simsens"><i class="fa fa-check"></i><b>4.4</b> Simulating to Assess Sensitivity</a><ul>
-<li class="chapter" data-level="4.4.1" data-path="sims.html"><a href="sims.html#technical-conditions"><i class="fa fa-check"></i><b>4.4.1</b> Technical Conditions</a></li>
-<li class="chapter" data-level="4.4.2" data-path="sims.html"><a href="sims.html#bias-in-models"><i class="fa fa-check"></i><b>4.4.2</b> Bias in Models</a></li>
+<li class="chapter" data-level="4.4.1" data-path="sims.html"><a href="sims.html#bias-in-models"><i class="fa fa-check"></i><b>4.4.1</b> Bias in Models</a></li>
+<li class="chapter" data-level="4.4.2" data-path="sims.html"><a href="sims.html#technical-conditions"><i class="fa fa-check"></i><b>4.4.2</b> Technical Conditions</a></li>
 <li class="chapter" data-level="4.4.3" data-path="sims.html"><a href="sims.html#generating-random-numbers"><i class="fa fa-check"></i><b>4.4.3</b> Generating random numbers</a></li>
 <li class="chapter" data-level="4.4.4" data-path="sims.html"><a href="sims.html#generating-other-rvs-the-inverse-transform-method"><i class="fa fa-check"></i><b>4.4.4</b> Generating other RVs: <strong>The Inverse Transform Method</strong></a></li>
 </ul></li>
@@ -234,7 +235,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.1</span> 9/24/19 Agenda</h2>
 <ol style="list-style-type: decimal">
 <li>Why simulate?</li>
-<li>What makes a good simulation</li>
+<li>What makes a good simulation?</li>
 <li>pigs / blackjack examples</li>
 </ol>
 <p>Below, computer simulations will be used for two main objectives:</p>
@@ -251,15 +252,25 @@ Snell's probability book discusses the need for simulation at length:  \url{http
 <h2><span class="header-section-number">4.2</span> Simulating Complicated Models</h2>
 <p>Simulation is done to model a scenario which allows us to understand random behavior without actually replicating the entire study multiple times or trying to model the process analytically.</p>
 <p>For example, what if you have a keen interest in understanding the probability of getting a single during room draw? Or getting a single on north campus? You wouldn’t actually run room draw thousands of times to find your probability of getting a single room. Similarly, the situation (e.g., room draw) may have too much information (e.g., all the different permutations of integers assigned to groups of 3 or 4 people) to model (easily) in a closed form solution. With a few moderate assumptions (proportion of students in groups of 1, 2, 3, 4; probability of choosing dorm X over dorm Y; random allocation of integers to students; etc.) it is straightforward to simulate the scenario thousands of time and measure the proportion of times your rank (47) will give you the room you want (single in Sontag).</p>
-<p><strong>Example 1</strong> Consider the following problem from probability. Two points are selected randomly on a line of length <span class="math inline">\(L\)</span> so as to be on opposite sides of the midpoint of the line. [In other words, the two points <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent random variables such that <span class="math inline">\(X\)</span> is uniformly distributed over <span class="math inline">\((0,L/2)\)</span> and <span class="math inline">\(Y\)</span> is uniformly distributed over <span class="math inline">\((L/2, 1)\)</span>.] Find the probability that the 3 line segments from <span class="math inline">\(0\)</span> to <span class="math inline">\(X\)</span>, from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>, and from <span class="math inline">\(Y\)</span> to <span class="math inline">\(L\)</span> could be made to form the three sides of a triangle. (Note that three line segments can be made to form a triangle if the length of each of them is less than the sum of the lengths of the others.)</p>
+<p>Consider the following simulation where the top 10 GOP candidates get to participate in the debate, and the remaining 6 are kept out (example taken for debate on August 6, 2015). The write-up (and example) is a few years old, but the process is <strong>identical</strong> to the process used for deciding who is eligible for the 2020 Democtratic debates for president. <a href="http://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0" class="uri">http://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0</a></p>
+<blockquote>
+<p>A candidate needed to get at least two percent support in four different polls published from a list of approved pollsters between June 28 and August 28, 2019, which cannot be based on open-ended questions and may cover either the national level or one of the first four primary/caucus states (Iowa, New Hampshire, Nevada, and South Carolina). Only one poll from each approved pollster counted towards meeting the criterion in each region. <a href="https://en.wikipedia.org/wiki/2020_Democratic_Party_presidential_debates_and_forums">Wikipedia</a></p>
+</blockquote>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<img src="figs/GOPdebate.jpg" alt="For the 2016 election the Republican primary debates allowed only the top 10 candidates, ranked by national polls [NYT](https://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0)" width="981" />
+<p class="caption">
+Figure 1.2: For the 2016 election the Republican primary debates allowed only the top 10 candidates, ranked by national polls <a href="https://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0">NYT</a>
+</p>
+</div>
+<p><strong>Example</strong> Consider the following problem from probability. Two points are selected randomly on a line of length <span class="math inline">\(L\)</span> so as to be on opposite sides of the midpoint of the line. [In other words, the two points <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent random variables such that <span class="math inline">\(X\)</span> is uniformly distributed over <span class="math inline">\((0,L/2)\)</span> and <span class="math inline">\(Y\)</span> is uniformly distributed over <span class="math inline">\((L/2, 1)\)</span>.] Find the probability that the 3 line segments from <span class="math inline">\(0\)</span> to <span class="math inline">\(X\)</span>, from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>, and from <span class="math inline">\(Y\)</span> to <span class="math inline">\(L\)</span> could be made to form the three sides of a triangle. (Note that three line segments can be made to form a triangle if the length of each of them is less than the sum of the lengths of the others.)</p>
 <p>The joint density is:
 <span class="math display">\[ f(x,y) = \begin{cases} \frac{4}{L^2} &amp; 0 \le x \le L/2, \, L/2 \le y \le L \\ 0 &amp; else \end{cases} \]</span></p>
 <p>The three pieces have lengths: <span class="math inline">\(X\)</span>, <span class="math inline">\(Y- X\)</span> and <span class="math inline">\(L - Y\)</span>. Three conditions need to be satisfied in order that the three pieces form a triangle:</p>
-<p><span class="math display">\[\begin{eqnarray*}
-X + (Y- X)&amp;&gt;&amp; (L - Y) \Rightarrow Y &gt; L - Y \Rightarrow 2 Y &gt; L \Rightarrow Y &gt; L/2 \\
-X + (L-Y ) &amp;&gt;&amp; Y - X \Rightarrow 2X + L &gt; 2Y \Rightarrow X + \frac{L}{2} &gt; Y \\
-Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+X + (Y- X) &amp;&gt; (L - Y) \Rightarrow Y &gt; L - Y \Rightarrow 2 Y &gt; L \Rightarrow Y &gt; L/2 \\
+X + (L-Y ) &amp;&gt; Y - X \Rightarrow 2X + L &gt; 2Y \Rightarrow X + \frac{L}{2} &gt; Y \\
+Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
+\end{align}\]</span></p>
 <!--
 %\begin{figure}[H]
 %\begin{center}
@@ -271,9 +282,9 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <p>The first and third conditions are always satisfied, so we just need to find the probability that <span class="math inline">\(Y\)</span> is below the line <span class="math inline">\(X + \frac{L}{2}\)</span>. The density is the same as in the previous problem, so, as before, we just need to find the area of the region below the line that is within the square <span class="math inline">\([0, L/2] \times [L/2, L]\)</span>, and then multiply it by <span class="math inline">\(\frac{4}{L^2}\)</span>.</p>
 <p>Area = <span class="math inline">\(\displaystyle{ \frac{1}{2}\frac{L}{2}\frac{L}{2} = \frac{L^2}{8} }\)</span>.</p>
 <p>Thus, the probability is</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 \int_{area} f(x,y)dxdy = \frac{4}{L^2} \frac{L^2}{8} =  \frac{1}{2}.
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <p>What happens for different values of <span class="math inline">\(f(x,y)\)</span>? For example, if <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> have Beta(3,47) distributions on [0,.5] and [.5,1]? Simulating the probability in R is quite straightforward. What is the confidence bounds on the point estimates for the probabilities?? [n.b., we could simulate repeatedly to get a sense for the variability of our estimate!]</p>
 <div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb222-1" data-line-number="1">sticks &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
 <a class="sourceLine" id="cb222-2" data-line-number="2">    pointx &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>,<span class="dv">0</span>,.<span class="dv">5</span>)  <span class="co"># runif is &quot;random uniform&quot;, not &quot;run if&quot;</span></a>
@@ -284,7 +295,7 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <a class="sourceLine" id="cb222-7" data-line-number="7">    <span class="kw">max</span>(l1,l2,l3) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span><span class="op">-</span><span class="kw">max</span>(l1,l2,l3)}</a>
 <a class="sourceLine" id="cb222-8" data-line-number="8">    </a>
 <a class="sourceLine" id="cb222-9" data-line-number="9"><span class="kw">sum</span>(<span class="kw">replicate</span>(<span class="dv">100000</span>, <span class="kw">sticks</span>())) <span class="op">/</span><span class="st"> </span><span class="dv">100000</span></a></code></pre></div>
-<pre><code>## [1] 0.50257</code></pre>
+<pre><code>## [1] 0.5</code></pre>
 <div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb224-1" data-line-number="1">sticks_beta &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
 <a class="sourceLine" id="cb224-2" data-line-number="2">  pointx &lt;-<span class="st"> </span><span class="kw">rbeta</span>(<span class="dv">1</span>,<span class="dv">3</span>, <span class="dv">47</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>  <span class="co"># rbeta is random beta</span></a>
 <a class="sourceLine" id="cb224-3" data-line-number="3">  pointy &lt;-<span class="st"> </span>(<span class="kw">rbeta</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">47</span>) <span class="op">+</span><span class="st">  </span><span class="dv">1</span>)<span class="op">/</span><span class="dv">2</span></a>
@@ -294,8 +305,8 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <a class="sourceLine" id="cb224-7" data-line-number="7">  <span class="kw">max</span>(l1,l2,l3) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span><span class="op">-</span><span class="kw">max</span>(l1,l2,l3)}</a>
 <a class="sourceLine" id="cb224-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb224-9" data-line-number="9"><span class="kw">sum</span>(<span class="kw">replicate</span>(<span class="dv">100000</span>, <span class="kw">sticks_beta</span>())) <span class="op">/</span><span class="st"> </span><span class="dv">100000</span></a></code></pre></div>
-<pre><code>## [1] 0.49774</code></pre>
-<p><strong>Example 2</strong> Or consider the problem where the goal is to estimate <span class="math inline">\(E(X)\)</span> where <span class="math inline">\(X=\max \{ k: \sum_{i=1}^k U_i &lt; 1 \}\)</span> and <span class="math inline">\(U_i\)</span> are uniform(0,1). The simulation problem is quite straightforward. Look carefully at the pieces. How are they broken down into steps? Notice that the steps go from inside out.</p>
+<pre><code>## [1] 0.5</code></pre>
+<p><strong>Example</strong> Or consider the problem where the goal is to estimate <span class="math inline">\(E(X)\)</span> where <span class="math inline">\(X=\max \{ k: \sum_{i=1}^k U_i &lt; 1 \}\)</span> and <span class="math inline">\(U_i\)</span> are uniform(0,1). The simulation problem is quite straightforward. Look carefully at the pieces. How are they broken down into steps? Notice that the steps go from inside out.</p>
 <ol style="list-style-type: decimal">
 <li>Set k (the number of random numbers) equal to zero. And the running sum to zero.</li>
 <li>Generate a uniform random variable.</li>
@@ -312,7 +323,7 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <a class="sourceLine" id="cb226-6" data-line-number="6">    k &lt;-<span class="st"> </span>k<span class="op">+</span><span class="dv">1</span> }</a>
 <a class="sourceLine" id="cb226-7" data-line-number="7">  allk &lt;-<span class="st"> </span><span class="kw">c</span>(allk, k<span class="dv">-1</span>) }</a>
 <a class="sourceLine" id="cb226-8" data-line-number="8"><span class="kw">mean</span>(allk)</a></code></pre></div>
-<pre><code>## [1] 1.707</code></pre>
+<pre><code>## [1] 1.71</code></pre>
 <div id="goals-of-simulating-complicated-models" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Goals of Simulating Complicated Models</h3>
 <p>The goal of simulating a complicated model is not only to create a program which will provide the desired results. We also hope to be able to code such that:</p>
@@ -341,6 +352,328 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <li>All R code is online at <a href="http://rdatasciencecases.org/">http://rdatasciencecases.org/</a></li>
 <li>More about the game of blackjack, there are many online resources that you can use to learn about the came. Two resources that Nolan and Temple Lang recommend are <a href="http://wizardofodds.com/games/blackjack/" class="uri">http://wizardofodds.com/games/blackjack/</a> and <a href="http://hitorstand.net/" class="uri">http://hitorstand.net/</a>.</li>
 </ul>
+<div id="basic-blackjack" class="section level5 unnumbered">
+<h5>Basic Blackjack</h5>
+<ul>
+<li>Card game, goal: sum cards as close to 21 without going over</li>
+<li>A few nuances to card value (e.g., Ace can be 1 or 11)</li>
+<li>Start with 2 cards, build up one card at a time</li>
+<li>Lots of different strategies (also based on dealer’s cards)</li>
+</ul>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /></p>
+<hr />
+</div>
+<div id="what-do-we-need-to-simulate-poker" class="section level5 unnumbered">
+<h5>What do we need to simulate poker?</h5>
+<blockquote>
+<ul>
+<li>set-up of cards, dealing, hands</li>
+<li>“score” (both sum of cards and payout)</li>
+<li>strategies</li>
+<li>result of strategies (summary of outcomes)</li>
+</ul>
+</blockquote>
+</div>
+<div id="source" class="section level5 unnumbered">
+<h5>Source</h5>
+<ul>
+<li>Example and code come from <strong>Data Science in R: a case studies approach to computational reasoning and problem solving</strong> by Nolan and Temple Lang.</li>
+<li>Chapter 9 <em>Simulating Blackjack</em> by Hadley Wickham</li>
+<li>All R code is online at <a href="http://rdatasciencecases.org/">http://rdatasciencecases.org/</a></li>
+<li>Link is also on the HW4 assignment</li>
+</ul>
+</div>
+<div id="setting-up-the-game-in-r" class="section level5 unnumbered">
+<h5>Setting up the Game in R</h5>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1">deck =<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>), <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb228-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb228-3" data-line-number="3">shuffle_decks =<span class="st"> </span><span class="cf">function</span>(ndecks){<span class="kw">sample</span>(<span class="kw">rep</span>(deck, ndecks))}</a>
+<a class="sourceLine" id="cb228-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb228-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">shuffle_decks</span>(<span class="dv">4</span>), <span class="dv">10</span>)</a></code></pre></div>
+<pre><code>##  [1]  2  6  6  1  6 10 10 10  2 10</code></pre>
+</div>
+<div id="outcome-of-cards-in-hand" class="section level5 unnumbered">
+<h5>Outcome of cards in hand</h5>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb230-1" data-line-number="1">handValue =<span class="st"> </span><span class="cf">function</span>(cards) {</a>
+<a class="sourceLine" id="cb230-2" data-line-number="2">  value =<span class="st"> </span><span class="kw">sum</span>(cards)</a>
+<a class="sourceLine" id="cb230-3" data-line-number="3">  </a>
+<a class="sourceLine" id="cb230-4" data-line-number="4">       <span class="co"># Check for an Ace and change value if it doesn&#39;t bust</span></a>
+<a class="sourceLine" id="cb230-5" data-line-number="5">  <span class="cf">if</span> (<span class="kw">any</span>(cards <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">&amp;&amp;</span><span class="st"> </span>value <span class="op">&lt;=</span><span class="st"> </span><span class="dv">11</span>) </a>
+<a class="sourceLine" id="cb230-6" data-line-number="6">    value =<span class="st"> </span>value <span class="op">+</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb230-7" data-line-number="7">  </a>
+<a class="sourceLine" id="cb230-8" data-line-number="8">       <span class="co"># Check bust (set to 0); check Blackjack (set to 21.5)</span></a>
+<a class="sourceLine" id="cb230-9" data-line-number="9">  <span class="cf">if</span>(value <span class="op">&gt;</span><span class="st"> </span><span class="dv">21</span>)  </a>
+<a class="sourceLine" id="cb230-10" data-line-number="10">    <span class="dv">0</span> </a>
+<a class="sourceLine" id="cb230-11" data-line-number="11">  <span class="cf">else</span> <span class="cf">if</span> (value <span class="op">==</span><span class="st"> </span><span class="dv">21</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">length</span>(cards) <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)  </a>
+<a class="sourceLine" id="cb230-12" data-line-number="12">    <span class="fl">21.5</span> <span class="co"># Blackjack</span></a>
+<a class="sourceLine" id="cb230-13" data-line-number="13">  <span class="cf">else</span> </a>
+<a class="sourceLine" id="cb230-14" data-line-number="14">    value</a>
+<a class="sourceLine" id="cb230-15" data-line-number="15">}</a>
+<a class="sourceLine" id="cb230-16" data-line-number="16"><span class="kw">handValue</span>(<span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">4</span>))</a></code></pre></div>
+<pre><code>## [1] 14</code></pre>
+</div>
+<div id="of-cards-in-hand" class="section level5 unnumbered">
+<h5>$ of cards in hand</h5>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" data-line-number="1">winnings =<span class="st"> </span><span class="cf">function</span>(dealer, players) {</a>
+<a class="sourceLine" id="cb232-2" data-line-number="2">  <span class="cf">if</span> (dealer <span class="op">&gt;</span><span class="st"> </span><span class="dv">21</span>) {  <span class="co"># Dealer=Blackjack, ties players with Blackjack</span></a>
+<a class="sourceLine" id="cb232-3" data-line-number="3">    <span class="dv">-1</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&lt;=</span><span class="st"> </span><span class="dv">21</span>)</a>
+<a class="sourceLine" id="cb232-4" data-line-number="4">  } <span class="cf">else</span> <span class="cf">if</span> (dealer <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) { <span class="co"># Dealer busts - all non-busted players win</span></a>
+<a class="sourceLine" id="cb232-5" data-line-number="5">    <span class="fl">1.5</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&gt;</span><span class="st"> </span><span class="dv">21</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb232-6" data-line-number="6"><span class="st">      </span><span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&lt;=</span><span class="st"> </span><span class="dv">21</span> <span class="op">&amp;</span><span class="st"> </span>players <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb232-7" data-line-number="7"><span class="st">     </span><span class="dv">-1</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) </a>
+<a class="sourceLine" id="cb232-8" data-line-number="8">  } <span class="cf">else</span> {            <span class="co"># Dealer 21 or below, all players &gt; dealer win</span></a>
+<a class="sourceLine" id="cb232-9" data-line-number="9">    <span class="fl">1.5</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&gt;</span><span class="st"> </span><span class="dv">21</span>) <span class="op">+</span><span class="st">  </span></a>
+<a class="sourceLine" id="cb232-10" data-line-number="10"><span class="st">      </span><span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&lt;=</span><span class="st"> </span><span class="dv">21</span> <span class="op">&amp;</span><span class="st"> </span>players <span class="op">&gt;</span><span class="st"> </span>dealer) <span class="op">+</span></a>
+<a class="sourceLine" id="cb232-11" data-line-number="11"><span class="st">     </span><span class="dv">-1</span> <span class="op">*</span><span class="st"> </span>(players <span class="op">&lt;=</span><span class="st"> </span><span class="dv">21</span> <span class="op">&amp;</span><span class="st"> </span>players <span class="op">&lt;</span><span class="st"> </span>dealer) </a>
+<a class="sourceLine" id="cb232-12" data-line-number="12">  }</a>
+<a class="sourceLine" id="cb232-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb232-14" data-line-number="14"><span class="kw">winnings</span>(<span class="dv">17</span>,<span class="kw">c</span>(<span class="dv">20</span>, <span class="fl">21.5</span>, <span class="dv">14</span>, <span class="dv">0</span>, <span class="dv">21</span>))</a></code></pre></div>
+<pre><code>## [1]  1.0  1.5 -1.0 -1.0  1.0</code></pre>
+</div>
+<div id="better-of-cards-in-hand" class="section level5 unnumbered">
+<h5>Better $ of cards in hand</h5>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb234-1" data-line-number="1">winnings =<span class="st"> </span><span class="cf">function</span>(dealer, players){</a>
+<a class="sourceLine" id="cb234-2" data-line-number="2">  (players <span class="op">&gt;</span><span class="st"> </span>dealer <span class="op">&amp;</span><span class="st"> </span>players <span class="op">&gt;</span><span class="st"> </span><span class="dv">21</span>) <span class="op">*</span><span class="st"> </span><span class="fl">1.5</span> <span class="op">+</span><span class="st"> </span><span class="co"># Blackjack</span></a>
+<a class="sourceLine" id="cb234-3" data-line-number="3"><span class="st">  </span>(players <span class="op">&gt;</span><span class="st"> </span>dealer <span class="op">&amp;</span><span class="st"> </span>players <span class="op">&lt;=</span><span class="st"> </span><span class="dv">21</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st">  </span><span class="co"># win</span></a>
+<a class="sourceLine" id="cb234-4" data-line-number="4"><span class="st">  </span>(players <span class="op">&lt;</span><span class="st"> </span>dealer <span class="op">|</span><span class="st"> </span>players <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span><span class="dv">-1</span>    <span class="co"># lose</span></a>
+<a class="sourceLine" id="cb234-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb234-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb234-7" data-line-number="7"><span class="kw">winnings</span>(<span class="dv">17</span>,<span class="kw">c</span>(<span class="dv">20</span>, <span class="fl">21.5</span>, <span class="dv">14</span>, <span class="dv">0</span>, <span class="dv">21</span>))</a></code></pre></div>
+<pre><code>## [1]  1.0  1.5 -1.0 -1.0  1.0</code></pre>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb236-1" data-line-number="1"><span class="kw">winnings</span>(<span class="fl">21.5</span>,<span class="kw">c</span>(<span class="dv">20</span>, <span class="fl">21.5</span>, <span class="dv">14</span>, <span class="dv">0</span>, <span class="dv">21</span>))</a></code></pre></div>
+<pre><code>## [1] -1  0 -1 -1 -1</code></pre>
+</div>
+<div id="how-well-does-handvalue-work" class="section level5 unnumbered">
+<h5>How well does <code>handValue</code> work?</h5>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb238-1" data-line-number="1">test_cards =<span class="st"> </span><span class="kw">list</span>( <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">6</span>), <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">1</span>, <span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb238-2" data-line-number="2">                   <span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">5</span>), <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">1</span>, <span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb238-3" data-line-number="3">                   <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">10</span>), <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">9</span>, <span class="dv">1</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb238-4" data-line-number="4">                   <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">7</span>), <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">9</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)) </a>
+<a class="sourceLine" id="cb238-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb238-6" data-line-number="6">test_cards_val =<span class="st"> </span><span class="kw">c</span>(<span class="fl">21.5</span>, <span class="dv">21</span>, <span class="dv">12</span>, <span class="dv">19</span>, <span class="dv">21</span>, <span class="dv">19</span>, <span class="dv">17</span>, <span class="dv">0</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb238-7" data-line-number="7"><span class="kw">sapply</span>(test_cards, handValue)  <span class="co"># apply the function handValue to test_cards</span></a></code></pre></div>
+<pre><code>## [1] 21.5 21.0 12.0 19.0 21.0 19.0 17.0  0.0  0.0</code></pre>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb240-1" data-line-number="1"><span class="kw">identical</span>(test_cards_val, <span class="kw">sapply</span>(test_cards, handValue))</a></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="testing-winnings-create-known" class="section level5 unnumbered">
+<h5>Testing winnings (create known)</h5>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb242-1" data-line-number="1">test_vals =<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">16</span>, <span class="dv">19</span>, <span class="dv">20</span>, <span class="dv">21</span>, <span class="fl">21.5</span>)</a>
+<a class="sourceLine" id="cb242-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb242-3" data-line-number="3">testWinnings =</a>
+<a class="sourceLine" id="cb242-4" data-line-number="4"><span class="st">  </span><span class="kw">matrix</span>(<span class="kw">c</span>( <span class="dv">-1</span>,  <span class="dv">1</span>,  <span class="dv">1</span>,  <span class="dv">1</span>,  <span class="dv">1</span>, <span class="fl">1.5</span>,</a>
+<a class="sourceLine" id="cb242-5" data-line-number="5">            <span class="dv">-1</span>,  <span class="dv">0</span>,  <span class="dv">1</span>,  <span class="dv">1</span>,  <span class="dv">1</span>, <span class="fl">1.5</span>,</a>
+<a class="sourceLine" id="cb242-6" data-line-number="6">            <span class="dv">-1</span>, <span class="dv">-1</span>,  <span class="dv">0</span>,  <span class="dv">1</span>,  <span class="dv">1</span>, <span class="fl">1.5</span>,</a>
+<a class="sourceLine" id="cb242-7" data-line-number="7">            <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>,  <span class="dv">0</span>,  <span class="dv">1</span>, <span class="fl">1.5</span>,</a>
+<a class="sourceLine" id="cb242-8" data-line-number="8">            <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>,  <span class="dv">0</span>, <span class="fl">1.5</span>,</a>
+<a class="sourceLine" id="cb242-9" data-line-number="9">            <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">0</span>), </a>
+<a class="sourceLine" id="cb242-10" data-line-number="10">         <span class="dt">nrow =</span> <span class="kw">length</span>(test_vals), <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb242-11" data-line-number="11"><span class="kw">dimnames</span>(testWinnings) =<span class="st"> </span><span class="kw">list</span>(<span class="dt">dealer =</span> test_vals, </a>
+<a class="sourceLine" id="cb242-12" data-line-number="12">                              <span class="dt">player =</span> test_vals)</a>
+<a class="sourceLine" id="cb242-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb242-14" data-line-number="14">testWinnings</a></code></pre></div>
+<pre><code>##       player
+## dealer  0 16 19 20 21 21.5
+##   0    -1  1  1  1  1  1.5
+##   16   -1  0  1  1  1  1.5
+##   19   -1 -1  0  1  1  1.5
+##   20   -1 -1 -1  0  1  1.5
+##   21   -1 -1 -1 -1  0  1.5
+##   21.5 -1 -1 -1 -1 -1  0.0</code></pre>
+</div>
+<div id="does-winnings-work" class="section level5 unnumbered">
+<h5>Does <code>winnings</code> work?</h5>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb244-1" data-line-number="1">check =<span class="st"> </span>testWinnings  <span class="co"># make the matrix the right size</span></a>
+<a class="sourceLine" id="cb244-2" data-line-number="2">check[] =<span class="st"> </span><span class="ot">NA</span>  <span class="co"># make all entries NA</span></a>
+<a class="sourceLine" id="cb244-3" data-line-number="3"> </a>
+<a class="sourceLine" id="cb244-4" data-line-number="4"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(test_vals)) {</a>
+<a class="sourceLine" id="cb244-5" data-line-number="5">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq_along</span>(test_vals)) {</a>
+<a class="sourceLine" id="cb244-6" data-line-number="6">    check[i, j] =<span class="st"> </span><span class="kw">winnings</span>(test_vals[i], test_vals[j])</a>
+<a class="sourceLine" id="cb244-7" data-line-number="7">  }</a>
+<a class="sourceLine" id="cb244-8" data-line-number="8">}</a>
+<a class="sourceLine" id="cb244-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb244-10" data-line-number="10"><span class="kw">identical</span>(check, testWinnings)</a></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="function-for-getting-more-cards" class="section level5 unnumbered">
+<h5>Function for getting more cards</h5>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb246-1" data-line-number="1">shoe =<span class="st"> </span><span class="cf">function</span>(<span class="dt">m =</span> <span class="dv">1</span>) <span class="kw">sample</span>(deck, m, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb246-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb246-3" data-line-number="3">new_hand =<span class="st"> </span><span class="cf">function</span>(shoe, <span class="dt">cards =</span> <span class="kw">shoe</span>(<span class="dv">2</span>), <span class="dt">bet =</span> <span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb246-4" data-line-number="4">  <span class="kw">list</span>(<span class="dt">bet =</span> bet, <span class="dt">shoe =</span> shoe, <span class="dt">cards =</span> cards)</a>
+<a class="sourceLine" id="cb246-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb246-6" data-line-number="6">myCards =<span class="st"> </span><span class="kw">new_hand</span>(shoe, <span class="dt">bet =</span> <span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb246-7" data-line-number="7">myCards</a></code></pre></div>
+<pre><code>## $bet
+## [1] 7
+## 
+## $shoe
+## function(m = 1) sample(deck, m, replace = TRUE)
+## 
+## $cards
+## [1] 4 9</code></pre>
+</div>
+<div id="first-action-hit" class="section level5 unnumbered">
+<h5>First action: hit</h5>
+<p>receive another card</p>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb248-1" data-line-number="1">hit =<span class="st"> </span><span class="cf">function</span>(hand) {</a>
+<a class="sourceLine" id="cb248-2" data-line-number="2">  hand<span class="op">$</span>cards =<span class="st"> </span><span class="kw">c</span>(hand<span class="op">$</span>cards, hand<span class="op">$</span><span class="kw">shoe</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb248-3" data-line-number="3">  hand</a>
+<a class="sourceLine" id="cb248-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb248-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb248-6" data-line-number="6"><span class="kw">hit</span>(myCards)<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1]  4  9 10</code></pre>
+</div>
+<div id="second-action-stand" class="section level5 unnumbered">
+<h5>Second action: stand</h5>
+<p>stay with current cards</p>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1">stand =<span class="st"> </span><span class="cf">function</span>(hand) hand</a>
+<a class="sourceLine" id="cb250-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb250-3" data-line-number="3"><span class="kw">stand</span>(myCards)<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 4 9</code></pre>
+</div>
+<div id="third-action-double-down" class="section level5 unnumbered">
+<h5>Third action: double down</h5>
+<p>double the bet after receiving exactly one more card</p>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb252-1" data-line-number="1">dd =<span class="st">  </span><span class="cf">function</span>(hand) {</a>
+<a class="sourceLine" id="cb252-2" data-line-number="2">  hand<span class="op">$</span>bet =<span class="st"> </span>hand<span class="op">$</span>bet <span class="op">*</span><span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb252-3" data-line-number="3">  hand =<span class="st"> </span><span class="kw">hit</span>(hand)</a>
+<a class="sourceLine" id="cb252-4" data-line-number="4">  <span class="kw">stand</span>(hand)</a>
+<a class="sourceLine" id="cb252-5" data-line-number="5">}</a>
+<a class="sourceLine" id="cb252-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb252-7" data-line-number="7"><span class="kw">dd</span>(myCards)<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 4 9 3</code></pre>
+</div>
+<div id="fourth-action-split-a-pair" class="section level5 unnumbered">
+<h5>Fourth action: split a pair</h5>
+<p>create two different hands from initial hand with two cards of the same value</p>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1">splitPair =<span class="st"> </span><span class="cf">function</span>(hand) {</a>
+<a class="sourceLine" id="cb254-2" data-line-number="2">  <span class="kw">list</span>( <span class="kw">new_hand</span>(hand<span class="op">$</span>shoe, </a>
+<a class="sourceLine" id="cb254-3" data-line-number="3">             <span class="dt">cards =</span> <span class="kw">c</span>(hand<span class="op">$</span>cards[<span class="dv">1</span>], hand<span class="op">$</span><span class="kw">shoe</span>(<span class="dv">1</span>)),</a>
+<a class="sourceLine" id="cb254-4" data-line-number="4">             <span class="dt">bet =</span> hand<span class="op">$</span>bet),</a>
+<a class="sourceLine" id="cb254-5" data-line-number="5">        <span class="kw">new_hand</span>(hand<span class="op">$</span>shoe, </a>
+<a class="sourceLine" id="cb254-6" data-line-number="6">             <span class="dt">cards =</span> <span class="kw">c</span>(hand<span class="op">$</span>cards[<span class="dv">2</span>], hand<span class="op">$</span><span class="kw">shoe</span>(<span class="dv">1</span>)),</a>
+<a class="sourceLine" id="cb254-7" data-line-number="7">             <span class="dt">bet =</span> hand<span class="op">$</span>bet))   }</a>
+<a class="sourceLine" id="cb254-8" data-line-number="8">splitHand =<span class="st"> </span><span class="kw">splitPair</span>(myCards)</a></code></pre></div>
+</div>
+<div id="results-of-splitting" class="section level5 unnumbered">
+<h5>Results of splitting</h5>
+<p>(can we always split?)</p>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1">splitHand[[<span class="dv">1</span>]]<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 4 1</code></pre>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb257-1" data-line-number="1">splitHand[[<span class="dv">2</span>]]<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 9 5</code></pre>
+</div>
+<div id="lets-play-not-yet-automated" class="section level5 unnumbered">
+<h5>Let’s play! Not yet automated…</h5>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb259-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">470</span>); dealer =<span class="st"> </span><span class="kw">new_hand</span>(shoe); player =<span class="st"> </span><span class="kw">new_hand</span>(shoe); </a>
+<a class="sourceLine" id="cb259-2" data-line-number="2">dealer<span class="op">$</span>cards[<span class="dv">1</span>]</a></code></pre></div>
+<pre><code>## [1] 2</code></pre>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb261-1" data-line-number="1">player<span class="op">$</span>cards; player =<span class="st"> </span><span class="kw">hit</span>(player); player<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1]  5 10</code></pre>
+<pre><code>## [1]  5 10  9</code></pre>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb264-1" data-line-number="1">dealer<span class="op">$</span>cards; dealer =<span class="st"> </span><span class="kw">hit</span>(dealer); dealer<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 2 3</code></pre>
+<pre><code>## [1] 2 3 3</code></pre>
+</div>
+<div id="who-won" class="section level5 unnumbered">
+<h5>Who won?</h5>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb267-1" data-line-number="1">dealer<span class="op">$</span>cards; player<span class="op">$</span>cards</a></code></pre></div>
+<pre><code>## [1] 2 3 3</code></pre>
+<pre><code>## [1]  5 10  9</code></pre>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb270-1" data-line-number="1"><span class="kw">handValue</span>(dealer<span class="op">$</span>cards); <span class="kw">handValue</span>(player<span class="op">$</span>cards)</a></code></pre></div>
+<pre><code>## [1] 8</code></pre>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">winnings</span>(<span class="kw">handValue</span>(dealer<span class="op">$</span>cards), <span class="kw">handValue</span>(player<span class="op">$</span>cards))</a></code></pre></div>
+<pre><code>## [1] -1</code></pre>
+</div>
+<div id="simply-strategy" class="section level5 unnumbered">
+<h5>Simply strategy</h5>
+<p>recall the handValue function – what if player busts?</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1">strategy_simple =<span class="st"> </span><span class="cf">function</span>(mine, dealerFaceUp) {</a>
+<a class="sourceLine" id="cb275-2" data-line-number="2">  <span class="cf">if</span> (<span class="kw">handValue</span>(dealerFaceUp) <span class="op">&gt;</span><span class="st"> </span><span class="dv">6</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">handValue</span>(mine) <span class="op">&lt;</span><span class="st"> </span><span class="dv">17</span>) </a>
+<a class="sourceLine" id="cb275-3" data-line-number="3">     <span class="st">&quot;H&quot;</span> </a>
+<a class="sourceLine" id="cb275-4" data-line-number="4">  <span class="cf">else</span> </a>
+<a class="sourceLine" id="cb275-5" data-line-number="5">     <span class="st">&quot;S&quot;</span></a>
+<a class="sourceLine" id="cb275-6" data-line-number="6">}</a></code></pre></div>
+</div>
+<div id="better-simple-strategy" class="section level5 unnumbered">
+<h5>Better simple strategy</h5>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb276-1" data-line-number="1">strategy_simple =<span class="st"> </span><span class="cf">function</span>(mine, dealerFaceUp) {</a>
+<a class="sourceLine" id="cb276-2" data-line-number="2">  <span class="cf">if</span> (<span class="kw">handValue</span>(mine) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="st">&quot;S&quot;</span>)</a>
+<a class="sourceLine" id="cb276-3" data-line-number="3">  <span class="cf">if</span> (<span class="kw">handValue</span>(dealerFaceUp) <span class="op">&gt;</span><span class="st"> </span><span class="dv">6</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">handValue</span>(mine) <span class="op">&lt;</span><span class="st"> </span><span class="dv">17</span>) </a>
+<a class="sourceLine" id="cb276-4" data-line-number="4">     <span class="st">&quot;H&quot;</span> </a>
+<a class="sourceLine" id="cb276-5" data-line-number="5">  <span class="cf">else</span> </a>
+<a class="sourceLine" id="cb276-6" data-line-number="6">     <span class="st">&quot;S&quot;</span></a>
+<a class="sourceLine" id="cb276-7" data-line-number="7">}</a></code></pre></div>
+</div>
+<div id="dealer" class="section level5 unnumbered">
+<h5>Dealer</h5>
+<p>The dealer gets cards regardless of what the player does</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1">dealer_cards =<span class="st"> </span><span class="cf">function</span>(shoe) {</a>
+<a class="sourceLine" id="cb277-2" data-line-number="2">  cards =<span class="st"> </span><span class="kw">shoe</span>(<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb277-3" data-line-number="3">  <span class="cf">while</span>(<span class="kw">handValue</span>(cards) <span class="op">&lt;</span><span class="st"> </span><span class="dv">17</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">handValue</span>(cards) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb277-4" data-line-number="4">    cards =<span class="st"> </span><span class="kw">c</span>(cards, <span class="kw">shoe</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb277-5" data-line-number="5">  }</a>
+<a class="sourceLine" id="cb277-6" data-line-number="6">  cards</a>
+<a class="sourceLine" id="cb277-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb277-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb277-9" data-line-number="9"><span class="kw">dealer_cards</span>(shoe)</a></code></pre></div>
+<pre><code>## [1] 5 9 1 8</code></pre>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1"><span class="kw">dealer_cards</span>(shoe)</a></code></pre></div>
+<pre><code>## [1]  4  4  7 10</code></pre>
+</div>
+<div id="playing-a-hand" class="section level5 unnumbered">
+<h5>Playing a hand</h5>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1">play_hand =<span class="st"> </span><span class="cf">function</span>(shoe, strategy, </a>
+<a class="sourceLine" id="cb281-2" data-line-number="2">                      <span class="dt">hand =</span> <span class="kw">new_hand</span>(shoe), </a>
+<a class="sourceLine" id="cb281-3" data-line-number="3">                      <span class="dt">dealer =</span> <span class="kw">dealer_cards</span>(shoe)) {</a>
+<a class="sourceLine" id="cb281-4" data-line-number="4">  </a>
+<a class="sourceLine" id="cb281-5" data-line-number="5">  face_up_card =<span class="st"> </span>dealer[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb281-6" data-line-number="6">  </a>
+<a class="sourceLine" id="cb281-7" data-line-number="7">  action =<span class="st"> </span><span class="kw">strategy</span>(hand<span class="op">$</span>cards, face_up_card)</a>
+<a class="sourceLine" id="cb281-8" data-line-number="8">  <span class="cf">while</span>(action <span class="op">!=</span><span class="st"> &quot;S&quot;</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">handValue</span>(hand<span class="op">$</span>cards) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb281-9" data-line-number="9">    <span class="cf">if</span> (action <span class="op">==</span><span class="st"> &quot;H&quot;</span>) {</a>
+<a class="sourceLine" id="cb281-10" data-line-number="10">      hand =<span class="st"> </span><span class="kw">hit</span>(hand)</a>
+<a class="sourceLine" id="cb281-11" data-line-number="11">      action =<span class="st"> </span><span class="kw">strategy</span>(hand<span class="op">$</span>cards, face_up_card)</a>
+<a class="sourceLine" id="cb281-12" data-line-number="12">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb281-13" data-line-number="13">      <span class="kw">stop</span>(<span class="st">&quot;Unknown action: should be one of S, H&quot;</span>)</a>
+<a class="sourceLine" id="cb281-14" data-line-number="14">    }</a>
+<a class="sourceLine" id="cb281-15" data-line-number="15">  }  </a>
+<a class="sourceLine" id="cb281-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb281-17" data-line-number="17">  <span class="kw">winnings</span>(<span class="kw">handValue</span>(dealer), <span class="kw">handValue</span>(hand<span class="op">$</span>cards)) <span class="op">*</span><span class="st"> </span>hand<span class="op">$</span>bet</a>
+<a class="sourceLine" id="cb281-18" data-line-number="18">}</a></code></pre></div>
+</div>
+<div id="play-a-few-hands" class="section level5 unnumbered">
+<h5>Play a few hands</h5>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1"><span class="kw">play_hand</span>(shoe, strategy_simple)</a></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">play_hand</span>(shoe, strategy_simple)</a></code></pre></div>
+<pre><code>## [1] -1</code></pre>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb286-1" data-line-number="1"><span class="kw">play_hand</span>(shoe, strategy_simple, <span class="kw">new_hand</span>(shoe, <span class="dt">bet=</span><span class="dv">7</span>))</a></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb288-1" data-line-number="1"><span class="kw">play_hand</span>(shoe, strategy_simple, <span class="kw">new_hand</span>(shoe, <span class="dt">bet=</span><span class="dv">7</span>))</a></code></pre></div>
+<pre><code>## [1] 7</code></pre>
+</div>
+<div id="repeated-games" class="section level5 unnumbered">
+<h5>Repeated games</h5>
+<p>To repeat the game, we simply repeat the <code>play_hand</code> function and keep track of the dollars gained or lost.</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb290-1" data-line-number="1">reps=<span class="dv">10</span></a>
+<a class="sourceLine" id="cb290-2" data-line-number="2">money=<span class="dv">20</span></a>
+<a class="sourceLine" id="cb290-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb290-4" data-line-number="4">  money &lt;-<span class="st"> </span>money <span class="op">+</span><span class="st"> </span><span class="kw">play_hand</span>(shoe, strategy_simple)</a>
+<a class="sourceLine" id="cb290-5" data-line-number="5">  <span class="kw">print</span>(money)}</a></code></pre></div>
+<pre><code>## [1] 19
+## [1] 20
+## [1] 19
+## [1] 18
+## [1] 19.5
+## [1] 18.5
+## [1] 20
+## [1] 19
+## [1] 18
+## [1] 19.5</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -355,98 +688,8 @@ Y + (L - Y) &amp;&gt;&amp; X \Rightarrow L &gt; X
 <div id="simsens" class="section level2">
 <h2><span class="header-section-number">4.4</span> Simulating to Assess Sensitivity</h2>
 <p>As a second use of simulations, we can assess the sensitivity of parameters, model assumptions, sample size, etc. Ideally, the results will be summarized graphically, instead of as a table. A graphical representation can often provide insight into how parameters are related, whereas a table can be very hard to read.</p>
-<p>Consider the following simulation where the top 10 GOP candidates get to participate in the debate, and the remaining 6 are kept out (example taken for debate on August 6, 2015). The write-up (and example) is a few years old, but the process is <strong>identical</strong> to the process used for deciding who is eligible for the 2020 Democtratic debates for president. <a href="http://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0" class="uri">http://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0</a></p>
-<blockquote>
-<p>A candidate needed to get at least two percent support in four different polls published from a list of approved pollsters between June 28 and August 28, 2019, which cannot be based on open-ended questions and may cover either the national level or one of the first four primary/caucus states (Iowa, New Hampshire, Nevada, and South Carolina). Only one poll from each approved pollster counted towards meeting the criterion in each region. <a href="https://en.wikipedia.org/wiki/2020_Democratic_Party_presidential_debates_and_forums">Wikipedia</a></p>
-</blockquote>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-5"></span>
-<img src="figs/GOPdebate.jpg" alt="For the 2016 election the Republican primary debates allowed only the top 10 candidates, ranked by national polls [NYT](https://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0)" width="981" />
-<p class="caption">
-Figure 1.5: For the 2016 election the Republican primary debates allowed only the top 10 candidates, ranked by national polls <a href="https://www.nytimes.com/interactive/2015/07/21/upshot/election-2015-the-first-gop-debate-and-the-role-of-chance.html?_r=0">NYT</a>
-</p>
-</div>
-<div id="technical-conditions" class="section level3">
-<h3><span class="header-section-number">4.4.1</span> Technical Conditions</h3>
-<div id="definitions" class="section level4 unnumbered">
-<h4>Definitions</h4>
-<p><strong>p-value</strong> is the probability of obtaining the observed data or <em>more extreme</em> given the null hypothesis is true.</p>
-<p><strong>confidence interval</strong> is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in <span class="math inline">\((1-\alpha)100\)</span>% of the intervals.</p>
-</div>
-<div id="examples-1" class="section level4 unnumbered">
-<h4>Examples</h4>
-<p><strong>Equal variance in the t-test</strong> Recall that one of the technical conditions for the t-test is that the two samples come from populations where the variance is equal (at least when <code>var.equal=TRUE</code> is specified). What happens if the null hypothesis is true (i.e., the <em>means</em> are equal!) but the technical conditions are violated (i.e., the variances are unequal)?</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1">pvals &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb228-2" data-line-number="2">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb228-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
-<a class="sourceLine" id="cb228-4" data-line-number="4">  x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb228-5" data-line-number="5">  x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb228-6" data-line-number="6">  pvals &lt;-<span class="st"> </span><span class="kw">c</span>(pvals, <span class="kw">t.test</span>(x1,x2, <span class="dt">var.equal=</span><span class="ot">TRUE</span>)<span class="op">$</span>p.value) }</a>
-<a class="sourceLine" id="cb228-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb228-8" data-line-number="8"><span class="kw">sum</span>(pvals <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>)<span class="op">/</span>reps</a></code></pre></div>
-<pre><code>## [1] 0.0468</code></pre>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb230-1" data-line-number="1">pvals &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb230-2" data-line-number="2">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb230-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
-<a class="sourceLine" id="cb230-4" data-line-number="4">  x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb230-5" data-line-number="5">  x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb230-6" data-line-number="6">  pvals &lt;-<span class="st"> </span><span class="kw">c</span>(pvals, <span class="kw">t.test</span>(x1,x2, <span class="dt">var.equal=</span><span class="ot">TRUE</span>)<span class="op">$</span>p.value) }</a>
-<a class="sourceLine" id="cb230-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb230-8" data-line-number="8"><span class="kw">sum</span>(pvals <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>)<span class="op">/</span>reps</a></code></pre></div>
-<pre><code>## [1] 0.067</code></pre>
-<p><strong>Equal variance in the linear model</strong></p>
-<p>Consider the following linear model with the points normally distributed with <em>equal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory works out well. It turns out that the confidence interval will capture the true parameter in 95% of samples!]</p>
-<p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)\]</span></p>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" data-line-number="1">beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb232-2" data-line-number="2">beta0 &lt;-<span class="st"> </span><span class="dv">-1</span></a>
-<a class="sourceLine" id="cb232-3" data-line-number="3">beta1 &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb232-4" data-line-number="4">beta2 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
-<a class="sourceLine" id="cb232-5" data-line-number="5">n &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb232-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb232-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb232-8" data-line-number="8"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
-<a class="sourceLine" id="cb232-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
-<a class="sourceLine" id="cb232-10" data-line-number="10">  x1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">each=</span>n<span class="op">/</span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb232-11" data-line-number="11">  x2 &lt;-<span class="st"> </span><span class="kw">runif</span>(n, <span class="dt">min=</span><span class="op">-</span><span class="dv">1</span>, <span class="dt">max=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb232-12" data-line-number="12">  y &lt;-<span class="st"> </span>beta0 <span class="op">+</span><span class="st"> </span>beta1<span class="op">*</span>x1 <span class="op">+</span><span class="st"> </span>beta2<span class="op">*</span>x2 <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb232-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb232-14" data-line-number="14">  CI &lt;-<span class="st"> </span><span class="kw">lm</span>(y<span class="op">~</span>x1<span class="op">+</span>x2) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>(<span class="dt">conf.int=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()</a>
-<a class="sourceLine" id="cb232-15" data-line-number="15">  </a>
-<a class="sourceLine" id="cb232-16" data-line-number="16">  beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>(beta2.in, <span class="kw">between</span>(beta2, CI[<span class="dv">3</span>,<span class="dv">6</span>], CI[<span class="dv">3</span>,<span class="dv">7</span>]))</a>
-<a class="sourceLine" id="cb232-17" data-line-number="17">}</a>
-<a class="sourceLine" id="cb232-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb232-19" data-line-number="19"><span class="co"># coverage rate of the CI is given by:</span></a>
-<a class="sourceLine" id="cb232-20" data-line-number="20"><span class="kw">sum</span>(beta2.in)<span class="op">/</span>reps</a></code></pre></div>
-<pre><code>## [1] 0.9516</code></pre>
-<p><strong>Unequal variance in the linear model</strong></p>
-<p>Consider the following linear model with the points normally distributed with <em>unequal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory does not work out as well. It turns out that the confidence interval will not capture the true parameter in 95% of samples!]</p>
-<p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)\]</span></p>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb234-1" data-line-number="1">beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb234-2" data-line-number="2">beta0 &lt;-<span class="st"> </span><span class="dv">-1</span></a>
-<a class="sourceLine" id="cb234-3" data-line-number="3">beta1 &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb234-4" data-line-number="4">beta2 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
-<a class="sourceLine" id="cb234-5" data-line-number="5">n &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb234-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb234-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb234-8" data-line-number="8"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
-<a class="sourceLine" id="cb234-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
-<a class="sourceLine" id="cb234-10" data-line-number="10">  x1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">each=</span>n<span class="op">/</span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb234-11" data-line-number="11">  x2 &lt;-<span class="st"> </span><span class="kw">runif</span>(n, <span class="dt">min=</span><span class="op">-</span><span class="dv">1</span>, <span class="dt">max=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb234-12" data-line-number="12">  y &lt;-<span class="st"> </span>beta0 <span class="op">+</span><span class="st"> </span>beta1<span class="op">*</span>x1 <span class="op">+</span><span class="st"> </span>beta2<span class="op">*</span>x2 <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span><span class="dv">10</span><span class="op">*</span><span class="kw">abs</span>(x2))</a>
-<a class="sourceLine" id="cb234-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb234-14" data-line-number="14">  CI &lt;-<span class="st"> </span><span class="kw">lm</span>(y<span class="op">~</span>x1<span class="op">+</span>x2) <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>(<span class="dt">conf.int=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()</a>
-<a class="sourceLine" id="cb234-15" data-line-number="15">  </a>
-<a class="sourceLine" id="cb234-16" data-line-number="16">  beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>(beta2.in, <span class="kw">between</span>(beta2, CI[<span class="dv">3</span>,<span class="dv">6</span>], CI[<span class="dv">3</span>,<span class="dv">7</span>]))</a>
-<a class="sourceLine" id="cb234-17" data-line-number="17">}</a>
-<a class="sourceLine" id="cb234-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb234-19" data-line-number="19"><span class="co"># coverage rate of the CI is given by:</span></a>
-<a class="sourceLine" id="cb234-20" data-line-number="20"><span class="kw">sum</span>(beta2.in)<span class="op">/</span>reps</a></code></pre></div>
-<pre><code>## [1] 0.8717</code></pre>
-</div>
-</div>
 <div id="bias-in-models" class="section level3">
-<h3><span class="header-section-number">4.4.2</span> Bias in Models</h3>
+<h3><span class="header-section-number">4.4.1</span> Bias in Models</h3>
 <p>The example below is taken directly (and mostly verbatim) from a blog by Aaron Roth <a href="http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html">Algorithmic Unfairness Without Any Bias Baked In</a>.</p>
 <blockquote>
 <p>Bias in the data is certainly a problem, especially when labels are gathered by human beings. But its far from being the only problem. In this post, I want to walk through a very simple example in which the algorithm designer is being entirely reasonable, there are no human beings injecting bias into the labels, and yet the resulting outcome is “unfair”. Here is the (toy) scenario – the specifics aren’t important. High school students are applying to college, and each student has some innate “talent” <span class="math inline">\(I\)</span>, which we will imagine is normally distributed, with mean 100 and standard deviation 15: <span class="math inline">\(I \sim N(100,15)\)</span>. The college would like to admit students who are sufficiently talented — say one standard deviation above the mean (so, it would like to admit students with <span class="math inline">\(I \geq 115\)</span>). The problem is that talent isn’t directly observable. Instead, the college can observe grades <span class="math inline">\(g\)</span> and SAT scores <span class="math inline">\(s\)</span>, which are a noisy estimate of talent. For simplicity, lets imagine that both grades and SAT scores are independently and normally distributed, centered at a student’s talent level, and also with standard deviation 15: <span class="math inline">\(g \sim N(I, 15)\)</span>, <span class="math inline">\(s \sim N(I, 15)\)</span>.</p>
@@ -462,130 +705,130 @@ Figure 1.5: For the 2016 election the Republican primary debates allowed only th
 <blockquote>
 <p>But there is one difference: the Blues have a bit more money than the Reds, so they each take the SAT twice, and report only the highest of the two scores to the college. This results in a small but noticeable bump in their average SAT scores, compared to the Reds.</p>
 </blockquote>
-<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb236-1" data-line-number="1">n =<span class="st"> </span><span class="dv">100000</span></a>
-<a class="sourceLine" id="cb236-2" data-line-number="2">n.red =<span class="st"> </span>n<span class="op">*</span><span class="fl">0.99</span></a>
-<a class="sourceLine" id="cb236-3" data-line-number="3">n.blue =<span class="st"> </span>n<span class="op">*</span><span class="fl">0.01</span></a>
-<a class="sourceLine" id="cb236-4" data-line-number="4">reds &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb236-5" data-line-number="5">blues &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb236-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb236-7" data-line-number="7">red.sat &lt;-<span class="st"> </span>reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb236-8" data-line-number="8">blue.sat &lt;-<span class="st"> </span>blues <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb236-9" data-line-number="9"><span class="st">    </span><span class="kw">pmax</span>(<span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>),</a>
-<a class="sourceLine" id="cb236-10" data-line-number="10">         <span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>))</a>
-<a class="sourceLine" id="cb236-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb236-12" data-line-number="12">red.grade &lt;-<span class="st"> </span>reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb236-13" data-line-number="13">blue.grade &lt;-<span class="st"> </span>blues <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb236-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb236-15" data-line-number="15">college.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">talent =</span> <span class="kw">c</span>(reds, blues),</a>
-<a class="sourceLine" id="cb236-16" data-line-number="16">                           <span class="dt">SAT =</span> <span class="kw">c</span>(red.sat, blue.sat),</a>
-<a class="sourceLine" id="cb236-17" data-line-number="17">                           <span class="dt">grades =</span> <span class="kw">c</span>(red.grade, blue.grade),</a>
-<a class="sourceLine" id="cb236-18" data-line-number="18">                           <span class="dt">color =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;red&quot;</span>, n.red), <span class="kw">rep</span>(<span class="st">&quot;blue&quot;</span>, n.blue)))</a>
-<a class="sourceLine" id="cb236-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb236-20" data-line-number="20"><span class="kw">ggplot</span>(college.data, <span class="kw">aes</span>(<span class="dt">x =</span> grades, <span class="dt">y =</span> SAT, <span class="dt">color =</span> color)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb236-21" data-line-number="21"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb236-22" data-line-number="22"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
-<a class="sourceLine" id="cb236-23" data-line-number="23">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb292-1" data-line-number="1">n =<span class="st"> </span><span class="dv">100000</span></a>
+<a class="sourceLine" id="cb292-2" data-line-number="2">n.red =<span class="st"> </span>n<span class="op">*</span><span class="fl">0.99</span></a>
+<a class="sourceLine" id="cb292-3" data-line-number="3">n.blue =<span class="st"> </span>n<span class="op">*</span><span class="fl">0.01</span></a>
+<a class="sourceLine" id="cb292-4" data-line-number="4">reds &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb292-5" data-line-number="5">blues &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb292-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb292-7" data-line-number="7">red.sat &lt;-<span class="st"> </span>reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb292-8" data-line-number="8">blue.sat &lt;-<span class="st"> </span>blues <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb292-9" data-line-number="9"><span class="st">    </span><span class="kw">pmax</span>(<span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>),</a>
+<a class="sourceLine" id="cb292-10" data-line-number="10">         <span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>))</a>
+<a class="sourceLine" id="cb292-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb292-12" data-line-number="12">red.grade &lt;-<span class="st"> </span>reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb292-13" data-line-number="13">blue.grade &lt;-<span class="st"> </span>blues <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb292-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb292-15" data-line-number="15">college.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">talent =</span> <span class="kw">c</span>(reds, blues),</a>
+<a class="sourceLine" id="cb292-16" data-line-number="16">                           <span class="dt">SAT =</span> <span class="kw">c</span>(red.sat, blue.sat),</a>
+<a class="sourceLine" id="cb292-17" data-line-number="17">                           <span class="dt">grades =</span> <span class="kw">c</span>(red.grade, blue.grade),</a>
+<a class="sourceLine" id="cb292-18" data-line-number="18">                           <span class="dt">color =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;red&quot;</span>, n.red), <span class="kw">rep</span>(<span class="st">&quot;blue&quot;</span>, n.blue)))</a>
+<a class="sourceLine" id="cb292-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb292-20" data-line-number="20"><span class="kw">ggplot</span>(college.data, <span class="kw">aes</span>(<span class="dt">x =</span> grades, <span class="dt">y =</span> SAT, <span class="dt">color =</span> color)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb292-21" data-line-number="21"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb292-22" data-line-number="22"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
+<a class="sourceLine" id="cb292-23" data-line-number="23">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="two-separate-models" class="section level4 unnumbered">
 <h4>Two separate models</h4>
 <blockquote>
 <p>So what is the effect of this when we use our reasonable inference procedure? First, lets consider what happens when we learn two different regression models: one for the Blues, and a different one for the Reds. We don’t see much difference:</p>
 </blockquote>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb237-1" data-line-number="1">red.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb237-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;red&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb237-3" data-line-number="3"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
-<a class="sourceLine" id="cb237-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb237-5" data-line-number="5">blue.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb237-6" data-line-number="6"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;blue&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb237-7" data-line-number="7"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
-<a class="sourceLine" id="cb237-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb237-9" data-line-number="9">global.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb237-10" data-line-number="10"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
-<a class="sourceLine" id="cb237-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb237-12" data-line-number="12">red.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb293-1" data-line-number="1">red.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb293-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;red&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb293-3" data-line-number="3"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
+<a class="sourceLine" id="cb293-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb293-5" data-line-number="5">blue.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb293-6" data-line-number="6"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;blue&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb293-7" data-line-number="7"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
+<a class="sourceLine" id="cb293-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb293-9" data-line-number="9">global.lm =<span class="st"> </span>college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb293-10" data-line-number="10"><span class="st">  </span><span class="kw">lm</span>(talent <span class="op">~</span><span class="st"> </span>SAT <span class="op">+</span><span class="st"> </span>grades, <span class="dt">data =</span> .)</a>
+<a class="sourceLine" id="cb293-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb293-12" data-line-number="12">red.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term        estimate std.error statistic p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-## 1 (Intercept)   33.3     0.153        218.       0
-## 2 SAT            0.333   0.00151      221.       0
-## 3 grades         0.334   0.00151      222.       0</code></pre>
-<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb239-1" data-line-number="1">blue.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
+## 1 (Intercept)   33.2     0.153        216.       0
+## 2 SAT            0.333   0.00151      220.       0
+## 3 grades         0.335   0.00151      222.       0</code></pre>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb295-1" data-line-number="1">blue.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term        estimate std.error statistic   p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 (Intercept)   23.7      1.51        15.7 5.71e- 50
-## 2 SAT            0.423    0.0151      28.1 2.95e-128
-## 3 grades         0.304    0.0135      22.5 5.91e- 91</code></pre>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb241-1" data-line-number="1">global.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
+## 1 (Intercept)   25.6      1.64        15.6 1.85e- 49
+## 2 SAT            0.429    0.0169      25.3 1.12e-109
+## 3 grades         0.280    0.0157      17.9 3.50e- 62</code></pre>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb297-1" data-line-number="1">global.lm <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term        estimate std.error statistic p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-## 1 (Intercept)   33.3     0.152        219.       0
-## 2 SAT            0.333   0.00150      222.       0
-## 3 grades         0.334   0.00150      223.       0</code></pre>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb243-1" data-line-number="1">new.reds &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb243-2" data-line-number="2">new.blues &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb243-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb243-4" data-line-number="4">new.red.sat &lt;-<span class="st"> </span>new.reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb243-5" data-line-number="5">new.blue.sat &lt;-<span class="st"> </span>new.blues <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb243-6" data-line-number="6"><span class="st">    </span><span class="kw">pmax</span>(<span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>),</a>
-<a class="sourceLine" id="cb243-7" data-line-number="7">         <span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>))</a>
-<a class="sourceLine" id="cb243-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb243-9" data-line-number="9">new.red.grade &lt;-<span class="st"> </span>new.reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb243-10" data-line-number="10">new.blue.grade &lt;-<span class="st"> </span>new.blues <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb243-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb243-12" data-line-number="12">new.college.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">talent =</span> <span class="kw">c</span>(new.reds, new.blues),</a>
-<a class="sourceLine" id="cb243-13" data-line-number="13">                           <span class="dt">SAT =</span> <span class="kw">c</span>(new.red.sat, new.blue.sat),</a>
-<a class="sourceLine" id="cb243-14" data-line-number="14">                           <span class="dt">grades =</span> <span class="kw">c</span>(new.red.grade, new.blue.grade),</a>
-<a class="sourceLine" id="cb243-15" data-line-number="15">                           <span class="dt">color =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;red&quot;</span>, n.red), <span class="kw">rep</span>(<span class="st">&quot;blue&quot;</span>, n.blue)))</a>
-<a class="sourceLine" id="cb243-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb243-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb243-18" data-line-number="18">new.red.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb243-19" data-line-number="19"><span class="st">  </span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;red&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb243-20" data-line-number="20"><span class="st">  </span><span class="kw">predict.lm</span>(red.lm, <span class="dt">newdata =</span> .)</a>
-<a class="sourceLine" id="cb243-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb243-22" data-line-number="22">new.blue.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb243-23" data-line-number="23"><span class="st">  </span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;blue&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb243-24" data-line-number="24"><span class="st">  </span><span class="kw">predict.lm</span>(blue.lm, <span class="dt">newdata =</span> .)</a>
-<a class="sourceLine" id="cb243-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb243-26" data-line-number="26">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb243-27" data-line-number="27"><span class="st">  </span><span class="kw">cbind</span>(<span class="dt">predicted =</span> <span class="kw">c</span>(new.red.pred, new.blue.pred))</a>
-<a class="sourceLine" id="cb243-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb243-29" data-line-number="29"><span class="kw">ggplot</span>(new.college.data, <span class="kw">aes</span>(<span class="dt">x =</span> talent, <span class="dt">y =</span> predicted, <span class="dt">color =</span> color)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb243-30" data-line-number="30"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb243-31" data-line-number="31"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">115</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb243-32" data-line-number="32"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">115</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb243-33" data-line-number="33"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
-<a class="sourceLine" id="cb243-34" data-line-number="34">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb244-1" data-line-number="1">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb244-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fp =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb244-3" data-line-number="3">         <span class="dt">tp =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb244-4" data-line-number="4">         <span class="dt">fn =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb244-5" data-line-number="5">         <span class="dt">tn =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb244-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb244-7" data-line-number="7">error.rates &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(color) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb244-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">tpr =</span> <span class="kw">sum</span>(tp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)),</a>
-<a class="sourceLine" id="cb244-9" data-line-number="9">            <span class="dt">fpr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn)),</a>
-<a class="sourceLine" id="cb244-10" data-line-number="10">            <span class="dt">fnr =</span> <span class="kw">sum</span>(fn) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
-<a class="sourceLine" id="cb244-11" data-line-number="11">            <span class="dt">fdr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
-<a class="sourceLine" id="cb244-12" data-line-number="12">            <span class="dt">error =</span> (<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn) ))</a>
-<a class="sourceLine" id="cb244-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb244-14" data-line-number="14">error.rates</a></code></pre></div>
+## 1 (Intercept)   33.2     0.153        217.       0
+## 2 SAT            0.333   0.00151      221.       0
+## 3 grades         0.335   0.00150      223.       0</code></pre>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb299-1" data-line-number="1">new.reds &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb299-2" data-line-number="2">new.blues &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">100</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb299-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb299-4" data-line-number="4">new.red.sat &lt;-<span class="st"> </span>new.reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb299-5" data-line-number="5">new.blue.sat &lt;-<span class="st"> </span>new.blues <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb299-6" data-line-number="6"><span class="st">    </span><span class="kw">pmax</span>(<span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>),</a>
+<a class="sourceLine" id="cb299-7" data-line-number="7">         <span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>))</a>
+<a class="sourceLine" id="cb299-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb299-9" data-line-number="9">new.red.grade &lt;-<span class="st"> </span>new.reds <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.red, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb299-10" data-line-number="10">new.blue.grade &lt;-<span class="st"> </span>new.blues <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n.blue, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb299-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb299-12" data-line-number="12">new.college.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">talent =</span> <span class="kw">c</span>(new.reds, new.blues),</a>
+<a class="sourceLine" id="cb299-13" data-line-number="13">                           <span class="dt">SAT =</span> <span class="kw">c</span>(new.red.sat, new.blue.sat),</a>
+<a class="sourceLine" id="cb299-14" data-line-number="14">                           <span class="dt">grades =</span> <span class="kw">c</span>(new.red.grade, new.blue.grade),</a>
+<a class="sourceLine" id="cb299-15" data-line-number="15">                           <span class="dt">color =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;red&quot;</span>, n.red), <span class="kw">rep</span>(<span class="st">&quot;blue&quot;</span>, n.blue)))</a>
+<a class="sourceLine" id="cb299-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb299-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb299-18" data-line-number="18">new.red.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb299-19" data-line-number="19"><span class="st">  </span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;red&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb299-20" data-line-number="20"><span class="st">  </span><span class="kw">predict.lm</span>(red.lm, <span class="dt">newdata =</span> .)</a>
+<a class="sourceLine" id="cb299-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb299-22" data-line-number="22">new.blue.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb299-23" data-line-number="23"><span class="st">  </span><span class="kw">filter</span>(color <span class="op">==</span><span class="st"> &quot;blue&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb299-24" data-line-number="24"><span class="st">  </span><span class="kw">predict.lm</span>(blue.lm, <span class="dt">newdata =</span> .)</a>
+<a class="sourceLine" id="cb299-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb299-26" data-line-number="26">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb299-27" data-line-number="27"><span class="st">  </span><span class="kw">cbind</span>(<span class="dt">predicted =</span> <span class="kw">c</span>(new.red.pred, new.blue.pred))</a>
+<a class="sourceLine" id="cb299-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb299-29" data-line-number="29"><span class="kw">ggplot</span>(new.college.data, <span class="kw">aes</span>(<span class="dt">x =</span> talent, <span class="dt">y =</span> predicted, <span class="dt">color =</span> color)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb299-30" data-line-number="30"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb299-31" data-line-number="31"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">115</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb299-32" data-line-number="32"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">115</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb299-33" data-line-number="33"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
+<a class="sourceLine" id="cb299-34" data-line-number="34">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb300-1" data-line-number="1">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb300-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fp =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb300-3" data-line-number="3">         <span class="dt">tp =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb300-4" data-line-number="4">         <span class="dt">fn =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb300-5" data-line-number="5">         <span class="dt">tn =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb300-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb300-7" data-line-number="7">error.rates &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(color) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb300-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">tpr =</span> <span class="kw">sum</span>(tp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)),</a>
+<a class="sourceLine" id="cb300-9" data-line-number="9">            <span class="dt">fpr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn)),</a>
+<a class="sourceLine" id="cb300-10" data-line-number="10">            <span class="dt">fnr =</span> <span class="kw">sum</span>(fn) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
+<a class="sourceLine" id="cb300-11" data-line-number="11">            <span class="dt">fdr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
+<a class="sourceLine" id="cb300-12" data-line-number="12">            <span class="dt">error =</span> (<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn) ))</a>
+<a class="sourceLine" id="cb300-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb300-14" data-line-number="14">error.rates</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 6
 ##   color   tpr    fpr   fnr   fdr error
 ##   &lt;fct&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 blue  0.526 0.0438 0.474 0.311 0.111
-## 2 red   0.498 0.0365 0.502 0.278 0.111</code></pre>
+## 1 blue  0.548 0.0367 0.452 0.267 0.101
+## 2 red   0.506 0.0379 0.494 0.284 0.111</code></pre>
 <blockquote>
-<p>The Red classifier makes errors approximately 11.069697% of the time. The Blue classifier does about the same — it makes errors about 11.1% of the time. This makes sense: the Blues artificially inflated their SAT score distribution without increasing their talent, and the classifier picked up on this and corrected for it. In fact, it is even a little more accurate!</p>
+<p>The Red classifier makes errors approximately 11.053% of the time. The Blue classifier does about the same — it makes errors about 10.1% of the time. This makes sense: the Blues artificially inflated their SAT score distribution without increasing their talent, and the classifier picked up on this and corrected for it. In fact, it is even a little more accurate!</p>
 </blockquote>
 <blockquote>
 <p>And since we are interested in fairness, lets think about the false negative rate of our classifiers. <strong>“False Negatives” in this setting are the people who are qualified to attend the college (<span class="math inline">\(I &gt; 115\)</span>), but whom the college mistakenly rejects.</strong> These are really the people who have come to harm as a result of the classifier’s mistakes. And the False Negative Rate is the probability that a randomly selected qualified person is mistakenly rejected from college — i.e. the probability that a randomly selected student is harmed by the classifier. We should want that the false negative rates are approximately equal across the two populations: this would mean that the burden of harm caused by the classifier’s mistakes is not disproportionately borne by one population over the other. This is one reason why the difference between false negative rates across different populations has become a standard fairness metric in algorithmic fairness — sometimes referred to as “equal opportunity.”</p>
 </blockquote>
 <blockquote>
-<p>So how do we fare on this metric? Not so badly! The Blue model has a false negative rate of 47.4358974% on the blues, and the Red model has a false negative rate of 50.1709293% on the reds — so the difference between these two is a satisfyingly small 2.7350319%.</p>
+<p>So how do we fare on this metric? Not so badly! The Blue model has a false negative rate of 45.161% on the blues, and the Red model has a false negative rate of 49.413% on the reds — so the difference between these two is a satisfyingly small 4.252%.</p>
 </blockquote>
 </div>
 <div id="one-global-model" class="section level4 unnumbered">
@@ -593,52 +836,134 @@ Figure 1.5: For the 2016 election the Republican primary debates allowed only th
 <blockquote>
 <p>But you might reasonably object: because we have learned separate models for the Blues and the Reds, we are explicitly making admissions decisions as a function of a student’s color! This might sound like a form of discrimination, baked in by the algorithm designer — and if the two populations represent e.g. racial groups, then its explicitly illegal in a number of settings, including lending.</p>
 </blockquote>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb246-1" data-line-number="1">new.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb246-2" data-line-number="2"><span class="st">  </span><span class="kw">predict.lm</span>(global.lm, <span class="dt">newdata =</span> .)</a>
-<a class="sourceLine" id="cb246-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb246-4" data-line-number="4">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb246-5" data-line-number="5"><span class="st">  </span><span class="kw">cbind</span>(<span class="dt">global.predicted =</span> new.pred)</a>
-<a class="sourceLine" id="cb246-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb246-7" data-line-number="7"><span class="kw">ggplot</span>(new.college.data, <span class="kw">aes</span>(<span class="dt">x =</span> talent, </a>
-<a class="sourceLine" id="cb246-8" data-line-number="8">                             <span class="dt">y =</span> global.predicted, </a>
-<a class="sourceLine" id="cb246-9" data-line-number="9">                             <span class="dt">color =</span> color)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb246-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb246-11" data-line-number="11"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">115</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb246-12" data-line-number="12"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">115</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb246-13" data-line-number="13"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
-<a class="sourceLine" id="cb246-14" data-line-number="14">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb247-1" data-line-number="1">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb247-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fp =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb247-3" data-line-number="3">         <span class="dt">tp =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb247-4" data-line-number="4">         <span class="dt">fn =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb247-5" data-line-number="5">         <span class="dt">tn =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb247-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb247-7" data-line-number="7">error.rates &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(color) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb247-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">tpr =</span> <span class="kw">sum</span>(tp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)),</a>
-<a class="sourceLine" id="cb247-9" data-line-number="9">            <span class="dt">fpr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn)),</a>
-<a class="sourceLine" id="cb247-10" data-line-number="10">            <span class="dt">fnr =</span> <span class="kw">sum</span>(fn) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
-<a class="sourceLine" id="cb247-11" data-line-number="11">            <span class="dt">fdr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
-<a class="sourceLine" id="cb247-12" data-line-number="12">            <span class="dt">error =</span> (<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn) ))</a>
-<a class="sourceLine" id="cb247-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb247-14" data-line-number="14">error.rates</a></code></pre></div>
+<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb302-1" data-line-number="1">new.pred &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb302-2" data-line-number="2"><span class="st">  </span><span class="kw">predict.lm</span>(global.lm, <span class="dt">newdata =</span> .)</a>
+<a class="sourceLine" id="cb302-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb302-4" data-line-number="4">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb302-5" data-line-number="5"><span class="st">  </span><span class="kw">cbind</span>(<span class="dt">global.predicted =</span> new.pred)</a>
+<a class="sourceLine" id="cb302-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb302-7" data-line-number="7"><span class="kw">ggplot</span>(new.college.data, <span class="kw">aes</span>(<span class="dt">x =</span> talent, </a>
+<a class="sourceLine" id="cb302-8" data-line-number="8">                             <span class="dt">y =</span> global.predicted, </a>
+<a class="sourceLine" id="cb302-9" data-line-number="9">                             <span class="dt">color =</span> color)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb302-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb302-11" data-line-number="11"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">115</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb302-12" data-line-number="12"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">115</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb302-13" data-line-number="13"><span class="st">  </span><span class="kw">scale_color_identity</span>(<span class="dt">name =</span> <span class="st">&quot;Color Group&quot;</span>,</a>
+<a class="sourceLine" id="cb302-14" data-line-number="14">                       <span class="dt">guide =</span> <span class="st">&quot;legend&quot;</span>)</a></code></pre></div>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb303-1" data-line-number="1">new.college.data &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb303-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fp =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb303-3" data-line-number="3">         <span class="dt">tp =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb303-4" data-line-number="4">         <span class="dt">fn =</span> <span class="kw">ifelse</span>(talent <span class="op">&gt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb303-5" data-line-number="5">         <span class="dt">tn =</span> <span class="kw">ifelse</span>(talent <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span> <span class="op">&amp;</span><span class="st"> </span>global.predicted <span class="op">&lt;</span><span class="st"> </span><span class="dv">115</span>, <span class="dv">1</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb303-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb303-7" data-line-number="7">error.rates &lt;-<span class="st"> </span>new.college.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(color) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb303-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">tpr =</span> <span class="kw">sum</span>(tp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)),</a>
+<a class="sourceLine" id="cb303-9" data-line-number="9">            <span class="dt">fpr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn)),</a>
+<a class="sourceLine" id="cb303-10" data-line-number="10">            <span class="dt">fnr =</span> <span class="kw">sum</span>(fn) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
+<a class="sourceLine" id="cb303-11" data-line-number="11">            <span class="dt">fdr =</span> <span class="kw">sum</span>(fp) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp)),</a>
+<a class="sourceLine" id="cb303-12" data-line-number="12">            <span class="dt">error =</span> (<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn)) <span class="op">/</span><span class="st"> </span>(<span class="kw">sum</span>(fp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tp) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(fn) <span class="op">+</span><span class="st"> </span><span class="kw">sum</span>(tn) ))</a>
+<a class="sourceLine" id="cb303-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb303-14" data-line-number="14">error.rates</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 6
 ##   color   tpr    fpr   fnr   fdr error
 ##   &lt;fct&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 blue  0.596 0.0557 0.404 0.336 0.11 
-## 2 red   0.497 0.0362 0.503 0.278 0.111</code></pre>
+## 1 blue  0.632 0.0627 0.368 0.351 0.11 
+## 2 red   0.504 0.0377 0.496 0.283 0.111</code></pre>
 <blockquote>
-<p>So what happens if we don’t allow our classifier to see group membership, and just train one classifier on the whole student body? The gap in false negative rates between the two populations balloons to 9.9572433%, and the overall error rate ticks up. This means if you are a qualified member of the Red population, you are substantially more likely to be mistakenly rejected by our classifier than if you are a qualified member of the Blue population.</p>
+<p>So what happens if we don’t allow our classifier to see group membership, and just train one classifier on the whole student body? The gap in false negative rates between the two populations balloons to 12.791%. Additionally, the Blues now have a higher false <strong>positive</strong> rate (people who don’t have talent about 115 are let in accidentally) and the Reds now have a higher false <strong>negative</strong> rate (people who do have talent are mistakenly kept out). This means if you are a qualified member of the Red population, you are substantially more likely to be mistakenly rejected by our classifier than if you are a qualified member of the Blue population.</p>
 </blockquote>
 </div>
 <div id="what-happened" class="section level4 unnumbered">
 <h4>What happened????</h4>
 <blockquote>
-<p>What happened? There wasn’t any malice anywhere in this data pipeline. Its just that the Red population was much larger than the Blue population, so when we trained a classifier to minimize its average error over the entire student body, it naturally fit the Red population – which contributed much more to the average. But this means that the classifier was no longer compensating for the artificially inflated SAT scores of the Blues, and so was making a disproportionate number of errors on them – all in their favor.</p>
+<p>What happened? There wasn’t any malice anywhere in this data pipeline. Its just that the <strong>Red population was much larger than the Blue population</strong>, so when we trained a classifier to minimize its average error over the entire student body, it naturally fit the Red population – which contributed much more to the average. But this means that the classifier was no longer compensating for the artificially inflated SAT scores of the Blues, and so was making a disproportionate number of errors on them – all in their favor.</p>
 </blockquote>
 <blockquote>
 <p>This is the kind of thing that happens all the time: whenever there are two populations that have different feature distributions, learning a single classifier (that is prohibited from discriminating based on population) will fit the bigger of the two populations, simply because they contribute more to average error. Depending on the nature of the distribution difference, this can be either to the benefit or the detriment of the minority population. And not only does this not involve any explicit human bias, either on the part of the algorithm designer or the data gathering process, it is exacerbated if we artificially force the algorithm to be group blind. Well intentioned “fairness” regulations prohibiting decision makers form taking sensitive attributes into account can actually make things less fair and less accurate at the same time.</p>
 </blockquote>
+</div>
+</div>
+<div id="technical-conditions" class="section level3">
+<h3><span class="header-section-number">4.4.2</span> Technical Conditions</h3>
+<div id="definitions" class="section level4 unnumbered">
+<h4>Definitions</h4>
+<p><strong>p-value</strong> is the probability of obtaining the observed data or <em>more extreme</em> given the null hypothesis is true.</p>
+<p><strong>confidence interval</strong> is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in <span class="math inline">\((1-\alpha)100\)</span>% of the intervals.</p>
+</div>
+<div id="examples-1" class="section level4 unnumbered">
+<h4>Examples</h4>
+<p><strong>Equal variance in the t-test</strong> Recall that one of the technical conditions for the t-test is that the two samples come from populations where the variance is equal (at least when <code>var.equal=TRUE</code> is specified). What happens if the null hypothesis is true (i.e., the <em>means</em> are equal!) but the technical conditions are violated (i.e., the variances are unequal)?</p>
+<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb305-1" data-line-number="1">pvals &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb305-2" data-line-number="2">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb305-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb305-4" data-line-number="4">  x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb305-5" data-line-number="5">  x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb305-6" data-line-number="6">  pvals &lt;-<span class="st"> </span><span class="kw">c</span>(pvals, <span class="kw">t.test</span>(x1,x2, <span class="dt">var.equal=</span><span class="ot">TRUE</span>)<span class="op">$</span>p.value) }</a>
+<a class="sourceLine" id="cb305-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb305-8" data-line-number="8"><span class="kw">sum</span>(pvals <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>)<span class="op">/</span>reps</a></code></pre></div>
+<pre><code>## [1] 0.0502</code></pre>
+<p><strong>Unequal variance in the t-test</strong></p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb307-1" data-line-number="1">pvals &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb307-2" data-line-number="2">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb307-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb307-4" data-line-number="4">  x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb307-5" data-line-number="5">  x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>, <span class="dt">mean=</span><span class="dv">47</span>, <span class="dt">sd=</span><span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb307-6" data-line-number="6">  pvals &lt;-<span class="st"> </span><span class="kw">c</span>(pvals, <span class="kw">t.test</span>(x1,x2, <span class="dt">var.equal=</span><span class="ot">TRUE</span>)<span class="op">$</span>p.value) }</a>
+<a class="sourceLine" id="cb307-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb307-8" data-line-number="8"><span class="kw">sum</span>(pvals <span class="op">&lt;</span><span class="st"> </span><span class="fl">.05</span>)<span class="op">/</span>reps</a></code></pre></div>
+<pre><code>## [1] 0.0637</code></pre>
+<p><strong>Equal variance in the linear model</strong></p>
+<p>The <a href="http://www.rossmanchance.com/applets/RegShuffle.htm">ISCAM applet</a> by Beth Chance and Allan Rossman <span class="citation">(Chance and Rossman <a href="#ref-iscam">2018</a>)</span> demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.</p>
+<p>Consider the following linear model with the points normally distributed with <em>equal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory works out well. It turns out that the confidence interval will capture the true parameter in 95% of samples!]</p>
+<p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)\]</span></p>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb309-1" data-line-number="1">beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb309-2" data-line-number="2">beta0 &lt;-<span class="st"> </span><span class="dv">-1</span></a>
+<a class="sourceLine" id="cb309-3" data-line-number="3">beta1 &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb309-4" data-line-number="4">beta2 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
+<a class="sourceLine" id="cb309-5" data-line-number="5">n &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb309-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb309-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb309-8" data-line-number="8"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb309-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb309-10" data-line-number="10">  x1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">each=</span>n<span class="op">/</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb309-11" data-line-number="11">  x2 &lt;-<span class="st"> </span><span class="kw">runif</span>(n, <span class="dt">min=</span><span class="op">-</span><span class="dv">1</span>, <span class="dt">max=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb309-12" data-line-number="12">  y &lt;-<span class="st"> </span>beta0 <span class="op">+</span><span class="st"> </span>beta1<span class="op">*</span>x1 <span class="op">+</span><span class="st"> </span>beta2<span class="op">*</span>x2 <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb309-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb309-14" data-line-number="14">  CI &lt;-<span class="st"> </span><span class="kw">lm</span>(y<span class="op">~</span>x1<span class="op">+</span>x2) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>(<span class="dt">conf.int=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()</a>
+<a class="sourceLine" id="cb309-15" data-line-number="15">  </a>
+<a class="sourceLine" id="cb309-16" data-line-number="16">  beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>(beta2.in, <span class="kw">between</span>(beta2, CI[<span class="dv">3</span>,<span class="dv">6</span>], CI[<span class="dv">3</span>,<span class="dv">7</span>]))</a>
+<a class="sourceLine" id="cb309-17" data-line-number="17">}</a>
+<a class="sourceLine" id="cb309-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb309-19" data-line-number="19"><span class="co"># coverage rate of the CI is given by:</span></a>
+<a class="sourceLine" id="cb309-20" data-line-number="20"><span class="kw">sum</span>(beta2.in)<span class="op">/</span>reps</a></code></pre></div>
+<pre><code>## [1] 0.952</code></pre>
+<p><strong>Unequal variance in the linear model</strong></p>
+<p>Consider the following linear model with the points normally distributed with <em>unequal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory does not work out as well. It turns out that the confidence interval will not capture the true parameter in 95% of samples!]</p>
+<p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)\]</span></p>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb311-1" data-line-number="1">beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb311-2" data-line-number="2">beta0 &lt;-<span class="st"> </span><span class="dv">-1</span></a>
+<a class="sourceLine" id="cb311-3" data-line-number="3">beta1 &lt;-<span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb311-4" data-line-number="4">beta2 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
+<a class="sourceLine" id="cb311-5" data-line-number="5">n &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb311-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb311-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb311-8" data-line-number="8"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb311-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb311-10" data-line-number="10">  x1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">each=</span>n<span class="op">/</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb311-11" data-line-number="11">  x2 &lt;-<span class="st"> </span><span class="kw">runif</span>(n, <span class="dt">min=</span><span class="op">-</span><span class="dv">1</span>, <span class="dt">max=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb311-12" data-line-number="12">  y &lt;-<span class="st"> </span>beta0 <span class="op">+</span><span class="st"> </span>beta1<span class="op">*</span>x1 <span class="op">+</span><span class="st"> </span>beta2<span class="op">*</span>x2 <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span><span class="dv">10</span><span class="op">*</span><span class="kw">abs</span>(x2))</a>
+<a class="sourceLine" id="cb311-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb311-14" data-line-number="14">  CI &lt;-<span class="st"> </span><span class="kw">lm</span>(y<span class="op">~</span>x1<span class="op">+</span>x2) <span class="op">%&gt;%</span><span class="st"> </span>broom<span class="op">::</span><span class="kw">tidy</span>(<span class="dt">conf.int=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()</a>
+<a class="sourceLine" id="cb311-15" data-line-number="15">  </a>
+<a class="sourceLine" id="cb311-16" data-line-number="16">  beta2.in &lt;-<span class="st"> </span><span class="kw">c</span>(beta2.in, <span class="kw">between</span>(beta2, CI[<span class="dv">3</span>,<span class="dv">6</span>], CI[<span class="dv">3</span>,<span class="dv">7</span>]))</a>
+<a class="sourceLine" id="cb311-17" data-line-number="17">}</a>
+<a class="sourceLine" id="cb311-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb311-19" data-line-number="19"><span class="co"># coverage rate of the CI is given by:</span></a>
+<a class="sourceLine" id="cb311-20" data-line-number="20"><span class="kw">sum</span>(beta2.in)<span class="op">/</span>reps</a></code></pre></div>
+<pre><code>## [1] 0.872</code></pre>
 </div>
 </div>
 <div id="generating-random-numbers" class="section level3">
@@ -654,21 +979,21 @@ Figure 1.5: For the 2016 election the Republican primary debates allowed only th
 <li><span class="math inline">\(a - 1\)</span> is divisible by all prime factors of <span class="math inline">\(m\)</span>,</li>
 <li><span class="math inline">\(a - 1\)</span> is divisible by 4 if <span class="math inline">\(m\)</span> is divisible by 4.</li>
 </ul>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb249-1" data-line-number="1">a &lt;-<span class="st"> </span><span class="dv">31541435235</span></a>
-<a class="sourceLine" id="cb249-2" data-line-number="2">b &lt;-<span class="st"> </span><span class="dv">23462146143</span> </a>
-<a class="sourceLine" id="cb249-3" data-line-number="3">m &lt;-<span class="st"> </span><span class="dv">423514351351</span></a>
-<a class="sourceLine" id="cb249-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb249-5" data-line-number="5">xval &lt;-<span class="st"> </span><span class="dv">47</span> </a>
-<a class="sourceLine" id="cb249-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb249-7" data-line-number="7">unif.val &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb249-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb249-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
-<a class="sourceLine" id="cb249-10" data-line-number="10">  xval &lt;-<span class="st"> </span>(a<span class="op">*</span>xval <span class="op">+</span><span class="st"> </span>b) <span class="op">%%</span><span class="st"> </span>m</a>
-<a class="sourceLine" id="cb249-11" data-line-number="11">  unif.val &lt;-<span class="st"> </span><span class="kw">c</span>(unif.val, xval<span class="op">/</span>m)   }</a>
-<a class="sourceLine" id="cb249-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb249-13" data-line-number="13"><span class="kw">data.frame</span>(<span class="dt">uniformRVs =</span> unif.val) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb249-14" data-line-number="14"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> uniformRVs)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>)</a></code></pre></div>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb313-1" data-line-number="1">a &lt;-<span class="st"> </span><span class="dv">31541435235</span></a>
+<a class="sourceLine" id="cb313-2" data-line-number="2">b &lt;-<span class="st"> </span><span class="dv">23462146143</span> </a>
+<a class="sourceLine" id="cb313-3" data-line-number="3">m &lt;-<span class="st"> </span><span class="dv">423514351351</span></a>
+<a class="sourceLine" id="cb313-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb313-5" data-line-number="5">xval &lt;-<span class="st"> </span><span class="dv">47</span> </a>
+<a class="sourceLine" id="cb313-6" data-line-number="6">reps &lt;-<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb313-7" data-line-number="7">unif.val &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb313-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb313-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>reps){</a>
+<a class="sourceLine" id="cb313-10" data-line-number="10">  xval &lt;-<span class="st"> </span>(a<span class="op">*</span>xval <span class="op">+</span><span class="st"> </span>b) <span class="op">%%</span><span class="st"> </span>m</a>
+<a class="sourceLine" id="cb313-11" data-line-number="11">  unif.val &lt;-<span class="st"> </span><span class="kw">c</span>(unif.val, xval<span class="op">/</span>m)   }</a>
+<a class="sourceLine" id="cb313-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb313-13" data-line-number="13"><span class="kw">data.frame</span>(<span class="dt">uniformRVs =</span> unif.val) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb313-14" data-line-number="14"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> uniformRVs)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>)</a></code></pre></div>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="generating-other-rvs-the-inverse-transform-method" class="section level3">
@@ -690,16 +1015,16 @@ Note that <span class="math inline">\(F\)</span> is just the area function descr
 </ol>
 <hr />
 <p><strong>Proof:</strong> that the algorithm above generates variables that come from the probability distribution represented by <span class="math inline">\(F\)</span>.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-P(X \leq x) &amp;=&amp; P(F^{-1}(U) \leq x)\\
-&amp;=&amp; P(U \leq F(x))\\
-&amp;=&amp; F(x)\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+P(X \leq x) &amp;= P(F^{-1}(U) \leq x)\\
+&amp;= P(U \leq F(x))\\
+&amp;= F(x)\\
+\end{align}\]</span></p>
 <p><strong>Example:</strong>
 <span class="math display">\[ f(x) = \begin{cases}
- 2x e^{-x^2} &amp; 0 &lt; x \\ 0 &amp; x &lt; 0 \end{cases}\]</span>
-<em>Note:</em> This is known as a (<span class="math inline">\(\lambda=1\)</span>, <span class="math inline">\(k=2\)</span>) distribution.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-17"></span>
+ 2x e^{-x^2} &amp; 0 &lt; x \\ 0 &amp; x &lt; 0 \end{cases}\]</span></p>
+<p><em>Note:</em> This is known as a Weibull(<span class="math inline">\(\lambda=1\)</span>, <span class="math inline">\(k=2\)</span>) distribution.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-39"></span>
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
 <p class="caption">
 Figure 4.1: Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons
@@ -710,30 +1035,30 @@ Figure 4.1: Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed und
 <span class="math display">\[ F(x) = \int_0^x 2w e^{-w^2} dw = 1 - e^{-x^2}\]</span></li>
 <li>What is <span class="math inline">\(F^{-1}(u)\)</span>?</li>
 </ul>
-<p><span class="math display">\[\begin{eqnarray*}
-u &amp;=&amp; F(x)\\
-&amp;=&amp; 1 - e^{-x^2}\\
-1-u &amp;=&amp; e^{-x^2}\\
--\ln(1-u) &amp;=&amp; x^2\\
-\sqrt{-\ln(1-u)} &amp;=&amp; x\\
-F^{-1}(u) &amp;=&amp; \sqrt{-\ln(1-u)}
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+u &amp;= F(x)\\
+&amp;= 1 - e^{-x^2}\\
+1-u &amp;= e^{-x^2}\\
+-\ln(1-u) &amp;= x^2\\
+\sqrt{-\ln(1-u)} &amp;= x\\
+F^{-1}(u) &amp;= \sqrt{-\ln(1-u)}
+\end{align}\]</span></p>
 <ul>
 <li>Suppose you could simulate uniform random variables, <span class="math inline">\(U_1, U_2, \dots\)</span>. How
 could you use these to simulate RV’s with the Weibull density, <span class="math inline">\(f(x)\)</span>, given above?
 <span class="math display">\[ \mbox{Let: } X_i = \sqrt{-\ln(1-U_i)}\]</span></li>
 </ul>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1">unifdata =<span class="st"> </span><span class="kw">runif</span>(<span class="dv">10000</span>,<span class="dv">0</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb250-2" data-line-number="2">weib1data =<span class="st"> </span><span class="kw">sqrt</span>(<span class="op">-</span><span class="kw">log</span>(<span class="dv">1</span><span class="op">-</span>unifdata))</a>
-<a class="sourceLine" id="cb250-3" data-line-number="3">weib2data =<span class="st"> </span><span class="kw">rweibull</span>(<span class="dv">10000</span>,<span class="dv">2</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb250-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb250-5" data-line-number="5">weibdata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">weibull =</span> <span class="kw">c</span>(weib1data, weib2data),</a>
-<a class="sourceLine" id="cb250-6" data-line-number="6">                       <span class="dt">sim.method =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;InvTrans&quot;</span>, <span class="dv">10000</span>), </a>
-<a class="sourceLine" id="cb250-7" data-line-number="7">                                      <span class="kw">rep</span>(<span class="st">&quot;rweibull&quot;</span>, <span class="dv">10000</span>)))</a>
-<a class="sourceLine" id="cb250-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb250-9" data-line-number="9"><span class="kw">ggplot</span>(weibdata, <span class="kw">aes</span>(<span class="dt">x =</span> weibull)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb250-10" data-line-number="10"><span class="st">  </span><span class="kw">facet_grid</span>(<span class="op">~</span>sim.method)</a></code></pre></div>
-<p><img src="04-simulating_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb314-1" data-line-number="1">unifdata =<span class="st"> </span><span class="kw">runif</span>(<span class="dv">10000</span>,<span class="dv">0</span>,<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb314-2" data-line-number="2">weib1data =<span class="st"> </span><span class="kw">sqrt</span>(<span class="op">-</span><span class="kw">log</span>(<span class="dv">1</span><span class="op">-</span>unifdata))</a>
+<a class="sourceLine" id="cb314-3" data-line-number="3">weib2data =<span class="st"> </span><span class="kw">rweibull</span>(<span class="dv">10000</span>,<span class="dv">2</span>,<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb314-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb314-5" data-line-number="5">weibdata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">weibull =</span> <span class="kw">c</span>(weib1data, weib2data),</a>
+<a class="sourceLine" id="cb314-6" data-line-number="6">                       <span class="dt">sim.method =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;InvTrans&quot;</span>, <span class="dv">10000</span>), </a>
+<a class="sourceLine" id="cb314-7" data-line-number="7">                                      <span class="kw">rep</span>(<span class="st">&quot;rweibull&quot;</span>, <span class="dv">10000</span>)))</a>
+<a class="sourceLine" id="cb314-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb314-9" data-line-number="9"><span class="kw">ggplot</span>(weibdata, <span class="kw">aes</span>(<span class="dt">x =</span> weibull)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb314-10" data-line-number="10"><span class="st">  </span><span class="kw">facet_grid</span>(<span class="op">~</span>sim.method)</a></code></pre></div>
+<p><img src="04-simulating_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="discrete-rvs" class="section level4 unnumbered">
 <h4>Discrete RVs</h4>
@@ -749,22 +1074,28 @@ could you use these to simulate RV’s with the Weibull density, <span class="ma
 </ol>
 <hr />
 <p><strong>Proof:</strong> that the algorithm above generates variables that come from the probability mass function <span class="math inline">\(\{p_1, p_2, \ldots, p_m\}\)</span>.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-P(X = x_j) &amp;=&amp; \sum_{i=1}^{j-1} p_i \leq U \leq \sum_{i=1}^j p_i\\
-&amp;=&amp; \sum_{i=1}^j p_i - \sum_{i=1}^{j-1} p_i\\
-&amp;=&amp; p_j\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+P(X = x_j) &amp;= \sum_{i=1}^{j-1} p_i \leq U \leq \sum_{i=1}^j p_i\\
+&amp;= \sum_{i=1}^j p_i - \sum_{i=1}^{j-1} p_i\\
+&amp;= p_j\\
+\end{align}\]</span></p>
 </div>
 <div id="what-if-you-dont-know-f-or-cant-calculate-f-1" class="section level4 unnumbered">
 <h4>What if you don’t know <span class="math inline">\(F\)</span>? Or can’t calculate <span class="math inline">\(F^{-1}\)</span>?</h4>
 <p>In the case that the CDF cannot be calculated explicitly (the normal for example), one could still use this methodology by estimating F at a collection of points <span class="math inline">\(x_i, u_i = F(x_i)\)</span>. Now we temporarily mimic the discrete inverse transform, as we generate a <span class="math inline">\(U\)</span> and see which subinterval it falls in, i.e. <span class="math inline">\(u_i \leq U \leq u_{i+1}\)</span>. Assuming the <span class="math inline">\(x_i\)</span> are close enough, we expect the CDF to be approximately linear on this subinterval, so then we take a linear interpolation of the CDF on the subinterval to get <span class="math inline">\(X\)</span> via</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 X = \frac{u_{i+1} -  U}{u_{i+1} - u_i} x_i + \frac{U - u_i}{u_{i+1} - u_i} x_j
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <p>However, the linear interpolation requires a complete approximation of <span class="math inline">\(F(x)\)</span>, regardless of the sample size desired, and doesn’t generalize to higher dimensions, and of course only gives you something with the approximate distribution back, even if you have your hands on real uniform random variables.</p>
 
 </div>
 </div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-iscam">
+<p>Chance, Beth, and Allan Rossman. 2018. <em>Investigating Statistics, Concepts, Applications, and Methods</em>. 3rd ed. <a href="http://www.rossmanchance.com/iscam3/">http://www.rossmanchance.com/iscam3/</a>.</p>
 </div>
 </div>
             </section>

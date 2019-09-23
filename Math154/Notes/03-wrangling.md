@@ -1248,7 +1248,7 @@ head(litGDPfull)
 ```
 
 
-#### `lubridate`
+### `lubridate`
 
 `lubridate` is a another R package meant for data wrangling [@lubridate].  In particular, `lubridate` makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.  The linked table is from the original paper and provides many of the basic `lubridate` commands:  http://blog.yhathq.com/static/pdf/R_date_cheat_sheet.pdf}.
 
