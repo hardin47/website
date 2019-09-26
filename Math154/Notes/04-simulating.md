@@ -215,6 +215,7 @@ handValue = function(cards) {
        # Check for an Ace and change value if it doesn't bust
   if (any(cards == 1) && value <= 11) 
     value = value + 10
+    value
   
        # Check bust (set to 0); check Blackjack (set to 21.5)
   if(value > 21)  
@@ -663,8 +664,8 @@ for(i in 1:reps){
 
 
 ## 9/26/19 Agenda {#Sep26}
-1. Sensitivity of mathematical procedures to technical conditions
-2. Understanding bias in modeling
+1. Understanding bias in modeling
+2. Sensitivity of statistical inferential procedures to technical conditions
 3. (Not responsible for: Generating random numbers)
 
 
@@ -712,7 +713,8 @@ college.data <- data.frame(talent = c(reds, blues),
 ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
   geom_point(size = 0.5) +
   scale_color_identity(name = "Color Group",
-                       guide = "legend")
+                       guide = "legend") +
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 <img src="04-simulating_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />

@@ -843,6 +843,8 @@ There are more complicated verbs which may be important for more sophisticated a
 
 Good practice:  always specify the `by` argument when joining data frames.
 
+![If you ever need to understand which join is the right join for you, try to find an image that will lay out what the function is doing.  I found this one that is quite good and is taken from Statistics Globe blog: https://statisticsglobe.com/r-dplyr-join-inner-left-right-full-semi-anti](figs/join.png)
+
 
 ## R examples, higher level verbs
 
