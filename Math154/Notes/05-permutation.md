@@ -36,8 +36,8 @@ Before working out the nitty gritty details, recall the structure of hypothesis 
 1. Choose a statistic that measures the effect you are looking for.  For example, the ANOVA F statistic is:
 
 \begin{align}
-F &=& \frac{\text{between-group variability}}{\text{within-group variability}}\\
-&=& \frac{\sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2/(K-1)}{\sum_{ij} (X_{ij}-\overline{X}_{i\cdot})^2/(N-K)}
+F &= \frac{\text{between-group variability}}{\text{within-group variability}}\\
+&= \frac{\sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2/(K-1)}{\sum_{ij} (X_{ij}-\overline{X}_{i\cdot})^2/(N-K)}
 \end{align}
 
 2. Construct the sampling distribution that this statistic would have if the effect were *not* present in the population.  [The sampling distributions for t statistics and F statistics are based on the Central Limit Theorem and derived in Math 152.]
@@ -132,14 +132,14 @@ We will call **randomization tests** those that enumerate *all* possible data pe
 
 Let $t^*$ be the observed test statistic.  For a two sample test with $N$ total observations and $n$ observations in group 1, there are ${N \choose n}$ randomizations, all of which are equally likely under $H_0$.  The p-value then becomes:
 \begin{align}
-p_R &=& P(T \leq t^* | H_0) = \frac{\sum_{i=1}^{{N \choose n}} I(t_i \leq t*)}{{N \choose n}}
+p_R &= P(T \leq t^* | H_0) = \frac{\sum_{i=1}^{{N \choose n}} I(t_i \leq t*)}{{N \choose n}}
 \end{align}
 If we choose a significance level of $\alpha = k/{N \choose n}$, then the type I error rate is:
 \begin{align}
-P(\text{type I error}) &=& P(p_R \leq \alpha | H_0)\\
-&=& P\bigg(\sum_{i=1}^{{N \choose n}} I(t_i \leq t*) \leq k | H_0 \bigg)\\
-&=& \frac{k}{{N \choose n}}= \alpha\\
-\text{alternatively }  k&=& \alpha {N \choose n}
+P(\text{type I error}) &= P(p_R \leq \alpha | H_0)\\
+&= P\bigg(\sum_{i=1}^{{N \choose n}} I(t_i \leq t*) \leq k | H_0 \bigg)\\
+&= \frac{k}{{N \choose n}}= \alpha\\
+\text{alternatively }  k&= \alpha {N \choose n}
 \end{align}
 The point of which is to say that the randomization test controls the probability of a Type I error under the very minimal conditions that the subjects are randomized to treatments (minimal assumption, but hard to do in practice!!)
 
@@ -147,16 +147,16 @@ The point of which is to say that the randomization test controls the probabilit
 
 Now consider a permutation test that randomly permutes the data $B$ times (instead of all ${N \choose n}$ times).  A permutation test approximates a randomization test.  In fact, the permutation test can be analyzed using the following binomial random variable:
 \begin{align}
-X_P &=& \# \ \mbox{permutations out of B that give a more extreme value than the observed test statistic}\\
+X_P &= \# \ \mbox{permutations out of B that give a more extreme value than the observed test statistic}\\
 X_P &\sim& Bin(p_R, B)\\
-SE(X_P) &=& \sqrt{\frac{p_R (1-p_R)}{B}} \approx \sqrt{\frac{\hat{p}_P (1-\hat{p}_P)}{B}}
+SE(X_P) &= \sqrt{\frac{p_R (1-p_R)}{B}} \approx \sqrt{\frac{\hat{p}_P (1-\hat{p}_P)}{B}}
 \end{align}
 
 Consider a situation where interest is in a small effect, say p-value$\approx 0.01$.  The SE should be less than 0.001.
 \begin{align}
-0.001 &=& \sqrt{ (0.01)\cdot(0.99) / B}\\
-B &=& (0.01) \cdot (0.99) / (0.001)^2\\
-&=& 9900
+0.001 &= \sqrt{ (0.01)\cdot(0.99) / B}\\
+B &= (0.01) \cdot (0.99) / (0.001)^2\\
+&= 9900
 \end{align}
 
 Another way to look at the same problem is to use the estimated p-value = $\hat{p}_P = \frac{X_P}{B}$ to come up with a confidence interval for $p_R$.
@@ -168,8 +168,8 @@ CI for $p_R \approx \hat{p}_P \pm 1.96 \sqrt{\frac{\hat{p}_P (1-\hat{p}_P)}{B}}$
 
 Use shifts or rescaling to create a CI for a parameter value using permutation tests.  That is, consider a situation with data from $X$ and $Y$  Use one of the following transformation (depending on the study):
 \begin{align}
-W &=& Y + a\\
-\mbox{or } Y &=& Y / b
+W &= Y + a\\
+\mbox{or } Y &= Y / b
 \end{align}
 and run the permutation test of interest on $X$ vs. $W$ or $X$ vs. $U$.  For a series of $a$ or $b$ values we can find which we don't reject at a particular level of significance ($\alpha$) to create a $(1-\alpha)100\%$ confidence interval.
 
@@ -191,12 +191,11 @@ Given fixed row and column totals, we can easily calculate the interior distribu
 | Row 2 	| c-X 	| N-r-c+X 	| N-r 	|
 | Total 	| c 	| N-c 	| N 	|
 
-\begin{align}
-P(X=x) &=& \mbox{\(\frac{{r \choose x}{{N-r} \choose{c-x}}}{{N \choose c}}\)}\\
+\[\begin{aligned}
+P(X=x) &= \frac{{r \choose x}{{N-r} \choose{c-x}}}{{N \choose c}}\\
 && \mbox{out of those in col 1, how many are in row 1?}\\
-P(X \leq x) &=& \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
-&=& \mbox{p-value}
-\end{align}
+P(X \leq x) &= \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
+&= \mbox{p-value}\end{aligned}\]
 
 Not common for both row and column totals to be fixed.  (More likely for just column totals to be fixed, e.g., men and women.)  Instead, consider all subsets of the sample space with $N$ observations.  For any particular combination of row and column totals ($rc$):
 
