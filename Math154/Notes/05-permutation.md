@@ -138,7 +138,7 @@ If we choose a significance level of $\alpha = k/{N \choose n}$, then the type I
 \begin{align}
 P(\text{type I error}) &=& P(p_R \leq \alpha | H_0)\\
 &=& P\bigg(\sum_{i=1}^{ {N \choose n}} I(t_i \leq t*) \leq k | H_0 \bigg)\\
-&=& \frac{k}{{N \choose n} }= \alpha\\
+&=& \frac{k}{{N \choose n}}= \alpha\\
 \text{alternatively }  k&=& \alpha {N \choose n}
 \end{align}
 The point of which is to say that the randomization test controls the probability of a Type I error under the very minimal conditions that the subjects are randomized to treatments (minimal assumption, but hard to do in practice!!)
