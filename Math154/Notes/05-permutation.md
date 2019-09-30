@@ -192,7 +192,7 @@ Given fixed row and column totals, we can easily calculate the interior distribu
 | Total 	| c 	| N-c 	| N 	|
 
 \begin{align}
-P(X=x) &=& \frac{{r \choose x}{{N-r} \choose {c-x}}}{{N \choose c}}\\
+P(X=x) &=& \frac{{r\choose x}{{N-r}\choose{c-x}}}{{N\choose c}}\\
 && \mbox{out of those in col 1, how many are in row 1?}\\
 P(X \leq x) &=& \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
 &=& \mbox{p-value}
