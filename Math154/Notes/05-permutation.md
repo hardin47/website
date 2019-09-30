@@ -191,11 +191,11 @@ Given fixed row and column totals, we can easily calculate the interior distribu
 | Row 2 	| c-X 	| N-r-c+X 	| N-r 	|
 | Total 	| c 	| N-c 	| N 	|
 
-$$\begin{aligned}
-P(X=x) &= \frac{{r \choose x}{{N-r} \choose{c-x}}}{{N \choose c}}\\
-&& \mbox{out of those in col 1, how many are in row 1?}\\
-P(X \leq x) &= \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
-&= \mbox{p-value}\end{aligned}$$
+$$\\begin{aligned}
+P(X=x) &= \\frac{{r \\choose x}{{N-r} \\choose{c-x}}}{{N \\choose c}}\\\\
+&& \\mbox{out of those in col 1, how many are in row 1?}\\\\
+P(X \\leq x) &= \\sum\_{i=0}^x \\frac{{r \\choose i}{{N-r} \\choose {c-i}}}{{N \\choose c}}\\\\
+&= \\mbox{p-value}\\end{aligned}$$
 
 Not common for both row and column totals to be fixed.  (More likely for just column totals to be fixed, e.g., men and women.)  Instead, consider all subsets of the sample space with $N$ observations.  For any particular combination of row and column totals ($rc$):
 
