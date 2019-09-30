@@ -1,15 +1,7 @@
 # Randomization & Permutation Tests {#permschp}
 
 
-```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
-                      fig.height=3, fig.width=5,  
-                      cache=TRUE, fig.align = "center")
 
-library(tidyverse)
-library(broom)
-options(digits=3)
-```
 
 ## 10/1/19 Agenda {#Oct1}
 1. Review: logic of hypothesis testing
@@ -284,7 +276,8 @@ After running tests to compare means and variances we obtain the following p-val
 
 Before doing anything, let's look at the data.  Here, we visualize with both boxplots and histograms.  Also, we visualize on the raw scale as well as the log scale.  Certainly, the log10 scale indicates that a transformation makes the data more symmetric.
 
-```{r}
+
+```r
 clouds <- read_delim("https://dasl.datadescription.com/download/data/3117/cloud-seeding.txt", 
      "\t", escape_double = FALSE, trim_ws = TRUE) 
 
@@ -294,35 +287,68 @@ clouds <- tidyr::pivot_longer(clouds, cols = 1:2, names_to = "seeding", values_t
 
 clouds %>%
   ggplot(aes(x=seeding, y=rainfall)) + geom_boxplot()
+```
 
+<img src="05-permutation_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
 clouds %>%
   ggplot(aes(x=rainfall)) + geom_histogram(bins = 20) + facet_wrap(~seeding)
 ```
 
+<img src="05-permutation_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" />
 
-```{r}
+
+
+```r
 clouds %>%
   ggplot(aes(x=seeding, y=rainfall)) + geom_boxplot() + scale_y_log10()
+```
 
+<img src="05-permutation_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
 clouds %>%
   ggplot(aes(x=rainfall)) + geom_histogram(bins = 20) + facet_wrap(~seeding) + scale_x_log10()
 ```
 
+<img src="05-permutation_files/figure-html/unnamed-chunk-3-2.png" width="480" style="display: block; margin: auto;" />
+
 
 #unlogged data:
 
-```{r}
+
+```r
 clouds %>%
   mutate(lnrain = log(rainfall)) %>%
   group_by(seeding) %>%
   summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain))
+```
 
+```
+## # A tibble: 2 x 3
+##   seeding  meanrain meanlnrain
+##   <fct>       <dbl>      <dbl>
+## 1 seeded       442.       5.13
+## 2 unseeded     165.       3.99
+```
+
+```r
 clouds %>%
   mutate(lnrain = log(rainfall)) %>%
   group_by(seeding) %>%
   summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain)) %>%
   summarize(diff(meanrain), diff(meanlnrain))
+```
 
+```
+## # A tibble: 1 x 2
+##   `diff(meanrain)` `diff(meanlnrain)`
+##              <dbl>              <dbl>
+## 1            -277.              -1.14
+```
+
+```r
 raindiffs <- clouds %>%
   mutate(lnrain = log(rainfall)) %>%
   group_by(seeding) %>%
@@ -330,7 +356,13 @@ raindiffs <- clouds %>%
   summarize(diffrain = diff(meanrain), difflnrain = diff(meanlnrain))
 
 raindiffs
+```
 
+```
+## # A tibble: 1 x 2
+##   diffrain difflnrain
+##      <dbl>      <dbl>
+## 1    -277.      -1.14
 ```
 
 
@@ -339,7 +371,8 @@ Below, we've formally gone through a permutation.  hhere, the resampling is not 
 
 #####  Difference in means after permuting
 
-```{r}
+
+```r
 reps <- 1000
 permdiffs <- c()
 
@@ -355,13 +388,15 @@ permdiffs <- c(permdiffs, onediff)
 
 permdiffs %>% data.frame() %>%
   ggplot(aes(x = permdiffs)) + geom_histogram(bins=30) + geom_vline(xintercept = raindiffs$diffrain, color = "red")
-
 ```
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #####  Ratio of variances after permuting
 
-```{r}
+
+```r
 rainvarratio <- clouds %>%
     group_by(seeding) %>%
     summarize(varrain = var(rainfall)) %>%
@@ -383,8 +418,9 @@ permvars <- c(permvars, oneratio)
 
 permvars %>% data.frame() %>%
   ggplot(aes(x = permvars)) + geom_histogram(bins=30) + geom_vline(xintercept = rainvarratio$rainratio , color = "red")
-
 ```
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -397,9 +433,21 @@ As evidenced in the histograms above,
 
 * the permutation test (one-sided) for the ratio of variances will count the number of permuted ratios that are greater than or equal to the observered ratio of varances, about 7%.
 
-```{r}
+
+```r
 (sum(raindiffs$diffrain >= permdiffs) + 1) /1000
+```
+
+```
+## [1] 0.027
+```
+
+```r
 (sum(rainvarratio$rainratio <= permvars)+1)/1000
+```
+
+```
+## [1] 0.081
 ```
 
 <!--
@@ -418,7 +466,8 @@ To find a CI for the difference in locations of the distributions of the seeded 
 
 where p is the proportion of simulated test statistics greater than or equal to our observed value (after shifting by an amount "b").
 
-```{r eval=FALSE}
+
+```r
 reps <- 1000
 raindiffs <- clouds %>%
   mutate(lnrain = log(rainfall)) %>%

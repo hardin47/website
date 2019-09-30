@@ -45,5 +45,9 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 9/19/19  	|  |  | \@ref(Sep17) [Sep17], \@ref(highverb)   [highverb] |
 | 9/24/19	| Simulating |  | \@ref(Sep24) [Sep24], \@ref(simmodels) [sim models] |
 | 9/26/19  	|  |  | \@ref(Sep26) [Sep26], \@ref(simsens)   [sim sens] |
+| 10/1/19	| Permutations |  | \@ref(Oct1) [Oct1], \@ref(algs) [inf algs] |
+| 10/3/19  	|  |  | \@ref(Oct3) [Oct3], \@ref(perms)   [perm test] |
+
+
 
 
