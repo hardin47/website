@@ -1,4 +1,4 @@
-# Randomization & Permutation Tests {#permschp}
+# Permutation Tests {#permschp}
 
 
 
@@ -15,7 +15,7 @@ Just use repeated measures????
 
 ##### Motivation: {-}  
 
-* Great video of how/why computational statistical methods can be extremely useful. And it's about beer and mosquitos!  John Rauser from Pintrest gives the keynote address at Strata + Hadoop World Conference October 16, 2014.  David Smith, Revolution Analytics blog, October 17, 2014. http://blog.revolutionanalytics.com/2014/10/statistics-doesnt-have-to-be-that-hard.html
+* Great video of how/why computational statistical methods can be extremely useful. And it's about beer and mosquitoes!  John Rauser from Pintrest gives the keynote address at Strata + Hadoop World Conference October 16, 2014.  David Smith, Revolution Analytics blog, October 17, 2014. http://blog.revolutionanalytics.com/2014/10/statistics-doesnt-have-to-be-that-hard.html
 * A more complicated scenario with the same tools being applied.  Here the point is to understand gerrymandering.  https://www.youtube.com/watch?v=gRCZR_BbjTo&t=125s
 
 
@@ -61,14 +61,16 @@ To evaluate the p-value for a permutation test, estimate the sampling distributi
 3. Create a null sampling distribution of the test statistic (under $H_0$)
 4. Find the observed test statistic on the null sampling distribution and compute the p-value (observed data or more extreme).  The p-value can be one or two-sided.
 
-#### Assumptions {-}
-Permutation tests fall into a broad class of tests called "non-parametric" tests.  The label indicates that there are no distributional assumptions made on the data (i.e., no assumption that the data come from a normal or binomial distribution).  However, a test which is ``non-parametric" does not meant that there are no assumptions on the data, simply that there are no *distributional or parametric* assumptions on the data.  \textcolor{red}{The parameters are at the heart of almost all parametric tests.}
+#### Technical Conditions {-}
+Permutation tests fall into a broad class of tests called "non-parametric" tests.  The label indicates that there are no distributional assumptions made on the data (i.e., no assumption that the data come from a normal or binomial distribution).  However, a test which is ``non-parametric" does not meant that there are no assumptions on the data, simply that there are no *distributional or parametric* assumptions on the data.  **The parameters are at the heart of almost all parametric tests.**
 
 For permutation tests, we are not basing the test on population parameters, so we don't need to make any assumptions about them (i.e., that they are the mean of a particular distribution).
 
 * **Permutation** The different treatments have the same effect.  [Note: exchangeability, same population, etc.]  *If the null hypothesis is true, the labels assigning groups are interchangeable.*
-    * Note that it is our choice of *statistic} which makes the test more sensitive to some kinds of difference (e.g., difference in mean) than other kinds (e.g., difference in variance).
+    * Note that it is our choice of *statistic* which makes the test more sensitive to some kinds of difference (e.g., difference in mean) than other kinds (e.g., difference in variance).
 * **Parametric** The different populations have the same mean.
+
+**IMPORTANT KEY IDEA**  the point of technical conditions for parametric or permutation tests is to create a sampling distribution that accurately reflects the null sampling distribution for the statistic of interest (the statistic which captures the relevant research question information).
 
 
 ## 10/3/19 Agenda {#Oct3}
@@ -76,16 +78,21 @@ For permutation tests, we are not basing the test on population parameters, so w
 2. Assumptions, exchangeability, random structure
 3. Different statistics within the permutation test
 4. Permutation vs. Randomization tests (Binomial)
-5. Other test statistics
 
 
-## Permutation tests {#perms}
+
+## Permutation tests in practice {#perms}
 
 How is the test interpreted given the different types of sampling which are possibly used to collect the data?
+
 * **Random Sample** The concept of a p-value usually comes from the idea of taking a sample from a population and comparing it to a sampling distribution (from many many random samples).
+
 * **Random Experiment** In the context of a **randomized experiment**, the p-value represents the observed data compared to "happening by chance."
+
     * The interpretation is easy: if there is only a very small chance that the observed statistic would take such an extreme value, as a result only of the randomization of cases:  we reject the null treatment effect hypothesis. CAUSAL!
+    
 * **Observational Study** In the context of **observational studies** the results are less strong, but it is reasonable to conclude that the effect observed in the sample reflects an effect present in the population.
+
     * In a sample, consider the difference (or ratio) and ask "Is this difference so large it would rarely occur by chance in a particular sample constructed under the null setting?"
     * If the data come from a random sample, then the sample (or results from the sample) are probably consistent with the population [i.e., we can infer the results back to the larger population].
 
@@ -365,7 +372,7 @@ raindiffs
 ```
 
 
-Below, we've formally gone through a permutation.  hhere, the resampling is not coded in a particularly tidy way, but there is a tidy way to code loops!  Generally, loops are not the fasted way to code in R, so if you need to quickly run code that seems like it should go in a loop, it is very likely that `purrr` is the direction you want to go, https://purrr.tidyverse.org/.
+Below, we've formally gone through a permutation.  here, the resampling is not coded in a particularly tidy way, but there is a tidy way to code loops!  Generally, loops are not the fasted way to code in R, so if you need to quickly run code that seems like it should go in a loop, it is very likely that `purrr` is the direction you want to go, https://purrr.tidyverse.org/.
 
 
 #####  Difference in means after permuting
@@ -430,7 +437,7 @@ As evidenced in the histograms above,
 
 * the permutation test (one-sided) for the difference in means will count the number of permuted differences that are less than or equal to the observed difference in means, just over 1%.
 
-* the permutation test (one-sided) for the ratio of variances will count the number of permuted ratios that are greater than or equal to the observered ratio of varances, about 7%.
+* the permutation test (one-sided) for the ratio of variances will count the number of permuted ratios that are greater than or equal to the observed ratio of variances, about 7%.
 
 
 ```r
