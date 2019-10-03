@@ -914,7 +914,7 @@ Are the differences in means simply due to random chance??
 NHANES %>% filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% 
 ggplot(aes(x=HealthGen, y=HHIncomeMid)) + 
   geom_boxplot() + 
-  geom_jitter()
+  geom_jitter(width=0.1, alpha=.2)
 ```
 
 <img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
