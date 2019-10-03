@@ -55,10 +55,12 @@ To estimate the p-value for a test of significance, estimate the sampling distri
 
 To evaluate the p-value for a permutation test, estimate the sampling distribution of the test statistic when the null hypothesis is true by resampling in a manner that is consistent with the null hypothesis (the number of resamples is finite but can be large!).
 
-**Procedure**
 1. Choose a test statistic
+
 2. Shuffle the data (enforce the null hypothesis to be true)
+
 3. Create a null sampling distribution of the test statistic (under $H_0$)
+
 4. Find the observed test statistic on the null sampling distribution and compute the p-value (observed data or more extreme).  The p-value can be one or two-sided.
 
 #### Technical Conditions {-}
@@ -182,7 +184,7 @@ and run the permutation test of interest on $X$ vs. $W$ or $X$ vs. $U$.  For a s
 
 Usually, however, we use bootstrapping for confidence intervals and permutation tests for hypothesis testing.
 
-### Permutation/Randomization Examples
+### Randomization Example
 
 #### Fisher's Exact Test -- computationally efficient randomization test
 
@@ -262,10 +264,9 @@ P(X \leq 3) = \sum_{i=0}^3 \frac{{11 \choose i}{12 \choose {12-i}}}{{24 \choose 
 \end{align}
 
 
+## R examples
 
-#### Two sample test -- computationally very difficult to do a randomization test
-
-##### Example: Cloud Seeding
+### Cloud Seeding (Two sample test -- computationally very difficult to do a randomization test)
 
 Cloud seeding data:  seeding or not seeding was randomly allocated to 52 days when seeding was appropriate.  The pilot did not know whether or not the plane was seeding.  Rain is measured in acre-feet.
 
@@ -278,7 +279,7 @@ After running tests to compare means and variances we obtain the following p-val
 | Logged Data 	| 0.010 	| 0.014 	| 0.535 	| 0.897 	|
 
 
-######  R code
+####  R code
 
 Before doing anything, let's look at the data.  Here, we visualize with both boxplots and histograms.  Also, we visualize on the raw scale as well as the log scale.  Certainly, the log10 scale indicates that a transformation makes the data more symmetric.
 
@@ -321,7 +322,7 @@ clouds %>%
 <img src="05-permutation_files/figure-html/unnamed-chunk-3-2.png" width="480" style="display: block; margin: auto;" />
 
 
-#unlogged data:
+**unlogged data:**
 
 
 ```r
@@ -515,6 +516,284 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 ```
 
 -->
+
+### MacNell Teaching Evaluations (Stratified two-sample t-test)
+
+Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were randomized to 4 online sections of a course.  In two sections, the instructors swapped identities.  Was the instructor who identified as female rated lower on average? (https://www.math.upenn.edu/~pemantle/active-papers/Evals/stark2016.pdf)
+
+
+Gender bias in teaching evaluations *The Economist*, Sep 21, 2017 
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" />
+
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-10-1.png" width="1440" style="display: block; margin: auto;" />
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" />
+
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" />
+
+
+
+#####  R code
+
+
+```r
+macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+```
+
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+
+
+####  Analysis goal
+
+Want to know if the score for the **perceived** gender is different.
+
+
+$$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
+
+
+#### MacNell Data without permutation
+
+
+```r
+macnell %>%
+  select(overall, tagender, taidgender) %>% head(15)
+```
+
+```
+## # A tibble: 15 x 3
+##    overall tagender taidgender
+##      <dbl>    <dbl>      <dbl>
+##  1       4        0          1
+##  2       4        0          1
+##  3       5        0          1
+##  4       5        0          1
+##  5       5        0          1
+##  6       4        0          1
+##  7       4        0          1
+##  8       5        0          1
+##  9       4        0          1
+## 10       3        0          1
+## 11       5        0          1
+## 12       4        0          1
+## 13       5        1          1
+## 14       5        1          1
+## 15       4        1          1
+```
+
+
+#### Permuting MacNell data
+
+Conceptually, there are two levels of randomization:
+
+1. $N_m$ students are randomly assigned to the male instructor and the remaining $N_f$ get the female instructor.
+
+2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, for $j=1,2$.
+
+
+**Stratified two-sample test:**
+
+* For each instructor, permute *perceived* gender assignments.
+* Use difference in mean ratings for female-identified vs male-identified instructors.
+
+
+<pre><code class='language-r'><code>macnell %>% <span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  select(overall, tagender, taidgender, permTAID) %>% head(15)</code></code></pre> 
+
+```
+## # A tibble: 15 x 4
+## # Groups:   tagender [2]
+##    overall tagender taidgender permTAID
+##      <dbl>    <dbl>      <dbl>    <dbl>
+##  1       4        0          1        1
+##  2       4        0          1        1
+##  3       5        0          1        0
+##  4       5        0          1        0
+##  5       5        0          1        1
+##  6       4        0          1        1
+##  7       4        0          1        0
+##  8       5        0          1        0
+##  9       4        0          1        1
+## 10       3        0          1        1
+## 11       5        0          1        0
+## 12       4        0          1        0
+## 13       5        1          1        1
+## 14       5        1          1        1
+## 15       4        1          1        1
+```
+
+
+
+
+<pre><code class='language-r'><code>macnell %>% <span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  ungroup(tagender) %>%<br>  <span style='background-color:#ffff7f'>group_by(permTAID)</span> %>%<br>  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%<br>  summarize(diff(pmeans))</code></code></pre> 
+
+```
+## # A tibble: 1 x 1
+##   `diff(pmeans)`
+##            <dbl>
+## 1         -0.380
+```
+
+
+
+
+<pre><code class='language-r'><code><span style='background-color:#ffff7f'>replicate(5</span>,<br>  macnell %>% group_by(tagender) %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  ungroup(tagender) %>%<br>  group_by(permTAID) %>%<br>  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%<br>  summarize(diff(pmeans)))</code></code></pre> 
+
+```
+## $`diff(pmeans)`
+## [1] -0.671
+## 
+## $`diff(pmeans)`
+## [1] -0.1
+## 
+## $`diff(pmeans)`
+## [1] 0.18
+## 
+## $`diff(pmeans)`
+## [1] -0.00652
+## 
+## $`diff(pmeans)`
+## [1] 0.0952
+```
+
+
+
+
+
+
+```r
+set.seed(47)
+reps = 10000
+ov.stats <- replicate(reps,
+  macnell %>% group_by(tagender) %>%
+  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
+  ungroup(tagender) %>%
+  group_by(permTAID) %>%
+  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+  summarize(diff(pmeans))
+  )
+
+ov.stats <- unlist(ov.stats)
+```
+
+
+
+
+
+#### permutation sampling distribution:
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+```r
+# brute force permuation
+2*sum(ov.stats > 0.47) / reps
+```
+
+
+
+```
+## [1] 0.113
+```
+
+
+
+
+#### MacNell Data with different permutation tests
+
+The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
+
+
+
+
+
+```r
+macnell %>% group_by(taidgender) %>%
+  summarize(means = mean(overall, na.rm=TRUE)) %>%
+  summarize(diff(means))
+```
+
+
+
+```
+## # A tibble: 1 x 1
+##   `diff(means)`
+##           <dbl>
+## 1         0.474
+```
+
+
+
+```r
+macnell %>% group_by(taidgender) %>%
+  summarize(means = mean(overall, na.rm=TRUE), 
+            vars = var(overall, na.rm = TRUE), ns = n() ) %>%
+  summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
+```
+
+
+
+```
+## # A tibble: 1 x 1
+##   `(means[1] - means[2])/sqrt(vars[1]/ns[1] + vars[2]/ns[2])`
+##                                                         <dbl>
+## 1                                                       -1.59
+```
+
+
+
+
+
+```r
+# brute force permuation
+2*sum(ov.stats > 0.47) / reps
+```
+
+
+
+```
+## [1] 0.113
+```
+
+
+
+```r
+# mean(x) - mean(y)
+t2p(0.47, distr1, alternative="two-sided")
+```
+
+
+
+```
+## Two-sided 
+##      0.13
+```
+
+
+
+```r
+# t permutation
+t2p(-1.56, distr2, alternative="two-sided")
+```
+
+
+
+```
+## Two-sided 
+##    0.0978
+```
+
+
+
+
+
+#### Actual MacNell results
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="768" style="display: block; margin: auto;" />
+
 
 
 
