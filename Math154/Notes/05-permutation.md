@@ -747,7 +747,7 @@ distr2 <- stratified_two_sample(response = macnell$overall,
 
 ```r
 macnell %>% group_by(taidgender) %>%
-  summarize(means = mean(overall, na.rm=TRUE)) %>%
+  summarize(means = mean(overall, na.rm = TRUE)) %>%
   summarize(diff(means))
 ```
 
@@ -765,7 +765,7 @@ macnell %>% group_by(taidgender) %>%
 ```r
 macnell %>% group_by(taidgender) %>%
   summarize(means = mean(overall, na.rm=TRUE), 
-            vars = var(overall, na.rm = TRUE), ns = n() ) %>%
+            vars = var(overall, na.rm=TRUE), ns = n() ) %>%
   summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
 ```
 
@@ -912,7 +912,9 @@ Are the differences in means simply due to random chance??
 
 ```r
 NHANES %>% filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% 
-ggplot(aes(x=HealthGen, y=HHIncomeMid)) + geom_boxplot()
+ggplot(aes(x=HealthGen, y=HHIncomeMid)) + 
+  geom_boxplot() + 
+  geom_jitter()
 ```
 
 <img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
@@ -1120,7 +1122,7 @@ NHANES %>%
   filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
   mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
   group_by(HealthGen) %>% 
-  summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+  summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
   summarize(teststat = sum(count*(IncMeanP - GM)^2))
 ```
 
@@ -1148,7 +1150,7 @@ SSB <-
         filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
         mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
         group_by(HealthGen) %>% 
-        summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+        summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
         summarize(teststat = sum(count*(IncMeanP - GM)^2))
       ))
 
@@ -1174,7 +1176,7 @@ head(SSB)
 obsSSB <- NHANES %>%
   filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
   group_by(HealthGen) %>% 
-  summarize(IncMean = mean(HHIncomeMid, na.rm=TRUE), count=n()) %>%
+  summarize(IncMean = mean(HHIncomeMid), count=n()) %>%
   summarize(obs.teststat = sum(count*(IncMean - GM)^2))
 
 obsSSB

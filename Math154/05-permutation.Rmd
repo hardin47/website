@@ -646,12 +646,12 @@ distr2 <- stratified_two_sample(response = macnell$overall,
 
 ```{r}
 macnell %>% group_by(taidgender) %>%
-  summarize(means = mean(overall, na.rm=TRUE)) %>%
+  summarize(means = mean(overall, na.rm = TRUE)) %>%
   summarize(diff(means))
 
 macnell %>% group_by(taidgender) %>%
   summarize(means = mean(overall, na.rm=TRUE), 
-            vars = var(overall, na.rm = TRUE), ns = n() ) %>%
+            vars = var(overall, na.rm=TRUE), ns = n() ) %>%
   summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
 
 ```
@@ -711,7 +711,9 @@ Are the differences in means simply due to random chance??
 
 ```{r warning=FALSE}
 NHANES %>% filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% 
-ggplot(aes(x=HealthGen, y=HHIncomeMid)) + geom_boxplot()
+ggplot(aes(x=HealthGen, y=HHIncomeMid)) + 
+  geom_boxplot() + 
+  geom_jitter()
 ```
 
 The differences in health, can be calculated directly, but we still don't know if the differences are due to randome chance or some other larger structure.
@@ -784,7 +786,7 @@ NHANES %>%
   filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
   mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
   group_by(HealthGen) %>% 
-  summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+  summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
   summarize(teststat = sum(count*(IncMeanP - GM)^2))
 
 ```
@@ -800,7 +802,7 @@ SSB <-
         filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
         mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
         group_by(HealthGen) %>% 
-        summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+        summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
         summarize(teststat = sum(count*(IncMeanP - GM)^2))
       ))
 
@@ -815,7 +817,7 @@ head(SSB)
 obsSSB <- NHANES %>%
   filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
   group_by(HealthGen) %>% 
-  summarize(IncMean = mean(HHIncomeMid, na.rm=TRUE), count=n()) %>%
+  summarize(IncMean = mean(HHIncomeMid), count=n()) %>%
   summarize(obs.teststat = sum(count*(IncMean - GM)^2))
 
 obsSSB
