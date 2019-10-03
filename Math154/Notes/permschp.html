@@ -223,6 +223,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5" data-path="permschp.html"><a href="permschp.html#r-examples"><i class="fa fa-check"></i><b>5.5</b> R examples</a><ul>
 <li class="chapter" data-level="5.5.1" data-path="permschp.html"><a href="permschp.html#cloud-seeding-two-sample-test-computationally-very-difficult-to-do-a-randomization-test"><i class="fa fa-check"></i><b>5.5.1</b> Cloud Seeding (Two sample test – computationally very difficult to do a randomization test)</a></li>
 <li class="chapter" data-level="5.5.2" data-path="permschp.html"><a href="permschp.html#macnell-teaching-evaluations-stratified-two-sample-t-test"><i class="fa fa-check"></i><b>5.5.2</b> MacNell Teaching Evaluations (Stratified two-sample t-test)</a></li>
+<li class="chapter" data-level="5.5.3" data-path="permschp.html"><a href="permschp.html#income-and-health-f-like-test"><i class="fa fa-check"></i><b>5.5.3</b> Income and Health (F-like test)</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -829,13 +830,22 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 <h3><span class="header-section-number">5.5.2</span> MacNell Teaching Evaluations (Stratified two-sample t-test)</h3>
 <p>Boring et al. (2016) reanalyze data from MacNell et al. (2014). Students were randomized to 4 online sections of a course. In two sections, the instructors swapped identities. Was the instructor who identified as female rated lower on average? (<a href="https://www.math.upenn.edu/~pemantle/active-papers/Evals/stark2016.pdf" class="uri">https://www.math.upenn.edu/~pemantle/active-papers/Evals/stark2016.pdf</a>)</p>
 <p>Gender bias in teaching evaluations <em>The Economist</em>, Sep 21, 2017</p>
-<p><img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p><img src="05-permutation_files/figure-html/unnamed-chunk-10-1.png" width="1440" style="display: block; margin: auto;" /></p>
-<p><img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p><img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <div id="r-code-1" class="section level5">
 <h5><span class="header-section-number">5.5.2.0.1</span> R code</h5>
 <div class="sourceCode" id="cb331"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb331-1" data-line-number="1">macnell &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb332-1" data-line-number="1">macnell <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb332-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">TAID =</span> <span class="kw">ifelse</span>(taidgender<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb332-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">TAGend =</span> <span class="kw">ifelse</span>(tagender<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb332-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gendjitter =</span> <span class="kw">ifelse</span>(tagender<span class="op">==</span><span class="dv">1</span>, <span class="fl">-0.2</span>, <span class="fl">0.2</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb332-5" data-line-number="5"><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>TAGend, <span class="dt">y=</span>overall, <span class="dt">color=</span>TAID, <span class="dt">fill=</span>TAID)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb332-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">rep</span>(<span class="st">&#39;white&#39;</span>, <span class="dv">2</span>))  <span class="op">+</span></a>
+<a class="sourceLine" id="cb332-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">position=</span><span class="kw">position_jitterdodge</span>(<span class="dt">jitter.width=</span><span class="fl">0.2</span>), <span class="dt">alpha=</span><span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb332-8" data-line-number="8"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">fun.y=</span><span class="st">&quot;mean&quot;</span>, <span class="dt">geom=</span><span class="st">&quot;point&quot;</span>, <span class="dt">size=</span><span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb332-9" data-line-number="9">    <span class="dt">position=</span><span class="kw">position_dodge</span>(<span class="dt">width=</span><span class="fl">0.75</span>))</a></code></pre></div>
 <p><img src="05-permutation_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="analysis-goal" class="section level4">
@@ -845,8 +855,8 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 </div>
 <div id="macnell-data-without-permutation" class="section level4">
 <h4><span class="header-section-number">5.5.2.2</span> MacNell Data without permutation</h4>
-<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb332-1" data-line-number="1">macnell <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb332-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(overall, tagender, taidgender) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">15</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb333-1" data-line-number="1">macnell <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb333-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(overall, tagender, taidgender) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">15</span>)</a></code></pre></div>
 <pre><code>## # A tibble: 15 x 3
 ##    overall tagender taidgender
 ##      &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
@@ -918,59 +928,244 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 ## 
 ## $`diff(pmeans)`
 ## [1] 0.0952</code></pre>
-<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb337-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">47</span>)</a>
-<a class="sourceLine" id="cb337-2" data-line-number="2">reps =<span class="st"> </span><span class="dv">10000</span></a>
-<a class="sourceLine" id="cb337-3" data-line-number="3">ov.stats &lt;-<span class="st"> </span><span class="kw">replicate</span>(reps,</a>
-<a class="sourceLine" id="cb337-4" data-line-number="4">  macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(tagender) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb337-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">permTAID =</span> <span class="kw">sample</span>(taidgender, <span class="dt">replace=</span><span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb337-6" data-line-number="6"><span class="st">  </span><span class="kw">ungroup</span>(tagender) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb337-7" data-line-number="7"><span class="st">  </span><span class="kw">group_by</span>(permTAID) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb337-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">pmeans =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb337-9" data-line-number="9"><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">diff</span>(pmeans))</a>
-<a class="sourceLine" id="cb337-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb337-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb337-12" data-line-number="12">ov.stats &lt;-<span class="st"> </span><span class="kw">unlist</span>(ov.stats)</a></code></pre></div>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb338-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">47</span>)</a>
+<a class="sourceLine" id="cb338-2" data-line-number="2">reps =<span class="st"> </span><span class="dv">10000</span></a>
+<a class="sourceLine" id="cb338-3" data-line-number="3">ov.stats &lt;-<span class="st"> </span><span class="kw">replicate</span>(reps,</a>
+<a class="sourceLine" id="cb338-4" data-line-number="4">  macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(tagender) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb338-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">permTAID =</span> <span class="kw">sample</span>(taidgender, <span class="dt">replace=</span><span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb338-6" data-line-number="6"><span class="st">  </span><span class="kw">ungroup</span>(tagender) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb338-7" data-line-number="7"><span class="st">  </span><span class="kw">group_by</span>(permTAID) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb338-8" data-line-number="8"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">pmeans =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb338-9" data-line-number="9"><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">diff</span>(pmeans))</a>
+<a class="sourceLine" id="cb338-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb338-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb338-12" data-line-number="12">ov.stats &lt;-<span class="st"> </span><span class="kw">unlist</span>(ov.stats)</a></code></pre></div>
 </div>
 <div id="permutation-sampling-distribution" class="section level4">
 <h4><span class="header-section-number">5.5.2.4</span> permutation sampling distribution:</h4>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb339-1" data-line-number="1"><span class="kw">hist</span>(ov.stats)</a>
+<a class="sourceLine" id="cb339-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">v=</span><span class="fl">0.47</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</a></code></pre></div>
 <p><img src="05-permutation_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb338-1" data-line-number="1"><span class="co"># brute force permuation</span></a>
-<a class="sourceLine" id="cb338-2" data-line-number="2"><span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>(ov.stats <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.47</span>) <span class="op">/</span><span class="st"> </span>reps</a></code></pre></div>
+<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb340-1" data-line-number="1"><span class="co"># brute force permuation</span></a>
+<a class="sourceLine" id="cb340-2" data-line-number="2"><span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>(ov.stats <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.47</span>) <span class="op">/</span><span class="st"> </span>reps</a></code></pre></div>
 <pre><code>## [1] 0.113</code></pre>
 </div>
 <div id="macnell-data-with-different-permutation-tests" class="section level4">
 <h4><span class="header-section-number">5.5.2.5</span> MacNell Data with different permutation tests</h4>
 <p>The <code>permuter</code> package contains functions for a variety of different permutation tests, including one with stratification.</p>
-<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb340-1" data-line-number="1">macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(taidgender) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb340-2" data-line-number="2"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">means =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb340-3" data-line-number="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">diff</span>(means))</a></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb342-1" data-line-number="1">distr1 &lt;-<span class="st"> </span><span class="kw">stratified_two_sample</span>(<span class="dt">response =</span> macnell<span class="op">$</span>overall,</a>
+<a class="sourceLine" id="cb342-2" data-line-number="2">                               <span class="dt">group =</span>  macnell<span class="op">$</span>taidgender,</a>
+<a class="sourceLine" id="cb342-3" data-line-number="3">                               <span class="dt">stratum =</span> macnell<span class="op">$</span>tagender,</a>
+<a class="sourceLine" id="cb342-4" data-line-number="4">                               <span class="dt">stat =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">reps=</span>reps)</a>
+<a class="sourceLine" id="cb342-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb342-6" data-line-number="6">distr2 &lt;-<span class="st"> </span><span class="kw">stratified_two_sample</span>(<span class="dt">response =</span> macnell<span class="op">$</span>overall,</a>
+<a class="sourceLine" id="cb342-7" data-line-number="7">                               <span class="dt">group =</span>  macnell<span class="op">$</span>taidgender,</a>
+<a class="sourceLine" id="cb342-8" data-line-number="8">                               <span class="dt">stratum =</span> macnell<span class="op">$</span>tagender,</a>
+<a class="sourceLine" id="cb342-9" data-line-number="9">                               <span class="dt">stat =</span> <span class="st">&quot;t&quot;</span>, <span class="dt">reps=</span>reps)</a></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb343-1" data-line-number="1">macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(taidgender) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb343-2" data-line-number="2"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">means =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb343-3" data-line-number="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="kw">diff</span>(means))</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##   `diff(means)`
 ##           &lt;dbl&gt;
 ## 1         0.474</code></pre>
-<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb342-1" data-line-number="1">macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(taidgender) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb342-2" data-line-number="2"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">means =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), </a>
-<a class="sourceLine" id="cb342-3" data-line-number="3">            <span class="dt">vars =</span> <span class="kw">var</span>(overall, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">ns =</span> <span class="kw">n</span>() ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb342-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>((means[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>means[<span class="dv">2</span>])<span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(vars[<span class="dv">1</span>]<span class="op">/</span>ns[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>vars[<span class="dv">2</span>]<span class="op">/</span>ns[<span class="dv">2</span>]))</a></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb345-1" data-line-number="1">macnell <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(taidgender) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb345-2" data-line-number="2"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">means =</span> <span class="kw">mean</span>(overall, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), </a>
+<a class="sourceLine" id="cb345-3" data-line-number="3">            <span class="dt">vars =</span> <span class="kw">var</span>(overall, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">ns =</span> <span class="kw">n</span>() ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb345-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>((means[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>means[<span class="dv">2</span>])<span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(vars[<span class="dv">1</span>]<span class="op">/</span>ns[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>vars[<span class="dv">2</span>]<span class="op">/</span>ns[<span class="dv">2</span>]))</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 1
 ##   `(means[1] - means[2])/sqrt(vars[1]/ns[1] + vars[2]/ns[2])`
 ##                                                         &lt;dbl&gt;
 ## 1                                                       -1.59</code></pre>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb344-1" data-line-number="1"><span class="co"># brute force permuation</span></a>
-<a class="sourceLine" id="cb344-2" data-line-number="2"><span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>(ov.stats <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.47</span>) <span class="op">/</span><span class="st"> </span>reps</a></code></pre></div>
+<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb347-1" data-line-number="1"><span class="co"># brute force permuation</span></a>
+<a class="sourceLine" id="cb347-2" data-line-number="2"><span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>(ov.stats <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.47</span>) <span class="op">/</span><span class="st"> </span>reps</a></code></pre></div>
 <pre><code>## [1] 0.113</code></pre>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb346-1" data-line-number="1"><span class="co"># mean(x) - mean(y)</span></a>
-<a class="sourceLine" id="cb346-2" data-line-number="2"><span class="kw">t2p</span>(<span class="fl">0.47</span>, distr1, <span class="dt">alternative=</span><span class="st">&quot;two-sided&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb349-1" data-line-number="1"><span class="co"># mean(x) - mean(y)</span></a>
+<a class="sourceLine" id="cb349-2" data-line-number="2"><span class="kw">t2p</span>(<span class="fl">0.47</span>, distr1, <span class="dt">alternative=</span><span class="st">&quot;two-sided&quot;</span>)</a></code></pre></div>
 <pre><code>## Two-sided 
 ##      0.13</code></pre>
-<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb348-1" data-line-number="1"><span class="co"># t permutation</span></a>
-<a class="sourceLine" id="cb348-2" data-line-number="2"><span class="kw">t2p</span>(<span class="op">-</span><span class="fl">1.56</span>, distr2, <span class="dt">alternative=</span><span class="st">&quot;two-sided&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb351"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb351-1" data-line-number="1"><span class="co"># t permutation</span></a>
+<a class="sourceLine" id="cb351-2" data-line-number="2"><span class="kw">t2p</span>(<span class="op">-</span><span class="fl">1.56</span>, distr2, <span class="dt">alternative=</span><span class="st">&quot;two-sided&quot;</span>)</a></code></pre></div>
 <pre><code>## Two-sided 
 ##    0.0978</code></pre>
 </div>
 <div id="actual-macnell-results" class="section level4">
 <h4><span class="header-section-number">5.5.2.6</span> Actual MacNell results</h4>
-<p><img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="income-and-health-f-like-test" class="section level3">
+<h3><span class="header-section-number">5.5.3</span> Income and Health (F-like test)</h3>
+<p>Consider the NHANES dataset.</p>
+<ul>
+<li>Income
+<ul>
+<li>(HHIncomeMid - Numerical version of HHIncome derived from the middle income in each category)</li>
+</ul></li>
+<li>Health
+<ul>
+<li>(HealthGen - Self-reported rating of participant’s health in general Reported for participants aged 12 years or older. One of Excellent, Vgood, Good, Fair, or Poor.)</li>
+</ul></li>
+</ul>
+<div id="summary-of-the-variables-of-interest" class="section level4">
+<h4><span class="header-section-number">5.5.3.1</span> Summary of the variables of interest</h4>
+<div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb353-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(HealthGen) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">table</span>()</a></code></pre></div>
+<pre><code>## .
+## Excellent     Vgood      Good      Fair      Poor 
+##       878      2508      2956      1010       187</code></pre>
+<div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb355-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(HHIncomeMid) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summary</span>()</a></code></pre></div>
+<pre><code>##   HHIncomeMid    
+##  Min.   :  2500  
+##  1st Qu.: 30000  
+##  Median : 50000  
+##  Mean   : 57206  
+##  3rd Qu.: 87500  
+##  Max.   :100000  
+##  NA&#39;s   :811</code></pre>
+</div>
+<div id="mean-income-broken-down-by-health" class="section level4">
+<h4><span class="header-section-number">5.5.3.2</span> Mean Income broken down by Health</h4>
+<div class="sourceCode" id="cb357"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb357-1" data-line-number="1">NH.means &lt;-<span class="st"> </span>NHANES <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb357-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb357-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(HealthGen) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb357-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">IncMean =</span> <span class="kw">mean</span>(HHIncomeMid, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), <span class="dt">count=</span><span class="kw">n</span>())</a>
+<a class="sourceLine" id="cb357-5" data-line-number="5">NH.means</a></code></pre></div>
+<pre><code>## # A tibble: 5 x 3
+##   HealthGen IncMean count
+##   &lt;fct&gt;       &lt;dbl&gt; &lt;int&gt;
+## 1 Excellent  69354.   817
+## 2 Vgood      65011.  2342
+## 3 Good       55662.  2744
+## 4 Fair       44194.   899
+## 5 Poor       37027.   164</code></pre>
+<p>Are the differences in means simply due to random chance??</p>
+<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb359-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen)<span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb359-2" data-line-number="2"><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>HealthGen, <span class="dt">y=</span>HHIncomeMid)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_boxplot</span>()</a></code></pre></div>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>The differences in health, can be calculated directly, but we still don’t know if the differences are due to randome chance or some other larger structure.</p>
+<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb360-1" data-line-number="1">diff.mat =<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="dt">ncol=</span><span class="dv">5</span>, <span class="dt">nrow=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb360-2" data-line-number="2"><span class="kw">names</span>(diff.mat) =<span class="st"> </span>NH.means<span class="op">$</span>HealthGen</a>
+<a class="sourceLine" id="cb360-3" data-line-number="3"><span class="kw">rownames</span>(diff.mat) =<span class="st"> </span>NH.means<span class="op">$</span>HealthGen</a>
+<a class="sourceLine" id="cb360-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb360-5" data-line-number="5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>){</a>
+<a class="sourceLine" id="cb360-6" data-line-number="6">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>){</a>
+<a class="sourceLine" id="cb360-7" data-line-number="7">    diff.mat[i,j] =<span class="st"> </span>NH.means<span class="op">$</span>IncMean[i] <span class="op">-</span><span class="st"> </span>NH.means<span class="op">$</span>IncMean[j]   }}</a>
+<a class="sourceLine" id="cb360-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb360-9" data-line-number="9">diff.mat</a></code></pre></div>
+<pre><code>##           Excellent  Vgood   Good  Fair  Poor
+## Excellent         0   4344  13692 25161 32327
+## Vgood         -4344      0   9348 20817 27983
+## Good         -13692  -9348      0 11469 18635
+## Fair         -25161 -20817 -11469     0  7166
+## Poor         -32327 -27983 -18635 -7166     0</code></pre>
+</div>
+<div id="overall-difference" class="section level4">
+<h4><span class="header-section-number">5.5.3.3</span> Overall difference</h4>
+<p>We can measure the overall differences as the amount of variability between each of the means and the overall mean:</p>
+<p><span class="math display">\[F = \frac{\text{between-group variability}}{\text{within-group variability}}\]</span>
+<span class="math display">\[F = \frac{\sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2/(K-1)}{\sum_{ij} (X_{ij}-\overline{X}_{i\cdot})^2/(N-K)}\]</span>
+<span class="math display">\[SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2\]</span></p>
+</div>
+<div id="creating-a-test-statistic" class="section level4">
+<h4><span class="header-section-number">5.5.3.4</span> Creating a test statistic</h4>
+<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb362-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(HHIncomeMid, HealthGen) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb362-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen)<span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 2
+##   HHIncomeMid HealthGen
+##         &lt;int&gt; &lt;fct&gt;    
+## 1       30000 Good     
+## 2       30000 Good     
+## 3       30000 Good     
+## 4       40000 Good     
+## 5       87500 Vgood    
+## 6       87500 Vgood</code></pre>
+<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb364-1" data-line-number="1">GM =<span class="st"> </span><span class="kw">mean</span>(NHANES<span class="op">$</span>HHIncomeMid, <span class="dt">na.rm=</span><span class="ot">TRUE</span>); GM</a></code></pre></div>
+<pre><code>## [1] 57206</code></pre>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb366-1" data-line-number="1">NH.means</a></code></pre></div>
+<pre><code>## # A tibble: 5 x 3
+##   HealthGen IncMean count
+##   &lt;fct&gt;       &lt;dbl&gt; &lt;int&gt;
+## 1 Excellent  69354.   817
+## 2 Vgood      65011.  2342
+## 3 Good       55662.  2744
+## 4 Fair       44194.   899
+## 5 Poor       37027.   164</code></pre>
+<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb368-1" data-line-number="1">NH.means<span class="op">$</span>IncMean <span class="op">-</span><span class="st"> </span>GM</a></code></pre></div>
+<pre><code>## [1]  12148   7805  -1544 -13013 -20179</code></pre>
+<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb370-1" data-line-number="1">(NH.means<span class="op">$</span>IncMean <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 1.48e+08 6.09e+07 2.38e+06 1.69e+08 4.07e+08</code></pre>
+<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb372-1" data-line-number="1">NH.means<span class="op">$</span>count</a></code></pre></div>
+<pre><code>## [1]  817 2342 2744  899  164</code></pre>
+<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb374-1" data-line-number="1">NH.means<span class="op">$</span>count <span class="op">*</span><span class="st"> </span>(NH.means<span class="op">$</span>IncMean <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 1.21e+11 1.43e+11 6.54e+09 1.52e+11 6.68e+10</code></pre>
+<p><span class="math display">\[SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2\]</span></p>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb376-1" data-line-number="1"><span class="kw">sum</span>(NH.means<span class="op">$</span>count <span class="op">*</span><span class="st"> </span>(NH.means<span class="op">$</span>IncMean <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<pre><code>## [1] 4.89e+11</code></pre>
+</div>
+<div id="permuting-the-data" class="section level4">
+<h4><span class="header-section-number">5.5.3.5</span> Permuting the data</h4>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb378-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb378-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen)<span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb378-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">IncomePerm =</span> <span class="kw">sample</span>(HHIncomeMid, <span class="dt">replace=</span><span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb378-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(HealthGen, HHIncomeMid, IncomePerm) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb378-5" data-line-number="5"><span class="st">  </span><span class="kw">head</span>()</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 3
+##   HealthGen HHIncomeMid IncomePerm
+##   &lt;fct&gt;           &lt;int&gt;      &lt;int&gt;
+## 1 Good            30000      50000
+## 2 Good            30000     100000
+## 3 Good            30000     100000
+## 4 Good            40000      87500
+## 5 Vgood           87500      17500
+## 6 Vgood           87500      60000</code></pre>
+</div>
+<div id="permuting-the-data-a-new-test-statistic" class="section level4">
+<h4><span class="header-section-number">5.5.3.6</span> Permuting the data &amp; a new test statistic</h4>
+<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb380-1" data-line-number="1">NHANES <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb380-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen)<span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb380-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">IncomePerm =</span> <span class="kw">sample</span>(HHIncomeMid, <span class="dt">replace=</span><span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb380-4" data-line-number="4"><span class="st">  </span><span class="kw">group_by</span>(HealthGen) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb380-5" data-line-number="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">IncMeanP =</span> <span class="kw">mean</span>(IncomePerm, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), <span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb380-6" data-line-number="6"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">teststat =</span> <span class="kw">sum</span>(count<span class="op">*</span>(IncMeanP <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##       teststat
+##          &lt;dbl&gt;
+## 1 20176269113.</code></pre>
+</div>
+<div id="lots-of-times" class="section level4">
+<h4><span class="header-section-number">5.5.3.7</span> Lots of times…</h4>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb382-1" data-line-number="1">reps =<span class="st"> </span><span class="dv">1000</span></a>
+<a class="sourceLine" id="cb382-2" data-line-number="2">SSB &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb382-3" data-line-number="3"><span class="st">  </span><span class="kw">unlist</span>(<span class="kw">replicate</span>(reps, </a>
+<a class="sourceLine" id="cb382-4" data-line-number="4">     NHANES <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb382-5" data-line-number="5"><span class="st">        </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen)<span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb382-6" data-line-number="6"><span class="st">        </span><span class="kw">mutate</span>(<span class="dt">IncomePerm =</span> <span class="kw">sample</span>(HHIncomeMid, <span class="dt">replace=</span><span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb382-7" data-line-number="7"><span class="st">        </span><span class="kw">group_by</span>(HealthGen) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb382-8" data-line-number="8"><span class="st">        </span><span class="kw">summarize</span>(<span class="dt">IncMeanP =</span> <span class="kw">mean</span>(IncomePerm, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), <span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb382-9" data-line-number="9"><span class="st">        </span><span class="kw">summarize</span>(<span class="dt">teststat =</span> <span class="kw">sum</span>(count<span class="op">*</span>(IncMeanP <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb382-10" data-line-number="10">      ))</a>
+<a class="sourceLine" id="cb382-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb382-12" data-line-number="12"><span class="kw">head</span>(SSB)</a></code></pre></div>
+<pre><code>## teststat teststat teststat teststat teststat teststat 
+## 1.28e+10 1.87e+10 1.58e+10 1.30e+10 1.60e+10 1.31e+10</code></pre>
+</div>
+<div id="compared-to-the-real-data" class="section level4">
+<h4><span class="header-section-number">5.5.3.8</span> Compared to the real data</h4>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb384-1" data-line-number="1">obsSSB &lt;-<span class="st"> </span>NHANES <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb384-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(HealthGen) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(HHIncomeMid)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb384-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(HealthGen) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb384-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">IncMean =</span> <span class="kw">mean</span>(HHIncomeMid, <span class="dt">na.rm=</span><span class="ot">TRUE</span>), <span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb384-5" data-line-number="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">obs.teststat =</span> <span class="kw">sum</span>(count<span class="op">*</span>(IncMean <span class="op">-</span><span class="st"> </span>GM)<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb384-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb384-7" data-line-number="7">obsSSB</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##    obs.teststat
+##           &lt;dbl&gt;
+## 1 488767088754.</code></pre>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb386-1" data-line-number="1"><span class="kw">sum</span>(SSB<span class="op">&gt;</span>obsSSB) <span class="op">/</span><span class="st"> </span>reps</a></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb388-1" data-line-number="1"><span class="kw">hist</span>(SSB, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">6e+11</span>)); <span class="kw">abline</span>(<span class="dt">v=</span>obsSSB)</a></code></pre></div>
+<p><img src="05-permutation_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </div>
 </div>

@@ -524,15 +524,15 @@ Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were r
 
 Gender bias in teaching evaluations *The Economist*, Sep 21, 2017 
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" />
 
 
 <img src="05-permutation_files/figure-html/unnamed-chunk-10-1.png" width="1440" style="display: block; margin: auto;" />
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="1440" style="display: block; margin: auto;" />
 
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" />
 
 
 
@@ -543,6 +543,20 @@ Gender bias in teaching evaluations *The Economist*, Sep 21, 2017
 macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
 ```
 
+
+
+
+```r
+macnell %>% 
+  mutate(TAID = ifelse(taidgender==1, "male", "female")) %>%
+  mutate(TAGend = ifelse(tagender==1, "male", "female")) %>%
+  mutate(gendjitter = ifelse(tagender==1, -0.2, 0.2)) %>%
+ggplot(aes(x=TAGend, y=overall, color=TAID, fill=TAID)) + 
+  geom_boxplot() + scale_fill_manual(values=rep('white', 2))  +
+  geom_point(position=position_jitterdodge(jitter.width=0.2), alpha=0.5) +
+  stat_summary(fun.y="mean", geom="point", size=3,
+    position=position_dodge(width=0.75))
+```
 
 <img src="05-permutation_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
@@ -684,6 +698,13 @@ ov.stats <- unlist(ov.stats)
 
 #### permutation sampling distribution:
 
+
+
+```r
+hist(ov.stats)
+abline(v=0.47, col="red")
+```
+
 <img src="05-permutation_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
 
 
@@ -705,6 +726,20 @@ ov.stats <- unlist(ov.stats)
 #### MacNell Data with different permutation tests
 
 The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
+
+
+
+```r
+distr1 <- stratified_two_sample(response = macnell$overall,
+                               group =  macnell$taidgender,
+                               stratum = macnell$tagender,
+                               stat = "mean", reps=reps)
+
+distr2 <- stratified_two_sample(response = macnell$overall,
+                               group =  macnell$taidgender,
+                               stratum = macnell$tagender,
+                               stat = "t", reps=reps)
+```
 
 
 
@@ -792,7 +827,389 @@ t2p(-1.56, distr2, alternative="two-sided")
 
 #### Actual MacNell results
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="768" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="1440" style="display: block; margin: auto;" />
+
+
+### Income and Health (F-like test)
+
+Consider the NHANES dataset.
+
+- Income 
+    * (HHIncomeMid - Numerical version of HHIncome derived from the middle income in each category)
+- Health 
+    * (HealthGen - Self-reported rating of participant's health in general Reported for participants aged 12 years or older. One of Excellent, Vgood, Good, Fair, or Poor.)
+
+
+#### Summary of the variables of interest
+
+
+
+```r
+NHANES %>% select(HealthGen) %>% table()
+```
+
+
+
+```
+## .
+## Excellent     Vgood      Good      Fair      Poor 
+##       878      2508      2956      1010       187
+```
+
+
+
+```r
+NHANES %>% select(HHIncomeMid) %>% summary()
+```
+
+
+
+```
+##   HHIncomeMid    
+##  Min.   :  2500  
+##  1st Qu.: 30000  
+##  Median : 50000  
+##  Mean   : 57206  
+##  3rd Qu.: 87500  
+##  Max.   :100000  
+##  NA's   :811
+```
+
+
+
+
+#### Mean Income broken down by Health
+
+
+
+```r
+NH.means <- NHANES %>% 
+  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
+  group_by(HealthGen) %>% 
+  summarize(IncMean = mean(HHIncomeMid, na.rm=TRUE), count=n())
+NH.means
+```
+
+
+
+```
+## # A tibble: 5 x 3
+##   HealthGen IncMean count
+##   <fct>       <dbl> <int>
+## 1 Excellent  69354.   817
+## 2 Vgood      65011.  2342
+## 3 Good       55662.  2744
+## 4 Fair       44194.   899
+## 5 Poor       37027.   164
+```
+
+
+
+Are the differences in means simply due to random chance??
+
+
+
+
+```r
+NHANES %>% filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% 
+ggplot(aes(x=HealthGen, y=HHIncomeMid)) + geom_boxplot()
+```
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+
+The differences in health, can be calculated directly, but we still don't know if the differences are due to randome chance or some other larger structure.
+
+
+
+```r
+diff.mat = data.frame(matrix(ncol=5, nrow=5))
+names(diff.mat) = NH.means$HealthGen
+rownames(diff.mat) = NH.means$HealthGen
+
+for(i in 1:5){
+  for(j in 1:5){
+    diff.mat[i,j] = NH.means$IncMean[i] - NH.means$IncMean[j]   }}
+
+diff.mat
+```
+
+
+
+```
+##           Excellent  Vgood   Good  Fair  Poor
+## Excellent         0   4344  13692 25161 32327
+## Vgood         -4344      0   9348 20817 27983
+## Good         -13692  -9348      0 11469 18635
+## Fair         -25161 -20817 -11469     0  7166
+## Poor         -32327 -27983 -18635 -7166     0
+```
+
+
+
+
+#### Overall difference
+
+We can measure the overall differences as the amount of variability between each of the means and the overall mean:
+
+$$F = \frac{\text{between-group variability}}{\text{within-group variability}}$$
+$$F = \frac{\sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2/(K-1)}{\sum_{ij} (X_{ij}-\overline{X}_{i\cdot})^2/(N-K)}$$
+$$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
+
+
+#### Creating a test statistic
+
+
+
+```r
+NHANES %>% select(HHIncomeMid, HealthGen) %>% 
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% head()
+```
+
+
+
+```
+## # A tibble: 6 x 2
+##   HHIncomeMid HealthGen
+##         <int> <fct>    
+## 1       30000 Good     
+## 2       30000 Good     
+## 3       30000 Good     
+## 4       40000 Good     
+## 5       87500 Vgood    
+## 6       87500 Vgood
+```
+
+
+
+
+
+```r
+GM = mean(NHANES$HHIncomeMid, na.rm=TRUE); GM
+```
+
+
+
+```
+## [1] 57206
+```
+
+
+
+```r
+NH.means
+```
+
+
+
+```
+## # A tibble: 5 x 3
+##   HealthGen IncMean count
+##   <fct>       <dbl> <int>
+## 1 Excellent  69354.   817
+## 2 Vgood      65011.  2342
+## 3 Good       55662.  2744
+## 4 Fair       44194.   899
+## 5 Poor       37027.   164
+```
+
+
+
+
+
+
+```r
+NH.means$IncMean - GM
+```
+
+
+
+```
+## [1]  12148   7805  -1544 -13013 -20179
+```
+
+
+
+```r
+(NH.means$IncMean - GM)^2
+```
+
+
+
+```
+## [1] 1.48e+08 6.09e+07 2.38e+06 1.69e+08 4.07e+08
+```
+
+
+
+```r
+NH.means$count
+```
+
+
+
+```
+## [1]  817 2342 2744  899  164
+```
+
+
+
+```r
+NH.means$count * (NH.means$IncMean - GM)^2
+```
+
+
+
+```
+## [1] 1.21e+11 1.43e+11 6.54e+09 1.52e+11 6.68e+10
+```
+
+
+
+
+$$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
+
+
+```r
+sum(NH.means$count * (NH.means$IncMean - GM)^2)
+```
+
+
+
+```
+## [1] 4.89e+11
+```
+
+
+
+
+####  Permuting the data 
+
+
+
+```r
+NHANES %>% 
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
+  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
+  select(HealthGen, HHIncomeMid, IncomePerm) %>%
+  head()
+```
+
+
+
+```
+## # A tibble: 6 x 3
+##   HealthGen HHIncomeMid IncomePerm
+##   <fct>           <int>      <int>
+## 1 Good            30000      50000
+## 2 Good            30000     100000
+## 3 Good            30000     100000
+## 4 Good            40000      87500
+## 5 Vgood           87500      17500
+## 6 Vgood           87500      60000
+```
+
+
+
+
+####  Permuting the data & a new test statistic
+
+
+
+```r
+NHANES %>% 
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
+  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
+  group_by(HealthGen) %>% 
+  summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+  summarize(teststat = sum(count*(IncMeanP - GM)^2))
+```
+
+
+
+```
+## # A tibble: 1 x 1
+##       teststat
+##          <dbl>
+## 1 20176269113.
+```
+
+
+
+
+#### Lots of times...
+
+
+
+```r
+reps = 1000
+SSB <- 
+  unlist(replicate(reps, 
+     NHANES %>% 
+        filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
+        mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
+        group_by(HealthGen) %>% 
+        summarize(IncMeanP = mean(IncomePerm, na.rm=TRUE), count=n()) %>%
+        summarize(teststat = sum(count*(IncMeanP - GM)^2))
+      ))
+
+head(SSB)
+```
+
+
+
+```
+## teststat teststat teststat teststat teststat teststat 
+## 1.28e+10 1.87e+10 1.58e+10 1.30e+10 1.60e+10 1.31e+10
+```
+
+
+
+
+#### Compared to the real data
+
+
+
+
+```r
+obsSSB <- NHANES %>%
+  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
+  group_by(HealthGen) %>% 
+  summarize(IncMean = mean(HHIncomeMid, na.rm=TRUE), count=n()) %>%
+  summarize(obs.teststat = sum(count*(IncMean - GM)^2))
+
+obsSSB
+```
+
+
+
+```
+## # A tibble: 1 x 1
+##    obs.teststat
+##           <dbl>
+## 1 488767088754.
+```
+
+
+
+```r
+sum(SSB>obsSSB) / reps
+```
+
+
+
+```
+## [1] 0
+```
+
+
+
+
+
+```r
+hist(SSB, xlim=c(0, 6e+11)); abline(v=obsSSB)
+```
+
+<img src="05-permutation_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
