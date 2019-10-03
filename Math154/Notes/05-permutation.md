@@ -106,7 +106,7 @@ The example in class used a modification of the ANOVA F-statistic to compare the
 |  	| ratio of medians 	| $\mbox{median}_1 / \mbox{median}_2$ 	|
 |  	| diff in SD 	| $s_1 - s_2$ 	|
 |  	| diff in var 	| $s^2_1 - s^2_2$ 	|
-|  	| ratio of SD or VAR 	| $ s_1 / s_2$ 	|
+|  	| ratio of SD or VAR 	| $s_1 / s_2$ 	|
 | 1 numeric 	| diff in means 	| $\sum n_i (\overline{X}_i - \overline{X})^2$ or 	|
 | k groups 	|  	| F stat 	|
 | paired or 	| (permute *within* row) 	| $\overline{X}_1 - \overline{X}_2$ 	|
