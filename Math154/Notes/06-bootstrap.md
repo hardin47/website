@@ -18,10 +18,11 @@ Main idea:  we will be able to estimate the **variability** of our estimator (di
 * Bootstrapping doesn't help get around small samples.
 
 The following applets may be helpful:
+
 * The logic of confidence intervals http://www.rossmanchance.com/applets/ConfSim.html
 * Bootstrapping from actual datasets http://lock5stat.com/statkey/index.html
 
-## Basics & Notation
+## Basics & Notation {#BSnotation}
 
 Let $\theta$ be the parameter of interest, and let $\hat{\theta}$ be the estimate of $\theta$.  If we could, we'd take lots of samples of size $n$ from the population to create a **sampling distribution** for $\hat{\theta}$.  Consider taking $B$ random samples from $F$:
 
@@ -236,11 +237,8 @@ We think of this as the non-linear transformation that normalizes the sampling d
 https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 -->
 
-Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
 
-See: http://pages.pomona.edu/~jsh04747/courses/math154/heroinBS.pdf
-
-## Bootstrap Confidence Intervals
+## Bootstrap Confidence Intervals {#BSCI}
 
 ### Normal (standard) CI with BS SE: `type="norm"`
 
@@ -617,6 +615,679 @@ We can think of the skew as the rate of chance of the standard error on a normal
 \begin{align}
 \hat{a} = \frac{\sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^3}{6 [ \sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^2 ] ^{3/2}}
 \end{align}
+
+
+## R example: Heroin
+
+Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
+
+
+
+#### Why bootstrap?
+
+Motivation:  to estimate the variability of a statistic (*not* dependent on $H_0$ being true).
+
+
+#### Reading in the data
+
+
+```r
+heroin <- readr::read_table2("http://www.rossmanchance.com/iscam2/data/heroin.txt")
+names(heroin)
+```
+
+
+
+```
+## [1] "id"     "clinic" "status" "times"  "prison" "dose"
+```
+
+
+
+```r
+head(heroin)
+```
+
+
+
+```
+## # A tibble: 6 x 6
+##      id clinic status times prison  dose
+##   <dbl>  <dbl>  <dbl> <dbl>  <dbl> <dbl>
+## 1     1      1      1   428      0    50
+## 2     2      1      1   275      1    55
+## 3     3      1      1   262      0    55
+## 4     4      1      1   183      0    30
+## 5     5      1      1   259      1    65
+## 6     6      1      1   714      0    55
+```
+
+
+
+
+#### Observed Test Statistic(s)
+
+
+```r
+obs.stat<-heroin %>% summarize(medtime = median(times)) %>% pull()
+obs.stat2<-heroin %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
+obs.stat
+```
+
+
+
+```
+## [1] 368
+```
+
+
+
+```r
+obs.stat2
+```
+
+
+
+```
+## [1] 378
+```
+
+
+
+#### Bootstrapped data!
+
+
+```r
+set.seed(4747)
+heroin.rs<-heroin %>% sample_frac(size=1, replace=TRUE)
+
+heroin.rs %>% summarize(medtime = median(times)) %>% pull()
+```
+
+
+
+```
+## [1] 368
+```
+
+
+
+```r
+heroin.rs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
+```
+
+
+
+```
+## [1] 372
+```
+
+
+
+####  Need to bootstrap a lot of times...
+
+Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals).  However, the package and funciton `boot` will do the boostrapping for you.
+
+
+
+```r
+test.stat<-c()
+test.stat2<-c()
+sd.test.stat<-c()
+sd.test.stat2<-c()
+
+reps1 <- 1000
+reps2 <- 100
+
+set.seed(4747)
+for(i in 1:reps1){ 
+	heroin.rs<-heroin %>% sample_frac(size=1, replace=TRUE)
+	test.stat<-c(test.stat,heroin.rs %>% summarize(medtime = median(times)) %>% pull())
+	test.stat2<-c(test.stat2,heroin.rs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull())
+
+	test.stat.rs<-c()
+	test.stat2.rs<-c()
+
+	for(j in 1:reps2){
+	heroin.rsrs<-heroin %>% sample_frac(size=1, replace=TRUE)
+	test.stat.rs<-c(test.stat.rs,heroin.rsrs %>% summarize(medtime = median(times)) %>% pull())
+	test.stat2.rs<-c(test.stat2.rs,heroin.rsrs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull())
+	}
+	sd.test.stat<-c(sd.test.stat,sd(test.stat.rs))
+	sd.test.stat2<-c(sd.test.stat2,sd(test.stat2.rs))
+}
+```
+
+
+
+
+#### What do the distributions look like?
+
+The distributions of both the median and the trimmed mean are symmetric and bell-shaped.  However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).
+
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-2.png" width="480" style="display: block; margin: auto;" />
+
+
+#### What do the distributions look like?
+
+The distributions of both the median and the trimmed mean are symmetric and bell-shaped.  However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).
+
+
+
+```r
+bs.stats <- data.frame(test.stat, test.stat2)
+ggplot(bs.stats, aes(x=test.stat)) + 
+  geom_histogram(bins=20) + 
+  ggtitle("dist of median") +  
+  xlab(paste("mean=",round(mean(test.stat),2),
+             ";SE=", round(sd(test.stat),2)))
+```
+
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+ggplot(bs.stats, aes(x=test.stat2)) + 
+  geom_histogram(bins=20) + 
+  ggtitle("dist of trimmed mean") +  
+  xlab(paste("mean=",round(mean(test.stat),2),
+             ";SE=", round(sd(test.stat),2)))
+```
+
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;" />
+
+
+#### OR using the built in functions
+
+
+```r
+sampletmean <- function(x,d,trimperc){
+  return(mean(x[d], trim=trimperc))
+}
+set.seed(4747)
+bs.tmean.resamps <- boot::boot(heroin$times,sampletmean, reps1, trimperc=.25)
+```
+
+
+
+#### What does the boot output look like?
+
+
+```r
+# bs.tmean.resamps <- boot(heroin[,4],sampletmean, reps1, trimperc=.25)
+str(bs.tmean.resamps)
+```
+
+
+
+```
+## List of 11
+##  $ t0       : num 378
+##  $ t        : num [1:1000, 1] 364 377 372 392 349 ...
+##  $ R        : num 1000
+##  $ data     : num [1:238] 428 275 262 183 259 714 438 796 892 393 ...
+##  $ seed     : int [1:626] 10403 624 -1645349161 -2081516244 1489809469 823736794 -755145325 950390200 -1779428263 1453445190 ...
+##  $ statistic:function (x, d, trimperc)  
+##   ..- attr(*, "srcref")= 'srcref' int [1:8] 1 16 3 1 16 1 1 3
+##   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x7fb9af2d1a48> 
+##  $ sim      : chr "ordinary"
+##  $ call     : language boot::boot(data = heroin$times, statistic = sampletmean, R = reps1,      trimperc = 0.25)
+##  $ stype    : chr "i"
+##  $ strata   : num [1:238] 1 1 1 1 1 1 1 1 1 1 ...
+##  $ weights  : num [1:238] 0.0042 0.0042 0.0042 0.0042 0.0042 ...
+##  - attr(*, "class")= chr "boot"
+##  - attr(*, "boot_type")= chr "boot"
+```
+
+
+
+
+
+```r
+samplemed <- function(x,d){
+  return(median(x[d]))
+}
+set.seed(4747)
+bs.med.resamps <- boot::boot(heroin$times,samplemed, reps1)
+```
+
+
+
+#### SE of median
+
+Whew!  They are very close (one using for loops, one using the boot function).
+
+
+
+```r
+sd(test.stat)  # SE of median
+```
+
+
+
+```
+## [1] 30.8
+```
+
+
+
+```r
+bs.med.resamps
+```
+
+
+
+```
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot::boot(data = heroin$times, statistic = samplemed, R = reps1)
+## 
+## 
+## Bootstrap Statistics :
+##     original  bias    std. error
+## t1*      368    7.64        32.2
+```
+
+
+
+#### SE of trimmed mean
+
+Whew!  They are very close (one using for loops, one using the boot function).
+
+
+
+```r
+sd(test.stat2)  # SE of trimmed mean
+```
+
+
+
+```
+## [1] 21.9
+```
+
+
+
+```r
+bs.tmean.resamps
+```
+
+
+
+```
+## 
+## ORDINARY NONPARAMETRIC BOOTSTRAP
+## 
+## 
+## Call:
+## boot::boot(data = heroin$times, statistic = sampletmean, R = reps1, 
+##     trimperc = 0.25)
+## 
+## 
+## Bootstrap Statistics :
+##     original  bias    std. error
+## t1*      378   0.635        22.3
+```
+
+
+
+
+#### 95% normal CI with BS SE
+
+##### Without built in functions
+
+
+```r
+obs.stat + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat)
+```
+
+
+
+```
+## [1] 307 428
+```
+
+
+
+```r
+obs.stat2 + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat2)
+```
+
+
+
+```
+## [1] 335 421
+```
+
+
+
+
+##### With built in functions
+
+
+```r
+se.bs <- sd(bs.med.resamps$t)
+se.bs2 <- sd(bs.tmean.resamps$t)
+
+obs.stat + qt(c(0.025,.975), nrow(heroin) - 1)*se.bs 
+```
+
+
+
+```
+## [1] 304 431
+```
+
+
+
+```r
+obs.stat2 + qt(c(0.025,.975), nrow(heroin) - 1)*se.bs2 
+```
+
+
+
+```
+## [1] 334 422
+```
+
+
+
+
+#### 95% Percentile CI
+
+##### Without built in functions
+
+
+```r
+quantile(test.stat, c(.025, .975))
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   322   450
+```
+
+
+
+```r
+quantile(test.stat2, c(.025, .975))
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   337   423
+```
+
+
+
+
+##### With built in functions
+
+
+```r
+quantile(bs.med.resamps$t, c(.025, .975))
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   320   452
+```
+
+
+
+```r
+quantile(bs.tmean.resamps$t, c(.025, .975))
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   334   423
+```
+
+
+
+##### With built in functions more directly
+
+
+```r
+boot::boot.ci(bs.med.resamps, type="perc")
+```
+
+
+
+```
+## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.med.resamps, type = "perc")
+## 
+## Intervals : 
+## Level     Percentile     
+## 95%   (320, 452 )  
+## Calculations and Intervals on Original Scale
+```
+
+
+
+```r
+boot::boot.ci(bs.tmean.resamps, type="perc")
+```
+
+
+
+```
+## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.tmean.resamps, type = "perc")
+## 
+## Intervals : 
+## Level     Percentile     
+## 95%   (334, 423 )  
+## Calculations and Intervals on Original Scale
+```
+
+
+
+
+#### 95% Bootstrap-t CI
+
+##### Without built in functions
+
+Note that the t-value is needed (which requires a different SE for each bootstrap sample).
+
+
+
+```r
+t.hat<-(test.stat - obs.stat)/sd.test.stat
+t.hat2<-(test.stat2 - obs.stat2)/sd.test.stat2
+
+t.hat.95 = quantile(t.hat, c(.025,.975))
+t.hat2.95 = quantile(t.hat2, c(.025,.975))
+
+obs.stat + t.hat.95*sd(test.stat)
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   322   446
+```
+
+
+
+```r
+obs.stat2 + t.hat2.95*sd(test.stat2) 
+```
+
+
+
+```
+##  2.5% 97.5% 
+##   337   423
+```
+
+
+
+
+##### With built in functions
+
+Trimmed mean:
+
+
+```r
+sampletmean2 <- function(x, d, R2, trimperc) {
+   boot.samp = x[d]  # boostrapped sample
+   m.bs = mean(boot.samp, trim=trimperc)  # bootstrapped mean
+   v.bs = var(boot::boot(boot.samp, sampletmean, R2, trim=trimperc)$t)
+   return(c(m.bs, v.bs))  # boot expects the statistic to be the 1st and the var to be the 2nd
+}
+set.seed(4747)
+bs.tmean.reresamps <- boot::boot(heroin$times, sampletmean2, R=reps1, R2=reps2, trimperc=.25)
+```
+
+
+
+Median:
+
+
+```r
+samplemed2 <- function(x, d, R2) {
+   boot.samp = x[d]  # boostrapped sample
+   m.bs = median(boot.samp)  # bootstrapped mean
+   v.bs = var(boot::boot(boot.samp, samplemed, R2)$t)
+   return(c(m.bs, v.bs))  # boot expects the statistic to be the 1st and the var to be the 2nd
+}
+set.seed(4747)
+bs.med.reresamps <- boot::boot(heroin$times, samplemed2, R=reps1, R2=reps2)
+```
+
+
+
+The confidence intervals (BS-t intervals, called "studentized"):
+
+
+```r
+boot::boot.ci(bs.med.reresamps, type="stud")
+```
+
+
+
+```
+## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.med.reresamps, type = "stud")
+## 
+## Intervals : 
+## Level    Studentized     
+## 95%   (292, 421 )  
+## Calculations and Intervals on Original Scale
+```
+
+
+
+```r
+boot::boot.ci(bs.tmean.reresamps, type="stud")
+```
+
+
+
+```
+## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.tmean.reresamps, type = "stud")
+## 
+## Intervals : 
+## Level    Studentized     
+## 95%   (335, 423 )  
+## Calculations and Intervals on Original Scale
+```
+
+
+
+
+#### 95% BCa interval (not responsible for BCa)
+
+##### With built in functions
+
+
+```r
+boot::boot.ci(bs.med.reresamps, type="bca")
+boot::boot.ci(bs.tmean.reresamps, type="bca")
+```
+
+
+
+
+##### Without built in functions
+
+
+```r
+test.stat.jk<-c()
+test.stat2.jk<-c()
+
+set.seed(4747)
+for(i in 1:length(heroin$times)){
+
+	test.stat.jk<-c(test.stat.jk,median(heroin[-i,4]))
+	 test.stat2.jk<-c(test.stat2.jk,mean(heroin[-i,4],trim=.25))
+}
+
+zo.hat<-qnorm(sum(test.stat<obs.stat)/reps1,0,1)
+a.hat<- sum((mean(test.stat.jk) - test.stat.jk)^3)/
+                 (6*(sum((mean(test.stat.jk)-test.stat.jk)^2)^1.5))
+
+zo.hat2<- qnorm(sum(test.stat2< obs.stat2)/reps1,0,1)
+a.hat2<- sum((mean(test.stat2.jk) - test.stat2.jk)^3)/
+                 (6*(sum((mean(test.stat2.jk)-test.stat2.jk)^2)^1.5))
+
+alpha1.bca<-pnorm(zo.hat + (zo.hat + qnorm(.975))/(1 - a.hat*(zo.hat + qnorm(.975))))
+alpha2.bca<-pnorm(zo.hat + (zo.hat + qnorm(.025))/(1 - a.hat*(zo.hat + qnorm(.025))))
+
+
+alpha1.bca2<-pnorm(zo.hat2 + (zo.hat2 + qnorm(.975))/(1 - a.hat2*(zo.hat2 + qnorm(.975))))
+alpha2.bca2<-pnorm(zo.hat2 + (zo.hat2 + qnorm(.025))/(1 - a.hat2*(zo.hat2 + qnorm(.025))))
+
+
+c(sort(test.stat)[ceiling(reps1*alpha2.bca)],sort(test.stat)[ceiling(reps1*alpha1.bca)])
+c(sort(test.stat2)[ceiling(reps1*alpha2.bca2)],sort(test.stat2)[ceiling(reps1*alpha1.bca2)])
+```
+
+
+
+#### Comparison of intervals
+
+The first three columns  correspond to the CIs for the true median of the survival times.  The second three columns correspond to the CIs for the true trimmed mean of the survival times.
+
+
+CI | lower | observed | upper | lower | observed | upper
+--- | ----- | ----- | ----- | ----- | ------ | -------- | 
+Percentile | 321.00 | 367.50| 452.00 | 339.38 | 378.30 | 423.46
+CI w BS SE | 306.33 | 367.50|428.67 | 335.21 | 378.30 | 421.39
+BS-t | 294.98 | 367.50|418.00 | 334.28 | 378.30 | 418.09
+BCa | 317.00 | 367.50|444.00 | 338.29 | 378.30 | 422.43
+
+
+
+
+
 
 
 
