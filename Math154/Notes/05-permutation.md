@@ -521,27 +521,39 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 
 Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were randomized to 4 online sections of a course.  In two sections, the instructors swapped identities.  Was the instructor who identified as female rated lower on average? (https://www.math.upenn.edu/~pemantle/active-papers/Evals/stark2016.pdf)
 
-
-Gender bias in teaching evaluations *The Economist*, Sep 21, 2017 
-
-<img src="05-permutation_files/figure-html/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" />
-
-
-<img src="05-permutation_files/figure-html/unnamed-chunk-10-1.png" width="1440" style="display: block; margin: auto;" />
-
-<img src="05-permutation_files/figure-html/unnamed-chunk-11-1.png" width="1440" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+<img src="figs/genderbias2a.png" alt="@genderbias3" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-91)@genderbias3</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/genderbias2b.png" alt="@genderbias3" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-92)@genderbias3</p>
+</div>
 
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+<img src="figs/genderbias.png" alt="@genderbias1" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-10)@genderbias1</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/genderbias3a.png" alt="@genderbias2" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-111)@genderbias2</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/genderbias3b.png" alt="@genderbias2" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-112)@genderbias2</p>
+</div>
 
 
 
 #####  R code
 
 
+
 ```r
 macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
 ```
+
+
 
 
 
@@ -558,7 +570,7 @@ ggplot(aes(x=TAGend, y=overall, color=TAID, fill=TAID)) +
     position=position_dodge(width=0.75))
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ####  Analysis goal
@@ -572,10 +584,13 @@ $$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
 #### MacNell Data without permutation
 
 
+
 ```r
 macnell %>%
   select(overall, tagender, taidgender) %>% head(15)
 ```
+
+
 
 ```
 ## # A tibble: 15 x 3
@@ -597,6 +612,8 @@ macnell %>%
 ## 14       5        1          1
 ## 15       4        1          1
 ```
+
+
 
 
 #### Permuting MacNell data
@@ -705,7 +722,7 @@ hist(ov.stats)
 abline(v=0.47, col="red")
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -827,7 +844,7 @@ t2p(-1.56, distr2, alternative="two-sided")
 
 #### Actual MacNell results
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-25-1.png" width="1440" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-24-1.png" width="1440" style="display: block; margin: auto;" />
 
 
 ### Income and Health (F-like test)
@@ -917,7 +934,7 @@ ggplot(aes(x=HealthGen, y=HHIncomeMid)) +
   geom_jitter(width=0.1, alpha=.2)
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
 
 The differences in health, can be calculated directly, but we still don't know if the differences are due to randome chance or some other larger structure.
 
@@ -1102,12 +1119,12 @@ NHANES %>%
 ## # A tibble: 6 x 3
 ##   HealthGen HHIncomeMid IncomePerm
 ##   <fct>           <int>      <int>
-## 1 Good            30000      50000
-## 2 Good            30000     100000
-## 3 Good            30000     100000
-## 4 Good            40000      87500
-## 5 Vgood           87500      17500
-## 6 Vgood           87500      60000
+## 1 Good            30000     100000
+## 2 Good            30000      87500
+## 3 Good            30000      17500
+## 4 Good            40000      60000
+## 5 Vgood           87500      50000
+## 6 Vgood           87500     100000
 ```
 
 
@@ -1132,7 +1149,7 @@ NHANES %>%
 ## # A tibble: 1 x 1
 ##       teststat
 ##          <dbl>
-## 1 20176269113.
+## 1 12553059728.
 ```
 
 
@@ -1161,7 +1178,7 @@ head(SSB)
 
 ```
 ## teststat teststat teststat teststat teststat teststat 
-## 1.28e+10 1.87e+10 1.58e+10 1.30e+10 1.60e+10 1.31e+10
+## 1.45e+10 1.60e+10 1.38e+10 1.32e+10 1.37e+10 1.44e+10
 ```
 
 
@@ -1211,7 +1228,7 @@ sum(SSB>obsSSB) / reps
 hist(SSB, xlim=c(0, 6e+11)); abline(v=obsSSB)
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
