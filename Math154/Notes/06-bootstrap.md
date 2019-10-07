@@ -1329,16 +1329,14 @@ c(sort(test.stat2)[ceiling(reps1*alpha2.bca2)],sort(test.stat2)[ceiling(reps1*al
 The first three columns  correspond to the CIs for the true median of the survival times.  The second three columns correspond to the CIs for the true trimmed mean of the survival times.
 
 
-CI | lower | observed | upper | lower | observed | upper
---- | ----- | ----- | ----- | ----- | ------ | -------- | 
-Percentile | 321.00 | 367.50| 452.00 | 339.38 | 378.30 | 423.46
-CI w BS SE | 306.33 | 367.50|428.67 | 335.21 | 378.30 | 421.39
-BS-t | 294.98 | 367.50|418.00 | 334.28 | 378.30 | 418.09
-BCa | 317.00 | 367.50|444.00 | 338.29 | 378.30 | 422.43
-
-
-
-
+|  	| 	| median  	|  	| 	|  trimmed mean 	|  	|
+|------------	|:------:	|:----------:	|:--------:	|:------------:	|:----------:	|:----------:	|
+| CI 	| lower 	| observed 	| upper 	| lower 	| observed 	| upper 	|
+| --- 	| ----- 	| ----- 	| ----- 	| ----- 	| ------ 	| -------- 	|
+| Percentile 	| 321.00 	| 367.50 	| 452.00 	| 339.38 	| 378.30 	| 423.46 	|
+| CI w BS SE 	| 306.33 	| 367.50 	| 428.67 	| 335.21 	| 378.30 	| 421.39 	|
+| BS-t 	| 294.98 	| 367.50 	| 418.00 	| 334.28 	| 378.30 	| 418.09 	|
+| BCa 	| 317.00 	| 367.50 	| 444.00 	| 338.29 	| 378.30 	| 422.43 	|
 
 
 
