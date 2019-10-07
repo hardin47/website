@@ -852,12 +852,12 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <div id="r-example-heroin" class="section level2">
 <h2><span class="header-section-number">6.6</span> R example: Heroin</h2>
 <p>Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment. The data in <code>heroin.txt</code> include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4). For about 37% of the subjects, the study ended while they were still the in clinic (status=0). Thus, their survival time has been truncated. For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time. Below we explore using the median as well as the 25% trimmed mean. We treat the group of 238 patients as representative of the population. <span class="citation">(From Chance and Rossman <a href="#ref-ISCAM">2018</a><a href="#ref-ISCAM">a</a>, Investigation 4.5.3)</span></p>
-<div id="why-bootstrap" class="section level4">
-<h4><span class="header-section-number">6.6.0.1</span> Why bootstrap?</h4>
+<div id="why-bootstrap" class="section level4 unnumbered">
+<h4>Why bootstrap?</h4>
 <p>Motivation: to estimate the variability of a statistic (<em>not</em> dependent on <span class="math inline">\(H_0\)</span> being true).</p>
 </div>
-<div id="reading-in-the-data" class="section level4">
-<h4><span class="header-section-number">6.6.0.2</span> Reading in the data</h4>
+<div id="reading-in-the-data" class="section level4 unnumbered">
+<h4>Reading in the data</h4>
 <div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb390-1" data-line-number="1">heroin &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_table2</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/heroin.txt&quot;</span>)</a>
 <a class="sourceLine" id="cb390-2" data-line-number="2"><span class="kw">names</span>(heroin)</a></code></pre></div>
 <pre><code>## [1] &quot;id&quot;     &quot;clinic&quot; &quot;status&quot; &quot;times&quot;  &quot;prison&quot; &quot;dose&quot;</code></pre>
@@ -872,8 +872,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ## 5     5      1      1   259      1    65
 ## 6     6      1      1   714      0    55</code></pre>
 </div>
-<div id="observed-test-statistics" class="section level4">
-<h4><span class="header-section-number">6.6.0.3</span> Observed Test Statistic(s)</h4>
+<div id="observed-test-statistics" class="section level4 unnumbered">
+<h4>Observed Test Statistic(s)</h4>
 <div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb394-1" data-line-number="1">obs.stat&lt;-heroin <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">medtime =</span> <span class="kw">median</span>(times)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>()</a>
 <a class="sourceLine" id="cb394-2" data-line-number="2">obs.stat2&lt;-heroin <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">tmeantime =</span> <span class="kw">mean</span>(times, <span class="dt">trim=</span><span class="fl">0.25</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>()</a>
 <a class="sourceLine" id="cb394-3" data-line-number="3">obs.stat</a></code></pre></div>
@@ -881,8 +881,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb396-1" data-line-number="1">obs.stat2</a></code></pre></div>
 <pre><code>## [1] 378</code></pre>
 </div>
-<div id="bootstrapped-data" class="section level4">
-<h4><span class="header-section-number">6.6.0.4</span> Bootstrapped data!</h4>
+<div id="bootstrapped-data" class="section level4 unnumbered">
+<h4>Bootstrapped data!</h4>
 <div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb398-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb398-2" data-line-number="2">heroin.rs&lt;-heroin <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="dt">size=</span><span class="dv">1</span>, <span class="dt">replace=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb398-3" data-line-number="3"></a>
@@ -891,8 +891,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb400-1" data-line-number="1">heroin.rs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">tmeantime =</span> <span class="kw">mean</span>(times, <span class="dt">trim=</span><span class="fl">0.25</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>()</a></code></pre></div>
 <pre><code>## [1] 372</code></pre>
 </div>
-<div id="need-to-bootstrap-a-lot-of-times" class="section level4">
-<h4><span class="header-section-number">6.6.0.5</span> Need to bootstrap a lot of times…</h4>
+<div id="need-to-bootstrap-a-lot-of-times" class="section level4 unnumbered">
+<h4>Need to bootstrap a lot of times…</h4>
 <p>Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals). However, the package and funciton <code>boot</code> will do the boostrapping for you.</p>
 <div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb402-1" data-line-number="1">test.stat&lt;-<span class="kw">c</span>()</a>
 <a class="sourceLine" id="cb402-2" data-line-number="2">test.stat2&lt;-<span class="kw">c</span>()</a>
@@ -920,13 +920,13 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <a class="sourceLine" id="cb402-24" data-line-number="24">    sd.test.stat2&lt;-<span class="kw">c</span>(sd.test.stat2,<span class="kw">sd</span>(test.stat2.rs))</a>
 <a class="sourceLine" id="cb402-25" data-line-number="25">}</a></code></pre></div>
 </div>
-<div id="what-do-the-distributions-look-like" class="section level4">
-<h4><span class="header-section-number">6.6.0.6</span> What do the distributions look like?</h4>
+<div id="what-do-the-distributions-look-like" class="section level4 unnumbered">
+<h4>What do the distributions look like?</h4>
 <p>The distributions of both the median and the trimmed mean are symmetric and bell-shaped. However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).</p>
 <p><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-2.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
-<div id="what-do-the-distributions-look-like-1" class="section level4">
-<h4><span class="header-section-number">6.6.0.7</span> What do the distributions look like?</h4>
+<div id="what-do-the-distributions-look-like-1" class="section level4 unnumbered">
+<h4>What do the distributions look like?</h4>
 <p>The distributions of both the median and the trimmed mean are symmetric and bell-shaped. However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).</p>
 <div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb403-1" data-line-number="1">bs.stats &lt;-<span class="st"> </span><span class="kw">data.frame</span>(test.stat, test.stat2)</a>
 <a class="sourceLine" id="cb403-2" data-line-number="2"><span class="kw">ggplot</span>(bs.stats, <span class="kw">aes</span>(<span class="dt">x=</span>test.stat)) <span class="op">+</span><span class="st"> </span></a>
@@ -942,17 +942,17 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <a class="sourceLine" id="cb404-5" data-line-number="5">             <span class="st">&quot;;SE=&quot;</span>, <span class="kw">round</span>(<span class="kw">sd</span>(test.stat),<span class="dv">2</span>)))</a></code></pre></div>
 <p><img src="06-bootstrap_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
-<div id="or-using-the-built-in-functions" class="section level4">
-<h4><span class="header-section-number">6.6.0.8</span> OR using the built in functions</h4>
+<div id="or-using-the-built-in-functions" class="section level4 unnumbered">
+<h4>OR using the built in functions</h4>
 <div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb405-1" data-line-number="1">sampletmean &lt;-<span class="st"> </span><span class="cf">function</span>(x,d,trimperc){</a>
 <a class="sourceLine" id="cb405-2" data-line-number="2">  <span class="kw">return</span>(<span class="kw">mean</span>(x[d], <span class="dt">trim=</span>trimperc))</a>
 <a class="sourceLine" id="cb405-3" data-line-number="3">}</a>
 <a class="sourceLine" id="cb405-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb405-5" data-line-number="5">bs.tmean.resamps &lt;-<span class="st"> </span>boot<span class="op">::</span><span class="kw">boot</span>(heroin<span class="op">$</span>times,sampletmean, reps1, <span class="dt">trimperc=</span>.<span class="dv">25</span>)</a></code></pre></div>
 </div>
-<div id="what-does-the-boot-output-look-like" class="section level4">
-<h4><span class="header-section-number">6.6.0.9</span> What does the boot output look like?</h4>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb406-1" data-line-number="1"><span class="co"># bs.tmean.resamps &lt;- boot(heroin[,4],sampletmean, reps1, trimperc=.25)</span></a>
+<div id="what-does-the-boot-output-look-like" class="section level4 unnumbered">
+<h4>What does the boot output look like?</h4>
+<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb406-1" data-line-number="1"><span class="co">#bs.tmean.resamps &lt;- boot(heroin$times,sampletmean, reps1, trimperc=.25)</span></a>
 <a class="sourceLine" id="cb406-2" data-line-number="2"><span class="kw">str</span>(bs.tmean.resamps)</a></code></pre></div>
 <pre><code>## List of 11
 ##  $ t0       : num 378
@@ -962,7 +962,7 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ##  $ seed     : int [1:626] 10403 624 -1645349161 -2081516244 1489809469 823736794 -755145325 950390200 -1779428263 1453445190 ...
 ##  $ statistic:function (x, d, trimperc)  
 ##   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 1 16 3 1 16 1 1 3
-##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x7fb9af2d1a48&gt; 
+##   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilecopy&#39;, &#39;srcfile&#39; &lt;environment: 0x7f85a9366f60&gt; 
 ##  $ sim      : chr &quot;ordinary&quot;
 ##  $ call     : language boot::boot(data = heroin$times, statistic = sampletmean, R = reps1,      trimperc = 0.25)
 ##  $ stype    : chr &quot;i&quot;
@@ -976,8 +976,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <a class="sourceLine" id="cb408-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb408-5" data-line-number="5">bs.med.resamps &lt;-<span class="st"> </span>boot<span class="op">::</span><span class="kw">boot</span>(heroin<span class="op">$</span>times,samplemed, reps1)</a></code></pre></div>
 </div>
-<div id="se-of-median" class="section level4">
-<h4><span class="header-section-number">6.6.0.10</span> SE of median</h4>
+<div id="se-of-median" class="section level4 unnumbered">
+<h4>SE of median</h4>
 <p>Whew! They are very close (one using for loops, one using the boot function).</p>
 <div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb409-1" data-line-number="1"><span class="kw">sd</span>(test.stat)  <span class="co"># SE of median</span></a></code></pre></div>
 <pre><code>## [1] 30.8</code></pre>
@@ -994,8 +994,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ##     original  bias    std. error
 ## t1*      368    7.64        32.2</code></pre>
 </div>
-<div id="se-of-trimmed-mean" class="section level4">
-<h4><span class="header-section-number">6.6.0.11</span> SE of trimmed mean</h4>
+<div id="se-of-trimmed-mean" class="section level4 unnumbered">
+<h4>SE of trimmed mean</h4>
 <p>Whew! They are very close (one using for loops, one using the boot function).</p>
 <div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb413-1" data-line-number="1"><span class="kw">sd</span>(test.stat2)  <span class="co"># SE of trimmed mean</span></a></code></pre></div>
 <pre><code>## [1] 21.9</code></pre>
@@ -1013,17 +1013,17 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ##     original  bias    std. error
 ## t1*      378   0.635        22.3</code></pre>
 </div>
-<div id="normal-ci-with-bs-se" class="section level4">
-<h4><span class="header-section-number">6.6.0.12</span> 95% normal CI with BS SE</h4>
-<div id="without-built-in-functions" class="section level5">
-<h5><span class="header-section-number">6.6.0.12.1</span> Without built in functions</h5>
+<div id="normal-ci-with-bs-se" class="section level4 unnumbered">
+<h4>95% normal CI with BS SE</h4>
+<div id="without-built-in-functions" class="section level5 unnumbered">
+<h5>Without built in functions</h5>
 <div class="sourceCode" id="cb417"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb417-1" data-line-number="1">obs.stat <span class="op">+</span><span class="st"> </span><span class="kw">qt</span>(<span class="kw">c</span>(.<span class="dv">025</span>,.<span class="dv">975</span>),<span class="kw">nrow</span>(heroin)<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span><span class="kw">sd</span>(test.stat)</a></code></pre></div>
 <pre><code>## [1] 307 428</code></pre>
 <div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb419-1" data-line-number="1">obs.stat2 <span class="op">+</span><span class="st"> </span><span class="kw">qt</span>(<span class="kw">c</span>(.<span class="dv">025</span>,.<span class="dv">975</span>),<span class="kw">nrow</span>(heroin)<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span><span class="kw">sd</span>(test.stat2)</a></code></pre></div>
 <pre><code>## [1] 335 421</code></pre>
 </div>
-<div id="with-built-in-functions" class="section level5">
-<h5><span class="header-section-number">6.6.0.12.2</span> With built in functions</h5>
+<div id="with-built-in-functions" class="section level5 unnumbered">
+<h5>With built in functions</h5>
 <div class="sourceCode" id="cb421"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb421-1" data-line-number="1">se.bs &lt;-<span class="st"> </span><span class="kw">sd</span>(bs.med.resamps<span class="op">$</span>t)</a>
 <a class="sourceLine" id="cb421-2" data-line-number="2">se.bs2 &lt;-<span class="st"> </span><span class="kw">sd</span>(bs.tmean.resamps<span class="op">$</span>t)</a>
 <a class="sourceLine" id="cb421-3" data-line-number="3"></a>
@@ -1033,10 +1033,10 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <pre><code>## [1] 334 422</code></pre>
 </div>
 </div>
-<div id="percentile-ci" class="section level4">
-<h4><span class="header-section-number">6.6.0.13</span> 95% Percentile CI</h4>
-<div id="without-built-in-functions-1" class="section level5">
-<h5><span class="header-section-number">6.6.0.13.1</span> Without built in functions</h5>
+<div id="percentile-ci" class="section level4 unnumbered">
+<h4>95% Percentile CI</h4>
+<div id="without-built-in-functions-1" class="section level5 unnumbered">
+<h5>Without built in functions</h5>
 <div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb425-1" data-line-number="1"><span class="kw">quantile</span>(test.stat, <span class="kw">c</span>(.<span class="dv">025</span>, <span class="fl">.975</span>))</a></code></pre></div>
 <pre><code>##  2.5% 97.5% 
 ##   322   450</code></pre>
@@ -1044,8 +1044,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <pre><code>##  2.5% 97.5% 
 ##   337   423</code></pre>
 </div>
-<div id="with-built-in-functions-1" class="section level5">
-<h5><span class="header-section-number">6.6.0.13.2</span> With built in functions</h5>
+<div id="with-built-in-functions-1" class="section level5 unnumbered">
+<h5>With built in functions</h5>
 <div class="sourceCode" id="cb429"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb429-1" data-line-number="1"><span class="kw">quantile</span>(bs.med.resamps<span class="op">$</span>t, <span class="kw">c</span>(.<span class="dv">025</span>, <span class="fl">.975</span>))</a></code></pre></div>
 <pre><code>##  2.5% 97.5% 
 ##   320   452</code></pre>
@@ -1053,8 +1053,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <pre><code>##  2.5% 97.5% 
 ##   334   423</code></pre>
 </div>
-<div id="with-built-in-functions-more-directly" class="section level5">
-<h5><span class="header-section-number">6.6.0.13.3</span> With built in functions more directly</h5>
+<div id="with-built-in-functions-more-directly" class="section level5 unnumbered">
+<h5>With built in functions more directly</h5>
 <div class="sourceCode" id="cb433"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb433-1" data-line-number="1">boot<span class="op">::</span><span class="kw">boot.ci</span>(bs.med.resamps, <span class="dt">type=</span><span class="st">&quot;perc&quot;</span>)</a></code></pre></div>
 <pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 ## Based on 1000 bootstrap replicates
@@ -1079,10 +1079,10 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ## Calculations and Intervals on Original Scale</code></pre>
 </div>
 </div>
-<div id="bootstrap-t-ci" class="section level4">
-<h4><span class="header-section-number">6.6.0.14</span> 95% Bootstrap-t CI</h4>
-<div id="without-built-in-functions-2" class="section level5">
-<h5><span class="header-section-number">6.6.0.14.1</span> Without built in functions</h5>
+<div id="bootstrap-t-ci" class="section level4 unnumbered">
+<h4>95% Bootstrap-t CI</h4>
+<div id="without-built-in-functions-2" class="section level5 unnumbered">
+<h5>Without built in functions</h5>
 <p>Note that the t-value is needed (which requires a different SE for each bootstrap sample).</p>
 <div class="sourceCode" id="cb437"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb437-1" data-line-number="1">t.hat&lt;-(test.stat <span class="op">-</span><span class="st"> </span>obs.stat)<span class="op">/</span>sd.test.stat</a>
 <a class="sourceLine" id="cb437-2" data-line-number="2">t.hat2&lt;-(test.stat2 <span class="op">-</span><span class="st"> </span>obs.stat2)<span class="op">/</span>sd.test.stat2</a>
@@ -1097,8 +1097,8 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <pre><code>##  2.5% 97.5% 
 ##   337   423</code></pre>
 </div>
-<div id="with-built-in-functions-2" class="section level5">
-<h5><span class="header-section-number">6.6.0.14.2</span> With built in functions</h5>
+<div id="with-built-in-functions-2" class="section level5 unnumbered">
+<h5>With built in functions</h5>
 <p>Trimmed mean:</p>
 <div class="sourceCode" id="cb441"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb441-1" data-line-number="1">sampletmean2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, d, R2, trimperc) {</a>
 <a class="sourceLine" id="cb441-2" data-line-number="2">   boot.samp =<span class="st"> </span>x[d]  <span class="co"># boostrapped sample</span></a>
@@ -1142,47 +1142,69 @@ We can think of the skew as the rate of chance of the standard error on a normal
 ## Calculations and Intervals on Original Scale</code></pre>
 </div>
 </div>
-<div id="bca-interval-not-responsible-for-bca" class="section level4">
-<h4><span class="header-section-number">6.6.0.15</span> 95% BCa interval (not responsible for BCa)</h4>
-<div id="with-built-in-functions-3" class="section level5">
-<h5><span class="header-section-number">6.6.0.15.1</span> With built in functions</h5>
-<div class="sourceCode" id="cb447"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb447-1" data-line-number="1">boot<span class="op">::</span><span class="kw">boot.ci</span>(bs.med.reresamps, <span class="dt">type=</span><span class="st">&quot;bca&quot;</span>)</a>
-<a class="sourceLine" id="cb447-2" data-line-number="2">boot<span class="op">::</span><span class="kw">boot.ci</span>(bs.tmean.reresamps, <span class="dt">type=</span><span class="st">&quot;bca&quot;</span>)</a></code></pre></div>
+<div id="bca-interval-not-responsible-for-bca" class="section level4 unnumbered">
+<h4>95% BCa interval (not responsible for BCa)</h4>
+<div id="with-built-in-functions-3" class="section level5 unnumbered">
+<h5>With built in functions</h5>
+<div class="sourceCode" id="cb447"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb447-1" data-line-number="1">boot<span class="op">::</span><span class="kw">boot.ci</span>(bs.med.reresamps, <span class="dt">type=</span><span class="st">&quot;bca&quot;</span>)</a></code></pre></div>
+<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.med.reresamps, type = &quot;bca&quot;)
+## 
+## Intervals : 
+## Level       BCa          
+## 95%   (316, 450 )  
+## Calculations and Intervals on Original Scale</code></pre>
+<div class="sourceCode" id="cb449"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb449-1" data-line-number="1">boot<span class="op">::</span><span class="kw">boot.ci</span>(bs.tmean.reresamps, <span class="dt">type=</span><span class="st">&quot;bca&quot;</span>)</a></code></pre></div>
+<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot::boot.ci(boot.out = bs.tmean.reresamps, type = &quot;bca&quot;)
+## 
+## Intervals : 
+## Level       BCa          
+## 95%   (333, 423 )  
+## Calculations and Intervals on Original Scale</code></pre>
 </div>
-<div id="without-built-in-functions-3" class="section level5">
-<h5><span class="header-section-number">6.6.0.15.2</span> Without built in functions</h5>
-<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb448-1" data-line-number="1">test.stat.jk&lt;-<span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb448-2" data-line-number="2">test.stat2.jk&lt;-<span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb448-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb448-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
-<a class="sourceLine" id="cb448-5" data-line-number="5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(heroin<span class="op">$</span>times)){</a>
-<a class="sourceLine" id="cb448-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb448-7" data-line-number="7">    test.stat.jk&lt;-<span class="kw">c</span>(test.stat.jk,<span class="kw">median</span>(heroin[<span class="op">-</span>i,<span class="dv">4</span>]))</a>
-<a class="sourceLine" id="cb448-8" data-line-number="8">     test.stat2.jk&lt;-<span class="kw">c</span>(test.stat2.jk,<span class="kw">mean</span>(heroin[<span class="op">-</span>i,<span class="dv">4</span>],<span class="dt">trim=</span>.<span class="dv">25</span>))</a>
-<a class="sourceLine" id="cb448-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb448-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb448-11" data-line-number="11">zo.hat&lt;-<span class="kw">qnorm</span>(<span class="kw">sum</span>(test.stat<span class="op">&lt;</span>obs.stat)<span class="op">/</span>reps1,<span class="dv">0</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb448-12" data-line-number="12">a.hat&lt;-<span class="st"> </span><span class="kw">sum</span>((<span class="kw">mean</span>(test.stat.jk) <span class="op">-</span><span class="st"> </span>test.stat.jk)<span class="op">^</span><span class="dv">3</span>)<span class="op">/</span></a>
-<a class="sourceLine" id="cb448-13" data-line-number="13"><span class="st">                 </span>(<span class="dv">6</span><span class="op">*</span>(<span class="kw">sum</span>((<span class="kw">mean</span>(test.stat.jk)<span class="op">-</span>test.stat.jk)<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="fl">1.5</span>))</a>
-<a class="sourceLine" id="cb448-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb448-15" data-line-number="15">zo.hat2&lt;-<span class="st"> </span><span class="kw">qnorm</span>(<span class="kw">sum</span>(test.stat2<span class="op">&lt;</span><span class="st"> </span>obs.stat2)<span class="op">/</span>reps1,<span class="dv">0</span>,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb448-16" data-line-number="16">a.hat2&lt;-<span class="st"> </span><span class="kw">sum</span>((<span class="kw">mean</span>(test.stat2.jk) <span class="op">-</span><span class="st"> </span>test.stat2.jk)<span class="op">^</span><span class="dv">3</span>)<span class="op">/</span></a>
-<a class="sourceLine" id="cb448-17" data-line-number="17"><span class="st">                 </span>(<span class="dv">6</span><span class="op">*</span>(<span class="kw">sum</span>((<span class="kw">mean</span>(test.stat2.jk)<span class="op">-</span>test.stat2.jk)<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="fl">1.5</span>))</a>
-<a class="sourceLine" id="cb448-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb448-19" data-line-number="19">alpha1.bca&lt;-<span class="kw">pnorm</span>(zo.hat <span class="op">+</span><span class="st"> </span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat<span class="op">*</span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))))</a>
-<a class="sourceLine" id="cb448-20" data-line-number="20">alpha2.bca&lt;-<span class="kw">pnorm</span>(zo.hat <span class="op">+</span><span class="st"> </span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat<span class="op">*</span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))))</a>
-<a class="sourceLine" id="cb448-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb448-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb448-23" data-line-number="23">alpha1.bca2&lt;-<span class="kw">pnorm</span>(zo.hat2 <span class="op">+</span><span class="st"> </span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat2<span class="op">*</span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))))</a>
-<a class="sourceLine" id="cb448-24" data-line-number="24">alpha2.bca2&lt;-<span class="kw">pnorm</span>(zo.hat2 <span class="op">+</span><span class="st"> </span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat2<span class="op">*</span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))))</a>
-<a class="sourceLine" id="cb448-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb448-26" data-line-number="26"></a>
-<a class="sourceLine" id="cb448-27" data-line-number="27"><span class="kw">c</span>(<span class="kw">sort</span>(test.stat)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha2.bca)],<span class="kw">sort</span>(test.stat)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha1.bca)])</a>
-<a class="sourceLine" id="cb448-28" data-line-number="28"><span class="kw">c</span>(<span class="kw">sort</span>(test.stat2)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha2.bca2)],<span class="kw">sort</span>(test.stat2)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha1.bca2)])</a></code></pre></div>
+<div id="without-built-in-functions-3" class="section level5 unnumbered">
+<h5>Without built in functions</h5>
+<div class="sourceCode" id="cb451"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb451-1" data-line-number="1">test.stat.jk&lt;-<span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb451-2" data-line-number="2">test.stat2.jk&lt;-<span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb451-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb451-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb451-5" data-line-number="5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(heroin<span class="op">$</span>times)){</a>
+<a class="sourceLine" id="cb451-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb451-7" data-line-number="7">    test.stat.jk&lt;-<span class="kw">c</span>(test.stat.jk,<span class="kw">median</span>(heroin<span class="op">$</span>times[<span class="op">-</span>i]))</a>
+<a class="sourceLine" id="cb451-8" data-line-number="8">     test.stat2.jk&lt;-<span class="kw">c</span>(test.stat2.jk,<span class="kw">mean</span>(heroin<span class="op">$</span>times[<span class="op">-</span>i],<span class="dt">trim=</span>.<span class="dv">25</span>))</a>
+<a class="sourceLine" id="cb451-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb451-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb451-11" data-line-number="11">zo.hat&lt;-<span class="kw">qnorm</span>(<span class="kw">sum</span>(test.stat<span class="op">&lt;</span>obs.stat)<span class="op">/</span>reps1,<span class="dv">0</span>,<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb451-12" data-line-number="12">a.hat&lt;-<span class="st"> </span><span class="kw">sum</span>((<span class="kw">mean</span>(test.stat.jk) <span class="op">-</span><span class="st"> </span>test.stat.jk)<span class="op">^</span><span class="dv">3</span>)<span class="op">/</span></a>
+<a class="sourceLine" id="cb451-13" data-line-number="13"><span class="st">                 </span>(<span class="dv">6</span><span class="op">*</span>(<span class="kw">sum</span>((<span class="kw">mean</span>(test.stat.jk)<span class="op">-</span>test.stat.jk)<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="fl">1.5</span>))</a>
+<a class="sourceLine" id="cb451-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb451-15" data-line-number="15">zo.hat2&lt;-<span class="st"> </span><span class="kw">qnorm</span>(<span class="kw">sum</span>(test.stat2<span class="op">&lt;</span><span class="st"> </span>obs.stat2)<span class="op">/</span>reps1,<span class="dv">0</span>,<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb451-16" data-line-number="16">a.hat2&lt;-<span class="st"> </span><span class="kw">sum</span>((<span class="kw">mean</span>(test.stat2.jk) <span class="op">-</span><span class="st"> </span>test.stat2.jk)<span class="op">^</span><span class="dv">3</span>)<span class="op">/</span></a>
+<a class="sourceLine" id="cb451-17" data-line-number="17"><span class="st">                 </span>(<span class="dv">6</span><span class="op">*</span>(<span class="kw">sum</span>((<span class="kw">mean</span>(test.stat2.jk)<span class="op">-</span>test.stat2.jk)<span class="op">^</span><span class="dv">2</span>)<span class="op">^</span><span class="fl">1.5</span>))</a>
+<a class="sourceLine" id="cb451-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb451-19" data-line-number="19">alpha1.bca&lt;-<span class="kw">pnorm</span>(zo.hat <span class="op">+</span><span class="st"> </span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat<span class="op">*</span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))))</a>
+<a class="sourceLine" id="cb451-20" data-line-number="20">alpha2.bca&lt;-<span class="kw">pnorm</span>(zo.hat <span class="op">+</span><span class="st"> </span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat<span class="op">*</span>(zo.hat <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))))</a>
+<a class="sourceLine" id="cb451-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb451-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb451-23" data-line-number="23">alpha1.bca2&lt;-<span class="kw">pnorm</span>(zo.hat2 <span class="op">+</span><span class="st"> </span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat2<span class="op">*</span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">975</span>))))</a>
+<a class="sourceLine" id="cb451-24" data-line-number="24">alpha2.bca2&lt;-<span class="kw">pnorm</span>(zo.hat2 <span class="op">+</span><span class="st"> </span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))<span class="op">/</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>a.hat2<span class="op">*</span>(zo.hat2 <span class="op">+</span><span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">025</span>))))</a>
+<a class="sourceLine" id="cb451-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb451-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb451-27" data-line-number="27"><span class="kw">c</span>(<span class="kw">sort</span>(test.stat)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha2.bca)],<span class="kw">sort</span>(test.stat)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha1.bca)])</a></code></pre></div>
+<pre><code>## [1] 317 444</code></pre>
+<div class="sourceCode" id="cb453"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb453-1" data-line-number="1"><span class="kw">c</span>(<span class="kw">sort</span>(test.stat2)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha2.bca2)],<span class="kw">sort</span>(test.stat2)[<span class="kw">ceiling</span>(reps1<span class="op">*</span>alpha1.bca2)])</a></code></pre></div>
+<pre><code>## [1] 337 424</code></pre>
 </div>
 </div>
-<div id="comparison-of-intervals" class="section level4">
-<h4><span class="header-section-number">6.6.0.16</span> Comparison of intervals</h4>
+<div id="comparison-of-intervals" class="section level4 unnumbered">
+<h4>Comparison of intervals</h4>
 <p>The first three columns correspond to the CIs for the true median of the survival times. The second three columns correspond to the CIs for the true trimmed mean of the survival times.</p>
 <table>
 <thead>
