@@ -157,7 +157,7 @@ The point of which is to say that the randomization test controls the probabilit
 Now consider a permutation test that randomly permutes the data $B$ times (instead of all ${N \choose n}$ times).  A permutation test approximates a randomization test.  In fact, the permutation test can be analyzed using the following binomial random variable:
 \begin{align}
 X_P &= \# \ \mbox{permutations out of B that give a more extreme value than the observed test statistic}\\
-X_P &\sim& Bin(p_R, B)\\
+X_P &\sim Bin(p_R, B)\\
 SE(X_P) &= \sqrt{\frac{p_R (1-p_R)}{B}} \approx \sqrt{\frac{\hat{p}_P (1-\hat{p}_P)}{B}}
 \end{align}
 
@@ -200,11 +200,12 @@ Given fixed row and column totals, we can easily calculate the interior distribu
 | Row 2 	| c-X 	| N-r-c+X 	| N-r 	|
 | Total 	| c 	| N-c 	| N 	|
 
-<p><span class="math display">\[\begin{aligned}
-P(X=x) &amp;= \frac{{r \choose x}{{N-r} \choose{c-x}}}{{N \choose c}}\\
-&amp;&amp; \mbox{out of those in col 1, how many are in row 1?}\\
-P(X \leq x) &amp;= \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
-&amp;= \mbox{p-value}\end{aligned}\]</span></p>
+\begin{align}
+P(X=x) &= \frac{{r \choose x}{{N-r} \choose{c-x}}}{{N \choose c}}\\
+& \mbox{out of those in col 1, how many are in row 1?}\\
+P(X \leq x) &= \sum_{i=0}^x \frac{{r \choose i}{{N-r} \choose {c-i}}}{{N \choose c}}\\
+&= \mbox{p-value}
+\end{align}
 
 Not common for both row and column totals to be fixed.  (More likely for just column totals to be fixed, e.g., men and women.)  Instead, consider all subsets of the sample space with $N$ observations.  For any particular combination of row and column totals ($rc$):
 
