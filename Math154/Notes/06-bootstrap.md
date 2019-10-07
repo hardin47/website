@@ -129,14 +129,8 @@ Just like repeatedly taking samples from the population, taking resamples from t
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-31)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-32)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-33)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
+<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" /><img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" /><img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-3)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
 </div>
 
 
