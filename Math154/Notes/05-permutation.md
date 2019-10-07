@@ -845,8 +845,8 @@ t2p(-1.56, distr2, alternative="two-sided")
 
 #### Actual MacNell results
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-24-1.png" width="1440" style="display: block; margin: auto;" />
 
+<img src="figs/genderbias3c.png" width="100%" style="display: block; margin: auto;" />
 
 ### Income and Health (F-like test)
 
