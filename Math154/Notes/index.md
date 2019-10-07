@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-10-03"
+date: "2019-10-07"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -47,7 +47,11 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 9/26/19  	|  |  | \@ref(Sep26) [Sep26], \@ref(simsens)   [sim sens] |
 | 10/1/19	| Permutations |  [ISCAM](http://www.rossmanchance.com/iscam3/files.html) | \@ref(Oct1) [Oct1], \@ref(algs) [inf algs] |
 | 10/3/19  	|  |  | \@ref(Oct3) [Oct3], \@ref(perms)   [perm test] |
-
+| 10/8/19	| Bootstrapping |  [ISL]() | \@ref(Oct8) [Oct8], |
+| 10/10/19  	|  |  | \@ref(Oct10) [Oct10], |
+| 10/15/19	| Catch-up |   |  |
+| 10/17/19	| In-class Exam |   |  |
+| 10/22/19	| Fall Break |   |  |
 
 
 

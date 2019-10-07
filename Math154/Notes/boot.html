@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 Bootstrapping | Computational Statistics</title>
+  <meta name="description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 Bootstrapping | Computational Statistics" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
+  <meta name="github-repo" content="hardin47/website/Math154/" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Bootstrapping | Computational Statistics" />
+  
+  <meta name="twitter:description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
+  
+
+<meta name="author" content="Jo Hardin" />
+
+
+<meta name="date" content="2019-10-07" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="permschp.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Computational Statistics</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Class Information</a></li>
+<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="intro.html"><a href="intro.html#Sep3"><i class="fa fa-check"></i><b>1.1</b> 9/3/19 Agenda</a></li>
+<li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#course-logistics"><i class="fa fa-check"></i><b>1.2</b> Course Logistics</a></li>
+<li class="chapter" data-level="1.3" data-path="intro.html"><a href="intro.html#course-content"><i class="fa fa-check"></i><b>1.3</b> Course Content</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="intro.html"><a href="intro.html#topics"><i class="fa fa-check"></i><b>1.3.1</b> Topics</a></li>
+<li class="chapter" data-level="1.3.2" data-path="intro.html"><a href="intro.html#vocabulary"><i class="fa fa-check"></i><b>1.3.2</b> Vocabulary</a></li>
+<li class="chapter" data-level="1.3.3" data-path="intro.html"><a href="intro.html#the-workflow"><i class="fa fa-check"></i><b>1.3.3</b> The Workflow</a></li>
+<li class="chapter" data-level="1.3.4" data-path="intro.html"><a href="intro.html#principles-for-the-data-science-process-tldr"><i class="fa fa-check"></i><b>1.3.4</b> Principles for the Data Science Process tl;dr</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="intro.html"><a href="intro.html#Sep5"><i class="fa fa-check"></i><b>1.4</b> 9/5/19 Agenda</a></li>
+<li class="chapter" data-level="1.5" data-path="intro.html"><a href="intro.html#repro"><i class="fa fa-check"></i><b>1.5</b> Reproducibility</a><ul>
+<li class="chapter" data-level="1.5.1" data-path="intro.html"><a href="intro.html#need-for-reproducibility"><i class="fa fa-check"></i><b>1.5.1</b> Need for Reproducibility</a></li>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#example-1"><i class="fa fa-check"></i>Example 1</a></li>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#example-2"><i class="fa fa-check"></i>Example 2</a></li>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#example-3"><i class="fa fa-check"></i>Example 3</a></li>
+<li class="chapter" data-level="" data-path="intro.html"><a href="intro.html#example-4"><i class="fa fa-check"></i>Example 4</a></li>
+<li class="chapter" data-level="1.5.2" data-path="intro.html"><a href="intro.html#the-reproducible-data-analysis-process"><i class="fa fa-check"></i><b>1.5.2</b> The reproducible data analysis process</a></li>
+</ul></li>
+<li class="chapter" data-level="1.6" data-path="intro.html"><a href="intro.html#data-examples"><i class="fa fa-check"></i><b>1.6</b> Data Examples</a><ul>
+<li class="chapter" data-level="1.6.1" data-path="intro.html"><a href="intro.html#college-rankings-systems"><i class="fa fa-check"></i><b>1.6.1</b> College Rankings Systems</a></li>
+<li class="chapter" data-level="1.6.2" data-path="intro.html"><a href="intro.html#trump-and-twitter"><i class="fa fa-check"></i><b>1.6.2</b> Trump and Twitter</a></li>
+<li class="chapter" data-level="1.6.3" data-path="intro.html"><a href="intro.html#can-twitter-predict-election-results"><i class="fa fa-check"></i><b>1.6.3</b> Can Twitter Predict Election Results?</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>2</b> Visualization</a><ul>
+<li class="chapter" data-level="2.1" data-path="visualization.html"><a href="visualization.html#Sep10"><i class="fa fa-check"></i><b>2.1</b> 9/10/19 Agenda</a></li>
+<li class="chapter" data-level="2.2" data-path="visualization.html"><a href="visualization.html#examples"><i class="fa fa-check"></i><b>2.2</b> Examples</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="visualization.html"><a href="visualization.html#cholera-via-tufte"><i class="fa fa-check"></i><b>2.2.1</b> Cholera via Tufte</a></li>
+<li class="chapter" data-level="2.2.2" data-path="visualization.html"><a href="visualization.html#challenger-via-tufte"><i class="fa fa-check"></i><b>2.2.2</b> Challenger via Tufte</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="visualization.html"><a href="visualization.html#thoughts"><i class="fa fa-check"></i><b>2.3</b> Thoughts on Plotting</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="visualization.html"><a href="visualization.html#advice"><i class="fa fa-check"></i><b>2.3.1</b> Advice</a></li>
+<li class="chapter" data-level="2.3.2" data-path="visualization.html"><a href="visualization.html#an-example-from-information-is-beautiful"><i class="fa fa-check"></i><b>2.3.2</b> An example from Information is Beautiful</a></li>
+<li class="chapter" data-level="2.3.3" data-path="visualization.html"><a href="visualization.html#assessing-graphics-and-other-analyses"><i class="fa fa-check"></i><b>2.3.3</b> Assessing Graphics (and Other Analyses)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="visualization.html"><a href="visualization.html#Sep12"><i class="fa fa-check"></i><b>2.4</b> 9/12/19 Agenda</a></li>
+<li class="chapter" data-level="2.5" data-path="visualization.html"><a href="visualization.html#deconstruct"><i class="fa fa-check"></i><b>2.5</b> Deconstructing a graph</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="visualization.html"><a href="visualization.html#gg"><i class="fa fa-check"></i><b>2.5.1</b> The Grammar of Graphics (<code>gg</code>)</a></li>
+<li class="chapter" data-level="2.5.2" data-path="visualization.html"><a href="visualization.html#ggplot2"><i class="fa fa-check"></i><b>2.5.2</b> <code>ggplot2</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="wrang.html"><a href="wrang.html"><i class="fa fa-check"></i><b>3</b> Data Wrangling</a><ul>
+<li class="chapter" data-level="3.1" data-path="wrang.html"><a href="wrang.html#Sep17"><i class="fa fa-check"></i><b>3.1</b> 9/17/19 Agenda</a></li>
+<li class="chapter" data-level="3.2" data-path="wrang.html"><a href="wrang.html#datastruc"><i class="fa fa-check"></i><b>3.2</b> Structure of Data</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="wrang.html"><a href="wrang.html#building-tidy-data"><i class="fa fa-check"></i><b>3.2.1</b> Building Tidy Data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="wrang.html"><a href="wrang.html#examples-of-chaining"><i class="fa fa-check"></i><b>3.2.2</b> Examples of Chaining</a></li>
+<li class="chapter" data-level="3.2.3" data-path="wrang.html"><a href="wrang.html#data-verbs-on-single-data-frames"><i class="fa fa-check"></i><b>3.2.3</b> Data Verbs (on single data frames)</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="wrang.html"><a href="wrang.html#r-examples-basic-verbs"><i class="fa fa-check"></i><b>3.3</b> R examples, basic verbs</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="wrang.html"><a href="wrang.html#datasets"><i class="fa fa-check"></i><b>3.3.1</b> Datasets</a></li>
+<li class="chapter" data-level="3.3.2" data-path="wrang.html"><a href="wrang.html#examples-of-chaining-1"><i class="fa fa-check"></i><b>3.3.2</b> Examples of Chaining</a></li>
+<li class="chapter" data-level="3.3.3" data-path="wrang.html"><a href="wrang.html#data-verbs"><i class="fa fa-check"></i><b>3.3.3</b> Data Verbs</a></li>
+<li class="chapter" data-level="3.3.4" data-path="wrang.html"><a href="wrang.html#summarize-and-group_by"><i class="fa fa-check"></i><b>3.3.4</b> <code>summarize</code> and <code>group_by</code></a></li>
+<li class="chapter" data-level="3.3.5" data-path="wrang.html"><a href="wrang.html#babynames"><i class="fa fa-check"></i><b>3.3.5</b> babynames</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="wrang.html"><a href="wrang.html#Sep19"><i class="fa fa-check"></i><b>3.4</b> 9/19/19 Agenda</a></li>
+<li class="chapter" data-level="3.5" data-path="wrang.html"><a href="wrang.html#highverb"><i class="fa fa-check"></i><b>3.5</b> Higher Level Data Verbs</a></li>
+<li class="chapter" data-level="3.6" data-path="wrang.html"><a href="wrang.html#r-examples-higher-level-verbs"><i class="fa fa-check"></i><b>3.6</b> R examples, higher level verbs</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="wrang.html"><a href="wrang.html#pivot_longer"><i class="fa fa-check"></i><b>3.6.1</b> <code>pivot_longer</code></a></li>
+<li class="chapter" data-level="3.6.2" data-path="wrang.html"><a href="wrang.html#pivot_wider"><i class="fa fa-check"></i><b>3.6.2</b> <code>pivot_wider</code></a></li>
+<li class="chapter" data-level="3.6.3" data-path="wrang.html"><a href="wrang.html#join-use-join-to-merge-two-datasets"><i class="fa fa-check"></i><b>3.6.3</b> <code>join</code> (use <code>join</code> to <strong>merge</strong> two datasets)</a></li>
+<li class="chapter" data-level="3.6.4" data-path="wrang.html"><a href="wrang.html#lubridate"><i class="fa fa-check"></i><b>3.6.4</b> <code>lubridate</code></a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="wrang.html"><a href="wrang.html#reprex"><i class="fa fa-check"></i><b>3.7</b> <code>reprex</code></a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="sims.html"><a href="sims.html"><i class="fa fa-check"></i><b>4</b> Simulating</a><ul>
+<li class="chapter" data-level="4.1" data-path="sims.html"><a href="sims.html#Sep24"><i class="fa fa-check"></i><b>4.1</b> 9/24/19 Agenda</a></li>
+<li class="chapter" data-level="4.2" data-path="sims.html"><a href="sims.html#simmodels"><i class="fa fa-check"></i><b>4.2</b> Simulating Complicated Models</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="sims.html"><a href="sims.html#goals-of-simulating-complicated-models"><i class="fa fa-check"></i><b>4.2.1</b> Goals of Simulating Complicated Models</a></li>
+<li class="chapter" data-level="4.2.2" data-path="sims.html"><a href="sims.html#examples-of-pigs-and-blackjack"><i class="fa fa-check"></i><b>4.2.2</b> Examples of Pigs and Blackjack</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="sims.html"><a href="sims.html#Sep26"><i class="fa fa-check"></i><b>4.3</b> 9/26/19 Agenda</a></li>
+<li class="chapter" data-level="4.4" data-path="sims.html"><a href="sims.html#simsens"><i class="fa fa-check"></i><b>4.4</b> Simulating to Assess Sensitivity</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="sims.html"><a href="sims.html#bias-in-models"><i class="fa fa-check"></i><b>4.4.1</b> Bias in Models</a></li>
+<li class="chapter" data-level="4.4.2" data-path="sims.html"><a href="sims.html#technical-conditions"><i class="fa fa-check"></i><b>4.4.2</b> Technical Conditions</a></li>
+<li class="chapter" data-level="4.4.3" data-path="sims.html"><a href="sims.html#generating-random-numbers"><i class="fa fa-check"></i><b>4.4.3</b> Generating random numbers</a></li>
+<li class="chapter" data-level="4.4.4" data-path="sims.html"><a href="sims.html#generating-other-rvs-the-inverse-transform-method"><i class="fa fa-check"></i><b>4.4.4</b> Generating other RVs: <strong>The Inverse Transform Method</strong></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="permschp.html"><a href="permschp.html"><i class="fa fa-check"></i><b>5</b> Permutation Tests</a><ul>
+<li class="chapter" data-level="5.1" data-path="permschp.html"><a href="permschp.html#Oct1"><i class="fa fa-check"></i><b>5.1</b> 10/1/19 Agenda</a></li>
+<li class="chapter" data-level="5.2" data-path="permschp.html"><a href="permschp.html#algs"><i class="fa fa-check"></i><b>5.2</b> Inference Algorithms</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="permschp.html"><a href="permschp.html#hypothesis-test-algorithm"><i class="fa fa-check"></i><b>5.2.1</b> Hypothesis Test Algorithm</a></li>
+<li class="chapter" data-level="5.2.2" data-path="permschp.html"><a href="permschp.html#permutation-tests-algorithm"><i class="fa fa-check"></i><b>5.2.2</b> Permutation Tests Algorithm</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="permschp.html"><a href="permschp.html#Oct3"><i class="fa fa-check"></i><b>5.3</b> 10/3/19 Agenda</a></li>
+<li class="chapter" data-level="5.4" data-path="permschp.html"><a href="permschp.html#perms"><i class="fa fa-check"></i><b>5.4</b> Permutation tests in practice</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="permschp.html"><a href="permschp.html#permutation-vs.randomization-tests"><i class="fa fa-check"></i><b>5.4.1</b> Permutation vs. Randomization Tests</a></li>
+<li class="chapter" data-level="5.4.2" data-path="permschp.html"><a href="permschp.html#ci-from-permutation-tests"><i class="fa fa-check"></i><b>5.4.2</b> CI from Permutation Tests</a></li>
+<li class="chapter" data-level="5.4.3" data-path="permschp.html"><a href="permschp.html#randomization-example"><i class="fa fa-check"></i><b>5.4.3</b> Randomization Example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="permschp.html"><a href="permschp.html#r-examples"><i class="fa fa-check"></i><b>5.5</b> R examples</a><ul>
+<li class="chapter" data-level="5.5.1" data-path="permschp.html"><a href="permschp.html#cloud-seeding-two-sample-test-computationally-very-difficult-to-do-a-randomization-test"><i class="fa fa-check"></i><b>5.5.1</b> Cloud Seeding (Two sample test – computationally very difficult to do a randomization test)</a></li>
+<li class="chapter" data-level="5.5.2" data-path="permschp.html"><a href="permschp.html#macnell-teaching-evaluations-stratified-two-sample-t-test"><i class="fa fa-check"></i><b>5.5.2</b> MacNell Teaching Evaluations (Stratified two-sample t-test)</a></li>
+<li class="chapter" data-level="5.5.3" data-path="permschp.html"><a href="permschp.html#income-and-health-f-like-test"><i class="fa fa-check"></i><b>5.5.3</b> Income and Health (F-like test)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="boot.html"><a href="boot.html"><i class="fa fa-check"></i><b>6</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="6.1" data-path="boot.html"><a href="boot.html#Oct8"><i class="fa fa-check"></i><b>6.1</b> 10/8/19 Agenda</a></li>
+<li class="chapter" data-level="6.2" data-path="boot.html"><a href="boot.html#introduction"><i class="fa fa-check"></i><b>6.2</b> Introduction</a></li>
+<li class="chapter" data-level="6.3" data-path="boot.html"><a href="boot.html#basics-notation"><i class="fa fa-check"></i><b>6.3</b> Basics &amp; Notation</a><ul>
+<li class="chapter" data-level="6.3.1" data-path="boot.html"><a href="boot.html#the-plug-in-principle"><i class="fa fa-check"></i><b>6.3.1</b> The Plug-in Principle</a></li>
+<li class="chapter" data-level="6.3.2" data-path="boot.html"><a href="boot.html#the-bootstrap-idea"><i class="fa fa-check"></i><b>6.3.2</b> The Bootstrap Idea</a></li>
+<li class="chapter" data-level="6.3.3" data-path="boot.html"><a href="boot.html#bootstrap-procedure"><i class="fa fa-check"></i><b>6.3.3</b> Bootstrap Procedure</a></li>
+<li class="chapter" data-level="6.3.4" data-path="boot.html"><a href="boot.html#bootstrap-notation"><i class="fa fa-check"></i><b>6.3.4</b> Bootstrap Notation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="boot.html"><a href="boot.html#Oct10"><i class="fa fa-check"></i><b>6.4</b> 10/10/19 Agenda</a></li>
+<li class="chapter" data-level="6.5" data-path="boot.html"><a href="boot.html#bootstrap-confidence-intervals"><i class="fa fa-check"></i><b>6.5</b> Bootstrap Confidence Intervals</a><ul>
+<li class="chapter" data-level="6.5.1" data-path="boot.html"><a href="boot.html#normal-standard-ci-with-bs-se-typenorm"><i class="fa fa-check"></i><b>6.5.1</b> Normal (standard) CI with BS SE: <code>type=&quot;norm&quot;</code></a></li>
+<li class="chapter" data-level="6.5.2" data-path="boot.html"><a href="boot.html#bootstrap-t-confidence-intervals-typestud"><i class="fa fa-check"></i><b>6.5.2</b> Bootstrap-t Confidence Intervals: <code>type=&quot;stud&quot;</code></a></li>
+<li class="chapter" data-level="6.5.3" data-path="boot.html"><a href="boot.html#percentile-confidence-intervals-typeperc"><i class="fa fa-check"></i><b>6.5.3</b> Percentile Confidence Intervals: <code>type=&quot;perc&quot;</code></a></li>
+<li class="chapter" data-level="6.5.4" data-path="boot.html"><a href="boot.html#what-makes-a-ci-good"><i class="fa fa-check"></i><b>6.5.4</b> What makes a CI good?</a></li>
+<li class="chapter" data-level="6.5.5" data-path="boot.html"><a href="boot.html#bca-ci-typebca"><i class="fa fa-check"></i><b>6.5.5</b> BCa CI: <code>type=&quot;bca&quot;</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://st47s.com/Math154" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Computational Statistics</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="boot" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> Bootstrapping</h1>
+<div id="Oct8" class="section level2">
+<h2><span class="header-section-number">6.1</span> 10/8/19 Agenda</h2>
+<ol style="list-style-type: decimal">
+<li>Review: logic of confidence intervals</li>
+<li>Logic of bootstrapping (resample from the sample <em>with</em> replacement)</li>
+<li>BS SE of a statistic</li>
+</ol>
+</div>
+<div id="introduction" class="section level2">
+<h2><span class="header-section-number">6.2</span> Introduction</h2>
+<p>As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample).</p>
+<p>Main idea: we will be able to estimate the <strong>variability</strong> of our estimator (difference in medians, ordinary least square with non-normal errors, etc.).</p>
+<ul>
+<li>It’s not so strange to get <span class="math inline">\(\hat{\theta}\)</span> and SE(<span class="math inline">\(\hat{\theta}\)</span>) from the data (consider <span class="math inline">\(\hat{p}\)</span> &amp; <span class="math inline">\(\sqrt{\hat{p}(1-\hat{p})/n}\)</span> and <span class="math inline">\(\overline{X}\)</span> &amp; <span class="math inline">\(s/\sqrt{n}\)</span>).</li>
+<li>We’ll only consider confidence intervals for now.</li>
+<li>Bootstrapping doesn’t help get around small samples.</li>
+</ul>
+<p>The following applets may be helpful:
+* The logic of confidence intervals <a href="http://www.rossmanchance.com/applets/ConfSim.html" class="uri">http://www.rossmanchance.com/applets/ConfSim.html</a>
+* Bootstrapping from actual datasets <a href="http://lock5stat.com/statkey/index.html" class="uri">http://lock5stat.com/statkey/index.html</a></p>
+</div>
+<div id="basics-notation" class="section level2">
+<h2><span class="header-section-number">6.3</span> Basics &amp; Notation</h2>
+<p>Let <span class="math inline">\(\theta\)</span> be the parameter of interest, and let <span class="math inline">\(\hat{\theta}\)</span> be the estimate of <span class="math inline">\(\theta\)</span>. If we could, we’d take lots of samples of size <span class="math inline">\(n\)</span> from the population to create a <strong>sampling distribution</strong> for <span class="math inline">\(\hat{\theta}\)</span>. Consider taking <span class="math inline">\(B\)</span> random samples from <span class="math inline">\(F\)</span>:</p>
+<p><span class="math display">\[\begin{align}
+\hat{\theta}(\cdot) = \frac{1}{B} \sum_{i=1}^B \hat{\theta}_i
+\end{align}\]</span>
+is our best guess for <span class="math inline">\(\theta\)</span>. If <span class="math inline">\(\hat{\theta}\)</span> is very different from <span class="math inline">\(\theta\)</span>, we would call it <strong>biased</strong>.
+<span class="math display">\[\begin{align}
+SE(\hat{\theta}) &amp;= \bigg[ \frac{1}{B-1} \sum_{i=1}^B(\hat{\theta}_i - \hat{\theta}(\cdot))^2 \bigg]^{1/2}\\
+q_1 &amp;= [0.25 n] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
+q_3 &amp;= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
+\end{align}\]</span></p>
+<p>If we could, we would completely characterize the sampling distribution (as a function of <span class="math inline">\(\theta\)</span>) which would allow us to make inference on <span class="math inline">\(\theta\)</span> when we only had <span class="math inline">\(\hat{\theta}\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-2-1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="1440" />
+<p class="caption">
+Figure 1.2: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig
+</p>
+</div>
+<div id="the-plug-in-principle" class="section level3">
+<h3><span class="header-section-number">6.3.1</span> The Plug-in Principle</h3>
+<p>Recall
+<span class="math display">\[\begin{align}
+F(x) &amp;= P(X \leq x)\\
+\hat{F}(x) &amp;= S(x) = \frac{\# \{X_i \leq x\} }{n}
+\end{align}\]</span>
+<span class="math inline">\(\hat{F}(x)\)</span> is a sufficient statistic for <span class="math inline">\(F(x)\)</span>. That is, all the information about <span class="math inline">\(F\)</span> that is in the data is contained in <span class="math inline">\(\hat{F}(x)\)</span>. Additionally, <span class="math inline">\(\hat{F}(x)\)</span> is the MLE of <span class="math inline">\(F(x)\)</span> (they are both probabilities, so it’s a binomial argument).</p>
+<p>Note that, in general, we are interested in a parameter, <span class="math inline">\(\theta\)</span>.
+<span class="math display">\[\begin{align}
+\theta = t(F) \ \ \ \ [\mbox{e.g., } \mu = \int x f(x) dx ]
+\end{align}\]</span></p>
+<p>The <em>plug-in estimate</em> of <span class="math inline">\(\theta\)</span> is:
+<span class="math display">\[\begin{align}
+\hat{\theta} = t(\hat{F}) \ \ \ \ [\mbox{e.g., } \overline{X} = \frac{1}{n} \sum X_i ]
+\end{align}\]</span></p>
+<p>That is: <em>to estimate a parameter, use the statistic that is the corresponding quantity for the sample.</em></p>
+<p><span class="math display">\[\begin{align}
+\mbox{Ideal Real World} &amp;&amp; \mbox{Boostrap World}\\
+F \rightarrow x &amp;\Rightarrow&amp; \hat{F} \rightarrow x^*\\
+\downarrow &amp; &amp; \downarrow\\
+\hat{\theta} &amp; &amp; \hat{\theta}^*
+\end{align}\]</span></p>
+<p>The idea of boostrapping (and in fact, the bootstrap samples themselves), depends on the double arrow. We must have a random sample: that is, <span class="math inline">\(\hat{F}\)</span> must do a good job of estimating <span class="math inline">\(F\)</span> in order for bootstrap concepts to be meaningful.</p>
+<p>Note that you’ve seen the plug-in-principle before:
+<span class="math display">\[\begin{align}
+\sqrt{\frac{p(1-p)}{n}} &amp;\approx&amp; \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\\
+\end{align}\]</span>
+<!--
+%\mbox{Fisher's Information: } I(\theta) &\approx& I(\hat{\theta})
+--></p>
+</div>
+<div id="the-bootstrap-idea" class="section level3">
+<h3><span class="header-section-number">6.3.2</span> The Bootstrap Idea</h3>
+<p>We can <em>resample</em> from the <em>sample</em> to represent samples from the actual population! The <em>boostrap distribution</em> of a statistic, based on many resamples, represents the <strong>sampling distribution</strong> of the statistic based on many samples. Is this okay?? What are we assuming?</p>
+<ol style="list-style-type: decimal">
+<li><p>As <span class="math inline">\(n \rightarrow \infty\)</span>, <span class="math inline">\(\hat{F}(x) \rightarrow F(x)\)</span></p></li>
+<li><p>As <span class="math inline">\(B \rightarrow \infty\)</span>, <span class="math inline">\(\hat{F}(\hat{\theta}^*) \rightarrow F(\hat{\theta})\)</span> (with large <span class="math inline">\(n\)</span>). Or really, what we typically see if <span class="math inline">\(\hat{F}(\hat{\theta}^* / \hat{\theta}) \rightarrow F(\hat{\theta} / \theta)\)</span> or <span class="math inline">\(\hat{F}(\hat{\theta}^* - \hat{\theta}) \rightarrow F(\hat{\theta} - \theta)\)</span></p></li>
+</ol>
+</div>
+<div id="bootstrap-procedure" class="section level3">
+<h3><span class="header-section-number">6.3.3</span> Bootstrap Procedure</h3>
+<ol style="list-style-type: decimal">
+<li>Resample data <strong>with replacement</strong>.</li>
+<li>Calculate the statistic of interest for each resample.</li>
+<li>Repeat 1. and 2. <span class="math inline">\(B\)</span> times.</li>
+<li>Use the bootstrap distribution for inference.</li>
+</ol>
+<p>In R:</p>
+<pre><code>install.packages(&#39;bootstrap&#39;)
+library(bootstrap)
+install.packages(&#39;boot&#39;)
+library(boot)
+?bootstrap
+?boott
+?bootpred</code></pre>
+</div>
+<div id="bootstrap-notation" class="section level3">
+<h3><span class="header-section-number">6.3.4</span> Bootstrap Notation</h3>
+<p>Take lots (<span class="math inline">\(B\)</span>) of sample of size n from the sample, <span class="math inline">\(\hat{F}(x)\)</span> (instead of from the population, <span class="math inline">\(F(x)\)</span> ) to create a bootstrap distribution for <span class="math inline">\(\hat{\theta}^*\)</span> (instead of the sampling distribution for <span class="math inline">\(\hat{\theta}\)</span>).</p>
+<p>Let <span class="math inline">\(\hat{\theta}^*(b)\)</span> be the calculated statistic of interest for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. Our best guess for <span class="math inline">\(\theta\)</span> is:
+<span class="math display">\[\begin{align}
+\hat{\theta}^* = \frac{1}{B} \sum_{b=1}^B \hat{\theta}^*(b)
+\end{align}\]</span>
+(if <span class="math inline">\(\hat{\theta}^*\)</span> is very different from <span class="math inline">\(\hat{\theta}\)</span>, we call it biased.) And the estimated value for the standard error of our estimate is
+<span class="math display">\[\begin{align}
+\hat{SE}_B = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
+\end{align}\]</span></p>
+<p>Just like repeatedly taking samples from the population, taking resamples from the sample allows us to characterize the bootstrap distribution which approximates the sampling distribution. The bootstrap distribution approximates the <strong>shape, spread, &amp; bias</strong> of the actual sampling distribution.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-3-1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="1440" />
+<p class="caption">
+Figure 1.3: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig
+</p>
+</div>
+<!--
+#### How accurate is a bootstrap distribution?
+\begin{itemize}
+\item
+**Almost all** of the variation in a bootstrap distribution comes from the selection of the original sample.  (That is,  boostrapping does not overcome issues associated with small sample or non-random samples.)
+\item
+Resampling $B>1000$ does not typically reduce variability more.
+\end{itemize}
+
+Again,
+\begin{enumerate}
+\item
+As $n \rightarrow \infty$, $\hat{F}(x) \rightarrow F(x)$
+\item
+As $B \rightarrow \infty$, $\hat{F^*}(\hat{\theta}^*) \rightarrow F(\hat{\theta})$  (with large $n$)
+\end{enumerate}
+
+
+#### When does the bootstrap not work?
+
+Consider $X \sim U[0,1]$ (note this would also work with $U[a,b]$).  Let $Y = \max(X_i)$.
+\begin{align}
+F_Y(y) = P(Y \leq y) &= P( \mbox{ all } X_i \leq y)\\
+&= P(X_i \leq y ) ^n\\
+&= y^n\\
+f_Y(y) &= \frac{\partial F_Y(y)}{\partial y}\\
+&= n y^{n-1} \\
+\end{align}
+
+Note that the Bootstrap sampling distributions are a poor approximation to the true sampling distribution.  The problem is that $\hat{F}$ is not a good estimate of the true distribution $F$ in the extreme tail.  Options to fix this problem include using a parametric bootstrap (with knowledge of the population distribution) or smoothing $\hat{F}$ to approximate $F$ better.
+
+Bias of the sample max:
+
+\begin{align}
+bias_F &= E[\hat{\theta}] - \theta\\
+E[\hat{\theta}] &= E [\max(X_i)] \\
+&= \int_0^1 y n y^{n-1} dy\\
+&= \frac{n}{n+1} y^{n+1} \bigg|_0^1\\
+&= \frac{n}{n+1}\\
+bias_F &= \frac{n}{n+1} -1 = \frac{-1}{n+1}
+\end{align}
+
+We can think about the bootstrap bias in the same way:
+\begin{align}
+bias_{\hat{F}} &= E[\theta^*]- \hat{\theta}\\
+&\approx& \hat{\theta}^* - \hat{\theta}\\
+\hat{\theta} &= 0.9997507\\
+\hat{\theta}^* &= 0.9805526\\
+\hat{bias}_{\hat{F}} &=  0.01919808\\
+1/51 &=  0.01960784\\
+\end{align}
+
+Consider a population of 82 law schools.  Two measurements were made on the entering class of each school (in 1973!).  LSAT, the average score for the class on a national law test, and GPA, the average undergraduate grade-point average for the class.  A random sample of 15 schools is selected from the population, and the correlation between GPA and LSAT score was found to be 0.776.
+
+In a perfect world, how would we then proceed to think about this problem?  What do we want to know?  What do we want to say about the population? We'd want to know the **sampling distribution** of r...$\hat{\theta}$.
+
+Before we go any further...  Fisher worked on the correlation coefficient and had two interesting results:
+
+\begin{enumerate}
+\item
+Fisher (1915) proved that the expected value of the correlation coefficient based on random sampling from a normal population is approximately:
+\begin{align}
+E[r] = \rho - \frac{\rho(1-\rho^2)}{2n}
+\end{align}
+Solving for $\rho$ gives an approximately unbiased estimator of the population correlation:
+\begin{align}
+\hat{\rho} = r \Big[ 1 + \frac{(1-r^2)}{2n} \Big]
+\end{align}
+Further work has been done (Fisher (1915), Kenny and Keeping (1951), Sawkins (1944), and Olkin and Pratt (1958)) the later which recommend using
+\begin{align}
+\hat{\rho} = r \Big[ 1 + \frac{(1-r^2)}{2(n-3)} \Big]
+\end{align}
+Note that the bias decreases as $n$ increases and as $\rho$ approaches zero.  Note also that if the data are distributed normally:
+\begin{align}
+SE(r) = \frac{(1-\rho^2)}{\sqrt{n-2}}
+\end{align}
+(No other distribution leads to a simple formula for the SE of the correlation.)
+\item
+Fisher also introduced the $r$ to $Z$ transformation:
+\begin{align}
+Z = \frac{1}{2} \ln \Big[\frac{1+r}{1-r}\Big]
+\end{align}
+We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is simply an inverse hyperbolic tangent function.)
+\end{enumerate}
+-->
+</div>
+</div>
+<div id="Oct10" class="section level2">
+<h2><span class="header-section-number">6.4</span> 10/10/19 Agenda</h2>
+<ol style="list-style-type: decimal">
+<li>t CI using BS SE</li>
+<li>Bootstrap-t (studentized) CIs</li>
+<li>Percentile CIs</li>
+<li>properties / advantages / disadvantages</li>
+</ol>
+<!--
+https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
+-->
+<p>Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment. The data in <code>heroin.txt</code> include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4). For about 37% of the subjects, the study ended while they were still the in clinic (status=0). Thus, their survival time has been truncated. For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time. Below we explore using the median as well as the 25% trimmed mean. We treat the group of 238 patients as representative of the population. <span class="citation">(From Chance and Rossman <a href="#ref-ISCAM">2018</a><a href="#ref-ISCAM">a</a>, Investigation 4.5.3)</span></p>
+<p>See: <a href="http://pages.pomona.edu/~jsh04747/courses/math154/heroinBS.pdf" class="uri">http://pages.pomona.edu/~jsh04747/courses/math154/heroinBS.pdf</a></p>
+</div>
+<div id="bootstrap-confidence-intervals" class="section level2">
+<h2><span class="header-section-number">6.5</span> Bootstrap Confidence Intervals</h2>
+<div id="normal-standard-ci-with-bs-se-typenorm" class="section level3">
+<h3><span class="header-section-number">6.5.1</span> Normal (standard) CI with BS SE: <code>type=&quot;norm&quot;</code></h3>
+<p>Keep in mind that what we are trying to do is approximate the sampling distribution of <span class="math inline">\(\hat{\theta}\)</span>. In fact, what we are really able to do here is to estimate the sampling distribution of <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>. We hope that:</p>
+<p><span class="math display">\[\begin{align}
+\hat{F}\Big(\frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}(\hat{\theta}^*(b))} \Big) \rightarrow F\Big(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\Big)
+\end{align}\]</span></p>
+<p>Recall the derivation of conventional confidence intervals (based on the assumption that the sampling distribution of the test statistic is normal or close):</p>
+<p><span class="math display">\[\begin{align}
+P\bigg(t_{(\alpha/2), df} \leq \frac{\hat{\theta} - \theta}{SE(\hat{\theta})} \leq t_{(1-\alpha/2), df}\bigg)&amp;= 1 - \alpha\\
+P\bigg(\hat{\theta} - t_{(1-\alpha/2), df} SE(\hat{\theta}) \leq \theta \leq \hat{\theta} - t_{(\alpha/2), df} SE(\hat{\theta})\bigg) &amp;= 1 - \alpha\\
+\end{align}\]</span></p>
+<p>That is, it’s the endpoints that are random, and we have a 0.95 probability that we’ll get a random sample which will produce endpoints which will capture the true parameter.</p>
+<p>A 95% CI for <span class="math inline">\(\theta\)</span> would then be: <span class="math display">\[\hat{\theta} \pm t_{(\alpha/2), df} \hat{SE}(\hat{\theta}^*(b))\]</span></p>
+</div>
+<div id="bootstrap-t-confidence-intervals-typestud" class="section level3">
+<h3><span class="header-section-number">6.5.2</span> Bootstrap-t Confidence Intervals: <code>type=&quot;stud&quot;</code></h3>
+<p>(The idea here is that we are calculating the “t-multiplier” that is used in the CI. It was William Gosset who went my the pseudonym of “Student” who originally figured out the distribution of the t-multiplier, so the following intervals are called either “studentized” or “t” bootstrap confidence intervals.)</p>
+<p>Recall the derivation of conventional confidence intervals:</p>
+<p><span class="math display">\[\begin{align}
+P\bigg(t_{(\alpha/2), df} \leq \frac{\hat{\theta} - \theta}{SE(\hat{\theta})} \leq t_{(1-\alpha/2), df}\bigg)&amp;= 1 - \alpha\\
+P\bigg(\hat{\theta} - t_{(1-\alpha/2), df} SE(\hat{\theta}) \leq \theta \leq \hat{\theta} - t_{(\alpha/2), df} SE(\hat{\theta})\bigg) &amp;= 1 - \alpha\\
+\end{align}\]</span></p>
+<p>That is, it’s the endpoints that are random, and we have a 0.95 probability that we’ll get a random sample which will produce endpoints which will capture the true parameter.</p>
+<ol style="list-style-type: decimal">
+<li><p>We could simply use the BS SE within the CI formula (and did for the interval above). The problem is that such an interval will only be accurate if the distribution for <span class="math inline">\(\hat{\theta}\)</span> is reasonably normal. If there is any bias or skew, the CI will not have desired coverage levels (<span class="citation">Efron and Tibshirani (<a href="#ref-efrontibs">1993</a>)</span>, pg 161 and chapter 22).</p></li>
+<li><p>Now consider using the bootstrap to estimate the distribution for <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>.
+<span class="math display">\[\begin{align}
+T^*(b) &amp;= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
+\end{align}\]</span></p></li>
+</ol>
+<p>where <span class="math inline">\(\hat{\theta}^*(b)\)</span> is the value of <span class="math inline">\(\hat{\theta}\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample, and <span class="math inline">\(\hat{SE}^*(b)\)</span> is the estimated standard error of <span class="math inline">\(\hat{\theta}^*(b)\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. The <span class="math inline">\(\alpha^{th}\)</span> percentile of <span class="math inline">\(T^*(b)\)</span> is estimated by the value of <span class="math inline">\(\hat{t}_\alpha\)</span> such that</p>
+<p><span class="math display">\[\begin{align}
+\frac{\# \{T^*(b) \leq \hat{t}_{\alpha/2} \} }{B} = \alpha/2
+\end{align}\]</span></p>
+<p>For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the 5% point is the <span class="math inline">\(50^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s, and the estimate of the 95% point is the <span class="math inline">\(950^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s.</p>
+<p>Finally, the boostrap-t confidence interval is:
+<span class="math display">\[\begin{align} \label{BSt}
+(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B)
+\end{align}\]</span></p>
+<p>To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as follows:</p>
+<ol style="list-style-type: decimal">
+<li><p>Generate <span class="math inline">\(B_1\)</span> bootstrap samples, and for each sample <span class="math inline">\(\underline{X}^{*b}\)</span> compute the bootstrap estimate <span class="math inline">\(\hat{\theta}^*(b)\)</span>.</p></li>
+<li><p>Take <span class="math inline">\(B_2\)</span> bootstrap samples from <span class="math inline">\(\underline{X}^{*b}\)</span>, and estimate the standard error, <span class="math inline">\(\hat{SE}(\hat{\theta}^*(b))\)</span>.</p></li>
+<li><p>Find <span class="math inline">\(B_1\)</span> values for <span class="math inline">\(T^*(b)\)</span>. Calculate <span class="math inline">\(\hat{t}_\alpha\)</span> and <span class="math inline">\(\hat{t}_{1-\alpha}\)</span>.</p></li>
+<li><p>Calculate the CI as in equation ().</p></li>
+</ol>
+<ul>
+<li><p>If <span class="math inline">\(B\cdot \alpha\)</span> is not an integer, use <span class="math inline">\(k=\lfloor (B+1) \alpha \rfloor\)</span> and <span class="math inline">\(B+1-k\)</span>.</p></li>
+<li><p>Bootstrap-t intervals are somewhat erratic and can be influenced by a few outliers. Percentile methods can be more reliable. [The balance of which is best when is an open question depending a lot on the data distribution and statistic of interest.]</p></li>
+<li><p><span class="math inline">\(B=100\)</span> or 200 is probably not enough for a bootstrap-t CI (500 or 1000 is better). However, <span class="math inline">\(B=25\)</span> may be enough to estimate the SE in the inner-BS procedure. (<span class="math inline">\(B=1000\)</span> is needed for computing percentiles.)</p></li>
+<li><p>In choosing the appropriate multiplier:</p>
+<ul>
+<li>When it is the correct multiplier to use, the normal multiplier (<span class="math inline">\(z\)</span>) is good for all <span class="math inline">\(n\)</span> and all samples.</li>
+<li>When it is the correct multiplier to use, the t multiplier is good for all samples but a specified <span class="math inline">\(n\)</span>.</li>
+<li>When it is the correct multiplier to use, the bootstrap-t multiplier is good for *this} sample only.</li>
+</ul></li>
+<li><p>The resulting intervals will typically not be symmetric (that is <span class="math inline">\(\hat{t}_\alpha \ne - \hat{t}_{1-\alpha}\)</span>). This is part of the improvement over <span class="math inline">\(z\)</span> or <span class="math inline">\(t\)</span> intervals.</p></li>
+<li><p>Bootstrap-t intervals are good for location statistics (mean, quantiles, trimmed means) but cannot be trusted for other statistics like the correlation (which do not necessarily vary based on ideas of shift).</p></li>
+</ul>
+</div>
+<div id="percentile-confidence-intervals-typeperc" class="section level3">
+<h3><span class="header-section-number">6.5.3</span> Percentile Confidence Intervals: <code>type=&quot;perc&quot;</code></h3>
+<p>The interval between the <span class="math inline">\(\alpha/2\)</span> and <span class="math inline">\(1-\alpha/2\)</span> quantiles of the bootstrap distribution of a statistic is a <span class="math inline">\((1-\alpha)100\%\)</span> bootstrap percentile confidence interval for the corresponding parameter:</p>
+<p><span class="math display">\[\begin{align}
+[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]
+\end{align}\]</span></p>
+<p>Why does it work? It isn’t immediately obvious that the interval above will capture the true parameter, <span class="math inline">\(\theta\)</span>, at a rate or 95%. Consider a skewed sampling distribution. If your <span class="math inline">\(\hat{\theta}\)</span> comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate? (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron’s “backwards” intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won’t capture the parameter with the correct rate.</p>
+<p>To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let <span class="math inline">\(\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)\)</span>, where g is a monotonic function (assume wlog that g is increasing). The point is to choose (if possible) <span class="math inline">\(g(\cdot)\)</span> such that</p>
+<p><span class="math display">\[\begin{align}
+ \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2). \label{phidist}
+ \end{align}\]</span>
+Again, consider the logic for the conventional confidence interval. Because <span class="math inline">\(\hat{\phi} - \phi \sim N(0, \sigma^2)\)</span>, the interval for <span class="math inline">\(\theta\)</span> is derived by:</p>
+<p><span class="math display">\[\begin{align}
+P(z_{0.05} \leq \frac{\hat{\phi} - \phi}{\sigma}  ) = 0.95  \nonumber \\
+P(-\infty \leq \phi \leq \hat{\phi} - z_{0.05} \sigma) = 0.95  \nonumber \\
+P(-\infty \leq \phi \leq \hat{\phi} + z_{0.95} \sigma) = 0.95  \nonumber \\
+P(-\infty \leq \theta \leq g^{-1}(\hat{\phi} + z_{0.95} \sigma)) = 0.95  \nonumber \\
+\Rightarrow \mbox{CI for } \theta: \ \ \ (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) \label{phiint}
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(z_{1-\alpha}\)</span> is the <span class="math inline">\(100(1-\alpha)\)</span> percent point of the standard normal distribution. Ideally, if we knew <span class="math inline">\(g\)</span> and <span class="math inline">\(\sigma\)</span>, we’d be able to do the transformation and find <span class="math inline">\(g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})\)</span> (which would give the endpoint of the confidence interval).</p>
+<p>Going back to () indicates that <span class="math inline">\(\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)\)</span> (because <span class="math inline">\(\hat{\phi} ^* \sim N(\hat{\phi}, \sigma^2)\)</span>). Further, since <span class="math inline">\(g\)</span> is monotonically increasing, <span class="math inline">\(F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).\)</span>
+Substituting in (), gives the percentile interval for <span class="math inline">\(\theta\)</span>,</p>
+<p><span class="math display">\[\begin{align}
+(-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
+\end{align}\]</span></p>
+<p>(A similar argument gives the same derivation of the two sided confidence interval. Proof from <span class="citation">Carpenter and Bithell (<a href="#ref-carp2000">2000</a>)</span>) In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists. We do not need to actually find the transformation!</p>
+<!--
+\begin{align}
+P\bigg(t_{(\alpha/2), df} \leq \frac{\hat{\theta} - \theta}{SE(\theta)} \leq t_{(1-\alpha/2), df}\bigg)&= 1 - \alpha\\
+P\bigg(\hat{\theta} - t_{(1-\alpha/2), df} SE(\theta) \leq \theta \leq \hat{\theta} - t_{(\alpha/2), df} SE(\theta)\bigg) &= 1 - \alpha\\
+\end{align}
+Let's think about the endpoints in a way that is convenient for bootstrap CIs.  Let $\hat{\theta}^*$ indicate a random variable drawn from the distribution $N(\hat{\theta}, \hat{SE}^2)$.  That is, assume (for a minute) that the true sampling distribution for $\hat{\theta}$ (and for $\hat{\theta}^*$) is normal.
+\begin{align}
+\hat{\theta}^* \sim N(\hat{\theta}, \hat{SE}^2)
+\end{align}
+Then $\hat{\theta}_{lo} = \hat{\theta} - t_{(1-\alpha/2), df} \hat{SE} \approx \hat{\theta} - t_{(1-\alpha/2), df} SE(\theta)$ and $\hat{\theta}_{up} = \hat{\theta} - t_{(\alpha/2), df} \hat{SE} \approx \hat{\theta} - t_{(\alpha/2), df} SE(\theta)$ are the $100\alpha^{th}$ and $100(1-\alpha)^{th}$ percentiles for the distribution of $\hat{\theta}^*$.   In other words:
+\begin{align}
+\hat{\theta}_{lo} &= \hat{\theta}^*_\alpha = 100 \alpha^{th} \mbox{ percentile of the distribution for } \hat{\theta}^*\\
+\hat{\theta}_{up} &= \hat{\theta}^*_{1-\alpha} = 100 (1-\alpha)^{th} \mbox{ percentile of the distribution for } \hat{\theta}^*\\
+\end{align}
+
+That is, if in fact $\hat{\theta}^*$ has a normal distribution, the percentiles will equal the appropriate CI bounds, and so we know that the probability theory will hold.
+-->
+<p><strong>The transformation respecting property</strong> A CI is transformation respecting if, for any monotone transformation, the CI for the transformed parameter is simply the transformed CI for the unstransformed parameter. Let <span class="math inline">\(\phi = m(\theta)\)</span>.</p>
+<p><span class="math display">\[\begin{align}
+[\phi_{lo}, \phi_{up}] = [m(\theta_{lo}), m(\theta_{up})]
+\end{align}\]</span></p>
+<p>Note that the idea has to do with the process of creating the CI. That is, if we create the confidence interval using <span class="math inline">\(\phi\)</span>, we’ll get the same thing as if we created the CI using <span class="math inline">\(\theta\)</span> and then transformed it. It is straightforward to see that the percentile CI is transformation respecting. That is, for any monotone transformation of the statistic and parameter, the CI will be transformed appropriately.</p>
+<p>Let
+<span class="math display">\[\begin{align}
+\hat{\phi} &amp;= 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg)\\
+r &amp;=\frac{e^{2\phi}+1}{e^{2\phi}-1}\\
+\end{align}\]</span></p>
+<p>We know that <span class="math inline">\(\hat{\phi}\)</span> does have an approximated normal distribution. So, the percentile CI for <span class="math inline">\(\phi\)</span> will approximate the normal theory CI which we know to be correct (for a given <span class="math inline">\(\alpha\)</span>). But once we have a CI for <span class="math inline">\(\phi\)</span> we can find the CI for <span class="math inline">\(\rho\)</span> by taking the inverse monotonic transformation; or rather… we can just use the r percentile CI to start with!</p>
+<!--
+**Percentile interval lemma** (@efrontibs pg 173, 1993)  Suppose the transformation for $\hat{\phi} = m(\hat{\theta})$ perfectly normalizes the distribution of $\hat{\theta}$:
+\begin{align}
+\hat{\phi} \sim N (\phi, 1)
+\end{align}
+Then the percentile interval based on $\hat{\theta}$ equals $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$.
+
+And we can approximate $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$ using $[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]$
+
+In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
+
+See Charlotte's example on bootstrapping a loess smooth for her thesis data (carryingcap.r).  The idea was this:  Charlotte had some data that she wanted to model (using differential equations).  She asked me how to tell whether or not her new model was reflective of the data / population.  So, we fit a loess spline to see the shape of the data.  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit.
+
+Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
+-->
+<p><strong>The range preserving property</strong> Another advantage of the percentile interval is that it is range preserving. That is, the CI always produces endpoints that fall within the allowable range of the parameter.</p>
+<p><strong>Bias</strong> The percentile interval is not, however, perfect. If the statistic is a biased estimator of the parameter, there will not exist a transformation such that the distribution is centered around the correct function of the parameter. Formally, if
+<span class="math display">\[\begin{align}
+\hat{\theta} \sim N(\theta + bias, \hat{SE}^2)
+\end{align}\]</span>
+no transformation <span class="math inline">\(\phi = m(\theta)\)</span> can fix things up. Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has simply fixed the situation when the distribution is non-normal.</p>
+</div>
+<div id="what-makes-a-ci-good" class="section level3">
+<h3><span class="header-section-number">6.5.4</span> What makes a CI good?</h3>
+<ul>
+<li>Symmetry (??): the interval is symmetric, pivotal around some value. Not necessarily a good thing. Maybe a bad thing to force?</li>
+<li>Resistant: BS-t is particularly not resistant to outliers or crazy sampling distributions of the statistic (can make it more robust with a variance stabilizing transformation)</li>
+<li>Range preserving: the CI always contains only values that fall within an allowable range (<span class="math inline">\(p, \rho\)</span>,…)</li>
+<li>Transformation respecting: for any monotone transformation, <span class="math inline">\(\phi = m(\theta)\)</span>, the interval for <span class="math inline">\(\theta\)</span> is simply mapped by <span class="math inline">\(m(\theta)\)</span>. If <span class="math inline">\([\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]\)</span> is a <span class="math inline">\((1-\alpha)100\)</span>% interval for <span class="math inline">\(\theta\)</span>, then</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+[\hat{\phi}_{(lo)},\hat{\phi}_{(hi)}] = [m(\hat{\theta}_{(lo)}),m(\hat{\theta}_{(hi)})]
+\end{align}\]</span>
+are exactly the same interval.</p>
+<ul>
+<li>Level of confidence: A central (not symmetric) confidence interval, <span class="math inline">\([\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]\)</span> should have probability <span class="math inline">\(\alpha/2\)</span> of not covering <span class="math inline">\(\theta\)</span> from above or below:</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+P(\theta &lt; \hat{\theta}_{(lo)})&amp;=\alpha/2\\
+P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2\\
+\end{align}\]</span></p>
+<ul>
+<li><p>Note: all of our intervals are approximate. We judge them based on how accurately they cover <span class="math inline">\(\theta\)</span>.</p>
+<ul>
+<li><p>A CI is first order accurate if:
+<span class="math display">\[\begin{align}
+P(\theta &lt; \hat{\theta}_{(lo)})&amp;=\alpha/2 + \frac{const_{lo}}{\sqrt{n}}\\
+P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2+ \frac{const_{hi}}{\sqrt{n}}\\
+\end{align}\]</span></p></li>
+<li><p>A CI is second order accurate if:
+<span class="math display">\[\begin{align}
+P(\theta &lt; \hat{\theta}_{(lo)})&amp;=\alpha/2 + \frac{const_{lo}}{n}\\
+P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2+ \frac{const_{hi}}{n}\\
+\end{align}\]</span></p></li>
+</ul></li>
+</ul>
+<p>BS-t is <span class="math inline">\(2^{nd}\)</span> order accurate for a large general class of functions. However, in practice, the coverage rate doesn’t kick in for small/med sample sizes unless appropriate transformations make the distribution more bell-shaped. <span class="citation">(Tibshirani <a href="#ref-tibs88">1988</a>)</span></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">CI</th>
+<th align="center">Symmetric</th>
+<th align="center">Range Resp</th>
+<th align="center">Trans Resp</th>
+<th align="center">Accuracy</th>
+<th align="center">Normal Samp Dist?</th>
+<th>Other</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">perc</td>
+<td align="center">No</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center"><span class="math inline">\(1^{st}\)</span> order</td>
+<td align="center">No</td>
+<td>small <span class="math inline">\(n \rightarrow\)</span> low accuracy</td>
+</tr>
+<tr class="even">
+<td align="center">BS SE</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+<td align="center">No</td>
+<td align="center"><span class="math inline">\(1^{st}\)</span> order</td>
+<td align="center">Yes</td>
+<td>param assump <span class="math inline">\(F(\hat{\theta})\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">BS-t</td>
+<td align="center">No</td>
+<td align="center">No</td>
+<td align="center">No</td>
+<td align="center"><span class="math inline">\(2^{nd}\)</span> order</td>
+<td align="center">Yes/No</td>
+<td>computer intensive</td>
+</tr>
+<tr class="even">
+<td align="center">BCa</td>
+<td align="center">No</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center"><span class="math inline">\(2^{nd}\)</span> order</td>
+<td align="center">No</td>
+<td>limited param assump</td>
+</tr>
+</tbody>
+</table>
+<p>All of the above criteria speak to the coverage rates of the parameters. But note that they must be taken in context. Much also depends on:
+the choice of statistic itself; the original data distribution; any outlying observations; etc.</p>
+<div id="advantages-and-disadvantages" class="section level4">
+<h4><span class="header-section-number">6.5.4.1</span> Advantages and Disadvantages</h4>
+<ul>
+<li>Normal Approximation
+<ul>
+<li><strong>Advantages</strong> similar to the familiar parametric approach; useful with a normally distributed <span class="math inline">\(\hat{\theta}\)</span>; requires the least computation (<span class="math inline">\(B=50-200\)</span>)</li>
+<li><strong>Disadvantages</strong> fails to use the entire <span class="math inline">\(\hat{F}^*(\hat{\theta}^*)\)</span>; only works if <span class="math inline">\(\hat{\theta}\)</span> is reasonably normal to start with</li>
+</ul></li>
+<li>Bootstrap-t Confidence Interval
+<ul>
+<li><strong>Advantages</strong> highly accurate CI in many cases; handles skewed <span class="math inline">\(F(\hat{\theta})\)</span> better than the percentile method</li>
+<li><strong>Disadvantages</strong> not invariant to transformations; computationally expensive with the double bootstrap; coverage probabilities are best if the distribution of <span class="math inline">\(\hat{\theta}\)</span> is nice (e.g., normal)</li>
+</ul></li>
+<li>Percentile
+<ul>
+<li><strong>Advantages</strong> uses the entire <span class="math inline">\(\hat{F}^*(\hat{\theta}^*)\)</span>; allows <span class="math inline">\(F(\hat{\theta})\)</span> to be asymmetrical; invariant to transformations; range respecting; simple to execute</li>
+<li><strong>Disadvantages</strong> small samples may result in low accuracy (because of the dependence on the tail behavior); assumes <span class="math inline">\(\hat{F}^*(\hat{\theta}^*)\)</span> to be unbiased</li>
+</ul></li>
+<li>BCa
+<ul>
+<li><strong>Advantages</strong>
+all of those of the percentile method; allows for bias in <span class="math inline">\(\hat{F}^*(\hat{\theta}^*)\)</span>; <span class="math inline">\(z_0\)</span> can be calculated easily from <span class="math inline">\(\hat{F}^*(\hat{\theta}^*)\)</span></li>
+<li><strong>Disadvantages</strong> requires a limited parametric assumption; more computational than other intervals</li>
+</ul></li>
+</ul>
+</div>
+<div id="bootstrap-ci-and-hypothesis-testing" class="section level4">
+<h4><span class="header-section-number">6.5.4.2</span> Bootstrap CI and Hypothesis Testing</h4>
+<p>If a null value for a parameter is not contained in a CI, we reject the null hypothesis; similarly, we do not reject a null value if it does lie inside the CI. Using BS CIs, we can apply the same logic, and test any hypothesis of interest (note: we can always create one-sided intervals as well!). But simply using CIs leaves out the p-value information. How do we get a p-value from a CI? Consider an alternative definition for the p-value:</p>
+<p><strong>p-value:</strong> The smallest level of significance at which you would reject <span class="math inline">\(H_0\)</span>.</p>
+<p>So, what we want is for the null value (<span class="math inline">\(\theta_0\)</span>) to be one of the endpoints of the confidence interval with some level of confidence <span class="math inline">\(1-2\alpha_0\)</span>. <span class="math inline">\(\alpha_0\)</span> will then be the one-sided p-value, <span class="math inline">\(2\alpha_0\)</span> will be the two-sided p-value.</p>
+<p>For percentile intervals,
+<span class="math display">\[\begin{align}
+p-value = \alpha_0 = \frac{\# \hat{\theta}^*(b) &lt; \theta_0}{B}
+\end{align}\]</span>
+(without loss of generality, assuming we set <span class="math inline">\(\hat{\theta}^*_{lo} = \theta_0\)</span>).</p>
+<!--
+% Print out this section of notes for a handout
+%\begin{flushright}
+%Math 152, Fall 2012\\
+%Jo Hardin
+%\end{flushright}
+%\vspace*{-1.4cm}
+-->
+</div>
+</div>
+<div id="bca-ci-typebca" class="section level3">
+<h3><span class="header-section-number">6.5.5</span> BCa CI: <code>type=&quot;bca&quot;</code></h3>
+<p><strong>Another cool bootstrap CI method that we won’t have time to cover. You are not responsible for the remainder of the bootstrap material in these notes.</strong></p>
+<p>In the percentile method, we’ve assumed that there exists a transformation of <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\phi(\theta)\)</span>, such that
+<span class="math display">\[\begin{align}
+\phi(\hat{\theta}) - \phi(\theta) \sim N(0,1)
+\end{align}\]</span>
+The transformation assumes that neither <span class="math inline">\(\theta\)</span> nor <span class="math inline">\(\phi\)</span> are biased, and it assumes that the variance is constant for all values of the parameter. That is, in the percentage intervals, we assume the normalizing transformation creates a sampling distribution that is unbiased and variance stabilizing. Consider a monotone transformation that *normalizes} the sampling distribution (we no longer assume unbiased or constant variance).</p>
+<p>We now consider the case where <span class="math inline">\(\theta\)</span> is a biased estimator. That is:
+<span class="math display">\[\begin{align}
+\frac{\phi(\hat{\theta}) - \phi(\theta)}{c} \sim N(-z_0,1)
+\end{align}\]</span>
+We’ve corrected for the bias, but if there is non-constant variance, we need a further adjustment to stabilize the variance:</p>
+<p><span class="math display">\[\begin{align}
+\phi(\hat{\theta}) - \phi(\theta) \sim N(-z_0 \sigma_\phi,\sigma_\phi), \ \ \ \ \ \ \sigma_\phi = 1 + a \phi
+\end{align}\]</span>
+That is, there must exist a monotone transformation <span class="math inline">\(\phi\)</span> such that <span class="math inline">\(\phi(\hat{\theta}) \sim N\)</span> where
+<span class="math display">\[\begin{align}
+E(\phi(\hat{\theta})) = \phi(\theta) - z_0 [1 + a \phi(\theta)] &amp;&amp; SE(\phi(\hat{\theta})) = 1 + a \phi(\theta)
+\end{align}\]</span>
+(Note: in the expected value and SE we’ve assumed that <span class="math inline">\(c=1\)</span>. If <span class="math inline">\(c\ne1\)</span>, then we can always choose a different transformation, <span class="math inline">\(\phi&#39;\)</span> so that <span class="math inline">\(c=1\)</span>.) Then
+<span class="math display">\[\begin{align}
+P(z_{\alpha/2} \leq \frac{\phi(\hat{\theta}) - \phi(\theta)}{1 + a \phi(\theta)} + z_0 \leq z_{1-\alpha/2}) = 1 - \alpha
+\end{align}\]</span>
+A $(1-)$100% CI for <span class="math inline">\(\phi(\theta)\)</span> is
+<span class="math display">\[\begin{align}
+\bigg[ \frac{\phi(\hat{\theta}) - (z_{1-\alpha/2} - z_0)}{1 + a (z_{1-\alpha/2} - z_0)}, \frac{\phi(\hat{\theta}) - (z_{\alpha/2} - z_0)}{1 + a (z_{\alpha/2} - z_0)} \bigg]
+\end{align}\]</span>
+Let’s consider an interesting probability question:
+<span class="math display">\[\begin{align}
+P\bigg( \phi(\hat{\theta}^*) &amp;\leq&amp; \frac{\phi(\hat{\theta}) - (z_{1-\alpha/2} - z_0)}{(1 + a (z_{1-\alpha/2} - z_0))} \bigg) = ?\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} &amp;\leq&amp; \frac{\phi(\hat{\theta}) - (z_{1-\alpha/2} - z_0) - \phi(\hat{\theta}) - \phi(\hat{\theta})a(z_{1-\alpha/2} - z_0)}{(1 + a (z_{1-\alpha/2} - z_0))(1+a \phi(\hat{\theta}))} \bigg)\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} &amp;\leq&amp; \frac{ - (z_{1-\alpha/2} - z_0) - \phi(\hat{\theta})a(z_{1-\alpha/2} - z_0)}{(1 + a (z_{1-\alpha/2} - z_0))(1+a \phi(\hat{\theta}))} \bigg)\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} &amp;\leq&amp; \frac{ -(1+a \phi(\hat{\theta})) (z_{1-\alpha/2} - z_0) }{(1 + a (z_{1-\alpha/2} - z_0))(1+a \phi(\hat{\theta}))} \bigg)\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} &amp;\leq&amp; \frac{ - (z_{1-\alpha/2} - z_0) }{(1 + a (z_{1-\alpha/2} - z_0))} \bigg)\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} &amp;\leq&amp; \frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} \bigg)\\
+= P\bigg( \frac{\phi(\hat{\theta}^*) - \phi(\hat{\theta})}{1 + a \phi(\hat{\theta})} + z_0 &amp;\leq&amp; \frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg)\\
+= P\bigg( Z &amp;\leq&amp; \frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg) = \gamma_1\\
+\mbox{where } \gamma_1 &amp;= \Phi \bigg(\frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg)\\
+ &amp;= \verb;pnorm; \bigg(\frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg)
+\end{align}\]</span></p>
+<p>What we’ve shown is that the <span class="math inline">\(\gamma_1\)</span> quantile of the <span class="math inline">\(\phi(\hat{\theta}^*)\)</span> sampling distribution will be a good estimate for the lower bound of the confidence interval for <span class="math inline">\(\phi(\theta)\)</span>. Using the same argument on the upper bound, we find a $(1-)$100% confidence interval for <span class="math inline">\(\phi(\theta)\)</span> to be:</p>
+<p><span class="math display">\[\begin{align}
+&amp;&amp;[\phi(\hat{\theta}^*)_{\gamma_1}, \phi(\hat{\theta}^*)_{\gamma_2}]\\
+&amp;&amp; \\
+\mbox{where } \gamma_1 &amp;= \Phi\bigg(\frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg)\\
+ \gamma_2 &amp;= \Phi \bigg(\frac{ (z_{1-\alpha/2} + z_0) }{(1 - a (z_{1-\alpha/2} + z_0))} + z_0 \bigg)\\
+\end{align}\]</span></p>
+<p>Using the transformation respecting property of percentile intervals, we know that a $(1-)$100% confidence interval for <span class="math inline">\(\theta\)</span> is:</p>
+<p><span class="math display">\[\begin{align}
+&amp;&amp;[\hat{\theta}^*_{\gamma_1}, \hat{\theta}^*_{\gamma_2}]
+\end{align}\]</span></p>
+<p><strong>How do we estimate <span class="math inline">\(a\)</span> and <span class="math inline">\(z_0\)</span>?</strong></p>
+<ul>
+<li><strong>bias:</strong>
+<span class="math inline">\(z_0\)</span> is a measure of the bias. Recall:</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+bias &amp;= E(\hat{\theta}) - \theta\\
+\hat{bias} &amp;= \hat{\theta}^* - \hat{\theta}\\
+\end{align}\]</span></p>
+<p>But remember that <span class="math inline">\(z_0\)</span> represents the bias for <span class="math inline">\(\phi(\hat{\theta})\)</span>, not for <span class="math inline">\(\hat{\theta}\)</span> (and we don’t know <span class="math inline">\(\phi\)</span>!). So, we use <span class="math inline">\(\theta\)</span> to see what proportion of <span class="math inline">\(\theta\)</span> values are too low, and we can map it back to the <span class="math inline">\(\phi\)</span> space using the normal distribution:</p>
+<p><span class="math display">\[\begin{align}
+\hat{z}_0 &amp;= \Phi^{-1} \bigg( \frac{ \# \hat{\theta}^*(b) &lt; \hat{\theta}}{B} \bigg)
+\end{align}\]</span>
+That is, if <span class="math inline">\(\hat{\theta}^*\)</span> underestimates <span class="math inline">\(\hat{\theta}\)</span>, then <span class="math inline">\(\hat{\theta}\)</span> likely underestimates <span class="math inline">\(\theta\)</span>; <span class="math inline">\(z_0 &gt; 0\)</span>. We think of <span class="math inline">\(z_0\)</span> and the normal quantile associated with the proportion of BS replicates less than <span class="math inline">\(\hat{\theta}\)</span>.</p>
+<ul>
+<li><strong>skew:</strong>
+<span class="math inline">\(a\)</span> is a measure of skew.
+<span class="math display">\[\begin{align}
+bias&amp;= E(\hat{\theta} - \theta)\\
+var &amp;= E(\hat{\theta} - \theta)^2 = \sigma^2\\
+skew &amp;= E(\hat{\theta} - \theta)^3 / \sigma^3\\
+\end{align}\]</span>
+We can think of the skew as the rate of chance of the standard error on a normalized scale. If there is no skew, we will estimate <span class="math inline">\(a=0\)</span>. Our estimate of <span class="math inline">\(a\)</span> comes from a procedure known as the jackknife.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+\hat{a} = \frac{\sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^3}{6 [ \sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^2 ] ^{3/2}}
+\end{align}\]</span></p>
+
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-carp2000">
+<p>Carpenter, James, and John Bithell. 2000. “Bootstrap Confidence Intervals: When, Which, What? A Practical Guide for Medical Statisticians.” <em>Statistics in Medicine</em> 19: 1141–64.</p>
+</div>
+<div id="ref-ISCAM">
+<p>Chance, Beth, and Allan Rossman. 2018a. <em>Investigating Statistical Concepts, Applications, and Methods</em>. <a href="http://www.rossmanchance.com/iscam3/">http://www.rossmanchance.com/iscam3/</a>.</p>
+</div>
+<div id="ref-efrontibs">
+<p>Efron, Bradley, and Robert Tibshirani. 1993. <em>An Introduction to the Bootstrap</em>. Edited by Chapman and Hall / CRC.</p>
+</div>
+<div id="ref-tibs88">
+<p>Tibshirani, Robert. 1988. “Variance Stabilization and the Bootstrap.” <em>Biometrika</em> 75: 433–44.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="permschp.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/06-bootstrap.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["Math-154-Notes.pdf", "Math-154-Notes.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
