@@ -38,7 +38,7 @@ q_3 &= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
 If we could, we would completely characterize the sampling distribution (as a function of $\theta$) which would allow us to make inference on $\theta$ when we only had $\hat{\theta}$.
 
 <div class="figure" style="text-align: center">
-<img src="06-bootstrap_files/figure-html/unnamed-chunk-2-1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="1440" />
+<img src="figs/BSlogic.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="50%" />
 <p class="caption">(\#fig:unnamed-chunk-2)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
 </div>
 
@@ -128,8 +128,14 @@ Just like repeatedly taking samples from the population, taking resamples from t
 
 
 <div class="figure" style="text-align: center">
-<img src="06-bootstrap_files/figure-html/unnamed-chunk-3-1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="1440" />
-<p class="caption">(\#fig:unnamed-chunk-3)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
+<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="70%" />
+<p class="caption">(\#fig:unnamed-chunk-31)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="70%" />
+<p class="caption">(\#fig:unnamed-chunk-32)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="70%" />
+<p class="caption">(\#fig:unnamed-chunk-33)From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig</p>
 </div>
 
 
