@@ -519,7 +519,7 @@ p-value = \alpha_0 = \frac{\# \hat{\theta}^*(b) < \theta_0}{B}
 
 ### BCa CI: `type="bca"`
 
-**Another cool bootstrap CI method that we won't have time to cover.  You are not responsible for the remainder of the bootstrap material in these notes.**
+\textcolor{red}{**Another cool bootstrap CI method that we won't have time to cover.  You are not responsible for the remainder of the bootstrap material in these notes.**}
 
 
 In the percentile method, we've assumed that there exists a transformation of $\theta$, $\phi(\theta)$, such that
@@ -934,7 +934,7 @@ bs.tmean.resamps
 
 
 ```r
-obs.stat + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat)
+obs.stat + qnorm(c(.025,.975))*sd(test.stat)
 ```
 
 
@@ -946,7 +946,7 @@ obs.stat + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat)
 
 
 ```r
-obs.stat2 + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat2)
+obs.stat2 + qnorm(c(.025,.975))*sd(test.stat2)
 ```
 
 
@@ -965,7 +965,7 @@ obs.stat2 + qt(c(.025,.975),nrow(heroin)-1)*sd(test.stat2)
 se.bs <- sd(bs.med.resamps$t)
 se.bs2 <- sd(bs.tmean.resamps$t)
 
-obs.stat + qt(c(0.025,.975), nrow(heroin) - 1)*se.bs 
+obs.stat + qnorm(c(0.025,.975))*se.bs 
 ```
 
 
@@ -977,13 +977,13 @@ obs.stat + qt(c(0.025,.975), nrow(heroin) - 1)*se.bs
 
 
 ```r
-obs.stat2 + qt(c(0.025,.975), nrow(heroin) - 1)*se.bs2 
+obs.stat2 + qnorm(c(0.025,.975))*se.bs2 
 ```
 
 
 
 ```
-## [1] 334 422
+## [1] 335 422
 ```
 
 
