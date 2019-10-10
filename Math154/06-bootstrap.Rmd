@@ -133,13 +133,13 @@ Let $\hat{\theta}^*(b)$ be the calculated statistic of interest for the $b^{th}$
 \end{align}
 (if $\hat{\theta}^*$ is very different from $\hat{\theta}$, we call it biased.)  And the estimated value for the standard error of our estimate is
 \begin{align}
-\hat{SE}_B = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
+\hat{SE}^* = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
 \end{align}
 
 Just like repeatedly taking samples from the population, taking resamples from the sample allows us to characterize the bootstrap distribution which approximates the sampling distribution.  The bootstrap distribution approximates the **shape, spread, & bias** of the actual sampling distribution.
 
 
-```{r out.width='30%', fig.align="center",  echo=FALSE, fig.cap = "From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig", fig.show='hold'}
+```{r out.width='30%', fig.align="center",  echo=FALSE, fig.cap = "From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15.", fig.show='hold'}
 knitr::include_graphics(c("figs/BShesterberg1.png",
                           "figs/BShesterberg2.png",
                           "figs/BShesterberg3.png"))
@@ -238,6 +238,7 @@ We think of this as the non-linear transformation that normalizes the sampling d
 3. Percentile CIs
 4. properties / advantages / disadvantages
 
+The StatKey applets which demonstrate bootstrapping are here:  http://www.lock5stat.com/StatKey/
 
 <!--
 https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
@@ -251,7 +252,7 @@ https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 Keep in mind that what we are trying to do is approximate the sampling distribution of $\hat{\theta}$.  In fact, what we are really able to do here is to estimate the sampling distribution of $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$.  We hope that:
 
 \begin{align}
-\hat{F}\Big(\frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}(\hat{\theta}^*(b))} \Big) \rightarrow F\Big(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\Big)
+\hat{F}\Big(\frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)} \Big) \rightarrow F\Big(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\Big)
 \end{align}
 
 Recall the derivation of conventional confidence intervals (based on the assumption that the sampling distribution of the test statistic is normal or close):
@@ -264,7 +265,7 @@ P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\t
 That is, it's the endpoints that are random, and we have a 0.95 probability that we'll get a random sample which will produce endpoints which will capture the true parameter.
 
 
-A 95% CI for $\theta$ would then be: $$\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}(\hat{\theta}^*(b))$$
+A 95% CI for $\theta$ would then be: $$\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}^*(b)$$
 
 
 ### Bootstrap-t Confidence Intervals: `type="stud"`
@@ -299,20 +300,20 @@ For example, if $B=1000$, the estimate of the 5% point is the $50^{th}$ smallest
 
 
 Finally, the boostrap-t confidence interval is:
-\begin{align} \label{BSt}
-(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B)
-\end{align}
+\begin{equation} 
+(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B) (\#eq:BSt)
+\end{equation}
 
 
 To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as follows:
 
 1. Generate $B_1$ bootstrap samples, and for each sample $\underline{X}^{*b}$ compute the bootstrap estimate $\hat{\theta}^*(b)$.
 
-2. Take $B_2$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}(\hat{\theta}^*(b))$.
+2. Take $B_2$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$.
 
 3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{t}_\alpha$ and $\hat{t}_{1-\alpha}$.
 
-4. Calculate the CI as in equation (\ref{BSt}).
+4. Calculate the CI as in equation (\@ref(eq:BSt)).
 
 
 * If $B\cdot \alpha$ is not an integer, use $k=\lfloor (B+1) \alpha \rfloor$ and $B+1-k$.
@@ -346,9 +347,9 @@ Why does it work? It isn't immediately obvious that the interval above will capt
 
 To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where g is a monotonic function (assume wlog that g is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
 
-\begin{align}
- \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2). \label{phidist}
- \end{align}
+\begin{equation}
+ \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2) (\#eq:phidist).
+ \end{equation}
 Again, consider the logic for the conventional confidence interval.  Because $\hat{\phi} - \phi \sim N(0, \sigma^2)$, the interval for $\theta$ is derived by:
 
 \begin{align}
@@ -356,13 +357,13 @@ P(z_{0.05} \leq \frac{\hat{\phi} - \phi}{\sigma}  ) = 0.95  \nonumber \\
 P(-\infty \leq \phi \leq \hat{\phi} - z_{0.05} \sigma) = 0.95  \nonumber \\
 P(-\infty \leq \phi \leq \hat{\phi} + z_{0.95} \sigma) = 0.95  \nonumber \\
 P(-\infty \leq \theta \leq g^{-1}(\hat{\phi} + z_{0.95} \sigma)) = 0.95  \nonumber \\
-\Rightarrow \mbox{CI for } \theta: \ \ \ (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) \label{phiint}
+\Rightarrow \mbox{CI for } \theta: \ \ \ (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) (\#eq:phiint)
 \end{align}
 
 where $z_{1-\alpha}$ is the $100(1-\alpha)$ percent point of the standard normal distribution.  Ideally, if we knew $g$ and $\sigma$, we'd be able to do the transformation and find  $g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})$  (which would give the endpoint of the confidence interval).
 
-Going back to (\ref{phidist}) indicates that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$ (because $\hat{\phi} ^* \sim N(\hat{\phi}, \sigma^2)$).  Further, since $g$ is monotonically increasing, $F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).$
-Substituting in (\ref{phiint}), gives the percentile interval for $\theta$,
+Going back to (\@ref(eq:phidist)) indicates that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$ (because $\hat{\phi} ^* \sim N(\hat{\phi}, \sigma^2)$).  Further, since $g$ is monotonically increasing, $F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).$
+Substituting in (\@ref(eq:phiint)), gives the percentile interval for $\theta$,
 
 \begin{align}
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).

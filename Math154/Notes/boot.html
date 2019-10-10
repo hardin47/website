@@ -376,13 +376,13 @@ library(boot)
 \end{align}\]</span>
 (if <span class="math inline">\(\hat{\theta}^*\)</span> is very different from <span class="math inline">\(\hat{\theta}\)</span>, we call it biased.) And the estimated value for the standard error of our estimate is
 <span class="math display">\[\begin{align}
-\hat{SE}_B = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
+\hat{SE}^* = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
 \end{align}\]</span></p>
 <p>Just like repeatedly taking samples from the population, taking resamples from the sample allows us to characterize the bootstrap distribution which approximates the sampling distribution. The bootstrap distribution approximates the <strong>shape, spread, &amp; bias</strong> of the actual sampling distribution.</p>
 <div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
-<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="30%" /><img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="30%" /><img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig" width="30%" />
+<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%" /><img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%" /><img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%" />
 <p class="caption">
-Figure 1.3: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig
+Figure 1.3: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig. The left image represents the mean with n=50. The center image represents the mean with n=9. The right image represents the median with n=15.
 </p>
 </div>
 <!--
@@ -480,6 +480,7 @@ We think of this as the non-linear transformation that normalizes the sampling d
 <li>Percentile CIs</li>
 <li>properties / advantages / disadvantages</li>
 </ol>
+<p>The StatKey applets which demonstrate bootstrapping are here: <a href="http://www.lock5stat.com/StatKey/" class="uri">http://www.lock5stat.com/StatKey/</a></p>
 <!--
 https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 -->
@@ -490,7 +491,7 @@ https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 <h3><span class="header-section-number">6.5.1</span> Normal (standard) CI with BS SE: <code>type=&quot;norm&quot;</code></h3>
 <p>Keep in mind that what we are trying to do is approximate the sampling distribution of <span class="math inline">\(\hat{\theta}\)</span>. In fact, what we are really able to do here is to estimate the sampling distribution of <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>. We hope that:</p>
 <p><span class="math display">\[\begin{align}
-\hat{F}\Big(\frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}(\hat{\theta}^*(b))} \Big) \rightarrow F\Big(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\Big)
+\hat{F}\Big(\frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)} \Big) \rightarrow F\Big(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\Big)
 \end{align}\]</span></p>
 <p>Recall the derivation of conventional confidence intervals (based on the assumption that the sampling distribution of the test statistic is normal or close):</p>
 <p><span class="math display">\[\begin{align}
@@ -498,7 +499,7 @@ P\bigg(z_{(\alpha/2)} \leq \frac{\hat{\theta} - \theta}{SE(\hat{\theta})} \leq z
 P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\theta} - z_{(\alpha/2)} SE(\hat{\theta})\bigg) &amp;= 1 - \alpha\\
 \end{align}\]</span></p>
 <p>That is, it’s the endpoints that are random, and we have a 0.95 probability that we’ll get a random sample which will produce endpoints which will capture the true parameter.</p>
-<p>A 95% CI for <span class="math inline">\(\theta\)</span> would then be: <span class="math display">\[\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}(\hat{\theta}^*(b))\]</span></p>
+<p>A 95% CI for <span class="math inline">\(\theta\)</span> would then be: <span class="math display">\[\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}^*(b)\]</span></p>
 </div>
 <div id="bootstrap-t-confidence-intervals-typestud" class="section level3">
 <h3><span class="header-section-number">6.5.2</span> Bootstrap-t Confidence Intervals: <code>type=&quot;stud&quot;</code></h3>
@@ -522,15 +523,15 @@ T^*(b) &amp;= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
 \end{align}\]</span></p>
 <p>For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the 5% point is the <span class="math inline">\(50^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s, and the estimate of the 95% point is the <span class="math inline">\(950^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s.</p>
 <p>Finally, the boostrap-t confidence interval is:
-<span class="math display">\[\begin{align} \label{BSt}
-(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B)
-\end{align}\]</span></p>
+<span class="math display" id="eq:BSt">\[\begin{equation} 
+(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B) \tag{6.1}
+\end{equation}\]</span></p>
 <p>To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as follows:</p>
 <ol style="list-style-type: decimal">
 <li><p>Generate <span class="math inline">\(B_1\)</span> bootstrap samples, and for each sample <span class="math inline">\(\underline{X}^{*b}\)</span> compute the bootstrap estimate <span class="math inline">\(\hat{\theta}^*(b)\)</span>.</p></li>
-<li><p>Take <span class="math inline">\(B_2\)</span> bootstrap samples from <span class="math inline">\(\underline{X}^{*b}\)</span>, and estimate the standard error, <span class="math inline">\(\hat{SE}(\hat{\theta}^*(b))\)</span>.</p></li>
+<li><p>Take <span class="math inline">\(B_2\)</span> bootstrap samples from <span class="math inline">\(\underline{X}^{*b}\)</span>, and estimate the standard error, <span class="math inline">\(\hat{SE}^*(b)\)</span>.</p></li>
 <li><p>Find <span class="math inline">\(B_1\)</span> values for <span class="math inline">\(T^*(b)\)</span>. Calculate <span class="math inline">\(\hat{t}_\alpha\)</span> and <span class="math inline">\(\hat{t}_{1-\alpha}\)</span>.</p></li>
-<li><p>Calculate the CI as in equation ().</p></li>
+<li><p>Calculate the CI as in equation (<a href="boot.html#eq:BSt">(6.1)</a>).</p></li>
 </ol>
 <ul>
 <li><p>If <span class="math inline">\(B\cdot \alpha\)</span> is not an integer, use <span class="math inline">\(k=\lfloor (B+1) \alpha \rfloor\)</span> and <span class="math inline">\(B+1-k\)</span>.</p></li>
@@ -554,20 +555,20 @@ T^*(b) &amp;= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
 \end{align}\]</span></p>
 <p>Why does it work? It isn’t immediately obvious that the interval above will capture the true parameter, <span class="math inline">\(\theta\)</span>, at a rate or 95%. Consider a skewed sampling distribution. If your <span class="math inline">\(\hat{\theta}\)</span> comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate? (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron’s “backwards” intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won’t capture the parameter with the correct rate.</p>
 <p>To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let <span class="math inline">\(\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)\)</span>, where g is a monotonic function (assume wlog that g is increasing). The point is to choose (if possible) <span class="math inline">\(g(\cdot)\)</span> such that</p>
-<p><span class="math display">\[\begin{align}
- \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2). \label{phidist}
- \end{align}\]</span>
+<p><span class="math display" id="eq:phidist">\[\begin{equation}
+ \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2) \tag{6.2}.
+ \end{equation}\]</span>
 Again, consider the logic for the conventional confidence interval. Because <span class="math inline">\(\hat{\phi} - \phi \sim N(0, \sigma^2)\)</span>, the interval for <span class="math inline">\(\theta\)</span> is derived by:</p>
-<p><span class="math display">\[\begin{align}
+<p><span class="math display" id="eq:phiint">\[\begin{align}
 P(z_{0.05} \leq \frac{\hat{\phi} - \phi}{\sigma}  ) = 0.95  \nonumber \\
 P(-\infty \leq \phi \leq \hat{\phi} - z_{0.05} \sigma) = 0.95  \nonumber \\
 P(-\infty \leq \phi \leq \hat{\phi} + z_{0.95} \sigma) = 0.95  \nonumber \\
 P(-\infty \leq \theta \leq g^{-1}(\hat{\phi} + z_{0.95} \sigma)) = 0.95  \nonumber \\
-\Rightarrow \mbox{CI for } \theta: \ \ \ (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) \label{phiint}
+\Rightarrow \mbox{CI for } \theta: \ \ \ (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) \tag{6.3}
 \end{align}\]</span></p>
 <p>where <span class="math inline">\(z_{1-\alpha}\)</span> is the <span class="math inline">\(100(1-\alpha)\)</span> percent point of the standard normal distribution. Ideally, if we knew <span class="math inline">\(g\)</span> and <span class="math inline">\(\sigma\)</span>, we’d be able to do the transformation and find <span class="math inline">\(g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})\)</span> (which would give the endpoint of the confidence interval).</p>
-<p>Going back to () indicates that <span class="math inline">\(\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)\)</span> (because <span class="math inline">\(\hat{\phi} ^* \sim N(\hat{\phi}, \sigma^2)\)</span>). Further, since <span class="math inline">\(g\)</span> is monotonically increasing, <span class="math inline">\(F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).\)</span>
-Substituting in (), gives the percentile interval for <span class="math inline">\(\theta\)</span>,</p>
+<p>Going back to (<a href="boot.html#eq:phidist">(6.2)</a>) indicates that <span class="math inline">\(\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)\)</span> (because <span class="math inline">\(\hat{\phi} ^* \sim N(\hat{\phi}, \sigma^2)\)</span>). Further, since <span class="math inline">\(g\)</span> is monotonically increasing, <span class="math inline">\(F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).\)</span>
+Substituting in (<a href="boot.html#eq:phiint">(6.3)</a>), gives the percentile interval for <span class="math inline">\(\theta\)</span>,</p>
 <p><span class="math display">\[\begin{align}
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
 \end{align}\]</span></p>
