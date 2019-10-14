@@ -253,7 +253,7 @@ P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\t
 That is, it's the endpoints that are random, and we have a 0.95 probability that we'll get a random sample which will produce endpoints which will capture the true parameter.
 
 
-A 95% CI for $\theta$ would then be: $$\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}^*(b)$$
+A 95% CI for $\theta$ would then be: $$\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}^*$$
 
 
 ### Bootstrap-t Confidence Intervals: `type="stud"`
@@ -289,7 +289,7 @@ For example, if $B=1000$, the estimate of the 5% point is the $50^{th}$ smallest
 
 Finally, the boostrap-t confidence interval is:
 \begin{equation} 
-(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}_B,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}_B) (\#eq:BSt)
+(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}^*,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}^*) (\#eq:BSt)
 \end{equation}
 
 
@@ -299,7 +299,7 @@ To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as 
 
 2. Take $B_2$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$.
 
-3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{t}_\alpha$ and $\hat{t}_{1-\alpha}$.
+3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{t}_\alpha/2$ and $\hat{t}_{1-\alpha/2}$.
 
 4. Calculate the CI as in equation (\@ref(eq:BSt)).
 
