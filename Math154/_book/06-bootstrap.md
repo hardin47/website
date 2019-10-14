@@ -330,8 +330,6 @@ The interval between the $\alpha/2$ and $1-\alpha/2$ quantiles of the bootstrap 
 [\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]
 \end{align}
 
-\textcolor{red}{You do not need to know *why* the percentile interval works.}
-
 Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron's "backwards" intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
 
 
@@ -465,9 +463,9 @@ BS-t is $2^{nd}$ order accurate for a large general class of functions.  However
 
 | CI 	| Symmetric 	| Range Resp 	| Trans Resp 	| Accuracy 	| Normal Samp Dist? 	| Other 	|
 |:-----:	|:---------:	|:----------:	|:----------:	|:--------------:	|:-----------------:	|------------------------------------	|
+| perc 	| No 	| Yes 	| Yes 	| $1^{st}$ order 	| No 	| small $n \rightarrow$ low accuracy 	|
 | BS SE 	| Yes 	| No 	| No 	| $1^{st}$ order 	| Yes 	| param assump $F(\hat{\theta})$ 	|
 | BS-t 	| No 	| No 	| No 	| $2^{nd}$ order 	| Yes/No 	| computer intensive 	|
-| perc 	| No 	| Yes 	| Yes 	| $1^{st}$ order 	| No 	| small $n \rightarrow$ low accuracy 	|
 | BCa 	| No 	| Yes 	| Yes 	| $2^{nd}$ order 	| No 	| limited param assump 	|
 
 All of the above criteria speak to the coverage rates of the parameters.  But note that they must be taken in context.  Much also depends on:
@@ -520,9 +518,9 @@ p-value = \alpha_0 = \frac{\# \hat{\theta}^*(b) < \theta_0}{B}
 %\vspace*{-1.4cm}
 -->
 
-### \textocolor{red}{BCa CI: `type="bca"`}
+### BCa CI: `type="bca"`
 
-\textcolor{red}{Another cool bootstrap CI method that we won't have time to cover.  You are not responsible for the remainder of the bootstrap material in these notes.}
+\textcolor{red}{**Another cool bootstrap CI method that we won't have time to cover.  You are not responsible for the remainder of the bootstrap material in these notes.**}
 
 
 In the percentile method, we've assumed that there exists a transformation of $\theta$, $\phi(\theta)$, such that
@@ -825,7 +823,7 @@ str(bs.tmean.resamps)
 ##  $ seed     : int [1:626] 10403 624 -1645349161 -2081516244 1489809469 823736794 -755145325 950390200 -1779428263 1453445190 ...
 ##  $ statistic:function (x, d, trimperc)  
 ##   ..- attr(*, "srcref")= 'srcref' int [1:8] 1 16 3 1 16 1 1 3
-##   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x7fa91addbff0> 
+##   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x7f85a9366f60> 
 ##  $ sim      : chr "ordinary"
 ##  $ call     : language boot::boot(data = heroin$times, statistic = sampletmean, R = reps1,      trimperc = 0.25)
 ##  $ stype    : chr "i"

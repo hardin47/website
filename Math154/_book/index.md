@@ -1,7 +1,7 @@
 --- 
-title: "Methods in Biostatistics"
+title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-04-11"
+date: "2019-10-14"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -11,21 +11,17 @@ documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: hardin47/website/Math150/
-description: "Class notes for Math 150 at Pomona College: Methods in Biostatistics.  The notes are based primarily on the text Practicing Statistics, Kuiper and Sklar"
+github-repo: hardin47/website/Math154/
+description: "Class notes for Math 154 at Pomona College: Computational Statistics.  The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton."
 ---
 
-\newcommand{\logit}{\mathrm{logit}}
 
 # Class Information {-}
 
-Class notes for Math 150 at Pomona College: Methods in Biostatistics.  The notes are based primarily on the text **Practicing Statistics**, [@KuiperSklar].
+Class notes for Math 154 at Pomona College: Methods in Biostatistics.  The notes are based extensively on An Introduction to Statistical Learning [@ISL] by James, Witten, Hastie, and Tibshiran;  Modern Data Science [@MDSR] with R by Baumer, Kaplan, and Horton; Data Science in R: A Case Studies Approach to Computational Reasoning and Problem Solving [@DSR] by Nolan and Temple Lang; and Visual and Statistical Thinking: Displays of Evidence for Making Decisions [@VST] by Tufte.
 
 
-You are responsible for reading your text.  Your text is very good & readable, so you should use it.  Your text is not, however, overly technical.  You should make sure you are coming to class and also reading the materials associated with the activities. 
-
-
-
+You are responsible for reading the relevant chapters in the text.  The texts are very good & readable, so you should use them.   You should make sure you are coming to class and also reading the materials associated with the activities. 
 
 
 
@@ -36,31 +32,26 @@ You are responsible for reading your text.  Your text is very good & readable, s
 
 
 
-| Week    	| Topic                      	|  Book Chp   	|   Notes Section |
-|:---------	|:---------------------------	|:----------------:	|:----------------:	|
-| 1/23/19 	| t-tests / SLR / Intro to R | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr) [t-test] |
-| 1/28/19 	| SLR | 2 |  \@ref(SLR)  [SLR]   |
-| 1/30/19 	| | | \@ref(intervals), \@ref(cat) [SLR CI] |
-| 2/4/19  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [.Fisher's Exact Test] |
-| 2/6/19 	| | |  \@ref(studies) [Types of studies]
-| 2/11/19 	| Contingency Analysis | 6 | \@ref(catest) [RR and OR] |
-| 2/13/19 	| | | \@ref(chisq) [ChiSq test] |
-| 2/18/19 	| Logistic Regression | 7 | \@ref(logmodel) [Log Reg] |
-| 2/20/19 	| | | \@ref(logMLE), \@ref(loginf) [Log MLE and Inference] |
-| 2/25/19 	| Logistic Regression | 7 | \@ref(multlog), \@ref(multicol) [Multiple Log Reg] |
-| 2/27/19 	| | | \@ref(logstep) [Model Build] |
-| 3/4/19  	| Logistic Regression | 7 | \@ref(roc) [ROC] |
-| 3/6/19  	| | | \@ref(cv)   [.Cross Validation] | 
-| 3/11/19 	| Catch-up / Review | |
-| 3/13/19 	| Midterm (Wednesday) |  (2, 6, 7) 	|
-| 3/25/19 	| Survival Analysis | 9 | \@ref(timedata), \@ref(KM) [KM curves] |
-| 3/27/19 	| | | \@ref(KMCI) [KM CI]  |
-| 4/1/19  	| Survival Analysis | 9 |  \@ref(logrank)  [Log Rank test]|
-| 4/3/19  	| | |  \@ref(hazfunc) [haz functions] |
-| 4/8/19  	| Survival Analysis | 9 | \@ref(coxph) [Cox PH model] |
-| 4/10/19  	| | | \@ref(multcoxph) [Multiple Cox PH]  |
-| 4/15/19 	| Survival Analysis | 9 |  \@ref(testingph) [Assessing PH] |
-| 4/15/19 	| | |  \@ref(othersurv) [Other surv topics]  |
-| 4/22/19 	| Ioannidis & mult. compar. | 1.13 |
-| 4/29/19 	| Poisson Regression | 8 |
-| 5/6/19  	| Poisson Regression | 8 |
+
+
+
+| Day    	| Topic     	|  Book Chap   	|   Notes Section |
+|:-------	|:------------|:---------:	|:--------------------	|
+| 9/3/19 	| Intro to Data / R | ISL1 | \@ref(intro) [intro],  \@ref(Sep3) [Sep3]|
+| 9/5/19	| Intro to GitHub |  |  \@ref(Sep5) [Sep5], \@ref(repro)  [repro] |
+| 9/10/19	| Data Viz| VST | \@ref(Sep10) [Sep10], \@ref(thoughts) [thoughts]  |
+| 9/12/19  	|  | MDS2 |  \@ref(Sep12)   [Sep12], \@ref(deconstruct) [decon], \@ref(gg) [gg]|
+| 9/17/19	| Data Wrangling | [MDS4](http://mdsr-book.github.io/) | \@ref(Sep17) [Sep17], \@ref(datastruc) [structure] |
+| 9/19/19  	|  |  | \@ref(Sep17) [Sep17], \@ref(highverb)   [highverb] |
+| 9/24/19	| Simulating |  MDS8 | \@ref(Sep24) [Sep24], \@ref(simmodels) [sim models] |
+| 9/26/19  	|  |  | \@ref(Sep26) [Sep26], \@ref(simsens)   [sim sens] |
+| 10/1/19	| Permutations |  [ISCAM](http://www.rossmanchance.com/iscam3/files.html) | \@ref(Oct1) [Oct1], \@ref(algs) [inf algs] |
+| 10/3/19  	|  |  | \@ref(Oct3) [Oct3], \@ref(perms)   [perm test] |
+| 10/8/19	| Bootstrapping |  [ISL]() | \@ref(Oct8) [Oct8], \@ref(BSnotation) [notation] |
+| 10/10/19  	|  |  | \@ref(Oct10) [Oct10],\@ref(BSCI) [BS CI] |
+| 10/15/19	| Catch-up |   |  |
+| 10/17/19	| In-class Exam |   |  |
+| 10/22/19	| Fall Break |   |  |
+
+
+
