@@ -520,7 +520,7 @@ p-value = \alpha_0 = \frac{\# \hat{\theta}^*(b) < \theta_0}{B}
 %\vspace*{-1.4cm}
 -->
 
-<h3> <div class = "red">BCa CI: `type="bca"`</div> </h3>
+<h3 style = "color:red">BCa CI: `type="bca"` </h3>
 
 <p style="color:red">Another cool bootstrap CI method that we won't have time to cover.  You are not responsible for the remainder of the bootstrap material in these notes.</p>
 
