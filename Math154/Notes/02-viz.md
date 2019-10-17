@@ -247,12 +247,12 @@ The most important questions you can ask with respect to creating figures are:
 
 <img src="figs/Yau_viz_cues.png" width="100%" style="display: block; margin: auto;" />
 
-#### Order Matters
+#### Order Matters {-}
 
 <img src="figs/Yau_order.png" width="100%" style="display: block; margin: auto;" />
 
 
-#### Cues Together
+#### Cues Together {-}
 
 <img src="figs/Yau_cuestogether.png" width="100%" style="display: block; margin: auto;" />
 
