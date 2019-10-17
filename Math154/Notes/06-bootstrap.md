@@ -1220,7 +1220,7 @@ boot::boot.ci(bs.tmean.reresamps, type="stud")
 
 
 
-#### 95% BCa interval (not responsible for BCa) {-}
+<h4 style = "color:red">95% BCa interval (not responsible for BCa) {-} <h4>
 
 ##### With built in functions {-}
 

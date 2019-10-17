@@ -666,7 +666,7 @@ for(i in 1:reps){
 ## 9/26/19 Agenda {#Sep26}
 1. Understanding bias in modeling
 2. Sensitivity of statistical inferential procedures to technical conditions
-3. (Not responsible for: Generating random numbers)
+3. <p style = "color:red">(Not responsible for: Generating random numbers) </p>
 
 
 
@@ -1031,9 +1031,9 @@ sum(beta2.in)/reps
 
 
 
-### Generating random numbers
+<h3 style = "color:red">Generating random numbers<h3>
 
-(You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.)
+<p style = "color:red">You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.</p>
 
 #### How do we generate uniform[0,1] numbers?
 

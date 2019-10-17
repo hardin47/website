@@ -245,9 +245,20 @@ The most important questions you can ask with respect to creating figures are:
 4. Context: in comparison to what (think back to ideas from Tufte)
 
 
+<img src="figs/Yau_viz_cues.png" width="100%" style="display: block; margin: auto;" />
+
+#### Order Matters
+
+<img src="figs/Yau_order.png" width="100%" style="display: block; margin: auto;" />
+
+
+#### Cues Together
+
+<img src="figs/Yau_cuestogether.png" width="100%" style="display: block; margin: auto;" />
+
 ##### What are the visual cues on the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
 *  position
@@ -260,7 +271,7 @@ Coordinate System?  Scale?
 
 ##### What are the visual cues on the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 *  position
 *  length
@@ -275,7 +286,7 @@ Coordinate System?  Scale?
 
 ##### What are the visual cues on the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 
 *  position
@@ -380,7 +391,7 @@ head(Births78, 3)
 ##### How can we make the plot? {-}
 
 
-<img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 
 Two Questions:
@@ -413,7 +424,7 @@ Two Questions:
 
 ##### How can we make the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 What has changed?  
 
@@ -440,12 +451,12 @@ ggplot(data=Births78) +
   ggtitle("US Births in 1978")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### How can we make the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -461,7 +472,7 @@ ggplot(data=Births78) +
 
 ##### How can we make the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 Now we have two **layers**, one with points and one with
 lines
@@ -492,7 +503,7 @@ Births78 %>%
   ggtitle("US Births in 1978")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### What does adding the color argument do? {-}
@@ -507,7 +518,7 @@ Births78 %>%
 
 
 
-<img src="02-viz_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
 
 Because there is no variable, we have *mapped* the color aesthetic to a new variable with only one value ("navy").   So all the dots get set to the same color, but it's not navy.
 
@@ -524,14 +535,14 @@ Births78 %>%
   ggtitle("US Births in 1978")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
 
 * Note that `color = "navy"` is now outside of the aesthetics list.  That's how `ggplot2` distinguishes between mapping and setting.
 
 
 ##### How can we make the plot? {-}
 
-<img src="02-viz_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -563,26 +574,27 @@ apropos("^geom_")
 ```
 
 ```
- [1] "geom_abline"      "geom_area"        "geom_ash"        
- [4] "geom_bar"         "geom_barh"        "geom_bin2d"      
- [7] "geom_blank"       "geom_boxplot"     "geom_boxploth"   
-[10] "geom_col"         "geom_colh"        "geom_contour"    
-[13] "geom_count"       "geom_crossbar"    "geom_crossbarh"  
-[16] "geom_curve"       "geom_density"     "geom_density_2d" 
-[19] "geom_density2d"   "geom_dotplot"     "geom_errorbar"   
-[22] "geom_errorbarh"   "geom_errorbarh"   "geom_freqpoly"   
-[25] "geom_hex"         "geom_histogram"   "geom_histogramh" 
-[28] "geom_hline"       "geom_jitter"      "geom_label"      
-[31] "geom_line"        "geom_linerange"   "geom_linerangeh" 
-[34] "geom_lm"          "geom_map"         "geom_path"       
-[37] "geom_point"       "geom_pointrange"  "geom_pointrangeh"
-[40] "geom_polygon"     "geom_qq"          "geom_qq_line"    
-[43] "geom_quantile"    "geom_raster"      "geom_rect"       
-[46] "geom_ribbon"      "geom_rug"         "geom_segment"    
-[49] "geom_sf"          "geom_sf_label"    "geom_sf_text"    
-[52] "geom_smooth"      "geom_spline"      "geom_spoke"      
-[55] "geom_step"        "geom_text"        "geom_tile"       
-[58] "geom_violin"      "geom_violinh"     "geom_vline"      
+ [1] "geom_abline"       "geom_area"         "geom_ash"         
+ [4] "geom_bar"          "geom_barh"         "geom_bin2d"       
+ [7] "geom_blank"        "geom_boxplot"      "geom_boxploth"    
+[10] "geom_col"          "geom_colh"         "geom_contour"     
+[13] "geom_count"        "geom_crossbar"     "geom_crossbarh"   
+[16] "geom_curve"        "geom_density"      "geom_density_2d"  
+[19] "geom_density2d"    "geom_dotplot"      "geom_errorbar"    
+[22] "geom_errorbarh"    "geom_errorbarh"    "geom_freqpoly"    
+[25] "geom_hex"          "geom_histogram"    "geom_histogramh"  
+[28] "geom_hline"        "geom_jitter"       "geom_label"       
+[31] "geom_line"         "geom_linerange"    "geom_linerangeh"  
+[34] "geom_lm"           "geom_map"          "geom_path"        
+[37] "geom_point"        "geom_pointrange"   "geom_pointrangeh" 
+[40] "geom_polygon"      "geom_qq"           "geom_qq_line"     
+[43] "geom_quantile"     "geom_rangeframe"   "geom_raster"      
+[46] "geom_rect"         "geom_ribbon"       "geom_rug"         
+[49] "geom_segment"      "geom_sf"           "geom_sf_label"    
+[52] "geom_sf_text"      "geom_smooth"       "geom_spline"      
+[55] "geom_spoke"        "geom_step"         "geom_text"        
+[58] "geom_tile"         "geom_tufteboxplot" "geom_violin"      
+[61] "geom_violinh"      "geom_vline"       
 ```
 
 help pages will tell you their aesthetics, default stats, etc.
@@ -603,7 +615,7 @@ Births78 %>%
   ggtitle("US Births in 1978")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 Using area does not produce a good plot
 
@@ -670,7 +682,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
 
 * Hmm.  What's up with `y`?
 
@@ -689,7 +701,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### Who are the people in the study? {-}
 
@@ -703,7 +715,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Who are the people in the study? {-}
@@ -717,7 +729,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### How old are people in the HELP study? {-}
@@ -735,7 +747,7 @@ HELPrct %>%
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
 
 Notice the messages
 
@@ -755,7 +767,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### How old are people in the HELP study? -- Other geoms {-}
@@ -768,7 +780,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -778,7 +790,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### Selecting stat and geom manually {-}
 
@@ -795,7 +807,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### Selecting stat and geom manually {-}
 
@@ -812,7 +824,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### More combinations {-}
 
@@ -825,7 +837,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -835,7 +847,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit") 
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-42-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -846,7 +858,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### How much do they drink? (i1) {-}
 
@@ -857,7 +869,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -866,7 +878,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-42-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -875,7 +887,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-46-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Covariates: Adding in more variables {-}
@@ -891,7 +903,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-47-1.png" width="480" style="display: block; margin: auto;" />
 
 Using `color` and `facet`s
 
@@ -903,7 +915,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-48-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -913,7 +925,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-46-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-49-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Boxplots {-}
@@ -929,7 +941,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-47-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-50-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### Horizontal boxplots {-}
 
@@ -943,7 +955,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-48-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-51-1.png" width="480" style="display: block; margin: auto;" />
 
 * `coord_flip()` may be used with other plots as well to reverse the roles
 of `x` and `y` on the plot.
@@ -961,7 +973,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-49-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-52-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Give me some space {-}
@@ -976,7 +988,7 @@ HELPrct %>%
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-50-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Issues with bigger data {-}
@@ -997,7 +1009,7 @@ NHANES %>%  ggplot(aes(x=Height, y=Weight)) +
   ggtitle("National Health and Nutrition Examination Survey")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-51-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-54-1.png" width="480" style="display: block; margin: auto;" />
 
 * Although we can see a generally positive association (as we would expect), the over plotting may be hiding information.
 
@@ -1013,7 +1025,7 @@ NHANES %>%
   ggtitle("National Health and Nutrition Examination Survey")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-52-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### geom_density2d {-}
 
@@ -1027,7 +1039,7 @@ NHANES %>%
   ggtitle("National Health and Nutrition Examination Survey")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-56-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1042,7 +1054,7 @@ ggplot( data=HELPrct, aes(x=sex, y=age)) +
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-54-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-57-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### Multiple layers {-}
 
@@ -1055,7 +1067,7 @@ ggplot( data=HELPrct, aes(x=sex, y=age)) +
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-58-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Things I haven't mentioned (much) {-}
@@ -1076,7 +1088,7 @@ ggplot(Births78, aes(x=date, y=births)) + geom_point() +
           theme_wsj()
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-56-1.png" width="1344" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-59-1.png" width="1344" style="display: block; margin: auto;" />
 
  
 
@@ -1087,7 +1099,7 @@ ggplot(data=HELPrct, aes(x=substance, y=age, color=sex)) +
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-57-1.png" width="1344" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-60-1.png" width="1344" style="display: block; margin: auto;" />
 
 
 ##### A little bit of everything {-}
@@ -1102,7 +1114,7 @@ ggplot( data=HELPrct, aes(x=substance, y=age, color=sex)) +
   ggtitle("HELP clinical trial at detoxification unit")
 ```
 
-<img src="02-viz_files/figure-html/unnamed-chunk-58-1.png" width="1344" style="display: block; margin: auto;" />
+<img src="02-viz_files/figure-html/unnamed-chunk-61-1.png" width="1344" style="display: block; margin: auto;" />
 
 
 
