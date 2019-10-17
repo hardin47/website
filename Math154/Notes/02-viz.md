@@ -261,27 +261,25 @@ The most important questions you can ask with respect to creating figures are:
 <img src="02-viz_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-Coordinate System?  Scale?
+* position?
+* length?
+* shape?
+* area/volume?
+* shade/color?
+* coordinate System?  
+* scale?
 
 ##### What are the visual cues on the plot? {-}
 
 <img src="02-viz_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-
-
-Coordinate System?  Scale?
+* position?
+* length?
+* shape?
+* area/volume?
+* shade/color?
+* coordinate System?  
+* scale?
 
 
 ##### What are the visual cues on the plot? {-}
@@ -289,18 +287,13 @@ Coordinate System?  Scale?
 <img src="02-viz_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 
-*  position
-*  length
-*  shape
-*  area/volume
-*  shade/color
-
-
-Coordinate System?  Scale?
-
-
-
-
+* position?
+* length?
+* shape?
+* area/volume?
+* shade/color?
+* coordinate System?  
+* scale?
 
 
 #### The grammar of graphics in `ggplot2`
