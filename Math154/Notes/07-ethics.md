@@ -23,7 +23,7 @@ Questions to ask yourself in every single data analysis you perform (taken from 
 
 ## Graphics
 
-There are so many ways to lie with graphics.  You may already be familiar with the book *How to Lie with Statistics}.  Many of the ideas are replicated here: http://www.rci.rutgers.edu/~roos/Courses/grstat502/wainer.pdf  [just the plots are provided here: http://www.stat.berkeley.edu/~nolan/stat133/Fall05/lectures/DirtyDozen.pdf]
+There are so many ways to lie with graphics.  You may already be familiar with the book *How to Lie with Statistics*.  Many of the ideas are replicated here: http://www.rci.rutgers.edu/~roos/Courses/grstat502/wainer.pdf  [just the plots are provided here: http://www.stat.berkeley.edu/~nolan/stat133/Fall05/lectures/DirtyDozen.pdf]
 
 For a recent and relevant example, consider the following image.  What do you think is wrong?  (Hint: examine the y-axis carefully)
 
