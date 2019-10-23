@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-10-17"
+date: "2019-10-22"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -52,6 +52,8 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 10/15/19	| Catch-up |   |  |
 | 10/17/19	| In-class Exam |   |  |
 | 10/22/19	| Fall Break |   |  |
+| 10/24/19	| Ethics | [MDS6](http://mdsr-book.github.io/) | \@ref(Oct24) [Oct24], \@ref(ethics) [ethics] |
+
 
 
 
