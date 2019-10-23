@@ -19,7 +19,7 @@ Questions to ask yourself in every single data analysis you perform (taken from 
 * How will your choices with tuning parameters affect different populations represented in the data?
 * How do you know you aren't getting the right answer to the wrong question?
 * How would you justify what you'd built to someone whose welfare is made worse off by the implementation of your algorithm?
-* See the section on bias in modeling (\@ref(simsens)) for times when there are no inherent biases but the structure of the data create unequal model results.
+* See the section on bias in modeling (\@ref(biasmodels)) for times when there are no inherent biases but the structure of the data create unequal model results.
 
 ## Graphics
 
