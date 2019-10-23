@@ -28,7 +28,7 @@ For a recent and relevant example, consider the following image.  What do you th
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/FLguns.jpg" alt="Reproduction of a data graphic reporting the number of gun deaths in Florida over time. The original image was published by Reuters.  [@MDSR]"  />
+<img src="figs/FLguns.jpg" alt="Reproduction of a data graphic reporting the number of gun deaths in Florida over time. The original image was published by Reuters.  [@MDSR]" width="7" />
 <p class="caption">(\#fig:unnamed-chunk-2)Reproduction of a data graphic reporting the number of gun deaths in Florida over time. The original image was published by Reuters.  [@MDSR]</p>
 </div>
 
@@ -42,7 +42,7 @@ Or another plot that has gotten a lot of press is the following.  What is wrong 
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/climate.jpg" alt="A tweet by *National Review* on December 14, 2015 showing the change in global temperature over time.  [@MDSR]"  />
+<img src="figs/climate.jpg" alt="A tweet by *National Review* on December 14, 2015 showing the change in global temperature over time.  [@MDSR]" width="7" />
 <p class="caption">(\#fig:unnamed-chunk-3)A tweet by *National Review* on December 14, 2015 showing the change in global temperature over time.  [@MDSR]</p>
 </div>
 
@@ -162,7 +162,7 @@ Consider a study done on a dataset of nearly 70,000 users of the online dating s
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/okcupid.jpg" alt="Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking."  />
+<img src="figs/okcupid.jpg" alt="Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking." width="7" />
 <p class="caption">(\#fig:unnamed-chunk-4)Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking.</p>
 </div>
 
@@ -183,7 +183,7 @@ From the International Committee of Medical Journal Editors, http://www.icmje.or
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/retraction.jpg" alt="The paper was retracted because the authors could not agree on the order of authorship."  />
+<img src="figs/retraction.jpg" alt="The paper was retracted because the authors could not agree on the order of authorship." width="7" />
 <p class="caption">(\#fig:unnamed-chunk-5)The paper was retracted because the authors could not agree on the order of authorship.</p>
 </div>
 
@@ -197,7 +197,7 @@ We could spend days talking about bias in algorithms.  The take away from the ex
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/recid1.jpg" alt="Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses."  />
+<img src="figs/recid1.jpg" alt="Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses." width="7" />
 <p class="caption">(\#fig:unnamed-chunk-6)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
 </div>
 
@@ -216,7 +216,7 @@ Subsequent Offenses & Subsequent Offenses\\
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/recid2.jpg" alt="False positive and false negative rates broken down by race."  />
+<img src="figs/recid2.jpg" alt="False positive and false negative rates broken down by race." width="7" />
 <p class="caption">(\#fig:unnamed-chunk-7)False positive and false negative rates broken down by race.</p>
 </div>
 
@@ -250,7 +250,7 @@ Analyses sentiment of a sentence in English and assigns score to it. It can clas
 * **SentimentAnalysis**
 Performs a sentiment analysis of textual contents in R. This implementation utilizes various existing dictionaries, such as Harvard IV, or finance-specific dictionaries. Furthermore, it can also create customized dictionaries. The latter uses LASSO regularization as a statistical approach to select relevant terms based on an exogenous response variable. https://cran.r-project.org/web/packages/SentimentAnalysis/index.html
 
-## Guiding Ethical Principles}
+## Guiding Ethical Principles
 
 From @MDSR:
 1. Do your work well by your own standards and by the standards of your profession (avoid using your skills in a way that is effectively lying - leading others to believe one thing when in fact something different is true).
