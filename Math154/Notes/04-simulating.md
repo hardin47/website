@@ -1031,7 +1031,7 @@ sum(beta2.in)/reps
 
 
 
-<h3 style = "color:red">Generating random numbers<h3>
+### Generating random numbers
 
 <p style = "color:red">You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.</p>
 
@@ -1072,6 +1072,8 @@ data.frame(uniformRVs = unif.val) %>%
 <!--
 %\textcolor{red}{See Bill De Roses's simulation!!}
 -->
+
+<p style = "color:red">You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.</p>
 
 #### Continuous RVs {-}
 
