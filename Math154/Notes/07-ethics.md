@@ -49,6 +49,8 @@ Or another plot that has gotten a lot of press is the following.  What is wrong 
 
 ## p-hacking
 
+* Great applet from 538 on how to get significance by just trying enough things: https://projects.fivethirtyeight.com/p-hacking/
+
 J. Ioannidis, *Why most published research findings are false*.  PLoS Medicine, 2. e124 2005.  Ioannidis  focuses on multiple testing with specific understanding of the effect of testing in three different contexts:
 
 
@@ -71,7 +73,6 @@ J. Ioannidis, *Why most published research findings are false*.  PLoS Medicine, 
     * As $n \uparrow$, someone will definitely see significance (good!)
 
 ### p-values
-
 
 * In 1929 RA Fisher said the following (and thus 0.05 was born):
 
@@ -143,21 +144,6 @@ Social Media in Research", **Monitor**, 2012.  https://www.quorumreview.com/wp-c
 
 
 
-Also keep in mind the various laws which are designed to protect privacy and civil liberties.  Just because you didn't try to build an algorithm that is biased against a protected group does not mean that you are off the hook.  There are two ways that laws are enforced (both equally important):
-
-1. disparate treatment $\rightarrow$ means that the differential treatment is intentional
-
-2. disparate impact $\rightarrow$ means that the differential treatment is unintentional or implicit (some examples include advancing mortgage credit, employment selection, predictive policing)
-
-#### Anti-discrimination Laws {-}
-
-* Civil Rights Acts of 1964 and 1991
-* Americans with Disabilities Act
-* Genetic Information Nondiscrimination Act
-* Equal Credit Opportunity Act
-* Fair Housing Act
-
-
 #### OKCupid {-}
 Consider a study done on a dataset of nearly 70,000 users of the online dating site OkCupid (including usernames, age, gender, location, relationship interests, personality traits, and many other profile variables).  The authors did not violate any technical policies such as breaking passwords.  However, their work indicates a violation of privacy ethics as indicated by HIPPA and use of IRBs.  [Kirkegaard and Bjerrekaer, "The OKCupid dataset: A very large public dataset of dating site users," *Open Differential Pyschology*, 2016.] https://openpsych.net/paper/46
 
@@ -192,6 +178,26 @@ From the International Committee of Medical Journal Editors, http://www.icmje.or
 
 We could spend days talking about bias in algorithms.  The take away from the examples below is that the data that is used to *train* the model can have huge effects on the creation of the model.  A fantastic book on the issue is **Weapons of Math Destruction** by Cathy O'Neil.   A podcast about the book is at: https://99percentinvisible.org/episode/the-age-of-the-algorithm/.  
 
+
+Also keep in mind the various laws which are designed to protect privacy and civil liberties.  Just because you didn't try to build an algorithm that is biased against a protected group does not mean that you are off the hook.  There are two ways that laws are enforced (both equally important):
+
+1. disparate treatment $\rightarrow$ means that the differential treatment is intentional
+
+2. disparate impact $\rightarrow$ means that the differential treatment is unintentional or implicit (some examples include advancing mortgage credit, employment selection, predictive policing)
+
+* Alexandria Ocasio-Cortez, Jan 22, 2019 MLK event with Ta-Nehisi Coates  http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html 
+* S. Barocas and A. Selbst, "Big Data's Disparate Impact", *California Law Review, 671*, 2016.
+
+
+#### Anti-discrimination Laws {-}
+
+* Civil Rights Acts of 1964 and 1991
+* Americans with Disabilities Act
+* Genetic Information Nondiscrimination Act
+* Equal Credit Opportunity Act
+* Fair Housing Act
+
+
 ### Sentencing {-}
 
 "Machine Bias" in *Pro Publica* by Julia Angwin, Jeff Larson, Surya Mattu, and Lauren Kirchner, May 23, 2016 https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing/
@@ -202,17 +208,13 @@ We could spend days talking about bias in algorithms.  The take away from the ex
 <p class="caption">(\#fig:unnamed-chunk-6)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
 </div>
 
-
-\begin{tabular}{l|l}
-DYLAN FUGETT & BERNARD PARKER\\
-\hline
-Prior Offense & Prior Offense\\
-1 attempted burglary & 1 resisting arrest without violence\\
-LOW RISK3 & HIGH RISK10\\
-\hline
-Subsequent Offenses & Subsequent Offenses\\
-3 drug possessions & None\\
-\end{tabular}
+| DYLAN FUGETT 	| BERNARD PARKER 	|
+|----------------------	|-------------------------------------	|
+| Prior Offense 	| Prior Offense 	|
+| 1 attempted burglary 	| 1 resisting arrest without violence 	|
+| LOW RISK3 	| HIGH RISK10 	|
+| Subsequent Offenses 	| Subsequent Offenses 	|
+| 3 drug possessions 	| None 	|
 
 
 
@@ -229,6 +231,9 @@ The Algorithmic Justice League is a collective that aims to:
 * Highlight algorithmic bias through media, art, and science
 * Provide space for people to voice concerns and experiences with coded bias
 * Develop practices for accountability during design, development, and deployment of coded systems
+* Joy Buolamwini -- AI, Ain't I A Woman?  https://www.youtube.com/embed/QxuyfWoVV98
+
+
 
 ### Sentiment Analysis {-}
 
@@ -239,6 +244,7 @@ In this talk, Mike Williams, Research Engineer at Fast Forward Labs, looks at ho
 
 > There isn't an option which is objective and fair.  That option doesn't exist... The whole premise is based on bias in your training set.  If there are no biases, there are no patterns in your training set.  Then the system is not going to work... Supervised machine learning, when it goes really well, when you do a really good job, reproduces the biases in the training data.
 
+* Williams' full (biased!) sentiment analysis on GitHub: https://github.com/williamsmj/sentiment/blob/master/sentiment.ipynb
 
 #### R packages {-}
 
