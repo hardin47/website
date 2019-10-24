@@ -261,7 +261,9 @@ Performs a sentiment analysis of textual contents in R. This implementation util
 
 From @MDSR:
 1. Do your work well by your own standards and by the standards of your profession (avoid using your skills in a way that is effectively lying - leading others to believe one thing when in fact something different is true).
+
 2. Recognize the parties to whom you have a special professional obligation (you should worry about conflict of interest!).
+
 3. Report results and methods honestly and respect your responsibility to identify and report flaws and shortcomings in your work (don't be over-confident, do use reproducible methods).
 
 
@@ -272,7 +274,7 @@ http://www.amstat.org/ASA/Your-Career/Ethical-Guidelines-for-Statistical-Practic
 
 
 #### Professional Integrity and Accountability {-}
-The ethical statistician uses methodology and data that are relevant and appropriate, without favoritism or prejudice, and in a manner intended to produce valid, interpretable, and reproducible results. The ethical statistician does not knowingly accept work for which he/she is not sufficiently qualified, is honest with the client about any limitation of expertise, and consults other statisticians when necessary or in doubt.
+The ethical statistician uses methodology and data that are relevant and appropriate, without favoritism or prejudice, and in a manner intended to produce valid, interpretable, and reproducible results. The ethical statistician does not knowingly accept work for which they are not sufficiently qualified, is honest with the client about any limitation of expertise, and consults other statisticians when necessary or in doubt.
 
 #### Integrity of Data and Methods {-}
 The ethical statistician is candid about any known or suspected limitations, defects, or biases in the data that may impact the integrity or reliability of the statistical analysis. Objective and valid interpretation of the results requires that the underlying analysis recognizes and acknowledges the degree of reliability and integrity of the data.
@@ -287,7 +289,7 @@ The ethical statistician protects and respects the rights and interests of human
 Science and statistical practice are often conducted in teams made up of professionals with different professional standards. The statistician must know how to work ethically in this environment.
 
 #### Responsibilities to Other Statisticians or Statistics Practitioners {-}
-The practice of statistics requires consideration of the entire range of possible explanations for observed phenomena, and distinct observers drawing on their own unique sets of experiences can arrive at different and potentially diverging judgments about the plausibility of different explanations. Even in adversarial settings, discourse tends to be most successful when statisticians treat one another with mutual respect and focus on scientific principles, methodology and the sub- stance of data interpretations.
+The practice of statistics requires consideration of the entire range of possible explanations for observed phenomena, and distinct observers drawing on their own unique sets of experiences can arrive at different and potentially diverging judgments about the plausibility of different explanations. Even in adversarial settings, discourse tends to be most successful when statisticians treat one another with mutual respect and focus on scientific principles, methodology and the substance of data interpretations.
 
 #### Responsibilities Regarding Allegations of Misconduct {-}
 The ethical statistician understands the difference between questionable scientific practices and practices that constitute misconduct, avoids both, but knows how each should be handled.
