@@ -30,7 +30,7 @@ Some examples of classification techniques include: linear regression, logistic 
 3. Simple models provide better insight into causality and specific associations.
 4. Fewer predictors implies fewer variables to collect in later studies.
 
-That said, the model should still represent the complexity of the data!  We describe the tradeoff above as the ``bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
+That said, the model should still represent the complexity of the data!  We describe the trade-off above as the ``bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
 
 
 ## $k$-Nearest Neighbors {#knn}
@@ -98,7 +98,7 @@ Generally, the simpler the model, the lower the variance.  The more complicated 
 Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
 
 <div class="figure" style="text-align: center">
-<img src="figs/varbias.pdf" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-3)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
 </div>
 
@@ -179,3 +179,12 @@ For now we will talk about test/training data *and* CV in order to both model as
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-5)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
+
+## 10/31/19 Agenda {#Oct31}
+1. trees (CART)
+2. building trees (binary recursive splitting)
+3. homogeneity measures
+4. pruning trees
+
+
+## CART {#cart}
