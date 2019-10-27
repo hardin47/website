@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Computational Statistics</title>
+  <title>Chapter 8 Classification | Computational Statistics</title>
   <meta name="description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
   <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Computational Statistics" />
+  <meta property="og:title" content="Chapter 8 Classification | Computational Statistics" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="hardin47/website/Math154/" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Computational Statistics" />
+  <meta name="twitter:title" content="Chapter 8 Classification | Computational Statistics" />
   
   <meta name="twitter:description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="intro.html"/>
+<link rel="prev" href="ethics.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -295,144 +295,205 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Computational Statistics</h1>
-<p class="author"><em>Jo Hardin</em></p>
-<p class="date"><em>2019-10-26</em></p>
+<div id="class" class="section level1">
+<h1><span class="header-section-number">Chapter 8</span> Classification</h1>
+<div id="Oct29" class="section level2">
+<h2><span class="header-section-number">8.1</span> 10/29/19 Agenda</h2>
+<ol style="list-style-type: decimal">
+<li>classification</li>
+<li><span class="math inline">\(k\)</span>-Nearest Neighbors</li>
+<li>bias-variance trade-off</li>
+<li>cross validation</li>
+</ol>
+<p><strong>Important Note</strong>: For the majority of the classification and clustering methods, we will use the <code>caret</code> package in R. For more information see: <a href="http://topepo.github.io/caret/index.html" class="uri">http://topepo.github.io/caret/index.html</a></p>
+<p><span class="citation">Baumer (<a href="#ref-Baumer15">2015</a>)</span> provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:</p>
+<blockquote>
+<p>In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by <span class="citation">Breiman (<a href="#ref-brei01">2001</a>)</span>, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a <em>data model</em> f such that y <span class="math inline">\(\sim\)</span> f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is</p>
+</blockquote>
+<blockquote>
+<p>Alternatively, one might construct an <em>algorithmic model</em> f, such that <span class="math inline">\(y \sim f(x)\)</span>, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).</p>
+</blockquote>
+<p>Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set. That is, the model should <em>classify</em> new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value. For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.</p>
+<p>Some examples of classification techniques include: linear regression, logistic regression, neural networks, <strong>classification trees</strong>, <strong>random forests</strong>, <strong>k-nearest neighbors</strong>, <strong>support vector machines</strong>, n{&quot;a}ive Bayes, and linear discriminant analysis. We will cover the methods in <strong>bold</strong>.</p>
+<p><strong>Simple is Better</strong> (From <span class="citation">Fielding (<a href="#ref-field07">2007</a>)</span>, p. 87)</p>
+<ol style="list-style-type: decimal">
+<li>We want to avoid over-fitting the model (certainly, it is a bad idea to model the noise!)</li>
+<li>Future prediction performance goes down with too many predictors.</li>
+<li>Simple models provide better insight into causality and specific associations.</li>
+<li>Fewer predictors implies fewer variables to collect in later studies.</li>
+</ol>
+<p>That said, the model should still represent the complexity of the data! We describe the tradeoff above as the ``bias-variance&quot; trade-off. In order to fully understand that trade-off, let’s first cover the classification method known as <span class="math inline">\(k\)</span>-Nearest Neighbors.</p>
 </div>
-<div id="class-information" class="section level1 unnumbered">
-<h1>Class Information</h1>
-<p>Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning <span class="citation">(James et al. <a href="#ref-ISL">2013</a>)</span> by James, Witten, Hastie, and Tibshiran; Modern Data Science <span class="citation">(Baumer, Kaplan, and Horton <a href="#ref-MDSR">2017</a>)</span> with R by Baumer, Kaplan, and Horton; Data Science in R: A Case Studies Approach to Computational Reasoning and Problem Solving <span class="citation">(Nolan and Temple Lang <a href="#ref-DSR">2015</a>)</span> by Nolan and Temple Lang; and Visual and Statistical Thinking: Displays of Evidence for Making Decisions <span class="citation">(Tufte <a href="#ref-VST">1997</a>)</span> by Tufte.</p>
-<p>You are responsible for reading the relevant chapters in the text. The texts are very good &amp; readable, so you should use them. You should make sure you are coming to class and also reading the materials associated with the activities.</p>
-<table>
-<colgroup>
-<col width="15%" />
-<col width="24%" />
-<col width="20%" />
-<col width="39%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Day</th>
-<th align="left">Topic</th>
-<th align="center">Book Chap</th>
-<th align="left">Notes Section</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">9/3/19</td>
-<td align="left">Intro to Data / R</td>
-<td align="center">ISL1</td>
-<td align="left"><a href="intro.html#intro">1</a> [intro], <a href="intro.html#Sep3">1.1</a> [Sep3]</td>
-</tr>
-<tr class="even">
-<td align="left">9/5/19</td>
-<td align="left">Intro to GitHub</td>
-<td align="center"></td>
-<td align="left"><a href="intro.html#Sep5">1.4</a> [Sep5], <a href="intro.html#repro">1.5</a> [repro]</td>
-</tr>
-<tr class="odd">
-<td align="left">9/10/19</td>
-<td align="left">Data Viz</td>
-<td align="center">VST</td>
-<td align="left"><a href="visualization.html#Sep10">2.1</a> [Sep10], <a href="visualization.html#thoughts">2.3</a> [thoughts]</td>
-</tr>
-<tr class="even">
-<td align="left">9/12/19</td>
-<td align="left"></td>
-<td align="center">MDS2</td>
-<td align="left"><a href="visualization.html#Sep12">2.4</a> [Sep12], <a href="visualization.html#deconstruct">2.5</a> [decon], <a href="visualization.html#gg">2.5.1</a> [gg]</td>
-</tr>
-<tr class="odd">
-<td align="left">9/17/19</td>
-<td align="left">Data Wrangling</td>
-<td align="center"><a href="http://mdsr-book.github.io/">MDS4</a></td>
-<td align="left"><a href="wrang.html#Sep17">3.1</a> [Sep17], <a href="wrang.html#datastruc">3.2</a> [structure]</td>
-</tr>
-<tr class="even">
-<td align="left">9/19/19</td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="left"><a href="wrang.html#Sep17">3.1</a> [Sep17], <a href="wrang.html#highverb">3.5</a> [highverb]</td>
-</tr>
-<tr class="odd">
-<td align="left">9/24/19</td>
-<td align="left">Simulating</td>
-<td align="center">MDS8</td>
-<td align="left"><a href="sims.html#Sep24">4.1</a> [Sep24], <a href="sims.html#simmodels">4.2</a> [sim models]</td>
-</tr>
-<tr class="even">
-<td align="left">9/26/19</td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="left"><a href="sims.html#Sep26">4.3</a> [Sep26], <a href="sims.html#simsens">4.4</a> [sim sens]</td>
-</tr>
-<tr class="odd">
-<td align="left">10/1/19</td>
-<td align="left">Permutations</td>
-<td align="center"><a href="http://www.rossmanchance.com/iscam3/files.html">ISCAM</a></td>
-<td align="left"><a href="permschp.html#Oct1">5.1</a> [Oct1], <a href="permschp.html#algs">5.2</a> [inf algs]</td>
-</tr>
-<tr class="even">
-<td align="left">10/3/19</td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="left"><a href="permschp.html#Oct3">5.3</a> [Oct3], <a href="permschp.html#perms">5.4</a> [perm test]</td>
-</tr>
-<tr class="odd">
-<td align="left">10/8/19</td>
-<td align="left">Bootstrapping</td>
-<td align="center"><a href="">ISL</a></td>
-<td align="left"><a href="boot.html#Oct8">6.1</a> [Oct8], <a href="boot.html#BSnotation">6.3</a> [notation]</td>
-</tr>
-<tr class="even">
-<td align="left">10/10/19</td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="left"><a href="boot.html#Oct10">6.4</a> [Oct10],<a href="boot.html#BSCI">6.5</a> [BS CI]</td>
-</tr>
-<tr class="odd">
-<td align="left">10/15/19</td>
-<td align="left">Catch-up</td>
-<td align="center"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">10/17/19</td>
-<td align="left">In-class Exam</td>
-<td align="center"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">10/22/19</td>
-<td align="left">Fall Break</td>
-<td align="center"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">10/24/19</td>
-<td align="left">Ethics</td>
-<td align="center"><a href="http://mdsr-book.github.io/">MDS6</a></td>
-<td align="left"><a href="ethics.html#Oct24">7.1</a> [Oct24], <a href="ethics.html#ethics">7</a> <a href="ethics.html#ethics">ethics</a></td>
-</tr>
-</tbody>
-</table>
+<div id="knn" class="section level2">
+<h2><span class="header-section-number">8.2</span> <span class="math inline">\(k\)</span>-Nearest Neighbors</h2>
+<p>The <span class="math inline">\(k\)</span>-Nearest Neighbor algorithm does exactly what it sounds like it does. The user decides on the integer value for <span class="math inline">\(k\)</span>, and a point is classified to be in the group for which the majority of the <span class="math inline">\(k\)</span> closest points in the training data.</p>
+<div id="k-nn-algorithm" class="section level3">
+<h3><span class="header-section-number">8.2.1</span> <span class="math inline">\(k\)</span>-NN algorithm</h3>
+<ol style="list-style-type: decimal">
+<li>Decide on a distance metric (e.g., Euclidean distance, 1 - correlation, etc.) and find the distances from each point in the test set to each point in the training set. The distance is measured in the feature space, that is, with respect to the explanatory variables (not the response variable).</li>
+</ol>
+<p>n.b. In most machine learning algorithms that use “distance” as a measure, the “distance” is not required to be a mathematical distance metric. Indeed, 1-correlation is a very common distance measure, and it fails the triangle inequality.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Consider a point in the training set. Find the <span class="math inline">\(k\)</span> closest points in the test set to the one test observation.</p></li>
+<li><p>Using majority vote, find the dominate class of the <span class="math inline">\(k\)</span> closest points. Predict that class label to the test observation.</p></li>
+</ol>
+<p>Note: if the response variable is continuous (instead of categorical), find the average response variable of the <span class="math inline">\(k\)</span> training point to be the predicted response for the one test observation.</p>
+<p><strong>Shortcomings of <span class="math inline">\(k\)</span>-NN</strong>:
+* one class can dominate if it has a large majority
+* Euclidean distance is dominated by scale
+* it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
+* the output doesn’t provide any information about which explanatory variables are informative.</p>
+<p><strong>Strengths of <span class="math inline">\(k\)</span>-NN</strong>:
+* it can easily work for any number of categories
+* it can predict a quantitative response variable
+* the bias of 1-NN is often low (but the variance is high)
+* any distance metric can be used (so the algorithm models the data appropriately)
+* the method is simple to implement / understand
+* model is nonparametric (no distributional assumptions on the data)
+* great model for imputing missing data</p>
+<p><img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;" /><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="r-knn-example" class="section level3">
+<h3><span class="header-section-number">8.2.2</span> R knn Example</h3>
+<p>R code for using the <code>knn</code> package to cluster the <code>iris</code> data. The <code>caret</code> package vignette for <code>knn</code> is here: <a href="http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function" class="uri">http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function</a></p>
+</div>
+</div>
+<div id="cv" class="section level2">
+<h2><span class="header-section-number">8.3</span> Cross Validation</h2>
+<div id="bias-variance-trade-off" class="section level3">
+<h3><span class="header-section-number">8.3.1</span> Bias-variance trade-off</h3>
+<ul>
+<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
+<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
+</ul>
+<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit. [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]</p>
+<p><span class="math display">\[\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}\]</span></p>
+<ul>
+<li><strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
+<li><strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, with more complicated models (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
+<li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
+</ul>
+<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<img src="figs/varbias.pdf" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<p class="caption">
+Figure 1.3: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(Hastie, Tibshirani, and Friedman <a href="#ref-ESL">2001</a>)</span>
+</p>
+</div>
+<p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
+</div>
+<div id="implementing-cross-validation" class="section level3">
+<h3><span class="header-section-number">8.3.2</span> Implementing Cross Validation</h3>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
+<p class="caption">
+Figure 1.4: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span>
+</p>
+</div>
+<p>Cross validation is typically used in two ways.</p>
+<ol style="list-style-type: decimal">
+<li>To assess a model’s accuracy (<em>model assessment</em>).<br />
+</li>
+<li>To build a model (<em>model selection</em>).</li>
+</ol>
+<div id="different-ways-to-cv" class="section level4 unnumbered">
+<h4>Different ways to CV</h4>
+<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</li>
+<li>leave one out cross validation (LOOCV)</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation</li>
+<li>build the model using the remaining n-1 points</li>
+<li>predict class membership for the observation which was removed</li>
+<li>repeat by removing each observation one at a time</li>
+</ol>
+<ul>
+<li><span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span></li>
+<li>advantage of <span class="math inline">\(k\)</span>-fold is computational</li>
+<li><span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+</ul></li>
+</ul>
+</div>
+<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
+<h4>CV for Model assessment 10-fold</h4>
+<ol style="list-style-type: decimal">
+<li>assume <span class="math inline">\(k\)</span> is given for <span class="math inline">\(k\)</span>NN</li>
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
+</ol>
+</div>
+<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for Model selection 10-fold</h4>
+<ol style="list-style-type: decimal">
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+</ol></li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
+<li>repeat steps 1-3 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest</li>
+</ol>
+</div>
+<div id="cv-for-model-assessment-and-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for Model assessment and selection 10-fold</h4>
+<p>For now we will talk about test/training data <em>and</em> CV in order to both model assessment and selection. Note that CV could be used in both steps, but the algorithm is slightly more complicated.</p>
+<ol style="list-style-type: decimal">
+<li>split the data into training and test observations</li>
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above on <em>only the training data</em>:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the training data</li>
+<li>build the model using the remaining 90% of the training data</li>
+<li>predict class membership / continuous response for the 10% of the training observations which were removed</li>
+<li>repeat by removing each decile one at a time from the training data</li>
+</ol></li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand on the training data</li>
+<li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
+<li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
+</ol>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-5"></span>
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
+<p class="caption">
+Figure 1.5: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(Varoquaux et al. <a href="#ref-CVpaper">2017</a>)</span>
+</p>
+</div>
 
+</div>
+</div>
+</div>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-MDSR">
-<p>Baumer, Kaplan, and Horton. 2017. <em>Modern Data Science with R</em>. CRC Press. <a href="https://mdsr-book.github.io/">https://mdsr-book.github.io/</a>.</p>
+<div id="ref-Baumer15">
+<p>Baumer, Ben. 2015. “A Data Science Course for Undergraduates: Thinking with Data.” <em>The American Statistician</em>.</p>
 </div>
-<div id="ref-ISL">
-<p>James, Witten, Hastie, and Tibshirani. 2013. <em>An Introduction to Statistical Learning</em>. Springer. <a href="http://faculty.marshall.usc.edu/gareth-james/ISL/">http://faculty.marshall.usc.edu/gareth-james/ISL/</a>.</p>
+<div id="ref-brei01">
+<p>Breiman, L. 2001. “Statistical Modeling: The Two Cultures.” <em>Statistical Science</em> 16 (3): 199–215.</p>
 </div>
-<div id="ref-DSR">
-<p>Nolan, and Temple Lang. 2015. <em>Data Science in R: A Case Studies Approach to Computational Reasoning and Problem Solving</em>. CRC Press. <a href="http://rdatasciencecases.org/">http://rdatasciencecases.org/</a>.</p>
+<div id="ref-field07">
+<p>Fielding, Alan. 2007. <em>Cluster and Classification Techniques for the Biosciences</em>. Cambridge.</p>
 </div>
-<div id="ref-VST">
-<p>Tufte. 1997. <em>Visual and Statistical Thinking: Displays of Evidence for Making Decisions</em>. <a href="http://www.edwardtufte.com/tufte/books_textb">http://www.edwardtufte.com/tufte/books_textb</a>.</p>
+<div id="ref-flach12">
+<p>Flach, P. 2012. <em>Machine Learning</em>. Cambridge University Press.</p>
+</div>
+<div id="ref-ESL">
+<p>Hastie, T., R. Tibshirani, and J. Friedman. 2001. <em>The Elements of Statistical Learning</em>. Springer.</p>
+</div>
+<div id="ref-CVpaper">
+<p>Varoquaux, G., P. Reddy Raamana, D. Engemann, A. Hoyos-Idrobo, Y. Schwartz, and B. Thirion. 2017. “Assessing and Tuning Brain Decoders: Cross-Validation, Caveats, and Guidelines.” <em>NeuroImage</em> 145: 166–79.</p>
 </div>
 </div>
             </section>
@@ -440,8 +501,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-
-<a href="intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="ethics.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -471,7 +532,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/rstudio/bookdown-demo/edit/master/index.Rmd",
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/08-classification.Rmd",
 "text": "Edit"
 },
 "history": {
