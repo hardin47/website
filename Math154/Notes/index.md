@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-10-26"
+date: "2019-10-28"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -53,8 +53,8 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 10/17/19	| In-class Exam |   |  |
 | 10/22/19	| Fall Break |   |  |
 | 10/24/19	| Ethics | [MDS6](http://mdsr-book.github.io/) | \@ref(Oct24) [Oct24], \@ref(ethics) [ethics] |
-| 10/29/19	| $k$-NN & CV | [ISL 4 & 5](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Oct29) [Oct29], \@ref(knn) [knn]  \@ref(cv) [CV]|
-| 10/31/19	| CART | [ISL 8](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Oct31) [Oct31], \@ref(cart) [cart] |
+| 10/29/19	| $k$-NN & CV | [ISL sections 2.2.3 and 4.6.5 & 5.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Oct29) [Oct29], \@ref(knn) [knn]  \@ref(cv) [CV]|
+| 10/31/19	| CART | [ISL 8.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Oct31) [Oct31], \@ref(cart) [cart] |
 
 
 

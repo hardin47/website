@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-10-26" />
+<meta name="date" content="2019-10-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -316,7 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Alternatively, one might construct an <em>algorithmic model</em> f, such that <span class="math inline">\(y \sim f(x)\)</span>, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).</p>
 </blockquote>
 <p>Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set. That is, the model should <em>classify</em> new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value. For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.</p>
-<p>Some examples of classification techniques include: linear regression, logistic regression, neural networks, <strong>classification trees</strong>, <strong>random forests</strong>, <strong>k-nearest neighbors</strong>, <strong>support vector machines</strong>, n{&quot;a}ive Bayes, and linear discriminant analysis. We will cover the methods in <strong>bold</strong>.</p>
+<p>Some examples of classification techniques include: linear regression, logistic regression, neural networks, <strong>classification trees</strong>, <strong>random forests</strong>, <strong>k-nearest neighbors</strong>, <strong>support vector machines</strong>, näive Bayes, and linear discriminant analysis. We will cover the methods in <strong>bold</strong>.</p>
 <p><strong>Simple is Better</strong> (From <span class="citation">Fielding (<a href="#ref-field07">2007</a>)</span>, p. 87)</p>
 <ol style="list-style-type: decimal">
 <li>We want to avoid over-fitting the model (certainly, it is a bad idea to model the noise!)</li>
@@ -357,7 +357,179 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="r-knn-example" class="section level3">
 <h3><span class="header-section-number">8.2.2</span> R knn Example</h3>
-<p>R code for using the <code>knn</code> package to cluster the <code>iris</code> data. The <code>caret</code> package vignette for <code>knn</code> is here: <a href="http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function" class="uri">http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function</a></p>
+<p>R code for using the <code>caret</code> package to cluster the <code>iris</code> data. The <code>caret</code> package vignette for <code>knn</code> is here: <a href="http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function" class="uri">http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function</a></p>
+<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb455-1" data-line-number="1"><span class="kw">library</span>(GGally) <span class="co"># for plotting</span></a>
+<a class="sourceLine" id="cb455-2" data-line-number="2"><span class="kw">library</span>(caret)  <span class="co"># for partitioning &amp; classification</span></a>
+<a class="sourceLine" id="cb455-3" data-line-number="3"><span class="kw">data</span>(iris)</a></code></pre></div>
+<div id="iris-data" class="section level4 unnumbered">
+<h4>iris Data</h4>
+<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb456-1" data-line-number="1"><span class="kw">ggpairs</span>(iris, <span class="dt">color=</span><span class="st">&quot;Species&quot;</span>, <span class="dt">alpha=</span>.<span class="dv">4</span>)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="knn-1" class="section level4 unnumbered">
+<h4>kNN</h4>
+<p>Without thinking about test / training data, a naive model is:</p>
+<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb457-1" data-line-number="1">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>, <span class="dt">classProbs =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb457-2" data-line-number="2">tr.iris &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>iris, </a>
+<a class="sourceLine" id="cb457-3" data-line-number="3">                 <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
+<a class="sourceLine" id="cb457-4" data-line-number="4">                 <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb457-5" data-line-number="5">                 <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb457-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb457-7" data-line-number="7">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data=</span><span class="kw">predict</span>(tr.iris, <span class="dt">newdata =</span> iris), </a>
+<a class="sourceLine" id="cb457-8" data-line-number="8">                <span class="dt">reference =</span> iris<span class="op">$</span>Species)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         50          0         0
+##   versicolor      0         47         3
+##   virginica       0          3        47
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.96           
+##                  95% CI : (0.915, 0.9852)
+##     No Information Rate : 0.3333         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.94           
+##                                          
+##  Mcnemar&#39;s Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9400           0.9400
+## Specificity                 1.0000            0.9700           0.9700
+## Pos Pred Value              1.0000            0.9400           0.9400
+## Neg Pred Value              1.0000            0.9700           0.9700
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3133           0.3133
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9550           0.9550</code></pre>
+</div>
+<div id="why-naive" class="section level4 unnumbered">
+<h4>Why naive?</h4>
+<ol style="list-style-type: decimal">
+<li>Not good to train and test on the same data set!</li>
+<li>Assumed the knowledge of <span class="math inline">\(k\)</span> groups.</li>
+<li>Was Euclidean distance the right thing to use? [The <code>knn</code> package in R only uses Euclidean distance.]</li>
+</ol>
+</div>
+<div id="using-testtraining-data-sets." class="section level4 unnumbered">
+<h4>Using test/training data sets.</h4>
+<p>One of the common pieces to use in the <code>caret</code> package is creating test and training datasets for cross validation.</p>
+<div class="sourceCode" id="cb459"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb459-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb459-2" data-line-number="2">inTrain &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> iris<span class="op">$</span>Species, <span class="dt">p=</span><span class="fl">0.7</span>, <span class="dt">list=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb459-3" data-line-number="3">iris.train &lt;-<span class="st"> </span>iris[inTrain,]</a>
+<a class="sourceLine" id="cb459-4" data-line-number="4">iris.test &lt;-<span class="st"> </span>iris[<span class="op">-</span><span class="kw">c</span>(inTrain),]</a>
+<a class="sourceLine" id="cb459-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb459-6" data-line-number="6">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb459-7" data-line-number="7">tr.iris &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb459-8" data-line-number="8">                        <span class="dt">data=</span>iris.train, </a>
+<a class="sourceLine" id="cb459-9" data-line-number="9">                        <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
+<a class="sourceLine" id="cb459-10" data-line-number="10">                        <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb459-11" data-line-number="11">                        <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb459-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb459-13" data-line-number="13">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data=</span><span class="kw">predict</span>(tr.iris, <span class="dt">newdata =</span> iris.test), </a>
+<a class="sourceLine" id="cb459-14" data-line-number="14">                <span class="dt">reference =</span> iris.test<span class="op">$</span>Species)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500</code></pre>
+</div>
+<div id="k-neighbors-cv-on-training-to-find-k" class="section level4 unnumbered">
+<h4><span class="math inline">\(k\)</span> neighbors? CV on TRAINING to find <span class="math inline">\(k\)</span></h4>
+<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb461-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">47</span>)</a>
+<a class="sourceLine" id="cb461-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>, <span class="dt">number=</span><span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb461-3" data-line-number="3">tr.iris &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>iris.train, </a>
+<a class="sourceLine" id="cb461-4" data-line-number="4">                        <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
+<a class="sourceLine" id="cb461-5" data-line-number="5">                        <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb461-6" data-line-number="6">                        <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">11</span>)))</a>
+<a class="sourceLine" id="cb461-7" data-line-number="7">tr.iris</a></code></pre></div>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: &#39;setosa&#39;, &#39;versicolor&#39;, &#39;virginica&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 95, 93, 95, 95, 94, 95, ... 
+## Resampling results across tuning parameters:
+## 
+##   k   Accuracy   Kappa    
+##    1  0.9516667  0.9275521
+##    3  0.9316667  0.8974822
+##    5  0.9205556  0.8805824
+##    7  0.9500000  0.9249006
+##    9  0.9616667  0.9427036
+##   11  0.9716667  0.9580882
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was k = 11.</code></pre>
+</div>
+<div id="then-measure-accuracy-by-testing-on-test-data" class="section level4 unnumbered">
+<h4>Then measure accuracy by testing on test data!</h4>
+<div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb463-1" data-line-number="1">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data=</span><span class="kw">predict</span>(tr.iris, <span class="dt">newdata =</span> iris.test), </a>
+<a class="sourceLine" id="cb463-2" data-line-number="2">                       <span class="dt">reference =</span> iris.test<span class="op">$</span>Species)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500</code></pre>
+</div>
 </div>
 </div>
 <div id="cv" class="section level2">
@@ -378,20 +550,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
 </ul>
 <p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-9"></span>
 <img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
 <p class="caption">
-Figure 1.3: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(Hastie, Tibshirani, and Friedman <a href="#ref-ESL">2001</a>)</span>
+Figure 8.1: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(Hastie, Tibshirani, and Friedman <a href="#ref-ESL">2001</a>)</span>
 </p>
 </div>
 <p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
 </div>
 <div id="implementing-cross-validation" class="section level3">
 <h3><span class="header-section-number">8.3.2</span> Implementing Cross Validation</h3>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-10"></span>
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
 <p class="caption">
-Figure 1.4: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span>
+Figure 5.3: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span>
 </p>
 </div>
 <p>Cross validation is typically used in two ways.</p>
@@ -466,10 +638,10 @@ Figure 1.4: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span
 <li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
 <li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
 </ol>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-5"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-11"></span>
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
 <p class="caption">
-Figure 1.5: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(Varoquaux et al. <a href="#ref-CVpaper">2017</a>)</span>
+Figure 1.7: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(Varoquaux et al. <a href="#ref-CVpaper">2017</a>)</span>
 </p>
 </div>
 </div>

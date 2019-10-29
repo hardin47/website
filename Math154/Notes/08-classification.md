@@ -21,7 +21,7 @@
 
 Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.
 
-Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **random forests**, **k-nearest neighbors**, **support vector machines**, n{\"a}ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
+Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **random forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
 
 **Simple is Better**  (From @field07, p. 87)
 
@@ -73,7 +73,218 @@ Note: if the response variable is continuous (instead of categorical), find the 
 
 ###  R knn Example  
 
-R code for using the `knn` package to cluster the `iris` data.  The `caret` package vignette for `knn` is here: http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function
+R code for using the `caret` package to cluster the `iris` data.  The `caret` package vignette for `knn` is here: http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function
+
+
+
+```r
+library(GGally) # for plotting
+library(caret)  # for partitioning & classification
+data(iris)
+```
+
+#### iris Data {-}
+
+
+```r
+ggpairs(iris, color="Species", alpha=.4)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+
+#### kNN {-}
+
+Without thinking about test / training data, a naive model is:
+
+
+```r
+fitControl <- trainControl(method="none", classProbs = TRUE)
+tr.iris <- train(Species ~ ., data=iris, 
+                 method="knn", 
+                 trControl = fitControl, 
+                 tuneGrid= data.frame(k=3))
+
+caret::confusionMatrix(data=predict(tr.iris, newdata = iris), 
+                reference = iris$Species)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         50          0         0
+##   versicolor      0         47         3
+##   virginica       0          3        47
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.96           
+##                  95% CI : (0.915, 0.9852)
+##     No Information Rate : 0.3333         
+##     P-Value [Acc > NIR] : < 2.2e-16      
+##                                          
+##                   Kappa : 0.94           
+##                                          
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9400           0.9400
+## Specificity                 1.0000            0.9700           0.9700
+## Pos Pred Value              1.0000            0.9400           0.9400
+## Neg Pred Value              1.0000            0.9700           0.9700
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3133           0.3133
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9550           0.9550
+```
+
+
+#### Why naive? {-}
+
+1. Not good to train and test on the same data set!
+2. Assumed the knowledge of $k$ groups.
+3. Was Euclidean distance the right thing to use?  [The `knn` package in R only uses Euclidean distance.]
+
+
+#### Using test/training data sets. {-}
+
+One of the common pieces to use in the `caret` package is creating test and training datasets for cross validation.
+
+
+```r
+set.seed(4747)
+inTrain <- caret::createDataPartition(y = iris$Species, p=0.7, list=FALSE)
+iris.train <- iris[inTrain,]
+iris.test <- iris[-c(inTrain),]
+
+fitControl <- caret::trainControl(method="none")
+tr.iris <- caret::train(Species ~ ., 
+                        data=iris.train, 
+                        method="knn", 
+                        trControl = fitControl, 
+                        tuneGrid= data.frame(k=5))
+
+caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
+                reference = iris.test$Species)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc > NIR] : < 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500
+```
+
+#### $k$ neighbors?  CV on TRAINING to find $k$ {-}
+
+
+```r
+set.seed(47)
+fitControl <- caret::trainControl(method="cv", number=10)
+tr.iris <- caret::train(Species ~ ., data=iris.train, 
+                        method="knn", 
+                        trControl = fitControl, 
+                        tuneGrid= data.frame(k=c(1,3,5,7,9,11)))
+tr.iris
+```
+
+```
+## k-Nearest Neighbors 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 95, 93, 95, 95, 94, 95, ... 
+## Resampling results across tuning parameters:
+## 
+##   k   Accuracy   Kappa    
+##    1  0.9516667  0.9275521
+##    3  0.9316667  0.8974822
+##    5  0.9205556  0.8805824
+##    7  0.9500000  0.9249006
+##    9  0.9616667  0.9427036
+##   11  0.9716667  0.9580882
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was k = 11.
+```
+
+
+
+#### Then measure accuracy by testing on test data! {-}
+
+
+```r
+caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
+                       reference = iris.test$Species)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc > NIR] : < 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500
+```
+
+
 
 ## Cross Validation {#cv}
 
@@ -99,7 +310,7 @@ Note the bias-variance trade-off.  We want our prediction error to be small, so 
 
 <div class="figure" style="text-align: center">
 <img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-3)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+<p class="caption">(\#fig:unnamed-chunk-9)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
 </div>
 
 
@@ -110,7 +321,7 @@ The following visualization does an excellent job of communicating the trade-off
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-4)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-10)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -177,7 +388,7 @@ For now we will talk about test/training data *and* CV in order to both model as
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-5)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-11)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
 
 ## 10/31/19 Agenda {#Oct31}
