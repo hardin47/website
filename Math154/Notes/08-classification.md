@@ -33,6 +33,112 @@ Some examples of classification techniques include: linear regression, logistic 
 That said, the model should still represent the complexity of the data!  We describe the trade-off above as the ``bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
 
 
+## Cross Validation {#cv}
+
+### Bias-variance trade-off
+
+* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
+
+* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
+
+Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
+
+
+\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}
+
+* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
+* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, with more complicated models (e.g., smaller $k$ in $k$NN) the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
+* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
+
+
+Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
+
+<div class="figure" style="text-align: center">
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-2)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+</div>
+
+
+The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
+
+### Implementing Cross Validation 
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-3)[@flach12]</p>
+</div>
+
+Cross validation is typically used in two ways.  
+
+1. To assess a model's accuracy (*model assessment*).  
+2. To build a model (*model selection*).
+
+#### Different ways to CV {-}
+
+Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
+
+* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
+* leave one out cross validation (LOOCV)
+1. remove one observation
+2. build the model using the remaining n-1 points
+3. predict class membership for the observation which was removed
+4. repeat by removing each observation one at a time
+
+* $k$-fold cross validation ($k$-fold CV)
+    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $k$-fold CV with $k=n$
+    * advantage of $k$-fold is computational
+    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+
+
+#### CV for Model assessment 10-fold {-}
+
+1. assume $k$ is given for $k$NN
+2. remove 10% of the data
+3. build the model using the remaining 90%
+4. predict class membership / continuous response for the 10% of the observations which were removed
+5. repeat by removing each decile one at a time
+6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
+
+
+#### CV for Model selection 10-fold {-}
+
+1. set $k$ in $k$NN
+2. build the model using the $k$ value set above:
+    a. remove 10% of the data
+    b. build the model using the remaining 90%
+    c. predict class membership / continuous response for the 10% of the observations which were removed
+    d. repeat by removing each decile one at a time
+
+3. measure the CV prediction error for the $k$ value at hand
+4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
+
+
+#### CV for Model assessment and selection 10-fold {-}
+
+For now we will talk about test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
+
+1. split the data into training and test observations
+2. set $k$ in $k$NN
+3. build the model using the $k$ value set above on *only the training data*:
+    a. remove 10% of the training data
+    b. build the model using the remaining 90% of the training data
+    c. predict class membership / continuous response for the 10% of the training observations which were removed
+    d. repeat by removing each decile one at a time from the training data
+4. measure the CV prediction error for the $k$ value at hand on the training data
+5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
+6. using the $k$ value given in step 5, assess the prediction error on the test data
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-4)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+</div>
+
+
 ## $k$-Nearest Neighbors {#knn}
 
 
@@ -90,7 +196,7 @@ data(iris)
 ggpairs(iris, color="Species", alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 #### kNN {-}
 
@@ -285,111 +391,6 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 ```
 
 
-
-## Cross Validation {#cv}
-
-### Bias-variance trade-off
-
-* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
-
-* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
-
-Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
-
-
-\begin{align}
-\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
-\end{align}
-
-* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
-* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, with more complicated models (e.g., smaller $k$ in $k$NN) the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
-* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
-
-
-Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
-
-<div class="figure" style="text-align: center">
-<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-9)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
-</div>
-
-
-The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
-
-### Implementing Cross Validation 
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-10)[@flach12]</p>
-</div>
-
-Cross validation is typically used in two ways.  
-
-1. To assess a model's accuracy (*model assessment*).  
-2. To build a model (*model selection*).
-
-#### Different ways to CV {-}
-
-Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
-
-* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
-* leave one out cross validation (LOOCV)
-1. remove one observation
-2. build the model using the remaining n-1 points
-3. predict class membership for the observation which was removed
-4. repeat by removing each observation one at a time
-
-* $k$-fold cross validation ($k$-fold CV)
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
-    * LOOCV is a special case of $k$-fold CV with $k=n$
-    * advantage of $k$-fold is computational
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
-
-
-#### CV for Model assessment 10-fold {-}
-
-1. assume $k$ is given for $k$NN
-2. remove 10% of the data
-3. build the model using the remaining 90%
-4. predict class membership / continuous response for the 10% of the observations which were removed
-5. repeat by removing each decile one at a time
-6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
-
-
-#### CV for Model selection 10-fold {-}
-
-1. set $k$ in $k$NN
-2. build the model using the $k$ value set above:
-    a. remove 10% of the data
-    b. build the model using the remaining 90%
-    c. predict class membership / continuous response for the 10% of the observations which were removed
-    d. repeat by removing each decile one at a time
-
-3. measure the CV prediction error for the $k$ value at hand
-4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
-
-
-#### CV for Model assessment and selection 10-fold {-}
-
-For now we will talk about test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
-
-1. split the data into training and test observations
-2. set $k$ in $k$NN
-3. build the model using the $k$ value set above on *only the training data*:
-    a. remove 10% of the training data
-    b. build the model using the remaining 90% of the training data
-    c. predict class membership / continuous response for the 10% of the training observations which were removed
-    d. repeat by removing each decile one at a time from the training data
-4. measure the CV prediction error for the $k$ value at hand on the training data
-5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
-6. using the $k$ value given in step 5, assess the prediction error on the test data
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-11)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
-</div>
 
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)

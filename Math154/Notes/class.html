@@ -265,13 +265,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8" data-path="class.html"><a href="class.html"><i class="fa fa-check"></i><b>8</b> Classification</a><ul>
 <li class="chapter" data-level="8.1" data-path="class.html"><a href="class.html#Oct29"><i class="fa fa-check"></i><b>8.1</b> 10/29/19 Agenda</a></li>
-<li class="chapter" data-level="8.2" data-path="class.html"><a href="class.html#knn"><i class="fa fa-check"></i><b>8.2</b> <span class="math inline">\(k\)</span>-Nearest Neighbors</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="class.html"><a href="class.html#k-nn-algorithm"><i class="fa fa-check"></i><b>8.2.1</b> <span class="math inline">\(k\)</span>-NN algorithm</a></li>
-<li class="chapter" data-level="8.2.2" data-path="class.html"><a href="class.html#r-knn-example"><i class="fa fa-check"></i><b>8.2.2</b> R knn Example</a></li>
+<li class="chapter" data-level="8.2" data-path="class.html"><a href="class.html#cv"><i class="fa fa-check"></i><b>8.2</b> Cross Validation</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="class.html"><a href="class.html#bias-variance-trade-off"><i class="fa fa-check"></i><b>8.2.1</b> Bias-variance trade-off</a></li>
+<li class="chapter" data-level="8.2.2" data-path="class.html"><a href="class.html#implementing-cross-validation"><i class="fa fa-check"></i><b>8.2.2</b> Implementing Cross Validation</a></li>
 </ul></li>
-<li class="chapter" data-level="8.3" data-path="class.html"><a href="class.html#cv"><i class="fa fa-check"></i><b>8.3</b> Cross Validation</a><ul>
-<li class="chapter" data-level="8.3.1" data-path="class.html"><a href="class.html#bias-variance-trade-off"><i class="fa fa-check"></i><b>8.3.1</b> Bias-variance trade-off</a></li>
-<li class="chapter" data-level="8.3.2" data-path="class.html"><a href="class.html#implementing-cross-validation"><i class="fa fa-check"></i><b>8.3.2</b> Implementing Cross Validation</a></li>
+<li class="chapter" data-level="8.3" data-path="class.html"><a href="class.html#knn"><i class="fa fa-check"></i><b>8.3</b> <span class="math inline">\(k\)</span>-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="8.3.1" data-path="class.html"><a href="class.html#k-nn-algorithm"><i class="fa fa-check"></i><b>8.3.1</b> <span class="math inline">\(k\)</span>-NN algorithm</a></li>
+<li class="chapter" data-level="8.3.2" data-path="class.html"><a href="class.html#r-knn-example"><i class="fa fa-check"></i><b>8.3.2</b> R knn Example</a></li>
 </ul></li>
 <li class="chapter" data-level="8.4" data-path="class.html"><a href="class.html#Oct31"><i class="fa fa-check"></i><b>8.4</b> 10/31/19 Agenda</a></li>
 <li class="chapter" data-level="8.5" data-path="class.html"><a href="class.html#cart"><i class="fa fa-check"></i><b>8.5</b> CART</a></li>
@@ -326,11 +326,126 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p>That said, the model should still represent the complexity of the data! We describe the trade-off above as the ``bias-variance&quot; trade-off. In order to fully understand that trade-off, let’s first cover the classification method known as <span class="math inline">\(k\)</span>-Nearest Neighbors.</p>
 </div>
+<div id="cv" class="section level2">
+<h2><span class="header-section-number">8.2</span> Cross Validation</h2>
+<div id="bias-variance-trade-off" class="section level3">
+<h3><span class="header-section-number">8.2.1</span> Bias-variance trade-off</h3>
+<ul>
+<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
+<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
+</ul>
+<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit. [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]</p>
+<p><span class="math display">\[\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}\]</span></p>
+<ul>
+<li><strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
+<li><strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, with more complicated models (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
+<li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
+</ul>
+<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<p class="caption">
+Figure 1.2: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(Hastie, Tibshirani, and Friedman <a href="#ref-ESL">2001</a>)</span>
+</p>
+</div>
+<p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
+</div>
+<div id="implementing-cross-validation" class="section level3">
+<h3><span class="header-section-number">8.2.2</span> Implementing Cross Validation</h3>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
+<p class="caption">
+Figure 1.3: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span>
+</p>
+</div>
+<p>Cross validation is typically used in two ways.</p>
+<ol style="list-style-type: decimal">
+<li>To assess a model’s accuracy (<em>model assessment</em>).<br />
+</li>
+<li>To build a model (<em>model selection</em>).</li>
+</ol>
+<div id="different-ways-to-cv" class="section level4 unnumbered">
+<h4>Different ways to CV</h4>
+<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</li>
+<li>leave one out cross validation (LOOCV)</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation</li>
+<li>build the model using the remaining n-1 points</li>
+<li>predict class membership for the observation which was removed</li>
+<li>repeat by removing each observation one at a time</li>
+</ol>
+<ul>
+<li><span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span></li>
+<li>advantage of <span class="math inline">\(k\)</span>-fold is computational</li>
+<li><span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+</ul></li>
+</ul>
+</div>
+<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
+<h4>CV for Model assessment 10-fold</h4>
+<ol style="list-style-type: decimal">
+<li>assume <span class="math inline">\(k\)</span> is given for <span class="math inline">\(k\)</span>NN</li>
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
+</ol>
+</div>
+<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for Model selection 10-fold</h4>
+<ol style="list-style-type: decimal">
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+</ol></li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
+<li>repeat steps 1-3 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest</li>
+</ol>
+</div>
+<div id="cv-for-model-assessment-and-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for Model assessment and selection 10-fold</h4>
+<p>For now we will talk about test/training data <em>and</em> CV in order to both model assessment and selection. Note that CV could be used in both steps, but the algorithm is slightly more complicated.</p>
+<ol style="list-style-type: decimal">
+<li>split the data into training and test observations</li>
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above on <em>only the training data</em>:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the training data</li>
+<li>build the model using the remaining 90% of the training data</li>
+<li>predict class membership / continuous response for the 10% of the training observations which were removed</li>
+<li>repeat by removing each decile one at a time from the training data</li>
+</ol></li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand on the training data</li>
+<li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
+<li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
+</ol>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
+<p class="caption">
+Figure 1.4: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(Varoquaux et al. <a href="#ref-CVpaper">2017</a>)</span>
+</p>
+</div>
+</div>
+</div>
+</div>
 <div id="knn" class="section level2">
-<h2><span class="header-section-number">8.2</span> <span class="math inline">\(k\)</span>-Nearest Neighbors</h2>
+<h2><span class="header-section-number">8.3</span> <span class="math inline">\(k\)</span>-Nearest Neighbors</h2>
 <p>The <span class="math inline">\(k\)</span>-Nearest Neighbor algorithm does exactly what it sounds like it does. The user decides on the integer value for <span class="math inline">\(k\)</span>, and a point is classified to be in the group for which the majority of the <span class="math inline">\(k\)</span> closest points in the training data.</p>
 <div id="k-nn-algorithm" class="section level3">
-<h3><span class="header-section-number">8.2.1</span> <span class="math inline">\(k\)</span>-NN algorithm</h3>
+<h3><span class="header-section-number">8.3.1</span> <span class="math inline">\(k\)</span>-NN algorithm</h3>
 <ol style="list-style-type: decimal">
 <li>Decide on a distance metric (e.g., Euclidean distance, 1 - correlation, etc.) and find the distances from each point in the test set to each point in the training set. The distance is measured in the feature space, that is, with respect to the explanatory variables (not the response variable).</li>
 </ol>
@@ -356,7 +471,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;" /><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="r-knn-example" class="section level3">
-<h3><span class="header-section-number">8.2.2</span> R knn Example</h3>
+<h3><span class="header-section-number">8.3.2</span> R knn Example</h3>
 <p>R code for using the <code>caret</code> package to cluster the <code>iris</code> data. The <code>caret</code> package vignette for <code>knn</code> is here: <a href="http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function" class="uri">http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function</a></p>
 <div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb455-1" data-line-number="1"><span class="kw">library</span>(GGally) <span class="co"># for plotting</span></a>
 <a class="sourceLine" id="cb455-2" data-line-number="2"><span class="kw">library</span>(caret)  <span class="co"># for partitioning &amp; classification</span></a>
@@ -364,7 +479,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="iris-data" class="section level4 unnumbered">
 <h4>iris Data</h4>
 <div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb456-1" data-line-number="1"><span class="kw">ggpairs</span>(iris, <span class="dt">color=</span><span class="st">&quot;Species&quot;</span>, <span class="dt">alpha=</span>.<span class="dv">4</span>)</a></code></pre></div>
-<p><img src="08-classification_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="knn-1" class="section level4 unnumbered">
 <h4>kNN</h4>
@@ -529,121 +644,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Detection Rate              0.3333            0.3111           0.3111
 ## Detection Prevalence        0.3333            0.3333           0.3333
 ## Balanced Accuracy           1.0000            0.9500           0.9500</code></pre>
-</div>
-</div>
-</div>
-<div id="cv" class="section level2">
-<h2><span class="header-section-number">8.3</span> Cross Validation</h2>
-<div id="bias-variance-trade-off" class="section level3">
-<h3><span class="header-section-number">8.3.1</span> Bias-variance trade-off</h3>
-<ul>
-<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
-<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
-</ul>
-<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit. [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]</p>
-<p><span class="math display">\[\begin{align}
-\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
-\end{align}\]</span></p>
-<ul>
-<li><strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
-<li><strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, with more complicated models (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
-<li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
-</ul>
-<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-9"></span>
-<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">
-Figure 8.1: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(Hastie, Tibshirani, and Friedman <a href="#ref-ESL">2001</a>)</span>
-</p>
-</div>
-<p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
-</div>
-<div id="implementing-cross-validation" class="section level3">
-<h3><span class="header-section-number">8.3.2</span> Implementing Cross Validation</h3>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-10"></span>
-<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">
-Figure 5.3: <span class="citation">(Flach <a href="#ref-flach12">2012</a>)</span>
-</p>
-</div>
-<p>Cross validation is typically used in two ways.</p>
-<ol style="list-style-type: decimal">
-<li>To assess a model’s accuracy (<em>model assessment</em>).<br />
-</li>
-<li>To build a model (<em>model selection</em>).</li>
-</ol>
-<div id="different-ways-to-cv" class="section level4 unnumbered">
-<h4>Different ways to CV</h4>
-<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
-<ul>
-<li>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</li>
-<li>leave one out cross validation (LOOCV)</li>
-</ul>
-<ol style="list-style-type: decimal">
-<li>remove one observation</li>
-<li>build the model using the remaining n-1 points</li>
-<li>predict class membership for the observation which was removed</li>
-<li>repeat by removing each observation one at a time</li>
-</ol>
-<ul>
-<li><span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
-<ul>
-<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
-<li>LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span></li>
-<li>advantage of <span class="math inline">\(k\)</span>-fold is computational</li>
-<li><span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
-</ul></li>
-</ul>
-</div>
-<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
-<h4>CV for Model assessment 10-fold</h4>
-<ol style="list-style-type: decimal">
-<li>assume <span class="math inline">\(k\)</span> is given for <span class="math inline">\(k\)</span>NN</li>
-<li>remove 10% of the data</li>
-<li>build the model using the remaining 90%</li>
-<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
-<li>repeat by removing each decile one at a time</li>
-<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
-</ol>
-</div>
-<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
-<h4>CV for Model selection 10-fold</h4>
-<ol style="list-style-type: decimal">
-<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
-<li>build the model using the <span class="math inline">\(k\)</span> value set above:
-<ol style="list-style-type: lower-alpha">
-<li>remove 10% of the data</li>
-<li>build the model using the remaining 90%</li>
-<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
-<li>repeat by removing each decile one at a time</li>
-</ol></li>
-<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
-<li>repeat steps 1-3 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest</li>
-</ol>
-</div>
-<div id="cv-for-model-assessment-and-selection-10-fold" class="section level4 unnumbered">
-<h4>CV for Model assessment and selection 10-fold</h4>
-<p>For now we will talk about test/training data <em>and</em> CV in order to both model assessment and selection. Note that CV could be used in both steps, but the algorithm is slightly more complicated.</p>
-<ol style="list-style-type: decimal">
-<li>split the data into training and test observations</li>
-<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN</li>
-<li>build the model using the <span class="math inline">\(k\)</span> value set above on <em>only the training data</em>:
-<ol style="list-style-type: lower-alpha">
-<li>remove 10% of the training data</li>
-<li>build the model using the remaining 90% of the training data</li>
-<li>predict class membership / continuous response for the 10% of the training observations which were removed</li>
-<li>repeat by removing each decile one at a time from the training data</li>
-</ol></li>
-<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand on the training data</li>
-<li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
-<li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
-</ol>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-11"></span>
-<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">
-Figure 1.7: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(Varoquaux et al. <a href="#ref-CVpaper">2017</a>)</span>
-</p>
-</div>
 </div>
 </div>
 </div>
