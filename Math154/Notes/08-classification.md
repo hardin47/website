@@ -481,7 +481,7 @@ and we seek the value of $j$ and $s$ that minimize the equation:
 
 
 
-#### Continuous Predictor
+#### Regression Trees
 
 
 The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $J$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_J$.  For every observation that falls into the region $R_J$, we make the same prediction - the mean of the response values for the training observations in $R_J$.  So how do we find the regions $R_1, \ldots, R_J$?
@@ -508,7 +508,7 @@ where $\overline{y}_{R_1}$ is the mean response for the training observations in
 3. Repeat the process, looking for the best predictor and best cutpoint *within* one of the previously identified regions (producing three regions, now).
 4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
 
-## 10/30/17
+
 
 One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  We use cross validation to build the subtree so as to not overfit the data.
 
@@ -900,3 +900,4 @@ postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 
 Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
+## 10/30/17
