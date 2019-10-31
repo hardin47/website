@@ -11,6 +11,8 @@
 
 **Important Note**:  For the majority of the classification and clustering methods, we will use the `caret` package in R.  For more information see: http://topepo.github.io/caret/index.html
 
+Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets/raw/master/caret.pdf
+
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
 
@@ -94,9 +96,9 @@ Suppose that we build a classifier on a given data set.  We'd like to know how w
     * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
 
 
-#### CV for Model assessment 10-fold {-}
+#### CV for **Model assessment** 10-fold {-}
 
-1. assume $k$ is given for $k$NN
+1. assume $k$ is given for $k$-NN
 2. remove 10% of the data
 3. build the model using the remaining 90%
 4. predict class membership / continuous response for the 10% of the observations which were removed
@@ -104,9 +106,9 @@ Suppose that we build a classifier on a given data set.  We'd like to know how w
 6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
 
 
-#### CV for Model selection 10-fold {-}
+#### CV for **Model selection** 10-fold {-}
 
-1. set $k$ in $k$NN
+1. set $k$ in $k$-NN
 2. build the model using the $k$ value set above:
     a. remove 10% of the data
     b. build the model using the remaining 90%
@@ -117,12 +119,12 @@ Suppose that we build a classifier on a given data set.  We'd like to know how w
 4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
 
 
-#### CV for Model assessment and selection 10-fold {-}
+#### CV for **Model assessment and selection** 10-fold {-}
 
-For now we will talk about test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
+To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
 
 1. split the data into training and test observations
-2. set $k$ in $k$NN
+2. set $k$ in $k$-NN
 3. build the model using the $k$ value set above on *only the training data*:
     a. remove 10% of the training data
     b. build the model using the remaining 90% of the training data
@@ -400,3 +402,180 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 
 
 ## CART {#cart}
+
+See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.us/visual-intro-to-machine-learning-part-1/
+
+### CART algorithm
+
+### R CART Example
+
+
+
+**Basic Classification and Regression Trees (CART) Algorithm:**
+1. Start with all variables in one group.
+2. Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
+* Evaluation "homogeneity" within each group
+* Divide the data into two groups ("leaves") on that split ("node").
+* Within each split, find the best variable/split that separates the outcomes.
+3. Continue until the groups are too small or sufficiently ``pure".
+4. Prune tree.
+
+
+
+**Shortcomings of CART:**
+* Straight CART do not generally have the same predictive accuracy as other classification approaches.  (we will improve the model - see random forests, boosting, bagging)
+* Difficult to write down / consider the CART "model"
+* Without proper pruning, the model can easily lead to overfitting
+* With lots of predictors, (even greedy) partitioning can become computationally unwieldy
+* Often, prediction performance is poor
+
+
+**Strengths of CART:**
+
+* They are easy to explain; trees are easy to display graphically (which make them easy to interpret). (They mirror the typical human decision-making process.)
+* Can handle categorical or numerical predictors or response variables (indeed, they can handle mixed predictors at the same time!).
+* Can handle more than 2 groups for categorical predictions
+* Easily ignore redundant variables.
+* Perform better than linear models in non-linear settings.  Classification trees are non-linear models, so they immediately use interactions between variables.
+* Data transformations may be less important (monotone transformations on the explanatory variables won't change anything).
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/ObamaClinton.jpg" alt="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg Best information was whether or not the county was more than 20 percent black.   Then each successive node is split again on the best possible informative variable.  Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-12)http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg Best information was whether or not the county was more than 20 percent black.   Then each successive node is split again on the best possible informative variable.  Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008.</p>
+</div>
+
+
+#### Classification Trees
+
+A *classification tree* is used to predict a categorical response variable (rather than a quantitative one).  The end predicted value will be the one of the *most commonly occurring class* of training observations in the region to which it belongs.  The goal is to create regions which are as homogeneous as possible with respect to the response variable - categories.
+
+**measures of impurity**
+
+1. Calculate the *classification error rate* as the fraction of the training observations in that region that do not belong to the most common class: $$E_m = 1 - \max_k(\hat{p}_{mk})$$
+where $\hat{p}_{mk}$ represents the proportion of training observations in the $m$th region that are from the $k$th class.  However, the classification error rate is not particularly sensitive to node purity, and so two additional measures are typically used to partition the regions.
+2. Further, the *Gini index* is defined by $$G_m= \sum_{k=1}^K \hat{p}_{mk}(1-\hat{p}_{mk})$$
+a measure of total variance across the $K$ classes. [Recall, the variance of a Bernoulli random variable with $\pi$ = P(success) is $\pi(1-\pi)$.] Note that the Gini index takes on a small value if all of the $\hat{p}_{mk}$ values are close to zero or one.  For this reason, the Gini index is referred to as a measure of node *purity* - a small value indicates that a node contains predominantly observations from a single class.
+3. Last, the *cross-entropy* is defined as $$D_m = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}$$
+Since $0 \leq \hat{p}_{mk} \leq 1$ it follows that $0 \leq -\hat{p}_{mk} \log\hat{p}_{mk} $.  One can show that the cross-entropy will take on a value near zero if the $\hat{p}_{mk} $ values are all near zero or all near one.  Therefore, like the Gini index, the cross-entropy will take on a small value if the $m$th node is pure.
+4. To *build* the tree, typically the Gini index or the cross-entropy are used to evaluate a particular split.
+5. To *prune* the tree, often classification error is used (if accuracy of the final pruned tree is the goal)
+
+
+
+Computationally, it is usually infeasible to consider every possible partition of the observations.  Instead of looking at all partitions, we perform a *top down* approach to the problem which is known as *recursive binary splitting*  (*greedy* because we look only at the current split and not at the outcomes of the splits to come).
+
+
+**Recursive Binary Splitting on Categories** (for a given node)
+1. Select the predictor $X_j$ and the cutpoint $s$ such that splitting the predictor space into the regions $\{X | X_j< s\}$ and $\{X | X_j \geq s\}$ lead to the greatest reduction in Gini index or cross-entropy.
+2. For any $j$ and $s$, define the pair of half-planes to be
+$$R_1(j,s) = \{X | X_j < s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}$$
+and we seek the value of $j$ and $s$ that minimize the equation:
+\begin{align}
+& \sum_{i:x_i \in R_1(j,s)} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + \sum_{i:x_i \in R_2(j,s)} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
+\mbox{equivalently: } & n_{R_1} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + n_{R_2} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
+\end{align}
+3. Repeat the process, looking for the best predictor and best cutpoint *within* one of the previously identified regions (producing three regions, now).
+4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
+
+
+
+#### Continuous Predictor
+
+
+The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $J$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_J$.  For every observation that falls into the region $R_J$, we make the same prediction - the mean of the response values for the training observations in $R_J$.  So how do we find the regions $R_1, \ldots, R_J$?
+
+
+$\Rightarrow$ Minimize RSS, $$RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2$$
+where $\overline{y}_{R_j}$ is the mean response for the training observations within the $j$th box.
+
+(Note:  in the chapter they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5) in ISLR.)
+
+$$ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}$$
+
+Again, it is usually infeasible to consider every possible partition of the observations.  Instead of looking at all partitions, we perform a *top down* approach to the problem which is known as *recursive binary splitting*  (*greedy* because we look only at the current split and not at the outcomes of the splits to come).
+
+
+**Recursive Binary Splitting on Numerical Response** (for a given node)
+1. Select the predictor $X_j$ and the cutpoint $s$ such that splitting the predictor space into the regions $\{X | X_j< s\}$ and $\{X | X_j \geq s\}$ lead to the greatest reduction in RSS.
+2. For any $j$ and $s$, define the pair of half-planes to be
+$$R_1(j,s) = \{X | X_j < s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}$$
+and we see the value of $j$ and $s$ that minimize the equation:
+$$\sum_{i:x_i \in R_1(j,s)} (y_i - \overline{y}_{R_1})^2 + \sum_{i:x_i \in R_2(j,s)} (y_i - \overline{y}_{R_2})^2$$
+where $\overline{y}_{R_1}$ is the mean response for the training observations in $R_1(j,s)$ and $\overline{y}_{R_2}$ is the mean response for training observations in $R_2(j,s)$.
+3. Repeat the process, looking for the best predictor and best cutpoint *within* one of the previously identified regions (producing three regions, now).
+4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
+
+## 10/30/17
+
+One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  We use cross validation to build the subtree so as to not overfit the data.
+
+\begin{algorithm}
+\caption{Building a Regression Tree}
+\label{array-sum}
+\begin{algorithmic}[]
+\State 1.  Use recursive binary splitting to grow a large tree on the training data, stopping only when each terminal node has fewer than some minimum number of observations.
+\State 2. Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of $\alpha$.
+\State 3. Use $K$-fold cross-validation to choose $\alpha$.  That is, divide the training observations into $K$ folds.  For each $k=1, 2, \ldots, K$:
+\begin{itemize}
+\item[(a)] Repeat Steps 1 and 2 on all but the $k$th fold of the training data.
+\item[(b)] Evaluate the mean squared prediction error on the data in the left-out $k$th fold, as a function of $\alpha$.
+
+For each value of $\alpha$, average the prediction error (either misclassification or RSS), and pick $\alpha$ to minimize the average error.
+\end{itemize}
+\State 4. Return the subtree from Step 2 that corresponds to the chosen value of $\alpha$.
+\end{algorithmic}
+\end{algorithm}
+
+
+#### Cost Complexity Pruning
+
+Also known as *weakest link pruning*, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$ (instead of considering every single subtree).  Generally, the idea is that there is a cost to having a larger (more complex!) tree.  We define the cost complexity criterion ($\alpha > 0$):
+\begin{align}
+\mbox{numerical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha|T|\\
+\mbox{categorical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha|T|
+\end{align}
+where $k(m)$ is the class with the majority of observations in node $m$ and $|T|$ is the number of terminal nodes in the tree.
+
+
+* $\alpha$ small:  If $\alpha$ is set to be small, we are saying that the risk is more worrisome than the complexity and larger trees are favored because they reduce the risk.
+* $\alpha$ large:  If $\alpha$ is set to be large, then the complexity of the tree is more worrisome and smaller trees are favored.
+
+The way to think about cost complexity is to consider $\alpha$ increasing.  As $\alpha$ gets bigger, the ``best" tree will be smaller.  But the test error will not be monotonically related to the size of the training tree.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=.4, angle=90]{treealpha.jpg}
+\end{center}
+\end{figure}
+
+<img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;" />
+
+##### Variations on a theme {-}
+
+The main ideas above are consistent throughout all CART algorithms.  However, the exact details of implementation can change from function to function, and often times it is very difficult to decipher exactly which equation is being used.  In the `tree` function in R, much of the decision making is done on `deviance` which is defined as:
+\begin{align}
+\mbox{numerical: } \mbox{deviance} &= \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\\
+\mbox{categorical: }  \mbox{deviance} &= -2\sum_{m=1}^{|T|} \sum_{k=1}^K n_{mk} \log \hat{p}_{mk}\\
+\end{align}
+For the CART algorithm, minimize the deviance (for both types of variables).  The categorical deviance will be small if most of the observations are in the majority group  (with high proportion).  Also, $\lim_{\epsilon \rightarrow 0} \epsilon \log(\epsilon) = 0$.  Additionally, methods of cross validation can also vary.  In particular, if the number of variables is large, the tree algorithm can be slow and so the cross validation process - choice of $\alpha$ - needs to be efficient.
+
+**Example:** See trees.html for examples and R code. There are multiple tree building options in R both in the `caret` package and `party`, `rpart`, and `tree` packages.
+
+##### CV for model building and model assessment {-}
+
+Notice that CV is used for both model building and model assessment.  It is possible (and practical, though quite computational!) to use both practices on the same classification model.  The algorithm would be as follows.
+
+\begin{algorithm}[H]
+\caption{CV for both building and assessment}
+\label{array-sum}
+\begin{algorithmic}[]
+\State 1.  Partition the data in $K_1$ groups.
+\State 2. Remove the first group, and train the data on the remaining $K_1-1$ groups.
+\State 3. Use $K_2$-fold cross-validation (on the $K_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $K_2$ folds and find $\alpha$ that minimizes the error.
+\State 4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $K_1$ hold out samples.
+\State 5. Repeat steps 2-4 using the remaining $K_1 - 1$ groups.
+\end{algorithmic}
+\end{algorithm}
+
+
