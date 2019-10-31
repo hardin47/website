@@ -814,6 +814,8 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 <div id="r-cart-example" class="section level3">
 <h3><span class="header-section-number">8.5.2</span> R CART Example</h3>
 <p>There are multiple tree building options in R both in the <code>caret</code> package and <code>party</code>, <code>rpart</code>, and <code>tree</code> packages.</p>
+<p>The Census Bureau divides the country up into “tracts” of approximately
+equal population. For the 1990 Census, California was divided into 20640 tracts. One data sets (houses on <a href="http://lib.stat.cmu.edu/datasets/" class="uri">http://lib.stat.cmu.edu/datasets/</a>; <a href="http://lib.stat.cmu.edu/datasets/houses.zip" class="uri">http://lib.stat.cmu.edu/datasets/houses.zip</a>) records the following for each tract in California: Median house price, median house age, total number of rooms, total number of bedrooms, total number of occupants, total number of houses, median income (in thousands of dollars), latitude and longitude. It appeared in Pace and Barry (1997), “Sparse Spatial Autoregressions”, <strong>Statistics and Probability Letters</strong>.</p>
 <div id="classification-and-regression-trees" class="section level4 unnumbered">
 <h4>Classification and Regression Trees</h4>
 <p><strong>Classification Trees</strong> are used to predict a response or class <span class="math inline">\(Y\)</span> from input <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>. If it is a continuous response it’s called a regression tree, if it is categorical, it’s called a classification tree. At each node of the tree, we check the value of one the input <span class="math inline">\(X_i\)</span> and depending of the (binary) answer we continue to the left or to the right subbranch. When we reach a leaf we will find the prediction (usually it is a simple statistic of the dataset the leaf represents, like the most common value from the available classes).</p>
@@ -932,17 +934,16 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 <div id="cross-validation-model-building" class="section level4 unnumbered">
 <h4>Cross Validation (model building!)</h4>
 <p>Turns out that the tree does “better” by being more complex – why is that? The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.</p>
-<pre><code>plot(cv.model$size, cv.model$dev, type=&quot;l&quot;, xlab=&quot;size&quot;, ylab=&quot;deviance&quot;)</code></pre>
-<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb474-1" data-line-number="1"><span class="co"># here, let&#39;s use all the variables and all the samples</span></a>
-<a class="sourceLine" id="cb474-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
-<a class="sourceLine" id="cb474-3" data-line-number="3">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
-<a class="sourceLine" id="cb474-4" data-line-number="4">tree.cv.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>real.estate, </a>
-<a class="sourceLine" id="cb474-5" data-line-number="5">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
-<a class="sourceLine" id="cb474-6" data-line-number="6">                              <span class="dt">trControl=</span>fitControl,</a>
-<a class="sourceLine" id="cb474-7" data-line-number="7">                              <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
-<a class="sourceLine" id="cb474-8" data-line-number="8">                              <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
-<a class="sourceLine" id="cb474-9" data-line-number="9">  </a>
-<a class="sourceLine" id="cb474-10" data-line-number="10">tree.cv.house  </a></code></pre></div>
+<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb473-1" data-line-number="1"><span class="co"># here, let&#39;s use all the variables and all the samples</span></a>
+<a class="sourceLine" id="cb473-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb473-3" data-line-number="3">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
+<a class="sourceLine" id="cb473-4" data-line-number="4">tree.cv.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb473-5" data-line-number="5">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb473-6" data-line-number="6">                              <span class="dt">trControl=</span>fitControl,</a>
+<a class="sourceLine" id="cb473-7" data-line-number="7">                              <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb473-8" data-line-number="8">                              <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb473-9" data-line-number="9">  </a>
+<a class="sourceLine" id="cb473-10" data-line-number="10">tree.cv.house  </a></code></pre></div>
 <pre><code>## CART 
 ## 
 ## 20640 samples
@@ -977,32 +978,32 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 ## 
 ## RMSE was used to select the optimal model using the smallest value.
 ## The final value used for the model was maxdepth = 14.</code></pre>
-<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb476-1" data-line-number="1">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tree.cv.house<span class="op">$</span>finalModel)</a></code></pre></div>
+<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb475-1" data-line-number="1">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tree.cv.house<span class="op">$</span>finalModel)</a></code></pre></div>
 <p><img src="08-classification_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" data-line-number="1"><span class="kw">plot</span>(tree.cv.house)</a></code></pre></div>
+<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb476-1" data-line-number="1"><span class="kw">plot</span>(tree.cv.house)</a></code></pre></div>
 <p><img src="08-classification_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="training-test-data-for-model-building-and-model-accuracy" class="section level4 unnumbered">
 <h4>Training / test data for model building AND model accuracy</h4>
-<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb478-1" data-line-number="1"><span class="co"># first create two datasets: one training, one test</span></a>
-<a class="sourceLine" id="cb478-2" data-line-number="2">inTrain &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> real.estate<span class="op">$</span>MedianHouseValue, </a>
-<a class="sourceLine" id="cb478-3" data-line-number="3">                                      <span class="dt">p=</span>.<span class="dv">8</span>, <span class="dt">list=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb478-4" data-line-number="4">house.train &lt;-<span class="st"> </span>real.estate[inTrain,]</a>
-<a class="sourceLine" id="cb478-5" data-line-number="5">house.test &lt;-<span class="st"> </span>real.estate[<span class="op">-</span><span class="kw">c</span>(inTrain),]</a>
-<a class="sourceLine" id="cb478-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb478-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb478-8" data-line-number="8"><span class="co"># then use CV on the training data to find the best maxdepth</span></a>
-<a class="sourceLine" id="cb478-9" data-line-number="9"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
-<a class="sourceLine" id="cb478-10" data-line-number="10">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
-<a class="sourceLine" id="cb478-11" data-line-number="11">tree.cvtrain.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
-<a class="sourceLine" id="cb478-12" data-line-number="12">                                   <span class="dt">data=</span>house.train, </a>
-<a class="sourceLine" id="cb478-13" data-line-number="13">                                   <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
-<a class="sourceLine" id="cb478-14" data-line-number="14">                                   <span class="dt">trControl=</span>fitControl, </a>
-<a class="sourceLine" id="cb478-15" data-line-number="15">                                   <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
-<a class="sourceLine" id="cb478-16" data-line-number="16">                                   <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
-<a class="sourceLine" id="cb478-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb478-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb478-19" data-line-number="19">tree.cvtrain.house</a></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" data-line-number="1"><span class="co"># first create two datasets: one training, one test</span></a>
+<a class="sourceLine" id="cb477-2" data-line-number="2">inTrain &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> real.estate<span class="op">$</span>MedianHouseValue, </a>
+<a class="sourceLine" id="cb477-3" data-line-number="3">                                      <span class="dt">p=</span>.<span class="dv">8</span>, <span class="dt">list=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb477-4" data-line-number="4">house.train &lt;-<span class="st"> </span>real.estate[inTrain,]</a>
+<a class="sourceLine" id="cb477-5" data-line-number="5">house.test &lt;-<span class="st"> </span>real.estate[<span class="op">-</span><span class="kw">c</span>(inTrain),]</a>
+<a class="sourceLine" id="cb477-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb477-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb477-8" data-line-number="8"><span class="co"># then use CV on the training data to find the best maxdepth</span></a>
+<a class="sourceLine" id="cb477-9" data-line-number="9"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb477-10" data-line-number="10">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
+<a class="sourceLine" id="cb477-11" data-line-number="11">tree.cvtrain.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb477-12" data-line-number="12">                                   <span class="dt">data=</span>house.train, </a>
+<a class="sourceLine" id="cb477-13" data-line-number="13">                                   <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb477-14" data-line-number="14">                                   <span class="dt">trControl=</span>fitControl, </a>
+<a class="sourceLine" id="cb477-15" data-line-number="15">                                   <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb477-16" data-line-number="16">                                   <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb477-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb477-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb477-19" data-line-number="19">tree.cvtrain.house</a></code></pre></div>
 <pre><code>## CART 
 ## 
 ## 16513 samples
@@ -1037,16 +1038,16 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 ## 
 ## RMSE was used to select the optimal model using the smallest value.
 ## The final value used for the model was maxdepth = 13.</code></pre>
-<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb480-1" data-line-number="1">tree.train.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
-<a class="sourceLine" id="cb480-2" data-line-number="2">                                 <span class="dt">data=</span>house.train, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
-<a class="sourceLine" id="cb480-3" data-line-number="3">                                 <span class="dt">trControl=</span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>),</a>
-<a class="sourceLine" id="cb480-4" data-line-number="4">                                 <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">14</span>),</a>
-<a class="sourceLine" id="cb480-5" data-line-number="5">                                 <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
-<a class="sourceLine" id="cb480-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb480-7" data-line-number="7"><span class="co"># use confusionMatrix instead of postResample for classification results</span></a>
-<a class="sourceLine" id="cb480-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb480-9" data-line-number="9">test.pred &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.train.house, house.test)</a>
-<a class="sourceLine" id="cb480-10" data-line-number="10"><span class="kw">postResample</span>(<span class="dt">pred =</span> test.pred, <span class="dt">obs=</span><span class="kw">log</span>(house.test<span class="op">$</span>MedianHouseValue))</a></code></pre></div>
+<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb479-1" data-line-number="1">tree.train.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb479-2" data-line-number="2">                                 <span class="dt">data=</span>house.train, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb479-3" data-line-number="3">                                 <span class="dt">trControl=</span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>),</a>
+<a class="sourceLine" id="cb479-4" data-line-number="4">                                 <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">14</span>),</a>
+<a class="sourceLine" id="cb479-5" data-line-number="5">                                 <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb479-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb479-7" data-line-number="7"><span class="co"># use confusionMatrix instead of postResample for classification results</span></a>
+<a class="sourceLine" id="cb479-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb479-9" data-line-number="9">test.pred &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.train.house, house.test)</a>
+<a class="sourceLine" id="cb479-10" data-line-number="10"><span class="kw">postResample</span>(<span class="dt">pred =</span> test.pred, <span class="dt">obs=</span><span class="kw">log</span>(house.test<span class="op">$</span>MedianHouseValue))</a></code></pre></div>
 <pre><code>##      RMSE  Rsquared       MAE 
 ## 0.3696649 0.5840583 0.2846395</code></pre>
 </div>
