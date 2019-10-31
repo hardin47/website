@@ -157,7 +157,7 @@ The $k$-Nearest Neighbor algorithm does exactly what it sounds like it does.  Th
 n.b.  In most machine learning algorithms that use "distance" as a measure, the "distance" is not required to be a mathematical distance metric.  Indeed, 1-correlation is a very common distance measure, and it fails the triangle inequality.
 
 
-2. Consider a point in the training set.  Find the $k$ closest points in the test set to the one test observation.
+2. Consider a point in the test set.  Find the $k$ closest points in the training set to the one test observation.
 
 3. Using majority vote, find the dominate class of the $k$ closest points.  Predict that class label to the test observation. 
 
@@ -363,7 +363,7 @@ The goal of the algorithm in a *regression tree* is to split the set of possible
 
 
 $\Rightarrow$ Minimize RSS, $$RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2$$
-where $\overline{y}_{R_j}$ is the mean response for the training observations within the $j$th box.
+where $\overline{y}_{R_j}$ is the mean response for the training observations within the $j$th region.
 
 (Note:  in the chapter [@ISL] they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)
 
@@ -384,6 +384,12 @@ where $\overline{y}_{R_1}$ is the mean response for the training observations in
 4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
 
 
+#### (Avoiding) Overfitting
+
+Ideally, the tree would not overfit the training data.  One could imagine how easy it would be to grow the treee over the training data so as to end up with terminal nodes which are completely homogenous (but then don't represent the test data).
+
+
+See the following (amazing!) demonstration for intuition on model validation / overfitting:  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
 
 One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  We use cross validation to build the subtree so as to not overfit the data.
 
@@ -399,6 +405,7 @@ One possible algorithm for building a tree is to split based on the reduction in
     b. Evaluate the mean squared prediction error on the data in the left-out $k$th fold, as a function of $\alpha$.
     For each value of $\alpha$, average the prediction error (either misclassification or RSS), and pick $\alpha$ to minimize the average error.
 4. Return the subtree from Step 2 that corresponds to the chosen value of $\alpha$.
+
 ******
 
 
@@ -418,7 +425,7 @@ where $k(m)$ is the class with the majority of observations in node $m$ and $|T|
 The way to think about cost complexity is to consider $\alpha$ increasing.  As $\alpha$ gets bigger, the "best" tree will be smaller.  But the test error will not be monotonically related to the size of the training tree.
 
 
-```{r  out.width='100%', fig.align='center', out.extra='angle=90', echo=FALSE}
+```{r  out.width='100%', fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/treealpha.jpg")
 ```
 
@@ -429,29 +436,32 @@ The main ideas above are consistent throughout all CART algorithms.  However, th
 \mbox{numerical: } \mbox{deviance} &= \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\\
 \mbox{categorical: }  \mbox{deviance} &= -2\sum_{m=1}^{|T|} \sum_{k=1}^K n_{mk} \log \hat{p}_{mk}\\
 \end{align}
+
 For the CART algorithm, minimize the deviance (for both types of variables).  The categorical deviance will be small if most of the observations are in the majority group  (with high proportion).  Also, $\lim_{\epsilon \rightarrow 0} \epsilon \log(\epsilon) = 0$.  Additionally, methods of cross validation can also vary.  In particular, if the number of variables is large, the tree algorithm can be slow and so the cross validation process - choice of $\alpha$ - needs to be efficient.
 
-**Example:** See trees.html for examples and R code. There are multiple tree building options in R both in the `caret` package and `party`, `rpart`, and `tree` packages.
+
 
 ##### CV for model building and model assessment {-}
 
-Notice that CV is used for both model building and model assessment.  It is possible (and practical, though quite computational!) to use both practices on the same classification model.  The algorithm would be as follows.
+Notice that CV is used for both model building and model assessment.  It is possible (and practical, though quite computational!) to use both practices on the same classification model.  The algorithm could be as follows.
 
 
 ******
-**Algorithm**:  CV for both building and assessment
+**Algorithm**:  CV for both $k_1$-fold CV building and $k_2$-fold CV assessment
 
 ******
-1. Partition the data in $K_1$ groups.
-2. Remove the first group, and train the data on the remaining $K_1-1$ groups.
-3. Use $K_2$-fold cross-validation (on the $K_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $K_2$ folds and find $\alpha$ that minimizes the error.
-4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $K_1$ hold out samples.
-5. Repeat steps 2-4 using the remaining $K_1 - 1$ groups.
+1. Partition the data in $k_1$ groups.
+2. Remove the first group, and train the data on the remaining $k_1-1$ groups.
+3. Use $k_2$-fold cross-validation (on the $k_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $k_2$ folds and find $\alpha$ that minimizes the error.
+4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $k_1$ hold out samples.
+5. Repeat steps 2-4 using the remaining $k_1 - 1$ groups.
+
 ******
 
 
 ### R CART Example
 
+There are multiple tree building options in R both in the `caret` package and `party`, `rpart`, and `tree` packages.
 
 #### Classification and Regression Trees {-}
 
