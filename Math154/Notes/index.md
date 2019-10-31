@@ -3,6 +3,9 @@ title: "Computational Statistics"
 author: "Jo Hardin"
 date: "2019-10-30"
 site: bookdown::bookdown_site
+header-includes:
+  - \usepackage{algorithm}
+  - \usepackage{algpseudocode}
 output:
   bookdown::pdf_book:
     includes:

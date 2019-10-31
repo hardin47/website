@@ -547,13 +547,8 @@ where $k(m)$ is the class with the majority of observations in node $m$ and $|T|
 
 The way to think about cost complexity is to consider $\alpha$ increasing.  As $\alpha$ gets bigger, the "best" tree will be smaller.  But the test error will not be monotonically related to the size of the training tree.
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.4, angle=90]{treealpha.jpg}
-\end{center}
-\end{figure}
 
-<img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;" />
+<img src="figs/treealpha.jpg" width="100%" angle=90 style="display: block; margin: auto;" />
 
 ##### Variations on a theme {-}
 
