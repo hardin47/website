@@ -275,10 +275,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8.4" data-path="class.html"><a href="class.html#Oct31"><i class="fa fa-check"></i><b>8.4</b> 10/31/19 Agenda</a></li>
 <li class="chapter" data-level="8.5" data-path="class.html"><a href="class.html#cart"><i class="fa fa-check"></i><b>8.5</b> CART</a><ul>
-<li class="chapter" data-level="8.5.1" data-path="class.html"><a href="class.html#r-cart-example"><i class="fa fa-check"></i><b>8.5.1</b> R CART Example</a></li>
-<li class="chapter" data-level="8.5.2" data-path="class.html"><a href="class.html#cart-algorithm"><i class="fa fa-check"></i><b>8.5.2</b> CART algorithm</a></li>
+<li class="chapter" data-level="8.5.1" data-path="class.html"><a href="class.html#cart-algorithm"><i class="fa fa-check"></i><b>8.5.1</b> CART algorithm</a></li>
 </ul></li>
-<li class="chapter" data-level="8.6" data-path="class.html"><a href="class.html#section"><i class="fa fa-check"></i><b>8.6</b> 10/30/17</a></li>
+<li class="chapter" data-level="8.6" data-path="class.html"><a href="class.html#section"><i class="fa fa-check"></i><b>8.6</b> 10/30/17</a><ul>
+<li class="chapter" data-level="8.6.1" data-path="class.html"><a href="class.html#r-cart-example"><i class="fa fa-check"></i><b>8.6.1</b> R CART Example</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -670,11 +671,8 @@ Figure 1.4: Nested cross-validation: two cross-validation loops are run one insi
 Figure 1.8: <a href="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg" class="uri">http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg</a> Best information was whether or not the county was more than 20 percent black. Then each successive node is split again on the best possible informative variable. Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008.
 </p>
 </div>
-<div id="r-cart-example" class="section level3">
-<h3><span class="header-section-number">8.5.1</span> R CART Example</h3>
-</div>
 <div id="cart-algorithm" class="section level3">
-<h3><span class="header-section-number">8.5.2</span> CART algorithm</h3>
+<h3><span class="header-section-number">8.5.1</span> CART algorithm</h3>
 <p><strong>Basic Classification and Regression Trees (CART) Algorithm:</strong></p>
 <ol style="list-style-type: decimal">
 <li>Start with all variables in one group.</li>
@@ -705,7 +703,7 @@ Figure 1.8: <a href="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-
 <li>Data transformations may be less important (monotone transformations on the explanatory variables won’t change anything).</li>
 </ul>
 <div id="classification-trees" class="section level4">
-<h4><span class="header-section-number">8.5.2.1</span> Classification Trees</h4>
+<h4><span class="header-section-number">8.5.1.1</span> Classification Trees</h4>
 <p>A <em>classification tree</em> is used to predict a categorical response variable (rather than a quantitative one). The end predicted value will be the one of the <em>most commonly occurring class</em> of training observations in the region to which it belongs. The goal is to create regions which are as homogeneous as possible with respect to the response variable - categories.</p>
 <p><strong>measures of impurity</strong></p>
 <ol style="list-style-type: decimal">
@@ -734,7 +732,7 @@ and we seek the value of <span class="math inline">\(j\)</span> and <span class=
 </ol>
 </div>
 <div id="continuous-predictor" class="section level4">
-<h4><span class="header-section-number">8.5.2.2</span> Continuous Predictor</h4>
+<h4><span class="header-section-number">8.5.1.2</span> Continuous Predictor</h4>
 <p>The goal of the algorithm in a <em>regression tree</em> is to split the set of possible value for the data into <span class="math inline">\(J\)</span> distinct and non-overlapping regions, <span class="math inline">\(R_1, R_2, \ldots, R_J\)</span>. For every observation that falls into the region <span class="math inline">\(R_J\)</span>, we make the same prediction - the mean of the response values for the training observations in <span class="math inline">\(R_J\)</span>. So how do we find the regions <span class="math inline">\(R_1, \ldots, R_J\)</span>?</p>
 <p><span class="math inline">\(\Rightarrow\)</span> Minimize RSS, <span class="math display">\[RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2\]</span>
 where <span class="math inline">\(\overline{y}_{R_j}\)</span> is the mean response for the training observations within the <span class="math inline">\(j\)</span>th box.</p>
@@ -787,6 +785,255 @@ For the CART algorithm, minimize the deviance (for both types of variables). The
 <h5>CV for model building and model assessment</h5>
 <p>Notice that CV is used for both model building and model assessment. It is possible (and practical, though quite computational!) to use both practices on the same classification model. The algorithm would be as follows.</p>
 
+</div>
+</div>
+<div id="r-cart-example" class="section level3">
+<h3><span class="header-section-number">8.6.1</span> R CART Example</h3>
+<div id="classification-and-regression-trees" class="section level4 unnumbered">
+<h4>Classification and Regression Trees</h4>
+<p><strong>Classification Trees</strong> are used to predict a response or class <span class="math inline">\(Y\)</span> from input <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>. If it is a continuous response it’s called a regression tree, if it is categorical, it’s called a classification tree. At each node of the tree, we check the value of one the input <span class="math inline">\(X_i\)</span> and depending of the (binary) answer we continue to the left or to the right subbranch. When we reach a leaf we will find the prediction (usually it is a simple statistic of the dataset the leaf represents, like the most common value from the available classes).</p>
+<p>Note on maxdepth: if maxdepth=6, the corresponding stopping rule will be, “if total nodes &gt; (2^6 - 1), the tree will stop growing”.</p>
+</div>
+<div id="regression-trees" class="section level4 unnumbered">
+<h4>Regression Trees</h4>
+<div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb465-1" data-line-number="1">real.estate &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt&quot;</span>, </a>
+<a class="sourceLine" id="cb465-2" data-line-number="2">                          <span class="dt">header=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb465-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb465-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb465-5" data-line-number="5">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb465-6" data-line-number="6">tr.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, </a>
+<a class="sourceLine" id="cb465-7" data-line-number="7">                         <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
+<a class="sourceLine" id="cb465-8" data-line-number="8">                         <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb465-9" data-line-number="9">                         <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb465-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb465-11" data-line-number="11">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tr.house<span class="op">$</span>finalModel)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="scatterplot" class="section level4 unnumbered">
+<h4>Scatterplot</h4>
+<p>Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend. Note that this plot uses the <code>tree</code> model (instead of the <code>rpart2</code> model) because the optimization is different.</p>
+<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb466-1" data-line-number="1">tree.model &lt;-<span class="st"> </span>tree<span class="op">::</span><span class="kw">tree</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, </a>
+<a class="sourceLine" id="cb466-2" data-line-number="2">                         <span class="dt">data=</span>real.estate)</a>
+<a class="sourceLine" id="cb466-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb466-4" data-line-number="4">price.deciles &lt;-<span class="st"> </span><span class="kw">quantile</span>(real.estate<span class="op">$</span>MedianHouseValue, <span class="dv">0</span><span class="op">:</span><span class="dv">10</span><span class="op">/</span><span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb466-5" data-line-number="5">cut.prices    &lt;-<span class="st"> </span><span class="kw">cut</span>(real.estate<span class="op">$</span>MedianHouseValue, price.deciles, </a>
+<a class="sourceLine" id="cb466-6" data-line-number="6">                     <span class="dt">include.lowest=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb466-7" data-line-number="7"><span class="kw">plot</span>(real.estate<span class="op">$</span>Longitude, real.estate<span class="op">$</span>Latitude, </a>
+<a class="sourceLine" id="cb466-8" data-line-number="8">     <span class="dt">col=</span><span class="kw">grey</span>(<span class="dv">10</span><span class="op">:</span><span class="dv">2</span><span class="op">/</span><span class="dv">11</span>)[cut.prices], <span class="dt">pch=</span><span class="dv">20</span>, </a>
+<a class="sourceLine" id="cb466-9" data-line-number="9">     <span class="dt">xlab=</span><span class="st">&quot;Longitude&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Latitude&quot;</span>)</a>
+<a class="sourceLine" id="cb466-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb466-11" data-line-number="11">tree<span class="op">::</span><span class="kw">partition.tree</span>(tree.model, </a>
+<a class="sourceLine" id="cb466-12" data-line-number="12">                     <span class="dt">ordvars=</span><span class="kw">c</span>(<span class="st">&quot;Longitude&quot;</span>,<span class="st">&quot;Latitude&quot;</span>), </a>
+<a class="sourceLine" id="cb466-13" data-line-number="13">                     <span class="dt">add=</span><span class="ot">TRUE</span>) </a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="finer-partition" class="section level4 unnumbered">
+<h4>Finer partition</h4>
+<pre><code>12) Latitude&gt;=34.7 2844  645.0 11.5 </code></pre>
+<p>the node that splits at latitude greater than 34.7 has 2844 houses. 645 is the “deviance” which is the sum of squares value for that node. the predicted value is the average of the points in that node: 11.5. it is not a terminal node (no asterisk).</p>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb468-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb468-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb468-3" data-line-number="3">tr.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
+<a class="sourceLine" id="cb468-4" data-line-number="4">                  <span class="dt">trControl =</span> fitControl, <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb468-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb468-6" data-line-number="6">tr.house<span class="op">$</span>finalModel</a></code></pre></div>
+<pre><code>## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) Latitude&gt;=38.485 2061  383.26410 11.59422  
+##      4) Latitude&gt;=39.355 674   65.51082 11.31630 *
+##      5) Latitude&lt; 39.355 1387  240.39580 11.72928 *
+##    3) Latitude&lt; 38.485 18579 5750.77400 12.13931  
+##      6) Longitude&gt;=-121.655 13941 4395.52000 12.05527  
+##       12) Latitude&gt;=34.675 2844  645.27310 11.51018  
+##         24) Longitude&gt;=-120.275 1460  212.47730 11.28145 *
+##         25) Longitude&lt; -120.275 1384  275.83120 11.75148 *
+##       13) Latitude&lt; 34.675 11097 2688.68000 12.19497  
+##         26) Longitude&gt;=-118.315 8384 1823.33000 12.08687  
+##           52) Longitude&gt;=-117.545 2839  691.79800 11.87672 *
+##           53) Longitude&lt; -117.545 5545  941.96340 12.19446 *
+##         27) Longitude&lt; -118.315 2713  464.62720 12.52902 *
+##      7) Longitude&lt; -121.655 4638  960.79250 12.39194  
+##       14) Latitude&gt;=37.925 1063  177.59430 12.09533 *
+##       15) Latitude&lt; 37.925 3575  661.87260 12.48013 *</code></pre>
+</div>
+<div id="more-variables" class="section level4 unnumbered">
+<h4>More variables</h4>
+<p>Including all the variables, not only the latitude and longitude:</p>
+<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb470-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb470-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb470-3" data-line-number="3">tr.full.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb470-4" data-line-number="4">                              <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
+<a class="sourceLine" id="cb470-5" data-line-number="5">                              <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb470-6" data-line-number="6">                              <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb470-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb470-8" data-line-number="8">tr.full.house<span class="op">$</span>finalModel</a></code></pre></div>
+<pre><code>## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) MedianIncome&lt; 3.5471 10381 2662.31300 11.77174  
+##      4) MedianIncome&lt; 2.51025 4842 1193.71700 11.57572  
+##        8) Latitude&gt;=34.465 2520  557.77450 11.38771  
+##         16) Longitude&gt;=-120.275 728   77.14396 11.08365 *
+##         17) Longitude&lt; -120.275 1792  385.97890 11.51124  
+##           34) Latitude&gt;=37.905 1103  150.31490 11.35795 *
+##           35) Latitude&lt; 37.905 689  168.25420 11.75664 *
+##        9) Latitude&lt; 34.465 2322  450.19880 11.77976  
+##         18) Longitude&gt;=-117.775 878  144.15330 11.52580 *
+##         19) Longitude&lt; -117.775 1444  214.98520 11.93418 *
+##      5) MedianIncome&gt;=2.51025 5539 1119.89800 11.94310  
+##       10) Latitude&gt;=37.925 1104  123.65980 11.68124 *
+##       11) Latitude&lt; 37.925 4435  901.69050 12.00829  
+##         22) Longitude&gt;=-122.235 4084  770.65270 11.96811  
+##           44) Latitude&gt;=34.455 1270  284.66500 11.76617 *
+##           45) Latitude&lt; 34.455 2814  410.82510 12.05924 *
+##         23) Longitude&lt; -122.235 351   47.73002 12.47579 *
+##    3) MedianIncome&gt;=3.5471 10259 1974.99300 12.40175  
+##      6) MedianIncome&lt; 5.5892 7265 1156.09500 12.25720  
+##       12) MedianHouseAge&lt; 38.5 5907  858.59850 12.20694 *
+##       13) MedianHouseAge&gt;=38.5 1358  217.69860 12.47578 *
+##      7) MedianIncome&gt;=5.5892 2994  298.73550 12.75251  
+##       14) MedianIncome&lt; 7.393 2008  176.41530 12.64297 *
+##       15) MedianIncome&gt;=7.393 986   49.16749 12.97557 *</code></pre>
+<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb472-1" data-line-number="1">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tr.full.house<span class="op">$</span>finalModel)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cross-validation-model-building" class="section level4 unnumbered">
+<h4>Cross Validation (model building!)</h4>
+<p>Turns out that the tree does “better” by being more complex – why is that? The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.</p>
+<pre><code>plot(cv.model$size, cv.model$dev, type=&quot;l&quot;, xlab=&quot;size&quot;, ylab=&quot;deviance&quot;)</code></pre>
+<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb474-1" data-line-number="1"><span class="co"># here, let&#39;s use all the variables and all the samples</span></a>
+<a class="sourceLine" id="cb474-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb474-3" data-line-number="3">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
+<a class="sourceLine" id="cb474-4" data-line-number="4">tree.cv.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb474-5" data-line-number="5">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb474-6" data-line-number="6">                              <span class="dt">trControl=</span>fitControl,</a>
+<a class="sourceLine" id="cb474-7" data-line-number="7">                              <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb474-8" data-line-number="8">                              <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb474-9" data-line-number="9">  </a>
+<a class="sourceLine" id="cb474-10" data-line-number="10">tree.cv.house  </a></code></pre></div>
+<pre><code>## CART 
+## 
+## 20640 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4748682  0.3041572  0.3848606
+##    2        0.4478756  0.3809354  0.3563586
+##    3        0.4282733  0.4340116  0.3393296
+##    4        0.4178448  0.4611563  0.3296215
+##    5        0.4054431  0.4924175  0.3184901
+##    6        0.3962472  0.5155365  0.3103266
+##    7        0.3948428  0.5189584  0.3092563
+##    8        0.3935306  0.5221099  0.3080369
+##    9        0.3891254  0.5326804  0.3044392
+##   10        0.3836652  0.5456808  0.3000226
+##   11        0.3786873  0.5574177  0.2956848
+##   12        0.3739131  0.5685161  0.2907504
+##   13        0.3712711  0.5746216  0.2868830
+##   14        0.3703641  0.5767271  0.2858720
+##   15        0.3703641  0.5767271  0.2858720
+##   16        0.3703641  0.5767271  0.2858720
+##   17        0.3703641  0.5767271  0.2858720
+##   18        0.3703641  0.5767271  0.2858720
+##   19        0.3703641  0.5767271  0.2858720
+##   20        0.3703641  0.5767271  0.2858720
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 14.</code></pre>
+<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb476-1" data-line-number="1">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tree.cv.house<span class="op">$</span>finalModel)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" data-line-number="1"><span class="kw">plot</span>(tree.cv.house)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="training-test-data-for-model-building-and-model-accuracy" class="section level4 unnumbered">
+<h4>Training / test data for model building AND model accuracy</h4>
+<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb478-1" data-line-number="1"><span class="co"># first create two datasets: one training, one test</span></a>
+<a class="sourceLine" id="cb478-2" data-line-number="2">inTrain &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> real.estate<span class="op">$</span>MedianHouseValue, </a>
+<a class="sourceLine" id="cb478-3" data-line-number="3">                                      <span class="dt">p=</span>.<span class="dv">8</span>, <span class="dt">list=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb478-4" data-line-number="4">house.train &lt;-<span class="st"> </span>real.estate[inTrain,]</a>
+<a class="sourceLine" id="cb478-5" data-line-number="5">house.test &lt;-<span class="st"> </span>real.estate[<span class="op">-</span><span class="kw">c</span>(inTrain),]</a>
+<a class="sourceLine" id="cb478-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb478-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb478-8" data-line-number="8"><span class="co"># then use CV on the training data to find the best maxdepth</span></a>
+<a class="sourceLine" id="cb478-9" data-line-number="9"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
+<a class="sourceLine" id="cb478-10" data-line-number="10">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
+<a class="sourceLine" id="cb478-11" data-line-number="11">tree.cvtrain.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb478-12" data-line-number="12">                                   <span class="dt">data=</span>house.train, </a>
+<a class="sourceLine" id="cb478-13" data-line-number="13">                                   <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb478-14" data-line-number="14">                                   <span class="dt">trControl=</span>fitControl, </a>
+<a class="sourceLine" id="cb478-15" data-line-number="15">                                   <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb478-16" data-line-number="16">                                   <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb478-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb478-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb478-19" data-line-number="19">tree.cvtrain.house</a></code></pre></div>
+<pre><code>## CART 
+## 
+## 16513 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4756049  0.2994314  0.3851775
+##    2        0.4497958  0.3734197  0.3581148
+##    3        0.4289837  0.4302083  0.3396992
+##    4        0.4192079  0.4558965  0.3304520
+##    5        0.4026435  0.4979229  0.3153937
+##    6        0.3960649  0.5141665  0.3102682
+##    7        0.3960649  0.5141665  0.3102682
+##    8        0.3924388  0.5229961  0.3072433
+##    9        0.3875832  0.5347306  0.3027262
+##   10        0.3830783  0.5454004  0.2981715
+##   11        0.3783297  0.5566766  0.2941443
+##   12        0.3724797  0.5702362  0.2883089
+##   13        0.3694837  0.5770987  0.2850918
+##   14        0.3694837  0.5770987  0.2850918
+##   15        0.3694837  0.5770987  0.2850918
+##   16        0.3694837  0.5770987  0.2850918
+##   17        0.3694837  0.5770987  0.2850918
+##   18        0.3694837  0.5770987  0.2850918
+##   19        0.3694837  0.5770987  0.2850918
+##   20        0.3694837  0.5770987  0.2850918
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 13.</code></pre>
+<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb480-1" data-line-number="1">tree.train.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb480-2" data-line-number="2">                                 <span class="dt">data=</span>house.train, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb480-3" data-line-number="3">                                 <span class="dt">trControl=</span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>),</a>
+<a class="sourceLine" id="cb480-4" data-line-number="4">                                 <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">14</span>),</a>
+<a class="sourceLine" id="cb480-5" data-line-number="5">                                 <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb480-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb480-7" data-line-number="7"><span class="co"># use confusionMatrix instead of postResample for classification results</span></a>
+<a class="sourceLine" id="cb480-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb480-9" data-line-number="9">test.pred &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.train.house, house.test)</a>
+<a class="sourceLine" id="cb480-10" data-line-number="10"><span class="kw">postResample</span>(<span class="dt">pred =</span> test.pred, <span class="dt">obs=</span><span class="kw">log</span>(house.test<span class="op">$</span>MedianHouseValue))</a></code></pre></div>
+<pre><code>##      RMSE  Rsquared       MAE 
+## 0.3696649 0.5840583 0.2846395</code></pre>
+</div>
+<div id="other-tree-r-packages" class="section level4 unnumbered">
+<h4>Other tree R packages</h4>
+<ul>
+<li><p><code>rpart</code> is faster than <code>tree</code></p></li>
+<li><p><code>party</code> gives great plotting options</p></li>
+<li><p><code>maptree</code> also gives trees from hierarchical clustering</p></li>
+<li><p><code>randomForest</code> up next!</p></li>
+</ul>
+<p>Reference: slides built from <a href="http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf" class="uri">http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf</a></p>
 
 </div>
 </div>

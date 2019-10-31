@@ -287,8 +287,6 @@ See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.
 knitr::include_graphics("figs/ObamaClinton.jpg")
 ```
 
-### R CART Example
-
 ### CART algorithm
 
 **Basic Classification and Regression Trees (CART) Algorithm:**
@@ -454,4 +452,168 @@ Notice that CV is used for both model building and model assessment.  It is poss
 \end{algorithmic}
 \end{algorithm}
 
+
+
+### R CART Example
+
+
+#### Classification and Regression Trees {-}
+
+**Classification Trees** are used to predict a response or class $Y$ from input $X_1, X_2, \ldots, X_n$. If it is a continuous response it's called a regression tree, if it is categorical, it's called a classification tree. At each node of the tree, we check the value of one the input $X_i$ and depending of the (binary) answer we continue to the left or to the right subbranch. When we reach a leaf we will find the prediction (usually it is a simple statistic of the dataset the leaf represents, like the most common value from the available classes).
+
+
+Note on maxdepth:  if maxdepth=6, the corresponding stopping rule will be, "if total nodes > (2^6 - 1), the tree will stop growing".
+
+
+
+#### Regression Trees  {-}
+
+```{r, fig.width=7, fig.height=5, echo=TRUE, message=FALSE, warning=FALSE}
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE)
+
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
+                         data=real.estate, method="rpart2", 
+                         trControl = fitControl, 
+                         tuneGrid= data.frame(maxdepth=5))
+
+rpart.plot::rpart.plot(tr.house$finalModel)
+```
+
+
+
+#### Scatterplot  {-}
+
+Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend.  Note that this plot uses the `tree` model (instead of the `rpart2` model) because the optimization is different.
+
+```{r, fig.width=8, fig.height=5}
+tree.model <- tree::tree(log(MedianHouseValue) ~ Longitude + Latitude, 
+                         data=real.estate)
+
+price.deciles <- quantile(real.estate$MedianHouseValue, 0:10/10)
+cut.prices    <- cut(real.estate$MedianHouseValue, price.deciles, 
+                     include.lowest=TRUE)
+plot(real.estate$Longitude, real.estate$Latitude, 
+     col=grey(10:2/11)[cut.prices], pch=20, 
+     xlab="Longitude",ylab="Latitude")
+
+tree::partition.tree(tree.model, 
+                     ordvars=c("Longitude","Latitude"), 
+                     add=TRUE) 
+```
+
+
+
+#### Finer partition  {-}
+
+```
+12) Latitude>=34.7 2844  645.0 11.5 
+```
+
+the node that splits at latitude greater than 34.7 has 2844 houses.  645 is the "deviance" which is the sum of squares value for that node.  the predicted value is the average of the points in that node: 11.5.  it is not a terminal node (no asterisk).
+
+```{r, fig.width=7, fig.height=5}
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, data=real.estate, method="rpart2", 
+                  trControl = fitControl, tuneGrid= data.frame(maxdepth=5))
+
+tr.house$finalModel
+```
+
+
+#### More variables {-}
+
+Including all the variables, not only the latitude and longitude:
+
+```{r, fig.width=7, fig.height=5}
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.full.house <- caret::train(log(MedianHouseValue) ~ ., 
+                              data=real.estate, method="rpart2", 
+                              trControl = fitControl, 
+                              tuneGrid= data.frame(maxdepth=5))
+
+tr.full.house$finalModel
+
+rpart.plot::rpart.plot(tr.full.house$finalModel)
+```
+
+
+#### Cross Validation (model building!)  {-}
+
+Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.
+
+```
+plot(cv.model$size, cv.model$dev, type="l", xlab="size", ylab="deviance")
+```
+
+```{r message=FALSE, warning=FALSE}
+# here, let's use all the variables and all the samples
+set.seed(4747)
+fitControl <- caret::trainControl(method="cv")
+tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., data=real.estate, 
+                              method="rpart2",
+                              trControl=fitControl,
+                              tuneGrid=data.frame(maxdepth=1:20),
+                              parms=list(split="gini"))
+  
+tree.cv.house  
+
+rpart.plot::rpart.plot(tree.cv.house$finalModel)
+
+plot(tree.cv.house)
+```
+
+
+#### Training / test data for model building AND model accuracy {-}
+
+```{r message=FALSE, warning=FALSE}
+# first create two datasets: one training, one test
+inTrain <- caret::createDataPartition(y = real.estate$MedianHouseValue, 
+                                      p=.8, list=FALSE)
+house.train <- real.estate[inTrain,]
+house.test <- real.estate[-c(inTrain),]
+
+
+# then use CV on the training data to find the best maxdepth
+set.seed(4747)
+fitControl <- caret::trainControl(method="cv")
+tree.cvtrain.house <- caret::train(log(MedianHouseValue) ~ ., 
+                                   data=house.train, 
+                                   method="rpart2",
+                                   trControl=fitControl, 
+                                   tuneGrid=data.frame(maxdepth=1:20),
+                                   parms=list(split="gini"))
+
+
+tree.cvtrain.house
+
+tree.train.house <- caret::train(log(MedianHouseValue) ~ ., 
+                                 data=house.train, method="rpart2",
+                                 trControl=caret::trainControl(method="none"),
+                                 tuneGrid=data.frame(maxdepth=14),
+                                 parms=list(split="gini"))
+
+# use confusionMatrix instead of postResample for classification results
+
+test.pred <- predict(tree.train.house, house.test)
+postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
+
+```
+
+
+#### Other tree R packages  {-}
+
+* `rpart` is faster than `tree`
+
+* `party`  gives great plotting options
+
+* `maptree` also gives trees from hierarchical clustering
+
+* `randomForest`  up next!
+
+Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 

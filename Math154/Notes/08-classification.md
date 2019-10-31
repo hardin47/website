@@ -412,8 +412,6 @@ See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.
 <p class="caption">(\#fig:unnamed-chunk-12)http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg Best information was whether or not the county was more than 20 percent black.   Then each successive node is split again on the best possible informative variable.  Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008.</p>
 </div>
 
-### R CART Example
-
 ### CART algorithm
 
 **Basic Classification and Regression Trees (CART) Algorithm:**
@@ -577,4 +575,328 @@ Notice that CV is used for both model building and model assessment.  It is poss
 \end{algorithmic}
 \end{algorithm}
 
+
+
+### R CART Example
+
+
+#### Classification and Regression Trees {-}
+
+**Classification Trees** are used to predict a response or class $Y$ from input $X_1, X_2, \ldots, X_n$. If it is a continuous response it's called a regression tree, if it is categorical, it's called a classification tree. At each node of the tree, we check the value of one the input $X_i$ and depending of the (binary) answer we continue to the left or to the right subbranch. When we reach a leaf we will find the prediction (usually it is a simple statistic of the dataset the leaf represents, like the most common value from the available classes).
+
+
+Note on maxdepth:  if maxdepth=6, the corresponding stopping rule will be, "if total nodes > (2^6 - 1), the tree will stop growing".
+
+
+
+#### Regression Trees  {-}
+
+
+```r
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE)
+
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
+                         data=real.estate, method="rpart2", 
+                         trControl = fitControl, 
+                         tuneGrid= data.frame(maxdepth=5))
+
+rpart.plot::rpart.plot(tr.house$finalModel)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+
+
+
+#### Scatterplot  {-}
+
+Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend.  Note that this plot uses the `tree` model (instead of the `rpart2` model) because the optimization is different.
+
+
+```r
+tree.model <- tree::tree(log(MedianHouseValue) ~ Longitude + Latitude, 
+                         data=real.estate)
+
+price.deciles <- quantile(real.estate$MedianHouseValue, 0:10/10)
+cut.prices    <- cut(real.estate$MedianHouseValue, price.deciles, 
+                     include.lowest=TRUE)
+plot(real.estate$Longitude, real.estate$Latitude, 
+     col=grey(10:2/11)[cut.prices], pch=20, 
+     xlab="Longitude",ylab="Latitude")
+
+tree::partition.tree(tree.model, 
+                     ordvars=c("Longitude","Latitude"), 
+                     add=TRUE) 
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" />
+
+
+
+#### Finer partition  {-}
+
+```
+12) Latitude>=34.7 2844  645.0 11.5 
+```
+
+the node that splits at latitude greater than 34.7 has 2844 houses.  645 is the "deviance" which is the sum of squares value for that node.  the predicted value is the average of the points in that node: 11.5.  it is not a terminal node (no asterisk).
+
+
+```r
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, data=real.estate, method="rpart2", 
+                  trControl = fitControl, tuneGrid= data.frame(maxdepth=5))
+
+tr.house$finalModel
+```
+
+```
+## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) Latitude>=38.485 2061  383.26410 11.59422  
+##      4) Latitude>=39.355 674   65.51082 11.31630 *
+##      5) Latitude< 39.355 1387  240.39580 11.72928 *
+##    3) Latitude< 38.485 18579 5750.77400 12.13931  
+##      6) Longitude>=-121.655 13941 4395.52000 12.05527  
+##       12) Latitude>=34.675 2844  645.27310 11.51018  
+##         24) Longitude>=-120.275 1460  212.47730 11.28145 *
+##         25) Longitude< -120.275 1384  275.83120 11.75148 *
+##       13) Latitude< 34.675 11097 2688.68000 12.19497  
+##         26) Longitude>=-118.315 8384 1823.33000 12.08687  
+##           52) Longitude>=-117.545 2839  691.79800 11.87672 *
+##           53) Longitude< -117.545 5545  941.96340 12.19446 *
+##         27) Longitude< -118.315 2713  464.62720 12.52902 *
+##      7) Longitude< -121.655 4638  960.79250 12.39194  
+##       14) Latitude>=37.925 1063  177.59430 12.09533 *
+##       15) Latitude< 37.925 3575  661.87260 12.48013 *
+```
+
+
+#### More variables {-}
+
+Including all the variables, not only the latitude and longitude:
+
+
+```r
+set.seed(4747)
+fitControl <- caret::trainControl(method="none")
+tr.full.house <- caret::train(log(MedianHouseValue) ~ ., 
+                              data=real.estate, method="rpart2", 
+                              trControl = fitControl, 
+                              tuneGrid= data.frame(maxdepth=5))
+
+tr.full.house$finalModel
+```
+
+```
+## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) MedianIncome< 3.5471 10381 2662.31300 11.77174  
+##      4) MedianIncome< 2.51025 4842 1193.71700 11.57572  
+##        8) Latitude>=34.465 2520  557.77450 11.38771  
+##         16) Longitude>=-120.275 728   77.14396 11.08365 *
+##         17) Longitude< -120.275 1792  385.97890 11.51124  
+##           34) Latitude>=37.905 1103  150.31490 11.35795 *
+##           35) Latitude< 37.905 689  168.25420 11.75664 *
+##        9) Latitude< 34.465 2322  450.19880 11.77976  
+##         18) Longitude>=-117.775 878  144.15330 11.52580 *
+##         19) Longitude< -117.775 1444  214.98520 11.93418 *
+##      5) MedianIncome>=2.51025 5539 1119.89800 11.94310  
+##       10) Latitude>=37.925 1104  123.65980 11.68124 *
+##       11) Latitude< 37.925 4435  901.69050 12.00829  
+##         22) Longitude>=-122.235 4084  770.65270 11.96811  
+##           44) Latitude>=34.455 1270  284.66500 11.76617 *
+##           45) Latitude< 34.455 2814  410.82510 12.05924 *
+##         23) Longitude< -122.235 351   47.73002 12.47579 *
+##    3) MedianIncome>=3.5471 10259 1974.99300 12.40175  
+##      6) MedianIncome< 5.5892 7265 1156.09500 12.25720  
+##       12) MedianHouseAge< 38.5 5907  858.59850 12.20694 *
+##       13) MedianHouseAge>=38.5 1358  217.69860 12.47578 *
+##      7) MedianIncome>=5.5892 2994  298.73550 12.75251  
+##       14) MedianIncome< 7.393 2008  176.41530 12.64297 *
+##       15) MedianIncome>=7.393 986   49.16749 12.97557 *
+```
+
+```r
+rpart.plot::rpart.plot(tr.full.house$finalModel)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+
+
+#### Cross Validation (model building!)  {-}
+
+Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.
+
+```
+plot(cv.model$size, cv.model$dev, type="l", xlab="size", ylab="deviance")
+```
+
+
+```r
+# here, let's use all the variables and all the samples
+set.seed(4747)
+fitControl <- caret::trainControl(method="cv")
+tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., data=real.estate, 
+                              method="rpart2",
+                              trControl=fitControl,
+                              tuneGrid=data.frame(maxdepth=1:20),
+                              parms=list(split="gini"))
+  
+tree.cv.house  
+```
+
+```
+## CART 
+## 
+## 20640 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4748682  0.3041572  0.3848606
+##    2        0.4478756  0.3809354  0.3563586
+##    3        0.4282733  0.4340116  0.3393296
+##    4        0.4178448  0.4611563  0.3296215
+##    5        0.4054431  0.4924175  0.3184901
+##    6        0.3962472  0.5155365  0.3103266
+##    7        0.3948428  0.5189584  0.3092563
+##    8        0.3935306  0.5221099  0.3080369
+##    9        0.3891254  0.5326804  0.3044392
+##   10        0.3836652  0.5456808  0.3000226
+##   11        0.3786873  0.5574177  0.2956848
+##   12        0.3739131  0.5685161  0.2907504
+##   13        0.3712711  0.5746216  0.2868830
+##   14        0.3703641  0.5767271  0.2858720
+##   15        0.3703641  0.5767271  0.2858720
+##   16        0.3703641  0.5767271  0.2858720
+##   17        0.3703641  0.5767271  0.2858720
+##   18        0.3703641  0.5767271  0.2858720
+##   19        0.3703641  0.5767271  0.2858720
+##   20        0.3703641  0.5767271  0.2858720
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 14.
+```
+
+```r
+rpart.plot::rpart.plot(tree.cv.house$finalModel)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+plot(tree.cv.house)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" />
+
+
+#### Training / test data for model building AND model accuracy {-}
+
+
+```r
+# first create two datasets: one training, one test
+inTrain <- caret::createDataPartition(y = real.estate$MedianHouseValue, 
+                                      p=.8, list=FALSE)
+house.train <- real.estate[inTrain,]
+house.test <- real.estate[-c(inTrain),]
+
+
+# then use CV on the training data to find the best maxdepth
+set.seed(4747)
+fitControl <- caret::trainControl(method="cv")
+tree.cvtrain.house <- caret::train(log(MedianHouseValue) ~ ., 
+                                   data=house.train, 
+                                   method="rpart2",
+                                   trControl=fitControl, 
+                                   tuneGrid=data.frame(maxdepth=1:20),
+                                   parms=list(split="gini"))
+
+
+tree.cvtrain.house
+```
+
+```
+## CART 
+## 
+## 16513 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4756049  0.2994314  0.3851775
+##    2        0.4497958  0.3734197  0.3581148
+##    3        0.4289837  0.4302083  0.3396992
+##    4        0.4192079  0.4558965  0.3304520
+##    5        0.4026435  0.4979229  0.3153937
+##    6        0.3960649  0.5141665  0.3102682
+##    7        0.3960649  0.5141665  0.3102682
+##    8        0.3924388  0.5229961  0.3072433
+##    9        0.3875832  0.5347306  0.3027262
+##   10        0.3830783  0.5454004  0.2981715
+##   11        0.3783297  0.5566766  0.2941443
+##   12        0.3724797  0.5702362  0.2883089
+##   13        0.3694837  0.5770987  0.2850918
+##   14        0.3694837  0.5770987  0.2850918
+##   15        0.3694837  0.5770987  0.2850918
+##   16        0.3694837  0.5770987  0.2850918
+##   17        0.3694837  0.5770987  0.2850918
+##   18        0.3694837  0.5770987  0.2850918
+##   19        0.3694837  0.5770987  0.2850918
+##   20        0.3694837  0.5770987  0.2850918
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 13.
+```
+
+```r
+tree.train.house <- caret::train(log(MedianHouseValue) ~ ., 
+                                 data=house.train, method="rpart2",
+                                 trControl=caret::trainControl(method="none"),
+                                 tuneGrid=data.frame(maxdepth=14),
+                                 parms=list(split="gini"))
+
+# use confusionMatrix instead of postResample for classification results
+
+test.pred <- predict(tree.train.house, house.test)
+postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
+```
+
+```
+##      RMSE  Rsquared       MAE 
+## 0.3696649 0.5840583 0.2846395
+```
+
+
+#### Other tree R packages  {-}
+
+* `rpart` is faster than `tree`
+
+* `party`  gives great plotting options
+
+* `maptree` also gives trees from hierarchical clustering
+
+* `randomForest`  up next!
+
+Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
