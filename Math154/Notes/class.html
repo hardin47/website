@@ -675,20 +675,26 @@ Figure 1.8: <a href="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-
 </div>
 <div id="cart-algorithm" class="section level3">
 <h3><span class="header-section-number">8.5.2</span> CART algorithm</h3>
-<p><strong>Basic Classification and Regression Trees (CART) Algorithm:</strong>
-1. Start with all variables in one group.
-2. Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
-* Evaluation “homogeneity” within each group
-* Divide the data into two groups (“leaves”) on that split (“node”).
-* Within each split, find the best variable/split that separates the outcomes.
-3. Continue until the groups are too small or sufficiently “pure”.
-4. Prune tree.</p>
-<p><strong>Shortcomings of CART:</strong>
-* Straight CART do not generally have the same predictive accuracy as other classification approaches. (we will improve the model - see random forests, boosting, bagging)
-* Difficult to write down / consider the CART “model”
-* Without proper pruning, the model can easily lead to overfitting
-* With lots of predictors, (even greedy) partitioning can become computationally unwieldy
-* Often, prediction performance is poor</p>
+<p><strong>Basic Classification and Regression Trees (CART) Algorithm:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Start with all variables in one group.</li>
+<li>Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
+<ul>
+<li>Evaluation “homogeneity” within each group</li>
+<li>Divide the data into two groups (“leaves”) on that split (“node”).</li>
+<li>Within each split, find the best variable/split that separates the outcomes.</li>
+</ul></li>
+<li>Continue until the groups are too small or sufficiently “pure”.</li>
+<li>Prune tree.</li>
+</ol>
+<p><strong>Shortcomings of CART:</strong></p>
+<ul>
+<li>Straight CART do not generally have the same predictive accuracy as other classification approaches. (we will improve the model - see random forests, boosting, bagging)</li>
+<li>Difficult to write down / consider the CART “model”</li>
+<li>Without proper pruning, the model can easily lead to overfitting</li>
+<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy</li>
+<li>Often, prediction performance is poor</li>
+</ul>
 <p><strong>Strengths of CART:</strong></p>
 <ul>
 <li>They are easy to explain; trees are easy to display graphically (which make them easy to interpret). (They mirror the typical human decision-making process.)</li>
@@ -713,35 +719,39 @@ Since <span class="math inline">\(0 \leq \hat{p}_{mk} \leq 1\)</span> it follows
 <li>To <em>prune</em> the tree, often classification error is used (if accuracy of the final pruned tree is the goal)</li>
 </ol>
 <p>Computationally, it is usually infeasible to consider every possible partition of the observations. Instead of looking at all partitions, we perform a <em>top down</em> approach to the problem which is known as <em>recursive binary splitting</em> (<em>greedy</em> because we look only at the current split and not at the outcomes of the splits to come).</p>
-<p><strong>Recursive Binary Splitting on Categories</strong> (for a given node)
-1. Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in Gini index or cross-entropy.
-2. For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
+<p><strong>Recursive Binary Splitting on Categories</strong> (for a given node)</p>
+<ol style="list-style-type: decimal">
+<li>Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in Gini index or cross-entropy.</li>
+<li>For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
 <span class="math display">\[R_1(j,s) = \{X | X_j &lt; s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}\]</span>
 and we seek the value of <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> that minimize the equation:
 <span class="math display">\[\begin{align}
 &amp; \sum_{i:x_i \in R_1(j,s)} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + \sum_{i:x_i \in R_2(j,s)} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
 \mbox{equivalently: } &amp; n_{R_1} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + n_{R_2} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
-\end{align}\]</span>
-3. Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).
-4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</p>
+\end{align}\]</span></li>
+<li>Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).</li>
+<li>Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</li>
+</ol>
 </div>
 <div id="continuous-predictor" class="section level4">
 <h4><span class="header-section-number">8.5.2.2</span> Continuous Predictor</h4>
 <p>The goal of the algorithm in a <em>regression tree</em> is to split the set of possible value for the data into <span class="math inline">\(J\)</span> distinct and non-overlapping regions, <span class="math inline">\(R_1, R_2, \ldots, R_J\)</span>. For every observation that falls into the region <span class="math inline">\(R_J\)</span>, we make the same prediction - the mean of the response values for the training observations in <span class="math inline">\(R_J\)</span>. So how do we find the regions <span class="math inline">\(R_1, \ldots, R_J\)</span>?</p>
 <p><span class="math inline">\(\Rightarrow\)</span> Minimize RSS, <span class="math display">\[RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2\]</span>
 where <span class="math inline">\(\overline{y}_{R_j}\)</span> is the mean response for the training observations within the <span class="math inline">\(j\)</span>th box.</p>
-<p>(Note: in the chapter they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5) in ISLR.)</p>
+<p>(Note: in the chapter <span class="citation">(James et al. <a href="#ref-ISL">2013</a>)</span> they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)</p>
 <p><span class="math display">\[ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}\]</span></p>
 <p>Again, it is usually infeasible to consider every possible partition of the observations. Instead of looking at all partitions, we perform a <em>top down</em> approach to the problem which is known as <em>recursive binary splitting</em> (<em>greedy</em> because we look only at the current split and not at the outcomes of the splits to come).</p>
-<p><strong>Recursive Binary Splitting on Numerical Response</strong> (for a given node)
-1. Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in RSS.
-2. For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
+<p><strong>Recursive Binary Splitting on Numerical Response</strong> (for a given node)</p>
+<ol style="list-style-type: decimal">
+<li>Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in RSS.</li>
+<li>For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
 <span class="math display">\[R_1(j,s) = \{X | X_j &lt; s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}\]</span>
 and we see the value of <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> that minimize the equation:
 <span class="math display">\[\sum_{i:x_i \in R_1(j,s)} (y_i - \overline{y}_{R_1})^2 + \sum_{i:x_i \in R_2(j,s)} (y_i - \overline{y}_{R_2})^2\]</span>
-where <span class="math inline">\(\overline{y}_{R_1}\)</span> is the mean response for the training observations in <span class="math inline">\(R_1(j,s)\)</span> and <span class="math inline">\(\overline{y}_{R_2}\)</span> is the mean response for training observations in <span class="math inline">\(R_2(j,s)\)</span>.
-3. Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).
-4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</p>
+where <span class="math inline">\(\overline{y}_{R_1}\)</span> is the mean response for the training observations in <span class="math inline">\(R_1(j,s)\)</span> and <span class="math inline">\(\overline{y}_{R_2}\)</span> is the mean response for training observations in <span class="math inline">\(R_2(j,s)\)</span>.</li>
+<li>Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).</li>
+<li>Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</li>
+</ol>
 </div>
 </div>
 </div>
@@ -799,6 +809,9 @@ For the CART algorithm, minimize the deviance (for both types of variables). The
 </div>
 <div id="ref-ESL">
 <p>Hastie, T., R. Tibshirani, and J. Friedman. 2001. <em>The Elements of Statistical Learning</em>. Springer.</p>
+</div>
+<div id="ref-ISL">
+<p>James, Witten, Hastie, and Tibshirani. 2013. <em>An Introduction to Statistical Learning</em>. Springer. <a href="http://faculty.marshall.usc.edu/gareth-james/ISL/">http://faculty.marshall.usc.edu/gareth-james/ISL/</a>.</p>
 </div>
 <div id="ref-CVpaper">
 <p>Varoquaux, G., P. Reddy Raamana, D. Engemann, A. Hoyos-Idrobo, Y. Schwartz, and B. Thirion. 2017. “Assessing and Tuning Brain Decoders: Cross-Validation, Caveats, and Guidelines.” <em>NeuroImage</em> 145: 166–79.</p>

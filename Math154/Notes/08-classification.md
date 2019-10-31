@@ -417,6 +417,7 @@ See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.
 ### CART algorithm
 
 **Basic Classification and Regression Trees (CART) Algorithm:**
+
 1. Start with all variables in one group.
 2. Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
     * Evaluation "homogeneity" within each group
@@ -428,6 +429,7 @@ See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.
 
 
 **Shortcomings of CART:**
+
 * Straight CART do not generally have the same predictive accuracy as other classification approaches.  (we will improve the model - see random forests, boosting, bagging)
 * Difficult to write down / consider the CART "model"
 * Without proper pruning, the model can easily lead to overfitting
@@ -467,6 +469,7 @@ Computationally, it is usually infeasible to consider every possible partition o
 
 
 **Recursive Binary Splitting on Categories** (for a given node)
+
 1. Select the predictor $X_j$ and the cutpoint $s$ such that splitting the predictor space into the regions $\{X | X_j< s\}$ and $\{X | X_j \geq s\}$ lead to the greatest reduction in Gini index or cross-entropy.
 2. For any $j$ and $s$, define the pair of half-planes to be
 $$R_1(j,s) = \{X | X_j < s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}$$
@@ -489,7 +492,7 @@ The goal of the algorithm in a *regression tree* is to split the set of possible
 $\Rightarrow$ Minimize RSS, $$RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2$$
 where $\overline{y}_{R_j}$ is the mean response for the training observations within the $j$th box.
 
-(Note:  in the chapter they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5) in ISLR.)
+(Note:  in the chapter [@ISL] they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)
 
 $$ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}$$
 
@@ -497,6 +500,7 @@ Again, it is usually infeasible to consider every possible partition of the obse
 
 
 **Recursive Binary Splitting on Numerical Response** (for a given node)
+
 1. Select the predictor $X_j$ and the cutpoint $s$ such that splitting the predictor space into the regions $\{X | X_j< s\}$ and $\{X | X_j \geq s\}$ lead to the greatest reduction in RSS.
 2. For any $j$ and $s$, define the pair of half-planes to be
 $$R_1(j,s) = \{X | X_j < s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}$$
