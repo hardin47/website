@@ -881,11 +881,14 @@ tree.train.house <- caret::train(log(MedianHouseValue) ~ .,
                                  trControl=caret::trainControl(method="none"),
                                  tuneGrid=data.frame(maxdepth=14),
                                  parms=list(split="gini"))
+```
 
-# use confusionMatrix instead of postResample for classification results
+**for classification results** use `confusionMatrix` instead of `postResample`
 
+
+```r
 test.pred <- predict(tree.train.house, house.test)
-postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
+caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 ```
 
 ```
