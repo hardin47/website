@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-10-31"
+date: "2019-11-05"
 site: bookdown::bookdown_site
 header-includes:
   - \usepackage{algorithm}

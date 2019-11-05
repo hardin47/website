@@ -9,6 +9,20 @@ library(tidyverse)
 library(caret)
 ```
 
+<!--
+Daniela Witten talking about inference in prediction: https://www.youtube.com/watch?v=Y4UJjzuYjfM 
+R Unconference 2013
+
+that f is a meaningful reflection of the true unknown process.
+
+
+One of the most satisfying aspects of this unit is that you can now turn students loose on a massive data set. Past instances of the KDD Cup \url{http://www.sigkdd.org/kddcup/index.php} are an excellent source for such data sets. We explored data from the 2008 KDD Cup on breast cancer. Each of the n observations contained digitized data from an X-Ray image of a breast. Each observation corresponded to a small area of a particular breast, which may or may not depict a malignant tumor ï¿œï¿œthis provided the binary response variable.  In addition to a handful of well-defined variables ((x, y)-location, etc.), each observation has 117 nameless attributes, about which no information was provided. Knowing nothing about what these variables mean, students recognized the need to employ machine learning techniques to sift through them and find relationships. The size of the data and number of variables made manual exploration of the data impractical.
+
+\textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
+\url{http://www.dabi.temple.edu/~hbling/8590.002/Montillo_RandomForests_4-2-2009.pdf}
+-->
+
+
 ## 10/29/19 Agenda {#Oct29}
 1. classification
 2. $k$-Nearest Neighbors
@@ -58,7 +72,7 @@ Generally, the simpler the model, the lower the variance.  The more complicated 
 \end{align}
 
 * **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
-* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, with more complicated models (e.g., smaller $k$ in $k$NN) the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
+* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., smaller $k$ in $k$NN), the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
 * **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
 
 
@@ -208,11 +222,12 @@ ggpairs(iris, color="Species", alpha=.4)
 Without thinking about test / training data, a naive model is:
 
 ```{r}
-fitControl <- trainControl(method="none", classProbs = TRUE)
-tr.iris <- train(Species ~ ., data=iris, 
-                 method="knn", 
-                 trControl = fitControl, 
-                 tuneGrid= data.frame(k=3))
+fitControl <-caret::trainControl(method="none", classProbs = TRUE)
+tr.iris <- caret::train(Species ~ ., 
+                        data=iris,
+                        method="knn",
+                        trControl = fitControl,
+                        tuneGrid= data.frame(k=3))
 
 caret::confusionMatrix(data=predict(tr.iris, newdata = iris), 
                 reference = iris$Species)
@@ -252,7 +267,8 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 ```{r}
 set.seed(47)
 fitControl <- caret::trainControl(method="cv", number=10)
-tr.iris <- caret::train(Species ~ ., data=iris.train, 
+tr.iris <- caret::train(Species ~ ., 
+                        data=iris.train, 
                         method="knn", 
                         trControl = fitControl, 
                         tuneGrid= data.frame(k=c(1,3,5,7,9,11)))
@@ -291,8 +307,8 @@ knitr::include_graphics("figs/ObamaClinton.jpg")
 
 **Basic Classification and Regression Trees (CART) Algorithm:**
 
-1. Start with all variables in one group.
-2. Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
+1. Start with all observations in one group.
+2. Find the variable/split that best separates the response variable (successive binary partitions based on the different predictors / explanatory variables).
     * Evaluation "homogeneity" within each group
     * Divide the data into two groups ("leaves") on that split ("node").
     * Within each split, find the best variable/split that separates the outcomes.
@@ -332,7 +348,7 @@ where $\hat{p}_{mk}$ represents the proportion of training observations in the $
 2. Further, the *Gini index* is defined by $$G_m= \sum_{k=1}^K \hat{p}_{mk}(1-\hat{p}_{mk})$$
 a measure of total variance across the $K$ classes. [Recall, the variance of a Bernoulli random variable with $\pi$ = P(success) is $\pi(1-\pi)$.] Note that the Gini index takes on a small value if all of the $\hat{p}_{mk}$ values are close to zero or one.  For this reason, the Gini index is referred to as a measure of node *purity* - a small value indicates that a node contains predominantly observations from a single class.
 3. Last, the *cross-entropy* is defined as $$D_m = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}$$
-Since $0 \leq \hat{p}_{mk} \leq 1$ it follows that $0 \leq -\hat{p}_{mk} \log\hat{p}_{mk} $.  One can show that the cross-entropy will take on a value near zero if the $\hat{p}_{mk} $ values are all near zero or all near one.  Therefore, like the Gini index, the cross-entropy will take on a small value if the $m$th node is pure.
+Since $0 \leq \hat{p}_{mk} \leq 1$ it follows that $0 \leq -\hat{p}_{mk} \log\hat{p}_{mk}$.  One can show that the cross-entropy will take on a value near zero if the $\hat{p}_{mk}$ values are all near zero or all near one.  Therefore, like the Gini index, the cross-entropy will take on a small value if the $m$th node is pure.
 4. To *build* the tree, typically the Gini index or the cross-entropy are used to evaluate a particular split.
 5. To *prune* the tree, often classification error is used (if accuracy of the final pruned tree is the goal)
 
@@ -386,7 +402,7 @@ where $\overline{y}_{R_1}$ is the mean response for the training observations in
 
 #### (Avoiding) Overfitting
 
-Ideally, the tree would not overfit the training data.  One could imagine how easy it would be to grow the treee over the training data so as to end up with terminal nodes which are completely homogenous (but then don't represent the test data).
+Ideally, the tree would not overfit the training data.  One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don't represent the test data).
 
 
 See the following (amazing!) demonstration for intuition on model validation / overfitting:  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
@@ -484,7 +500,8 @@ real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_
 set.seed(4747)
 fitControl <- caret::trainControl(method="none")
 tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate, method="rpart2", 
+                         data=real.estate, 
+                         method="rpart2", 
                          trControl = fitControl, 
                          tuneGrid= data.frame(maxdepth=5))
 
@@ -502,10 +519,13 @@ tree.model <- tree::tree(log(MedianHouseValue) ~ Longitude + Latitude,
                          data=real.estate)
 
 price.deciles <- quantile(real.estate$MedianHouseValue, 0:10/10)
-cut.prices    <- cut(real.estate$MedianHouseValue, price.deciles, 
+cut.prices    <- cut(real.estate$MedianHouseValue, 
+                     price.deciles, 
                      include.lowest=TRUE)
-plot(real.estate$Longitude, real.estate$Latitude, 
-     col=grey(10:2/11)[cut.prices], pch=20, 
+plot(real.estate$Longitude, 
+     real.estate$Latitude, 
+     col=grey(10:2/11)[cut.prices], 
+     pch=20, 
      xlab="Longitude",ylab="Latitude")
 
 tree::partition.tree(tree.model, 
@@ -526,8 +546,11 @@ the node that splits at latitude greater than 34.7 has 2844 houses.  645 is the 
 ```{r, fig.width=7, fig.height=5}
 set.seed(4747)
 fitControl <- caret::trainControl(method="none")
-tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, data=real.estate, method="rpart2", 
-                  trControl = fitControl, tuneGrid= data.frame(maxdepth=5))
+tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
+                         data=real.estate, 
+                         method="rpart2",
+                         trControl = fitControl, 
+                         tuneGrid= data.frame(maxdepth=5))
 
 tr.house$finalModel
 ```
@@ -541,7 +564,8 @@ Including all the variables, not only the latitude and longitude:
 set.seed(4747)
 fitControl <- caret::trainControl(method="none")
 tr.full.house <- caret::train(log(MedianHouseValue) ~ ., 
-                              data=real.estate, method="rpart2", 
+                              data=real.estate, 
+                              method="rpart2", 
                               trControl = fitControl, 
                               tuneGrid= data.frame(maxdepth=5))
 
@@ -560,7 +584,8 @@ Turns out that the tree does "better" by being more complex -- why is that?  The
 # here, let's use all the variables and all the samples
 set.seed(4747)
 fitControl <- caret::trainControl(method="cv")
-tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., data=real.estate, 
+tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., 
+                              data=real.estate, 
                               method="rpart2",
                               trControl=fitControl,
                               tuneGrid=data.frame(maxdepth=1:20),
@@ -598,7 +623,8 @@ tree.cvtrain.house <- caret::train(log(MedianHouseValue) ~ .,
 tree.cvtrain.house
 
 tree.train.house <- caret::train(log(MedianHouseValue) ~ ., 
-                                 data=house.train, method="rpart2",
+                                 data=house.train, 
+                                 method="rpart2",
                                  trControl=caret::trainControl(method="none"),
                                  tuneGrid=data.frame(maxdepth=14),
                                  parms=list(split="gini"))
@@ -626,6 +652,84 @@ caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 
 Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
-## 11/5/19 Agenda
+## 11/5/19 Agenda {#nov5}
+1. pruning
+2. variable selection
+3. bagging (no boosting)
+4. OOB error rate
+
+## Bagging {#bagging}
+
+The tree based models given by CART are easy to understand and implement, but they suffer from *high variance*.  That is, if we split the training data into two parts at random and fit a decision tree to both halves, the results that we get could be quite different (you might have seen this in your homework assignment!).   We'd like a model that produces low variance - one for which if we ran it on different datasets, we'd get (close to) the same model every time.
+
+
+**Bagging = Bootstrap Aggregating**.  The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit.  Bagging can be applied to any classifier to reduce variability.
+
+<p style = "color:red">Recall that the variance of the sample mean is variance / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
+
+
+**Shortcomings of Bagging:**
+* Model is even harder to "write-down" (than CART)
+* With lots of predictors, (even greedy) partitioning can become computationally unwieldy  - now computational task is even harder! (because of the number of trees grown for each bootstrap sample)
+
+
+**Strengths of Bagging:**
+* Can handle categorical or numerical predictors or response variables (indeed, they can handle mixed predictors at the same time!).
+* Can handle more than 2 groups for categorical predictions
+* Easily ignore redundant variables.
+* Perform better than linear models in non-linear settings.  Classification trees are non-linear models, so they immediately use interactions between variables.
+* Data transformations may be less important (monotone transformations on the explanatory variables won't change anything).
+<p style = "color:red">*Similar bias* to CART, but *reduced variance*</p> (can be proved).
+
+
+
+Basic Idea:
+
+* Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
+* Build a tree on each new set of $N'$ training observations.
+* Average (regression) or majority vote (classification).
+* Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
+\begin{align}
+P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
+\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
+\end{align} 
+\end{itemize}
+
+**Notes on bagging:**
+* Bagging alone uses the full set of predictors to determine every tree  (it is the observations that are bootstrapped).
+* Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction.  We average (or majority vote) the predictions to get one prediction for the observation at hand.
+* Bagging gives a smoother decision boundary
+* Bagging can be done on *any* decision method (not just trees).
+* No need to prune or CV trees.  The reason is that averaging keeps us from overfitting a particular few observations (think of averages in other contexts: law of large numbers).   Pruning wouldn't be a bad thing to do in terms of fit, but it is unnecessary for good predictions (and would add a lot to the complexity of the algorithm).
+
+### Out Of Bag (OOB) error rate
+
+Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:
+
+* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.
+* Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
+
+
+How does it work?  Consider the following predictions for a silly toy data set of 9 observations.  Recall that $\sim$1/3 of the observations will be left out at each bootstrap sample.  Those are the observations for which predictions will be made.  In the table below, an X is given if there is a prediction made for that value.
+
+| obs 	| tree1 	| tree2 	| tree3 	| tree4 	| $\cdots$ 	| tree100 	| average 	|
+|:---:	|:-----:	|:-----:	|:-----:	|:-----:	|:--------:	|:-------:	|:---------------:	|
+| 1 	|  	| X 	| X 	|  	|  	|  	| $\sum(pred)/2$ 	|
+| 2 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1$ 	|
+| 3 	|  	|  	|  	| X 	|  	| X 	| $\sum(pred)/2$ 	|
+| 4 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1$ 	|
+| 5 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1 $ 	|
+| 6 	|  	|  	| X 	|  	|  	| X 	| $\sum(pred)/2$ 	|
+| 7 	|  	|  	|  	|  	|  	| X 	| $\sum(pred)/1 $ 	|
+| 8 	|  	|  	| X 	| X 	|  	| X 	| $\sum(pred)/3$ 	|
+| 9 	|  	|  	|  	| X 	|  	|  	| $\sum(pred)/1$ 	|
+
+Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
+
+\begin{align}
+\mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n \textrm{I} (y_i \ne \hat{y}_{(-i)}) \ \ \ \ \ \ \ \  \mbox{classification}\\
+\mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
+\end{align}
+
 
 

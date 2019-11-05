@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-10-31" />
+<meta name="date" content="2019-11-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -278,7 +278,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.5.1" data-path="class.html"><a href="class.html#cart-algorithm"><i class="fa fa-check"></i><b>8.5.1</b> CART algorithm</a></li>
 <li class="chapter" data-level="8.5.2" data-path="class.html"><a href="class.html#r-cart-example"><i class="fa fa-check"></i><b>8.5.2</b> R CART Example</a></li>
 </ul></li>
-<li class="chapter" data-level="8.6" data-path="class.html"><a href="class.html#agenda"><i class="fa fa-check"></i><b>8.6</b> 11/5/19 Agenda</a></li>
+<li class="chapter" data-level="8.6" data-path="class.html"><a href="class.html#nov5"><i class="fa fa-check"></i><b>8.6</b> 11/5/19 Agenda</a></li>
+<li class="chapter" data-level="8.7" data-path="class.html"><a href="class.html#bagging"><i class="fa fa-check"></i><b>8.7</b> Bagging</a><ul>
+<li class="chapter" data-level="8.7.1" data-path="class.html"><a href="class.html#out-of-bag-oob-error-rate"><i class="fa fa-check"></i><b>8.7.1</b> Out Of Bag (OOB) error rate</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -303,6 +306,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="class" class="section level1">
 <h1><span class="header-section-number">Chapter 8</span> Classification</h1>
+<!--
+Daniela Witten talking about inference in prediction: https://www.youtube.com/watch?v=Y4UJjzuYjfM 
+R Unconference 2013
+
+that f is a meaningful reflection of the true unknown process.
+
+
+One of the most satisfying aspects of this unit is that you can now turn students loose on a massive data set. Past instances of the KDD Cup \url{http://www.sigkdd.org/kddcup/index.php} are an excellent source for such data sets. We explored data from the 2008 KDD Cup on breast cancer. Each of the n observations contained digitized data from an X-Ray image of a breast. Each observation corresponded to a small area of a particular breast, which may or may not depict a malignant tumor ï¿œï¿œthis provided the binary response variable.  In addition to a handful of well-defined variables ((x, y)-location, etc.), each observation has 117 nameless attributes, about which no information was provided. Knowing nothing about what these variables mean, students recognized the need to employ machine learning techniques to sift through them and find relationships. The size of the data and number of variables made manual exploration of the data impractical.
+
+\textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
+\url{http://www.dabi.temple.edu/~hbling/8590.002/Montillo_RandomForests_4-2-2009.pdf}
+-->
 <div id="Oct29" class="section level2">
 <h2><span class="header-section-number">8.1</span> 10/29/19 Agenda</h2>
 <ol style="list-style-type: decimal">
@@ -345,7 +360,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \end{align}\]</span></p>
 <ul>
 <li><strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
-<li><strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, with more complicated models (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
+<li><strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, the more complicated the model (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN), the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
 <li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
 </ul>
 <p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
@@ -489,14 +504,15 @@ Figure 1.4: Nested cross-validation: two cross-validation loops are run one insi
 <div id="knn-1" class="section level4 unnumbered">
 <h4>kNN</h4>
 <p>Without thinking about test / training data, a naive model is:</p>
-<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb457-1" data-line-number="1">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>, <span class="dt">classProbs =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb457-2" data-line-number="2">tr.iris &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>iris, </a>
-<a class="sourceLine" id="cb457-3" data-line-number="3">                 <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
-<a class="sourceLine" id="cb457-4" data-line-number="4">                 <span class="dt">trControl =</span> fitControl, </a>
-<a class="sourceLine" id="cb457-5" data-line-number="5">                 <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb457-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb457-7" data-line-number="7">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data=</span><span class="kw">predict</span>(tr.iris, <span class="dt">newdata =</span> iris), </a>
-<a class="sourceLine" id="cb457-8" data-line-number="8">                <span class="dt">reference =</span> iris<span class="op">$</span>Species)</a></code></pre></div>
+<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb457-1" data-line-number="1">fitControl &lt;-caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>, <span class="dt">classProbs =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb457-2" data-line-number="2">tr.iris &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb457-3" data-line-number="3">                        <span class="dt">data=</span>iris,</a>
+<a class="sourceLine" id="cb457-4" data-line-number="4">                        <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>,</a>
+<a class="sourceLine" id="cb457-5" data-line-number="5">                        <span class="dt">trControl =</span> fitControl,</a>
+<a class="sourceLine" id="cb457-6" data-line-number="6">                        <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb457-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb457-8" data-line-number="8">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data=</span><span class="kw">predict</span>(tr.iris, <span class="dt">newdata =</span> iris), </a>
+<a class="sourceLine" id="cb457-9" data-line-number="9">                <span class="dt">reference =</span> iris<span class="op">$</span>Species)</a></code></pre></div>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##             Reference
@@ -588,11 +604,12 @@ Figure 1.4: Nested cross-validation: two cross-validation loops are run one insi
 <h4><span class="math inline">\(k\)</span> neighbors? CV on TRAINING to find <span class="math inline">\(k\)</span></h4>
 <div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb461-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">47</span>)</a>
 <a class="sourceLine" id="cb461-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>, <span class="dt">number=</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb461-3" data-line-number="3">tr.iris &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>iris.train, </a>
-<a class="sourceLine" id="cb461-4" data-line-number="4">                        <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
-<a class="sourceLine" id="cb461-5" data-line-number="5">                        <span class="dt">trControl =</span> fitControl, </a>
-<a class="sourceLine" id="cb461-6" data-line-number="6">                        <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">11</span>)))</a>
-<a class="sourceLine" id="cb461-7" data-line-number="7">tr.iris</a></code></pre></div>
+<a class="sourceLine" id="cb461-3" data-line-number="3">tr.iris &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb461-4" data-line-number="4">                        <span class="dt">data=</span>iris.train, </a>
+<a class="sourceLine" id="cb461-5" data-line-number="5">                        <span class="dt">method=</span><span class="st">&quot;knn&quot;</span>, </a>
+<a class="sourceLine" id="cb461-6" data-line-number="6">                        <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb461-7" data-line-number="7">                        <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">k=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">11</span>)))</a>
+<a class="sourceLine" id="cb461-8" data-line-number="8">tr.iris</a></code></pre></div>
 <pre><code>## k-Nearest Neighbors 
 ## 
 ## 105 samples
@@ -674,8 +691,8 @@ Figure 1.8: <a href="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-
 <h3><span class="header-section-number">8.5.1</span> CART algorithm</h3>
 <p><strong>Basic Classification and Regression Trees (CART) Algorithm:</strong></p>
 <ol style="list-style-type: decimal">
-<li>Start with all variables in one group.</li>
-<li>Find the variable/split that best separates the outcomes (successive binary partitions based on the different predictors - explanatory variables).
+<li>Start with all observations in one group.</li>
+<li>Find the variable/split that best separates the response variable (successive binary partitions based on the different predictors / explanatory variables).
 <ul>
 <li>Evaluation “homogeneity” within each group</li>
 <li>Divide the data into two groups (“leaves”) on that split (“node”).</li>
@@ -711,7 +728,7 @@ where <span class="math inline">\(\hat{p}_{mk}\)</span> represents the proportio
 <li>Further, the <em>Gini index</em> is defined by <span class="math display">\[G_m= \sum_{k=1}^K \hat{p}_{mk}(1-\hat{p}_{mk})\]</span>
 a measure of total variance across the <span class="math inline">\(K\)</span> classes. [Recall, the variance of a Bernoulli random variable with <span class="math inline">\(\pi\)</span> = P(success) is <span class="math inline">\(\pi(1-\pi)\)</span>.] Note that the Gini index takes on a small value if all of the <span class="math inline">\(\hat{p}_{mk}\)</span> values are close to zero or one. For this reason, the Gini index is referred to as a measure of node <em>purity</em> - a small value indicates that a node contains predominantly observations from a single class.</li>
 <li>Last, the <em>cross-entropy</em> is defined as <span class="math display">\[D_m = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}\]</span>
-Since <span class="math inline">\(0 \leq \hat{p}_{mk} \leq 1\)</span> it follows that $0 -<em>{mk} </em>{mk} $. One can show that the cross-entropy will take on a value near zero if the $_{mk} $ values are all near zero or all near one. Therefore, like the Gini index, the cross-entropy will take on a small value if the <span class="math inline">\(m\)</span>th node is pure.</li>
+Since <span class="math inline">\(0 \leq \hat{p}_{mk} \leq 1\)</span> it follows that <span class="math inline">\(0 \leq -\hat{p}_{mk} \log\hat{p}_{mk}\)</span>. One can show that the cross-entropy will take on a value near zero if the <span class="math inline">\(\hat{p}_{mk}\)</span> values are all near zero or all near one. Therefore, like the Gini index, the cross-entropy will take on a small value if the <span class="math inline">\(m\)</span>th node is pure.</li>
 <li>To <em>build</em> the tree, typically the Gini index or the cross-entropy are used to evaluate a particular split.</li>
 <li>To <em>prune</em> the tree, often classification error is used (if accuracy of the final pruned tree is the goal)</li>
 </ol>
@@ -752,7 +769,7 @@ where <span class="math inline">\(\overline{y}_{R_1}\)</span> is the mean respon
 </div>
 <div id="avoiding-overfitting" class="section level4">
 <h4><span class="header-section-number">8.5.1.3</span> (Avoiding) Overfitting</h4>
-<p>Ideally, the tree would not overfit the training data. One could imagine how easy it would be to grow the treee over the training data so as to end up with terminal nodes which are completely homogenous (but then don’t represent the test data).</p>
+<p>Ideally, the tree would not overfit the training data. One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don’t represent the test data).</p>
 <p>See the following (amazing!) demonstration for intuition on model validation / overfitting: <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
 <p>One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold. However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information. A better strategy is to grow a very large tree <span class="math inline">\(T_0\)</span> and then prune it back in order to obtain a subtree. We use cross validation to build the subtree so as to not overfit the data.</p>
 <hr />
@@ -829,11 +846,12 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <a class="sourceLine" id="cb465-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb465-5" data-line-number="5">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
 <a class="sourceLine" id="cb465-6" data-line-number="6">tr.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, </a>
-<a class="sourceLine" id="cb465-7" data-line-number="7">                         <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
-<a class="sourceLine" id="cb465-8" data-line-number="8">                         <span class="dt">trControl =</span> fitControl, </a>
-<a class="sourceLine" id="cb465-9" data-line-number="9">                         <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb465-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb465-11" data-line-number="11">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tr.house<span class="op">$</span>finalModel)</a></code></pre></div>
+<a class="sourceLine" id="cb465-7" data-line-number="7">                         <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb465-8" data-line-number="8">                         <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
+<a class="sourceLine" id="cb465-9" data-line-number="9">                         <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb465-10" data-line-number="10">                         <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb465-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb465-12" data-line-number="12">rpart.plot<span class="op">::</span><span class="kw">rpart.plot</span>(tr.house<span class="op">$</span>finalModel)</a></code></pre></div>
 <p><img src="08-classification_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="scatterplot" class="section level4 unnumbered">
@@ -843,15 +861,18 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <a class="sourceLine" id="cb466-2" data-line-number="2">                         <span class="dt">data=</span>real.estate)</a>
 <a class="sourceLine" id="cb466-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb466-4" data-line-number="4">price.deciles &lt;-<span class="st"> </span><span class="kw">quantile</span>(real.estate<span class="op">$</span>MedianHouseValue, <span class="dv">0</span><span class="op">:</span><span class="dv">10</span><span class="op">/</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb466-5" data-line-number="5">cut.prices    &lt;-<span class="st"> </span><span class="kw">cut</span>(real.estate<span class="op">$</span>MedianHouseValue, price.deciles, </a>
-<a class="sourceLine" id="cb466-6" data-line-number="6">                     <span class="dt">include.lowest=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb466-7" data-line-number="7"><span class="kw">plot</span>(real.estate<span class="op">$</span>Longitude, real.estate<span class="op">$</span>Latitude, </a>
-<a class="sourceLine" id="cb466-8" data-line-number="8">     <span class="dt">col=</span><span class="kw">grey</span>(<span class="dv">10</span><span class="op">:</span><span class="dv">2</span><span class="op">/</span><span class="dv">11</span>)[cut.prices], <span class="dt">pch=</span><span class="dv">20</span>, </a>
-<a class="sourceLine" id="cb466-9" data-line-number="9">     <span class="dt">xlab=</span><span class="st">&quot;Longitude&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Latitude&quot;</span>)</a>
-<a class="sourceLine" id="cb466-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb466-11" data-line-number="11">tree<span class="op">::</span><span class="kw">partition.tree</span>(tree.model, </a>
-<a class="sourceLine" id="cb466-12" data-line-number="12">                     <span class="dt">ordvars=</span><span class="kw">c</span>(<span class="st">&quot;Longitude&quot;</span>,<span class="st">&quot;Latitude&quot;</span>), </a>
-<a class="sourceLine" id="cb466-13" data-line-number="13">                     <span class="dt">add=</span><span class="ot">TRUE</span>) </a></code></pre></div>
+<a class="sourceLine" id="cb466-5" data-line-number="5">cut.prices    &lt;-<span class="st"> </span><span class="kw">cut</span>(real.estate<span class="op">$</span>MedianHouseValue, </a>
+<a class="sourceLine" id="cb466-6" data-line-number="6">                     price.deciles, </a>
+<a class="sourceLine" id="cb466-7" data-line-number="7">                     <span class="dt">include.lowest=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb466-8" data-line-number="8"><span class="kw">plot</span>(real.estate<span class="op">$</span>Longitude, </a>
+<a class="sourceLine" id="cb466-9" data-line-number="9">     real.estate<span class="op">$</span>Latitude, </a>
+<a class="sourceLine" id="cb466-10" data-line-number="10">     <span class="dt">col=</span><span class="kw">grey</span>(<span class="dv">10</span><span class="op">:</span><span class="dv">2</span><span class="op">/</span><span class="dv">11</span>)[cut.prices], </a>
+<a class="sourceLine" id="cb466-11" data-line-number="11">     <span class="dt">pch=</span><span class="dv">20</span>, </a>
+<a class="sourceLine" id="cb466-12" data-line-number="12">     <span class="dt">xlab=</span><span class="st">&quot;Longitude&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Latitude&quot;</span>)</a>
+<a class="sourceLine" id="cb466-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb466-14" data-line-number="14">tree<span class="op">::</span><span class="kw">partition.tree</span>(tree.model, </a>
+<a class="sourceLine" id="cb466-15" data-line-number="15">                     <span class="dt">ordvars=</span><span class="kw">c</span>(<span class="st">&quot;Longitude&quot;</span>,<span class="st">&quot;Latitude&quot;</span>), </a>
+<a class="sourceLine" id="cb466-16" data-line-number="16">                     <span class="dt">add=</span><span class="ot">TRUE</span>) </a></code></pre></div>
 <p><img src="08-classification_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="finer-partition" class="section level4 unnumbered">
@@ -860,10 +881,13 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <p>the node that splits at latitude greater than 34.7 has 2844 houses. 645 is the “deviance” which is the sum of squares value for that node. the predicted value is the average of the points in that node: 11.5. it is not a terminal node (no asterisk).</p>
 <div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb468-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb468-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
-<a class="sourceLine" id="cb468-3" data-line-number="3">tr.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
-<a class="sourceLine" id="cb468-4" data-line-number="4">                  <span class="dt">trControl =</span> fitControl, <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb468-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb468-6" data-line-number="6">tr.house<span class="op">$</span>finalModel</a></code></pre></div>
+<a class="sourceLine" id="cb468-3" data-line-number="3">tr.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>Longitude <span class="op">+</span><span class="st"> </span>Latitude, </a>
+<a class="sourceLine" id="cb468-4" data-line-number="4">                         <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb468-5" data-line-number="5">                         <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb468-6" data-line-number="6">                         <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb468-7" data-line-number="7">                         <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb468-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb468-9" data-line-number="9">tr.house<span class="op">$</span>finalModel</a></code></pre></div>
 <pre><code>## n= 20640 
 ## 
 ## node), split, n, deviance, yval
@@ -893,11 +917,12 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb470-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb470-2" data-line-number="2">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>)</a>
 <a class="sourceLine" id="cb470-3" data-line-number="3">tr.full.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
-<a class="sourceLine" id="cb470-4" data-line-number="4">                              <span class="dt">data=</span>real.estate, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
-<a class="sourceLine" id="cb470-5" data-line-number="5">                              <span class="dt">trControl =</span> fitControl, </a>
-<a class="sourceLine" id="cb470-6" data-line-number="6">                              <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb470-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb470-8" data-line-number="8">tr.full.house<span class="op">$</span>finalModel</a></code></pre></div>
+<a class="sourceLine" id="cb470-4" data-line-number="4">                              <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb470-5" data-line-number="5">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>, </a>
+<a class="sourceLine" id="cb470-6" data-line-number="6">                              <span class="dt">trControl =</span> fitControl, </a>
+<a class="sourceLine" id="cb470-7" data-line-number="7">                              <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb470-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb470-9" data-line-number="9">tr.full.house<span class="op">$</span>finalModel</a></code></pre></div>
 <pre><code>## n= 20640 
 ## 
 ## node), split, n, deviance, yval
@@ -937,13 +962,14 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb473-1" data-line-number="1"><span class="co"># here, let&#39;s use all the variables and all the samples</span></a>
 <a class="sourceLine" id="cb473-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">4747</span>)</a>
 <a class="sourceLine" id="cb473-3" data-line-number="3">fitControl &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>)</a>
-<a class="sourceLine" id="cb473-4" data-line-number="4">tree.cv.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>real.estate, </a>
-<a class="sourceLine" id="cb473-5" data-line-number="5">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
-<a class="sourceLine" id="cb473-6" data-line-number="6">                              <span class="dt">trControl=</span>fitControl,</a>
-<a class="sourceLine" id="cb473-7" data-line-number="7">                              <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
-<a class="sourceLine" id="cb473-8" data-line-number="8">                              <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
-<a class="sourceLine" id="cb473-9" data-line-number="9">  </a>
-<a class="sourceLine" id="cb473-10" data-line-number="10">tree.cv.house  </a></code></pre></div>
+<a class="sourceLine" id="cb473-4" data-line-number="4">tree.cv.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb473-5" data-line-number="5">                              <span class="dt">data=</span>real.estate, </a>
+<a class="sourceLine" id="cb473-6" data-line-number="6">                              <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb473-7" data-line-number="7">                              <span class="dt">trControl=</span>fitControl,</a>
+<a class="sourceLine" id="cb473-8" data-line-number="8">                              <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb473-9" data-line-number="9">                              <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a>
+<a class="sourceLine" id="cb473-10" data-line-number="10">  </a>
+<a class="sourceLine" id="cb473-11" data-line-number="11">tree.cv.house  </a></code></pre></div>
 <pre><code>## CART 
 ## 
 ## 20640 samples
@@ -1039,10 +1065,11 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 ## RMSE was used to select the optimal model using the smallest value.
 ## The final value used for the model was maxdepth = 13.</code></pre>
 <div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb479-1" data-line-number="1">tree.train.house &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="kw">log</span>(MedianHouseValue) <span class="op">~</span><span class="st"> </span>., </a>
-<a class="sourceLine" id="cb479-2" data-line-number="2">                                 <span class="dt">data=</span>house.train, <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
-<a class="sourceLine" id="cb479-3" data-line-number="3">                                 <span class="dt">trControl=</span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>),</a>
-<a class="sourceLine" id="cb479-4" data-line-number="4">                                 <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">14</span>),</a>
-<a class="sourceLine" id="cb479-5" data-line-number="5">                                 <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a></code></pre></div>
+<a class="sourceLine" id="cb479-2" data-line-number="2">                                 <span class="dt">data=</span>house.train, </a>
+<a class="sourceLine" id="cb479-3" data-line-number="3">                                 <span class="dt">method=</span><span class="st">&quot;rpart2&quot;</span>,</a>
+<a class="sourceLine" id="cb479-4" data-line-number="4">                                 <span class="dt">trControl=</span>caret<span class="op">::</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;none&quot;</span>),</a>
+<a class="sourceLine" id="cb479-5" data-line-number="5">                                 <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">maxdepth=</span><span class="dv">14</span>),</a>
+<a class="sourceLine" id="cb479-6" data-line-number="6">                                 <span class="dt">parms=</span><span class="kw">list</span>(<span class="dt">split=</span><span class="st">&quot;gini&quot;</span>))</a></code></pre></div>
 <p><strong>for classification results</strong> use <code>confusionMatrix</code> instead of <code>postResample</code></p>
 <div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb480-1" data-line-number="1">test.pred &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.train.house, house.test)</a>
 <a class="sourceLine" id="cb480-2" data-line-number="2">caret<span class="op">::</span><span class="kw">postResample</span>(<span class="dt">pred =</span> test.pred, <span class="dt">obs=</span><span class="kw">log</span>(house.test<span class="op">$</span>MedianHouseValue))</a></code></pre></div>
@@ -1061,9 +1088,174 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 </div>
 </div>
 </div>
-<div id="agenda" class="section level2">
+<div id="nov5" class="section level2">
 <h2><span class="header-section-number">8.6</span> 11/5/19 Agenda</h2>
+<ol style="list-style-type: decimal">
+<li>pruning</li>
+<li>variable selection</li>
+<li>bagging (no boosting)</li>
+<li>OOB error rate</li>
+</ol>
+</div>
+<div id="bagging" class="section level2">
+<h2><span class="header-section-number">8.7</span> Bagging</h2>
+<p>The tree based models given by CART are easy to understand and implement, but they suffer from <em>high variance</em>. That is, if we split the training data into two parts at random and fit a decision tree to both halves, the results that we get could be quite different (you might have seen this in your homework assignment!). We’d like a model that produces low variance - one for which if we ran it on different datasets, we’d get (close to) the same model every time.</p>
+<p><strong>Bagging = Bootstrap Aggregating</strong>. The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit. Bagging can be applied to any classifier to reduce variability.</p>
+<p style="color:red">
+Recall that the variance of the sample mean is variance / n. So we’ve seen the idea that averaging an outcome gives reduced variability.
+</p>
+<p><strong>Shortcomings of Bagging:</strong>
+* Model is even harder to “write-down” (than CART)
+* With lots of predictors, (even greedy) partitioning can become computationally unwieldy - now computational task is even harder! (because of the number of trees grown for each bootstrap sample)</p>
+<strong>Strengths of Bagging:</strong>
+* Can handle categorical or numerical predictors or response variables (indeed, they can handle mixed predictors at the same time!).
+* Can handle more than 2 groups for categorical predictions
+* Easily ignore redundant variables.
+* Perform better than linear models in non-linear settings. Classification trees are non-linear models, so they immediately use interactions between variables.
+* Data transformations may be less important (monotone transformations on the explanatory variables won’t change anything).
+<p style="color:red">
+<em>Similar bias</em> to CART, but <em>reduced variance</em>
+</p>
+<p>(can be proved).</p>
+<p>Basic Idea:</p>
+<ul>
+<li>Resample <em>cases</em> (observational units, not variables) and recalculate predictions. Choose <span class="math inline">\(N&#39; \leq N\)</span> for the number of observations in the new training set through random sampling with replacement. Almost always we use <span class="math inline">\(N&#39; = N\)</span> for a full bootstrap.</li>
+<li>Build a tree on each new set of <span class="math inline">\(N&#39;\)</span> training observations.</li>
+<li>Average (regression) or majority vote (classification).</li>
+<li>Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
+<span class="math display">\[\begin{align}
+P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
+\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
+\end{align}\]</span>
+\end{itemize}</li>
+</ul>
+<p><strong>Notes on bagging:</strong>
+* Bagging alone uses the full set of predictors to determine every tree (it is the observations that are bootstrapped).
+* Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction. We average (or majority vote) the predictions to get one prediction for the observation at hand.
+* Bagging gives a smoother decision boundary
+* Bagging can be done on <em>any</em> decision method (not just trees).
+* No need to prune or CV trees. The reason is that averaging keeps us from overfitting a particular few observations (think of averages in other contexts: law of large numbers). Pruning wouldn’t be a bad thing to do in terms of fit, but it is unnecessary for good predictions (and would add a lot to the complexity of the algorithm).</p>
+<div id="out-of-bag-oob-error-rate" class="section level3">
+<h3><span class="header-section-number">8.7.1</span> Out Of Bag (OOB) error rate</h3>
+<p>Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:</p>
+<ul>
+<li>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.</li>
+<li>Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.</li>
+</ul>
+<p>How does it work? Consider the following predictions for a silly toy data set of 9 observations. Recall that $$1/3 of the observations will be left out at each bootstrap sample. Those are the observations for which predictions will be made. In the table below, an X is given if there is a prediction made for that value.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">obs</th>
+<th align="center">tree1</th>
+<th align="center">tree2</th>
+<th align="center">tree3</th>
+<th align="center">tree4</th>
+<th align="center"><span class="math inline">\(\cdots\)</span></th>
+<th align="center">tree100</th>
+<th align="center">average</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/2\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/1\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/2\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/1\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">$(pred)/1 $</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/2\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">$(pred)/1 $</td>
+</tr>
+<tr class="even">
+<td align="center">8</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/3\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">9</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/1\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Let the OOB prediction for the <span class="math inline">\(i^{th}\)</span> observation to be <span class="math inline">\(\hat{y}_{(-i)}\)</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{OOB}_{\mbox{error}} &amp;= \frac{1}{n} \sum_{i=1}^n \textrm{I} (y_i \ne \hat{y}_{(-i)}) \ \ \ \ \ \ \ \  \mbox{classification}\\
+\mbox{OOB}_{\mbox{error}} &amp;= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
+\end{align}\]</span></p>
 
+</div>
 </div>
 </div>
 <h3>References</h3>
