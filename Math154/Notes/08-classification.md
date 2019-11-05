@@ -935,7 +935,7 @@ caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 
 Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
-## 11/5/19 Agenda {#nov5}
+## 11/5/19 Agenda {#Nov5}
 1. pruning
 2. variable selection
 3. bagging (no boosting)
@@ -1014,5 +1014,12 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 \mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
 \end{align}
 
+## 11/7/19 Agenda {#Nov7}
+1. OOB again
+2. Random Forests
+3. variable importance
+4. R code / examples
 
+
+## Random Forests {#rf}
 

@@ -57,7 +57,7 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 10/22/19	| Fall Break |   |  |
 | 10/24/19	| Ethics | [MDS6](http://mdsr-book.github.io/) | \@ref(Oct24) [Oct24], \@ref(ethics) [ethics] |
 | 10/29/19	| $k$-NN & CV | [ISL sections 2.2.3 and 4.6.5 & 5.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Oct29) [Oct29], \@ref(knn) [knn]  \@ref(cv) [CV]|
-| 10/31/19	| CART | [ISL 8.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Oct31) [Oct31], \@ref(cart) [cart] |
-
+| 10/31/19	| CART | [ISL 8.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Oct31) | 11/5/19	| bagging| [ISL section 8.2.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Nov5) [Nov5], \@ref(bagging) [bagging] |
+| 10/31/19	| Random Forests | [ISL 8.2.2](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Nov7) [Nov7], \@ref(rf) [rf] |
 
 
