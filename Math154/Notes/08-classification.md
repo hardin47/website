@@ -985,6 +985,7 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n
 
 
 **Notes on bagging:**
+
 * Bagging alone uses the full set of predictors to determine every tree  (it is the observations that are bootstrapped).
 * Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction.  We average (or majority vote) the predictions to get one prediction for the observation at hand.
 * Bagging gives a smoother decision boundary
@@ -1235,17 +1236,16 @@ ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) +
 
 There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
 
-
-|:----------------------------------|:-------------------------|
-| * explanatory variable choice 	| * k (kNN)  	|
+| * explanatory variable choice 	| * k (kNN) 	|
+|---------------------------------------------	|-------------------------------	|
 | * number of explanatory variables 	| * distance measure 	|
-| * functions/transformation of explanatory 	|   * k (CV) 	|
-| * transformation of response 	| * CV set.seed  	|
-| * response:continuous vs. categorical 	|  * alpha prune 	|
+| * functions/transformation of explanatory 	| * k (CV) 	|
+| * transformation of response 	| * CV set.seed 	|
+| * response:continuous vs. categorical 	| * alpha prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
-| * train/test split (set.seed) 	|  * prune or not 	|
+| * train/test split (set.seed) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|
 | * type of classification model 	| * \# trees / \# BS samples 	|
-| * use of cost complexity / parameter 	|  * grid search etc. for tuning 	|
-| * majority / average prob (tree error rate)  	|  * value(s) of mtry	|
+| * use of cost complexity / parameter 	| * grid search etc. for tuning 	|
+| * majority / average prob (tree error rate) 	| * value(s) of mtry 	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
