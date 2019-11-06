@@ -833,12 +833,68 @@ All learners are bad when there are too many noisy variables because the respons
 If the number of variables is very large, forests can be run once with all the variables, then run again using only the most important variables from the first run.
 
 
+
+
+### R RF Example
+
+("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
+
+```{r}
+data(iris)
+library(tidyverse)
+library(caret)
+library(randomForest)
+
+inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+```
+
+`prox=TRUE` gives us a little more extra information in the output
+```{r}
+modFit <- train(Species ~ ., 
+                data=training, 
+                method="rf", 
+                prox=TRUE)
+modFit
+```
+
+look at a specific tree
+```{r}
+getTree(modFit$finalModel, k=2)
+```
+
+can get class "centers"
+```{r}
+irisP <- classCenter(training[,c(3,4)], 
+                     training$Species, 
+                     modFit$finalModel$prox)
+irisP <- as.data.frame(irisP)
+irisP$Species <- rownames(irisP)
+
+ggplot(training, aes(x=Petal.Width, y=Petal.Length, col=Species)) + 
+    geom_point(size=5, shape=4)
+```
+
+testing predictions
+```{r}
+pred <- predict(modFit, testing)
+testing$predRight <- pred == testing$Species
+table(pred, testing$Species)
+
+ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) + 
+    geom_point()
+# need a main label "new data Predictions"
+```
+
+
+
 ## Model Choices
 
 There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
 
 
-
+|:----------------------------------|:-------------------------|
 | * explanatory variable choice 	| * k (kNN)  	|
 | * number of explanatory variables 	| * distance measure 	|
 | * functions/transformation of explanatory 	|   * k (CV) 	|
@@ -851,8 +907,3 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * use of cost complexity / parameter 	|  * grid search etc. for tuning 	|
 | * majority / average prob (tree error rate)  	|  * value(s) of mtry	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
-
-
-### R RF Example
-
-("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.

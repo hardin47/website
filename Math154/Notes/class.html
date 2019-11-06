@@ -285,10 +285,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.8" data-path="class.html"><a href="class.html#Nov7"><i class="fa fa-check"></i><b>8.8</b> 11/7/19 Agenda</a></li>
 <li class="chapter" data-level="8.9" data-path="class.html"><a href="class.html#rf"><i class="fa fa-check"></i><b>8.9</b> Random Forests</a><ul>
 <li class="chapter" data-level="8.9.1" data-path="class.html"><a href="class.html#random-forest-algorithm"><i class="fa fa-check"></i><b>8.9.1</b> Random Forest algorithm</a></li>
+<li class="chapter" data-level="8.9.2" data-path="class.html"><a href="class.html#r-rf-example"><i class="fa fa-check"></i><b>8.9.2</b> R RF Example</a></li>
 </ul></li>
-<li class="chapter" data-level="8.10" data-path="class.html"><a href="class.html#model-choices"><i class="fa fa-check"></i><b>8.10</b> Model Choices</a><ul>
-<li class="chapter" data-level="8.10.1" data-path="class.html"><a href="class.html#r-rf-example"><i class="fa fa-check"></i><b>8.10.1</b> R RF Example</a></li>
-</ul></li>
+<li class="chapter" data-level="8.10" data-path="class.html"><a href="class.html#model-choices"><i class="fa fa-check"></i><b>8.10</b> Model Choices</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -1354,27 +1353,95 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <p>If the number of variables is very large, forests can be run once with all the variables, then run again using only the most important variables from the first run.</p>
 </div>
 </div>
+<div id="r-rf-example" class="section level3">
+<h3><span class="header-section-number">8.9.2</span> R RF Example</h3>
+<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees). In R see <code>importance</code> within the <code>randomForest</code> function, and then <code>varImpPlot</code> to plot.</p>
+<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb482-1" data-line-number="1"><span class="kw">data</span>(iris)</a>
+<a class="sourceLine" id="cb482-2" data-line-number="2"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb482-3" data-line-number="3"><span class="kw">library</span>(caret)</a>
+<a class="sourceLine" id="cb482-4" data-line-number="4"><span class="kw">library</span>(randomForest)</a>
+<a class="sourceLine" id="cb482-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb482-6" data-line-number="6">inTrain &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> iris<span class="op">$</span>Species, <span class="dt">p=</span><span class="fl">0.7</span>, <span class="dt">list=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb482-7" data-line-number="7">training &lt;-<span class="st"> </span>iris[inTrain,]</a>
+<a class="sourceLine" id="cb482-8" data-line-number="8">testing &lt;-<span class="st"> </span>iris[<span class="op">-</span>inTrain,]</a></code></pre></div>
+<p><code>prox=TRUE</code> gives us a little more extra information in the output</p>
+<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb483-1" data-line-number="1">modFit &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb483-2" data-line-number="2">                <span class="dt">data=</span>training, </a>
+<a class="sourceLine" id="cb483-3" data-line-number="3">                <span class="dt">method=</span><span class="st">&quot;rf&quot;</span>, </a>
+<a class="sourceLine" id="cb483-4" data-line-number="4">                <span class="dt">prox=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb483-5" data-line-number="5">modFit</a></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: &#39;setosa&#39;, &#39;versicolor&#39;, &#39;virginica&#39; 
+## 
+## No pre-processing
+## Resampling: Bootstrapped (25 reps) 
+## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##   2     0.9518527  0.9265992
+##   3     0.9508527  0.9250337
+##   4     0.9489015  0.9221052
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was mtry = 2.</code></pre>
+<p>look at a specific tree</p>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb485-1" data-line-number="1"><span class="kw">getTree</span>(modFit<span class="op">$</span>finalModel, <span class="dt">k=</span><span class="dv">2</span>)</a></code></pre></div>
+<pre><code>##   left daughter right daughter split var split point status prediction
+## 1             2              3         4        0.80      1          0
+## 2             0              0         0        0.00     -1          1
+## 3             4              5         4        1.65      1          0
+## 4             0              0         0        0.00     -1          2
+## 5             6              7         4        1.75      1          0
+## 6             8              9         2        2.75      1          0
+## 7             0              0         0        0.00     -1          3
+## 8             0              0         0        0.00     -1          3
+## 9             0              0         0        0.00     -1          2</code></pre>
+<p>can get class “centers”</p>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb487-1" data-line-number="1">irisP &lt;-<span class="st"> </span><span class="kw">classCenter</span>(training[,<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">4</span>)], </a>
+<a class="sourceLine" id="cb487-2" data-line-number="2">                     training<span class="op">$</span>Species, </a>
+<a class="sourceLine" id="cb487-3" data-line-number="3">                     modFit<span class="op">$</span>finalModel<span class="op">$</span>prox)</a>
+<a class="sourceLine" id="cb487-4" data-line-number="4">irisP &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(irisP)</a>
+<a class="sourceLine" id="cb487-5" data-line-number="5">irisP<span class="op">$</span>Species &lt;-<span class="st"> </span><span class="kw">rownames</span>(irisP)</a>
+<a class="sourceLine" id="cb487-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb487-7" data-line-number="7"><span class="kw">ggplot</span>(training, <span class="kw">aes</span>(<span class="dt">x=</span>Petal.Width, <span class="dt">y=</span>Petal.Length, <span class="dt">col=</span>Species)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb487-8" data-line-number="8"><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">5</span>, <span class="dt">shape=</span><span class="dv">4</span>)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>testing predictions</p>
+<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb488-1" data-line-number="1">pred &lt;-<span class="st"> </span><span class="kw">predict</span>(modFit, testing)</a>
+<a class="sourceLine" id="cb488-2" data-line-number="2">testing<span class="op">$</span>predRight &lt;-<span class="st"> </span>pred <span class="op">==</span><span class="st"> </span>testing<span class="op">$</span>Species</a>
+<a class="sourceLine" id="cb488-3" data-line-number="3"><span class="kw">table</span>(pred, testing<span class="op">$</span>Species)</a></code></pre></div>
+<pre><code>##             
+## pred         setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         2
+##   virginica       0          1        13</code></pre>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb490-1" data-line-number="1"><span class="kw">ggplot</span>(testing, <span class="kw">aes</span>(<span class="dt">x=</span>Petal.Width, <span class="dt">y=</span>Petal.Length, <span class="dt">color=</span>predRight) ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb490-2" data-line-number="2"><span class="st">    </span><span class="kw">geom_point</span>()</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb491-1" data-line-number="1"><span class="co"># need a main label &quot;new data Predictions&quot;</span></a></code></pre></div>
+</div>
 </div>
 <div id="model-choices" class="section level2">
 <h2><span class="header-section-number">8.10</span> Model Choices</h2>
 <p>There are <em>soooooo</em> many choices we’ve made along the way. The following list should make you realize that there is no <strong>truth</strong> with respect to any given model. Every choice will (could) lead to a different model.</p>
-<div class="line-block">* explanatory variable choice | * k (kNN) |<br />
-* number of explanatory variables | * distance measure |<br />
-* functions/transformation of explanatory | * k (CV) |<br />
-* transformation of response | * CV set.seed |<br />
-* response:continuous vs. categorical | * alpha prune |<br />
-* how missing data is dealt with | * maxdepth prune |<br />
-* train/test split (set.seed) | * prune or not |<br />
-* train/test proportion | * gini / entropy (split) |<br />
-* type of classification model | * # trees / # BS samples |<br />
-* use of cost complexity / parameter | * grid search etc. for tuning |<br />
-* majority / average prob (tree error rate) | * value(s) of mtry |<br />
-* accuracy vs sensitivity vs specificity | * OOB vs CV for tuning |</div>
-<div id="r-rf-example" class="section level3">
-<h3><span class="header-section-number">8.10.1</span> R RF Example</h3>
-<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees). In R see <code>importance</code> within the <code>randomForest</code> function, and then <code>varImpPlot</code> to plot.</p>
+<p>|:———————————-|:————————-|
+| * explanatory variable choice | * k (kNN) |
+| * number of explanatory variables | * distance measure |
+| * functions/transformation of explanatory | * k (CV) |
+| * transformation of response | * CV set.seed |
+| * response:continuous vs. categorical | * alpha prune |
+| * how missing data is dealt with | * maxdepth prune |
+| * train/test split (set.seed) | * prune or not |
+| * train/test proportion | * gini / entropy (split) |
+| * type of classification model | * # trees / # BS samples |
+| * use of cost complexity / parameter | * grid search etc. for tuning |
+| * majority / average prob (tree error rate) | * value(s) of mtry |
+| * accuracy vs sensitivity vs specificity | * OOB vs CV for tuning |</p>
 
-</div>
 </div>
 </div>
 <h3>References</h3>

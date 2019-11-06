@@ -1117,12 +1117,124 @@ All learners are bad when there are too many noisy variables because the respons
 If the number of variables is very large, forests can be run once with all the variables, then run again using only the most important variables from the first run.
 
 
+
+
+### R RF Example
+
+("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
+
+
+```r
+data(iris)
+library(tidyverse)
+library(caret)
+library(randomForest)
+
+inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+```
+
+`prox=TRUE` gives us a little more extra information in the output
+
+```r
+modFit <- train(Species ~ ., 
+                data=training, 
+                method="rf", 
+                prox=TRUE)
+modFit
+```
+
+```
+## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling: Bootstrapped (25 reps) 
+## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##   2     0.9518527  0.9265992
+##   3     0.9508527  0.9250337
+##   4     0.9489015  0.9221052
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was mtry = 2.
+```
+
+look at a specific tree
+
+```r
+getTree(modFit$finalModel, k=2)
+```
+
+```
+##   left daughter right daughter split var split point status prediction
+## 1             2              3         4        0.80      1          0
+## 2             0              0         0        0.00     -1          1
+## 3             4              5         4        1.65      1          0
+## 4             0              0         0        0.00     -1          2
+## 5             6              7         4        1.75      1          0
+## 6             8              9         2        2.75      1          0
+## 7             0              0         0        0.00     -1          3
+## 8             0              0         0        0.00     -1          3
+## 9             0              0         0        0.00     -1          2
+```
+
+can get class "centers"
+
+```r
+irisP <- classCenter(training[,c(3,4)], 
+                     training$Species, 
+                     modFit$finalModel$prox)
+irisP <- as.data.frame(irisP)
+irisP$Species <- rownames(irisP)
+
+ggplot(training, aes(x=Petal.Width, y=Petal.Length, col=Species)) + 
+    geom_point(size=5, shape=4)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+
+testing predictions
+
+```r
+pred <- predict(modFit, testing)
+testing$predRight <- pred == testing$Species
+table(pred, testing$Species)
+```
+
+```
+##             
+## pred         setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         2
+##   virginica       0          1        13
+```
+
+```r
+ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) + 
+    geom_point()
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+# need a main label "new data Predictions"
+```
+
+
+
 ## Model Choices
 
 There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
 
 
-
+|:----------------------------------|:-------------------------|
 | * explanatory variable choice 	| * k (kNN)  	|
 | * number of explanatory variables 	| * distance measure 	|
 | * functions/transformation of explanatory 	|   * k (CV) 	|
@@ -1135,8 +1247,3 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * use of cost complexity / parameter 	|  * grid search etc. for tuning 	|
 | * majority / average prob (tree error rate)  	|  * value(s) of mtry	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
-
-
-### R RF Example
-
-("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
