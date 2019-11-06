@@ -1236,8 +1236,9 @@ ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) +
 
 There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
 
-| * explanatory variable choice 	| * k (kNN) 	|
+|  $   $ 	| $   $	|
 |---------------------------------------------	|-------------------------------	|
+| * explanatory variable choice 	| * k (kNN) 	|
 | * number of explanatory variables 	| * distance measure 	|
 | * functions/transformation of explanatory 	| * k (CV) 	|
 | * transformation of response 	| * CV set.seed 	|
