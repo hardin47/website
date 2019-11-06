@@ -53,6 +53,10 @@ That said, the model should still represent the complexity of the data!  We desc
 
 ### Bias-variance trade-off
 
+####  Excellent resource {-} 
+
+for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
+
 * **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
 
 * **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
@@ -1023,3 +1027,116 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 
 ## Random Forests {#rf}
 
+Random Forests are an extension to bagging for regression trees (note: bagging can be done on any prediction method).  Again, with the idea of infusing extra variability and then averaging over that variability, RFs use a *subset* of predictor variables at every node in the tree.
+
+**Shortcomings of Random Forests:**
+* Model is even harder to "write-down" (than CART)
+* With lots of predictors, (even greedy) partitioning can become computationally unwieldy  - now computational task is even harder! ...  bagging the observations and
+
+
+**Strengths of Random Forests:**
+* refinement of bagged trees; quite popular  (random forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
+* subset of predictors makes random forests *much faster* to search through than all predictors
+* creates a diverse set of trees that can be built.  Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.
+* random forests are quite accurate
+* generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
+
+> "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
+
+
+### Random Forest algorithm
+
+******
+**Algorithm**:  Random Forest
+
+******
+1. Bootstrap sample from the training set.
+2. Grow an un-pruned tree on this bootstrap sample.
+* *At each split*, select $m$ variables and determine the best split using only these predictors.
+Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
+* Do *not* prune the tree.  Save the tree as is!
+
+3. For each tree grown on a bootstrap sample, predict the OOB samples.  For each tree grown, $~1/3$ of the training samples won't be in the bootstrap sample -- those are called out of bootstrap (OOB) samples.  OOB samples can be used as *test* data to estimate the error rate of the tree.
+4. Combine the OOB predictions to create the "out-of-bag" error rate (either majority vote or average of predictions / class probabilities).
+5. All trees together represent the model that is used for new predictions (either majority vote or average).
+
+******
+
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=.5]{zissermanRF.pdf}
+\caption{\label{ZissRF} Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a random forest prediction model.  \url{http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf}}
+\end{center}
+\end{figure}
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a random forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-21)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a random forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+</div>
+
+**Notes on random forests:**
+
+* Bagging alone uses the full set of predictors to determine every tree  (it is the observations that are bootstrapped).  Random Forests use a subset of predictors.
+* Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction.  We average (or majority vote) the predictions to get one prediction for the observation at hand.
+* Bagging is a special case of random forest where $m=k$.
+* generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
+
+> "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
+
+
+#### How to choose parameters? {-}
+
+* **$\#$ trees**
+Build trees until the error no longer decreases
+* **$m$**
+Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).
+* **$N'$ samples**
+$N'$ should be the same size as the training data.
+
+
+
+
+
+#### Variable Importance {-}
+
+All learners are bad when there are too many noisy variables because the response is bound to correlate with some of them.  We can measure the contribution of each additional variable in the model by how much the model accuracy decreased when the given variable was *excluded* from the model.
+
+> importance = decrease in node impurity resulting from splits over that variable, averaged over all trees
+
+("impurity" is defined as RSS for regression trees and deviance for classification trees). 
+
+**Variable importance** is measured by two different metrics (from R help on `importance`):
+
+* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).  Within the oob values, permute the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (with the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
+* **purity:** The decrease (or increase, depending on the plot) in node purity: root sum of squares (RSS) [deviance/gini for classification trees].  That is, the amount of total decrease in RSS from splitting on *that* variable, averaged over all trees.
+
+
+If the number of variables is very large, forests can be run once with all the variables, then run again using only the most important variables from the first run.
+
+
+## Model Choices
+
+There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
+
+
+
+| * explanatory variable choice 	| * k (kNN)  	|
+| * number of explanatory variables 	| * distance measure 	|
+| * functions/transformation of explanatory 	|   * k (CV) 	|
+| * transformation of response 	| * CV set.seed  	|
+| * response:continuous vs. categorical 	|  * alpha prune 	|
+| * how missing data is dealt with 	| * maxdepth prune 	|
+| * train/test split (set.seed) 	|  * prune or not 	|
+| * train/test proportion 	| * gini / entropy (split) 	|
+| * type of classification model 	| * \# trees / \# BS samples 	|
+| * use of cost complexity / parameter 	|  * grid search etc. for tuning 	|
+| * majority / average prob (tree error rate)  	|  * value(s) of mtry	|
+| * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
+
+
+### R RF Example
+
+("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
