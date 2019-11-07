@@ -1033,11 +1033,13 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 Random Forests are an extension to bagging for regression trees (note: bagging can be done on any prediction method).  Again, with the idea of infusing extra variability and then averaging over that variability, RFs use a *subset* of predictor variables at every node in the tree.
 
 **Shortcomings of Random Forests:**
+
 * Model is even harder to "write-down" (than CART)
 * With lots of predictors, (even greedy) partitioning can become computationally unwieldy  - now computational task is even harder! ...  bagging the observations and
 
 
 **Strengths of Random Forests:**
+
 * refinement of bagged trees; quite popular  (random forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
 * subset of predictors makes random forests *much faster* to search through than all predictors
 * creates a diverse set of trees that can be built.  Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.
@@ -1065,14 +1067,6 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 ******
 
-
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.5]{zissermanRF.pdf}
-\caption{\label{ZissRF} Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a random forest prediction model.  \url{http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf}}
-\end{center}
-\end{figure}
 
 
 <div class="figure" style="text-align: center">
@@ -1126,25 +1120,26 @@ If the number of variables is very large, forests can be run once with all the v
 
 ("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
 
+`method= 'ranger' ` is about a zillion times faster than `method = 'randomForest'` or  `method = 'rf'`, but they all do the work.
+
 
 ```r
 data(iris)
 library(tidyverse)
 library(caret)
-library(randomForest)
+library(ranger)
+library(e1071)
 
 inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-training <- iris[inTrain,]
-testing <- iris[-inTrain,]
+iris.train <- iris[inTrain,]
+iris.test <- iris[-inTrain,]
 ```
 
-`prox=TRUE` gives us a little more extra information in the output
 
 ```r
-modFit <- train(Species ~ ., 
-                data=training, 
-                method="rf", 
-                prox=TRUE)
+modFit <- caret::train(Species ~ ., 
+                data=iris.train, 
+                method="ranger")
 modFit
 ```
 
@@ -1160,75 +1155,88 @@ modFit
 ## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
 ## Resampling results across tuning parameters:
 ## 
-##   mtry  Accuracy   Kappa    
-##   2     0.9518527  0.9265992
-##   3     0.9508527  0.9250337
-##   4     0.9489015  0.9221052
+##   mtry  splitrule   Accuracy   Kappa    
+##   2     gini        0.9519882  0.9268222
+##   2     extratrees  0.9501667  0.9239468
+##   3     gini        0.9509638  0.9252363
+##   3     extratrees  0.9511923  0.9254990
+##   4     gini        0.9489015  0.9221052
+##   4     extratrees  0.9501289  0.9238519
 ## 
+## Tuning parameter 'min.node.size' was held constant at a value of 1
 ## Accuracy was used to select the optimal model using the largest value.
-## The final value used for the model was mtry = 2.
+## The final values used for the model were mtry = 2, splitrule = gini
+##  and min.node.size = 1.
 ```
-
-look at a specific tree
 
 ```r
-getTree(modFit$finalModel, k=2)
+caret::confusionMatrix(data=predict(modFit, newdata = iris.test), 
+                reference = iris.test$Species)
 ```
 
 ```
-##   left daughter right daughter split var split point status prediction
-## 1             2              3         4        0.80      1          0
-## 2             0              0         0        0.00     -1          1
-## 3             4              5         4        1.65      1          0
-## 4             0              0         0        0.00     -1          2
-## 5             6              7         4        1.75      1          0
-## 6             8              9         2        2.75      1          0
-## 7             0              0         0        0.00     -1          3
-## 8             0              0         0        0.00     -1          3
-## 9             0              0         0        0.00     -1          2
+## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         2
+##   virginica       0          1        13
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9333         
+##                  95% CI : (0.8173, 0.986)
+##     No Information Rate : 0.3333         
+##     P-Value [Acc > NIR] : < 2.2e-16      
+##                                          
+##                   Kappa : 0.9            
+##                                          
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.8667
+## Specificity                 1.0000            0.9333           0.9667
+## Pos Pred Value              1.0000            0.8750           0.9286
+## Neg Pred Value              1.0000            0.9655           0.9355
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.2889
+## Detection Prevalence        0.3333            0.3556           0.3111
+## Balanced Accuracy           1.0000            0.9333           0.9167
 ```
 
-can get class "centers"
+in order to get the variable importance, you need to specifiy importance within the building of the forest:
 
 ```r
-irisP <- classCenter(training[,c(3,4)], 
-                     training$Species, 
-                     modFit$finalModel$prox)
-irisP <- as.data.frame(irisP)
-irisP$Species <- rownames(irisP)
+modFit.VI <- caret::train(Species ~ ., 
+                data=iris.train, 
+                importance = "permutation",
+                method="ranger")
 
-ggplot(training, aes(x=Petal.Width, y=Petal.Length, col=Species)) + 
-    geom_point(size=5, shape=4)
+importance(modFit.VI$finalModel)
+```
+
+```
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##  0.012977001 -0.002459179  0.272617405  0.359246614
+```
+
+plot both the given labels as well as the predicted labels
+
+```r
+iris.test <- iris.test %>%
+    mutate(testSpecies = predict(modFit, iris.test))
+
+ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length, 
+                      shape = Species, col = testSpecies)) + 
+    geom_point(size=3)
 ```
 
 <img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
 
-testing predictions
 
-```r
-pred <- predict(modFit, testing)
-testing$predRight <- pred == testing$Species
-table(pred, testing$Species)
-```
-
-```
-##             
-## pred         setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         2
-##   virginica       0          1        13
-```
-
-```r
-ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) + 
-    geom_point()
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
-
-```r
-# need a main label "new data Predictions"
-```
 
 
 
@@ -1236,7 +1244,7 @@ ggplot(testing, aes(x=Petal.Width, y=Petal.Length, color=predRight) ) +
 
 There are *soooooo* many choices we've made along the way.  The following list should make you realize that there is no **truth** with respect to any given model.  Every choice will (could) lead to a different model.
 
-|  $   $ 	| $   $	|
+|  $\mbox{  }$ 	| $\mbox{  }$	|
 |---------------------------------------------	|-------------------------------	|
 | * explanatory variable choice 	| * k (kNN) 	|
 | * number of explanatory variables 	| * distance measure 	|
