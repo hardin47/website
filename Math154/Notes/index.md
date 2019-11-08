@@ -39,7 +39,7 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 
 
 | Day    	| Topic     	|  Book Chap   	|   Notes Section |
-|:-------	|:------------|:---------:	|:--------------------	|
+|:-------	|:------------|:---------	|:--------------------	|
 | 9/3/19 	| Intro to Data / R | ISL1 | \@ref(intro) [intro],  \@ref(Sep3) [Sep3]|
 | 9/5/19	| Intro to GitHub |  |  \@ref(Sep5) [Sep5], \@ref(repro)  [repro] |
 | 9/10/19	| Data Viz| VST | \@ref(Sep10) [Sep10], \@ref(thoughts) [thoughts]  |

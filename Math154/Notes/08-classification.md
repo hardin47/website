@@ -504,15 +504,17 @@ and we seek the value of $j$ and $s$ that minimize the equation:
 #### Regression Trees
 
 
-The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $J$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_J$.  For every observation that falls into the region $R_J$, we make the same prediction - the mean of the response values for the training observations in $R_J$.  So how do we find the regions $R_1, \ldots, R_J$?
+The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $|T|$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_{|T|}$.  For every observation that falls into the region $R_m$, we make the same prediction - the mean of the response values for the training observations in $R_m$.  So how do we find the regions $R_1, \ldots, R_{|T|}$?
 
 
-$\Rightarrow$ Minimize RSS, $$RSS = \sum_{j=1}^J \sum_{i \in R_j} (y_i - \overline{y}_{R_j})^2$$
-where $\overline{y}_{R_j}$ is the mean response for the training observations within the $j$th region.
+$\Rightarrow$ Minimize RSS, $$RSS = \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2$$
+where $\overline{y}_{R_m}$ is the mean response for the training observations within the $m$th region.
 
 (Note:  in the chapter [@ISL] they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)
 
+<!--
 $$ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}$$
+-->
 
 Again, it is usually infeasible to consider every possible partition of the observations.  Instead of looking at all partitions, we perform a *top down* approach to the problem which is known as *recursive binary splitting*  (*greedy* because we look only at the current split and not at the outcomes of the splits to come).
 
@@ -1004,15 +1006,15 @@ How does it work?  Consider the following predictions for a silly toy data set o
 
 | obs 	| tree1 	| tree2 	| tree3 	| tree4 	| $\cdots$ 	| tree100 	| average 	|
 |:---:	|:-----:	|:-----:	|:-----:	|:-----:	|:--------:	|:-------:	|:---------------:	|
-| 1 	|  	| X 	| X 	|  	|  	|  	| $\sum(pred)/2$ 	|
-| 2 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1$ 	|
-| 3 	|  	|  	|  	| X 	|  	| X 	| $\sum(pred)/2$ 	|
-| 4 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1$ 	|
-| 5 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/1 $ 	|
-| 6 	|  	|  	| X 	|  	|  	| X 	| $\sum(pred)/2$ 	|
-| 7 	|  	|  	|  	|  	|  	| X 	| $\sum(pred)/1$ 	|
-| 8 	|  	|  	| X 	| X 	|  	| X 	| $\sum(pred)/3$ 	|
-| 9 	|  	|  	|  	| X 	|  	|  	| $\sum(pred)/1$ 	|
+| 1 	|  	| X 	| X 	|  	|  	|  	| $\sum(pred)/38$ 	|
+| 2 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/30$ 	|
+| 3 	|  	|  	|  	| X 	|  	| X 	| $\sum(pred)/33$ 	|
+| 4 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/32$ 	|
+| 5 	| X 	|  	|  	|  	|  	|  	| $\sum(pred)/39$ 	|
+| 6 	|  	|  	| X 	|  	|  	| X 	| $\sum(pred)/29$ 	|
+| 7 	|  	|  	|  	|  	|  	| X 	| $\sum(pred)/29$ 	|
+| 8 	|  	|  	| X 	| X 	|  	| X 	| $\sum(pred)/31$ 	|
+| 9 	|  	|  	|  	| X 	|  	|  	| $\sum(pred)/36$ 	|
 
 Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 
@@ -1061,9 +1063,10 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
 * Do *not* prune the tree.  Save the tree as is!
 
-3. For each tree grown on a bootstrap sample, predict the OOB samples.  For each tree grown, $~1/3$ of the training samples won't be in the bootstrap sample -- those are called out of bootstrap (OOB) samples.  OOB samples can be used as *test* data to estimate the error rate of the tree.
-4. Combine the OOB predictions to create the "out-of-bag" error rate (either majority vote or average of predictions / class probabilities).
-5. All trees together represent the model that is used for new predictions (either majority vote or average).
+3. Repeat steps 1-2 for many many trees.
+4. For each tree grown on a bootstrap sample, predict the OOB samples.  For each tree grown, $~1/3$ of the training samples won't be in the bootstrap sample -- those are called out of bootstrap (OOB) samples.  OOB samples can be used as *test* data to estimate the error rate of the tree.
+5. Combine the OOB predictions to create the "out-of-bag" error rate (either majority vote or average of predictions / class probabilities).
+6. All trees together represent the *model* that is used for new predictions (either majority vote or average).
 
 ******
 
