@@ -1121,7 +1121,7 @@ If the number of variables is very large, forests can be run once with all the v
 
 ### R RF Example
 
-("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
+("impurity" is defined as RSS for regression trees and deviance for classification trees).  
 
 `method= 'ranger' ` is about a zillion times faster than `method = 'randomForest'` or  `method = 'rf'`, but they all do the work.
 
@@ -1210,7 +1210,86 @@ caret::confusionMatrix(data=predict(modFit, newdata = iris.test),
 ## Balanced Accuracy           1.0000            0.9333           0.9167
 ```
 
-in order to get the variable importance, you need to specifiy importance within the building of the forest:
+
+#### Parameters...  `mtry` and `ntrees`
+
+Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
+
+
+```r
+modFit.m <- caret::train(Species ~ ., 
+                data=iris.train, 
+                method="ranger", 
+                trControl = trainControl(method="oob"),
+                num.trees = 500,
+                tuneGrid= data.frame(mtry=1:4, splitrule = "gini",
+                                     min.node.size = 5))
+modFit.m
+```
+
+```
+## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##   1     0.9428571  0.9142857
+##   2     0.9523810  0.9285714
+##   3     0.9523810  0.9285714
+##   4     0.9523810  0.9285714
+## 
+## Tuning parameter 'splitrule' was held constant at a value of gini
+## 
+## Tuning parameter 'min.node.size' was held constant at a value of 5
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were mtry = 2, splitrule = gini
+##  and min.node.size = 5.
+```
+
+```r
+plot(modFit.m)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+
+```r
+set.seed(47)
+
+acc.ntree = c()
+for(i in seq(10, 260, by = 50)){
+modFit.ntree <- caret::train(Species ~ ., 
+                data=iris.train, 
+                method="ranger", 
+                trControl = trainControl(method="oob"),
+                num.trees = i,
+                tuneGrid= data.frame(mtry=3, splitrule = "gini",
+                                     min.node.size = 5))
+
+acc.ntree <- c(acc.ntree, modFit.ntree$finalModel$prediction.error)
+}
+
+data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
+    ggplot( aes(x=ntree, y = acc.ntree)) + geom_line() +
+    xlab("number of trees in the RF") +
+    ylab("OOB Accuracy") +
+    ylim(c(0.04, 0.06))
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+
+####  Variable Importance {-}
+
+In order to get the variable importance, you need to specifiy importance within the building of the forest.
+
+See if you can figure out every single line of the `ggplot` code.
 
 ```r
 modFit.VI <- caret::train(Species ~ ., 
@@ -1218,13 +1297,24 @@ modFit.VI <- caret::train(Species ~ .,
                 importance = "permutation",
                 method="ranger")
 
-importance(modFit.VI$finalModel)
+ranger::importance(modFit.VI$finalModel)
 ```
 
 ```
 ## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.012977001 -0.002459179  0.272617405  0.359246614
+##  0.026859630  0.006130369  0.297439677  0.323197349
 ```
+
+```r
+data.frame(importance = modFit.VI$finalModel$variable.importance,
+           variables = names(modFit.VI$finalModel$variable.importance)) %>% 
+    ggplot(aes(x = reorder(variables, importance), y = importance)) +
+    geom_bar(stat = "identity") + 
+    xlab("Variable") + 
+    coord_flip() 
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
 plot both the given labels as well as the predicted labels
 
@@ -1237,7 +1327,7 @@ ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length,
     geom_point(size=3)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
 
 
 

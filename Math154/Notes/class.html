@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-11-07" />
+<meta name="date" content="2019-11-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1366,7 +1366,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 </div>
 <div id="r-rf-example" class="section level3">
 <h3><span class="header-section-number">8.9.2</span> R RF Example</h3>
-<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees). In R see <code>importance</code> within the <code>randomForest</code> function, and then <code>varImpPlot</code> to plot.</p>
+<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees).</p>
 <p><code>method= 'ranger'</code> is about a zillion times faster than <code>method = 'randomForest'</code> or <code>method = 'rf'</code>, but they all do the work.</p>
 <div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb482-1" data-line-number="1"><span class="kw">data</span>(iris)</a>
 <a class="sourceLine" id="cb482-2" data-line-number="2"><span class="kw">library</span>(tidyverse)</a>
@@ -1436,23 +1436,90 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 ## Detection Rate              0.3333            0.3111           0.2889
 ## Detection Prevalence        0.3333            0.3556           0.3111
 ## Balanced Accuracy           1.0000            0.9333           0.9167</code></pre>
-<p>in order to get the variable importance, you need to specifiy importance within the building of the forest:</p>
-<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb487-1" data-line-number="1">modFit.VI &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<div id="parameters-mtry-and-ntrees" class="section level4">
+<h4><span class="header-section-number">8.9.2.1</span> Parameters… <code>mtry</code> and <code>ntrees</code></h4>
+<p>Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests). Hopefully the code below will help for other problems where Random Forests are more appropriate.</p>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb487-1" data-line-number="1">modFit.m &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
 <a class="sourceLine" id="cb487-2" data-line-number="2">                <span class="dt">data=</span>iris.train, </a>
-<a class="sourceLine" id="cb487-3" data-line-number="3">                <span class="dt">importance =</span> <span class="st">&quot;permutation&quot;</span>,</a>
-<a class="sourceLine" id="cb487-4" data-line-number="4">                <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>)</a>
-<a class="sourceLine" id="cb487-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb487-6" data-line-number="6"><span class="kw">importance</span>(modFit.VI<span class="op">$</span>finalModel)</a></code></pre></div>
-<pre><code>## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.012977001 -0.002459179  0.272617405  0.359246614</code></pre>
-<p>plot both the given labels as well as the predicted labels</p>
-<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb489-1" data-line-number="1">iris.test &lt;-<span class="st"> </span>iris.test <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb489-2" data-line-number="2"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">testSpecies =</span> <span class="kw">predict</span>(modFit, iris.test))</a>
-<a class="sourceLine" id="cb489-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb489-4" data-line-number="4"><span class="kw">ggplot</span>(iris.test, <span class="kw">aes</span>(<span class="dt">x=</span>Petal.Width, <span class="dt">y=</span>Petal.Length, </a>
-<a class="sourceLine" id="cb489-5" data-line-number="5">                      <span class="dt">shape =</span> Species, <span class="dt">col =</span> testSpecies)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb489-6" data-line-number="6"><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">3</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb487-3" data-line-number="3">                <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>, </a>
+<a class="sourceLine" id="cb487-4" data-line-number="4">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;oob&quot;</span>),</a>
+<a class="sourceLine" id="cb487-5" data-line-number="5">                <span class="dt">num.trees =</span> <span class="dv">500</span>,</a>
+<a class="sourceLine" id="cb487-6" data-line-number="6">                <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">mtry=</span><span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">splitrule =</span> <span class="st">&quot;gini&quot;</span>,</a>
+<a class="sourceLine" id="cb487-7" data-line-number="7">                                     <span class="dt">min.node.size =</span> <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb487-8" data-line-number="8">modFit.m</a></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: &#39;setosa&#39;, &#39;versicolor&#39;, &#39;virginica&#39; 
+## 
+## No pre-processing
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##   1     0.9428571  0.9142857
+##   2     0.9523810  0.9285714
+##   3     0.9523810  0.9285714
+##   4     0.9523810  0.9285714
+## 
+## Tuning parameter &#39;splitrule&#39; was held constant at a value of gini
+## 
+## Tuning parameter &#39;min.node.size&#39; was held constant at a value of 5
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were mtry = 2, splitrule = gini
+##  and min.node.size = 5.</code></pre>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb489-1" data-line-number="1"><span class="kw">plot</span>(modFit.m)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb490-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">47</span>)</a>
+<a class="sourceLine" id="cb490-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb490-3" data-line-number="3">acc.ntree =<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb490-4" data-line-number="4"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq</span>(<span class="dv">10</span>, <span class="dv">260</span>, <span class="dt">by =</span> <span class="dv">50</span>)){</a>
+<a class="sourceLine" id="cb490-5" data-line-number="5">modFit.ntree &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb490-6" data-line-number="6">                <span class="dt">data=</span>iris.train, </a>
+<a class="sourceLine" id="cb490-7" data-line-number="7">                <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>, </a>
+<a class="sourceLine" id="cb490-8" data-line-number="8">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;oob&quot;</span>),</a>
+<a class="sourceLine" id="cb490-9" data-line-number="9">                <span class="dt">num.trees =</span> i,</a>
+<a class="sourceLine" id="cb490-10" data-line-number="10">                <span class="dt">tuneGrid=</span> <span class="kw">data.frame</span>(<span class="dt">mtry=</span><span class="dv">3</span>, <span class="dt">splitrule =</span> <span class="st">&quot;gini&quot;</span>,</a>
+<a class="sourceLine" id="cb490-11" data-line-number="11">                                     <span class="dt">min.node.size =</span> <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb490-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb490-13" data-line-number="13">acc.ntree &lt;-<span class="st"> </span><span class="kw">c</span>(acc.ntree, modFit.ntree<span class="op">$</span>finalModel<span class="op">$</span>prediction.error)</a>
+<a class="sourceLine" id="cb490-14" data-line-number="14">}</a>
+<a class="sourceLine" id="cb490-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb490-16" data-line-number="16"><span class="kw">data.frame</span>( <span class="dt">ntree =</span> <span class="kw">seq</span>(<span class="dv">10</span>, <span class="dv">260</span>, <span class="dt">by =</span> <span class="dv">50</span>), acc.ntree) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb490-17" data-line-number="17"><span class="st">    </span><span class="kw">ggplot</span>( <span class="kw">aes</span>(<span class="dt">x=</span>ntree, <span class="dt">y =</span> acc.ntree)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb490-18" data-line-number="18"><span class="st">    </span><span class="kw">xlab</span>(<span class="st">&quot;number of trees in the RF&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb490-19" data-line-number="19"><span class="st">    </span><span class="kw">ylab</span>(<span class="st">&quot;OOB Accuracy&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb490-20" data-line-number="20"><span class="st">    </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="fl">0.04</span>, <span class="fl">0.06</span>))</a></code></pre></div>
 <p><img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="variable-importance-1" class="section level4 unnumbered">
+<h4>Variable Importance</h4>
+<p>In order to get the variable importance, you need to specifiy importance within the building of the forest.</p>
+<p>See if you can figure out every single line of the <code>ggplot</code> code.</p>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb491-1" data-line-number="1">modFit.VI &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>., </a>
+<a class="sourceLine" id="cb491-2" data-line-number="2">                <span class="dt">data=</span>iris.train, </a>
+<a class="sourceLine" id="cb491-3" data-line-number="3">                <span class="dt">importance =</span> <span class="st">&quot;permutation&quot;</span>,</a>
+<a class="sourceLine" id="cb491-4" data-line-number="4">                <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>)</a>
+<a class="sourceLine" id="cb491-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb491-6" data-line-number="6">ranger<span class="op">::</span><span class="kw">importance</span>(modFit.VI<span class="op">$</span>finalModel)</a></code></pre></div>
+<pre><code>## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##  0.026859630  0.006130369  0.297439677  0.323197349</code></pre>
+<div class="sourceCode" id="cb493"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb493-1" data-line-number="1"><span class="kw">data.frame</span>(<span class="dt">importance =</span> modFit.VI<span class="op">$</span>finalModel<span class="op">$</span>variable.importance,</a>
+<a class="sourceLine" id="cb493-2" data-line-number="2">           <span class="dt">variables =</span> <span class="kw">names</span>(modFit.VI<span class="op">$</span>finalModel<span class="op">$</span>variable.importance)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb493-3" data-line-number="3"><span class="st">    </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">reorder</span>(variables, importance), <span class="dt">y =</span> importance)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb493-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb493-5" data-line-number="5"><span class="st">    </span><span class="kw">xlab</span>(<span class="st">&quot;Variable&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb493-6" data-line-number="6"><span class="st">    </span><span class="kw">coord_flip</span>() </a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>plot both the given labels as well as the predicted labels</p>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb494-1" data-line-number="1">iris.test &lt;-<span class="st"> </span>iris.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb494-2" data-line-number="2"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">testSpecies =</span> <span class="kw">predict</span>(modFit, iris.test))</a>
+<a class="sourceLine" id="cb494-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb494-4" data-line-number="4"><span class="kw">ggplot</span>(iris.test, <span class="kw">aes</span>(<span class="dt">x=</span>Petal.Width, <span class="dt">y=</span>Petal.Length, </a>
+<a class="sourceLine" id="cb494-5" data-line-number="5">                      <span class="dt">shape =</span> Species, <span class="dt">col =</span> testSpecies)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb494-6" data-line-number="6"><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">3</span>)</a></code></pre></div>
+<p><img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 </div>
 <div id="model-choices" class="section level2">

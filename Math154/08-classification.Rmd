@@ -44,7 +44,7 @@ Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets
 
 Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.
 
-Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **random forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
+Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **Random Forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
 
 **Simple is Better**  (From @field07, p. 87)
 
@@ -323,7 +323,7 @@ knitr::include_graphics("figs/ObamaClinton.jpg")
 
 **Shortcomings of CART:**
 
-* Straight CART do not generally have the same predictive accuracy as other classification approaches.  (we will improve the model - see random forests, boosting, bagging)
+* Straight CART do not generally have the same predictive accuracy as other classification approaches.  (we will improve the model - see Random Forests, boosting, bagging)
 * Difficult to write down / consider the CART "model"
 * Without proper pruning, the model can easily lead to overfitting
 * With lots of predictors, (even greedy) partitioning can become computationally unwieldy
@@ -759,10 +759,10 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 
 **Strengths of Random Forests:**
 
-* refinement of bagged trees; quite popular  (random forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
-* subset of predictors makes random forests *much faster* to search through than all predictors
+* refinement of bagged trees; quite popular  (Random Forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
+* subset of predictors makes Random Forests *much faster* to search through than all predictors
 * creates a diverse set of trees that can be built.  Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.
-* random forests are quite accurate
+* Random Forests are quite accurate
 * generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
 
 > "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
@@ -777,7 +777,7 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 1. Bootstrap sample from the training set.
 2. Grow an un-pruned tree on this bootstrap sample.
 * *At each split*, select $m$ variables and determine the best split using only these predictors.
-Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
+Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random Forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
 * Do *not* prune the tree.  Save the tree as is!
 
 3. Repeat steps 1-2 for many many trees.
@@ -789,15 +789,15 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 
 
-```{r fig.cap = "Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a random forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf", out.width='100%', fig.align='center', echo=FALSE}
+```{r fig.cap = "Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf", out.width='100%', fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/zissermanRF.jpg")
 ```
 
-**Notes on random forests:**
+**Notes on Random Forests:**
 
 * Bagging alone uses the full set of predictors to determine every tree  (it is the observations that are bootstrapped).  Random Forests use a subset of predictors.
 * Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction.  We average (or majority vote) the predictions to get one prediction for the observation at hand.
-* Bagging is a special case of random forest where $m=k$.
+* Bagging is a special case of Random Forest where $m=k$.
 * generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
 
 > "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
@@ -837,7 +837,7 @@ If the number of variables is very large, forests can be run once with all the v
 
 ### R RF Example
 
-("impurity" is defined as RSS for regression trees and deviance for classification trees).  In R see `importance` within the `randomForest` function, and then `varImpPlot` to plot.
+("impurity" is defined as RSS for regression trees and deviance for classification trees).  
 
 `method= 'ranger' ` is about a zillion times faster than `method = 'randomForest'` or  `method = 'rf'`, but they all do the work.
 
@@ -863,14 +863,68 @@ caret::confusionMatrix(data=predict(modFit, newdata = iris.test),
                 reference = iris.test$Species)
 ```
 
-in order to get the variable importance, you need to specifiy importance within the building of the forest:
+
+#### Parameters...  `mtry` and `ntrees`
+
+Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
+
+```{r}
+modFit.m <- caret::train(Species ~ ., 
+                data=iris.train, 
+                method="ranger", 
+                trControl = trainControl(method="oob"),
+                num.trees = 500,
+                tuneGrid= data.frame(mtry=1:4, splitrule = "gini",
+                                     min.node.size = 5))
+modFit.m
+plot(modFit.m)
+```
+
+
+
+```{r}
+set.seed(47)
+
+acc.ntree = c()
+for(i in seq(10, 260, by = 50)){
+modFit.ntree <- caret::train(Species ~ ., 
+                data=iris.train, 
+                method="ranger", 
+                trControl = trainControl(method="oob"),
+                num.trees = i,
+                tuneGrid= data.frame(mtry=3, splitrule = "gini",
+                                     min.node.size = 5))
+
+acc.ntree <- c(acc.ntree, modFit.ntree$finalModel$prediction.error)
+}
+
+data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
+    ggplot( aes(x=ntree, y = acc.ntree)) + geom_line() +
+    xlab("number of trees in the RF") +
+    ylab("OOB Accuracy") +
+    ylim(c(0.04, 0.06))
+
+```
+
+####  Variable Importance {-}
+
+In order to get the variable importance, you need to specifiy importance within the building of the forest.
+
+See if you can figure out every single line of the `ggplot` code.
 ```{r}
 modFit.VI <- caret::train(Species ~ ., 
                 data=iris.train, 
                 importance = "permutation",
                 method="ranger")
 
-importance(modFit.VI$finalModel)
+ranger::importance(modFit.VI$finalModel)
+
+data.frame(importance = modFit.VI$finalModel$variable.importance,
+           variables = names(modFit.VI$finalModel$variable.importance)) %>% 
+    ggplot(aes(x = reorder(variables, importance), y = importance)) +
+    geom_bar(stat = "identity") + 
+    xlab("Variable") + 
+    coord_flip() 
 ```
 
 plot both the given labels as well as the predicted labels
