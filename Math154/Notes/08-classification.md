@@ -179,6 +179,7 @@ Note: if the response variable is continuous (instead of categorical), find the 
 
 
 **Shortcomings of $k$-NN**:
+
 * one class can dominate if it has a large majority
 * Euclidean distance is dominated by scale
 * it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
@@ -186,6 +187,7 @@ Note: if the response variable is continuous (instead of categorical), find the 
 
 
 **Strengths of $k$-NN**:
+
 * it can easily work for any number of categories
 * it can predict a quantitative response variable
 * the bias of 1-NN is often low (but the variance is high)
@@ -956,6 +958,25 @@ The tree based models given by CART are easy to understand and implement, but th
 
 <p style = "color:red">Recall that the variance of the sample mean is variance / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
 
+### Bagging algorithm
+
+******
+**Algorithm**:  Bagging Forest
+
+******
+1. Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
+2. Build a tree on each new set of $N'$ training observations.
+3. Average (regression) or majority vote (classification).
+4. Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
+
+
+******
+
+\begin{align}
+P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
+\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
+\end{align} 
+
 
 **Shortcomings of Bagging:**
 
@@ -972,18 +993,6 @@ The tree based models given by CART are easy to understand and implement, but th
 * Data transformations may be less important (monotone transformations on the explanatory variables won't change anything).
 <p style = "color:red">*Similar bias* to CART, but *reduced variance*</p> (can be proved).
 
-
-
-Basic Idea:
-
-* Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
-* Build a tree on each new set of $N'$ training observations.
-* Average (regression) or majority vote (classification).
-* Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
-\begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
-\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
-\end{align} 
 
 
 **Notes on bagging:**
@@ -1034,20 +1043,6 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 
 Random Forests are an extension to bagging for regression trees (note: bagging can be done on any prediction method).  Again, with the idea of infusing extra variability and then averaging over that variability, RFs use a *subset* of predictor variables at every node in the tree.
 
-**Shortcomings of Random Forests:**
-
-* Model is even harder to "write-down" (than CART)
-* With lots of predictors, (even greedy) partitioning can become computationally unwieldy  - now computational task is even harder! ...  bagging the observations and
-
-
-**Strengths of Random Forests:**
-
-* refinement of bagged trees; quite popular  (Random Forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
-* subset of predictors makes Random Forests *much faster* to search through than all predictors
-* creates a diverse set of trees that can be built.  Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.
-* Random Forests are quite accurate
-* generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
-
 > "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
 
 
@@ -1076,6 +1071,22 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-21)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
+
+**Shortcomings of Random Forests:**
+
+* Model is even harder to "write-down" (than CART)
+* With lots of predictors, (even greedy) partitioning can become computationally unwieldy  - now computational task is even harder! ...  bagging the observations and
+
+
+**Strengths of Random Forests:**
+
+* refinement of bagged trees; quite popular  (Random Forests tries to improve on bagging by "de-correlating" the trees. Each tree has the same expectation, but the average will again reduce the variability.)
+* subset of predictors makes Random Forests *much faster* to search through than all predictors
+* creates a diverse set of trees that can be built.  Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.
+* Random Forests are quite accurate
+* generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
+
+
 
 **Notes on Random Forests:**
 
@@ -1380,6 +1391,8 @@ Vladimir Vapnik (b. 1936) created SVMs in the late 1990s.   History: he actually
 
 The basic idea of SVMs is to figure out a way to create really complicated decision boundaries.  We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative).  The decision rule has to do with a dot product of the new sample with a vector ${\bf w}$ which is perpendicular to the median of the "street."
 
+Note: the standard formulation of SVM requires the computer to find dot products between each of the observations.  In order to do so, the explanatory variables must be numeric.  In order for the dot products to be meaningful, the data must be on the same scale.
+
 
 #### Linear Separator {#linsvm}
 
@@ -1398,7 +1411,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 #### Aside: what is a dot product? {-}
 
-Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)^t$ be two vectors which live in $\mathds{R}^p$.  Then their dot product is defined as:
+Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)^t$ be two vectors which live in $R^p$.  Then their dot product is defined as:
 \begin{align}
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
 \end{align}
@@ -1415,21 +1428,19 @@ The "width" of the street will be a vector which is perpendicular to the street 
 
 [Keep in mind that ${\bf u} \cdot {\bf w} = ||{\bf w}|| \times$(the length of the shadow).  That is, the projection will only be the length of the shadow if ${\bf w}$ is a unit vector.  And we aren't going to constrain ${\bf w}$ to be unit vector (though we could!).  But regardless, ${\bf u} \cdot {\bf w}$ still gives the ability to classify because it is proportional to the length of the shadow.]
 
-\begin{center}
-\framebox{
-\parbox[t][1cm]{9cm}{
-%\addspace{0.2cm}
-Decision rule:\\
-if ${\bf w} \cdot {\bf u} + b \geq 0$ then label the new sample "positive"
-}}\\
-\end{center}
+
+>Decision rule:
+>if ${\bf w} \cdot {\bf u} + b \geq 0$ then label the new sample "positive"
+
+
 where ${\bf w}$ is created in such a way that it is perpendicular to the median of the street.  Then the unknown (${\bf u}$) vector is projected onto ${\bf w}$ to see if it is on the left or the right side of the street.
 
 But we don't know the values in the decision rule!  We need more constraints.  Assuming that the data are linearly separable, as an initial step to find ${\bf w}$ and $b$, for all positive samples ($x_+$) and all negative samples ($x_-$) force:
 \begin{align}
-{\bf w} \cdot {\bf x}_+ + b &\geq 1 \label{posconstr}\\
-{\bf w} \cdot {\bf x}_- + b &\leq -1 \label{negconstr}
+{\bf w} \cdot {\bf x}_+ + b &\geq 1 (\#eq:posconstr)\\
+{\bf w} \cdot {\bf x}_- + b &\leq -1 (\#eq:negconstr)
 \end{align}
+
 
 For mathematical convenience (so that we don't have 2 equations hanging around), introduce $y_i$ such that
 \begin{align}
@@ -1438,19 +1449,14 @@ y_i &= -1 \mbox{ for negative samples}
 \end{align}
 
 Which simplifies the criteria for finding ${\bf w}$ and $b$ to be:
-$$ y_i({\bf w} \cdot {\bf x}_i** + b) \geq 1$$
-(Multiplying through by -1 on equation (\ref{negconstr}) switches the signs, and both equation (\ref{posconstr}) and (\ref{negconstr}) end up as the same for both types of points.)
+$$ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1$$
+(Multiplying through by -1 on equation (\@ref(eq:negconstr) switches the signs, and both equation (\@ref(eq:posconstr)) and (\@ref(eq:negconstr) end up as the same for both types of points.)
 
 
 Again, working toward solving for ${\bf w}$ and $b$, add the additional constraint that for the points in the gutter (on the margin lines):
-\begin{center}
-\framebox{
-\parbox[t][1.5cm]{6cm}{
-%\addspace{0.2cm}
-For $x_i$ in the gutter (by definition):\\
-$$y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0$$
-}}\\
-\end{center}
+
+> For $x_i$ in the gutter (by definition):
+>$$y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0$$
 
 Now consider two particular positive and negative values that live on the margin (gutter).  The difference is almost the width of the street (we want to find the street that is as *wide as possible*), but it is at the wrong angle  (see street picture again).  Remember, our goal here is to **find the street separating the pluses and the minuses is as wide as possible.**  If we had a unit vector, we could dot it with $(x_+ - x_-)$ to get the width of the street!
 
@@ -1462,18 +1468,18 @@ which doesn't do us much good yet.
 
 <img src="figs/width.jpg" width="100%" style="display: block; margin: auto;" />
 
-Goal: <p style="color:red">Try to find as wide a street as possible.</p>  But remember, the gutter points are constrained: it turns out that  $x_+ \cdot {\bf w} = 1 - b$ and $x_- \cdot {\bf w} = -1 - b$. Therefore:
+<p style="color:red">Goal: Try to find as wide a street as possible.</p>  But remember, the gutter points are constrained: it turns out that  $x_+ \cdot {\bf w} = 1 - b$ and $x_- \cdot {\bf w} = -1 - b$. Therefore:
 
 \begin{align}
 width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||} = \frac{(1-b) - (-1-b)}{|| {\bf w} ||} = \frac{2}{||w||}
 \end{align}
 
-In order to maximize $\frac{2}{||w||}$, minimize $||w||$. Or <p style="color:red">minimize $(1/2)*||w||^2$ </p> (to make it mathematically easier).   We have all the pieces of making the decision rules as an optimization problem.  That is, minimize some quantity subject to the constraints given by the problem.
+In order to maximize $\frac{2}{||w||}$, minimize $||w||$, or <center><p style="color:red">minimize $(1/2)*||w||^2$ </p></center> (to make it mathematically easier).   We have all the pieces of making the decision rules as an optimization problem.  That is, minimize some quantity subject to the constraints given by the problem.
 
 #### Lagrange multipliers {-}
 Recall, with Lagrange multipliers, the first part is the optimization, the second part is the constraint.  The point of Lagrange multipliers is to put together the constraint and the optimization into one equation where you don't worry about the constraints any longer.
 
-L consists of two parts.  The first is the thing to minimize.  The second is the set of constraints (here, the summation over all the constraints).  Each constraint has a multiplier $\alpha_i$, the non-zero $\alpha_i$ will be the ones connected to the values on the gutter.
+$L$ consists of two parts.  The first is the thing to minimize.  The second is the set of constraints (here, the summation over all the constraints).  Each constraint has a multiplier $\alpha_i$, the non-zero $\alpha_i$ will be the ones connected to the values on the gutter.
 
 \begin{align}
 L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1]
@@ -1486,14 +1492,10 @@ Find derivatives, set them equal to zero.  Note that we can differentiate with r
 \frac{\partial L}{\partial b} &= -\sum \alpha_i y_i = 0\\
 \end{align}
 
-\begin{center}
-\framebox{
-\parbox[t][2cm]{10cm}{
-%\addspace{0.2cm}
-It turns out that ${\bf w}$ is a linear sum of data vectors, either all of them or some of them (it turns out that for some $i$, $\alpha_i=0$):\\
-$${\bf w} = \sum \alpha_i  y_i  {\bf x}_i$$
-}}\\
-\end{center}
+
+> It turns out that ${\bf w}$ is a linear sum of data vectors, either all of them or some of them (it turns out that for some $i$, $\alpha_i=0$):
+> $${\bf w} = \sum \alpha_i  y_i  {\bf x}_i$$
+
 
 Use the value of ${\bf w}$ to plug back into $L$ to maximize.
 
@@ -1504,25 +1506,15 @@ L &= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf 
 &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
 \end{align}
 
-\begin{center}
-\framebox{
-\parbox[t][2cm]{10cm}{
-%\addspace{0.2cm}
-Find the minimum of this expression:\\
-$$L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j$$
-}}\\
-\end{center}
+> Find the minimum of this expression:
+> $$L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j$$
 
-The computer / numerical analyst is going to solve L for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, <p style="color:red">the optimization depends only on the dot product of pairs of samples</p>.  And the decision rule *also* depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  {\bf w} \cdot {\bf x}_i$, because $y_i = 1/y_i$.]
 
-\begin{center}
-\framebox{
-\parbox[t][1.5cm]{5cm}{
-%\addspace{0.2cm}
-Decision Rule, call positive if:\\
-$$\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0$$
-}}\\
-\end{center}
+The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, <center><p style="color:red">the optimization depends only on the dot product of pairs of samples</p></center>.  And the decision rule *also* depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  {\bf w} \cdot {\bf x}_i$, because $y_i = 1/y_i$.]
+
+> Decision Rule, call positive if:
+> $$\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0$$
+
 
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
@@ -1540,49 +1532,39 @@ Note that we have a convex space (can be proved), and so we can't get stuck in a
 
 #### Transformations
 
-Simultaneously,  <p style="color:red">the data can be transformed into a new space where the data **are** linearly separable.</p>   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
+Simultaneously,  <center><p style="color:red">the data can be transformed into a new space where the data **are** linearly separable.</p></center>   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
 
 Consider the case with a circle on the plane.  The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable.  Two great videos: https://www.youtube.com/watch?v=3liCbRZPrZA and https://www.youtube.com/watch?v=9NrALgHFwTo .
 
 Within the transformed space, the minimization procedure will amount to minimizing the following:
 
-\begin{center}
-\framebox{
-\parbox[t][3cm]{10cm}{
-%\addspace{0.2cm}
-We want the minimum of this expression:\\
-\begin{align}
+> We want the minimum of this expression:
+> \begin{align}
 L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\bf x}_i) \cdot  \phi({\bf x}_j)\\
  &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j K({\bf x}_i, {\bf x}_j)
  \end{align}
-}}\\
-\end{center}
 
-Leading to a decision rule of:
-\begin{center}
-\framebox{
-\parbox[t][2.5cm]{5cm}{
-%\addspace{0.2cm}
-Decision Rule, call positive if:\\
-\begin{align}
+
+
+> Decision Rule, call positive if:
+> \begin{align}
 \sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b &\geq& 0\\
 \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
 \end{align}
-}}\\
-\end{center}
+
 
 ##### Kernel Examples: {-}
 
 * **Kernel 1**
 
-Consider the following transformation, $\phi: \mathds{R}^2 \rightarrow \mathds{R}^3$:
+Consider the following transformation, $\phi: R^2 \rightarrow R^3$:
 \begin{align}
 \phi({\bf x}) &= (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
 K({\bf x}, {\bf y}) &= \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
 &= (x_1y_1 + x_2y_2)^2\\
 K({\bf x}, {\bf y}) &= ({\bf x} \cdot {\bf y})^2
 \end{align}
-Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.\\
+Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.
 
 
 * **Kernel 2**
@@ -1639,6 +1621,7 @@ Note, here $\gamma, r, d$ must be tuned using cross validation (along with the p
 The radial basis function is also called the Gaussian kernel because of its similarity to the Gaussian distribution (aka the normal distribution).  Because the RBF maps to infinite dimensional space, it can easily over fit the training data.  Care must be taken to estimate $\gamma$.
 $$K_{RBF}({\bf x}, {\bf y}) = \exp( - \gamma ||{\bf x} -  {\bf y}||^2) = \phi_{RBF}({\bf x}) \cdot \phi_{RBF}({\bf y})$$
 Note, here $\gamma$ must be tuned using cross validation (along with the penalty parameter $C$).
+
 * **sigmoid**
 The sigmoid kernel is not a valid kernel method for all values of $\gamma$ and $r$ [which means that for certain parameter values, the $\phi()$ function may not exist].
 $$K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x}) \cdot \phi_S({\bf y})$$
@@ -1648,7 +1631,7 @@ Note, here $\gamma, r$ must be tuned using cross validation (along with the pena
 #### Soft Margins
 
 But what if the data aren't linearly separable?  The optimization problem can be changed to allow for points to be on the other side of the margin.  The optimization problem is slightly more complicated, but basically the same idea:
-$$ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
+$$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
 
 
 <div class="figure" style="text-align: center">
@@ -1658,16 +1641,11 @@ $$ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n,
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
 
-\begin{center}
-\framebox{
-\parbox[t][3.5cm]{5cm}{
-%\addspace{0.2cm}
-Minimize (for ${\bf w}$, $\xi_i$, $b$):
-$$\frac{1}{2} ||{\bf w}||^2 + C \sum_{i=1}^n \xi_i$$
+> Minimize (for ${\bf w}$, $\xi_i$, $b$):
+> $$\frac{1}{2} ||{\bf w}||^2 + C \sum_{i=1}^n \xi_i$$
 Subject to:
 $$y_i ({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i \ \ \ \ \xi_i \geq 0$$
-}}\\
-\end{center}
+
 
 Which leads to the following Lagrangian equation:
 \begin{align}
@@ -1675,7 +1653,7 @@ L = \frac{1}{2}||{\bf w}||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i ({\bf 
 \end{align}
 
 
-That is, the objective function now allows for a trade-off between a large margin and a small error penalty.  Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations.  The key here is that although quadratic programming can be used to solve for most of the parameters, <p style="color:red">$C$ is now a tuning parameter that needs to be set by the user or by cross validation.</p>
+That is, the objective function now allows for a trade-off between a large margin and a small error penalty.  Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations.  The key here is that although quadratic programming can be used to solve for most of the parameters, <center><p style="color:red">$C$ is now a tuning parameter that needs to be set by the user or by cross validation.</p></center>
 
 ##### How does $C$ relate to margins? {-}
 
@@ -1698,6 +1676,20 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 <p class="caption">(\#fig:unnamed-chunk-333)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
+
+### Support Vector Machine algorithm
+
+
+******
+**Algorithm**:   Support Vector Machine
+
+******
+1. Using cross validation, find values of $C, \gamma, d, r$, etc.  (and the kernel function!)
+2. Using Lagrange multipliers (read: the computer), solve for $\alpha_i$ and $b$.
+3.  Classify an unknown observation (${\bf u}$) as "positive" if:
+$$\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b  = \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b \geq 0$$
+
+******
 
 * **Shortcomings of Support Vector Machines:**
 
@@ -1723,16 +1715,6 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 * It is effective in cases where number of dimensions is greater than the number of samples.
 * It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
 
-\begin{algorithm}
-\caption{Algorithm for Support Vector Machines}
-\label{array-sum}
-\begin{algorithmic}[]
-\State 1.  Using cross validation, find values of $C, \gamma, d, r$, etc.  (and the kernel function!)
-\State 2.  Using Lagrange multipliers (read: the computer), solve for $\alpha_i$ and $b$.
-\State 3. Classify an unknown observation (${\bf u}$) as "positive" if:
-$$\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b  = \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b \geq 0$$
-\end{algorithmic}
-\end{algorithm}
 
 ### Classifying more than one group
 

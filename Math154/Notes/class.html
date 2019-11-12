@@ -280,7 +280,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8.6" data-path="class.html"><a href="class.html#Nov5"><i class="fa fa-check"></i><b>8.6</b> 11/5/19 Agenda</a></li>
 <li class="chapter" data-level="8.7" data-path="class.html"><a href="class.html#bagging"><i class="fa fa-check"></i><b>8.7</b> Bagging</a><ul>
-<li class="chapter" data-level="8.7.1" data-path="class.html"><a href="class.html#out-of-bag-oob-error-rate"><i class="fa fa-check"></i><b>8.7.1</b> Out Of Bag (OOB) error rate</a></li>
+<li class="chapter" data-level="8.7.1" data-path="class.html"><a href="class.html#bagging-algorithm"><i class="fa fa-check"></i><b>8.7.1</b> Bagging algorithm</a></li>
+<li class="chapter" data-level="8.7.2" data-path="class.html"><a href="class.html#out-of-bag-oob-error-rate"><i class="fa fa-check"></i><b>8.7.2</b> Out Of Bag (OOB) error rate</a></li>
 </ul></li>
 <li class="chapter" data-level="8.8" data-path="class.html"><a href="class.html#Nov7"><i class="fa fa-check"></i><b>8.8</b> 11/7/19 Agenda</a></li>
 <li class="chapter" data-level="8.9" data-path="class.html"><a href="class.html#rf"><i class="fa fa-check"></i><b>8.9</b> Random Forests</a><ul>
@@ -292,7 +293,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.12" data-path="class.html"><a href="class.html#support-vector-machines"><i class="fa fa-check"></i><b>8.12</b> Support Vector Machines</a></li>
 <li class="chapter" data-level="8.13" data-path="class.html"><a href="class.html#Nov14"><i class="fa fa-check"></i><b>8.13</b> 11/14/19 Agenda</a><ul>
 <li class="chapter" data-level="8.13.1" data-path="class.html"><a href="class.html#notlinsvm"><i class="fa fa-check"></i><b>8.13.1</b> Not Linearly Separable</a></li>
-<li class="chapter" data-level="8.13.2" data-path="class.html"><a href="class.html#classifying-more-than-one-group"><i class="fa fa-check"></i><b>8.13.2</b> Classifying more than one group</a></li>
+<li class="chapter" data-level="8.13.2" data-path="class.html"><a href="class.html#support-vector-machine-algorithm"><i class="fa fa-check"></i><b>8.13.2</b> Support Vector Machine algorithm</a></li>
+<li class="chapter" data-level="8.13.3" data-path="class.html"><a href="class.html#classifying-more-than-one-group"><i class="fa fa-check"></i><b>8.13.3</b> Classifying more than one group</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -491,19 +493,23 @@ Figure 1.4: Nested cross-validation: two cross-validation loops are run one insi
 <li><p>Using majority vote, find the dominate class of the <span class="math inline">\(k\)</span> closest points. Predict that class label to the test observation.</p></li>
 </ol>
 <p>Note: if the response variable is continuous (instead of categorical), find the average response variable of the <span class="math inline">\(k\)</span> training point to be the predicted response for the one test observation.</p>
-<p><strong>Shortcomings of <span class="math inline">\(k\)</span>-NN</strong>:
-* one class can dominate if it has a large majority
-* Euclidean distance is dominated by scale
-* it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
-* the output doesn’t provide any information about which explanatory variables are informative.</p>
-<p><strong>Strengths of <span class="math inline">\(k\)</span>-NN</strong>:
-* it can easily work for any number of categories
-* it can predict a quantitative response variable
-* the bias of 1-NN is often low (but the variance is high)
-* any distance metric can be used (so the algorithm models the data appropriately)
-* the method is simple to implement / understand
-* model is nonparametric (no distributional assumptions on the data)
-* great model for imputing missing data</p>
+<p><strong>Shortcomings of <span class="math inline">\(k\)</span>-NN</strong>:</p>
+<ul>
+<li>one class can dominate if it has a large majority</li>
+<li>Euclidean distance is dominated by scale</li>
+<li>it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)</li>
+<li>the output doesn’t provide any information about which explanatory variables are informative.</li>
+</ul>
+<p><strong>Strengths of <span class="math inline">\(k\)</span>-NN</strong>:</p>
+<ul>
+<li>it can easily work for any number of categories</li>
+<li>it can predict a quantitative response variable</li>
+<li>the bias of 1-NN is often low (but the variance is high)</li>
+<li>any distance metric can be used (so the algorithm models the data appropriately)</li>
+<li>the method is simple to implement / understand</li>
+<li>model is nonparametric (no distributional assumptions on the data)</li>
+<li>great model for imputing missing data</li>
+</ul>
 <p><img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;" /><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="r-knn-example" class="section level3">
@@ -1122,6 +1128,22 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <p style="color:red">
 Recall that the variance of the sample mean is variance / n. So we’ve seen the idea that averaging an outcome gives reduced variability.
 </p>
+<div id="bagging-algorithm" class="section level3">
+<h3><span class="header-section-number">8.7.1</span> Bagging algorithm</h3>
+<hr />
+<p><strong>Algorithm</strong>: Bagging Forest</p>
+<hr />
+<ol style="list-style-type: decimal">
+<li>Resample <em>cases</em> (observational units, not variables) and recalculate predictions. Choose <span class="math inline">\(N&#39; \leq N\)</span> for the number of observations in the new training set through random sampling with replacement. Almost always we use <span class="math inline">\(N&#39; = N\)</span> for a full bootstrap.</li>
+<li>Build a tree on each new set of <span class="math inline">\(N&#39;\)</span> training observations.</li>
+<li>Average (regression) or majority vote (classification).</li>
+<li>Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.</li>
+</ol>
+<hr />
+<p><span class="math display">\[\begin{align}
+P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
+\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
+\end{align}\]</span></p>
 <p><strong>Shortcomings of Bagging:</strong></p>
 <ul>
 <li>Model is even harder to “write-down” (than CART)</li>
@@ -1139,17 +1161,6 @@ Recall that the variance of the sample mean is variance / n. So we’ve seen the
 </p>
 (can be proved).</li>
 </ul>
-<p>Basic Idea:</p>
-<ul>
-<li>Resample <em>cases</em> (observational units, not variables) and recalculate predictions. Choose <span class="math inline">\(N&#39; \leq N\)</span> for the number of observations in the new training set through random sampling with replacement. Almost always we use <span class="math inline">\(N&#39; = N\)</span> for a full bootstrap.</li>
-<li>Build a tree on each new set of <span class="math inline">\(N&#39;\)</span> training observations.</li>
-<li>Average (regression) or majority vote (classification).</li>
-<li>Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
-<span class="math display">\[\begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
-\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
-\end{align}\]</span></li>
-</ul>
 <p><strong>Notes on bagging:</strong></p>
 <ul>
 <li>Bagging alone uses the full set of predictors to determine every tree (it is the observations that are bootstrapped).</li>
@@ -1158,8 +1169,9 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{
 <li>Bagging can be done on <em>any</em> decision method (not just trees).</li>
 <li>No need to prune or CV trees. The reason is that averaging keeps us from overfitting a particular few observations (think of averages in other contexts: law of large numbers). Pruning wouldn’t be a bad thing to do in terms of fit, but it is unnecessary for good predictions (and would add a lot to the complexity of the algorithm).</li>
 </ul>
+</div>
 <div id="out-of-bag-oob-error-rate" class="section level3">
-<h3><span class="header-section-number">8.7.1</span> Out Of Bag (OOB) error rate</h3>
+<h3><span class="header-section-number">8.7.2</span> Out Of Bag (OOB) error rate</h3>
 <p>Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:</p>
 <ul>
 <li>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.</li>
@@ -1291,19 +1303,6 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{
 <div id="rf" class="section level2">
 <h2><span class="header-section-number">8.9</span> Random Forests</h2>
 <p>Random Forests are an extension to bagging for regression trees (note: bagging can be done on any prediction method). Again, with the idea of infusing extra variability and then averaging over that variability, RFs use a <em>subset</em> of predictor variables at every node in the tree.</p>
-<p><strong>Shortcomings of Random Forests:</strong></p>
-<ul>
-<li>Model is even harder to “write-down” (than CART)</li>
-<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy - now computational task is even harder! … bagging the observations and</li>
-</ul>
-<p><strong>Strengths of Random Forests:</strong></p>
-<ul>
-<li>refinement of bagged trees; quite popular (Random Forests tries to improve on bagging by “de-correlating” the trees. Each tree has the same expectation, but the average will again reduce the variability.)</li>
-<li>subset of predictors makes Random Forests <em>much faster</em> to search through than all predictors</li>
-<li>creates a diverse set of trees that can be built. Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.</li>
-<li>Random Forests are quite accurate</li>
-<li>generally, models do not overfit the data and CV is not needed. However, CV can be used to fit the tuning parameters (<span class="math inline">\(m\)</span>, node size, max number of nodes, etc.).</li>
-</ul>
 <blockquote>
 <p>“Random forests does not overfit. You can run as many trees as you want.” Brieman, <a href="http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm" class="uri">http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm</a></p>
 </blockquote>
@@ -1334,6 +1333,19 @@ Typically <span class="math inline">\(m = \sqrt{p}\)</span> or <span class="math
 Figure 8.1: Building multiple trees and then combining the outputs (predictions). Note that this image makes the choice to average the tree probabilities instead of using majority vote. Both are valid methods for creating a Random Forest prediction model. <a href="http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" class="uri">http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</a>
 </p>
 </div>
+<p><strong>Shortcomings of Random Forests:</strong></p>
+<ul>
+<li>Model is even harder to “write-down” (than CART)</li>
+<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy - now computational task is even harder! … bagging the observations and</li>
+</ul>
+<p><strong>Strengths of Random Forests:</strong></p>
+<ul>
+<li>refinement of bagged trees; quite popular (Random Forests tries to improve on bagging by “de-correlating” the trees. Each tree has the same expectation, but the average will again reduce the variability.)</li>
+<li>subset of predictors makes Random Forests <em>much faster</em> to search through than all predictors</li>
+<li>creates a diverse set of trees that can be built. Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.</li>
+<li>Random Forests are quite accurate</li>
+<li>generally, models do not overfit the data and CV is not needed. However, CV can be used to fit the tuning parameters (<span class="math inline">\(m\)</span>, node size, max number of nodes, etc.).</li>
+</ul>
 <p><strong>Notes on Random Forests:</strong></p>
 <ul>
 <li>Bagging alone uses the full set of predictors to determine every tree (it is the observations that are bootstrapped). Random Forests use a subset of predictors.</li>
@@ -1614,6 +1626,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <p>Support Vector Machines are one more algorithm for classification. As you’ll see, they have some excellent properties, but one important aspect to note is that they use only numeric predictor variables and only binary response variables (classify two groups).</p>
 <p>Vladimir Vapnik (b. 1936) created SVMs in the late 1990s. History: he actually did the work as his PhD in the early 60s in the Soviet Union. Someone from Bell Labs asked him to visit, and he ended up immigrating to the US. No one actually thought that SVMs would work, but he eventually (1995 - took 30 years between the idea and the implementation) bet a dinner on classifying handwriting via SVM (using a very simple kernel) versus neural networks and the rest is history.</p>
 <p>The basic idea of SVMs is to figure out a way to create really complicated decision boundaries. We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative). The decision rule has to do with a dot product of the new sample with a vector <span class="math inline">\({\bf w}\)</span> which is perpendicular to the median of the “street.”</p>
+<p>Note: the standard formulation of SVM requires the computer to find dot products between each of the observations. In order to do so, the explanatory variables must be numeric. In order for the dot products to be meaningful, the data must be on the same scale.</p>
 <div id="linsvm" class="section level4">
 <h4><span class="header-section-number">8.12.0.1</span> Linear Separator</h4>
 <p>Recall ideas of kNN and trees:</p>
@@ -1628,7 +1641,7 @@ Figure 8.2: The correct project of the observations can often produce a perfect 
 </div>
 <div id="aside-what-is-a-dot-product" class="section level4 unnumbered">
 <h4>Aside: what is a dot product?</h4>
-<p>Let <span class="math inline">\({\bf x} = (x_1, x_2, \ldots, x_p)^t\)</span> and <span class="math inline">\({\bf y} = (y_1, y_2, \ldots, y_p)^t\)</span> be two vectors which live in <span class="math inline">\(\mathds{R}^p\)</span>. Then their dot product is defined as:
+<p>Let <span class="math inline">\({\bf x} = (x_1, x_2, \ldots, x_p)^t\)</span> and <span class="math inline">\({\bf y} = (y_1, y_2, \ldots, y_p)^t\)</span> be two vectors which live in <span class="math inline">\(R^p\)</span>. Then their dot product is defined as:
 <span class="math display">\[\begin{align}
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
 \end{align}\]</span></p>
@@ -1641,12 +1654,15 @@ Figure 8.3: If <strong>w</strong> is known, then the projection of any new obser
 <p>How can the street be used to get a decision rule? All that is known is that <span class="math inline">\({\bf w}\)</span> is perpendicular to the street. We don’t yet know <span class="math inline">\({\bf w}\)</span> or <span class="math inline">\(b\)</span>.</p>
 <p>The “width” of the street will be a vector which is perpendicular to the street (median). We don’t know the width yet, but we know know that we can use that perpendicular vector (<span class="math inline">\({\bf w}\)</span>) to figure out how to classify the points. Project an unknown point (<span class="math inline">\({\bf u}\)</span>) onto <span class="math inline">\({\bf w}\)</span> to see which side of the street the unknown value lands. That is, if the projection is large enough, we would classify the point as positive: <span class="math display">\[{\bf w} \cdot {\bf u} \geq c?\]</span></p>
 <p>[Keep in mind that <span class="math inline">\({\bf u} \cdot {\bf w} = ||{\bf w}|| \times\)</span>(the length of the shadow). That is, the projection will only be the length of the shadow if <span class="math inline">\({\bf w}\)</span> is a unit vector. And we aren’t going to constrain <span class="math inline">\({\bf w}\)</span> to be unit vector (though we could!). But regardless, <span class="math inline">\({\bf u} \cdot {\bf w}\)</span> still gives the ability to classify because it is proportional to the length of the shadow.]</p>
-
+<blockquote>
+<p>Decision rule:
+if <span class="math inline">\({\bf w} \cdot {\bf u} + b \geq 0\)</span> then label the new sample “positive”</p>
+</blockquote>
 <p>where <span class="math inline">\({\bf w}\)</span> is created in such a way that it is perpendicular to the median of the street. Then the unknown (<span class="math inline">\({\bf u}\)</span>) vector is projected onto <span class="math inline">\({\bf w}\)</span> to see if it is on the left or the right side of the street.</p>
 <p>But we don’t know the values in the decision rule! We need more constraints. Assuming that the data are linearly separable, as an initial step to find <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, for all positive samples (<span class="math inline">\(x_+\)</span>) and all negative samples (<span class="math inline">\(x_-\)</span>) force:
-<span class="math display">\[\begin{align}
-{\bf w} \cdot {\bf x}_+ + b &amp;\geq 1 \label{posconstr}\\
-{\bf w} \cdot {\bf x}_- + b &amp;\leq -1 \label{negconstr}
+<span class="math display" id="eq:negconstr" id="eq:posconstr">\[\begin{align}
+{\bf w} \cdot {\bf x}_+ + b &amp;\geq 1 \tag{8.1}\\
+{\bf w} \cdot {\bf x}_- + b &amp;\leq -1 \tag{8.2}
 \end{align}\]</span></p>
 <p>For mathematical convenience (so that we don’t have 2 equations hanging around), introduce <span class="math inline">\(y_i\)</span> such that
 <span class="math display">\[\begin{align}
@@ -1654,34 +1670,38 @@ y_i &amp;= 1 \mbox{ for positive samples}\\
 y_i &amp;= -1 \mbox{ for negative samples}
 \end{align}\]</span></p>
 <p>Which simplifies the criteria for finding <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span> to be:
-<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i** + b) \geq 1\]</span>
-(Multiplying through by -1 on equation () switches the signs, and both equation () and () end up as the same for both types of points.)</p>
-Again, working toward solving for <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, add the additional constraint that for the points in the gutter (on the margin lines):
-
+<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1\]</span>
+(Multiplying through by -1 on equation (<a href="class.html#eq:negconstr">(8.2)</a> switches the signs, and both equation (<a href="class.html#eq:posconstr">(8.1)</a>) and (<a href="class.html#eq:negconstr">(8.2)</a> end up as the same for both types of points.)</p>
+<p>Again, working toward solving for <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, add the additional constraint that for the points in the gutter (on the margin lines):</p>
+<blockquote>
+<p>For <span class="math inline">\(x_i\)</span> in the gutter (by definition):
+<span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0\]</span></p>
+</blockquote>
 <p>Now consider two particular positive and negative values that live on the margin (gutter). The difference is almost the width of the street (we want to find the street that is as <em>wide as possible</em>), but it is at the wrong angle (see street picture again). Remember, our goal here is to <strong>find the street separating the pluses and the minuses is as wide as possible.</strong> If we had a unit vector, we could dot it with <span class="math inline">\((x_+ - x_-)\)</span> to get the width of the street!</p>
 <p><span class="math display">\[\begin{align}
 width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||}
 \end{align}\]</span>
 which doesn’t do us much good yet.</p>
 <p><img src="figs/width.jpg" width="100%" style="display: block; margin: auto;" /></p>
-Goal:
 <p style="color:red">
-Try to find as wide a street as possible.
+Goal: Try to find as wide a street as possible.
 </p>
 <p>But remember, the gutter points are constrained: it turns out that <span class="math inline">\(x_+ \cdot {\bf w} = 1 - b\)</span> and <span class="math inline">\(x_- \cdot {\bf w} = -1 - b\)</span>. Therefore:</p>
 <p><span class="math display">\[\begin{align}
 width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||} = \frac{(1-b) - (-1-b)}{|| {\bf w} ||} = \frac{2}{||w||}
 \end{align}\]</span></p>
-In order to maximize <span class="math inline">\(\frac{2}{||w||}\)</span>, minimize <span class="math inline">\(||w||\)</span>. Or
+In order to maximize <span class="math inline">\(\frac{2}{||w||}\)</span>, minimize <span class="math inline">\(||w||\)</span>, or
+<center>
 <p style="color:red">
 minimize <span class="math inline">\((1/2)*||w||^2\)</span>
 </p>
+</center>
 <p>(to make it mathematically easier). We have all the pieces of making the decision rules as an optimization problem. That is, minimize some quantity subject to the constraints given by the problem.</p>
 </div>
 <div id="lagrange-multipliers" class="section level4 unnumbered">
 <h4>Lagrange multipliers</h4>
 <p>Recall, with Lagrange multipliers, the first part is the optimization, the second part is the constraint. The point of Lagrange multipliers is to put together the constraint and the optimization into one equation where you don’t worry about the constraints any longer.</p>
-<p>L consists of two parts. The first is the thing to minimize. The second is the set of constraints (here, the summation over all the constraints). Each constraint has a multiplier <span class="math inline">\(\alpha_i\)</span>, the non-zero <span class="math inline">\(\alpha_i\)</span> will be the ones connected to the values on the gutter.</p>
+<p><span class="math inline">\(L\)</span> consists of two parts. The first is the thing to minimize. The second is the set of constraints (here, the summation over all the constraints). Each constraint has a multiplier <span class="math inline">\(\alpha_i\)</span>, the non-zero <span class="math inline">\(\alpha_i\)</span> will be the ones connected to the values on the gutter.</p>
 <p><span class="math display">\[\begin{align}
 L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1]
 \end{align}\]</span></p>
@@ -1690,7 +1710,10 @@ L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b)
 \frac{\partial L}{\partial {\bf w}} &amp;= {\bf w} - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow {\bf w} = \sum \alpha_i  y_i  {\bf x}_i \\
 \frac{\partial L}{\partial b} &amp;= -\sum \alpha_i y_i = 0\\
 \end{align}\]</span></p>
-
+<blockquote>
+<p>It turns out that <span class="math inline">\({\bf w}\)</span> is a linear sum of data vectors, either all of them or some of them (it turns out that for some <span class="math inline">\(i\)</span>, <span class="math inline">\(\alpha_i=0\)</span>):
+<span class="math display">\[{\bf w} = \sum \alpha_i  y_i  {\bf x}_i\]</span></p>
+</blockquote>
 <p>Use the value of <span class="math inline">\({\bf w}\)</span> to plug back into <span class="math inline">\(L\)</span> to maximize.</p>
 <p><span class="math display">\[\begin{align}
 L &amp;= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
@@ -1698,13 +1721,21 @@ L &amp;= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {
 &amp;= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
 &amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
 \end{align}\]</span></p>
-
-The computer / numerical analyst is going to solve L for the <span class="math inline">\(\alpha_i\)</span>, so why did we go to all the work? We need to understand the dependencies of sample vectors. That is,
+<blockquote>
+<p>Find the minimum of this expression:
+<span class="math display">\[L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j\]</span></p>
+</blockquote>
+The computer / numerical analyst is going to solve <span class="math inline">\(L\)</span> for the <span class="math inline">\(\alpha_i\)</span>, so why did we go to all the work? We need to understand the dependencies of sample vectors. That is,
+<center>
 <p style="color:red">
 the optimization depends only on the dot product of pairs of samples
 </p>
+</center>
 <p>. And the decision rule <em>also</em> depends only on the dot product of the new observation with the original samples. [Note, the points on the margin / gutter can be used to solve for <span class="math inline">\(b\)</span>: <span class="math inline">\(b =y_i - {\bf w} \cdot {\bf x}_i\)</span>, because <span class="math inline">\(y_i = 1/y_i\)</span>.]</p>
-
+<blockquote>
+<p>Decision Rule, call positive if:
+<span class="math display">\[\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0\]</span></p>
+</blockquote>
 <p>Note that we have a convex space (can be proved), and so we can’t get stuck in a local maximum.</p>
 </div>
 </div>
@@ -1722,28 +1753,41 @@ the optimization depends only on the dot product of pairs of samples
 <div id="transformations" class="section level4">
 <h4><span class="header-section-number">8.13.1.1</span> Transformations</h4>
 Simultaneously,
+<center>
 <p style="color:red">
 the data can be transformed into a new space where the data <strong>are</strong> linearly separable.
 </p>
+</center>
 <p>If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing! That is, consider the function <span class="math inline">\(\phi\)</span> such that our new space consists of vectors <span class="math inline">\(\phi({\bf x})\)</span>.</p>
 <p>Consider the case with a circle on the plane. The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable. Two great videos: <a href="https://www.youtube.com/watch?v=3liCbRZPrZA" class="uri">https://www.youtube.com/watch?v=3liCbRZPrZA</a> and <a href="https://www.youtube.com/watch?v=9NrALgHFwTo" class="uri">https://www.youtube.com/watch?v=9NrALgHFwTo</a> .</p>
 <p>Within the transformed space, the minimization procedure will amount to minimizing the following:</p>
-
-Leading to a decision rule of:
-
+<blockquote>
+<p>We want the minimum of this expression:
+<span class="math display">\[\begin{align}
+L &amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\bf x}_i) \cdot  \phi({\bf x}_j)\\
+&amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j K({\bf x}_i, {\bf x}_j)
+\end{align}\]</span></p>
+</blockquote>
+<blockquote>
+<p>Decision Rule, call positive if:
+<span class="math display">\[\begin{align}
+\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b &amp;\geq&amp; 0\\
+\sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &amp;\geq&amp; 0
+\end{align}\]</span></p>
+</blockquote>
 <div id="kernel-examples" class="section level5 unnumbered">
 <h5>Kernel Examples:</h5>
 <ul>
 <li><strong>Kernel 1</strong></li>
 </ul>
-<p>Consider the following transformation, <span class="math inline">\(\phi: \mathds{R}^2 \rightarrow \mathds{R}^3\)</span>:
+<p>Consider the following transformation, <span class="math inline">\(\phi: R^2 \rightarrow R^3\)</span>:
 <span class="math display">\[\begin{align}
 \phi({\bf x}) &amp;= (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
 K({\bf x}, {\bf y}) &amp;= \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
 &amp;= (x_1y_1 + x_2y_2)^2\\
 K({\bf x}, {\bf y}) &amp;= ({\bf x} \cdot {\bf y})^2
 \end{align}\]</span>
-Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.\</p>
+Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.</p>
 <ul>
 <li><strong>Kernel 2</strong>
 Writing the polynomial kernel out (for <span class="math inline">\(d=2\)</span>), we can find the exact <span class="math inline">\(\phi\)</span> function. Consider the following polynomial kernel for <span class="math inline">\(d=2\)</span>.
@@ -1790,10 +1834,10 @@ K({\bf x},{\bf y}) = \phi({\bf x}) \cdot \phi({\bf y})
 <li><p><strong>polynomial</strong>
 <span class="math display">\[K_P({\bf x}, {\bf y}) =(\gamma {\bf x}\cdot {\bf y} + r)^d = \phi_P({\bf x}) \cdot \phi_P({\bf y}) \ \ \ \ \gamma &gt; 0\]</span>
 Note, here <span class="math inline">\(\gamma, r, d\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>).</p></li>
-<li><strong>RBF</strong>
+<li><p><strong>RBF</strong>
 The radial basis function is also called the Gaussian kernel because of its similarity to the Gaussian distribution (aka the normal distribution). Because the RBF maps to infinite dimensional space, it can easily over fit the training data. Care must be taken to estimate <span class="math inline">\(\gamma\)</span>.
 <span class="math display">\[K_{RBF}({\bf x}, {\bf y}) = \exp( - \gamma ||{\bf x} -  {\bf y}||^2) = \phi_{RBF}({\bf x}) \cdot \phi_{RBF}({\bf y})\]</span>
-Note, here <span class="math inline">\(\gamma\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>).</li>
+Note, here <span class="math inline">\(\gamma\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>).</p></li>
 <li><p><strong>sigmoid</strong>
 The sigmoid kernel is not a valid kernel method for all values of <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(r\)</span> [which means that for certain parameter values, the <span class="math inline">\(\phi()\)</span> function may not exist].
 <span class="math display">\[K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x}) \cdot \phi_S({\bf y})\]</span>
@@ -1803,7 +1847,7 @@ Note, here <span class="math inline">\(\gamma, r\)</span> must be tuned using cr
 <div id="soft-margins" class="section level4">
 <h4><span class="header-section-number">8.13.1.3</span> Soft Margins</h4>
 <p>But what if the data aren’t linearly separable? The optimization problem can be changed to allow for points to be on the other side of the margin. The optimization problem is slightly more complicated, but basically the same idea:
-<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
+<span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
 <div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-32"></span>
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
 <p class="caption">
@@ -1811,15 +1855,22 @@ Figure 8.4: Note that now the problem is set up such that points are allowed to 
 </p>
 </div>
 <p>The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, <span class="math inline">\(C\)</span> (how much misclassification is allowed - the value of <span class="math inline">\(C\)</span> is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.</p>
-
+<blockquote>
+<p>Minimize (for <span class="math inline">\({\bf w}\)</span>, <span class="math inline">\(\xi_i\)</span>, <span class="math inline">\(b\)</span>):
+<span class="math display">\[\frac{1}{2} ||{\bf w}||^2 + C \sum_{i=1}^n \xi_i\]</span>
+Subject to:
+<span class="math display">\[y_i ({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i \ \ \ \ \xi_i \geq 0\]</span></p>
+</blockquote>
 <p>Which leads to the following Lagrangian equation:
 <span class="math display">\[\begin{align}
 L = \frac{1}{2}||{\bf w}||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
 \end{align}\]</span></p>
 That is, the objective function now allows for a trade-off between a large margin and a small error penalty. Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations. The key here is that although quadratic programming can be used to solve for most of the parameters,
+<center>
 <p style="color:red">
 <span class="math inline">\(C\)</span> is now a tuning parameter that needs to be set by the user or by cross validation.
 </p>
+</center>
 <div id="how-does-c-relate-to-margins" class="section level5 unnumbered">
 <h5>How does <span class="math inline">\(C\)</span> relate to margins?</h5>
 <p>Notice that the minimization is now over many more variables (with <span class="math inline">\(C\)</span> set/tuned - not optimized). If we are allowing for misclassification and <span class="math inline">\(C=0\)</span>, that implies that <span class="math inline">\(\xi_i\)</span> can be as large as possible. Which means the algorithm will choose the widest possible street. The widest possible street will be the one that hits at the two most extreme data points (the “support vectors” will now be the ones on the edge, not the ones near the separating hyperplane). <span class="math inline">\(C\)</span> small allows the constraints (on points crossing the line) to be ignored.</p>
@@ -1844,6 +1895,21 @@ Figure 8.6: In the first figure, the low C value gives a large margin. On the ri
 Figure 8.7: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
 </p>
 </div>
+</div>
+</div>
+</div>
+<div id="support-vector-machine-algorithm" class="section level3">
+<h3><span class="header-section-number">8.13.2</span> Support Vector Machine algorithm</h3>
+<hr />
+<p><strong>Algorithm</strong>: Support Vector Machine</p>
+<hr />
+<ol style="list-style-type: decimal">
+<li>Using cross validation, find values of <span class="math inline">\(C, \gamma, d, r\)</span>, etc. (and the kernel function!)</li>
+<li>Using Lagrange multipliers (read: the computer), solve for <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(b\)</span>.</li>
+<li>Classify an unknown observation (<span class="math inline">\({\bf u}\)</span>) as “positive” if:
+<span class="math display">\[\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b  = \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b \geq 0\]</span></li>
+</ol>
+<hr />
 <ul>
 <li><p><strong>Shortcomings of Support Vector Machines:</strong></p></li>
 <li>Can only classify binary categories (response variable).</li>
@@ -1870,12 +1936,9 @@ Figure 8.7: In the first figure, the low C value gives a large margin. On the ri
 <li>It is effective in cases where number of dimensions is greater than the number of samples.</li>
 <li><p>It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.</p></li>
 </ul>
-
-</div>
-</div>
 </div>
 <div id="classifying-more-than-one-group" class="section level3">
-<h3><span class="header-section-number">8.13.2</span> Classifying more than one group</h3>
+<h3><span class="header-section-number">8.13.3</span> Classifying more than one group</h3>
 <p>When there are more than two classes, the problem needs to be reduced into a binary classification problem. Consider the groups associated with Red, Green, and Blue. In order to figure out which points get classified as Red, two different methods can be applied.</p>
 <ul>
 <li><strong>One vs All</strong>
