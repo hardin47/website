@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-11-11" />
+<meta name="date" content="2019-11-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -289,9 +289,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8.10" data-path="class.html"><a href="class.html#model-choices"><i class="fa fa-check"></i><b>8.10</b> Model Choices</a></li>
 <li class="chapter" data-level="8.11" data-path="class.html"><a href="class.html#Nov12"><i class="fa fa-check"></i><b>8.11</b> 11/12/19 Agenda</a></li>
-<li class="chapter" data-level="8.12" data-path="class.html"><a href="class.html#support-vector-machines"><i class="fa fa-check"></i><b>8.12</b> Support Vector Machines</a><ul>
-<li class="chapter" data-level="8.12.1" data-path="class.html"><a href="class.html#not-linearly-separable"><i class="fa fa-check"></i><b>8.12.1</b> Not Linearly Separable</a></li>
-<li class="chapter" data-level="8.12.2" data-path="class.html"><a href="class.html#classifying-more-than-one-group"><i class="fa fa-check"></i><b>8.12.2</b> Classifying more than one group</a></li>
+<li class="chapter" data-level="8.12" data-path="class.html"><a href="class.html#support-vector-machines"><i class="fa fa-check"></i><b>8.12</b> Support Vector Machines</a></li>
+<li class="chapter" data-level="8.13" data-path="class.html"><a href="class.html#Nov14"><i class="fa fa-check"></i><b>8.13</b> 11/14/19 Agenda</a><ul>
+<li class="chapter" data-level="8.13.1" data-path="class.html"><a href="class.html#notlinsvm"><i class="fa fa-check"></i><b>8.13.1</b> Not Linearly Separable</a></li>
+<li class="chapter" data-level="8.13.2" data-path="class.html"><a href="class.html#classifying-more-than-one-group"><i class="fa fa-check"></i><b>8.13.2</b> Classifying more than one group</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -1612,8 +1613,8 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 -->
 <p>Support Vector Machines are one more algorithm for classification. As you’ll see, they have some excellent properties, but one important aspect to note is that they use only numeric predictor variables and only binary response variables (classify two groups).</p>
 <p>Vladimir Vapnik (b. 1936) created SVMs in the late 1990s. History: he actually did the work as his PhD in the early 60s in the Soviet Union. Someone from Bell Labs asked him to visit, and he ended up immigrating to the US. No one actually thought that SVMs would work, but he eventually (1995 - took 30 years between the idea and the implementation) bet a dinner on classifying handwriting via SVM (using a very simple kernel) versus neural networks and the rest is history.</p>
-<p>The basic idea of SVMs is to figure out a way to create really complicated decision boundaries. We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative). The decision rule has to do with a dot product of the new sample with a vector <span class="math inline">\(**w**\)</span> which is perpendicular to the median of the “street.”</p>
-<div id="linear-separator" class="section level4">
+<p>The basic idea of SVMs is to figure out a way to create really complicated decision boundaries. We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative). The decision rule has to do with a dot product of the new sample with a vector <span class="math inline">\({\bf w}\)</span> which is perpendicular to the median of the “street.”</p>
+<div id="linsvm" class="section level4">
 <h4><span class="header-section-number">8.12.0.1</span> Linear Separator</h4>
 <p>Recall ideas of kNN and trees:</p>
 <p><img src="figs/separate.jpg" width="100%" style="display: block; margin: auto;" /></p>
@@ -1628,114 +1629,181 @@ Figure 8.2: The correct project of the observations can often produce a perfect 
 <div id="aside-what-is-a-dot-product" class="section level4 unnumbered">
 <h4>Aside: what is a dot product?</h4>
 <p>Let <span class="math inline">\({\bf x} = (x_1, x_2, \ldots, x_p)^t\)</span> and <span class="math inline">\({\bf y} = (y_1, y_2, \ldots, y_p)^t\)</span> be two vectors which live in <span class="math inline">\(\mathds{R}^p\)</span>. Then their dot product is defined as:
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-30"></span>
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
 <p class="caption">
 Figure 8.3: If <strong>w</strong> is known, then the projection of any new observation onto <strong>w</strong> will lead to a linear partition of the space.
 </p>
 </div>
-<p>How can the street be used to get a decision rule? All that is known is that <span class="math inline">\(**w**\)</span> is perpendicular to the street. We don’t yet know <span class="math inline">\(**w**\)</span> or <span class="math inline">\(b\)</span>.</p>
-<p>The “width” of the street will be a vector which is perpendicular to the street (median). We don’t know the width yet, but we know know that we can use that perpendicular vector (<span class="math inline">\(**w**\)</span>) to figure out how to classify the points. Project an unknown point (<span class="math inline">\(**u**\)</span>) onto <span class="math inline">\(**w**\)</span> to see which side of the street the unknown value lands. That is, if the projection is large enough, we would classify the point as positive: <span class="math display">\[**w** \cdot **u** \geq c?\]</span></p>
-<p>[Keep in mind that <span class="math inline">\(**u** \cdot **w** = ||w|| \times\)</span>(the length of the shadow). That is, the projection will only be the length of the shadow if <span class="math inline">\(**w**\)</span> is a unit vector. And we aren’t going to constrain <span class="math inline">\(**w**\)</span> to be unit vector (though we could!). But regardless, <span class="math inline">\(**u** \cdot **w**\)</span> still gives the ability to classify because it is proportional to the length of the shadow.]</p>
+<p>How can the street be used to get a decision rule? All that is known is that <span class="math inline">\({\bf w}\)</span> is perpendicular to the street. We don’t yet know <span class="math inline">\({\bf w}\)</span> or <span class="math inline">\(b\)</span>.</p>
+<p>The “width” of the street will be a vector which is perpendicular to the street (median). We don’t know the width yet, but we know know that we can use that perpendicular vector (<span class="math inline">\({\bf w}\)</span>) to figure out how to classify the points. Project an unknown point (<span class="math inline">\({\bf u}\)</span>) onto <span class="math inline">\({\bf w}\)</span> to see which side of the street the unknown value lands. That is, if the projection is large enough, we would classify the point as positive: <span class="math display">\[{\bf w} \cdot {\bf u} \geq c?\]</span></p>
+<p>[Keep in mind that <span class="math inline">\({\bf u} \cdot {\bf w} = ||{\bf w}|| \times\)</span>(the length of the shadow). That is, the projection will only be the length of the shadow if <span class="math inline">\({\bf w}\)</span> is a unit vector. And we aren’t going to constrain <span class="math inline">\({\bf w}\)</span> to be unit vector (though we could!). But regardless, <span class="math inline">\({\bf u} \cdot {\bf w}\)</span> still gives the ability to classify because it is proportional to the length of the shadow.]</p>
 
-<p>where <span class="math inline">\(**w**\)</span> is created in such a way that it is perpendicular to the median of the street. Then the unknown (<span class="math inline">\(**u**\)</span>) vector is projected onto <span class="math inline">\(**w**\)</span> to see if it is on the left or the right side of the street.</p>
-<p>But we don’t know the values in the decision rule! We need more constraints. Assuming that the data are linearly separable, as an initial step to find <span class="math inline">\(**w**\)</span> and <span class="math inline">\(b\)</span>, for all positive samples (<span class="math inline">\(x_+\)</span>) and all negative samples (<span class="math inline">\(x_-\)</span>) force:
-<span class="math display">\[\begin{eqnarray}
-**w** \cdot {\bf x}_+ + b \geq 1 \label{posconstr}\\
-**w** \cdot {\bf x}_- + b \leq -1 \label{negconstr}
-\end{eqnarray}\]</span></p>
+<p>where <span class="math inline">\({\bf w}\)</span> is created in such a way that it is perpendicular to the median of the street. Then the unknown (<span class="math inline">\({\bf u}\)</span>) vector is projected onto <span class="math inline">\({\bf w}\)</span> to see if it is on the left or the right side of the street.</p>
+<p>But we don’t know the values in the decision rule! We need more constraints. Assuming that the data are linearly separable, as an initial step to find <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, for all positive samples (<span class="math inline">\(x_+\)</span>) and all negative samples (<span class="math inline">\(x_-\)</span>) force:
+<span class="math display">\[\begin{align}
+{\bf w} \cdot {\bf x}_+ + b &amp;\geq 1 \label{posconstr}\\
+{\bf w} \cdot {\bf x}_- + b &amp;\leq -1 \label{negconstr}
+\end{align}\]</span></p>
 <p>For mathematical convenience (so that we don’t have 2 equations hanging around), introduce <span class="math inline">\(y_i\)</span> such that
-<span class="math display">\[\begin{eqnarray*}
-y_i &amp;=&amp; 1 \mbox{ for positive samples}\\
-y_i &amp;=&amp; -1 \mbox{ for negative samples}
-\end{eqnarray*}\]</span></p>
-<p>Which simplifies the criteria for finding <span class="math inline">\(**w**\)</span> and <span class="math inline">\(b\)</span> to be:
-<span class="math display">\[ y_i(**w** \cdot **x_i** + b) \geq 1 \]</span>
+<span class="math display">\[\begin{align}
+y_i &amp;= 1 \mbox{ for positive samples}\\
+y_i &amp;= -1 \mbox{ for negative samples}
+\end{align}\]</span></p>
+<p>Which simplifies the criteria for finding <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span> to be:
+<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i** + b) \geq 1\]</span>
 (Multiplying through by -1 on equation () switches the signs, and both equation () and () end up as the same for both types of points.)</p>
-Again, working toward solving for <span class="math inline">\(**w**\)</span> and <span class="math inline">\(b\)</span>, add the additional constraint that for the points in the gutter (on the margin lines):
+Again, working toward solving for <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, add the additional constraint that for the points in the gutter (on the margin lines):
 
-<p>Now consider two particular positive and negative values that live on the margin (gutter). The difference is almost the width of the street (we want to find the street that is as {}), but it is at the wrong angle (see street picture again). Remember, our goal here is to  If we had a unit vector, we could dot it with <span class="math inline">\((x_+ - x_-)\)</span> to get the width of the street!</p>
-<p><span class="math display">\[\begin{eqnarray*}
-width = \frac{(x_+ - x_-) \cdot **w**}{|| **w** ||}
-\end{eqnarray*}\]</span>
+<p>Now consider two particular positive and negative values that live on the margin (gutter). The difference is almost the width of the street (we want to find the street that is as <em>wide as possible</em>), but it is at the wrong angle (see street picture again). Remember, our goal here is to <strong>find the street separating the pluses and the minuses is as wide as possible.</strong> If we had a unit vector, we could dot it with <span class="math inline">\((x_+ - x_-)\)</span> to get the width of the street!</p>
+<p><span class="math display">\[\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||}
+\end{align}\]</span>
 which doesn’t do us much good yet.</p>
-<p><img src="figs/width.jpg" width="100%" style="display: block; margin: auto;" />
-Goal:  But remember, the gutter points are constrained: it turns out that <span class="math inline">\(x_+ \cdot **w** = 1 - b\)</span> and <span class="math inline">\(x_- \cdot **w** = -1 - b\)</span>. Therefore:</p>
-<p><span class="math display">\[\begin{eqnarray*}
-width = \frac{(x_+ - x_-) \cdot **w**}{|| **w** ||} = \frac{(1-b) - (-1-b)}{|| **w** ||} = \frac{2}{||w||}
-\end{eqnarray*}\]</span></p>
-<p>In order to maximize <span class="math inline">\(\frac{2}{||w||}\)</span>, minimize <span class="math inline">\(||w||\)</span>. Or  (to make it mathematically easier). We have all the pieces of making the decision rules as an optimization problem. That is, minimize some quantity subject to the constraints given by the problem.</p>
+<p><img src="figs/width.jpg" width="100%" style="display: block; margin: auto;" /></p>
+Goal:
+<p style="color:red">
+Try to find as wide a street as possible.
+</p>
+<p>But remember, the gutter points are constrained: it turns out that <span class="math inline">\(x_+ \cdot {\bf w} = 1 - b\)</span> and <span class="math inline">\(x_- \cdot {\bf w} = -1 - b\)</span>. Therefore:</p>
+<p><span class="math display">\[\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||} = \frac{(1-b) - (-1-b)}{|| {\bf w} ||} = \frac{2}{||w||}
+\end{align}\]</span></p>
+In order to maximize <span class="math inline">\(\frac{2}{||w||}\)</span>, minimize <span class="math inline">\(||w||\)</span>. Or
+<p style="color:red">
+minimize <span class="math inline">\((1/2)*||w||^2\)</span>
+</p>
+<p>(to make it mathematically easier). We have all the pieces of making the decision rules as an optimization problem. That is, minimize some quantity subject to the constraints given by the problem.</p>
 </div>
 <div id="lagrange-multipliers" class="section level4 unnumbered">
 <h4>Lagrange multipliers</h4>
 <p>Recall, with Lagrange multipliers, the first part is the optimization, the second part is the constraint. The point of Lagrange multipliers is to put together the constraint and the optimization into one equation where you don’t worry about the constraints any longer.</p>
 <p>L consists of two parts. The first is the thing to minimize. The second is the set of constraints (here, the summation over all the constraints). Each constraint has a multiplier <span class="math inline">\(\alpha_i\)</span>, the non-zero <span class="math inline">\(\alpha_i\)</span> will be the ones connected to the values on the gutter.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-L = \frac{1}{2}||**w**||^2 - \sum \alpha_i [ y_i (**w** \cdot {\bf x}_i + b) - 1]
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1]
+\end{align}\]</span></p>
 <p>Find derivatives, set them equal to zero. Note that we can differentiate with respect to the vector component wise, but we’ll skip that notation, but you could do it one element at a time.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-\frac{\partial L}{\partial **w**} &amp;=&amp; **w** - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow **w** = \sum \alpha_i  y_i  {\bf x}_i \\
-\frac{\partial L}{\partial b} &amp;=&amp; -\sum \alpha_i y_i = 0\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\frac{\partial L}{\partial {\bf w}} &amp;= {\bf w} - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow {\bf w} = \sum \alpha_i  y_i  {\bf x}_i \\
+\frac{\partial L}{\partial b} &amp;= -\sum \alpha_i y_i = 0\\
+\end{align}\]</span></p>
 
-<p>Use the value of <span class="math inline">\(**w**\)</span> to plug back into <span class="math inline">\(L\)</span> to maximize.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-L &amp;=&amp; \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
-&amp;=&amp; -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
-&amp;=&amp; -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
-&amp;=&amp; \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
-\end{eqnarray*}\]</span></p>
+<p>Use the value of <span class="math inline">\({\bf w}\)</span> to plug back into <span class="math inline">\(L\)</span> to maximize.</p>
+<p><span class="math display">\[\begin{align}
+L &amp;= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
+&amp;= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
+&amp;= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
+&amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
+\end{align}\]</span></p>
 
-<p>The computer / numerical analyst is going to solve L for the <span class="math inline">\(\alpha_i\)</span>, so why did we go to all the work? We need to understand the dependencies of sample vectors. That is, . And the decision rule {} depends only on the dot product of the new observation with the original samples. [Note, the points on the margin / gutter can be used to solve for <span class="math inline">\(b\)</span>: $b =y_i - <strong>w</strong> *x_i** $, because <span class="math inline">\(y_i = 1/y_i\)</span>.]</p>
+The computer / numerical analyst is going to solve L for the <span class="math inline">\(\alpha_i\)</span>, so why did we go to all the work? We need to understand the dependencies of sample vectors. That is,
+<p style="color:red">
+the optimization depends only on the dot product of pairs of samples
+</p>
+<p>. And the decision rule <em>also</em> depends only on the dot product of the new observation with the original samples. [Note, the points on the margin / gutter can be used to solve for <span class="math inline">\(b\)</span>: <span class="math inline">\(b =y_i - {\bf w} \cdot {\bf x}_i\)</span>, because <span class="math inline">\(y_i = 1/y_i\)</span>.]</p>
 
 <p>Note that we have a convex space (can be proved), and so we can’t get stuck in a local maximum.</p>
-
-
 </div>
-<div id="not-linearly-separable" class="section level3">
-<h3><span class="header-section-number">8.12.1</span> Not Linearly Separable</h3>
+</div>
+<div id="Nov14" class="section level2">
+<h2><span class="header-section-number">8.13</span> 11/14/19 Agenda</h2>
+<ol style="list-style-type: decimal">
+<li>not linearly separable (SVM)</li>
+<li>kernels (SVM)</li>
+<li>support vector formulation</li>
+<li>soft margins / cost</li>
+<li>one vs. one / one vs. all</li>
+</ol>
+<div id="notlinsvm" class="section level3">
+<h3><span class="header-section-number">8.13.1</span> Not Linearly Separable</h3>
 <div id="transformations" class="section level4">
-<h4><span class="header-section-number">8.12.1.1</span> Transformations</h4>
-<p>Simultaneously,  If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing! That is, consider the function <span class="math inline">\(\phi\)</span> such that our new space consists of vectors <span class="math inline">\(\phi({\bf x})\)</span>.</p>
-<p>Consider the case with a circle on the plane. The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable. Two great videos:\
-\
-\</p>
+<h4><span class="header-section-number">8.13.1.1</span> Transformations</h4>
+Simultaneously,
+<p style="color:red">
+the data can be transformed into a new space where the data <strong>are</strong> linearly separable.
+</p>
+<p>If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing! That is, consider the function <span class="math inline">\(\phi\)</span> such that our new space consists of vectors <span class="math inline">\(\phi({\bf x})\)</span>.</p>
+<p>Consider the case with a circle on the plane. The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable. Two great videos: <a href="https://www.youtube.com/watch?v=3liCbRZPrZA" class="uri">https://www.youtube.com/watch?v=3liCbRZPrZA</a> and <a href="https://www.youtube.com/watch?v=9NrALgHFwTo" class="uri">https://www.youtube.com/watch?v=9NrALgHFwTo</a> .</p>
 <p>Within the transformed space, the minimization procedure will amount to minimizing the following:</p>
 
 Leading to a decision rule of:
 
+<div id="kernel-examples" class="section level5 unnumbered">
+<h5>Kernel Examples:</h5>
+<ul>
+<li><strong>Kernel 1</strong></li>
+</ul>
+<p>Consider the following transformation, <span class="math inline">\(\phi: \mathds{R}^2 \rightarrow \mathds{R}^3\)</span>:
+<span class="math display">\[\begin{align}
+\phi({\bf x}) &amp;= (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
+K({\bf x}, {\bf y}) &amp;= \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
+&amp;= (x_1y_1 + x_2y_2)^2\\
+K({\bf x}, {\bf y}) &amp;= ({\bf x} \cdot {\bf y})^2
+\end{align}\]</span>
+Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.\</p>
+<ul>
+<li><strong>Kernel 2</strong>
+Writing the polynomial kernel out (for <span class="math inline">\(d=2\)</span>), we can find the exact <span class="math inline">\(\phi\)</span> function. Consider the following polynomial kernel for <span class="math inline">\(d=2\)</span>.
+<span class="math display">\[K({\bf x}, {\bf y}) = ({\bf x} \cdot {\bf y} + c)^2\]</span>
+By writing down the dot product and then considering the square of each of the components separately, we get
+<span class="math display">\[\begin{align}
+({\bf x} \cdot {\bf y} + c)^2 &amp;= (c + \sum_{i=1}^p x_iy_i)^2\\
+&amp;= c^2 + \sum_{i=1}^p x_i^2y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_iy_ix_jy_j + \sum_{i=1}^p2cx_iy_i
+\end{align}\]</span>
+By pulling the sum apart into all the components of the <span class="math inline">\({\bf x}\)</span> and <span class="math inline">\({\bf y}\)</span> vectors separately, we find that
+<span class="math display">\[\begin{align}
+\phi({\bf x}) = (c, x_1^2, \ldots, x_p^2, \sqrt{2}x_1x_2, \ldots, \sqrt{2}x_1x_p, \sqrt{2}x_2x_3, \ldots, \sqrt{2}x_{p-1}x_p, \sqrt{2c}x_1, \ldots, \sqrt{2c}x_p)
+\end{align}\]</span></li>
+</ul>
+<!--
+%The polar transformation corresponds to $(x,y) \rightarrow (\sqrt(x^2+y^2),\arctan(x,y))$. The closest related polynomial kernel might be $(x,y) \rightarrow (x^2,y^2,\sqrt(2)xy)$. In any case, this will work for that toy case.
 
-
-
-
-<p>%The polar transformation corresponds to <span class="math inline">\((x,y) \rightarrow (\sqrt(x^2+y^2),\arctan(x,y))\)</span>. The closest related polynomial kernel might be <span class="math inline">\((x,y) \rightarrow (x^2,y^2,\sqrt(2)xy)\)</span>. In any case, this will work for that toy case.</p>
-<p>%If two concentric circles, just map to <span class="math inline">\((x, y, x^2 + y^2)\)</span> (note: we went from R2 to R3, and the data were then linearly separable in R3).</p>
-
-
+%If two concentric circles, just map to $(x, y, x^2 + y^2)$  (note: we went from R2 to R3, and the data were then linearly separable in R3).
+-->
+<ul>
+<li><strong>Kernel 3</strong>
+Using the radial kernel (see below) it is possible to map the observations into an infinite dimensional space yet still only consider the kernel associated with the dot product of the original data. Consider the following example for <span class="math inline">\(x\)</span> in one dimension mapped to infinite dimensions.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+\phi_{RBF}(x) &amp;= e^{-\gamma x} \bigg(1, \sqrt{\frac{2\gamma}{1!}} x, \sqrt{\frac{(2\gamma)^2}{2!}} x^2, \sqrt{\frac{(2\gamma)^3}{3!}} x^3, \ldots \bigg)^t\\
+K_{RBF} (x,y) &amp;= \exp( -\gamma ||x-y||^2)
+\end{align}\]</span>
+where cross validation is used to find the tuning value <span class="math inline">\(\gamma\)</span> as well as the penalty parameter <span class="math inline">\(C\)</span>.</p>
+</div>
 </div>
 <div id="what-is-a-kernel" class="section level4">
-<h4><span class="header-section-number">8.12.1.2</span> What is a Kernel?</h4>
-<p>What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won’t go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors, (e.g. a measure of `similarity’ between the two vectors). If <span class="math inline">\(K\)</span> is a function of two vectors <span class="math inline">\({\bf x}\)</span> and <span class="math inline">\({\bf y}\)</span>, then it is a kernel function if <span class="math inline">\(K\)</span> is the dot product of <span class="math inline">\(\phi()\)</span> applied to those vectors. We know that <span class="math inline">\(\phi()\)</span> exists if <span class="math inline">\(K\)</span> is symmetric and if when <span class="math inline">\(K_{ij} = K(**x_i**, **x_j**)\)</span>, the matrix <span class="math inline">\(**K** = [K_{ij}]\)</span> is positive definite.</p>
-<p>A helpful website about kernels:
-</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<h4><span class="header-section-number">8.13.1.2</span> What is a Kernel?</h4>
+<p>What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won’t go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors, (e.g. a measure of “similarity” between the two vectors). If <span class="math inline">\(K\)</span> is a function of two vectors <span class="math inline">\({\bf x}\)</span> and <span class="math inline">\({\bf y}\)</span>, then it is a kernel function if <span class="math inline">\(K\)</span> is the dot product of <span class="math inline">\(\phi()\)</span> applied to those vectors. We know that <span class="math inline">\(\phi()\)</span> exists if <span class="math inline">\(K\)</span> is symmetric and if when <span class="math inline">\(K_{ij} = K({\bf x}_i, {\bf x}_j)\)</span>, the matrix <span class="math inline">\({\bf K} = [K_{ij}]\)</span> is positive definite.</p>
+<p>A helpful website about kernels: <a href="http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html" class="uri">http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html</a></p>
+<p><span class="math display">\[\begin{align}
 K({\bf x},{\bf y}) = \phi({\bf x}) \cdot \phi({\bf y})
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 </div>
 <div id="examples-of-kernels" class="section level4 unnumbered">
 <h4>Examples of kernels:</h4>
-
-
-
+<ul>
+<li><strong>linear</strong>
+<span class="math display">\[K({\bf x}, {\bf y}) = {\bf x} \cdot{\bf y}\]</span></li>
+<li><p><strong>polynomial</strong>
+<span class="math display">\[K_P({\bf x}, {\bf y}) =(\gamma {\bf x}\cdot {\bf y} + r)^d = \phi_P({\bf x}) \cdot \phi_P({\bf y}) \ \ \ \ \gamma &gt; 0\]</span>
+Note, here <span class="math inline">\(\gamma, r, d\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>).</p></li>
+<li><strong>RBF</strong>
+The radial basis function is also called the Gaussian kernel because of its similarity to the Gaussian distribution (aka the normal distribution). Because the RBF maps to infinite dimensional space, it can easily over fit the training data. Care must be taken to estimate <span class="math inline">\(\gamma\)</span>.
+<span class="math display">\[K_{RBF}({\bf x}, {\bf y}) = \exp( - \gamma ||{\bf x} -  {\bf y}||^2) = \phi_{RBF}({\bf x}) \cdot \phi_{RBF}({\bf y})\]</span>
+Note, here <span class="math inline">\(\gamma\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>).</li>
+<li><p><strong>sigmoid</strong>
+The sigmoid kernel is not a valid kernel method for all values of <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(r\)</span> [which means that for certain parameter values, the <span class="math inline">\(\phi()\)</span> function may not exist].
+<span class="math display">\[K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x}) \cdot \phi_S({\bf y})\]</span>
+Note, here <span class="math inline">\(\gamma, r\)</span> must be tuned using cross validation (along with the penalty parameter <span class="math inline">\(C\)</span>). One benefit of the sigmoid kernel is that it has equivalence to a two-layer perceptron neural network.</p></li>
+</ul>
 </div>
 <div id="soft-margins" class="section level4">
-<h4><span class="header-section-number">8.12.1.3</span> Soft Margins</h4>
+<h4><span class="header-section-number">8.13.1.3</span> Soft Margins</h4>
 <p>But what if the data aren’t linearly separable? The optimization problem can be changed to allow for points to be on the other side of the margin. The optimization problem is slightly more complicated, but basically the same idea:
-<span class="math display">\[ y_i(**w** \cdot **x_i** + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
+<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
 <div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-32"></span>
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
 <p class="caption">
@@ -1745,42 +1813,76 @@ Figure 8.4: Note that now the problem is set up such that points are allowed to 
 <p>The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, <span class="math inline">\(C\)</span> (how much misclassification is allowed - the value of <span class="math inline">\(C\)</span> is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.</p>
 
 <p>Which leads to the following Lagrangian equation:
-<span class="math display">\[\begin{eqnarray*}
-L = \frac{1}{2}||**w**||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i (**w** \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
-\end{eqnarray*}\]</span></p>
-<p>That is, the objective function now allows for a trade-off between a large margin and a small error penalty. Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations. The key here is that although quadratic programming can be used to solve for most of the parameters, </p>
-
+<span class="math display">\[\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
+\end{align}\]</span></p>
+That is, the objective function now allows for a trade-off between a large margin and a small error penalty. Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations. The key here is that although quadratic programming can be used to solve for most of the parameters,
+<p style="color:red">
+<span class="math inline">\(C\)</span> is now a tuning parameter that needs to be set by the user or by cross validation.
+</p>
+<div id="how-does-c-relate-to-margins" class="section level5 unnumbered">
+<h5>How does <span class="math inline">\(C\)</span> relate to margins?</h5>
 <p>Notice that the minimization is now over many more variables (with <span class="math inline">\(C\)</span> set/tuned - not optimized). If we are allowing for misclassification and <span class="math inline">\(C=0\)</span>, that implies that <span class="math inline">\(\xi_i\)</span> can be as large as possible. Which means the algorithm will choose the widest possible street. The widest possible street will be the one that hits at the two most extreme data points (the “support vectors” will now be the ones on the edge, not the ones near the separating hyperplane). <span class="math inline">\(C\)</span> small allows the constraints (on points crossing the line) to be ignored.</p>
 <p><span class="math display">\[C=0 \rightarrow \mbox{ can lead to large training error}\]</span></p>
 <p>If <span class="math inline">\(C\)</span> is quite large, then the algorithm will try very hard to classify exactly perfectly. That is, it will want <span class="math inline">\(\xi_i\)</span> to be as close to zero as possible. When projecting into high dimensions, we can always perfectly classify, so a large <span class="math inline">\(C\)</span> will tend to overfit the training data and give a very small margin.
 <span class="math display">\[C&gt;&gt;&gt; \rightarrow \mbox{ can lead to classification rule which does not generalize to test data}\]</span></p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-33"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-331"></span>
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
 <p class="caption">
 Figure 8.5: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
 </p>
 </div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-33"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-332"></span>
 <img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
 <p class="caption">
-Figure 8.5: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
+Figure 8.6: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
 </p>
 </div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-33"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-333"></span>
 <img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
 <p class="caption">
-Figure 8.5: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
+Figure 8.7: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
 </p>
 </div>
+<ul>
+<li><p><strong>Shortcomings of Support Vector Machines:</strong></p></li>
+<li>Can only classify binary categories (response variable).</li>
+<li>All predictor variables must be numeric.
+<ul>
+<li>A great differential in range will allow variables with large range to dominate the predictions. Either linearly scale each attribute to some range [ e.g., (-1, +1) or (0,1)] or divide by the standard deviation.</li>
+<li>Categorical variables can be used if formatted as binary factor variables.</li>
+<li>Whatever is done to the training data <em>must</em> also be done to the test data!</li>
+</ul></li>
+<li>Another problem is the kernel function itself.
+<ul>
+<li>With primitive data (e.g., 2d data points), good kernels are easy to come by.</li>
+<li>With harder data (e.g., MRI scans), finding a sensible kernel function may be much harder.</li>
+</ul></li>
+<li>With really large data, it doesn’t perform well because of the large amount of required training time</li>
+<li>It also doesn’t perform very well when the data set has a lot of noise i.e., target classes are overlapping</li>
+<li><p>SVM doesn’t directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.</p></li>
+<li><strong>Strengths of Support Vector Machines:</strong></li>
+<li>Can always fit a linear separating hyper plane in a high enough dimensional space.</li>
+<li>The kernel trick makes it possible to not know the transformation functions, <span class="math inline">\(\phi\)</span>.</li>
+<li>Because the optimization is on a convex function, the numerical process for finding solutions are extremely efficient.</li>
+<li>It works really well with clear margin of separation</li>
+<li>It is effective in high dimensional spaces.</li>
+<li>It is effective in cases where number of dimensions is greater than the number of samples.</li>
+<li><p>It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.</p></li>
+</ul>
 
-
-
+</div>
 </div>
 </div>
 <div id="classifying-more-than-one-group" class="section level3">
-<h3><span class="header-section-number">8.12.2</span> Classifying more than one group</h3>
+<h3><span class="header-section-number">8.13.2</span> Classifying more than one group</h3>
 <p>When there are more than two classes, the problem needs to be reduced into a binary classification problem. Consider the groups associated with Red, Green, and Blue. In order to figure out which points get classified as Red, two different methods can be applied.</p>
-
+<ul>
+<li><strong>One vs All</strong>
+Each category can be compared to the <em>rest of the groups</em>. This will create <span class="math inline">\(k\)</span> different classifiers (here <span class="math inline">\(k=\)</span>). Each test value would then be classified according to each classifier, and the group assignment would be given by the group giving the highest value of <span class="math inline">\({\bf w}_k \cdot {\bf u} + b\)</span>, as the projection would represent the classification <em>farthest</em> into the group center. In the end, there will be <span class="math inline">\(K\)</span> classifiers.</li>
+<li><strong>One vs One</strong>
+Alternatively, each group can be compared with each other group (Red vs. Green, Red vs. Blue, Green vs. Blue). Class membership will be determine by the group to which the unknown point is most often classified. In the end, there will be <span class="math inline">\(K(K-1)/2\)</span> classifiers.</li>
+</ul>
 
 </div>
 </div>

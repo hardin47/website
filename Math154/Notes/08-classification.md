@@ -1378,10 +1378,10 @@ Support Vector Machines are one more algorithm for classification.  As you'll se
 
 Vladimir Vapnik (b. 1936) created SVMs in the late 1990s.   History: he actually did the work as his PhD in the early 60s in the Soviet Union.  Someone from Bell Labs asked him to visit, and he ended up immigrating to the US.  No one actually thought that SVMs would work, but he eventually (1995 - took 30 years between the idea and the implementation) bet a dinner on classifying handwriting via SVM (using a very simple kernel) versus neural networks and the rest is history.
 
-The basic idea of SVMs is to figure out a way to create really complicated decision boundaries.  We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative).  The decision rule has to do with a dot product of the new sample with a vector $**w**$ which is perpendicular to the median of the "street."
+The basic idea of SVMs is to figure out a way to create really complicated decision boundaries.  We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative).  The decision rule has to do with a dot product of the new sample with a vector ${\bf w}$ which is perpendicular to the median of the "street."
 
 
-#### Linear Separator
+#### Linear Separator {#linsvm}
 
 Recall ideas of kNN and trees:
 
@@ -1399,9 +1399,9 @@ But today's decision boundary is going to be based on a hyperplane which separat
 #### Aside: what is a dot product? {-}
 
 Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)^t$ be two vectors which live in $\mathds{R}^p$.  Then their dot product is defined as:
-\begin{eqnarray*}
+\begin{align}
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
-\end{eqnarray*}
+\end{align}
 
 
 <div class="figure" style="text-align: center">
@@ -1409,99 +1409,100 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 <p class="caption">(\#fig:unnamed-chunk-30)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
-How can the street be used to get a decision rule?  All that is known is that $**w**$ is perpendicular to the street.  We don't yet know $**w**$ or $b$.
+How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
 
-The "width" of the street will be a vector which is perpendicular to the street (median).  We don't know the width yet, but we know know that we can use that perpendicular vector ($**w**$) to figure out how to classify the points.  Project an unknown point ($**u**$) onto $**w**$ to see which side of the street  the unknown value lands.  That is, if the projection is large enough, we would classify the point as positive:  $$**w** \cdot **u** \geq c?$$
+The "width" of the street will be a vector which is perpendicular to the street (median).  We don't know the width yet, but we know know that we can use that perpendicular vector (${\bf w}$) to figure out how to classify the points.  Project an unknown point (${\bf u}$) onto ${\bf w}$ to see which side of the street  the unknown value lands.  That is, if the projection is large enough, we would classify the point as positive:  $${\bf w} \cdot {\bf u} \geq c?$$
 
-[Keep in mind that $**u** \cdot **w** = ||w|| \times$(the length of the shadow).  That is, the projection will only be the length of the shadow if $**w**$ is a unit vector.  And we aren't going to constrain $**w**$ to be unit vector (though we could!).  But regardless, $**u** \cdot **w**$ still gives the ability to classify because it is proportional to the length of the shadow.]
+[Keep in mind that ${\bf u} \cdot {\bf w} = ||{\bf w}|| \times$(the length of the shadow).  That is, the projection will only be the length of the shadow if ${\bf w}$ is a unit vector.  And we aren't going to constrain ${\bf w}$ to be unit vector (though we could!).  But regardless, ${\bf u} \cdot {\bf w}$ still gives the ability to classify because it is proportional to the length of the shadow.]
 
 \begin{center}
 \framebox{
 \parbox[t][1cm]{9cm}{
 %\addspace{0.2cm}
 Decision rule:\\
-if $**w** \cdot **u** + b \geq 0$ then label the new sample "positive"
+if ${\bf w} \cdot {\bf u} + b \geq 0$ then label the new sample "positive"
 }}\\
 \end{center}
-where $**w**$ is created in such a way that it is perpendicular to the median of the street.  Then the unknown ($**u**$) vector is projected onto $**w**$ to see if it is on the left or the right side of the street.
+where ${\bf w}$ is created in such a way that it is perpendicular to the median of the street.  Then the unknown (${\bf u}$) vector is projected onto ${\bf w}$ to see if it is on the left or the right side of the street.
 
-But we don't know the values in the decision rule!  We need more constraints.  Assuming that the data are linearly separable, as an initial step to find $**w**$ and $b$, for all positive samples ($x_+$) and all negative samples ($x_-$) force:
-\begin{eqnarray}
-**w** \cdot {\bf x}_+ + b \geq 1 \label{posconstr}\\
-**w** \cdot {\bf x}_- + b \leq -1 \label{negconstr}
-\end{eqnarray}
+But we don't know the values in the decision rule!  We need more constraints.  Assuming that the data are linearly separable, as an initial step to find ${\bf w}$ and $b$, for all positive samples ($x_+$) and all negative samples ($x_-$) force:
+\begin{align}
+{\bf w} \cdot {\bf x}_+ + b &\geq 1 \label{posconstr}\\
+{\bf w} \cdot {\bf x}_- + b &\leq -1 \label{negconstr}
+\end{align}
 
 For mathematical convenience (so that we don't have 2 equations hanging around), introduce $y_i$ such that
-\begin{eqnarray*}
-y_i &=& 1 \mbox{ for positive samples}\\
-y_i &=& -1 \mbox{ for negative samples}
-\end{eqnarray*}
+\begin{align}
+y_i &= 1 \mbox{ for positive samples}\\
+y_i &= -1 \mbox{ for negative samples}
+\end{align}
 
-Which simplifies the criteria for finding $**w**$ and $b$ to be:
-$$ y_i(**w** \cdot **x_i** + b) \geq 1 $$
+Which simplifies the criteria for finding ${\bf w}$ and $b$ to be:
+$$ y_i({\bf w} \cdot {\bf x}_i** + b) \geq 1$$
 (Multiplying through by -1 on equation (\ref{negconstr}) switches the signs, and both equation (\ref{posconstr}) and (\ref{negconstr}) end up as the same for both types of points.)
 
 
-Again, working toward solving for $**w**$ and $b$, add the additional constraint that for the points in the gutter (on the margin lines):
+Again, working toward solving for ${\bf w}$ and $b$, add the additional constraint that for the points in the gutter (on the margin lines):
 \begin{center}
 \framebox{
 \parbox[t][1.5cm]{6cm}{
 %\addspace{0.2cm}
 For $x_i$ in the gutter (by definition):\\
-$$y_i(**w** \cdot **x_i** + b) - 1 = 0$$
+$$y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0$$
 }}\\
 \end{center}
 
-Now consider two particular positive and negative values that live on the margin (gutter).  The difference is almost the width of the street (we want to find the street that is as {\em wide as possible}), but it is at the wrong angle  (see street picture again).  Remember, our goal here is to \ul{find the street separating the pluses and the minuses is as wide as possible.}  If we had a unit vector, we could dot it with $(x_+ - x_-)$ to get the width of the street!
+Now consider two particular positive and negative values that live on the margin (gutter).  The difference is almost the width of the street (we want to find the street that is as *wide as possible*), but it is at the wrong angle  (see street picture again).  Remember, our goal here is to **find the street separating the pluses and the minuses is as wide as possible.**  If we had a unit vector, we could dot it with $(x_+ - x_-)$ to get the width of the street!
 
-\begin{eqnarray*}
-width = \frac{(x_+ - x_-) \cdot **w**}{|| **w** ||}
-\end{eqnarray*}
+\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||}
+\end{align}
 which doesn't do us much good yet.
 
 
 <img src="figs/width.jpg" width="100%" style="display: block; margin: auto;" />
-Goal: \textcolor{red}{Try to find as wide a street as possible.}  But remember, the gutter points are constrained: it turns out that  $x_+ \cdot **w** = 1 - b$ and $x_- \cdot **w** = -1 - b$. Therefore:
 
-\begin{eqnarray*}
-width = \frac{(x_+ - x_-) \cdot **w**}{|| **w** ||} = \frac{(1-b) - (-1-b)}{|| **w** ||} = \frac{2}{||w||}
-\end{eqnarray*}
+Goal: <p style="color:red">Try to find as wide a street as possible.</p>  But remember, the gutter points are constrained: it turns out that  $x_+ \cdot {\bf w} = 1 - b$ and $x_- \cdot {\bf w} = -1 - b$. Therefore:
 
-In order to maximize $\frac{2}{||w||}$, minimize $||w||$. Or \textcolor{red}{minimize $(1/2)*||w||^2$} (to make it mathematically easier).   We have all the pieces of making the decision rules as an optimization problem.  That is, minimize some quantity subject to the constraints given by the problem.
+\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||} = \frac{(1-b) - (-1-b)}{|| {\bf w} ||} = \frac{2}{||w||}
+\end{align}
+
+In order to maximize $\frac{2}{||w||}$, minimize $||w||$. Or <p style="color:red">minimize $(1/2)*||w||^2$ </p> (to make it mathematically easier).   We have all the pieces of making the decision rules as an optimization problem.  That is, minimize some quantity subject to the constraints given by the problem.
 
 #### Lagrange multipliers {-}
 Recall, with Lagrange multipliers, the first part is the optimization, the second part is the constraint.  The point of Lagrange multipliers is to put together the constraint and the optimization into one equation where you don't worry about the constraints any longer.
 
 L consists of two parts.  The first is the thing to minimize.  The second is the set of constraints (here, the summation over all the constraints).  Each constraint has a multiplier $\alpha_i$, the non-zero $\alpha_i$ will be the ones connected to the values on the gutter.
 
-\begin{eqnarray*}
-L = \frac{1}{2}||**w**||^2 - \sum \alpha_i [ y_i (**w** \cdot {\bf x}_i + b) - 1]
-\end{eqnarray*}
+\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1]
+\end{align}
 
 Find derivatives, set them equal to zero.  Note that we can differentiate with respect to the vector component wise, but we'll skip that notation, but you could do it one element at a time.
 
-\begin{eqnarray*}
-\frac{\partial L}{\partial **w**} &=& **w** - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow **w** = \sum \alpha_i  y_i  {\bf x}_i \\
-\frac{\partial L}{\partial b} &=& -\sum \alpha_i y_i = 0\\
-\end{eqnarray*}
+\begin{align}
+\frac{\partial L}{\partial {\bf w}} &= {\bf w} - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow {\bf w} = \sum \alpha_i  y_i  {\bf x}_i \\
+\frac{\partial L}{\partial b} &= -\sum \alpha_i y_i = 0\\
+\end{align}
 
 \begin{center}
 \framebox{
 \parbox[t][2cm]{10cm}{
 %\addspace{0.2cm}
-It turns out that $**w**$ is a linear sum of data vectors, either all of them or some of them (it turns out that for some $i$, $\alpha_i=0$):\\
-$$**w** = \sum \alpha_i  y_i  {\bf x}_i$$
+It turns out that ${\bf w}$ is a linear sum of data vectors, either all of them or some of them (it turns out that for some $i$, $\alpha_i=0$):\\
+$${\bf w} = \sum \alpha_i  y_i  {\bf x}_i$$
 }}\\
 \end{center}
 
-Use the value of $**w**$ to plug back into $L$ to maximize.
+Use the value of ${\bf w}$ to plug back into $L$ to maximize.
 
-\begin{eqnarray*}
-L &=& \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
-&=& -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
-&=& -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
-&=& \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
-\end{eqnarray*}
+\begin{align}
+L &= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
+&= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
+&= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
+&= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
+\end{align}
 
 \begin{center}
 \framebox{
@@ -1512,39 +1513,36 @@ $$L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x
 }}\\
 \end{center}
 
-The computer / numerical analyst is going to solve L for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, \textcolor{red}{the optimization depends only on the dot product of pairs of samples}.  And the decision rule {\em also} depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  **w** \cdot **x_i** $, because $y_i = 1/y_i$.]
+The computer / numerical analyst is going to solve L for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, <p style="color:red">the optimization depends only on the dot product of pairs of samples</p>.  And the decision rule *also* depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  {\bf w} \cdot {\bf x}_i$, because $y_i = 1/y_i$.]
 
 \begin{center}
 \framebox{
 \parbox[t][1.5cm]{5cm}{
 %\addspace{0.2cm}
 Decision Rule, call positive if:\\
-$$\sum \alpha_i y_i {\bf x}_i \cdot **u** + b \geq 0$$
+$$\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0$$
 }}\\
 \end{center}
 
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
-\newpage
-\starthere{11/13/17}
 
-\paragraph{Agenda}
-\begin{enumerate}
-  \itemsep0em
-  \item not linearly separable (SVM)
-  \item kernels (SVM)
-\end{enumerate}
+## 11/14/19 Agenda {#Nov14}
+1. not linearly separable (SVM)
+2. kernels (SVM)
+3. support vector formulation
+4. soft margins / cost
+5. one vs. one / one vs. all
 
 
-### Not Linearly Separable
+
+### Not Linearly Separable {#notlinsvm}
 
 #### Transformations
 
-Simultaneously,  \textcolor{red}{the data can be transformed into a new space where the data {\bf are} linearly separable.}   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
+Simultaneously,  <p style="color:red">the data can be transformed into a new space where the data **are** linearly separable.</p>   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
 
-Consider the case with a circle on the plane.  The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable.  Two great videos:\\
-\url{https://www.youtube.com/watch?v=3liCbRZPrZA}\\
-\url{https://www.youtube.com/watch?v=9NrALgHFwTo}\\
+Consider the case with a circle on the plane.  The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable.  Two great videos: https://www.youtube.com/watch?v=3liCbRZPrZA and https://www.youtube.com/watch?v=9NrALgHFwTo .
 
 Within the transformed space, the minimization procedure will amount to minimizing the following:
 
@@ -1553,10 +1551,10 @@ Within the transformed space, the minimization procedure will amount to minimizi
 \parbox[t][3cm]{10cm}{
 %\addspace{0.2cm}
 We want the minimum of this expression:\\
-\begin{eqnarray*}
-L &=& \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\bf x}_i) \cdot  \phi({\bf x}_j)\\
- &=& \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j K({\bf x}_i, {\bf x}_j)
- \end{eqnarray*}
+\begin{align}
+L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\bf x}_i) \cdot  \phi({\bf x}_j)\\
+ &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j K({\bf x}_i, {\bf x}_j)
+ \end{align}
 }}\\
 \end{center}
 
@@ -1566,103 +1564,91 @@ Leading to a decision rule of:
 \parbox[t][2.5cm]{5cm}{
 %\addspace{0.2cm}
 Decision Rule, call positive if:\\
-\begin{eqnarray*}
-\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi(**u**) + b &\geq& 0\\
-\sum \alpha_i y_i K({\bf x}_i, **u**) + b &\geq& 0
-\end{eqnarray*}
+\begin{align}
+\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b &\geq& 0\\
+\sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
+\end{align}
 }}\\
 \end{center}
 
-\medskip
+##### Kernel Examples: {-}
 
-\begin{examp}[Kernel1]
+* **Kernel 1**
+
 Consider the following transformation, $\phi: \mathds{R}^2 \rightarrow \mathds{R}^3$:
-\begin{eqnarray*}
-\phi({\bf x}) &=& (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
-K({\bf x}, {\bf y}) &=& \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
-&=& (x_1y_1 + x_2y_2)^2\\
-K({\bf x}, {\bf y}) &=& ({\bf x} \cdot {\bf y})^2
-\end{eqnarray*}
+\begin{align}
+\phi({\bf x}) &= (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
+K({\bf x}, {\bf y}) &= \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
+&= (x_1y_1 + x_2y_2)^2\\
+K({\bf x}, {\bf y}) &= ({\bf x} \cdot {\bf y})^2
+\end{align}
 Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.\\
-\end{examp}
 
 
-\medskip
-
-\begin{examp}[Kernel2]
+* **Kernel 2**
 Writing the polynomial kernel out (for $d=2$), we can find the exact $\phi$ function.  Consider the following polynomial kernel for $d=2$.
 $$K({\bf x}, {\bf y}) = ({\bf x} \cdot {\bf y} + c)^2$$
 By writing down the dot product and then considering the square of each of the components separately, we get
-\begin{eqnarray*}
-({\bf x} \cdot {\bf y} + c)^2 &=& (c + \sum_{i=1}^p x_iy_i)^2\\
-&=& c^2 + \sum_{i=1}^p x_i^2y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_iy_ix_jy_j + \sum_{i=1}^p2cx_iy_i
-\end{eqnarray*}
+\begin{align}
+({\bf x} \cdot {\bf y} + c)^2 &= (c + \sum_{i=1}^p x_iy_i)^2\\
+&= c^2 + \sum_{i=1}^p x_i^2y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_iy_ix_jy_j + \sum_{i=1}^p2cx_iy_i
+\end{align}
 By pulling the sum apart into all the components of the ${\bf x}$ and ${\bf y}$ vectors separately, we find that
-\begin{eqnarray*}
+\begin{align}
 \phi({\bf x}) = (c, x_1^2, \ldots, x_p^2, \sqrt{2}x_1x_2, \ldots, \sqrt{2}x_1x_p, \sqrt{2}x_2x_3, \ldots, \sqrt{2}x_{p-1}x_p, \sqrt{2c}x_1, \ldots, \sqrt{2c}x_p)
-\end{eqnarray*}
-\end{examp}
+\end{align}
 
+<!--
 %The polar transformation corresponds to $(x,y) \rightarrow (\sqrt(x^2+y^2),\arctan(x,y))$. The closest related polynomial kernel might be $(x,y) \rightarrow (x^2,y^2,\sqrt(2)xy)$. In any case, this will work for that toy case.
 
 %If two concentric circles, just map to $(x, y, x^2 + y^2)$  (note: we went from R2 to R3, and the data were then linearly separable in R3).
+-->
 
-\medskip
 
-\begin{examp}[Kernel3]
+* **Kernel 3**
 Using the radial kernel (see below) it is possible to map the observations into an infinite dimensional space yet still only consider the kernel associated with the dot product of the original data.  Consider the following example for $x$ in one dimension mapped to infinite dimensions.
 
-\begin{eqnarray*}
-\phi_{RBF}(x) &=& e^{-\gamma x} \bigg(1, \sqrt{\frac{2\gamma}{1!}} x, \sqrt{\frac{(2\gamma)^2}{2!}} x^2, \sqrt{\frac{(2\gamma)^3}{3!}} x^3, \ldots \bigg)^t\\
-K_{RBF} (x,y) &=& \exp( -\gamma ||x-y||^2)
-\end{eqnarray*}
+\begin{align}
+\phi_{RBF}(x) &= e^{-\gamma x} \bigg(1, \sqrt{\frac{2\gamma}{1!}} x, \sqrt{\frac{(2\gamma)^2}{2!}} x^2, \sqrt{\frac{(2\gamma)^3}{3!}} x^3, \ldots \bigg)^t\\
+K_{RBF} (x,y) &= \exp( -\gamma ||x-y||^2)
+\end{align}
 where cross validation is used to find the tuning value $\gamma$ as well as the penalty parameter $C$.
-\end{examp}
+
 
 
 #### What is a Kernel?
 
-What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g. a measure of `similarity' between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K(**x_i**, **x_j**)$, the matrix $**K** = [K_{ij}]$ is positive definite.
+What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g. a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
 
-A helpful website about kernels:
-\url{http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html}
+A helpful website about kernels: http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html
 
 
-\begin{eqnarray*}
+\begin{align}
 K({\bf x},{\bf y}) = \phi({\bf x}) \cdot \phi({\bf y})
-\end{eqnarray*}
+\end{align}
 
 #### Examples of kernels: {-}
 
-\begin{itemize}
-\item[linear]
+* **linear**
 $$K({\bf x}, {\bf y}) = {\bf x} \cdot{\bf y}$$
-\item[polynomial]
+* **polynomial**
 $$K_P({\bf x}, {\bf y}) =(\gamma {\bf x}\cdot {\bf y} + r)^d = \phi_P({\bf x}) \cdot \phi_P({\bf y}) \ \ \ \ \gamma > 0$$
 Note, here $\gamma, r, d$ must be tuned using cross validation (along with the penalty parameter $C$).
-\item[RBF]
+
+* **RBF**
 The radial basis function is also called the Gaussian kernel because of its similarity to the Gaussian distribution (aka the normal distribution).  Because the RBF maps to infinite dimensional space, it can easily over fit the training data.  Care must be taken to estimate $\gamma$.
 $$K_{RBF}({\bf x}, {\bf y}) = \exp( - \gamma ||{\bf x} -  {\bf y}||^2) = \phi_{RBF}({\bf x}) \cdot \phi_{RBF}({\bf y})$$
 Note, here $\gamma$ must be tuned using cross validation (along with the penalty parameter $C$).
-\item[sigmoid]
+* **sigmoid**
 The sigmoid kernel is not a valid kernel method for all values of $\gamma$ and $r$ [which means that for certain parameter values, the $\phi()$ function may not exist].
 $$K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x}) \cdot \phi_S({\bf y})$$
 Note, here $\gamma, r$ must be tuned using cross validation (along with the penalty parameter $C$).  One benefit of the sigmoid kernel is that it has equivalence to a two-layer perceptron neural network.
-\end{itemize}
 
-\starthere{11/15/17}
-
-\paragraph{Agenda}
-\begin{enumerate}
-  \itemsep0em
-  \item soft margins / cost
-  \item one vs. one / one vs. all
-\end{enumerate}
 
 #### Soft Margins
 
 But what if the data aren't linearly separable?  The optimization problem can be changed to allow for points to be on the other side of the margin.  The optimization problem is slightly more complicated, but basically the same idea:
-$$ y_i(**w** \cdot **x_i** + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
+$$ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
 
 
 <div class="figure" style="text-align: center">
@@ -1676,22 +1662,22 @@ The optimization problem gets slightly more complicated in two ways, first, the 
 \framebox{
 \parbox[t][3.5cm]{5cm}{
 %\addspace{0.2cm}
-Minimize (for $**w**$, $\xi_i$, $b$):
-$$ \frac{1}{2} ||**w**||^2 + C \sum_{i=1}^n \xi_i$$\\
+Minimize (for ${\bf w}$, $\xi_i$, $b$):
+$$\frac{1}{2} ||{\bf w}||^2 + C \sum_{i=1}^n \xi_i$$
 Subject to:
-$$ y_i (**w** \cdot **x_i** + b) \geq 1 - \xi_i \ \ \ \ \xi_i \geq 0$$
+$$y_i ({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i \ \ \ \ \xi_i \geq 0$$
 }}\\
 \end{center}
 
 Which leads to the following Lagrangian equation:
-\begin{eqnarray*}
-L = \frac{1}{2}||**w**||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i (**w** \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
-\end{eqnarray*}
+\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
+\end{align}
 
 
-That is, the objective function now allows for a trade-off between a large margin and a small error penalty.  Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations.  The key here is that although quadratic programming can be used to solve for most of the parameters, \textcolor{red}{$C$ is now a tuning parameter that needs to be set by the user or by cross validation.}
+That is, the objective function now allows for a trade-off between a large margin and a small error penalty.  Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations.  The key here is that although quadratic programming can be used to solve for most of the parameters, <p style="color:red">$C$ is now a tuning parameter that needs to be set by the user or by cross validation.</p>
 
-\paragraph{How does $C$ relate to margins?}
+##### How does $C$ relate to margins? {-}
 
 Notice that the minimization is now over many more variables (with $C$ set/tuned - not optimized).   If we are allowing for misclassification and $C=0$, that implies that $\xi_i$ can be as large as possible.  Which means the algorithm will choose the widest possible street.  The widest possible street will be the one that hits at the two most extreme data points (the "support vectors" will now be the ones on the edge, not the ones near the separating hyperplane).  $C$ small allows the constraints (on points crossing the line) to be ignored.
 
@@ -1703,64 +1689,39 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-33)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-331)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div><div class="figure" style="text-align: center">
 <img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-33)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-332)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div><div class="figure" style="text-align: center">
 <img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-33)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-333)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
-\paragraph{Shortcomings of Support Vector Machines:}
-\begin{itemize}
-\item
-Can only classify binary categories (response variable).
-\item
-All predictor variables must be numeric.
-\begin{itemize}
-\item
-A great differential in range will allow variables with large range to dominate the predictions.  Either linearly scale each attribute to some range [ e.g., (-1, +1) or (0,1)] or divide by the standard deviation.
-\item
-Categorical variables can be used if formatted as binary factor variables.
-\item
-Whatever is done to the training data {\em must} also be done to the test data!
-\end{itemize}
-\item
-Another problem is the kernel function itself.
-\begin{itemize}
-\item
-With primitive data (e.g., 2d data points), good kernels are easy to come by.
-\item
-With harder data (e.g., MRI scans), finding a sensible kernel function may be much harder.
-\end{itemize}
-\item
-With really large data, it doesn?t perform well because of the large amount of required training time 
-\item
-It also doesn't perform very well when the data set has a lot of noise i.e., target classes are overlapping
-\item
-SVM doesn't directly provide probability estimates, these are calculated using an expensive five-fold cross-validation. 
-\end{itemize}
+* **Shortcomings of Support Vector Machines:**
+
+* Can only classify binary categories (response variable).
+* All predictor variables must be numeric.
+     * A great differential in range will allow variables with large range to dominate the predictions.  Either linearly scale each attribute to some range [ e.g., (-1, +1) or (0,1)] or divide by the standard deviation.
+     * Categorical variables can be used if formatted as binary factor variables.
+     * Whatever is done to the training data *must* also be done to the test data!
+* Another problem is the kernel function itself.
+     * With primitive data (e.g., 2d data points), good kernels are easy to come by.
+     * With harder data (e.g., MRI scans), finding a sensible kernel function may be much harder.
+* With really large data, it doesn't perform well because of the large amount of required training time 
+* It also doesn't perform very well when the data set has a lot of noise i.e., target classes are overlapping
+* SVM doesn't directly provide probability estimates, these are calculated using an expensive five-fold cross-validation. 
 
 
-\paragraph{Strengths of Support Vector Machines:}
-\begin{itemize}
-\item
-Can always fit a linear separating hyper plane in a high enough dimensional space.
-\item
-The kernel trick makes it possible to not know the transformation functions, $\phi$.
-\item
-Because the optimization is on a convex function, the numerical process for finding solutions are extremely efficient.
-\item
-It works really well with clear margin of separation
-\item
-It is effective in high dimensional spaces.
-\item
-It is effective in cases where number of dimensions is greater than the number of samples.
-\item
-It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
-\end{itemize}
+* **Strengths of Support Vector Machines:**
+* Can always fit a linear separating hyper plane in a high enough dimensional space.
+* The kernel trick makes it possible to not know the transformation functions, $\phi$.
+* Because the optimization is on a convex function, the numerical process for finding solutions are extremely efficient.
+* It works really well with clear margin of separation
+* It is effective in high dimensional spaces.
+* It is effective in cases where number of dimensions is greater than the number of samples.
+* It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
 
 \begin{algorithm}
 \caption{Algorithm for Support Vector Machines}
@@ -1768,8 +1729,8 @@ It uses a subset of training points in the decision function (called support vec
 \begin{algorithmic}[]
 \State 1.  Using cross validation, find values of $C, \gamma, d, r$, etc.  (and the kernel function!)
 \State 2.  Using Lagrange multipliers (read: the computer), solve for $\alpha_i$ and $b$.
-\State 3. Classify an unknown observation (**u**) as "positive" if:
-$$\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi(**u**) + b  = \sum \alpha_i y_i K({\bf x}_i, **u**) + b \geq 0$$
+\State 3. Classify an unknown observation (${\bf u}$) as "positive" if:
+$$\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b  = \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b \geq 0$$
 \end{algorithmic}
 \end{algorithm}
 
@@ -1777,12 +1738,11 @@ $$\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi(**u**) + b  = \sum \alpha_i y_i K
 
 When there are more than two classes, the problem needs to be reduced into a binary classification problem.  Consider the groups associated with Red, Green, and Blue.  In order to figure out which points get classified as Red, two different methods can be applied.
 
-\begin{itemize}
-\item[One vs All]
-Each category can be compared to the {\em rest of the groups}.  This will create $k$ different classifiers (here $k=$).  Each test value would then be classified according to each classifier, and the group assignment would be given by the group giving the highest value of $**w**_k \cdot **u** + b$, as the projection would represent the classification {\em farthest} into the group center.  In the end, there will be $K$ classifiers.
-\item[One vs One]
+* **One vs All**
+Each category can be compared to the *rest of the groups*.  This will create $k$ different classifiers (here $k=$).  Each test value would then be classified according to each classifier, and the group assignment would be given by the group giving the highest value of ${\bf w}_k \cdot {\bf u} + b$, as the projection would represent the classification *farthest* into the group center.  In the end, there will be $K$ classifiers.
+* **One vs One**
 Alternatively, each group can be compared with each other group (Red vs. Green, Red vs. Blue, Green vs. Blue).  Class membership will be determine by the group to which the unknown point is most often classified.  In the end, there will be $K(K-1)/2$ classifiers.
-\end{itemize}
+
 
 
 
