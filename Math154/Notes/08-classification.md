@@ -1458,7 +1458,7 @@ Again, working toward solving for ${\bf w}$ and $b$, add the additional constrai
 > For $x_i$ in the gutter (by definition):
 >$$y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0$$
 
-Now consider two particular positive and negative values that live on the margin (gutter).  The difference is almost the width of the street (we want to find the street that is as *wide as possible*), but it is at the wrong angle  (see street picture again).  Remember, our goal here is to **find the street separating the pluses and the minuses is as wide as possible.**  If we had a unit vector, we could dot it with $(x_+ - x_-)$ to get the width of the street!
+Now consider two particular positive and negative values that live on the margin (gutter).  The difference is almost the width of the street (we want to find the street that is as *wide as possible*), but it is at the wrong angle  (see street picture again).  Remember, our goal here is to **find the street separating the pluses and the minuses that is as wide as possible.**  If we had a unit vector, we could dot it with $(x_+ - x_-)$ to get the width of the street!
 
 \begin{align}
 width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||}
@@ -1519,7 +1519,7 @@ The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so wh
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
 
-## 11/14/19 Agenda {#Nov14}
+### 11/14/19 Agenda {#Nov14}
 1. not linearly separable (SVM)
 2. kernels (SVM)
 3. support vector formulation
@@ -1666,14 +1666,8 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-331)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-332)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-333)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-33)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
