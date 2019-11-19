@@ -1603,7 +1603,7 @@ Consider the following example from http://openclassroom.stanford.edu/MainFolder
 The take home message here is that a wiggly boundary is really best, and the value of $\gamma$ should be high to represent the high model complexity.
 
 <div class="figure" style="text-align: center">
-<img src="figs/SVMEx1.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx1g100.png" alt="Extremely complicated decision boundary" width="100%" />
+<img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-32)Extremely complicated decision boundary</p>
 </div>
 
@@ -1612,17 +1612,17 @@ The take home message here is that a wiggly boundary is really best, and the val
 But if the boundary has low complexity, then the best value of $\gamma$ is probably much lower.
 
 <div class="figure" style="text-align: center">
-<img src="figs/SVMEx2.png" alt="Simple decision boundary" width="100%" />
+<img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-33)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/SVMEx2g1.png" alt="Simple decision boundary -- reasonable gamma" width="100%" /><img src="figs/SVMEx2g10.png" alt="Simple decision boundary -- reasonable gamma" width="100%" />
+<img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="100%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-34)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/SVMEx2g100.png" alt="Simple decision boundary -- gamma too big" width="100%" /><img src="figs/SVMEx2g1000.png" alt="Simple decision boundary -- gamma too big" width="100%" />
+<img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="100%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary -- gamma too big</p>
 </div>
 
