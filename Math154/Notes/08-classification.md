@@ -1617,9 +1617,14 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/SVMEx2g1.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx2g10.png" alt="Extremely complicated decision boundary" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-34)Extremely complicated decision boundary</p>
-</div><img src="figs/SVMEx2g100.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx2g1000.png" alt="Extremely complicated decision boundary" width="100%" />
+<img src="figs/SVMEx2g1.png" alt="Simple decision boundary -- reasonable gamma" width="100%" /><img src="figs/SVMEx2g10.png" alt="Simple decision boundary -- reasonable gamma" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-34)Simple decision boundary -- reasonable gamma</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/SVMEx2g100.png" alt="Simple decision boundary -- gamma too big" width="100%" /><img src="figs/SVMEx2g1000.png" alt="Simple decision boundary -- gamma too big" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary -- gamma too big</p>
+</div>
 
 
 
@@ -1661,7 +1666,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-35)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-36)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -1692,7 +1697,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-36)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-37)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -1878,12 +1883,12 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
 
-For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
+> For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
 
 
 ```r
