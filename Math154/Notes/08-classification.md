@@ -1222,7 +1222,7 @@ caret::confusionMatrix(data=predict(modFit, newdata = iris.test),
 ```
 
 
-#### Parameters...  `mtry` and `ntrees`
+#### Parameters...  `mtry` and `num.trees`
 
 Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
 
@@ -1298,7 +1298,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
 
 ####  Variable Importance {-}
 
-In order to get the variable importance, you need to specifiy importance within the building of the forest.
+In order to get the variable importance, you need to specify importance within the building of the forest.
 
 See if you can figure out every single line of the `ggplot` code.
 
@@ -1356,11 +1356,11 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * transformation of response 	| * CV set.seed 	|
 | * response:continuous vs. categorical 	| * alpha prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
-| * train/test split (set.seed) 	| * prune or not 	|
+| * train/test split (`set.seed`) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|
 | * type of classification model 	| * \# trees / \# BS samples 	|
 | * use of cost complexity / parameter 	| * grid search etc. for tuning 	|
-| * majority / average prob (tree error rate) 	| * value(s) of mtry 	|
+| * majority / average prob (tree error rate) 	| * value(s) of `mtry` 	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
 
 
@@ -1572,8 +1572,8 @@ Writing the polynomial kernel out (for $d=2$), we can find the exact $\phi$ func
 $$K({\bf x}, {\bf y}) = ({\bf x} \cdot {\bf y} + c)^2$$
 By writing down the dot product and then considering the square of each of the components separately, we get
 \begin{align}
-({\bf x} \cdot {\bf y} + c)^2 &= (c + \sum_{i=1}^p x_iy_i)^2\\
-&= c^2 + \sum_{i=1}^p x_i^2y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_iy_ix_jy_j + \sum_{i=1}^p2cx_iy_i
+({\bf x} \cdot {\bf y} + c)^2 &= (c + \sum_{i=1}^p x_i y_i)^2\\
+&= c^2 + \sum_{i=1}^p x_i^2 y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_i y_i x_j y_j + \sum_{i=1}^p 2 cx_i y_i
 \end{align}
 By pulling the sum apart into all the components of the ${\bf x}$ and ${\bf y}$ vectors separately, we find that
 \begin{align}
@@ -1595,6 +1595,31 @@ Using the radial kernel (see below) it is possible to map the observations into 
 K_{RBF} (x,y) &= \exp( -\gamma ||x-y||^2)
 \end{align}
 where cross validation is used to find the tuning value $\gamma$ as well as the penalty parameter $C$.
+
+Consider the following example from http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex8/ex8.html.
+
+##### What if the boundary is wiggly? {-}
+
+The take home message here is that a wiggly boundary is really best, and the value of $\gamma$ should be high to represent the high model complexity.
+
+<div class="figure" style="text-align: center">
+<img src="figs/SVMEx1.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx1g100.png" alt="Extremely complicated decision boundary" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-32)Extremely complicated decision boundary</p>
+</div>
+
+##### What if the boundary isn't wiggly? {-}
+
+But if the boundary has low complexity, then the best value of $\gamma$ is probably much lower.
+
+<div class="figure" style="text-align: center">
+<img src="figs/SVMEx2.png" alt="Simple decision boundary" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-33)Simple decision boundary</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/SVMEx2g1.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx2g10.png" alt="Extremely complicated decision boundary" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-34)Extremely complicated decision boundary</p>
+</div><img src="figs/SVMEx2g100.png" alt="Extremely complicated decision boundary" width="100%" /><img src="figs/SVMEx2g1000.png" alt="Extremely complicated decision boundary" width="100%" />
 
 
 
@@ -1636,7 +1661,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-32)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-35)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -1667,7 +1692,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-33)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-36)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -1720,6 +1745,190 @@ Each category can be compared to the *rest of the groups*.  This will create $k$
 Alternatively, each group can be compared with each other group (Red vs. Green, Red vs. Blue, Green vs. Blue).  Class membership will be determine by the group to which the unknown point is most often classified.  In the end, there will be $K(K-1)/2$ classifiers.
 
 
+### R SVM Example
+
+We'll go back to the iris data.  As a first pass, let's use SVM to distinguish between Setosa and Versicolor/Virginica.
 
 
+```r
+library(kernlab)
+library(e1071)
+library(caret)
+data(iris)
+
+iris2 <- iris %>% dplyr::mutate(Species2 = as.factor(ifelse(Species == "setosa", "S", "V"))) %>%
+  dplyr::select(-Species)
+```
+
+
+#### Building an SVM on training data with radial kernel
+
+
+```r
+set.seed(4747)
+iris.svm.rad <- train(Species2 ~ ., data=iris2, method="svmRadial", 
+                 trControl = trainControl(method="cv"),
+                 tuneGrid= expand.grid(C=c(0.01,0.1,1,10,100), sigma=c(.5,1,2,3,4)),
+                 preProcess = c("center", "scale"))
+
+iris.svm.rad
+```
+
+```
+## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 150 samples
+##   4 predictor
+##   2 classes: 'S', 'V' 
+## 
+## Pre-processing: centered (4), scaled (4) 
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 135, 135, 135, 135, 135, 135, ... 
+## Resampling results across tuning parameters:
+## 
+##   C      sigma  Accuracy   Kappa    
+##   1e-02  0.5    0.6666667  0.0000000
+##   1e-02  1.0    0.6666667  0.0000000
+##   1e-02  2.0    0.6666667  0.0000000
+##   1e-02  3.0    0.6666667  0.0000000
+##   1e-02  4.0    0.6666667  0.0000000
+##   1e-01  0.5    0.9866667  0.9684211
+##   1e-01  1.0    0.9800000  0.9508772
+##   1e-01  2.0    0.9466667  0.8684211
+##   1e-01  3.0    0.8800000  0.6892931
+##   1e-01  4.0    0.7933333  0.4411765
+##   1e+00  0.5    0.9933333  0.9842105
+##   1e+00  1.0    0.9933333  0.9842105
+##   1e+00  2.0    0.9866667  0.9684211
+##   1e+00  3.0    0.9866667  0.9684211
+##   1e+00  4.0    0.9866667  0.9684211
+##   1e+01  0.5    0.9933333  0.9842105
+##   1e+01  1.0    0.9933333  0.9842105
+##   1e+01  2.0    0.9866667  0.9684211
+##   1e+01  3.0    0.9866667  0.9684211
+##   1e+01  4.0    0.9866667  0.9684211
+##   1e+02  0.5    0.9933333  0.9842105
+##   1e+02  1.0    0.9933333  0.9842105
+##   1e+02  2.0    0.9866667  0.9684211
+##   1e+02  3.0    0.9866667  0.9684211
+##   1e+02  4.0    0.9866667  0.9684211
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were sigma = 1 and C = 1.
+```
+
+#### Training Error
+
+
+```r
+iris.train.pred <- predict(iris.svm.rad, iris2)
+caret::confusionMatrix(iris.train.pred, iris2$Species2)$overall
+```
+
+```
+##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+##   1.000000e+00   1.000000e+00   9.757074e-01   1.000000e+00   6.666667e-01 
+## AccuracyPValue  McnemarPValue 
+##   3.857546e-27            NaN
+```
+
+```r
+caret::confusionMatrix(iris.train.pred, iris2$Species2)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   S   V
+##          S  50   0
+##          V   0 100
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9757, 1)
+##     No Information Rate : 0.6667     
+##     P-Value [Acc > NIR] : < 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##                                      
+##  Mcnemar's Test P-Value : NA         
+##                                      
+##             Sensitivity : 1.0000     
+##             Specificity : 1.0000     
+##          Pos Pred Value : 1.0000     
+##          Neg Pred Value : 1.0000     
+##              Prevalence : 0.3333     
+##          Detection Rate : 0.3333     
+##    Detection Prevalence : 0.3333     
+##       Balanced Accuracy : 1.0000     
+##                                      
+##        'Positive' Class : S          
+## 
+```
+
+
+#### Visualizing the Boundary
+
+`caret` doesn't allow for visualization, so I've applied the `svm` function directly here.  I had to try various combinations of variables before finding a boundary that was visually interesting.  Note that just being in the yellow or red part doesn't necessarily indicate missclassification.  Remember that the boundary is in 4 dimensions and is not linear.
+
+
+```r
+iris.svm <- e1071::svm(Species2 ~ ., data = iris2, kernel = "radial")
+plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width, 
+     slice=list(Sepal.Length = 3, Petal.Length = 3))
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
+
+
+#### 3 groups
+
+For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
+
+
+```r
+set.seed(474747)
+train.obs <- sample(1:150, 100, replace = FALSE)
+iris.train <- iris[train.obs, ]
+iris.test <- iris[-train.obs, ]
+```
+
+
+```r
+iris.svm3 <- caret::train(Species ~ ., data=iris.train, method="svmRadial", 
+                 trControl = trainControl(method="none"),
+                 tuneGrid= expand.grid(C=1, sigma=2),
+                 preProcess = c("center", "scale"))
+```
+
+
+
+```r
+predict(iris.svm3, iris.test)
+```
+
+```
+##  [1] setosa     setosa     setosa     setosa     setosa     setosa    
+##  [7] setosa     setosa     setosa     setosa     setosa     setosa    
+## [13] virginica  setosa     setosa     setosa     versicolor versicolor
+## [19] versicolor versicolor versicolor versicolor versicolor virginica 
+## [25] versicolor versicolor versicolor versicolor versicolor versicolor
+## [31] versicolor versicolor versicolor virginica  virginica  virginica 
+## [37] virginica  virginica  virginica  versicolor virginica  virginica 
+## [43] virginica  versicolor virginica  virginica  virginica  virginica 
+## [49] virginica  virginica 
+## Levels: setosa versicolor virginica
+```
+
+```r
+table(predict(iris.svm3, iris.test), iris.test$Species)
+```
+
+```
+##             
+##              setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         16         2
+##   virginica       1          1        15
+```
 

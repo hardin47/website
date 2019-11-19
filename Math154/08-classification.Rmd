@@ -875,7 +875,7 @@ caret::confusionMatrix(data=predict(modFit, newdata = iris.test),
 ```
 
 
-#### Parameters...  `mtry` and `ntrees`
+#### Parameters...  `mtry` and `num.trees`
 
 Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
 
@@ -919,7 +919,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
 
 ####  Variable Importance {-}
 
-In order to get the variable importance, you need to specifiy importance within the building of the forest.
+In order to get the variable importance, you need to specify importance within the building of the forest.
 
 See if you can figure out every single line of the `ggplot` code.
 ```{r}
@@ -964,11 +964,11 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * transformation of response 	| * CV set.seed 	|
 | * response:continuous vs. categorical 	| * alpha prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
-| * train/test split (set.seed) 	| * prune or not 	|
+| * train/test split (`set.seed`) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|
 | * type of classification model 	| * \# trees / \# BS samples 	|
 | * use of cost complexity / parameter 	| * grid search etc. for tuning 	|
-| * majority / average prob (tree error rate) 	| * value(s) of mtry 	|
+| * majority / average prob (tree error rate) 	| * value(s) of `mtry` 	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
 
 
@@ -1182,8 +1182,8 @@ Writing the polynomial kernel out (for $d=2$), we can find the exact $\phi$ func
 $$K({\bf x}, {\bf y}) = ({\bf x} \cdot {\bf y} + c)^2$$
 By writing down the dot product and then considering the square of each of the components separately, we get
 \begin{align}
-({\bf x} \cdot {\bf y} + c)^2 &= (c + \sum_{i=1}^p x_iy_i)^2\\
-&= c^2 + \sum_{i=1}^p x_i^2y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_iy_ix_jy_j + \sum_{i=1}^p2cx_iy_i
+({\bf x} \cdot {\bf y} + c)^2 &= (c + \sum_{i=1}^p x_i y_i)^2\\
+&= c^2 + \sum_{i=1}^p x_i^2 y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_i y_i x_j y_j + \sum_{i=1}^p 2 cx_i y_i
 \end{align}
 By pulling the sum apart into all the components of the ${\bf x}$ and ${\bf y}$ vectors separately, we find that
 \begin{align}
@@ -1205,6 +1205,29 @@ Using the radial kernel (see below) it is possible to map the observations into 
 K_{RBF} (x,y) &= \exp( -\gamma ||x-y||^2)
 \end{align}
 where cross validation is used to find the tuning value $\gamma$ as well as the penalty parameter $C$.
+
+Consider the following example from http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex8/ex8.html.
+
+##### What if the boundary is wiggly? {-}
+
+The take home message here is that a wiggly boundary is really best, and the value of $\gamma$ should be high to represent the high model complexity.
+
+```{r fig.cap = "Extremely complicated decision boundary", out.width='100%', fig.align='center', echo=FALSE, fig.show = "keep"}
+knitr::include_graphics(c("figs/SVMEx1.png", "figs/SVMEx1g100.png"))
+```
+
+##### What if the boundary isn't wiggly? {-}
+
+But if the boundary has low complexity, then the best value of $\gamma$ is probably much lower.
+
+```{r fig.cap = "Simple decision boundary", out.width='100%', fig.align='center', echo=FALSE, fig.show = "keep"}
+knitr::include_graphics("figs/SVMEx2.png")
+```
+
+```{r fig.cap = "Extremely complicated decision boundary", out.width='100%', fig.align='center', echo=FALSE, fig.show = "keep"}
+knitr::include_graphics(c("figs/SVMEx2g1.png", "figs/SVMEx2g10.png"))
+knitr::include_graphics(c("figs/SVMEx2g100.png", "figs/SVMEx2g1000.png"))
+```
 
 
 
@@ -1330,6 +1353,75 @@ Each category can be compared to the *rest of the groups*.  This will create $k$
 Alternatively, each group can be compared with each other group (Red vs. Green, Red vs. Blue, Green vs. Blue).  Class membership will be determine by the group to which the unknown point is most often classified.  In the end, there will be $K(K-1)/2$ classifiers.
 
 
+### R SVM Example
+
+We'll go back to the iris data.  As a first pass, let's use SVM to distinguish between Setosa and Versicolor/Virginica.
+
+```{r}
+library(kernlab)
+library(e1071)
+library(caret)
+data(iris)
+
+iris2 <- iris %>% dplyr::mutate(Species2 = as.factor(ifelse(Species == "setosa", "S", "V"))) %>%
+  dplyr::select(-Species)
+```
 
 
+#### Building an SVM on training data with radial kernel
+
+```{r}
+set.seed(4747)
+iris.svm.rad <- train(Species2 ~ ., data=iris2, method="svmRadial", 
+                 trControl = trainControl(method="cv"),
+                 tuneGrid= expand.grid(C=c(0.01,0.1,1,10,100), sigma=c(.5,1,2,3,4)),
+                 preProcess = c("center", "scale"))
+
+iris.svm.rad
+
+```
+
+#### Training Error
+
+```{r}
+iris.train.pred <- predict(iris.svm.rad, iris2)
+caret::confusionMatrix(iris.train.pred, iris2$Species2)$overall
+caret::confusionMatrix(iris.train.pred, iris2$Species2)
+```
+
+
+#### Visualizing the Boundary
+
+`caret` doesn't allow for visualization, so I've applied the `svm` function directly here.  I had to try various combinations of variables before finding a boundary that was visually interesting.  Note that just being in the yellow or red part doesn't necessarily indicate missclassification.  Remember that the boundary is in 4 dimensions and is not linear.
+
+```{r}
+iris.svm <- e1071::svm(Species2 ~ ., data = iris2, kernel = "radial")
+plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width, 
+     slice=list(Sepal.Length = 3, Petal.Length = 3))
+```
+
+
+#### 3 groups
+
+For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
+
+```{r}
+set.seed(474747)
+train.obs <- sample(1:150, 100, replace = FALSE)
+iris.train <- iris[train.obs, ]
+iris.test <- iris[-train.obs, ]
+```
+
+```{r}
+iris.svm3 <- caret::train(Species ~ ., data=iris.train, method="svmRadial", 
+                 trControl = trainControl(method="none"),
+                 tuneGrid= expand.grid(C=1, sigma=2),
+                 preProcess = c("center", "scale"))
+```
+
+
+```{r}
+predict(iris.svm3, iris.test)
+table(predict(iris.svm3, iris.test), iris.test$Species)
+```
 
