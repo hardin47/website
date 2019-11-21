@@ -125,7 +125,7 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
 
 
 
-<img src="figs/corEucdist.jpeg" width="100%" style="display: block; margin: auto;" />
+<img src="figs/corEucdist.jpeg" width="80%" style="display: block; margin: auto;" />
 
 **Shortcomings:**
 
@@ -175,7 +175,7 @@ Haversine distance is the great-circle distance (i.e., the distance between two 
 
 $$d_{HV} = 2 R \arcsin \sqrt{\sin^2 \bigg( \frac{lat2-lat1}{2} \bigg) + \cos(lat1) \cos(lat2) \sin^2 \bigg(\frac{long2 - long1}{2} \bigg)} $$
 
-<img src="figs/havdist.png" width="100%" style="display: block; margin: auto;" />
+<img src="figs/havdist.png" width="60%" style="display: block; margin: auto;" />
 
 **Shortcomings:**
 
@@ -196,7 +196,7 @@ d_H({\bf x}, {\bf y}) = \sum_{i=1}^p I(x_i \ne y_i)
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="100%" />
+<img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="80%" />
 <p class="caption">(\#fig:unnamed-chunk-4)The Hamming distance across the two DNA strands is 7.</p>
 </div>
 
@@ -214,7 +214,7 @@ Gives a more direct "distance" between categorical variables.
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/distR.jpg" alt="The function `dist` in `R` calculates the distances given above." width="100%" />
+<img src="figs/distR.png" alt="The function `dist` in `R` calculates the distances given above." width="80%" />
 <p class="caption">(\#fig:unnamed-chunk-5)The function `dist` in `R` calculates the distances given above.</p>
 </div>
 
@@ -223,7 +223,7 @@ Gives a more direct "distance" between categorical variables.
 
 **Example:**  Consider the following images / data (from Laura Hoopes, personal communication; *Molecular characterisation of soft tissue tumours: a gene expression study* by Nielsen et al., The Lancet 2002).  The first represents a microarray sample from aging yeast.  The second is a set of 41 samples of soft-tissue tumors (columns) and a subset of 5520 genes (rows) used to characterize their molecular signatures.
 
-<img src="figs/LH_microarray_small.jpg" width="45%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="45%" style="display: block; margin: auto;" />
+<img src="figs/LH_microarray_small.jpg" width="40%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="40%" style="display: block; margin: auto;" />
 
 Note: the ordering of the variables (or samples) does not affect the clustering of the samples (or variables).  That is:  we can clustering the variables / samples either sequentially or in parallel to see trends in both relationships simultaneously.  Clustering both the observations and the variables is called *biclustering*.
 
@@ -308,7 +308,7 @@ Link C with (DE)!
 d_{(AB)(CDE)} = d_{BC} = 0.5
 \end{align}
 
-<img src="figs/singlexamp.jpg" width="100%" style="display: block; margin: auto;" />
+<img src="figs/singlexamp.jpg" width="80%" style="display: block; margin: auto;" />
 
 
 
@@ -435,7 +435,7 @@ Note that if $a(i) < b(i)$ then $i$ is well classified with a maximum $s(i) = 1$
 
 **PAM example**  
 
-				\begin{align}
+\begin{align}
 					D_1=
 					\begin{blockarray}{cccccc}
 					\begin{block}{c[ccccc]}
@@ -445,7 +445,7 @@ Note that if $a(i) < b(i)$ then $i$ is well classified with a maximum $s(i) = 1$
 						D & 1 & 0.9 & 0.4 & 0 & \\[3pt]
 					\end{block}
 					\end{blockarray}
-				\end{align}
+\end{align}
 (Note: this is the same matrix as before, but with only 4 observations.) 
 
 Consider the data with (AB)(CD) as the clusters, we can calculate the previous metrics:
@@ -458,7 +458,7 @@ s(i=C) = \frac{b(C) - a(C)}{\max \{a(C), b(C)\}} = \frac{0.55 - 0.4}{0.55} = .27
 s(i=D) = \frac{b(D) - a(D)}{\max \{a(D), b(D)\}} = \frac{0.95 - 0.4}{0.95} = .57\\
 \mbox{Ave SW} = 0.575\\
 \end{align}
-* **Diam]\**
+* **Diam**
 \begin{align}
 \mbox{diameter}(AB) = 0.2\\
 \mbox{diameter}(CD) = 0.4\\
@@ -468,7 +468,8 @@ s(i=D) = \frac{b(D) - a(D)}{\max \{a(D), b(D)\}} = \frac{0.95 - 0.4}{0.95} = .57
 \mbox{separation}(AB) = \mbox{separation}(CD) = 0.5\\
 \end{align}
 
-* **Rand Index / Adjusted Rand Index** is based on a confusion matrix comparing either a known truth (labels) or comparing two different clusterings (e.g., comparing $k$-means and hierarchical clustering).  Let the two different clusterings be called partition1 and partition2.
+#### Rand Index / Adjusted Rand Index {-} 
+is based on a confusion matrix comparing either a known truth (labels) or comparing two different clusterings (e.g., comparing $k$-means and hierarchical clustering).  Let the two different clusterings be called partition1 and partition2.
 * **a** is the number of pairs of observations put together in both partition1 and partition2
 * **b** is the number of pairs of observations together in partition1 and apart in partition2
 * **c** is the number of pairs of observations together in partition2 and apart in partition1
@@ -495,8 +496,8 @@ Consider the Old Faithful geyser Yellowstone National Park, Wyoming, USA with th
 <img src="09-clustering_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 \begin{align}
-Y_1 &\sim& N(\mu_1, \sigma_1^2)\\
-Y_2 &\sim& N(\mu_2, \sigma_2^2)\\
+Y_1 &\sim N(\mu_1, \sigma_1^2)\\
+Y_2 &\sim N(\mu_2, \sigma_2^2)\\
 Y &= (1-\Delta) Y_1 + \Delta Y_2\\
 P(\Delta=1) &= \pi\\
 \end{align}
@@ -531,6 +532,7 @@ $$ \hat{\gamma}_i = \frac{\hat{\pi} \phi_{\hat{\theta}_2} (y_i)}{(1-\hat{\pi}) \
 \end{align}
 and the mixing probability $\hat{\pi} = \sum_{i=1}^N \hat{\gamma}_i / N$.
 4. Iterate Steps 2. and 3. until convergence.
+
 ******
 
 
