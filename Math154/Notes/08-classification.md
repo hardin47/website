@@ -1523,8 +1523,6 @@ Note that we have a convex space (can be proved), and so we can't get stuck in a
 1. not linearly separable (SVM)
 2. kernels (SVM)
 3. support vector formulation
-4. soft margins / cost
-5. one vs. one / one vs. all
 
 
 
@@ -1552,6 +1550,10 @@ L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\
 \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
 \end{align}
 
+### 11/19/19 Agenda {#Nov19}
+1. kernels
+2. not separable: soft margins / cost
+3. one vs. one / one vs. all
 
 ##### Kernel Examples: {-}
 
@@ -1628,7 +1630,7 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 
 
-#### What is a Kernel?
+#### What is a Kernel? {#kernels}
 
 What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g. a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
 

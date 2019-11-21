@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-11-20"
+date: "2019-11-21"
 site: bookdown::bookdown_site
 header-includes:
   - \usepackage{algorithm}
@@ -62,10 +62,10 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 11/7/19	| Random Forests | [ISL 8.2.2](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Nov7) [Nov7], \@ref(rf) [rf] |
 |11/12/19	| SVM | [ISL chapter 9](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Nov12) [Nov12], \@ref(linsvm) [linear svm] |
 | 11/14/19	|  |   | \@ref(Nov14) [Nov14], \@ref(notlinsvm) [notlin svm] |
-|11/19/19	| Hierarchical Clustering | [ISL chapter 10.3.2](http://faculty.marshall.usc.edu/gareth-james/ISL/)   | \@ref(Nov19) [Nov19], \@ref(hier) [hier] |
-| 11/21/19	| $k$-means  | [ISL chapter 10.3.1](http://faculty.marshall.usc.edu/gareth-james/ISL/)    | \@ref(Nov21) [Nov21], \@ref(kmeans) [kmeans] |
+|11/19/19	| |   | \@ref(Nov19) [Nov19], \@ref(kernels) [kernels] |
+| 11/21/19	| $k$-means  | [ISL chapter 10.3.2](http://faculty.marshall.usc.edu/gareth-james/ISL/)  | \@ref(Nov21) [Nov21], \@ref(hier) [HierClus], \@ref(part) [PartClus]|
 | 11/26/19  	| Project  |  | \@ref(Nov26) [Nov26] |
 | 12/3/19	| Catch-up |   |  |
 | 12/5/19	| In-class Exam 2|   |  |
-| 12/10/19  	| Reg Expr |  | \@ref(Dec10) [Dec10] |
+| 12/10/19  	| Reg Expr |  | \@ref(Dec10) [Dec10], \@ref(regexpr) [RegExpr] |
 

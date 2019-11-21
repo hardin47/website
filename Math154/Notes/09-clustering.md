@@ -5,16 +5,21 @@
 
 ### 11/21/19 Agenda {#Nov21}
 1. unsupervised methods
-2. clustering
-3. distance / dissimilarity
-4. soft margins / cost
-5. one vs. one / one vs. all
+2. distance / dissimilarity
+3. hierarchical clustering
+4. partitioning clustering
 
 The classification models we've discussed are all supervised learning techniques.  The word *supervised* refers to the fact that we know the response variable of all of the training observations.  Next up, we'll discuss clustering which is an *unsupervised* technique -- none of the observations have a given response variable.  For example, we might want to cluster a few hundred melanoma patients based on their genetic data.  We are looking for patterns in who groups together, but we don't have a preconceived idea of which patients belong to which group.
 
 There are also semi-supervised techniques applied to data which have some observations that are labeled and some that are not.  We will not discuss semi-supervised methods in this class.
 
 
+**Clustering** creates groups of observations via unsupervised methods.  We will cover hierarchical clustering, k-means, and k-medoids.  We cluster for two main reasons:
+
+* Summary: to describe the data and the observations' similarities to each other.
+* Discovery: to find new ways in which groups of observations are similar.
+
+**Classification -- SUPERVISED!** creates predictions (and prediction models) for unknown future observations via supervised methods.  With classification the group membership (i.e., response variable) is *known* for all the training data.  We covered k-NN, CART, bagging, Random Forests, and SVMs.
 
 ## Latent Dirichlet Allocation
 
@@ -39,22 +44,14 @@ Here is an algorithm for finding words that represent $K$ topics (where $K$ is c
 
 https://ziqixiong.shinyapps.io/TopicModeling/
 
-**Clustering** creates groups of observations via unsupervised methods.  We will cover hierarchical clustering, k-means, and k-medoids.  We cluster for two main reasons:
-
-* Summary: to describe the data and the observations' similarities to each other.
-* Discovery: to find new ways in which groups of observations are similar.
-
-** Classification -- SUPERVISED!** creates predictions (and prediction models) for unknown future observations via supervised methods.  With classification the group membership (i.e., response variable) is *known* for all the training data.  We covered k-NN, CART, bagging, Random Forests, and SVMs.
 
 ## Dissimilarities
 
-
-
 Many, though not all, clustering algorithms are based on distances between the objects being clustered.  Mathematical properties of a distance function are the following.  Consider two vectors ${\bf x}$ and ${\bf y}$ (${\bf x}, {\bf y} \in \mathbb{R}^p$), and the distance between them: $d({\bf x}, {\bf y})$.
 
-1.  $d({\bf x}, {\bf y}) \geq 0$
+1. $d({\bf x}, {\bf y}) \geq 0$
 2. $d({\bf x}, {\bf y}) = d({\bf y}, {\bf x})$
-3. $d({\bf x}, {\bf y}) = 0 $ iff ${\bf x} = {\bf y}$
+3. $d({\bf x}, {\bf y}) = 0$ iff ${\bf x} = {\bf y}$
 4. $d({\bf x}, {\bf y}) \leq d({\bf x}, {\bf z}) + d({\bf z}, {\bf y})$  for all other vectors ${\bf z}$.
 
 **Triangle Inequality**
@@ -62,15 +59,16 @@ Many, though not all, clustering algorithms are based on distances between the o
 The key to proving the triangle inequality for most of the distances relies on the Cauchy-Schwarz inequality.
 \begin{align}
 {\bf x} \cdot {\bf y} &= || {\bf x} ||  ||{\bf y}|| \cos(\theta) \\
-|{\bf x} \cdot {\bf y}| &= || {\bf x} ||  ||{\bf y}|| 
+|{\bf x} \cdot {\bf y}| &\leq || {\bf x} ||  ||{\bf y}|| 
 \end{align}
 
 
-**Euclidean Distance**
+#### Euclidean Distance {-}
 
 $$d_E({\bf x}, {\bf y}) = \sqrt{\sum_{i=1}^p (x_i - y_i)^2}$$
 
 Distance properties all check out.
+
 4.  Cauchy-Schwarz:
 \begin{align}
 \sum_{i=1}^p(x_i - y_i)^2 = \sum_{i=1}^p ( (x_i - z_i) + (z_i - y_i))^2 &\leq& \Bigg( \sqrt{\sum_{i=1}^p(x_i - z_i)^2} + \sqrt{\sum_{i=1}^p(z_i - y_i)^2} \Bigg)^2\\
@@ -80,14 +78,16 @@ d_E({\bf x}, {\bf y}) &\leq& d_E({\bf x}, {\bf z}) + d_E({\bf z}, {\bf y})
 
 
 **Shortcomings:**
+
 * $d_E$ is not scale invariant.
 * $d_E$ measures magnitude differences, not pattern differences.
 * $d_E$ is sensitive to outliers.
 
 **Strengths:**
-* Directly measures what is commonly considered to be ``distance."
 
-**Pearson Correlation**
+* Directly measures what is commonly considered to be "distance."
+
+#### Pearson Correlation Distance {-}
 \begin{align}
 d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
  \mbox{ or } &= 1 - |r_P ({\bf x}, {\bf y})|\\
@@ -108,8 +108,8 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
 
 
 Distance properties don't hold for Pearson correlation.
-3.  
-${\bf y}=a{\bf x}$
+
+3.   ${\bf y}=a{\bf x}$
  \begin{align}
 d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
 &= 1 - r_P ({\bf x}, a{\bf x})\\
@@ -118,30 +118,27 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
 
 4.
  ${\bf x}=(1,1,0)$, ${\bf y} = (2,1,0)$, ${\bf z} = (1,-1,0)$ 
- $ r_P({\bf x}, {\bf y}) = 0.87$, $r_P({\bf x}, {\bf z}) = 0$, $r_P({\bf y}, {\bf z}) = 0.5$
+ $r_P({\bf x}, {\bf y}) = 0.87$, $r_P({\bf x}, {\bf z}) = 0$, $r_P({\bf y}, {\bf z}) = 0.5$
 
- $ d_P({\bf x}, {\bf y}) + d_P({\bf y}, {\bf z})  <  d_P({\bf z}, {\bf x})  $
- $ \rightarrow\leftarrow$
-
-
+ $d_P({\bf x}, {\bf y}) + d_P({\bf y}, {\bf z})  <  d_P({\bf z}, {\bf x})$
+ $\rightarrow\leftarrow$
 
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=1]{corEucdist.jpeg}
-\end{center}
-\end{figure}
+
+<img src="figs/corEucdist.jpeg" width="100%" style="display: block; margin: auto;" />
 
 **Shortcomings:**
+
 * $d_P$ does not satisfy the triangle inequality.
 * $d_P$ is sensitive to outliers.
 
 **Strengths:**
+
 * Can measure the distance between variables on different scales  (although will still be sensitive to extreme values).
 
 
-**Spearman Correlation**
-Spearman correlation distance uses the spearman correlation instead of the Pearson correlation.  The Spearman correlation is simply the Pearson correlation applied to the ranks of the observations.  The ranking allows the Spearman distance to be resistant to outlying observations.
+#### Spearman Correlation Distance {-}
+Spearman correlation distance uses the Spearman correlation instead of the Pearson correlation.  The Spearman correlation is simply the Pearson correlation applied to the ranks of the observations.  The ranking allows the Spearman distance to be resistant to outlying observations.
 
 \begin{align}
 d_S({\bf x}, {\bf y}) &= 1 - r_S ({\bf x}, {\bf y})\\
@@ -150,13 +147,15 @@ d_S({\bf x}, {\bf y}) &= 1 - r_S ({\bf x}, {\bf y})\\
   \end{align}
 
 **Shortcomings:**
+
 * $d_S$ also does not satisfy the triangle inequality.
 * $d_S$ loses information about the shape of the relationship.
 
 **Strengths:**
+
 * Is resistant to outlying values
 
-**Cosine Distance**
+#### Cosine Distance {-}
 
 \begin{align}
 d_C({\bf x}, {\bf y}) &=  \frac{{\bf x} \cdot {\bf y}}{|| {\bf x} ||  ||{\bf y}||}\\
@@ -170,26 +169,24 @@ Said differently,
 d_P({\bf x}, {\bf y}) = d_C({\bf x} -  \overline{\bf x}, {\bf y} -  \overline{\bf y})
 \end{align}
 
-**Haversine Distance**
+#### Haversine Distance {-}
 
 Haversine distance is the great-circle distance (i.e., the distance between two points on a sphere) which is used to measure distance between two locations on the Earth.  Let $R$ be the radius of the Earth, and (lat1,long1) and (lat2, long2) be the two locations between which to calculate a distance.
 
 $$d_{HV} = 2 R \arcsin \sqrt{\sin^2 \bigg( \frac{lat2-lat1}{2} \bigg) + \cos(lat1) \cos(lat2) \sin^2 \bigg(\frac{long2 - long1}{2} \bigg)} $$
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.5]{havdist.png}
-\end{center}
-\end{figure}
+<img src="figs/havdist.png" width="100%" style="display: block; margin: auto;" />
 
 **Shortcomings:**
+
 * Earth is not a perfect sphere
 * Depending on how the distance is used, typically getting from one point to the next is not done by the shortest distance
 
 **Strengths:**
+
 * Allows calculations, for example, between two cities.
 
-**Hamming Distance**
+#### Hamming Distance {-}
 
 Hamming distance is the number of coordinates across two vectors whose values differ.  If the vectors are binary, the Hamming distance is equivalent to the $L_1$ norm of the difference.  (Hamming distance does satisfy the properties of a distance metric.)   Some methods, equivalently, calculate the proportion of coordinates that differ.
 
@@ -197,40 +194,36 @@ Hamming distance is the number of coordinates across two vectors whose values di
 d_H({\bf x}, {\bf y}) = \sum_{i=1}^p I(x_i \ne y_i)
 \end{align}
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.5]{hamdistGCTA.png}
-\end{center}
-\caption{The Hamming distance across the two DNA strands is 7.}
-\end{figure}
+
+<div class="figure" style="text-align: center">
+<img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-4)The Hamming distance across the two DNA strands is 7.</p>
+</div>
+
 
 **Shortcomings:**
+
 * Can't measure degree of difference between categorical variables.
 
 **Strengths:**
+
 * It is a distance metric.
-Gives a more direct ``distance" between categorical variables.
+Gives a more direct "distance" between categorical variables.
 
 
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.25]{distR.jpg}
-\end{center}
-\cprotect\caption{The function \verb;dist; in \verb;R; calculates the distances given above.}
-\end{figure}
 
-## Hierarchical Clustering
+<div class="figure" style="text-align: center">
+<img src="figs/distR.jpg" alt="The function `dist` in `R` calculates the distances given above." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-5)The function `dist` in `R` calculates the distances given above.</p>
+</div>
+
+
+## Hierarchical Clustering {#hier}
 
 **Example:**  Consider the following images / data (from Laura Hoopes, personal communication; *Molecular characterisation of soft tissue tumours: a gene expression study* by Nielsen et al., The Lancet 2002).  The first represents a microarray sample from aging yeast.  The second is a set of 41 samples of soft-tissue tumors (columns) and a subset of 5520 genes (rows) used to characterize their molecular signatures.
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.1]{LH_microarray_small.jpg}
-\includegraphics[scale=.7]{dendro.jpg}
-\end{center}
-\end{figure}
-
+<img src="figs/LH_microarray_small.jpg" width="45%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="45%" style="display: block; margin: auto;" />
 
 Note: the ordering of the variables (or samples) does not affect the clustering of the samples (or variables).  That is:  we can clustering the variables / samples either sequentially or in parallel to see trends in both relationships simultaneously.  Clustering both the observations and the variables is called *biclustering*.
 
@@ -315,31 +308,13 @@ Link C with (DE)!
 d_{(AB)(CDE)} = d_{BC} = 0.5
 \end{align}
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.4]{singlexamp.jpg}
-\end{center}
-\end{figure}
+<img src="figs/singlexamp.jpg" width="100%" style="display: block; margin: auto;" />
 
 
 
-## Partitioning Clustering
+## Partitioning Clustering {#part}
 
-### 11/21/19 Agenda {#Nov21}
-1. not linearly separable (SVM)
-2. kernels (SVM)
-3. support vector formulation
-4. soft margins / cost
-5. one vs. one / one vs. all
-\starthere{11/27/17}
 
-\paragraph{Agenda}
-\begin{enumerate}
-  \itemsep0em
-  \item k-means clustering
-  \item k-medoids clustering (Partitioning Around Medoids)
-  \item measures of cluster variability
-\end{enumerate}
 
 In contrast to hierarchical clustering where results were given for any (and all!) number of clusters, partitioning methods typically start with a given $k$ value and a set of distances.   The goal is to partition the observations into $k$ groups such that an objective function is optimized.  The number of possible partitions is roughly to $n^k / k!$  (note: $100^{5} / 5! = 83$ million).  [The exact number can be computed using Sterling numbers.]   So instead of looking through all of the partitions, we step through a recursive algorithm.
 
@@ -349,8 +324,10 @@ Some fun applets!! (There might be JAVA issues.)  http://www.math.le.ac.uk/peopl
 
 See also the guide to the applet which give lots of great advice.
 
+<!--
 % good datasets and also some interesting reflections on using k-means in R
 % https://www.datacamp.com/community/tutorials/k-means-clustering-r?utm_campaign=News&utm_medium=Community&utm_source=DataCamp.com
+-->
 
 $k$-means clustering is an unsupervised partitioning algorithm designed to find a partition of the observations such that the following objective function is minimized (find the smallest within cluster sum of squares):
 
@@ -361,12 +338,11 @@ As described in the algorithm below, reallocating observations can only improve 
 
 Note that the following algorithm is simply one $k$-means algorithm.  Other algorithms could include a different way to set the starting values, a different decision on when to recalculate the centers, what to do with ties, etc.
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.6]{kmeansISLRswap.pdf} \includegraphics[scale=.6]{kmeansISLRrand.pdf}
-\caption{ From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.}
-\end{center}
-\end{figure}
+
+<div class="figure" style="text-align: center">
+<img src="figs/kmeansISLRswap.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" /><img src="figs/kmeansISLRrand.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" />
+<p class="caption">(\#fig:unnamed-chunk-8)From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.</p>
+</div>
 
 ******
 **Algorithm**:   $k$-Means Clustering
@@ -398,7 +374,7 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 
 ## Partitioning Around Medoids
 
-As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the ``center" is no longer defined in Euclidean terms.
+As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the "center" is no longer defined in Euclidean terms.
 
 The two main steps are to Build (akin to assigning points to clusters) and to Swap (akin to redefining cluster centers).  The objective function the algorithm tries to minimize is the average dissimilarity of objects to the closest representative object.  (The PAM algorithm is a good (not necessarily global optimum) solution to minimizing the objective function.)  
 $$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
@@ -504,31 +480,19 @@ The cool thing about the Rand index is that the partitions don't have to even ha
 
 
 
-
+<!--
 % http://statweb.stanford.edu/~tibs/stat315a/LECTURES/em.pdf
+-->
 
-\starthere{12/4/17}
-
-\paragraph{Agenda}
-\begin{enumerate}
-  \itemsep0em
-  \item k-means with the EM algorithm
-  \item what next???
-  \item course evaluations
-\end{enumerate}
 
 
 ## EM algorithm
 
 The EM algorithm is an incredibly useful tool for solving complicated maximization procedures, particularly with respect to maximizing likelihoods (typically for parameter estimation).  We will describe the procedure here in the context of estimating the parameters of a two-component mixture model.
 
-Consider the Old Faithful geyser with the following histogram of waiting times between each eruption:
+Consider the Old Faithful geyser Yellowstone National Park, Wyoming, USA with the following histogram of data on waiting times between each eruption:
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale=.5]{oldfaithful.pdf}
-\end{center}
-\end{figure}
+<img src="09-clustering_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 \begin{align}
 Y_1 &\sim& N(\mu_1, \sigma_1^2)\\
