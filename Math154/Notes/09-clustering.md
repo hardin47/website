@@ -223,7 +223,7 @@ Gives a more direct "distance" between categorical variables.
 
 **Example:**  Consider the following images / data (from Laura Hoopes, personal communication; *Molecular characterisation of soft tissue tumours: a gene expression study* by Nielsen et al., The Lancet 2002).  The first represents a microarray sample from aging yeast.  The second is a set of 41 samples of soft-tissue tumors (columns) and a subset of 5520 genes (rows) used to characterize their molecular signatures.
 
-<img src="figs/LH_microarray_small.jpg" width="30%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="30%" style="display: block; margin: auto;" />
+<img src="figs/dendro.jpg" width="30%" style="display: block; margin: auto;" /><img src="figs/LH_microarray_small.jpg" width="30%" style="display: block; margin: auto;" />
 
 Note: the ordering of the variables (or samples) does not affect the clustering of the samples (or variables).  That is:  we can clustering the variables / samples either sequentially or in parallel to see trends in both relationships simultaneously.  Clustering both the observations and the variables is called *biclustering*.
 
