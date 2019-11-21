@@ -3,10 +3,7 @@ title: "Computational Statistics"
 author: "Jo Hardin"
 date: "2019-11-21"
 site: bookdown::bookdown_site
-header-includes:
-  - \usepackage{algorithm}
-  - \usepackage{algpseudocode}
-  - \usepackage{blkarray}
+header-includes:  \usepackage{blkarray}
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike

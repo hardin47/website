@@ -322,11 +322,15 @@ In contrast to hierarchical clustering where results were given for any (and all
 
 ### $k$-means Clustering
 
-Some fun applets!! (There might be JAVA issues.)  http://www.math.le.ac.uk/people/ag153/homepage/KmeansKmedoids/Kmeans_Kmedoids.html#L2
+Some fun applets!! 
+
+https://www.naftaliharris.com/blog/visualizing-k-means-clustering/
+
+<!--
+http://www.math.le.ac.uk/people/ag153/homepage/KmeansKmedoids/Kmeans_Kmedoids.html#L2
 
 See also the guide to the applet which give lots of great advice.
 
-<!--
 % good datasets and also some interesting reflections on using k-means in R
 % https://www.datacamp.com/community/tutorials/k-means-clustering-r?utm_campaign=News&utm_medium=Community&utm_source=DataCamp.com
 -->
@@ -355,6 +359,7 @@ Note that the following algorithm is simply one $k$-means algorithm.  Other algo
     (a) For each of the $k$ clusters, compute the cluster centroid. The $k^{th}$ cluster centroid is the vector of the $p$ feature means for the observations in the $k^{th}$ cluster.
     (b) Assign each observation to the cluster whose centroid is closest (where closest is defined using Euclidean distance).
 3.  Ties?  Do something consistent:  for example, leave in the current cluster.
+
 ******
 
 
@@ -367,10 +372,12 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 4. The algorithm must converge in finite number of steps because there are finitely many points.
 
 **strengths**
+
 * No hierarchical structure / points can move from one cluster to another.
 * Can run for a range of values of $k$.
 
 **shortcomings**
+
 * $k$ has to be predefined to run the algorithm.
 * $k$-means is based on Euclidean distance (*only*).
 
@@ -385,11 +392,13 @@ Where $D_i$ represents this distance from observation $i$ to the closest medoid,
 
 
 **strengths**
+
 * No hierarchical structure / points can move from one cluster to another.
 * Can run for a range of values of $k$.
 * It can use any distance measure
 
 **shortcomings**
+
 * $k$ has to be predefined to run the algorithm.
 
 ******
@@ -405,6 +414,7 @@ $$i^*_k = \argmin_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
 Then $m_k = x_{i^*_k}, k=1, 2, \ldots, K$ are the current estimates of the cluster centers.
 (b) Given a current set of cluster centers $\{m_1, m_2, \ldots, m_k\}$, minimize the total error by assigning each observation to the closest (current) cluster center:
 $$C_i = \argmin_{1 \leq k \leq K} d(x_i, m_k)$$
+
 ******
 
 
