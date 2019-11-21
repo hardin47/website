@@ -7,10 +7,6 @@ header-includes:
   - \usepackage{algorithm}
   - \usepackage{algpseudocode}
   - \usepackage{blkarray}
-output:
-  bookdown::pdf_book:
-    includes:
-      in_header: preamble.tex
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
