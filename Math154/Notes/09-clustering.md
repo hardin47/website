@@ -253,15 +253,15 @@ Note: the ordering of the variables (or samples) does not affect the clustering 
 **Toy Example of Single Linkage Agglomerative Hierarchical Clustering**
 
 \begin{align}
-D_1=
+D_1 =
 \begin{blockarray}{cccccc}
  &   A   &   B   &   C   &   D  & E \\
 \begin{block}{c[ccccc]}
-						A & 0 &  &  &  & \\[3pt]
-						B & 0.2 & 0 &  &  & \\[3pt]
-						C & 0.6 & 0.5 & 0 &  & \\[3pt]
-						D & 1 & 0.9 & 0.4 & 0 & \\[3pt]
-						E & 0.9 & 0.8 & 0.5 & 0.3 & 0\\
+A & 0 &  &  &  & \\[3pt]
+B & 0.2 & 0 &  &  & \\[3pt]
+C & 0.6 & 0.5 & 0 &  & \\[3pt]
+D & 1 & 0.9 & 0.4 & 0 & \\[3pt]
+E & 0.9 & 0.8 & 0.5 & 0.3 & 0\\
 \end{block}
 \end{blockarray}
 \end{align}
