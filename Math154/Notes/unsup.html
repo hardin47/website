@@ -819,7 +819,100 @@ Note that if <span class="math inline">\(a(i) &lt; b(i)\)</span> then <span clas
 \end{align}\]</span></p></li>
 <li><p><span class="math inline">\(L^*\)</span>: a cluster with diameter <span class="math inline">\(&lt;\)</span> separation; <span class="math inline">\(L\)</span>: a cluster with <span class="math inline">\(\max_{j \in Clus1} d(i,j) &lt; \min_{k \notin Clus1} d(i,k)\)</span>.</p></li>
 </ul>
-<p><strong>PAM example</strong></p>
+<div id="pam-example" class="section level4 unnumbered">
+<h4>PAM example</h4>
+<div id="building-the-clusters" class="section level5">
+<h5><span class="header-section-number">9.5.0.0.1</span> Building the clusters</h5>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+<th>E</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>0.2</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>0.6</td>
+<td>0.5</td>
+<td>0</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td>1</td>
+<td>0.9</td>
+<td>0.4</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>E</td>
+<td>0.9</td>
+<td>0.8</td>
+<td>5</td>
+<td>0.3</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>Start by consideing the random allocation (AC) and (BDE)</p></li>
+<li><p>As a second step, calculate the within cluster sums of distances:</p></li>
+</ul>
+<p>A: 0.6
+C: 0.6</p>
+<p>B: 0.9 + 0.8 = 1.7
+D: 0.9 + 0.3 = 1.2
+E: 0.8 + 0.3 = 1.1</p>
+<p>For cluster 1, it doesn’t matter if we choose A or C (let’s choose C). For cluster 2, we should choose E (it is the most “central” as measured by its closer distance to both B and D).</p>
+<ul>
+<li>Reallocate points:</li>
+</ul>
+<p>Cluster1: C <strong>and</strong> all the points that are closer to C than E. A and B are both closer to C than to E. Cluster1 will be (A,B,C).</p>
+<p>Cluster2: E <strong>and</strong> all the points that are closer to E than C. Only D is closer to E than C. Cluster2 will be (D,E)</p>
+<ul>
+<li>Redefine cluster centers:</li>
+</ul>
+<p>A: 0.2 + 0.6 = 0.8
+B: 0.2 + 0.5 = 0.7
+C: 0.6 + 0.5 = 1.1</p>
+<p>D: 0.3
+E: 0.3</p>
+<p>Cluster1 now has a medoid of B. Clsuter2 (we choose randomly) has a medoid of D.</p>
+<ul>
+<li>Reallocate points:</li>
+</ul>
+<p>Cluster1: B <strong>and</strong> A (A,B)
+Cluster2: D <strong>and</strong> C, E (D, C, E)</p>
+<ul>
+<li>The medoids are now A or B (randomly choose) and D. The iteration process has converged.</li>
+</ul>
+</div>
+</div>
+<div id="evaluating-the-clusters" class="section level4">
+<h4><span class="header-section-number">9.5.0.1</span> Evaluating the clusters</h4>
 <table>
 <thead>
 <tr class="header">
@@ -882,6 +975,7 @@ s(i=D) = \frac{b(D) - a(D)}{\max \{a(D), b(D)\}} = \frac{0.95 - 0.4}{0.95} = .57
 \mbox{separation}(AB) = \mbox{separation}(CD) = 0.5\\
 \end{align}\]</span></li>
 </ul>
+</div>
 <div id="rand-index-adjusted-rand-index" class="section level4 unnumbered">
 <h4>Rand Index / Adjusted Rand Index</h4>
 <p>is based on a confusion matrix comparing either a known truth (labels) or comparing two different clusterings (e.g., comparing <span class="math inline">\(k\)</span>-means and hierarchical clustering). Let the two different clusterings be called partition1 and partition2.
