@@ -214,7 +214,7 @@ Gives a more direct "distance" between categorical variables.
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/distR.png" alt="The function `dist` in `R` calculates the distances given above." width="80%" />
+<img src="figs/distR.png" alt="The function `dist` in `R` calculates the distances given above." width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-5)The function `dist` in `R` calculates the distances given above.</p>
 </div>
 
@@ -250,21 +250,17 @@ Note: the ordering of the variables (or samples) does not affect the clustering 
 
 **Average Linkage** algorithm defines the distance between groups as the average of the distances between all pairs of individuals across the groups.
 
-**Toy Example of Single Linkage Agglomerative Hierarchical Clustering**
+Toy Example of **Single Linkage Agglomerative Hierarchical Clustering**
 
-\begin{align}
-D_1 =
-\begin{blockarray}{cccccc}
- &   A   &   B   &   C   &   D  & E \\
-\begin{block}{c[ccccc]}
-A & 0 &  &  &  & \\[3pt]
-B & 0.2 & 0 &  &  & \\[3pt]
-C & 0.6 & 0.5 & 0 &  & \\[3pt]
-D & 1 & 0.9 & 0.4 & 0 & \\[3pt]
-E & 0.9 & 0.8 & 0.5 & 0.3 & 0\\
-\end{block}
-\end{blockarray}
-\end{align}
+
+|  	| A 	|  B	| C 	|  D	| E |
+|----	|-----	|-----	|-----	|----	|----	|
+| A 	| 0 	|  	|  	|  	|  |
+| B 	| 0.2 	| 0 	|  	|  	|  |
+| C 	| 0.6 	| 0.5 	| 0  	|  	|  |
+| D 	| 1 	| 0.9 	| 0.4 	| 0 	|  |
+| E 	| 0.9 	| 0.8 	| 5 	| 0.3 	|  0 |
+
 
 Link A and B!
 \begin{align}
@@ -273,17 +269,12 @@ d_{(AB)D} &= \min(d_{AD}, d_{BD}) = 0.9\\
 d_{(AB)E} &= \min(d_{AE}, d_{BE}) = 0.8\\
 \end{align}
 
-\begin{align}
-					D_2=
-					\begin{blockarray}{cccccc}
-					\begin{block}{c[ccccc]}
-						AB  & 0 &  &  & \\[3pt]
-						C  & 0.5 & 0 &  & \\[3pt]
-						D & 0.9 & 0.4 & 0 & \\[3pt]
-						E  & 0.8 & 0.5 & 0.3 & 0\\
-					\end{block}
-					\end{blockarray}
-\end{align}
+|  	| AB 	| C 	|  D	| E 	|
+|----	|-----	|-----	|-----	|----	|
+| AB 	| 0 	|  	|  	|  	|
+| C 	| 0.5 	| 0 	|  	|  	|
+| D 	| 0.9 	| 0.4 	| 0 	|  	|
+| E 	| 0.8 	| 0.5 	| 0.3 	| 0 	|
 
 Link D and E!
 \begin{align}
@@ -293,17 +284,11 @@ d_{(DE)C} &= \min(d_{CD}, d_{CE}) = 0.4\\
 \end{align}
 
 
-\begin{align}
-					D_3=
-					\begin{blockarray}{cccccc}
-					\begin{block}{c[ccccc]}
-						AB  & 0   &  & \\[3pt]
-						C  & 0.5 & 0   & \\[3pt]
-						DE & 0.8 & 0.4 & 0  \\
-					\end{block}
-					\end{blockarray}
-\end{align}
-
+|  	| AB 	| C 	|  DE	|  
+|----	|-----	|-----	|-----	|
+| AB 	| 0 	|  	|  	|
+| C 	| 0.5 	| 0 	|  	|
+| DE 	| 0.8 	| 0.4 	| 0 	|
 
 Link C with (DE)!
 \begin{align}
@@ -447,22 +432,19 @@ Note that if $a(i) < b(i)$ then $i$ is well classified with a maximum $s(i) = 1$
 
 **PAM example**  
 
-\begin{align}
-					D_1=
-					\begin{blockarray}{cccccc}
-					\begin{block}{c[ccccc]}
-						A & 0 &  &  &  & \\[3pt]
-						B & 0.2 & 0 &  &  & \\[3pt]
-						C & 0.6 & 0.5 & 0 &  & \\[3pt]
-						D & 1 & 0.9 & 0.4 & 0 & \\[3pt]
-					\end{block}
-					\end{blockarray}
-\end{align}
+|  	| A 	|  B	| C 	|  D	| 
+|----	|-----	|-----	|-----	|----	|
+| A 	| 0 	|  	|  	|  	|  
+| B 	| 0.2 	| 0 	|  	|  	|  
+| C 	| 0.6 	| 0.5 	| 0  	|  	|  
+| D 	| 1 	| 0.9 	| 0.4 	| 0 	|
+
+
 (Note: this is the same matrix as before, but with only 4 observations.) 
 
 Consider the data with (AB)(CD) as the clusters, we can calculate the previous metrics:
 
-* **SW**
+* **Silhouette Width**
 \begin{align}
 s(i=A) = \frac{b(A) - a(A)}{\max \{a(A), b(A)\}} = \frac{0.8 - 0.2}{0.8} = 0.75\\
 s(i=B) = \frac{b(B) - a(B)}{\max \{a(B), b(B)\}} = \frac{0.7 - 0.2}{0.7} = 0.71\\
@@ -470,12 +452,12 @@ s(i=C) = \frac{b(C) - a(C)}{\max \{a(C), b(C)\}} = \frac{0.55 - 0.4}{0.55} = .27
 s(i=D) = \frac{b(D) - a(D)}{\max \{a(D), b(D)\}} = \frac{0.95 - 0.4}{0.95} = .57\\
 \mbox{Ave SW} = 0.575\\
 \end{align}
-* **Diam**
+* **Diameter**
 \begin{align}
 \mbox{diameter}(AB) = 0.2\\
 \mbox{diameter}(CD) = 0.4\\
 \end{align}
-* **Sep**
+* **Separation**
 \begin{align}
 \mbox{separation}(AB) = \mbox{separation}(CD) = 0.5\\
 \end{align}
