@@ -318,7 +318,7 @@ d_{(AB)(CDE)} = d_{BC} = 0.5
 
 In contrast to hierarchical clustering where results were given for any (and all!) number of clusters, partitioning methods typically start with a given $k$ value and a set of distances.   The goal is to partition the observations into $k$ groups such that an objective function is optimized.  The number of possible partitions is roughly to $n^k / k!$  (note: $100^{5} / 5! = 83$ million).  [The exact number can be computed using Sterling numbers.]   So instead of looking through all of the partitions, we step through a recursive algorithm.
 
-## $k$-means Clustering
+### $k$-means Clustering
 
 Some fun applets!! (There might be JAVA issues.)  http://www.math.le.ac.uk/people/ag153/homepage/KmeansKmedoids/Kmeans_Kmedoids.html#L2
 
@@ -372,7 +372,7 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 * $k$ has to be predefined to run the algorithm.
 * $k$-means is based on Euclidean distance (*only*).
 
-## Partitioning Around Medoids
+### Partitioning Around Medoids
 
 As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the "center" is no longer defined in Euclidean terms.
 
