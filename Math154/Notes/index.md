@@ -6,6 +6,7 @@ site: bookdown::bookdown_site
 header-includes:
   - \usepackage{algorithm}
   - \usepackage{algpseudocode}
+  - \usepackage{blkarray}
 output:
   bookdown::pdf_book:
     includes:
