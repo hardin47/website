@@ -432,7 +432,7 @@ Note that if $a(i) < b(i)$ then $i$ is well classified with a maximum $s(i) = 1$
 
 #### PAM example {-}
 
-##### Building the clusters
+##### Building the clusters {-}
 
 
 |  	| A 	|  B	| C 	|  D	| E |
@@ -443,15 +443,20 @@ Note that if $a(i) < b(i)$ then $i$ is well classified with a maximum $s(i) = 1$
 | D 	| 1 	| 0.9 	| 0.4 	| 0 	|  |
 | E 	| 0.9 	| 0.8 	| 5 	| 0.3 	|  0 |
 
-* Start by consideing the random allocation (AC) and (BDE)
+* Start by considering the random allocation (AC) and (BDE)
 
 * As a second step, calculate the within cluster sums of distances:
 
 A: 0.6
+
 C: 0.6
 
+
+
 B: 0.9 + 0.8 = 1.7
+
 D: 0.9 + 0.3 = 1.2
+
 E: 0.8 + 0.3 = 1.1
 
 For cluster 1, it doesn't matter if we choose A or C (let's choose C).  For cluster 2, we should choose E (it is the most "central" as measured by its closer distance to both B and D).
@@ -465,24 +470,30 @@ Cluster2: E **and** all the points that are closer to E than C.  Only D is close
 * Redefine cluster centers:
 
 A: 0.2 + 0.6 = 0.8
+
 B: 0.2 + 0.5 = 0.7
+
 C: 0.6 + 0.5 = 1.1
 
+
+
 D: 0.3
+
 E: 0.3
 
-Cluster1 now has a medoid of B.  Clsuter2 (we choose randomly) has a medoid of D.
+Cluster1 now has a medoid of B.  Cluster2 (we choose randomly) has a medoid of D.
 
 * Reallocate points:  
 
 Cluster1: B **and** A  (A,B)
+
 Cluster2: D **and** C, E  (D, C, E)
 
 * The medoids are now A or B (randomly choose) and D.  The iteration process has converged.
 
 
 
-#### Evaluating the clusters
+#### Evaluating the clusters {-}
 
 |  	| A 	|  B	| C 	|  D	| 
 |----	|-----	|-----	|-----	|----	|
