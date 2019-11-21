@@ -175,7 +175,7 @@ Haversine distance is the great-circle distance (i.e., the distance between two 
 
 $$d_{HV} = 2 R \arcsin \sqrt{\sin^2 \bigg( \frac{lat2-lat1}{2} \bigg) + \cos(lat1) \cos(lat2) \sin^2 \bigg(\frac{long2 - long1}{2} \bigg)} $$
 
-<img src="figs/havdist.png" width="60%" style="display: block; margin: auto;" />
+<img src="figs/havdist.png" width="40%" style="display: block; margin: auto;" />
 
 **Shortcomings:**
 
@@ -196,7 +196,7 @@ d_H({\bf x}, {\bf y}) = \sum_{i=1}^p I(x_i \ne y_i)
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="80%" />
+<img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="60%" />
 <p class="caption">(\#fig:unnamed-chunk-4)The Hamming distance across the two DNA strands is 7.</p>
 </div>
 
@@ -223,7 +223,7 @@ Gives a more direct "distance" between categorical variables.
 
 **Example:**  Consider the following images / data (from Laura Hoopes, personal communication; *Molecular characterisation of soft tissue tumours: a gene expression study* by Nielsen et al., The Lancet 2002).  The first represents a microarray sample from aging yeast.  The second is a set of 41 samples of soft-tissue tumors (columns) and a subset of 5520 genes (rows) used to characterize their molecular signatures.
 
-<img src="figs/LH_microarray_small.jpg" width="40%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="40%" style="display: block; margin: auto;" />
+<img src="figs/LH_microarray_small.jpg" width="30%" style="display: block; margin: auto;" /><img src="figs/dendro.jpg" width="30%" style="display: block; margin: auto;" />
 
 Note: the ordering of the variables (or samples) does not affect the clustering of the samples (or variables).  That is:  we can clustering the variables / samples either sequentially or in parallel to see trends in both relationships simultaneously.  Clustering both the observations and the variables is called *biclustering*.
 
@@ -251,7 +251,7 @@ Note: the ordering of the variables (or samples) does not affect the clustering 
 
 **Toy Example of Single Linkage Agglomerative Hierarchical Clustering**
 
-				\begin{align}
+\begin{align}
 					D_1=
 					\begin{blockarray}{cccccc}
 					\begin{block}{c[ccccc]}
@@ -262,7 +262,7 @@ Note: the ordering of the variables (or samples) does not affect the clustering 
 						E & 0.9 & 0.8 & 0.5 & 0.3 & 0\\
 					\end{block}
 					\end{blockarray}
-				\end{align}
+\end{align}
 
 Link A and B!
 \begin{align}
@@ -271,7 +271,7 @@ d_{(AB)D} &= \min(d_{AD}, d_{BD}) = 0.9\\
 d_{(AB)E} &= \min(d_{AE}, d_{BE}) = 0.8\\
 \end{align}
 
-				\begin{align}
+\begin{align}
 					D_2=
 					\begin{blockarray}{cccccc}
 					\begin{block}{c[ccccc]}
@@ -281,7 +281,7 @@ d_{(AB)E} &= \min(d_{AE}, d_{BE}) = 0.8\\
 						E  & 0.8 & 0.5 & 0.3 & 0\\
 					\end{block}
 					\end{blockarray}
-				\end{align}
+\end{align}
 
 Link D and E!
 \begin{align}
@@ -291,7 +291,7 @@ d_{(DE)C} &= \min(d_{CD}, d_{CE}) = 0.4\\
 \end{align}
 
 
-				\begin{align}
+\begin{align}
 					D_3=
 					\begin{blockarray}{cccccc}
 					\begin{block}{c[ccccc]}
@@ -300,7 +300,7 @@ d_{(DE)C} &= \min(d_{CD}, d_{CE}) = 0.4\\
 						DE & 0.8 & 0.4 & 0  \\
 					\end{block}
 					\end{blockarray}
-				\end{align}
+\end{align}
 
 
 Link C with (DE)!
