@@ -221,6 +221,9 @@ Gives a more direct "distance" between categorical variables.
 
 ## Hierarchical Clustering {#hier}
 
+**Hierarchical Clustering** is a set of nested clusters that are organized as a tree.  Note that objects that belong to a child cluster also belong to the parent cluster.
+
+
 **Example:**  Consider the following images / data (from Laura Hoopes, personal communication; *Molecular characterisation of soft tissue tumours: a gene expression study* by Nielsen et al., The Lancet 2002).  The first represents a microarray sample from aging yeast.  The second is a set of 41 samples of soft-tissue tumors (columns) and a subset of 5520 genes (rows) used to characterize their molecular signatures.
 
 <img src="figs/dendro.jpg" width="30%" style="display: block; margin: auto;" /><img src="figs/LH_microarray_small.jpg" width="30%" style="display: block; margin: auto;" />
@@ -301,6 +304,7 @@ d_{(AB)(CDE)} = d_{BC} = 0.5
 
 ## Partitioning Clustering {#part}
 
+**Partition Clustering** is a division of the set of data objects into $K$ non-overlapping subsets (clusters) with each observation falling into exactly one cluster.
 
 
 In contrast to hierarchical clustering where results were given for any (and all!) number of clusters, partitioning methods typically start with a given $k$ value and a set of distances.   The goal is to partition the observations into $k$ groups such that an objective function is optimized.  The number of possible partitions is roughly to $n^k / k!$  (note: $100^{5} / 5! = 83$ million).  [The exact number can be computed using Sterling numbers.]   So instead of looking through all of the partitions, we step through a recursive algorithm.
