@@ -20,7 +20,7 @@ Think of an API as a restaurant menu.  The menu provides a list of what the rest
 
 An API is an intermediary that allows two applications to talk to one another.  It is not the database or the server, instead it is the *code* that allows communication.
 
-<img src="figs/api_xkcd.png" width="65%" style="display: block; margin: auto 0 auto auto;" />
+<img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
 
 #### Examples of APIs {-}
 
