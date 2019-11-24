@@ -20,6 +20,8 @@ Think of an API as a restaurant menu.  The menu provides a list of what the rest
 
 An API is an intermediary that allows two applications to talk to one another.  It is not the database or the server, instead it is the *code* that allows communication.
 
+<img src="figs/api_xkcd.png" width="65%" style="display: block; margin: auto 0 auto auto;" />
+
 ##### Examples of APIs {-}
 
 * When you use an app on your phone, the app connects to the internet and sends information to a server somewhere.  The server retrieves the data, interprets is, does what it does, and sends it back to you.  The application which takes the data from the server and presents it to you in a readable way is an API.
@@ -58,8 +60,6 @@ reticulate::import("statsmodels")
 ## I can run Python inside R??
 <img src="figs/pychunk1.png" width="65%" style="display: block; margin: auto auto auto 0;" />
 <img src="figs/pychunk2.png" width="65%" style="display: block; margin: auto 0 auto auto;" />
-
-
 
 
 
@@ -186,7 +186,7 @@ ggplot(py$flights,
   geom_jitter()
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### From R chunk to Python chunk {-}
@@ -236,7 +236,6 @@ print(r.diamonds.describe())
 
 
 ```python
-import statsmodels
 import statsmodels.formula.api as smf
 model = smf.ols('price ~ carat', data = r.diamonds).fit()
 print(model.summary())
@@ -249,7 +248,7 @@ print(model.summary())
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
 ## Date:                Sat, 23 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        21:27:35   Log-Likelihood:            -4.7273e+05
+## Time:                        21:38:21   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -274,61 +273,6 @@ print(model.summary())
 ##### Running just Python {-}
 
 <img src="figs/PyScript.png" width="120%" style="display: block; margin: auto;" />
-
-##### Importing Python modules {-}
-
-`import()` will import any Python module and call it from R.  [The `os` module provides functionality for navigating the operating system.]
-
-
-```r
-os <- import("os")
-os$listdir(".")
-```
-
-```
-##  [1] "11-references.Rmd"         "06-bootstrap_cache"       
-##  [3] "08-classification.utf8.md" "05-permutation.Rmd"       
-##  [5] "02-viz.utf8.md"            "10-misc_files"            
-##  [7] "01-intro.md"               "Math-154-Notes.rds"       
-##  [9] "06-bootstrap.utf8.md"      "render3e4d5ad0d6db.rds"   
-## [11] "Math_150_Notes_files"      "06-surv_files"            
-## [13] "09-clustering.utf8.md"     ".DS_Store"                
-## [15] "06-bootstrap.Rmd"          "LICENSE"                  
-## [17] "03-wrangling.md"           "01-intro.utf8.md"         
-## [19] "07-ethics.Rmd"             "03-wrangling.utf8.md"     
-## [21] "10-misc.knit.md"           "preamble.tex"             
-## [23] "03-wrangling_files"        "01-intro.Rmd"             
-## [25] "index.Rmd"                 "figs"                     
-## [27] "09-clustering_cache"       "Dockerfile"               
-## [29] "_deploy.sh"                "08-classification_cache"  
-## [31] "08-classification.Rmd"     "03-SLR_files"             
-## [33] "04-simulating.Rmd"         "05-permutation.utf8.md"   
-## [35] "02-viz_cache"              "09-clustering.md"         
-## [37] "index.utf8.md"             "packages.bib"             
-## [39] "04-simulating_files"       "04-cat_files"             
-## [41] "02-viz.Rmd"                "05-permutation_cache"     
-## [43] "05-log_files"              "08-PoisReg_files"         
-## [45] "_output.yml"               "07-ethics_cache"          
-## [47] "07-ethics.md"              "Math-150-Notes_files"     
-## [49] "_bookdown_files"           "10-misc_cache"            
-## [51] "08-classification.md"      "06-bootstrap.md"          
-## [53] "_bookdown.yml"             "06-bootstrap_files"       
-## [55] "02-viz.md"                 "Notes"                    
-## [57] "04-simulating.md"          "07-MC_files"              
-## [59] "DESCRIPTION"               "index.md"                 
-## [61] "03-wrangling.Rmd"          "03-wrangling_cache"       
-## [63] "style.css"                 "bookdown-demo_files"      
-## [65] "09-clustering.Rmd"         "05-permutation.md"        
-## [67] "07-ethics.utf8.md"         "_book"                    
-## [69] "renderd8c51d02f67e.rds"    "render181e160785218.rds"  
-## [71] "02-viz_files"              "now.json"                 
-## [73] "book.bib"                  "09-clustering_files"      
-## [75] "flights.csv"               "08-classification_files"  
-## [77] "04-simulating.utf8.md"     "04-simulating_cache"      
-## [79] "toc.css"                   "_build.sh"                
-## [81] "10-misc.Rmd"               "05-permutation_files"
-```
-
 
 
 ##### Full disclosure {-}
