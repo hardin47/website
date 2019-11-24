@@ -5,14 +5,14 @@
 
 
 
-### 11/26/19 Agenda {#Nov26}
+## 11/26/19 Agenda {#Nov26}
 1. API / authenticating 
 2. parallel computing
 3. cloud computing
 4. `reticulate` (Python in R!)
 5. SQL
 
-### API
+## API
 
 What is an API? (Application Programming Interface)
 
@@ -22,7 +22,7 @@ An API is an intermediary that allows two applications to talk to one another.  
 
 <img src="figs/api_xkcd.png" width="65%" style="display: block; margin: auto 0 auto auto;" />
 
-##### Examples of APIs {-}
+#### Examples of APIs {-}
 
 * When you use an app on your phone, the app connects to the internet and sends information to a server somewhere.  The server retrieves the data, interprets is, does what it does, and sends it back to you.  The application which takes the data from the server and presents it to you in a readable way is an API.
 
@@ -35,13 +35,13 @@ An API is an intermediary that allows two applications to talk to one another.  
 * What if you want some Twitter data?  How might you get it?  Well, you could email Twitter and ask someone for it.  **Instead** Twitter provides information about how their data is stored, and allows you to query their data in an automated way.
 
 
-### Parallel Computing
+## Parallel Computing
 
-### Cloud Computing
+## Cloud Computing
 
-### `reticulate`
+## `reticulate`
 
-#### Connect to Python within RStudio {-}
+### Connect to Python within RStudio {-}
 
 For many statisticians, the go-to software language is R.  However, there is no doubt that Python is a very important language in data science.  Why not do both??
 
@@ -57,13 +57,11 @@ reticulate::import("statsmodels")
 ## Module(statsmodels)
 ```
 
-## I can run Python inside R??
+#### I can run Python inside R?? {-}
+
 <img src="figs/pychunk1.png" width="65%" style="display: block; margin: auto auto auto 0;" />
 <img src="figs/pychunk2.png" width="65%" style="display: block; margin: auto 0 auto auto;" />
 
-
-
-#### Python in R {-}
 
 * `pandas` for data wrangling.  
 * In R, the chunk is specified to be a Python chunk (RStudio is now running Python). 
@@ -92,7 +90,7 @@ flights = flights.dropna()
 
 
 
-##### Learn about the dataset {-}
+#### Learn about the dataset {-}
 
 ````
 ```{python}
@@ -140,7 +138,7 @@ flights.describe()
 ```
 
 
-## Computations using `pandas` 
+#### Computations using `pandas` {-}
 
 
 ````
@@ -210,7 +208,7 @@ head(diamonds)
 ```
 
 
-#####  Python chunks {-}
+####  Python chunks {-}
 
 Note that we're calling Python code on an R object.
 
@@ -270,17 +268,17 @@ print(model.summary())
 ```
 
 
-##### Running just Python {-}
+#### Running just Python {-}
 
 <img src="figs/PyScript.png" width="120%" style="display: block; margin: auto;" />
 
 
-##### Full disclosure {-}
+#### Full disclosure {-}
 
 Reticulate is not always trivial to set up.  Indeed, I've had trouble figuring out which Python version is talking to R and where different module versions live.
 
 
-##### Learn more {-}
+#### Learn more {-}
 
 - [RStudio R Interface to Python](https://rstudio.github.io/reticulate/)
 
@@ -296,12 +294,12 @@ https://blog.rstudio.com/2018/10/09/rstudio-1-2-preview-reticulated-python
 
 
 
-### SQL
+## SQL
 
 
 
-### 12/10/19 Agenda {#Dec10}
+## 12/10/19 Agenda {#Dec10}
 1. Regular Expressions
 
-### Regular Expressions {#regexpr}
+## Regular Expressions {#regexpr}
 

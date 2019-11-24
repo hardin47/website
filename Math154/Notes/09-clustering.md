@@ -3,7 +3,7 @@
 
 
 
-### 11/21/19 Agenda {#Nov21}
+## 11/21/19 Agenda {#Nov21}
 1. unsupervised methods
 2. distance / dissimilarity
 3. hierarchical clustering
