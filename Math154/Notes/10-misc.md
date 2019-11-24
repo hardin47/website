@@ -14,7 +14,7 @@
 
 ## API
 
-<div style= "float:right;position: relative; top: -80px;">
+<div style= "float:right;position: relative; top: -50px;">
 <img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
 </div>
 
@@ -299,7 +299,7 @@ https://blog.rstudio.com/2018/10/09/rstudio-1-2-preview-reticulated-python
 
 ## SQL
 
-(Taken from the Teach Data Science blog: https://teachdatascience.com/sql/)
+(Taken from the Teach Data Science blog: https://teachdatascience.com/sql/, this entry written by Nick Horton)
 
 SQL (pronounced *sequel*) stands for [Structured Query Language](https://en.wikipedia.org/wiki/SQL); it is a language designed to manage data in a relational database system. 
 
