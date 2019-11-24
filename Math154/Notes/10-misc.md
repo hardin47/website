@@ -14,13 +14,18 @@
 
 ## API
 
+.pull-left[
 What is an API? (Application Programming Interface)
 
 Think of an API as a restaurant menu.  The menu provides a list of what the restaurant has to offer, and you order off the menu by choosing the dish that you want.  After you order, the restaurant figures out how to bring the food from the kitchen to your table in the way that you've specified. 
 
 An API is an intermediary that allows two applications to talk to one another.  It is not the database or the server, instead it is the *code* that allows communication.
+]
+
+.pull-right[
 
 <img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
+]
 
 #### Examples of APIs {-}
 
