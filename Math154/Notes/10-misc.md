@@ -14,18 +14,16 @@
 
 ## API
 
-.pull-left[
+<div style= "float:right;position: relative; top: -80px;">
+<img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
+</div>
+
 What is an API? (Application Programming Interface)
 
 Think of an API as a restaurant menu.  The menu provides a list of what the restaurant has to offer, and you order off the menu by choosing the dish that you want.  After you order, the restaurant figures out how to bring the food from the kitchen to your table in the way that you've specified. 
 
 An API is an intermediary that allows two applications to talk to one another.  It is not the database or the server, instead it is the *code* that allows communication.
-]
 
-.pull-right[
-
-<img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
-]
 
 #### Examples of APIs {-}
 
@@ -301,6 +299,377 @@ https://blog.rstudio.com/2018/10/09/rstudio-1-2-preview-reticulated-python
 
 ## SQL
 
+(Taken from the Teach Data Science blog: https://teachdatascience.com/sql/)
+
+SQL (pronounced *sequel*) stands for [Structured Query Language](https://en.wikipedia.org/wiki/SQL); it is a language designed to manage data in a relational database system. 
+
+We will use a public facing MySQL [database](http://www.science.smith.edu/wai-database/home/about) containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, [PI Susan Voss, R15 DC014129-01](https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&icde=44962011&ddparam=&ddvalue=&ddsub=&cr=46&csb=default&cs=ASC&pball=).) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.
+
+We begin by demonstrating how SQL queries can be sent to a database.  We begin by setting up a connection using the `dbConnect()` function.
+
+
+```r
+library(mosaic)
+library(RMySQL) # that there are plans to move this support to RMariaDB 
+con <- dbConnect(
+  MySQL(), host = "scidb.smith.edu", user = "waiuser", 
+  password = "smith_waiDB", dbname = "wai")
+```
+
+Next a series of SQL queries can be sent to the database using the `DBI::dbGetQuery()` function: each query returns an R dataframe.
+
+
+```r
+class(dbGetQuery(con, "SHOW TABLES"))
+```
+
+```
+## [1] "data.frame"
+```
+
+There are multiple tables within the `wai` database.
+
+
+```r
+dbGetQuery(con, "SHOW TABLES")
+```
+
+```
+##   Tables_in_wai
+## 1  Measurements
+## 2       PI_Info
+## 3       Subject
+```
+
+The `EXPLAIN` command describes the ten field names (variables) in the `PI_Info` table.
+
+
+```r
+dbGetQuery(con, "EXPLAIN PI_Info")
+```
+
+```
+##          Field           Type Null Key Default Extra
+## 1   Identifier    varchar(20)  YES        <NA>      
+## 2      PI_Year        int(11)  YES        <NA>      
+## 3           PI   varchar(500)  YES        <NA>      
+## 4  Affiliation   varchar(500)  YES        <NA>      
+## 5        Email    varchar(30)  YES        <NA>      
+## 6        Title   varchar(140)  YES        <NA>      
+## 7          Pub varchar(10000)  YES        <NA>      
+## 8         Date       char(20)  YES        <NA>      
+## 9          URL   varchar(140)  YES        <NA>      
+## 10    PI_Notes           text   NO        <NA>
+```
+
+The `SELECT` statement can be used to select all fields for eight observations in the `Measurements` table.
+
+
+```r
+eightobs <- dbGetQuery(con, "SELECT * FROM Measurements LIMIT 8")
+eightobs
+```
+
+```
+##   Identifier Sub_Number Session Left_Ear MEP Instrument    Freq Absorbance
+## 1  Abur_2014          1       1        0  -5          1 210.938  0.0451375
+## 2  Abur_2014          1       1        0  -5          1 234.375  0.0441247
+## 3  Abur_2014          1       1        0  -5          1 257.812  0.0495935
+## 4  Abur_2014          1       1        0  -5          1 281.250  0.0516088
+## 5  Abur_2014          1       1        0  -5          1 304.688  0.0590836
+## 6  Abur_2014          1       1        0  -5          1 328.125  0.0628038
+## 7  Abur_2014          1       1        0  -5          1 351.562  0.0682962
+## 8  Abur_2014          1       1        0  -5          1 375.000  0.0738373
+##        Zmag      Zang Canal_Area
+## 1 110638000 -0.228113         NA
+## 2 100482000 -0.230561         NA
+## 3  90561100 -0.230213         NA
+## 4  83515500 -0.230959         NA
+## 5  77476800 -0.229652         NA
+## 6  71229100 -0.230026         NA
+## 7  66615500 -0.229576         NA
+## 8  61996200 -0.229327         NA
+```
+
+
+More interesting and complicated `SELECT` calls can be used to undertake grouping and aggregation.  Here we calculate the sample size for each study
+
+
+```r
+dbGetQuery(con, 
+  "SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM")
+```
+
+```
+##       Identifier    NUM
+## 1       Sun_2016   2604
+## 2    Shaver_2013   2880
+## 3    Feeney_2017   3162
+## 4      Voss_1994   5120
+## 5       Liu_2008   5520
+## 6    Werner_2010   7935
+## 7  Rosowski_2012  14384
+## 8      Voss_2010  14880
+## 9      Abur_2014  21328
+## 10    Groon_2015  35469
+## 11  Shahnaz_2006  58776
+## 12    Lewis_2015 114716
+```
+
+
+#### Accessing a database using dplyr commands {-}
+
+Alternatively, a connection can be made to the server by creating a series of `dplyr` tbl
+objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadley Wickham](https://dbplyr.tidyverse.org/articles/dbplyr.html) has noted, SQL and R have similar syntax (but sufficiently different to be confusing).  
+
+The setup process looks similar.
+
+
+```r
+db <- src_mysql(dbname = "wai", host = "scidb.smith.edu", user = "waiuser", 
+          password="smith_waiDB")
+Measurements <- tbl(db, "Measurements")
+class(Measurements)
+```
+
+```
+## [1] "tbl_MySQLConnection" "tbl_dbi"             "tbl_sql"            
+## [4] "tbl_lazy"            "tbl"
+```
+
+```r
+PI_Info <- tbl(db, "PI_Info")
+Subject <- tbl(db, "Subject")
+```
+
+We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
+
+
+```r
+PI_Info  %>% summarise(total = n())
+```
+
+```
+## # Source:   lazy query [?? x 1]
+## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
+## #   [waiuser@scidb.smith.edu:/wai]
+##   total
+##   <dbl>
+## 1    12
+```
+
+```r
+PI_Info %>% select(-Email) %>% collect() %>% data.frame()   
+```
+
+```
+##       Identifier PI_Year
+## 1    Werner_2010    2010
+## 2      Voss_1994    1994
+## 3     Lewis_2015    2015
+## 4      Voss_2010    2010
+## 5       Sun_2016    2016
+## 6    Shaver_2013    2013
+## 7  Rosowski_2012    2012
+## 8       Liu_2008    2008
+## 9      Abur_2014    2014
+## 10   Feeney_2017    2017
+## 11    Groon_2015    2015
+## 12  Shahnaz_2006    2006
+##                                                                                                         PI
+## 1                                                                                            Douglas Keefe
+## 2                                                                                            Susan E. Voss
+## 3                                                                            James D. Lewis; Stephen Neely
+## 4                                                                                            Susan E. Voss
+## 5                                                                                            Xiao-Ming Sun
+## 6                                                                            Mark D. Shaver, Xiao-Ming Sun
+## 7                                                                                         John J. Rosowski
+## 8  Yi-Wen Liu; Chris A. Sanford; John C. Ellison; Denis F. Fitzpatrick; Michael P. Gorga; Douglas H. Keefe
+## 9                                                            Defne Abur; Nicholas J. Horton; Susan E. Voss
+## 10                                                                     M. Patrick Feeney; Douglas H. Keefe
+## 11                                                                                           Stephen Neely
+## 12                                                                               Navid Shahnaz; Karin Bork
+##                                                                                              Affiliation
+## 1                                                                 Boys Town National Research Laboratory
+## 2                                                                  Smith College, formerly ATT Bell Labs
+## 3                                                                 Boys Town National Research Laboratory
+## 4                                                                                          Smith College
+## 5                                                                               Wichita State University
+## 6                                                                               Wichita State University
+## 7                                  Eaton-Peabody Laboratory, Massachusetts Eye and Ear Infirmary, Boston
+## 8                                                                   Boys Town National Research Hospital
+## 9                                                                                          Smith College
+## 10 National Center for Rehabilitative Auditory Research (NCRAR) and Boys Town National Research Hospital
+## 11                                                                  Boys Town National Research Hospital
+## 12                                                                        University of British Columbia
+##                                                                                                                                     Title
+## 1                                             Ear-Canal Wideband Acoustic Transfer Functions of Adults and Two- to Nine-Month-Old Infants
+## 2                                                                Measurement of acoustic impedance and reflectance in the human ear canal
+## 3                                                                    Non-invasive estimation of middle-ear input impedance and efficiency
+## 4                                                                Posture systematically alters ear-canal reflectance and DPOAE properties
+## 5                       Wideband acoustic immittance: Normative study and test-retest reliability of tympanometric measurements in adults
+## 6  Wideband energy reflectance measurements: Effects of negative middle ear pressure and application of a pressure compensation procedure
+## 7                                                          Ear-Canal Reflectance, Umbo Velocity, and Tympanometry in Normal-Hearing Adult
+## 8                    Wideband absorbance tympanometry using pressure sweeps: System development and results on adults with normal hearing
+## 9                                                                                           Intrasubject Variability in Power Reflectance
+## 10      Normative wideband reflectance, equivalent admittance at the tympanic membrane, and acoustic stapedius reflex threshold in adults
+## 11                                                                                      Air-Leak Effects on Ear-Canal Acoustic Absorbance
+## 12                                                                      Wideband Reflectance Norms for Caucasian and Chinese Young Adults
+##                                                  Pub       Date
+## 1                                    Ear and Hearing   9/1/2017
+## 2       Journal of the Acoustical Society of America 02/08/2017
+## 3       Journal of the Acoustical Society of America 10/10/2018
+## 4                                   Hearing Research 06/05/2018
+## 5  Journal of Speech, Language, and Hearing Research 10/31/2017
+## 6   The Journal of the Acoustical Society of America 10/06/2018
+## 7                                    Ear and Hearing 11/06/2015
+## 8   The Journal of the Acoustical Society of America  6/26/2018
+## 9                                   J Am Acad Audiol 08/24/2016
+## 10                                   Ear and Hearing 06/07/2018
+## 11                                   Ear and Hearing 06/18/2019
+## 12                                   Ear and Hearing 08/24/2016
+##                                                                                                                   URL
+## 1                                                                        https://www.ncbi.nlm.nih.gov/pubmed/20517155
+## 2                                                                  https://asa.scitation.org/doi/abs/10.1121/1.408329
+## 3                                                                 https://asa.scitation.org/doi/abs/10.1121/1.4927408
+## 4                                                                        https://www.ncbi.nlm.nih.gov/pubmed/20227475
+## 5                                                                        https://www.ncbi.nlm.nih.gov/pubmed/27517667
+## 6                                                                        https://www.ncbi.nlm.nih.gov/pubmed/23862811
+## 7                                                                         http://www.ncbi.nlm.nih.gov/pubmed/21857517
+## 8                                                                        https://www.ncbi.nlm.nih.gov/pubmed/19206798
+## 9                                                                        https://www.ncbi.nlm.nih.gov/pubmed/25257718
+## 10                                                                       https://www.ncbi.nlm.nih.gov/pubmed/28045835
+## 11 https://journals.lww.com/ear-hearing/fulltext/2015/01000/Air_Leak_Effects_on_Ear_Canal_Acoustic_Absorbance.16.aspx
+## 12       http://journals.lww.com/ear-hearing/Abstract/2006/12000/Wideband_Reflectance_Norms_for_Caucasian_and.15.aspx
+##                                                                                                                                                                                                                                                                                                                                   PI_Notes
+## 1                                                    Used an ER-1 earphone and ER-7C microphone.  Data provided by Doug Keefe and formatted by Susan Voss with help.  Lynne Werner is retired.  In Subject Table, Sub_Notes=1  means part of 183 subjects included in the  means in paper and Sub_Notes=0 means not part of mean in paper.
+## 2                                                                                                                                                                                                                       Measurements taken with a system using sysid and the Etymotic ER-2 pressure transducer and ER-7c probe microphone.
+## 3                                                                                                                                                                                                                                            Used acoustically calculated areas for absorbance calculations, included in Measurement Table
+## 4                                                                                                                                                                                                                                                                                                                                 No notes
+## 5                                                                                                                                                                                                                                                                                                                                 No notes
+## 6  A research version of Titan (Interacoustics) was used. In this study, a total of five reflectance measurements at ambient pressure were taken per ear (detailed in the article). But, results from only two sessions were reported in this article. Included in this database is the second session (baseline), as the normative data. 
+## 7                                                                                                                                                                                                                                                                                                                                No Notes 
+## 8                                                                                                                                                                                                                                                                                                                                No Notes 
+## 9                                                                                                                                                                                                                                                                          Database includes measurements at Position 1 and Channel B only
+## 10                                                                                                                                                                                                                                     Sub_Notes=Boys Town National Lab are data taken by Keefe; Sub_Notes=NCRAR are data taken by Feeney 
+## 11                                                                                                                                                                                                                  First author is Groon, PI for grant is Steve Neely, data collected on system described in Rasetshwane and Neely (2011)
+## 12                                                                                                                                                                                                                                                                                          Impedance angles not available and set to Null
+```
+
+```r
+# be careful with collect() when dealing with large tables!
+```
+
+Note how the number of rows is unknown (`??` at the top of the output above) for the lazy query.
+
+Similarly, we can explore the `Subjects` table.
+
+```r
+Subject  %>% summarise(total = n())
+```
+
+```
+## # Source:   lazy query [?? x 1]
+## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
+## #   [waiuser@scidb.smith.edu:/wai]
+##   total
+##   <dbl>
+## 1   640
+```
+
+```r
+Subject %>% collect()  # be careful with collect() with large tables!
+```
+
+```
+## # A tibble: 640 x 10
+##    Identifier Sub_Number Session_Total   Age Female  Race Ethnicity
+##    <chr>      <chr>              <int> <int>  <int> <int>     <int>
+##  1 Voss_2010  1                      5    20      1     0         0
+##  2 Voss_2010  2                      5    39      1     0         0
+##  3 Voss_2010  3                      5    18      1     0         0
+##  4 Voss_2010  4                      5    19      1     0         0
+##  5 Voss_2010  5                      5    21      1     0         0
+##  6 Voss_2010  6                      5    21      1     0         0
+##  7 Voss_2010  7                      5    21      1     0         0
+##  8 Voss_2010  8                      5    42      1     0         0
+##  9 Voss_2010  9                      5    38      0     0         0
+## 10 Voss_2010  10                     5    20      1     0         0
+## # … with 630 more rows, and 3 more variables: Left_Ear_Status <int>,
+## #   Right_Ear_Status <int>, Sub_Notes <chr>
+```
+
+Let's explore the `Measurements` table.
+
+```r
+Measurements %>% summarise(total = n())
+```
+
+```
+## # Source:   lazy query [?? x 1]
+## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
+## #   [waiuser@scidb.smith.edu:/wai]
+##    total
+##    <dbl>
+## 1 286774
+```
+
+There are more than a quarter million observations.  
+
+In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al (2012) entitled ["Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults"](https://www.ncbi.nlm.nih.gov/pubmed/21857517).
+
+Arbitrarily we choose to collect data from subject number three.
+
+
+```r
+onesubj <- 
+  Measurements %>% 
+  filter(Identifier == "Rosowski_2012", Sub_Number == 3) %>%
+  collect %>%
+  mutate(SessionNum = as.factor(Session))
+head(onesubj)
+```
+
+```
+## # A tibble: 6 x 12
+##   Identifier Sub_Number Session Left_Ear   MEP Instrument  Freq Absorbance
+##   <chr>           <int>   <int>    <int> <dbl>      <int> <dbl>      <dbl>
+## 1 Rosowski_…          3       1        1    NA          1  211.     0.0852
+## 2 Rosowski_…          3       1        1    NA          1  234.     0.0903
+## 3 Rosowski_…          3       1        1    NA          1  258.     0.112 
+## 4 Rosowski_…          3       1        1    NA          1  281.     0.103 
+## 5 Rosowski_…          3       1        1    NA          1  305.     0.129 
+## 6 Rosowski_…          3       1        1    NA          1  328.     0.136 
+## # … with 4 more variables: Zmag <dbl>, Zang <dbl>, Canal_Area <dbl>,
+## #   SessionNum <fct>
+```
+
+Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.
+
+
+```r
+onesubj <- mutate(onesubj, Ear = ifelse(Left_Ear == 1, "Left", "Right"))
+ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
+  aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
+```
+
+<img src="10-misc_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+
+In summary, while SQL is a powerful tool, there are straightforward ways to integrate existing databases into analyses using a small number of commands.  Particularly if instructors use [RMarkdown](https://teachdatascience.com/rmarkdown), data ingestation can be scaffolded with students able to modify and augment code that is provided to them.  
+
+We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
+
+Setting up and managing a database is a topic for a different day: here we focused on how SQL can be used within R to access data in a flexible and powerful manner.  
+
+
+#### Learn more {-}
+
+- https://chance.amstat.org/2015/04/setting-the-stage/ (Setting the stage for data technologies)
+- https://www.w3schools.com/sql/sql_intro.asp (Intro to SQL)
+- http://www.science.smith.edu/wai-database/home/about/ (WAI SQL Database)
+- https://cran.r-project.org/web/views/Databases.html (CRAN Task View on Databases with R)
+- https://db.rstudio.com (RStudio Database resources)
+- https://dbplyr.tidyverse.org/articles/dbplyr.html (dbplyr package)
 
 
 ## 12/10/19 Agenda {#Dec10}
