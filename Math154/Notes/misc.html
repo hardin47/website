@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-11-24" />
+<meta name="date" content="2019-11-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -319,7 +319,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.5" data-path="misc.html"><a href="misc.html#reticulate"><i class="fa fa-check"></i><b>10.5</b> <code>reticulate</code></a><ul>
 <li class="chapter" data-level="" data-path="misc.html"><a href="misc.html#connect-to-python-within-rstudio"><i class="fa fa-check"></i>Connect to Python within RStudio</a></li>
 </ul></li>
-<li class="chapter" data-level="10.6" data-path="misc.html"><a href="misc.html#sql"><i class="fa fa-check"></i><b>10.6</b> SQL</a></li>
+<li class="chapter" data-level="10.6" data-path="misc.html"><a href="misc.html#sql-in-r"><i class="fa fa-check"></i><b>10.6</b> SQL (in R)</a></li>
 <li class="chapter" data-level="10.7" data-path="misc.html"><a href="misc.html#Dec10"><i class="fa fa-check"></i><b>10.7</b> 12/10/19 Agenda</a></li>
 <li class="chapter" data-level="10.8" data-path="misc.html"><a href="misc.html#regexpr"><i class="fa fa-check"></i><b>10.8</b> Regular Expressions</a></li>
 </ul></li>
@@ -358,8 +358,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="api" class="section level2">
 <h2><span class="header-section-number">10.2</span> API</h2>
-<div style="float:right;position: relative; top: -50px;">
-<p><img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" /></p>
+<div style="float:right;position: relative; top: -30px;">
+<div class="figure" style="text-align: right"><span id="fig:unnamed-chunk-2"></span>
+<img src="figs/api_xkcd.png" alt="xkcd, https://xkcd.com/1481/" width="80%" />
+<p class="caption">
+Figure 1.2: xkcd, <a href="https://xkcd.com/1481/" class="uri">https://xkcd.com/1481/</a>
+</p>
+</div>
 </div>
 <p>What is an API? (Application Programming Interface)</p>
 <p>Think of an API as a restaurant menu. The menu provides a list of what the restaurant has to offer, and you order off the menu by choosing the dish that you want. After you order, the restaurant figures out how to bring the food from the kitchen to your table in the way that you’ve specified.</p>
@@ -373,23 +378,152 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>You sign up to go to a concert, and StubHub asks whether you want to add the concert to your Google calendar. StubHub needs to talk to Google via Google’s API.</p></li>
 <li><p>What if you want some Twitter data? How might you get it? Well, you could email Twitter and ask someone for it. <strong>Instead</strong> Twitter provides information about how their data is stored, and allows you to query their data in an automated way.</p></li>
 </ul>
+<div class="figure" style="text-align: right"><span id="fig:unnamed-chunk-3"></span>
+<img src="figs/API_weather.png" alt="Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro" width="80%" />
+<p class="caption">
+Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-brief-intro" class="uri">https://rigor.com/blog/what-is-an-api-a-brief-intro</a>
+</p>
+</div>
 </div>
 </div>
 <div id="parallel-computing" class="section level2">
 <h2><span class="header-section-number">10.3</span> Parallel Computing</h2>
+<p>To demonstrate what parallel computing is, we’ll perform tasks that are <strong>embarrassingly parallel</strong> which means there is no dependency or communication between the parallel tasks. Again, parallel computing can be powerful in ways that link computational tasks in complicated ways. But we believe that as a <em>first</em> pass at teaching parallel computing, we should teach the parallel structure before bringing in dependence across the parallel tasks. Examples of <a href="https://en.wikipedia.org/wiki/Embarrassingly_parallel">embarrassingly parallel</a> algorithms include: Monte Carlo analysis, bootstrapping, growing trees for Random Forests, <code>group_by</code> analyses, and cross-validation. Additionally, data science methods increasingly use <a href="https://en.wikipedia.org/wiki/Randomized_algorithm">randomized algorithms</a> which can often be written in parallel.</p>
+<p>Indeed, it isn’t always easy to know when to use a parallel construction. Because of existing overhead processes (e.g., copying data across many threads, bring results together, etc.) an algorithm run on 10 parallel strands will not reduce an original (non-parallel) run time by 10-fold. Figuring out when a parallel implementation is appropriate is beyond the scope of this blog but should be carefully considered before embarking on large projects.</p>
+<div id="some-parallel-examples" class="section level4 unnumbered">
+<h4>Some parallel examples</h4>
+<p>Before running code in parallel, it is valuable to know how many cores your computer has to work with. Note that the <code>detectCores</code> function will provide information about the specific device you are using (<code>logical = FALSE</code> tells you only the physical cores which is likely what you want). Note that after <code>makeCluster</code> the separate threads have information. After <code>stopCluster</code>, the code is no longer connecting to the cluster structure.</p>
+<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb509-1" data-line-number="1"><span class="kw">library</span>(parallel)</a>
+<a class="sourceLine" id="cb509-2" data-line-number="2">P &lt;-<span class="st"> </span><span class="kw">detectCores</span>(<span class="dt">logical=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb509-3" data-line-number="3">P</a></code></pre></div>
+<pre><code>## [1] 8</code></pre>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb511-1" data-line-number="1">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(P)</a>
+<a class="sourceLine" id="cb511-2" data-line-number="2">cl[[<span class="dv">1</span>]]</a></code></pre></div>
+<pre><code>## node of a socket cluster on host &#39;localhost&#39; with pid 38688</code></pre>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb513-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a>
+<a class="sourceLine" id="cb513-2" data-line-number="2">cl[[<span class="dv">1</span>]]</a></code></pre></div>
+<pre><code>## Error in summary.connection(connection): invalid connection</code></pre>
+</div>
+<div id="embarrassingly-embarrassing-example" class="section level4 unnumbered">
+<h4>Embarrassingly embarrassing example</h4>
+<p>In the example below, we generate some Cauchy data and find the max of each sample. Note that for the current device there are 8 cores, so the process will happen 100/P = 12.5 times on each core. The second argument of <code>clusterApply</code> is a sequence of numbers that gets passed to each worker as the (first) argument of <code>func1</code>. Below, I’ve specified that the value 50 (number of reps) should be passed separately to 100 different workers.</p>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb515-1" data-line-number="1">W &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb515-2" data-line-number="2">P &lt;-<span class="st"> </span><span class="kw">detectCores</span>(<span class="dt">logical=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb515-3" data-line-number="3">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(P)</a>
+<a class="sourceLine" id="cb515-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb515-5" data-line-number="5">func1 &lt;-<span class="st"> </span><span class="cf">function</span>(reps){</a>
+<a class="sourceLine" id="cb515-6" data-line-number="6">  <span class="kw">max</span>(<span class="kw">rcauchy</span>(reps))</a>
+<a class="sourceLine" id="cb515-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb515-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb515-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb515-10" data-line-number="10"><span class="kw">clusterApply</span>(cl, <span class="kw">rep</span>(<span class="dv">50</span>,W), <span class="dt">fun =</span> func1) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">3</span>)</a></code></pre></div>
+<pre><code>## [[1]]
+## [1] 17.37151
+## 
+## [[2]]
+## [1] 20.73513
+## 
+## [[3]]
+## [1] 13.80041</code></pre>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb517-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
+<p>There are many R functions which implement parallel processing. For example, the same code from above can be processed using <code>foreach</code>.</p>
+<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb518-1" data-line-number="1"><span class="kw">library</span>(doParallel)</a>
+<a class="sourceLine" id="cb518-2" data-line-number="2">cl &lt;-<span class="st"> </span>parallel<span class="op">::</span><span class="kw">makeCluster</span>(P)</a>
+<a class="sourceLine" id="cb518-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb518-4" data-line-number="4">doParallel<span class="op">::</span><span class="kw">registerDoParallel</span>(cl)</a>
+<a class="sourceLine" id="cb518-5" data-line-number="5"><span class="kw">foreach</span>(<span class="dt">reps =</span> <span class="kw">rep</span>(<span class="dv">50</span>, <span class="dv">100</span>), <span class="dt">.combine =</span> <span class="st">&#39;c&#39;</span>) <span class="op">%dopar%</span><span class="st"> </span>{</a>
+<a class="sourceLine" id="cb518-6" data-line-number="6">  <span class="kw">max</span>(<span class="kw">rcauchy</span>(reps))</a>
+<a class="sourceLine" id="cb518-7" data-line-number="7">       } <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">3</span>)</a></code></pre></div>
+<pre><code>## [1]  5.881646  5.374148 43.051650</code></pre>
+<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb520-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
+</div>
+<div id="example-bootstrapping" class="section level4 unnumbered">
+<h4>Example bootstrapping</h4>
+<p>A slightly less embarrassingly parallel example comes with bootstrapping. Below we have used parallel implementation to bootstrap the mean of the iris data petal length (Virginica only).</p>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb521-1" data-line-number="1"><span class="kw">data</span>(iris)</a>
+<a class="sourceLine" id="cb521-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb521-3" data-line-number="3">iris_bs &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb521-4" data-line-number="4"><span class="st">  </span><span class="kw">filter</span>(Species <span class="op">==</span><span class="st"> &quot;virginica&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb521-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(Petal.Length)</a></code></pre></div>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb522-1" data-line-number="1">cl &lt;-<span class="st"> </span>parallel<span class="op">::</span><span class="kw">makeCluster</span>(P)</a>
+<a class="sourceLine" id="cb522-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb522-3" data-line-number="3">doParallel<span class="op">::</span><span class="kw">registerDoParallel</span>(cl)</a>
+<a class="sourceLine" id="cb522-4" data-line-number="4">bsmean_PL &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, <span class="dt">.combine =</span> <span class="st">&#39;c&#39;</span>) <span class="op">%dopar%</span><span class="st"> </span>{</a>
+<a class="sourceLine" id="cb522-5" data-line-number="5">  <span class="kw">mean</span>(<span class="kw">sample</span>(iris_bs<span class="op">$</span>Petal.Length, <span class="dt">replace =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb522-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb522-7" data-line-number="7">bootstrap &lt;-<span class="st"> </span><span class="kw">tibble</span>(bsmean_PL)</a>
+<a class="sourceLine" id="cb522-8" data-line-number="8"><span class="kw">stopCluster</span>(cl)</a>
+<a class="sourceLine" id="cb522-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb522-10" data-line-number="10"><span class="kw">ggplot</span>(bootstrap, <span class="kw">aes</span>(<span class="dt">x =</span> bsmean_PL)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using foreach&quot;</span>)</a></code></pre></div>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="spark-and-sparklyr" class="section level4 unnumbered">
+<h4>Spark and <code>sparklyr</code></h4>
+<p>Some of you may be familiar with <a href="http://spark.apache.org/">Apache Spark</a> which is an open-source product for distributed cluster-computing. You may want to learn more about its capabilities, including scheduling workflow, dispatching tasks, and consolidating end results. While incredibly powerful, there has historically been a steep learning curve to getting R to work smoothly with a Spark connection. Recently, RStudio has come out with a new package <a href="https://spark.rstudio.com/"><code>sparklyr</code></a> which integrates R and Spark seamlessly. Note that in the example below, we’ve set up a local connection just for the purposes of the example. For your work, you may want to connect to a cluster or cloud space with many cores.</p>
+<p>The <a href="https://spark.rstudio.com/">RStudio <code>sparklyr</code> webpage</a> provides a plethora of good examples demonstrating the sophistication and power of the technology. <code>sparklyr</code> has particularly strong connections to the suite of <code>tidyverse</code> functions. Indeed, the power of <code>sparklyr</code> is more about distributing the computing than about parallelizing it. For example, with <code>sparklyr</code> the computations are delayed until you need the results. Additionally, Spark is doing the heavy lifting and only at the very end (when your results are called) do you need to worry about the size of the table, results, or computational space. The example below repeats the bootstrapping work that was done previously.</p>
+<p>Note, it is important to look at your data structures and variables names. For example, when copying the local dataframe <code>iris_samps</code> to the remote data source called <code>iris_samps_tbl</code>, the variable <code>Petal.Length</code> was changed to <code>Petal_Length</code>.</p>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb523-1" data-line-number="1"><span class="kw">library</span>(sparklyr)</a>
+<a class="sourceLine" id="cb523-2" data-line-number="2"><span class="kw">spark_install</span>()</a>
+<a class="sourceLine" id="cb523-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb523-4" data-line-number="4">sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span class="dt">master =</span> <span class="st">&quot;local&quot;</span>)</a>
+<a class="sourceLine" id="cb523-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb523-6" data-line-number="6">n_sim =<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb523-7" data-line-number="7">iris_samps &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(Species <span class="op">==</span><span class="st"> &quot;virginica&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb523-8" data-line-number="8"><span class="st">  </span><span class="kw">sapply</span>(rep.int, <span class="dt">times=</span>n_sim) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">cbind</span>(<span class="dt">replicate =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>n_sim, <span class="dt">each =</span> <span class="dv">50</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb523-9" data-line-number="9"><span class="st">  </span><span class="kw">data.frame</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb523-10" data-line-number="10"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">group_by</span>(replicate) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb523-11" data-line-number="11"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">sample_n</span>(<span class="dv">50</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb523-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb523-13" data-line-number="13">iris_samps_tbl &lt;-<span class="st"> </span><span class="kw">copy_to</span>(sc, iris_samps)</a>
+<a class="sourceLine" id="cb523-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb523-15" data-line-number="15">iris_samps_tbl <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb523-16" data-line-number="16"><span class="st">  </span><span class="kw">spark_apply</span>(<span class="cf">function</span>(x) {<span class="kw">mean</span>(x<span class="op">$</span>Petal_Length)}, </a>
+<a class="sourceLine" id="cb523-17" data-line-number="17">    <span class="dt">group_by =</span> <span class="st">&quot;replicate&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb523-18" data-line-number="18"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> result)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">20</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using sparklyr&quot;</span>)</a></code></pre></div>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb524-1" data-line-number="1"><span class="kw">spark_disconnect</span>(sc)</a></code></pre></div>
+<p>For our particular application, the adept reader has probably noticed that the average of a variable using <code>group_by</code> is a very quick and easy task for <code>dplyr</code>. Indeed, the use of <code>sparklyr</code> above is overkill and is presented only as a way to demonstrate using <code>sparklyr</code>. If you are working with big datasets that require large computing infrastructure, the RStudio help pages on <code>sparklyr</code> are fantastic. Additionally, there are many instances of working with <code>Spark</code> in the wild, and you might consider working through someone else’s <code>Spark</code> analysis like this <a href="https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/">fantastic example</a> on splitting up large amounts of raw DNA sequencing to get data for a given genetic location.</p>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb525-1" data-line-number="1">iris_samps <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">group_by</span>(replicate) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb525-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">summarize</span>(<span class="dt">result =</span> <span class="kw">mean</span>(Petal.Length)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb525-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> result)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using dplyr&quot;</span>)</a></code></pre></div>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>While an introduction to parallel and cloud computing will help you become more adept and less apprehensive about using the tools, there is also a recognition that sufficient background in computer science is needed to be able to fully engage with principles of high performance computing.</p>
+</div>
+<div id="learn-more" class="section level4 unnumbered">
+<h4>Learn more</h4>
+<ul>
+<li>Hana Sevcikova <a href="https://channel9.msdn.com/Events/useR-international-R-User-conferences/useR-International-R-User-2017-Conference/Introduction-to-parallel-computing-with-R">Introduction to parallel computing with R</a> useR 2017 in Brussels, <a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html">tutorial here</a></li>
+<li><code>sparklyr</code> to do <a href="https://blog.rstudio.com/2018/05/14/sparklyr-0-8/">parallel cross-validation</a></li>
+<li><a href="https://www.rstudio.com/resources/cheatsheets/" class="uri">https://www.rstudio.com/resources/cheatsheets/</a>
+<ul>
+<li><a href="https://www.rstudio.com/resources/cheatsheets/#sparklyr" class="uri">https://www.rstudio.com/resources/cheatsheets/#sparklyr</a><br />
+</li>
+<li><a href="https://github.com/rstudio/cheatsheets/raw/master/parallel_computation.pdf" class="uri">https://github.com/rstudio/cheatsheets/raw/master/parallel_computation.pdf</a></li>
+</ul></li>
+<li>Great blog <a href="https://thecodeforest.github.io/post/two_flavors_of_parallel_simulation.html">Two Flavors of Parallel Simulation</a> by Mark LeBoeuf comparing different ways to process code in parallel.</li>
+</ul>
+</div>
 </div>
 <div id="cloud-computing" class="section level2">
 <h2><span class="header-section-number">10.4</span> Cloud Computing</h2>
+<p>The R package <code>parallel</code> is designed to send tasks to each of multiple cores. Today’s computers (even small laptops!) typically have multiple cores, and any server or cloud computing infrastructure can easily handle dozens or hundreds of parallel tasks. The structure of the R <code>parallel</code> implementation sends tasks to workers that don’t talk to one another until compiling their results at the end. In her <a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html">2017 UseR! tutorial</a>, Hana Sevcikova describes the function of workers which run code/functions/iterations separately before results are subsequently combined.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-11"></span>
+<img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html" width="65%" />
+<p class="caption">
+Figure 1.7: Image from Sevcikova UseR! 2017 [tutorial on parallel computing](<a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html" class="uri">https://rawgit.com/PPgp/useR2017public/master/tutorial.html</a>
+</p>
+</div>
+<p>As computing infrastructure becomes more sophisticated, it is important to have the language to describe how connected components work. Parallel processing allows for a conversation on the <a href="https://en.wikipedia.org/wiki/Grid_computing">differences between</a> distributed computing, cluster computing, and grid computing, and generally, the framework of high performance computing. The benefit of parallel computing as an introduction to the larger infrastructure is that the task of each worker is clear, important, and easy to describe.</p>
 </div>
 <div id="reticulate" class="section level2">
 <h2><span class="header-section-number">10.5</span> <code>reticulate</code></h2>
 <div id="connect-to-python-within-rstudio" class="section level3 unnumbered">
 <h3>Connect to Python within RStudio</h3>
 <p>For many statisticians, the go-to software language is R. However, there is no doubt that Python is a very important language in data science. Why not do both??</p>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb509-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
-<a class="sourceLine" id="cb509-2" data-line-number="2"><span class="kw">library</span>(reticulate)</a>
-<a class="sourceLine" id="cb509-3" data-line-number="3"><span class="kw">use_virtualenv</span>(<span class="st">&quot;r-reticulate&quot;</span>)</a>
-<a class="sourceLine" id="cb509-4" data-line-number="4">reticulate<span class="op">::</span><span class="kw">import</span>(<span class="st">&quot;statsmodels&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb526-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb526-2" data-line-number="2"><span class="kw">library</span>(reticulate)</a>
+<a class="sourceLine" id="cb526-3" data-line-number="3"><span class="kw">use_virtualenv</span>(<span class="st">&quot;r-reticulate&quot;</span>)</a>
+<a class="sourceLine" id="cb526-4" data-line-number="4">reticulate<span class="op">::</span><span class="kw">import</span>(<span class="st">&quot;statsmodels&quot;</span>)</a></code></pre></div>
 <pre><code>## Module(statsmodels)</code></pre>
 <div id="i-can-run-python-inside-r" class="section level4 unnumbered">
 <h4>I can run Python inside R??</h4>
@@ -408,11 +542,11 @@ flights = flights[[&#39;carrier&#39;, &#39;dep_delay&#39;, &#39;arr_delay&#39;]]
 flights = flights.dropna()
 ```</code></pre>
 <p>A view of the Python chunk which is actually run:</p>
-<div class="sourceCode" id="cb512"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb512-1" data-line-number="1"><span class="im">import</span> pandas</a>
-<a class="sourceLine" id="cb512-2" data-line-number="2">flights <span class="op">=</span> pandas.read_csv(<span class="st">&quot;flights.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb512-3" data-line-number="3">flights <span class="op">=</span> flights[flights[<span class="st">&quot;dest&quot;</span>] <span class="op">==</span> <span class="st">&quot;ORD&quot;</span>]</a>
-<a class="sourceLine" id="cb512-4" data-line-number="4">flights <span class="op">=</span> flights[[<span class="st">&#39;carrier&#39;</span>, <span class="st">&#39;dep_delay&#39;</span>, <span class="st">&#39;arr_delay&#39;</span>]]</a>
-<a class="sourceLine" id="cb512-5" data-line-number="5">flights <span class="op">=</span> flights.dropna()</a></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb529-1" data-line-number="1"><span class="im">import</span> pandas</a>
+<a class="sourceLine" id="cb529-2" data-line-number="2">flights <span class="op">=</span> pandas.read_csv(<span class="st">&quot;flights.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb529-3" data-line-number="3">flights <span class="op">=</span> flights[flights[<span class="st">&quot;dest&quot;</span>] <span class="op">==</span> <span class="st">&quot;ORD&quot;</span>]</a>
+<a class="sourceLine" id="cb529-4" data-line-number="4">flights <span class="op">=</span> flights[[<span class="st">&#39;carrier&#39;</span>, <span class="st">&#39;dep_delay&#39;</span>, <span class="st">&#39;arr_delay&#39;</span>]]</a>
+<a class="sourceLine" id="cb529-5" data-line-number="5">flights <span class="op">=</span> flights.dropna()</a></code></pre></div>
 </div>
 <div id="learn-about-the-dataset" class="section level4 unnumbered">
 <h4>Learn about the dataset</h4>
@@ -421,14 +555,14 @@ flights.shape
 flights.head(3)
 flights.describe()
 ```</code></pre>
-<div class="sourceCode" id="cb514"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb514-1" data-line-number="1">flights.shape</a></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb531-1" data-line-number="1">flights.shape</a></code></pre></div>
 <pre><code>## (12590, 3)</code></pre>
-<div class="sourceCode" id="cb516"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb516-1" data-line-number="1">flights.head(<span class="dv">3</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb533"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb533-1" data-line-number="1">flights.head(<span class="dv">3</span>)</a></code></pre></div>
 <pre><code>##    carrier  dep_delay  arr_delay
 ## 4       UA       -4.0       12.0
 ## 5       AA       -2.0        8.0
 ## 22      AA       -1.0       14.0</code></pre>
-<div class="sourceCode" id="cb518"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb518-1" data-line-number="1">flights.describe()</a></code></pre></div>
+<div class="sourceCode" id="cb535"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb535-1" data-line-number="1">flights.describe()</a></code></pre></div>
 <pre><code>##           dep_delay     arr_delay
 ## count  12590.000000  12590.000000
 ## mean      11.709770      2.917951
@@ -446,9 +580,9 @@ flights = pandas.read_csv(&quot;flights.csv&quot;)
 flights = flights[[&#39;carrier&#39;, &#39;dep_delay&#39;, &#39;arr_delay&#39;]]
 flights.groupby(&quot;carrier&quot;).mean()
 ```</code></pre>
-<div class="sourceCode" id="cb521"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb521-1" data-line-number="1">flights <span class="op">=</span> pandas.read_csv(<span class="st">&quot;flights.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb521-2" data-line-number="2">flights <span class="op">=</span> flights[[<span class="st">&#39;carrier&#39;</span>, <span class="st">&#39;dep_delay&#39;</span>, <span class="st">&#39;arr_delay&#39;</span>]]</a>
-<a class="sourceLine" id="cb521-3" data-line-number="3">flights.groupby(<span class="st">&quot;carrier&quot;</span>).mean()</a></code></pre></div>
+<div class="sourceCode" id="cb538"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb538-1" data-line-number="1">flights <span class="op">=</span> pandas.read_csv(<span class="st">&quot;flights.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb538-2" data-line-number="2">flights <span class="op">=</span> flights[[<span class="st">&#39;carrier&#39;</span>, <span class="st">&#39;dep_delay&#39;</span>, <span class="st">&#39;arr_delay&#39;</span>]]</a>
+<a class="sourceLine" id="cb538-3" data-line-number="3">flights.groupby(<span class="st">&quot;carrier&quot;</span>).mean()</a></code></pre></div>
 <pre><code>##          dep_delay  arr_delay
 ## carrier                      
 ## AA        8.586016   0.364291
@@ -463,18 +597,18 @@ flights.groupby(&quot;carrier&quot;).mean()
 <li><code>py$x</code> accesses an <code>x</code> variable created within Python from R</li>
 <li><code>r.x</code> accesses an <code>x</code> variable created within R from Python</li>
 </ul>
-<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb523-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb523-2" data-line-number="2"><span class="kw">ggplot</span>(py<span class="op">$</span>flights, </a>
-<a class="sourceLine" id="cb523-3" data-line-number="3">       <span class="kw">aes</span>(<span class="dt">x=</span>carrier, </a>
-<a class="sourceLine" id="cb523-4" data-line-number="4">           <span class="dt">y=</span>arr_delay)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb523-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb523-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_jitter</span>()</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb540-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb540-2" data-line-number="2"><span class="kw">ggplot</span>(py<span class="op">$</span>flights, </a>
+<a class="sourceLine" id="cb540-3" data-line-number="3">       <span class="kw">aes</span>(<span class="dt">x=</span>carrier, </a>
+<a class="sourceLine" id="cb540-4" data-line-number="4">           <span class="dt">y=</span>arr_delay)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb540-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb540-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_jitter</span>()</a></code></pre></div>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="from-r-chunk-to-python-chunk" class="section level4 unnumbered">
 <h4>From R chunk to Python chunk</h4>
-<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb524-1" data-line-number="1"><span class="kw">data</span>(diamonds)</a>
-<a class="sourceLine" id="cb524-2" data-line-number="2"><span class="kw">head</span>(diamonds)</a></code></pre></div>
+<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb541-1" data-line-number="1"><span class="kw">data</span>(diamonds)</a>
+<a class="sourceLine" id="cb541-2" data-line-number="2"><span class="kw">head</span>(diamonds)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 10
 ##   carat cut       color clarity depth table price     x     y     z
 ##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -488,7 +622,7 @@ flights.groupby(&quot;carrier&quot;).mean()
 <div id="python-chunks" class="section level4 unnumbered">
 <h4>Python chunks</h4>
 <p>Note that we’re calling Python code on an R object.</p>
-<div class="sourceCode" id="cb526"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb526-1" data-line-number="1"><span class="bu">print</span>(r.diamonds.describe())</a></code></pre></div>
+<div class="sourceCode" id="cb543"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb543-1" data-line-number="1"><span class="bu">print</span>(r.diamonds.describe())</a></code></pre></div>
 <pre><code>##               carat         depth  ...             y             z
 ## count  53940.000000  53940.000000  ...  53940.000000  53940.000000
 ## mean       0.797940     61.749405  ...      5.734526      3.538734
@@ -500,16 +634,16 @@ flights.groupby(&quot;carrier&quot;).mean()
 ## max        5.010000     79.000000  ...     58.900000     31.800000
 ## 
 ## [8 rows x 7 columns]</code></pre>
-<div class="sourceCode" id="cb528"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb528-1" data-line-number="1"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</a>
-<a class="sourceLine" id="cb528-2" data-line-number="2">model <span class="op">=</span> smf.ols(<span class="st">&#39;price ~ carat&#39;</span>, data <span class="op">=</span> r.diamonds).fit()</a>
-<a class="sourceLine" id="cb528-3" data-line-number="3"><span class="bu">print</span>(model.summary())</a></code></pre></div>
+<div class="sourceCode" id="cb545"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb545-1" data-line-number="1"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</a>
+<a class="sourceLine" id="cb545-2" data-line-number="2">model <span class="op">=</span> smf.ols(<span class="st">&#39;price ~ carat&#39;</span>, data <span class="op">=</span> r.diamonds).fit()</a>
+<a class="sourceLine" id="cb545-3" data-line-number="3"><span class="bu">print</span>(model.summary())</a></code></pre></div>
 <pre><code>##                             OLS Regression Results                            
 ## ==============================================================================
 ## Dep. Variable:                  price   R-squared:                       0.849
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
-## Date:                Sat, 23 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        21:38:21   Log-Likelihood:            -4.7273e+05
+## Date:                Mon, 25 Nov 2019   Prob (F-statistic):               0.00
+## Time:                        10:58:53   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -535,9 +669,9 @@ flights.groupby(&quot;carrier&quot;).mean()
 </div>
 <div id="full-disclosure" class="section level4 unnumbered">
 <h4>Full disclosure</h4>
-<p>Reticulate is not always trivial to set up. Indeed, I’ve had trouble figuring out which Python version is talking to R and where different module versions live.</p>
+<p><code>reticulate</code> is not always trivial to set up. Indeed, I’ve had trouble figuring out which Python version is talking to R and where different module versions live.</p>
 </div>
-<div id="learn-more" class="section level4 unnumbered">
+<div id="learn-more-1" class="section level4 unnumbered">
 <h4>Learn more</h4>
 <ul>
 <li><a href="https://rstudio.github.io/reticulate/">RStudio R Interface to Python</a></li>
@@ -550,28 +684,29 @@ flights.groupby(&quot;carrier&quot;).mean()
 </div>
 </div>
 </div>
-<div id="sql" class="section level2">
-<h2><span class="header-section-number">10.6</span> SQL</h2>
+<div id="sql-in-r" class="section level2">
+<h2><span class="header-section-number">10.6</span> SQL (in R)</h2>
+<p>Note that there exists an R interface to work with SQL commands from within an R Markdown file. For consistency with the class notes, we’ve continued to use the R Markdown structure to demonstrate the course material.</p>
 <p>(Taken from the Teach Data Science blog: <a href="https://teachdatascience.com/sql/" class="uri">https://teachdatascience.com/sql/</a>, this entry written by Nick Horton)</p>
 <p>SQL (pronounced <em>sequel</em>) stands for <a href="https://en.wikipedia.org/wiki/SQL">Structured Query Language</a>; it is a language designed to manage data in a relational database system.</p>
 <p>We will use a public facing MySQL <a href="http://www.science.smith.edu/wai-database/home/about">database</a> containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, <a href="https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&amp;icde=44962011&amp;ddparam=&amp;ddvalue=&amp;ddsub=&amp;cr=46&amp;csb=default&amp;cs=ASC&amp;pball=">PI Susan Voss, R15 DC014129-01</a>.) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.</p>
-<p>We begin by demonstrating how SQL queries can be sent to a database. We begin by setting up a connection using the <code>dbConnect()</code> function.</p>
-<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb530-1" data-line-number="1"><span class="kw">library</span>(mosaic)</a>
-<a class="sourceLine" id="cb530-2" data-line-number="2"><span class="kw">library</span>(RMySQL) <span class="co"># that there are plans to move this support to RMariaDB </span></a>
-<a class="sourceLine" id="cb530-3" data-line-number="3">con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(</a>
-<a class="sourceLine" id="cb530-4" data-line-number="4">  <span class="kw">MySQL</span>(), <span class="dt">host =</span> <span class="st">&quot;scidb.smith.edu&quot;</span>, <span class="dt">user =</span> <span class="st">&quot;waiuser&quot;</span>, </a>
-<a class="sourceLine" id="cb530-5" data-line-number="5">  <span class="dt">password =</span> <span class="st">&quot;smith_waiDB&quot;</span>, <span class="dt">dbname =</span> <span class="st">&quot;wai&quot;</span>)</a></code></pre></div>
+<p>We begin by demonstrating how SQL queries can be sent to a database. It is necessary to set up a connection using the <code>dbConnect()</code> function.</p>
+<div class="sourceCode" id="cb547"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb547-1" data-line-number="1"><span class="kw">library</span>(mosaic)</a>
+<a class="sourceLine" id="cb547-2" data-line-number="2"><span class="kw">library</span>(RMySQL)  </a>
+<a class="sourceLine" id="cb547-3" data-line-number="3">con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(</a>
+<a class="sourceLine" id="cb547-4" data-line-number="4">  <span class="kw">MySQL</span>(), <span class="dt">host =</span> <span class="st">&quot;scidb.smith.edu&quot;</span>, <span class="dt">user =</span> <span class="st">&quot;waiuser&quot;</span>, </a>
+<a class="sourceLine" id="cb547-5" data-line-number="5">  <span class="dt">password =</span> <span class="st">&quot;smith_waiDB&quot;</span>, <span class="dt">dbname =</span> <span class="st">&quot;wai&quot;</span>)</a></code></pre></div>
 <p>Next a series of SQL queries can be sent to the database using the <code>DBI::dbGetQuery()</code> function: each query returns an R dataframe.</p>
-<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb531-1" data-line-number="1"><span class="kw">class</span>(<span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SHOW TABLES&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb548"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb548-1" data-line-number="1"><span class="kw">class</span>(<span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SHOW TABLES&quot;</span>))</a></code></pre></div>
 <pre><code>## [1] &quot;data.frame&quot;</code></pre>
 <p>There are multiple tables within the <code>wai</code> database.</p>
-<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb533-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SHOW TABLES&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb550"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb550-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SHOW TABLES&quot;</span>)</a></code></pre></div>
 <pre><code>##   Tables_in_wai
 ## 1  Measurements
 ## 2       PI_Info
 ## 3       Subject</code></pre>
 <p>The <code>EXPLAIN</code> command describes the ten field names (variables) in the <code>PI_Info</code> table.</p>
-<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb535-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;EXPLAIN PI_Info&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb552"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb552-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;EXPLAIN PI_Info&quot;</span>)</a></code></pre></div>
 <pre><code>##          Field           Type Null Key Default Extra
 ## 1   Identifier    varchar(20)  YES        &lt;NA&gt;      
 ## 2      PI_Year        int(11)  YES        &lt;NA&gt;      
@@ -584,8 +719,8 @@ flights.groupby(&quot;carrier&quot;).mean()
 ## 9          URL   varchar(140)  YES        &lt;NA&gt;      
 ## 10    PI_Notes           text   NO        &lt;NA&gt;</code></pre>
 <p>The <code>SELECT</code> statement can be used to select all fields for eight observations in the <code>Measurements</code> table.</p>
-<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb537-1" data-line-number="1">eightobs &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SELECT * FROM Measurements LIMIT 8&quot;</span>)</a>
-<a class="sourceLine" id="cb537-2" data-line-number="2">eightobs</a></code></pre></div>
+<div class="sourceCode" id="cb554"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb554-1" data-line-number="1">eightobs &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SELECT * FROM Measurements LIMIT 8&quot;</span>)</a>
+<a class="sourceLine" id="cb554-2" data-line-number="2">eightobs</a></code></pre></div>
 <pre><code>##   Identifier Sub_Number Session Left_Ear MEP Instrument    Freq Absorbance
 ## 1  Abur_2014          1       1        0  -5          1 210.938  0.0451375
 ## 2  Abur_2014          1       1        0  -5          1 234.375  0.0441247
@@ -605,8 +740,8 @@ flights.groupby(&quot;carrier&quot;).mean()
 ## 7  66615500 -0.229576         NA
 ## 8  61996200 -0.229327         NA</code></pre>
 <p>More interesting and complicated <code>SELECT</code> calls can be used to undertake grouping and aggregation. Here we calculate the sample size for each study</p>
-<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb539-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, </a>
-<a class="sourceLine" id="cb539-2" data-line-number="2">  <span class="st">&quot;SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb556"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb556-1" data-line-number="1"><span class="kw">dbGetQuery</span>(con, </a>
+<a class="sourceLine" id="cb556-2" data-line-number="2">  <span class="st">&quot;SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM&quot;</span>)</a></code></pre></div>
 <pre><code>##       Identifier    NUM
 ## 1       Sun_2016   2604
 ## 2    Shaver_2013   2880
@@ -621,27 +756,27 @@ flights.groupby(&quot;carrier&quot;).mean()
 ## 11  Shahnaz_2006  58776
 ## 12    Lewis_2015 114716</code></pre>
 <div id="accessing-a-database-using-dplyr-commands" class="section level4 unnumbered">
-<h4>Accessing a database using dplyr commands</h4>
+<h4>Accessing a database using <code>dplyr</code> commands</h4>
 <p>Alternatively, a connection can be made to the server by creating a series of <code>dplyr</code> tbl
 objects. Connecting with familiar <code>dplyr</code> syntax is attractive because, as <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html">Hadley Wickham</a> has noted, SQL and R have similar syntax (but sufficiently different to be confusing).</p>
 <p>The setup process looks similar.</p>
-<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb541-1" data-line-number="1">db &lt;-<span class="st"> </span><span class="kw">src_mysql</span>(<span class="dt">dbname =</span> <span class="st">&quot;wai&quot;</span>, <span class="dt">host =</span> <span class="st">&quot;scidb.smith.edu&quot;</span>, <span class="dt">user =</span> <span class="st">&quot;waiuser&quot;</span>, </a>
-<a class="sourceLine" id="cb541-2" data-line-number="2">          <span class="dt">password=</span><span class="st">&quot;smith_waiDB&quot;</span>)</a>
-<a class="sourceLine" id="cb541-3" data-line-number="3">Measurements &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;Measurements&quot;</span>)</a>
-<a class="sourceLine" id="cb541-4" data-line-number="4"><span class="kw">class</span>(Measurements)</a></code></pre></div>
+<div class="sourceCode" id="cb558"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb558-1" data-line-number="1">db &lt;-<span class="st"> </span><span class="kw">src_mysql</span>(<span class="dt">dbname =</span> <span class="st">&quot;wai&quot;</span>, <span class="dt">host =</span> <span class="st">&quot;scidb.smith.edu&quot;</span>, <span class="dt">user =</span> <span class="st">&quot;waiuser&quot;</span>, </a>
+<a class="sourceLine" id="cb558-2" data-line-number="2">          <span class="dt">password=</span><span class="st">&quot;smith_waiDB&quot;</span>)</a>
+<a class="sourceLine" id="cb558-3" data-line-number="3">Measurements &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;Measurements&quot;</span>)</a>
+<a class="sourceLine" id="cb558-4" data-line-number="4"><span class="kw">class</span>(Measurements)</a></code></pre></div>
 <pre><code>## [1] &quot;tbl_MySQLConnection&quot; &quot;tbl_dbi&quot;             &quot;tbl_sql&quot;            
 ## [4] &quot;tbl_lazy&quot;            &quot;tbl&quot;</code></pre>
-<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb543-1" data-line-number="1">PI_Info &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;PI_Info&quot;</span>)</a>
-<a class="sourceLine" id="cb543-2" data-line-number="2">Subject &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;Subject&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb560"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb560-1" data-line-number="1">PI_Info &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;PI_Info&quot;</span>)</a>
+<a class="sourceLine" id="cb560-2" data-line-number="2">Subject &lt;-<span class="st"> </span><span class="kw">tbl</span>(db, <span class="st">&quot;Subject&quot;</span>)</a></code></pre></div>
 <p>We explore the <code>PI_Info</code> table using the <code>collect()</code> function used to force computation on the database (and return the results). One attractive aspect of database systems is that they feature <a href="https://en.wikipedia.org/wiki/Lazy_evaluation"><em>lazy evaluation</em></a>, where computation is optimized and postponed as long as possible.</p>
-<div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb544-1" data-line-number="1">PI_Info  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb561"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb561-1" data-line-number="1">PI_Info  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
 ## #   [waiuser@scidb.smith.edu:/wai]
 ##   total
 ##   &lt;dbl&gt;
 ## 1    12</code></pre>
-<div class="sourceCode" id="cb546"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb546-1" data-line-number="1">PI_Info <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>Email) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()   </a></code></pre></div>
+<div class="sourceCode" id="cb563"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb563-1" data-line-number="1">PI_Info <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>Email) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>()   </a></code></pre></div>
 <pre><code>##       Identifier PI_Year
 ## 1    Werner_2010    2010
 ## 2      Voss_1994    1994
@@ -733,17 +868,17 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 10                                                                                                                                                                                                                                     Sub_Notes=Boys Town National Lab are data taken by Keefe; Sub_Notes=NCRAR are data taken by Feeney 
 ## 11                                                                                                                                                                                                                  First author is Groon, PI for grant is Steve Neely, data collected on system described in Rasetshwane and Neely (2011)
 ## 12                                                                                                                                                                                                                                                                                          Impedance angles not available and set to Null</code></pre>
-<div class="sourceCode" id="cb548"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb548-1" data-line-number="1"><span class="co"># be careful with collect() when dealing with large tables!</span></a></code></pre></div>
+<div class="sourceCode" id="cb565"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb565-1" data-line-number="1"><span class="co"># be careful with collect() when dealing with large tables!</span></a></code></pre></div>
 <p>Note how the number of rows is unknown (<code>??</code> at the top of the output above) for the lazy query.</p>
 <p>Similarly, we can explore the <code>Subjects</code> table.</p>
-<div class="sourceCode" id="cb549"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb549-1" data-line-number="1">Subject  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb566"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb566-1" data-line-number="1">Subject  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
 ## #   [waiuser@scidb.smith.edu:/wai]
 ##   total
 ##   &lt;dbl&gt;
 ## 1   640</code></pre>
-<div class="sourceCode" id="cb551"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb551-1" data-line-number="1">Subject <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect</span>()  <span class="co"># be careful with collect() with large tables!</span></a></code></pre></div>
+<div class="sourceCode" id="cb568"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb568-1" data-line-number="1">Subject <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect</span>()  <span class="co"># be careful with collect() with large tables!</span></a></code></pre></div>
 <pre><code>## # A tibble: 640 x 10
 ##    Identifier Sub_Number Session_Total   Age Female  Race Ethnicity
 ##    &lt;chr&gt;      &lt;chr&gt;              &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;     &lt;int&gt;
@@ -760,7 +895,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## # … with 630 more rows, and 3 more variables: Left_Ear_Status &lt;int&gt;,
 ## #   Right_Ear_Status &lt;int&gt;, Sub_Notes &lt;chr&gt;</code></pre>
 <p>Let’s explore the <code>Measurements</code> table.</p>
-<div class="sourceCode" id="cb553"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb553-1" data-line-number="1">Measurements <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb570"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb570-1" data-line-number="1">Measurements <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">total =</span> <span class="kw">n</span>())</a></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log
 ## #   [waiuser@scidb.smith.edu:/wai]
@@ -768,14 +903,14 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ##    &lt;dbl&gt;
 ## 1 286774</code></pre>
 <p>There are more than a quarter million observations.</p>
-<p>In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al (2012) entitled <a href="https://www.ncbi.nlm.nih.gov/pubmed/21857517">“Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults”</a>.</p>
+<p>In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al. (2012) entitled <a href="https://www.ncbi.nlm.nih.gov/pubmed/21857517">“Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults”</a>.</p>
 <p>Arbitrarily we choose to collect data from subject number three.</p>
-<div class="sourceCode" id="cb555"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb555-1" data-line-number="1">onesubj &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb555-2" data-line-number="2"><span class="st">  </span>Measurements <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb555-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(Identifier <span class="op">==</span><span class="st"> &quot;Rosowski_2012&quot;</span>, Sub_Number <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb555-4" data-line-number="4"><span class="st">  </span>collect <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb555-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">SessionNum =</span> <span class="kw">as.factor</span>(Session))</a>
-<a class="sourceLine" id="cb555-6" data-line-number="6"><span class="kw">head</span>(onesubj)</a></code></pre></div>
+<div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb572-1" data-line-number="1">onesubj &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb572-2" data-line-number="2"><span class="st">  </span>Measurements <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb572-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(Identifier <span class="op">==</span><span class="st"> &quot;Rosowski_2012&quot;</span>, Sub_Number <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb572-4" data-line-number="4"><span class="st">  </span>collect <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb572-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">SessionNum =</span> <span class="kw">as.factor</span>(Session))</a>
+<a class="sourceLine" id="cb572-6" data-line-number="6"><span class="kw">head</span>(onesubj)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 12
 ##   Identifier Sub_Number Session Left_Ear   MEP Instrument  Freq Absorbance
 ##   &lt;chr&gt;           &lt;int&gt;   &lt;int&gt;    &lt;int&gt; &lt;dbl&gt;      &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;
@@ -788,15 +923,14 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## # … with 4 more variables: Zmag &lt;dbl&gt;, Zang &lt;dbl&gt;, Canal_Area &lt;dbl&gt;,
 ## #   SessionNum &lt;fct&gt;</code></pre>
 <p>Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.</p>
-<div class="sourceCode" id="cb557"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb557-1" data-line-number="1">onesubj &lt;-<span class="st"> </span><span class="kw">mutate</span>(onesubj, <span class="dt">Ear =</span> <span class="kw">ifelse</span>(Left_Ear <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;Left&quot;</span>, <span class="st">&quot;Right&quot;</span>))</a>
-<a class="sourceLine" id="cb557-2" data-line-number="2"><span class="kw">ggplot</span>(onesubj, <span class="kw">aes</span>(<span class="dt">x =</span> Freq, <span class="dt">y =</span> Absorbance)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb557-3" data-line-number="3"><span class="st">  </span><span class="kw">aes</span>(<span class="dt">colour =</span> Ear) <span class="op">+</span><span class="st"> </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Absorbance by ear Rosowski subject 3&quot;</span>)</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" /></p>
-<p>In summary, while SQL is a powerful tool, there are straightforward ways to integrate existing databases into analyses using a small number of commands. Particularly if instructors use <a href="https://teachdatascience.com/rmarkdown">RMarkdown</a>, data ingestation can be scaffolded with students able to modify and augment code that is provided to them.</p>
+<div class="sourceCode" id="cb574"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb574-1" data-line-number="1">onesubj &lt;-<span class="st"> </span><span class="kw">mutate</span>(onesubj, <span class="dt">Ear =</span> <span class="kw">ifelse</span>(Left_Ear <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;Left&quot;</span>, <span class="st">&quot;Right&quot;</span>))</a>
+<a class="sourceLine" id="cb574-2" data-line-number="2"><span class="kw">ggplot</span>(onesubj, <span class="kw">aes</span>(<span class="dt">x =</span> Freq, <span class="dt">y =</span> Absorbance)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb574-3" data-line-number="3"><span class="st">  </span><span class="kw">aes</span>(<span class="dt">colour =</span> Ear) <span class="op">+</span><span class="st"> </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Absorbance by ear Rosowski subject 3&quot;</span>)</a></code></pre></div>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite. More information about databases within R can be found in the CRAN <a href="https://cran.r-project.org/web/views/Databases.html">Databases with R</a> Task View.</p>
 <p>Setting up and managing a database is a topic for a different day: here we focused on how SQL can be used within R to access data in a flexible and powerful manner.</p>
 </div>
-<div id="learn-more-1" class="section level4 unnumbered">
+<div id="learn-more-2" class="section level4 unnumbered">
 <h4>Learn more</h4>
 <ul>
 <li><a href="https://chance.amstat.org/2015/04/setting-the-stage/" class="uri">https://chance.amstat.org/2015/04/setting-the-stage/</a> (Setting the stage for data technologies)</li>

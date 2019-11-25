@@ -14,8 +14,11 @@
 
 ## API
 
-<div style= "float:right;position: relative; top: -50px;">
-<img src="figs/api_xkcd.png" width="40%" style="display: block; margin: auto 0 auto auto;" />
+<div style= "float:right;position: relative; top: -30px;">
+<div class="figure" style="text-align: right">
+<img src="figs/api_xkcd.png" alt="xkcd, https://xkcd.com/1481/" width="80%" />
+<p class="caption">(\#fig:unnamed-chunk-2)xkcd, https://xkcd.com/1481/</p>
+</div>
 </div>
 
 What is an API? (Application Programming Interface)
@@ -37,10 +40,213 @@ An API is an intermediary that allows two applications to talk to one another.  
 
 * What if you want some Twitter data?  How might you get it?  Well, you could email Twitter and ask someone for it.  **Instead** Twitter provides information about how their data is stored, and allows you to query their data in an automated way.
 
+<div class="figure" style="text-align: right">
+<img src="figs/api_weather.png" alt="Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro" width="80%" />
+<p class="caption">(\#fig:unnamed-chunk-3)Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro</p>
+</div>
 
 ## Parallel Computing
 
+To demonstrate what parallel computing is, we'll perform tasks that are **embarrassingly parallel** which means there is no dependency or communication between the parallel tasks.  Again, parallel computing can be powerful in ways that link computational tasks in complicated ways.  But we believe that as a *first* pass at teaching parallel computing, we should teach the parallel structure before bringing in dependence across the parallel tasks.  Examples of [embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) algorithms include: Monte Carlo analysis, bootstrapping, growing trees for Random Forests, `group_by` analyses, and cross-validation.  Additionally, data science methods increasingly use [randomized algorithms](https://en.wikipedia.org/wiki/Randomized_algorithm) which can often be written in parallel.
+
+
+Indeed, it isn't always easy to know when to use a parallel construction.  Because of existing overhead processes (e.g., copying data across many threads, bring results together, etc.) an algorithm run on 10 parallel strands will not reduce an original (non-parallel) run time by 10-fold.  Figuring out when a parallel implementation is appropriate is beyond the scope of this blog but should be carefully considered before embarking on large projects.
+
+
+#### Some parallel examples {-}
+
+Before running code in parallel, it is valuable to know how many cores your computer has to work with.  Note that the `detectCores` function will provide information about the specific device you are using (`logical = FALSE` tells you only the physical cores which is likely what you want).  Note that after `makeCluster` the separate threads have information.  After `stopCluster`, the code is no longer connecting to the cluster structure.
+
+
+```r
+library(parallel)
+P <- detectCores(logical=FALSE)
+P
+```
+
+```
+## [1] 8
+```
+
+```r
+cl <- makeCluster(P)
+cl[[1]]
+```
+
+```
+## node of a socket cluster on host 'localhost' with pid 38688
+```
+
+```r
+stopCluster(cl)
+cl[[1]]
+```
+
+```
+## Error in summary.connection(connection): invalid connection
+```
+
+#### Embarrassingly embarrassing example {-}
+
+In the example below, we generate some Cauchy data and find the max of each sample.  Note that for the current device there are 8 cores, so the process will happen 100/P = 12.5 times on each core.  The second argument of `clusterApply` is a sequence of numbers that gets passed to each worker as the (first) argument of `func1`.  Below, I've specified that the value 50 (number of reps) should be passed separately to 100 different workers.
+
+
+```r
+W <- 100
+P <- detectCores(logical=FALSE)
+cl <- makeCluster(P)
+
+func1 <- function(reps){
+  max(rcauchy(reps))
+}
+
+
+clusterApply(cl, rep(50,W), fun = func1) %>% head(3)
+```
+
+```
+## [[1]]
+## [1] 17.37151
+## 
+## [[2]]
+## [1] 20.73513
+## 
+## [[3]]
+## [1] 13.80041
+```
+
+```r
+stopCluster(cl)
+```
+
+There are many R functions which implement parallel processing.  For example, the same code from above can be processed using `foreach`.
+
+
+```r
+library(doParallel)
+cl <- parallel::makeCluster(P)
+
+doParallel::registerDoParallel(cl)
+foreach(reps = rep(50, 100), .combine = 'c') %dopar% {
+  max(rcauchy(reps))
+       } %>% head(3)
+```
+
+```
+## [1]  5.881646  5.374148 43.051650
+```
+
+```r
+stopCluster(cl)
+```
+
+
+####  Example bootstrapping {-}
+
+A slightly less embarrassingly parallel example comes with bootstrapping.  Below we have used parallel implementation to bootstrap the mean of the iris data petal length (Virginica only).
+
+
+```r
+data(iris)
+
+iris_bs <- iris %>%
+  filter(Species == "virginica") %>%
+  select(Petal.Length)
+```
+
+
+```r
+cl <- parallel::makeCluster(P)
+
+doParallel::registerDoParallel(cl)
+bsmean_PL <- foreach(i = 1:100, .combine = 'c') %dopar% {
+  mean(sample(iris_bs$Petal.Length, replace = TRUE))
+}
+bootstrap <- tibble(bsmean_PL)
+stopCluster(cl)
+
+ggplot(bootstrap, aes(x = bsmean_PL)) + geom_histogram(bins = 25) + ggtitle("Histogram of 100 Bootstrapped Means using foreach")
+```
+
+<img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+
+
+#### Spark  and `sparklyr` {-}
+
+
+Some of you may be familiar with [Apache Spark](http://spark.apache.org/) which is an open-source product for distributed cluster-computing.  You may want to learn more about its capabilities, including scheduling workflow, dispatching tasks, and consolidating end results.  While incredibly powerful, there has historically been a steep learning curve to getting R to work smoothly with a Spark connection.  Recently, RStudio has come out with a new package [`sparklyr`](https://spark.rstudio.com/) which integrates R and Spark seamlessly.  Note that in the example below, we've set up a local connection just for the purposes of the example.  For your work, you may want to connect to a cluster or cloud space with many cores.
+
+The [RStudio `sparklyr` webpage](https://spark.rstudio.com/) provides a plethora of good examples demonstrating the sophistication and power of the technology. `sparklyr` has particularly strong connections to the suite of `tidyverse` functions. Indeed, the power of `sparklyr` is more about distributing the computing than about parallelizing it.  For example, with `sparklyr` the computations are delayed until you need the results.  Additionally, Spark is doing the heavy lifting and only at the very end (when your results are called) do you need to worry about the size of the table, results, or computational space.  The example below repeats the bootstrapping work that was done previously.
+
+Note, it is important to look at your data structures and variables names.  For example, when copying the local dataframe `iris_samps` to the remote data source called `iris_samps_tbl`, the variable `Petal.Length` was changed to `Petal_Length`.
+
+
+```r
+library(sparklyr)
+spark_install()
+
+sc <- spark_connect(master = "local")
+
+n_sim = 100
+iris_samps <- iris %>% dplyr::filter(Species == "virginica") %>%
+  sapply(rep.int, times=n_sim) %>% cbind(replicate = rep(1:n_sim, each = 50)) %>% 
+  data.frame() %>%
+  dplyr::group_by(replicate) %>%
+  dplyr::sample_n(50, replace = TRUE)
+
+iris_samps_tbl <- copy_to(sc, iris_samps)
+
+iris_samps_tbl %>% 
+  spark_apply(function(x) {mean(x$Petal_Length)}, 
+    group_by = "replicate") %>%
+  ggplot(aes(x = result)) + geom_histogram(bins = 20) + ggtitle("Histogram of 100 Bootstrapped Means using sparklyr")
+```
+
+<img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+spark_disconnect(sc)
+```
+
+For our particular application, the adept reader has probably noticed that the average of a variable using `group_by` is a very quick and easy task for `dplyr`.  Indeed, the use of `sparklyr` above is overkill and is presented only as a way to demonstrate using `sparklyr`.  If you are working with big datasets that require large computing infrastructure, the RStudio help pages on `sparklyr` are fantastic.  Additionally, there are many instances of working with `Spark` in the wild, and you might consider working through someone else's `Spark` analysis like this [fantastic example](https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/) on splitting up large amounts of raw DNA sequencing to get data for a given genetic location.
+
+
+```r
+iris_samps %>% dplyr::group_by(replicate) %>%
+  dplyr::summarize(result = mean(Petal.Length)) %>%
+  ggplot(aes(x = result)) + geom_histogram(bins = 25) + ggtitle("Histogram of 100 Bootstrapped Means using dplyr")
+```
+
+<img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+
+
+While an introduction to parallel and cloud computing will help you become more adept and less apprehensive about using the tools, there is also a recognition that sufficient background in computer science is needed to be able to fully engage with principles of high performance computing. 
+
+
+#### Learn more {-}
+
+- Hana Sevcikova [Introduction to parallel computing with R](https://channel9.msdn.com/Events/useR-international-R-User-conferences/useR-International-R-User-2017-Conference/Introduction-to-parallel-computing-with-R) useR 2017 in Brussels, [tutorial here](https://rawgit.com/PPgp/useR2017public/master/tutorial.html)
+- `sparklyr` to do [parallel cross-validation](https://blog.rstudio.com/2018/05/14/sparklyr-0-8/)
+- https://www.rstudio.com/resources/cheatsheets/  
+    - https://www.rstudio.com/resources/cheatsheets/#sparklyr       
+    - https://github.com/rstudio/cheatsheets/raw/master/parallel_computation.pdf
+- Great blog [Two Flavors of Parallel Simulation](https://thecodeforest.github.io/post/two_flavors_of_parallel_simulation.html) by Mark LeBoeuf comparing different ways to process code in parallel.
+
+
+
 ## Cloud Computing
+
+The R package `parallel` is designed to send tasks to each of multiple cores.  Today's computers (even small laptops!) typically have multiple cores, and any server or cloud computing infrastructure can easily handle dozens or hundreds of parallel tasks.  The structure of the R `parallel` implementation sends tasks to workers that don't talk to one another until compiling their results at the end.  In her [2017 UseR! tutorial](https://rawgit.com/PPgp/useR2017public/master/tutorial.html), Hana Sevcikova describes the function of workers which run code/functions/iterations separately before results are subsequently combined.
+
+<div class="figure" style="text-align: center">
+<img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html" width="65%" />
+<p class="caption">(\#fig:unnamed-chunk-11)Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html</p>
+</div>
+
+
+As computing infrastructure becomes more sophisticated, it is important to have the language to describe how connected components work.  Parallel processing allows for a conversation on the [differences between](https://en.wikipedia.org/wiki/Grid_computing) distributed computing, cluster computing, and grid computing, and generally, the framework of high performance computing.  The benefit of parallel computing as an introduction to the larger infrastructure is that the task of each worker is clear, important, and easy to describe.   
+
+
 
 ## `reticulate`
 
@@ -187,7 +393,7 @@ ggplot(py$flights,
   geom_jitter()
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### From R chunk to Python chunk {-}
@@ -248,8 +454,8 @@ print(model.summary())
 ## Dep. Variable:                  price   R-squared:                       0.849
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
-## Date:                Sat, 23 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        21:38:21   Log-Likelihood:            -4.7273e+05
+## Date:                Mon, 25 Nov 2019   Prob (F-statistic):               0.00
+## Time:                        10:58:53   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -278,7 +484,7 @@ print(model.summary())
 
 #### Full disclosure {-}
 
-Reticulate is not always trivial to set up.  Indeed, I've had trouble figuring out which Python version is talking to R and where different module versions live.
+`reticulate` is not always trivial to set up.  Indeed, I've had trouble figuring out which Python version is talking to R and where different module versions live.
 
 
 #### Learn more {-}
@@ -297,7 +503,9 @@ https://blog.rstudio.com/2018/10/09/rstudio-1-2-preview-reticulated-python
 
 
 
-## SQL
+## SQL (in R)
+
+Note that there exists an R interface to work with SQL commands from within an R Markdown file.  For consistency with the class notes, we've continued to use the R Markdown structure to demonstrate the course material.
 
 (Taken from the Teach Data Science blog: https://teachdatascience.com/sql/, this entry written by Nick Horton)
 
@@ -305,12 +513,12 @@ SQL (pronounced *sequel*) stands for [Structured Query Language](https://en.wiki
 
 We will use a public facing MySQL [database](http://www.science.smith.edu/wai-database/home/about) containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, [PI Susan Voss, R15 DC014129-01](https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&icde=44962011&ddparam=&ddvalue=&ddsub=&cr=46&csb=default&cs=ASC&pball=).) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.
 
-We begin by demonstrating how SQL queries can be sent to a database.  We begin by setting up a connection using the `dbConnect()` function.
+We begin by demonstrating how SQL queries can be sent to a database.  It is necessary to set up a connection using the `dbConnect()` function.
 
 
 ```r
 library(mosaic)
-library(RMySQL) # that there are plans to move this support to RMariaDB 
+library(RMySQL)  
 con <- dbConnect(
   MySQL(), host = "scidb.smith.edu", user = "waiuser", 
   password = "smith_waiDB", dbname = "wai")
@@ -417,7 +625,7 @@ dbGetQuery(con,
 ```
 
 
-#### Accessing a database using dplyr commands {-}
+#### Accessing a database using `dplyr` commands {-}
 
 Alternatively, a connection can be made to the server by creating a series of `dplyr` tbl
 objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadley Wickham](https://dbplyr.tidyverse.org/articles/dbplyr.html) has noted, SQL and R have similar syntax (but sufficiently different to be confusing).  
@@ -616,7 +824,7 @@ Measurements %>% summarise(total = n())
 
 There are more than a quarter million observations.  
 
-In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al (2012) entitled ["Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults"](https://www.ncbi.nlm.nih.gov/pubmed/21857517).
+In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al. (2012) entitled ["Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults"](https://www.ncbi.nlm.nih.gov/pubmed/21857517).
 
 Arbitrarily we choose to collect data from subject number three.
 
@@ -653,9 +861,8 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
 
-In summary, while SQL is a powerful tool, there are straightforward ways to integrate existing databases into analyses using a small number of commands.  Particularly if instructors use [RMarkdown](https://teachdatascience.com/rmarkdown), data ingestation can be scaffolded with students able to modify and augment code that is provided to them.  
 
 We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
 
