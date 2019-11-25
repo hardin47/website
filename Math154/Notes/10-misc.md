@@ -16,7 +16,7 @@
 
 <div style= "float:right;position: relative; top: -30px;">
 <div class="figure" style="text-align: right">
-<img src="figs/api_xkcd.png" alt="xkcd, https://xkcd.com/1481/" width="80%" />
+<img src="figs/api_xkcd.png" alt="xkcd, https://xkcd.com/1481/" width="60%" />
 <p class="caption">(\#fig:unnamed-chunk-2)xkcd, https://xkcd.com/1481/</p>
 </div>
 </div>
@@ -41,9 +41,13 @@ An API is an intermediary that allows two applications to talk to one another.  
 * What if you want some Twitter data?  How might you get it?  Well, you could email Twitter and ask someone for it.  **Instead** Twitter provides information about how their data is stored, and allows you to query their data in an automated way.
 
 <div class="figure" style="text-align: right">
-<img src="figs/api_weather.png" alt="Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro" width="80%" />
+<img src="figs/api_weather.png" alt="Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro" width="60%" />
 <p class="caption">(\#fig:unnamed-chunk-3)Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro</p>
 </div>
+
+### Authenticating
+
+
 
 ## Parallel Computing
 
@@ -171,7 +175,7 @@ ggplot(bootstrap, aes(x = bsmean_PL)) + geom_histogram(bins = 25) + ggtitle("His
 <img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
-#### Spark  and `sparklyr` {-}
+### Spark  and `sparklyr` 
 
 
 Some of you may be familiar with [Apache Spark](http://spark.apache.org/) which is an open-source product for distributed cluster-computing.  You may want to learn more about its capabilities, including scheduling workflow, dispatching tasks, and consolidating end results.  While incredibly powerful, there has historically been a steep learning curve to getting R to work smoothly with a Spark connection.  Recently, RStudio has come out with a new package [`sparklyr`](https://spark.rstudio.com/) which integrates R and Spark seamlessly.  Note that in the example below, we've set up a local connection just for the purposes of the example.  For your work, you may want to connect to a cluster or cloud space with many cores.
