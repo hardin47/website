@@ -251,6 +251,133 @@ The R package `parallel` is designed to send tasks to each of multiple cores.  T
 As computing infrastructure becomes more sophisticated, it is important to have the language to describe how connected components work.  Parallel processing allows for a conversation on the [differences between](https://en.wikipedia.org/wiki/Grid_computing) distributed computing, cluster computing, and grid computing, and generally, the framework of high performance computing.  The benefit of parallel computing as an introduction to the larger infrastructure is that the task of each worker is clear, important, and easy to describe.   
 
 
+This discussion is motivated by several recent papers and blog posts that describe how complex, real-world data science computation can be structured in ways that would not have been feasible in past years without herculean efforts.  It is worth notin the [fantastic example](https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/) that described multiple iterations needed to parse huge amounts of raw DNA sequencing data to undertake analyses for a given set of genetic locations.  In ["Ambitious data science can be painless"](https://hdsr.mitpress.mit.edu/pub/9mdn32tq) Monajemi et al. describe workflows that take advantage of new software stacks to undertake massive cloud-based experiments.  While a few years older, Chamandy et al.'s [Teaching statistics at Google scale](https://www.tandfonline.com/doi/full/10.1080/00031305.2015.1089790) described three examples where modern data challenges were overcome with creative statistical thinking (see companion report on [Estimating uncertainty for massive data streams](https://ai.google/research/pubs/pub43157) ).  Finally, the NSF-funded workshop report on ["Enabling computer and information science and engineering research and education in the cloud"](https://dl.acm.org/citation.cfm?id=3233928) highlights opportunities as university computing migrates to cloud solutions more and more.
+
+And last, you may enjoy reading the recent [Three strategies for working with Big Data in R](https://www.r-bloggers.com/three-strategies-for-working-with-big-data-in-r/) blog post.  
+
+How can we prepare for cloud computing in an undergraduate course?
+
+
+#### Getting started {-}
+
+What are the steps to exploring cloud-based systems?  Each of the main cloud providers have active educational outreach programs.
+
+- [Google Compute Platform](https://edu.google.com/programs/faculty/?modal_active=none) allows faculty to apply to receive $100 in GCP credits and $50 per student. Credits can be used in courses, student clubs, and other faculty-sponsored events.  (To replicate our example later in this blog, you'll want to set up an account and request credits.)
+
+- [Azure for Education](https://azure.microsoft.com/en-us/education/) provides access for educators to open source content for classes and $200 in Azure credits, plus free services.
+
+- [Amazon Web Services Educate](https://aws.amazon.com/education/awseducate/) provides between $75 and $200 in AWS annual credits per educator (depending on membership status) and between $30 and $100 for students.
+
+You should sign up and start to explore!  The world of cloud computing is quickly changing. By gaining experience through investment in time in learning these tools will help instructors provide guidance to their students in use of these modern compuational tools.
+
+#### An example: BigQuery in Google's GCP {-}
+
+Consider an example using GCP (kudos to [Shukry Zablah](https://www.shukryzablah.com) for his assistance).
+
+
+[BigQuery](https://cloud.google.com/bigquery/) is Google's serverless, highly-scalable, cloud data warehouse.  A [quickstart](https://cloud.google.com/bigquery/docs/quickstarts) document is available which discusses use of the web user interface and the GCP console as well as access through an API interface.  The [bigrquery](https://github.com/r-dbi/bigrquery) package in R makes it easy to work with data stored in Google BigQuery through queries to BigQuery tables.
+
+The first step is to request GCP credits (see above) and use the online interface to create a project (below called "Test Project for Blog").  
+
+
+
+```r
+library(dplyr)
+library(bigrquery)
+library(ggplot2)
+library(forcats)
+library(purrr)
+library(readr)
+```
+
+
+```r
+projectId <- "bigquery-public-data"  # replace with your own project
+billingId <- "test-project-for-blog" # replace with your own billing ID
+datasetName <- "samples"
+tableName <- "wikipedia"
+```
+
+BigQuery includes a number of [public datasets](https://cloud.google.com/bigquery/public-data/).
+Below is an analysis of the public dataset of the revisions of Wikipedia articles up to April 2010, hosted in GCP BigQuery. The size of the table is 35.69GB. The queries take only seconds to run. 
+
+
+```r
+query <- "SELECT  title, COUNT(title) as n
+          FROM `bigquery-public-data.samples.wikipedia` 
+          GROUP BY title
+          ORDER BY n DESC
+          LIMIT 500"
+```
+
+For safety, always try to make sure that your queries have the `LIMIT` set on your queries. 
+
+
+```r
+mostRevisions_tb <- 
+  bigrquery::bq_project_query(x = billingId, 
+    query = query) #creates temporary table
+```
+
+When the previous `bq_project_query()` function is run within RStudio, a connection is made to Google (GCP) and an authentication window will open up in a local browser.
+
+All the heavy lifting we perform is done on the database end (note that we are billed for it, though the first 1TB of accesses are free). The local machine only receives the data once we try to display it. Right now `mostRevisions_tb` is just a reference to a temporary table online.  The query accessed 7GB of data.
+
+We can get a copy of the data on our local machine once we are confident that it is what we want. 
+
+
+```r
+mostRevisions <- bq_table_download(mostRevisions_tb) 
+```
+
+
+
+
+```r
+glimpse(mostRevisions)
+```
+
+```
+## Observations: 500
+## Variables: 2
+## $ title <chr> "Wikipedia:Administrator intervention against vandalism", …
+## $ n     <int> 643271, 419695, 326337, 257893, 226802, 204469, 191679, 18…
+```
+
+
+```r
+clean <- mostRevisions %>% 
+  filter(!grepl("Wikipedia|User|Template|Talk", title)) %>%
+  mutate(title = fct_reorder(title, n)) %>% #to sort levels
+  glimpse()
+```
+
+```
+## Observations: 272
+## Variables: 2
+## $ title <fct> George W. Bush, List of World Wrestling Entertainment empl…
+## $ n     <int> 43652, 30572, 27433, 23245, 21768, 20814, 20546, 20529, 20…
+```
+
+Let's plot the top 10 entries. 
+
+
+```r
+ggplot(clean %>% head(10), aes(x = title, y = n, fill = n)) + 
+  geom_bar(stat = "identity") + 
+  labs(x = "Article Title",
+       y = "Number of Revisions",
+       title = "Most Revised Wikipedia Articles (Up to April 2010)") +
+  scale_fill_gradient(low = "darkblue", high = "darkred", guide = FALSE) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
+```
+
+<img src="10-misc_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+
+We've obviously just scratched the surface here.  There are lots of other examples out there to consider replicating in your classroom (e.g., [returning tweets on a schedule](https://www.mikejohnpage.com/blog/returning-tweets-on-a-schedule-in-r-using-aws-ec2-rds-and-cron/)).  Hopefully you are intrigued enough to request some credits for you and your students and start to explore.  Not sure where to begin?  Check out the [GCP Essentials Videos](https://www.youtube.com/playlist?list=PLIivdWyY5sqKh1gDR0WpP9iIOY00IE0xL) series.
+
+
 
 ## `reticulate`
 
@@ -397,7 +524,7 @@ ggplot(py$flights,
   geom_jitter()
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### From R chunk to Python chunk {-}
@@ -459,7 +586,7 @@ print(model.summary())
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
 ## Date:                Mon, 25 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        10:58:53   Log-Likelihood:            -4.7273e+05
+## Time:                        14:29:03   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -865,7 +992,7 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
 
 
 We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
