@@ -62,7 +62,7 @@ In almost all cases, in order to communicate with an API, you must tell the API 
 
 ## Parallel Computing
 
-(Taken from the Teach Data Science blog: https://teachdatascience.com/paralel/)
+(Taken from the Teach Data Science blog: https://teachdatascience.com/parallel/)
 
 To demonstrate what parallel computing is, we'll perform tasks that are **embarrassingly parallel** which means there is no dependency or communication between the parallel tasks.  Again, parallel computing can be powerful in ways that link computational tasks in complicated ways.  But we believe that as a *first* pass at teaching parallel computing, we should teach the parallel structure before bringing in dependence across the parallel tasks.  Examples of [embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) algorithms include: Monte Carlo analysis, bootstrapping, growing trees for Random Forests, `group_by` analyses, and cross-validation.  Additionally, data science methods increasingly use [randomized algorithms](https://en.wikipedia.org/wiki/Randomized_algorithm) which can often be written in parallel.
 
