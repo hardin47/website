@@ -62,6 +62,8 @@ In almost all cases, in order to communicate with an API, you must tell the API 
 
 ## Parallel Computing
 
+(Taken from the Teach Data Science blog: https://teachdatascience.com/paralel/)
+
 To demonstrate what parallel computing is, we'll perform tasks that are **embarrassingly parallel** which means there is no dependency or communication between the parallel tasks.  Again, parallel computing can be powerful in ways that link computational tasks in complicated ways.  But we believe that as a *first* pass at teaching parallel computing, we should teach the parallel structure before bringing in dependence across the parallel tasks.  Examples of [embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) algorithms include: Monte Carlo analysis, bootstrapping, growing trees for Random Forests, `group_by` analyses, and cross-validation.  Additionally, data science methods increasingly use [randomized algorithms](https://en.wikipedia.org/wiki/Randomized_algorithm) which can often be written in parallel.
 
 
@@ -251,6 +253,9 @@ While an introduction to parallel and cloud computing will help you become more 
 
 ## Cloud Computing
 
+(Taken from the Teach Data Science blog: https://teachdatascience.com/cloud2/, this entry written by Nick Horton)
+
+
 The R package `parallel` is designed to send tasks to each of multiple cores.  Today's computers (even small laptops!) typically have multiple cores, and any server or cloud computing infrastructure can easily handle dozens or hundreds of parallel tasks.  The structure of the R `parallel` implementation sends tasks to workers that don't talk to one another until compiling their results at the end.  In her [2017 UseR! tutorial](https://rawgit.com/PPgp/useR2017public/master/tutorial.html), Hana Sevcikova describes the function of workers which run code/functions/iterations separately before results are subsequently combined.
 
 <div class="figure" style="text-align: center">
@@ -391,6 +396,8 @@ We've obviously just scratched the surface here.  There are lots of other exampl
 
 
 ## `reticulate`
+
+(Taken from the Teach Data Science blog: https://teachdatascience.com/reticulate/)
 
 ### Connect to Python within RStudio {-}
 
