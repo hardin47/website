@@ -47,7 +47,18 @@ An API is an intermediary that allows two applications to talk to one another.  
 
 ### Authenticating
 
+* **Authenticating** is stating who you are
+* **Authorization** is asking for access to a resources (and happens after authentication)
 
+
+DO NOT post your credentials and keys to a public GitHub repo!!
+
+In almost all cases, in order to communicate with an API, you must tell the API who you are and that you should have access to the information the API is providing.
+
+<div class="figure" style="text-align: right">
+<img src="figs/auth.png" alt="Image taken from https://blog.restcase.com/restful-api-authentication-basics/" width="60%" />
+<p class="caption">(\#fig:unnamed-chunk-4)Image taken from https://blog.restcase.com/restful-api-authentication-basics/</p>
+</div>
 
 ## Parallel Computing
 
@@ -78,7 +89,7 @@ cl[[1]]
 ```
 
 ```
-## node of a socket cluster on host 'localhost' with pid 38688
+## node of a socket cluster on host 'localhost' with pid 6567
 ```
 
 ```r
@@ -110,13 +121,13 @@ clusterApply(cl, rep(50,W), fun = func1) %>% head(3)
 
 ```
 ## [[1]]
-## [1] 17.37151
+## [1] 12.83799
 ## 
 ## [[2]]
-## [1] 20.73513
+## [1] 7.578554
 ## 
 ## [[3]]
-## [1] 13.80041
+## [1] 8.749791
 ```
 
 ```r
@@ -137,7 +148,7 @@ foreach(reps = rep(50, 100), .combine = 'c') %dopar% {
 ```
 
 ```
-## [1]  5.881646  5.374148 43.051650
+## [1] 230.797839  53.562465   8.958124
 ```
 
 ```r
@@ -172,7 +183,7 @@ stopCluster(cl)
 ggplot(bootstrap, aes(x = bsmean_PL)) + geom_histogram(bins = 25) + ggtitle("Histogram of 100 Bootstrapped Means using foreach")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Spark  and `sparklyr` 
@@ -206,7 +217,7 @@ iris_samps_tbl %>%
   ggplot(aes(x = result)) + geom_histogram(bins = 20) + ggtitle("Histogram of 100 Bootstrapped Means using sparklyr")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 spark_disconnect(sc)
@@ -221,7 +232,7 @@ iris_samps %>% dplyr::group_by(replicate) %>%
   ggplot(aes(x = result)) + geom_histogram(bins = 25) + ggtitle("Histogram of 100 Bootstrapped Means using dplyr")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 
 While an introduction to parallel and cloud computing will help you become more adept and less apprehensive about using the tools, there is also a recognition that sufficient background in computer science is needed to be able to fully engage with principles of high performance computing. 
@@ -244,14 +255,14 @@ The R package `parallel` is designed to send tasks to each of multiple cores.  T
 
 <div class="figure" style="text-align: center">
 <img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html" width="65%" />
-<p class="caption">(\#fig:unnamed-chunk-11)Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html</p>
+<p class="caption">(\#fig:unnamed-chunk-12)Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html</p>
 </div>
 
 
 As computing infrastructure becomes more sophisticated, it is important to have the language to describe how connected components work.  Parallel processing allows for a conversation on the [differences between](https://en.wikipedia.org/wiki/Grid_computing) distributed computing, cluster computing, and grid computing, and generally, the framework of high performance computing.  The benefit of parallel computing as an introduction to the larger infrastructure is that the task of each worker is clear, important, and easy to describe.   
 
 
-This discussion is motivated by several recent papers and blog posts that describe how complex, real-world data science computation can be structured in ways that would not have been feasible in past years without herculean efforts.  It is worth notin the [fantastic example](https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/) that described multiple iterations needed to parse huge amounts of raw DNA sequencing data to undertake analyses for a given set of genetic locations.  In ["Ambitious data science can be painless"](https://hdsr.mitpress.mit.edu/pub/9mdn32tq) Monajemi et al. describe workflows that take advantage of new software stacks to undertake massive cloud-based experiments.  While a few years older, Chamandy et al.'s [Teaching statistics at Google scale](https://www.tandfonline.com/doi/full/10.1080/00031305.2015.1089790) described three examples where modern data challenges were overcome with creative statistical thinking (see companion report on [Estimating uncertainty for massive data streams](https://ai.google/research/pubs/pub43157) ).  Finally, the NSF-funded workshop report on ["Enabling computer and information science and engineering research and education in the cloud"](https://dl.acm.org/citation.cfm?id=3233928) highlights opportunities as university computing migrates to cloud solutions more and more.
+This discussion is motivated by several recent papers and blog posts that describe how complex, real-world data science computation can be structured in ways that would not have been feasible in past years without herculean efforts.  It is worth noting the [fantastic example](https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/) that described multiple iterations needed to parse huge amounts of raw DNA sequencing data to undertake analyses for a given set of genetic locations.  In ["Ambitious data science can be painless"](https://hdsr.mitpress.mit.edu/pub/9mdn32tq) Monajemi et al. describe workflows that take advantage of new software stacks to undertake massive cloud-based experiments.  While a few years older, Chamandy et al.'s [Teaching statistics at Google scale](https://www.tandfonline.com/doi/full/10.1080/00031305.2015.1089790) described three examples where modern data challenges were overcome with creative statistical thinking (see companion report on [Estimating uncertainty for massive data streams](https://ai.google/research/pubs/pub43157) ).  Finally, the NSF-funded workshop report on ["Enabling computer and information science and engineering research and education in the cloud"](https://dl.acm.org/citation.cfm?id=3233928) highlights opportunities as university computing migrates to cloud solutions more and more.
 
 And last, you may enjoy reading the recent [Three strategies for working with Big Data in R](https://www.r-bloggers.com/three-strategies-for-working-with-big-data-in-r/) blog post.  
 
@@ -268,7 +279,7 @@ What are the steps to exploring cloud-based systems?  Each of the main cloud pro
 
 - [Amazon Web Services Educate](https://aws.amazon.com/education/awseducate/) provides between $75 and $200 in AWS annual credits per educator (depending on membership status) and between $30 and $100 for students.
 
-You should sign up and start to explore!  The world of cloud computing is quickly changing. By gaining experience through investment in time in learning these tools will help instructors provide guidance to their students in use of these modern compuational tools.
+You should sign up and start to explore!  The world of cloud computing is quickly changing. By gaining experience through investment in time in learning these tools will help instructors provide guidance to their students in use of these modern computational tools.
 
 #### An example: BigQuery in Google's GCP {-}
 
@@ -373,7 +384,7 @@ ggplot(clean %>% head(10), aes(x = title, y = n, fill = n)) +
   theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
 We've obviously just scratched the surface here.  There are lots of other examples out there to consider replicating in your classroom (e.g., [returning tweets on a schedule](https://www.mikejohnpage.com/blog/returning-tweets-on-a-schedule-in-r-using-aws-ec2-rds-and-cron/)).  Hopefully you are intrigued enough to request some credits for you and your students and start to explore.  Not sure where to begin?  Check out the [GCP Essentials Videos](https://www.youtube.com/playlist?list=PLIivdWyY5sqKh1gDR0WpP9iIOY00IE0xL) series.
 
@@ -524,7 +535,7 @@ ggplot(py$flights,
   geom_jitter()
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### From R chunk to Python chunk {-}
@@ -585,8 +596,8 @@ print(model.summary())
 ## Dep. Variable:                  price   R-squared:                       0.849
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
-## Date:                Mon, 25 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        14:29:03   Log-Likelihood:            -4.7273e+05
+## Date:                Tue, 26 Nov 2019   Prob (F-statistic):               0.00
+## Time:                        06:57:15   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -992,7 +1003,7 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
 
 
 We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.

@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2019-11-25" />
+<meta name="date" content="2019-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -391,6 +391,18 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 </div>
 <div id="authenticating" class="section level3">
 <h3><span class="header-section-number">10.2.1</span> Authenticating</h3>
+<ul>
+<li><strong>Authenticating</strong> is stating who you are</li>
+<li><strong>Authorization</strong> is asking for access to a resources (and happens after authentication)</li>
+</ul>
+<p>DO NOT post your credentials and keys to a public GitHub repo!!</p>
+<p>In almost all cases, in order to communicate with an API, you must tell the API who you are and that you should have access to the information the API is providing.</p>
+<div class="figure" style="text-align: right"><span id="fig:unnamed-chunk-4"></span>
+<img src="figs/auth.png" alt="Image taken from https://blog.restcase.com/restful-api-authentication-basics/" width="60%" />
+<p class="caption">
+Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-authentication-basics/" class="uri">https://blog.restcase.com/restful-api-authentication-basics/</a>
+</p>
+</div>
 </div>
 </div>
 <div id="parallel-computing" class="section level2">
@@ -406,7 +418,7 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <pre><code>## [1] 8</code></pre>
 <div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb511-1" data-line-number="1">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(P)</a>
 <a class="sourceLine" id="cb511-2" data-line-number="2">cl[[<span class="dv">1</span>]]</a></code></pre></div>
-<pre><code>## node of a socket cluster on host &#39;localhost&#39; with pid 38688</code></pre>
+<pre><code>## node of a socket cluster on host &#39;localhost&#39; with pid 6567</code></pre>
 <div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb513-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a>
 <a class="sourceLine" id="cb513-2" data-line-number="2">cl[[<span class="dv">1</span>]]</a></code></pre></div>
 <pre><code>## Error in summary.connection(connection): invalid connection</code></pre>
@@ -425,13 +437,13 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <a class="sourceLine" id="cb515-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb515-10" data-line-number="10"><span class="kw">clusterApply</span>(cl, <span class="kw">rep</span>(<span class="dv">50</span>,W), <span class="dt">fun =</span> func1) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">3</span>)</a></code></pre></div>
 <pre><code>## [[1]]
-## [1] 17.37151
+## [1] 12.83799
 ## 
 ## [[2]]
-## [1] 20.73513
+## [1] 7.578554
 ## 
 ## [[3]]
-## [1] 13.80041</code></pre>
+## [1] 8.749791</code></pre>
 <div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb517-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
 <p>There are many R functions which implement parallel processing. For example, the same code from above can be processed using <code>foreach</code>.</p>
 <div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb518-1" data-line-number="1"><span class="kw">library</span>(doParallel)</a>
@@ -441,7 +453,7 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <a class="sourceLine" id="cb518-5" data-line-number="5"><span class="kw">foreach</span>(<span class="dt">reps =</span> <span class="kw">rep</span>(<span class="dv">50</span>, <span class="dv">100</span>), <span class="dt">.combine =</span> <span class="st">&#39;c&#39;</span>) <span class="op">%dopar%</span><span class="st"> </span>{</a>
 <a class="sourceLine" id="cb518-6" data-line-number="6">  <span class="kw">max</span>(<span class="kw">rcauchy</span>(reps))</a>
 <a class="sourceLine" id="cb518-7" data-line-number="7">       } <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">3</span>)</a></code></pre></div>
-<pre><code>## [1]  5.881646  5.374148 43.051650</code></pre>
+<pre><code>## [1] 230.797839  53.562465   8.958124</code></pre>
 <div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb520-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
 </div>
 <div id="example-bootstrapping" class="section level4 unnumbered">
@@ -462,7 +474,7 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <a class="sourceLine" id="cb522-8" data-line-number="8"><span class="kw">stopCluster</span>(cl)</a>
 <a class="sourceLine" id="cb522-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb522-10" data-line-number="10"><span class="kw">ggplot</span>(bootstrap, <span class="kw">aes</span>(<span class="dt">x =</span> bsmean_PL)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using foreach&quot;</span>)</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="spark-and-sparklyr" class="section level3">
 <h3><span class="header-section-number">10.3.1</span> Spark and <code>sparklyr</code></h3>
@@ -487,13 +499,13 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <a class="sourceLine" id="cb523-16" data-line-number="16"><span class="st">  </span><span class="kw">spark_apply</span>(<span class="cf">function</span>(x) {<span class="kw">mean</span>(x<span class="op">$</span>Petal_Length)}, </a>
 <a class="sourceLine" id="cb523-17" data-line-number="17">    <span class="dt">group_by =</span> <span class="st">&quot;replicate&quot;</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb523-18" data-line-number="18"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> result)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">20</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using sparklyr&quot;</span>)</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb524-1" data-line-number="1"><span class="kw">spark_disconnect</span>(sc)</a></code></pre></div>
 <p>For our particular application, the adept reader has probably noticed that the average of a variable using <code>group_by</code> is a very quick and easy task for <code>dplyr</code>. Indeed, the use of <code>sparklyr</code> above is overkill and is presented only as a way to demonstrate using <code>sparklyr</code>. If you are working with big datasets that require large computing infrastructure, the RStudio help pages on <code>sparklyr</code> are fantastic. Additionally, there are many instances of working with <code>Spark</code> in the wild, and you might consider working through someone else’s <code>Spark</code> analysis like this <a href="https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/">fantastic example</a> on splitting up large amounts of raw DNA sequencing to get data for a given genetic location.</p>
 <div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb525-1" data-line-number="1">iris_samps <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">group_by</span>(replicate) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb525-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">summarize</span>(<span class="dt">result =</span> <span class="kw">mean</span>(Petal.Length)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb525-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> result)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">25</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Histogram of 100 Bootstrapped Means using dplyr&quot;</span>)</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>While an introduction to parallel and cloud computing will help you become more adept and less apprehensive about using the tools, there is also a recognition that sufficient background in computer science is needed to be able to fully engage with principles of high performance computing.</p>
 <div id="learn-more" class="section level4 unnumbered">
 <h4>Learn more</h4>
@@ -514,14 +526,14 @@ Figure 1.3: Image taken from <a href="https://rigor.com/blog/what-is-an-api-a-br
 <div id="cloud-computing" class="section level2">
 <h2><span class="header-section-number">10.4</span> Cloud Computing</h2>
 <p>The R package <code>parallel</code> is designed to send tasks to each of multiple cores. Today’s computers (even small laptops!) typically have multiple cores, and any server or cloud computing infrastructure can easily handle dozens or hundreds of parallel tasks. The structure of the R <code>parallel</code> implementation sends tasks to workers that don’t talk to one another until compiling their results at the end. In her <a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html">2017 UseR! tutorial</a>, Hana Sevcikova describes the function of workers which run code/functions/iterations separately before results are subsequently combined.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-11"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-12"></span>
 <img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html" width="65%" />
 <p class="caption">
-Figure 1.7: Image from Sevcikova UseR! 2017 [tutorial on parallel computing](<a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html" class="uri">https://rawgit.com/PPgp/useR2017public/master/tutorial.html</a>
+Figure 1.8: Image from Sevcikova UseR! 2017 [tutorial on parallel computing](<a href="https://rawgit.com/PPgp/useR2017public/master/tutorial.html" class="uri">https://rawgit.com/PPgp/useR2017public/master/tutorial.html</a>
 </p>
 </div>
 <p>As computing infrastructure becomes more sophisticated, it is important to have the language to describe how connected components work. Parallel processing allows for a conversation on the <a href="https://en.wikipedia.org/wiki/Grid_computing">differences between</a> distributed computing, cluster computing, and grid computing, and generally, the framework of high performance computing. The benefit of parallel computing as an introduction to the larger infrastructure is that the task of each worker is clear, important, and easy to describe.</p>
-<p>This discussion is motivated by several recent papers and blog posts that describe how complex, real-world data science computation can be structured in ways that would not have been feasible in past years without herculean efforts. It is worth notin the <a href="https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/">fantastic example</a> that described multiple iterations needed to parse huge amounts of raw DNA sequencing data to undertake analyses for a given set of genetic locations. In <a href="https://hdsr.mitpress.mit.edu/pub/9mdn32tq">“Ambitious data science can be painless”</a> Monajemi et al. describe workflows that take advantage of new software stacks to undertake massive cloud-based experiments. While a few years older, Chamandy et al.’s <a href="https://www.tandfonline.com/doi/full/10.1080/00031305.2015.1089790">Teaching statistics at Google scale</a> described three examples where modern data challenges were overcome with creative statistical thinking (see companion report on <a href="https://ai.google/research/pubs/pub43157">Estimating uncertainty for massive data streams</a> ). Finally, the NSF-funded workshop report on <a href="https://dl.acm.org/citation.cfm?id=3233928">“Enabling computer and information science and engineering research and education in the cloud”</a> highlights opportunities as university computing migrates to cloud solutions more and more.</p>
+<p>This discussion is motivated by several recent papers and blog posts that describe how complex, real-world data science computation can be structured in ways that would not have been feasible in past years without herculean efforts. It is worth noting the <a href="https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/">fantastic example</a> that described multiple iterations needed to parse huge amounts of raw DNA sequencing data to undertake analyses for a given set of genetic locations. In <a href="https://hdsr.mitpress.mit.edu/pub/9mdn32tq">“Ambitious data science can be painless”</a> Monajemi et al. describe workflows that take advantage of new software stacks to undertake massive cloud-based experiments. While a few years older, Chamandy et al.’s <a href="https://www.tandfonline.com/doi/full/10.1080/00031305.2015.1089790">Teaching statistics at Google scale</a> described three examples where modern data challenges were overcome with creative statistical thinking (see companion report on <a href="https://ai.google/research/pubs/pub43157">Estimating uncertainty for massive data streams</a> ). Finally, the NSF-funded workshop report on <a href="https://dl.acm.org/citation.cfm?id=3233928">“Enabling computer and information science and engineering research and education in the cloud”</a> highlights opportunities as university computing migrates to cloud solutions more and more.</p>
 <p>And last, you may enjoy reading the recent <a href="https://www.r-bloggers.com/three-strategies-for-working-with-big-data-in-r/">Three strategies for working with Big Data in R</a> blog post.</p>
 <p>How can we prepare for cloud computing in an undergraduate course?</p>
 <div id="getting-started" class="section level4 unnumbered">
@@ -532,7 +544,7 @@ Figure 1.7: Image from Sevcikova UseR! 2017 [tutorial on parallel computing](<a 
 <li><p><a href="https://azure.microsoft.com/en-us/education/">Azure for Education</a> provides access for educators to open source content for classes and $200 in Azure credits, plus free services.</p></li>
 <li><p><a href="https://aws.amazon.com/education/awseducate/">Amazon Web Services Educate</a> provides between $75 and $200 in AWS annual credits per educator (depending on membership status) and between $30 and $100 for students.</p></li>
 </ul>
-<p>You should sign up and start to explore! The world of cloud computing is quickly changing. By gaining experience through investment in time in learning these tools will help instructors provide guidance to their students in use of these modern compuational tools.</p>
+<p>You should sign up and start to explore! The world of cloud computing is quickly changing. By gaining experience through investment in time in learning these tools will help instructors provide guidance to their students in use of these modern computational tools.</p>
 </div>
 <div id="an-example-bigquery-in-googles-gcp" class="section level4 unnumbered">
 <h4>An example: BigQuery in Google’s GCP</h4>
@@ -586,7 +598,7 @@ Below is an analysis of the public dataset of the revisions of Wikipedia article
 <a class="sourceLine" id="cb535-6" data-line-number="6"><span class="st">  </span><span class="kw">scale_fill_gradient</span>(<span class="dt">low =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="dt">high =</span> <span class="st">&quot;darkred&quot;</span>, <span class="dt">guide =</span> <span class="ot">FALSE</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb535-7" data-line-number="7"><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></a>
 <a class="sourceLine" id="cb535-8" data-line-number="8"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">20</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) </a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>We’ve obviously just scratched the surface here. There are lots of other examples out there to consider replicating in your classroom (e.g., <a href="https://www.mikejohnpage.com/blog/returning-tweets-on-a-schedule-in-r-using-aws-ec2-rds-and-cron/">returning tweets on a schedule</a>). Hopefully you are intrigued enough to request some credits for you and your students and start to explore. Not sure where to begin? Check out the <a href="https://www.youtube.com/playlist?list=PLIivdWyY5sqKh1gDR0WpP9iIOY00IE0xL">GCP Essentials Videos</a> series.</p>
 </div>
 </div>
@@ -678,7 +690,7 @@ flights.groupby(&quot;carrier&quot;).mean()
 <a class="sourceLine" id="cb550-4" data-line-number="4">           <span class="dt">y=</span>arr_delay)) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb550-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb550-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_jitter</span>()</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="from-r-chunk-to-python-chunk" class="section level4 unnumbered">
 <h4>From R chunk to Python chunk</h4>
@@ -717,8 +729,8 @@ flights.groupby(&quot;carrier&quot;).mean()
 ## Dep. Variable:                  price   R-squared:                       0.849
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
-## Date:                Mon, 25 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        14:29:03   Log-Likelihood:            -4.7273e+05
+## Date:                Tue, 26 Nov 2019   Prob (F-statistic):               0.00
+## Time:                        06:57:15   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -1001,7 +1013,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <div class="sourceCode" id="cb584"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb584-1" data-line-number="1">onesubj &lt;-<span class="st"> </span><span class="kw">mutate</span>(onesubj, <span class="dt">Ear =</span> <span class="kw">ifelse</span>(Left_Ear <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="st">&quot;Left&quot;</span>, <span class="st">&quot;Right&quot;</span>))</a>
 <a class="sourceLine" id="cb584-2" data-line-number="2"><span class="kw">ggplot</span>(onesubj, <span class="kw">aes</span>(<span class="dt">x =</span> Freq, <span class="dt">y =</span> Absorbance)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
 <a class="sourceLine" id="cb584-3" data-line-number="3"><span class="st">  </span><span class="kw">aes</span>(<span class="dt">colour =</span> Ear) <span class="op">+</span><span class="st"> </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Absorbance by ear Rosowski subject 3&quot;</span>)</a></code></pre></div>
-<p><img src="10-misc_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="10-misc_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite. More information about databases within R can be found in the CRAN <a href="https://cran.r-project.org/web/views/Databases.html">Databases with R</a> Task View.</p>
 <p>Setting up and managing a database is a topic for a different day: here we focused on how SQL can be used within R to access data in a flexible and powerful manner.</p>
 </div>
