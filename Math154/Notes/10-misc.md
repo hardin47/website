@@ -40,7 +40,7 @@ An API is an intermediary that allows two applications to talk to one another.  
 
 * What if you want some Twitter data?  How might you get it?  Well, you could email Twitter and ask someone for it.  **Instead** Twitter provides information about how their data is stored, and allows you to query their data in an automated way.
 
-<div class="figure" style="text-align: right">
+<div class="figure" style="text-align: center">
 <img src="figs/api_weather.png" alt="Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro" width="60%" />
 <p class="caption">(\#fig:unnamed-chunk-3)Image taken from https://rigor.com/blog/what-is-an-api-a-brief-intro</p>
 </div>
@@ -55,7 +55,7 @@ DO NOT post your credentials and keys to a public GitHub repo!!
 
 In almost all cases, in order to communicate with an API, you must tell the API who you are and that you should have access to the information the API is providing.
 
-<div class="figure" style="text-align: right">
+<div class="figure" style="text-align: center">
 <img src="figs/auth.png" alt="Image taken from https://blog.restcase.com/restful-api-authentication-basics/" width="60%" />
 <p class="caption">(\#fig:unnamed-chunk-4)Image taken from https://blog.restcase.com/restful-api-authentication-basics/</p>
 </div>
