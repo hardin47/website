@@ -256,11 +256,8 @@ While an introduction to parallel and cloud computing will help you become more 
 A great overview on high performance computing (HPC) what it is and what it isn't is given here: https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage
 
 <div class="figure" style="text-align: center">
-<img src="figs/notHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-121)Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)</p>
-</div><div class="figure" style="text-align: center">
-<img src="figs/whenHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-122)Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)</p>
+<img src="figs/notHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" /><img src="figs/whenHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" />
+<p class="caption">(\#fig:unnamed-chunk-12)Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)</p>
 </div>
 
 (Taken from the Teach Data Science blog: https://teachdatascience.com/cloud2/, this entry written by Nick Horton)
