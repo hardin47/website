@@ -253,14 +253,24 @@ While an introduction to parallel and cloud computing will help you become more 
 
 ## Cloud Computing
 
+A great overview on high performance computing (HPC) what it is and what it isn't is given here: https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage
+
+<div class="figure" style="text-align: center">
+<img src="figs/notHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" />
+<p class="caption">(\#fig:unnamed-chunk-121)Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/whenHPC.png" alt="Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)" width="45%" />
+<p class="caption">(\#fig:unnamed-chunk-122)Image from Pradeep Redddy Raamana [High performance computing tutorial, with checklist and tips to optimize cluster usage](https://www.slideshare.net/raamana/high-performance-computing-with-checklist-and-tips-optimal-cluster-usage)</p>
+</div>
+
 (Taken from the Teach Data Science blog: https://teachdatascience.com/cloud2/, this entry written by Nick Horton)
 
 
 The R package `parallel` is designed to send tasks to each of multiple cores.  Today's computers (even small laptops!) typically have multiple cores, and any server or cloud computing infrastructure can easily handle dozens or hundreds of parallel tasks.  The structure of the R `parallel` implementation sends tasks to workers that don't talk to one another until compiling their results at the end.  In her [2017 UseR! tutorial](https://rawgit.com/PPgp/useR2017public/master/tutorial.html), Hana Sevcikova describes the function of workers which run code/functions/iterations separately before results are subsequently combined.
 
 <div class="figure" style="text-align: center">
-<img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html" width="65%" />
-<p class="caption">(\#fig:unnamed-chunk-12)Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html</p>
+<img src="figs/flow.png" alt="Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html)" width="65%" />
+<p class="caption">(\#fig:unnamed-chunk-13)Image from Sevcikova UseR! 2017 [tutorial on parallel computing](https://rawgit.com/PPgp/useR2017public/master/tutorial.html)</p>
 </div>
 
 
@@ -389,7 +399,7 @@ ggplot(clean %>% head(10), aes(x = title, y = n, fill = n)) +
   theme(axis.text.x = element_text(angle = 20, hjust = 1)) 
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
 
 We've obviously just scratched the surface here.  There are lots of other examples out there to consider replicating in your classroom (e.g., [returning tweets on a schedule](https://www.mikejohnpage.com/blog/returning-tweets-on-a-schedule-in-r-using-aws-ec2-rds-and-cron/)).  Hopefully you are intrigued enough to request some credits for you and your students and start to explore.  Not sure where to begin?  Check out the [GCP Essentials Videos](https://www.youtube.com/playlist?list=PLIivdWyY5sqKh1gDR0WpP9iIOY00IE0xL) series.
 
@@ -542,7 +552,7 @@ ggplot(py$flights,
   geom_jitter()
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### From R chunk to Python chunk {-}
@@ -603,8 +613,8 @@ print(model.summary())
 ## Dep. Variable:                  price   R-squared:                       0.849
 ## Model:                            OLS   Adj. R-squared:                  0.849
 ## Method:                 Least Squares   F-statistic:                 3.041e+05
-## Date:                Tue, 26 Nov 2019   Prob (F-statistic):               0.00
-## Time:                        06:57:15   Log-Likelihood:            -4.7273e+05
+## Date:                Mon, 02 Dec 2019   Prob (F-statistic):               0.00
+## Time:                        05:34:26   Log-Likelihood:            -4.7273e+05
 ## No. Observations:               53940   AIC:                         9.455e+05
 ## Df Residuals:                   53938   BIC:                         9.455e+05
 ## Df Model:                           1                                         
@@ -1010,7 +1020,7 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
 ```
 
-<img src="10-misc_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
+<img src="10-misc_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" />
 
 
 We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
