@@ -1059,7 +1059,7 @@ The ideas below are mostly taken from Jenny Bryan's STAT545 class: https://githu
      * `stringr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/strings.pdf
 * [`tidyr` package](https://tidyr.tidyverse.org/) Especially useful for functions that split one character vector into many and vice versa: `separate()`, `unite()`, `extract()`.
 * Base functions: `nchar()`, `strsplit()`, `substr()`, `paste()`, `paste0()`.
-* The `glue` package is fantastic for string interpolation. If `stringr::str_interp()` doesn’t get your job done, check out the `glue` package.
+* The `glue` package is fantastic for string interpolation. If `stringr::str_interp()` doesn't get your job done, check out the `glue` package.
 
 #### String functions related to regular expression {-}
 Regular expression is a pattern that describes a specific set of strings with a common structure. It is heavily used for string matching / replacing in all programming languages, although specific syntax may differ a bit. It is truly the heart and soul for string operations. In R, many string functions in `base` R as well as in `stringr` package use regular expressions, even Rstudio's search and replace allows regular expression, we will go into more details about these functions later this week:       
@@ -1077,7 +1077,7 @@ Regular expressions typically specify characters (or character classes) to seek 
 There are some special characters in R that cannot be directly coded in a string. For example, let's say you specify your pattern with single quotes and you want to find countries with the single quote `'`. You would have to "escape" the single quote in the pattern, by preceding it with `\`, so it's clear it is not part of the string-specifying machinery.
 
 
-There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R esacpe sequences.        
+There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R escape sequences.        
 
   * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `"'"` in the previous example.        
   * `\"`: double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. `'"'`.          
