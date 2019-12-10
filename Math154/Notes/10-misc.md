@@ -1531,16 +1531,16 @@ As CDS, it is now important to find the actual genenames for each of the IGR seq
 
 
 ```r
-igr$start.gene <- case_when(
+igr$start.gene <- dplyr::case_when(
   igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, genename),
   TRUE ~ stringr::str_extract(igr$Geneid1, rna.name))
-igr$end.gene <- case_when(
+igr$end.gene <- dplyr::case_when(
   igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, genename),
   TRUE ~ stringr::str_extract(igr$Geneid2, rna.name))
-igr$start.bnum <- case_when(
+igr$start.bnum <- dplyr::case_when(
   igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, bnum),
   TRUE ~ "none")
-igr$end.bnum <- case_when(
+igr$end.bnum <- dplyr::case_when(
   igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, bnum),
   TRUE ~ "none")
 igr <- igr %>% tidyr::separate(start.gene, into = c("comma", "start.gene"), sep = "[,]") %>% 

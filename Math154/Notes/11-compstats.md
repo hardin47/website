@@ -1,6 +1,6 @@
 
 
-# Computational Statistics {#compstats}
+# Computational Statistics {#compstat}
 
 
 
