@@ -1440,22 +1440,6 @@ allCounts
 ## 5                                       IGR:(CDS,b1808,yoaA,putative_ATP-dependent_helicase2C_DinG_family,cds1798,-,1910/CDS,b1809,yoaB,putative_reactive_intermediate_deaminase,cds1799,+,344):+:396:NC_000913.3
 ```
 
-`bnum`, `genename`, `rna.name` act as place holders for the types of elements that we will need to identify the bookends of the IGRs.
-
-
-```r
-bnum = "b[0-9]{4}"
-bnum
-```
-
-```
-## [1] "b[0-9]{4}"
-```
-
-```r
-genename = ",[a-z]{3}[A-Z,]."
-rna.name = ",rna[0-9].."
-```
 
 
 We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note, the separation comes at the backslash.
@@ -1535,6 +1519,24 @@ igr
 ```
 
 As CDS, it is now important to find the actual genenames for each of the IGR sequences.  We also keep each element's `bnum` which represents a unique gene identifier in *E. coli*.
+
+
+`bnum`, `genename`, `rna.name` act as place holders for the types of elements that we will need to identify the bookends of the IGRs.
+
+
+```r
+bnum = "b[0-9]{4}"
+bnum
+```
+
+```
+## [1] "b[0-9]{4}"
+```
+
+```r
+genename = ",[a-z]{3}[A-Z,]."
+rna.name = ",rna[0-9].."
+```
 
 
 ```r
