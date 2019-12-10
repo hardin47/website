@@ -1445,6 +1445,14 @@ allCounts
 
 ```r
 bnum = "b[0-9]{4}"
+bnum
+```
+
+```
+## [1] "b[0-9]{4}"
+```
+
+```r
 genename = ",[a-z]{3}[A-Z,]."
 rna.name = ",rna[0-9].."
 ```
@@ -1454,7 +1462,6 @@ We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note
 
 ```r
 igr <- allCounts %>% filter(feature %in% c("IGR", "AS_IGR"))
-#igr$GeneidBackup = igr$Geneid
 igr <- igr %>% tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
 names(igr)
 ```
