@@ -1037,6 +1037,563 @@ Setting up and managing a database is a topic for a different day: here we focus
 
 ## 12/10/19 Agenda {#Dec10}
 1. Regular Expressions
+2. *Computational* and *Statistics*
 
 ## Regular Expressions {#regexpr}
+
+> A regular expression ... is a sequence of characters that define a search pattern. Usually such patterns are used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique developed in theoretical computer science and formal language theory. [From https://en.wikipedia.org/wiki/Regular_expression]
+
+### Main tasks in character matching:
+1. basic string operations
+2. pattern matching (regular expressions)
+3. sentiment analysis
+
+
+The ideas below are mostly taken from Jenny Bryan's STAT545 class: https://github.com/STAT545-UBC/STAT545-UBC-original-website/blob/master/block022_regular-expression.rmd
+
+#### R packages to make your life easier {-}
+* [`stringr` package](https://stringr.tidyverse.org/) A core package in the `tidyverse`. It is installed via `install.packages("tidyverse")` and also loaded via `library(tidyverse)`. Of course, you can also install or load it individually.
+     * Many of the main functions start with `str_`. Auto-complete is your friend.
+     * Replacements for base functions re: string manipulation and regular expressions (see below).
+     * Main advantages over base functions: greater consistency about inputs and outputs. Outputs are more ready for your next analytical task.
+     * `stringr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/strings.pdf
+* [`tidyr` package](https://tidyr.tidyverse.org/) Especially useful for functions that split one character vector into many and vice versa: `separate()`, `unite()`, `extract()`.
+* Base functions: `nchar()`, `strsplit()`, `substr()`, `paste()`, `paste0()`.
+* The `glue` package is fantastic for string interpolation. If `stringr::str_interp()` doesn’t get your job done, check out the `glue` package.
+
+#### String functions related to regular expression {-}
+Regular expression is a pattern that describes a specific set of strings with a common structure. It is heavily used for string matching / replacing in all programming languages, although specific syntax may differ a bit. It is truly the heart and soul for string operations. In R, many string functions in `base` R as well as in `stringr` package use regular expressions, even Rstudio's search and replace allows regular expression, we will go into more details about these functions later this week:       
+
+  * identify match to a pattern: `grep(..., value = FALSE)`, `grepl()`, `stringr::str_detect()`
+  * extract match to a pattern: `grep(..., value = TRUE)`, `stringr::str_extract()`, `stringr::str_extract_all()`     
+  * locate pattern within a string, i.e. give the start position of matched patterns. `regexpr()`, `gregexpr()`, `stringr::str_locate()`, `string::str_locate_all()`     
+  * replace a pattern: `sub()`, `gsub()`, `stringr::str_replace()`, `stringr::str_replace_all()`     
+  * split a string using a pattern: `strsplit()`, `stringr::str_split()`     
+
+Regular expressions typically specify characters (or character classes) to seek out, possibly with information about repeats and location within the string. This is accomplished with the help of metacharacters that have specific meaning: `$ * + . ? [ ] ^ { } | ( ) \`. We will use some small examples to introduce regular expression syntax and what these metacharacters mean. 
+
+#### Escape sequences {-}
+
+There are some special characters in R that cannot be directly coded in a string. For example, let's say you specify your pattern with single quotes and you want to find countries with the single quote `'`. You would have to "escape" the single quote in the pattern, by preceding it with `\`, so it's clear it is not part of the string-specifying machinery.
+
+
+There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R esacpe sequences.        
+
+  * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `"'"` in the previous example.        
+  * `\"`: double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. `'"'`.          
+  * `\n`: newline.   
+  * `\r`: carriage return.   
+  * `\t`: tab character.   
+
+> Note: `cat()` and `print()` to handle escape sequences differently, if you want to print a string out with these sequences interpreted, use `cat()`.      
+
+```r
+print("a\nb")
+```
+
+```
+## [1] "a\nb"
+```
+
+```r
+cat("a\nb")
+```
+
+```
+## a
+## b
+```
+
+#### Quantifiers {-}
+
+Quantifiers specify how many repetitions of the pattern.   
+
+  * `*`: matches at least 0 times.   
+  * `+`: matches at least 1 times.     
+  * `?`: matches at most 1 times.    
+  * `{n}`: matches exactly n times.    
+  * `{n,}`: matches at least n times.    
+  * `{n,m}`: matches between n and m times.     
+
+
+```r
+(strings <- c("a", "ab", "acb", "accb", "acccb", "accccb"))
+```
+
+```
+## [1] "a"      "ab"     "acb"    "accb"   "acccb"  "accccb"
+```
+
+```r
+grep("ac*b", strings, value = TRUE)
+```
+
+```
+## [1] "ab"     "acb"    "accb"   "acccb"  "accccb"
+```
+
+```r
+grep("ac+b", strings, value = TRUE)
+```
+
+```
+## [1] "acb"    "accb"   "acccb"  "accccb"
+```
+
+```r
+grep("ac?b", strings, value = TRUE)
+```
+
+```
+## [1] "ab"  "acb"
+```
+
+```r
+grep("ac{2}b", strings, value = TRUE)
+```
+
+```
+## [1] "accb"
+```
+
+```r
+grep("ac{2,}b", strings, value = TRUE)
+```
+
+```
+## [1] "accb"   "acccb"  "accccb"
+```
+
+```r
+grep("ac{2,3}b", strings, value = TRUE)
+```
+
+```
+## [1] "accb"  "acccb"
+```
+
+#### Position of pattern within the string{-}
+
+  * `^`: matches the start of the string.   
+  * `$`: matches the end of the string.   
+  * `\b`: matches the empty string at either edge of a _word_. Don't confuse it with `^ $` which marks the edge of a _string_.   
+  * `\B`: matches the empty string provided it is not at an edge of a word.    
+
+
+```r
+(strings <- c("abcd", "cdab", "cabd", "c abd"))
+```
+
+```
+## [1] "abcd"  "cdab"  "cabd"  "c abd"
+```
+
+```r
+grep("ab", strings, value = TRUE)
+```
+
+```
+## [1] "abcd"  "cdab"  "cabd"  "c abd"
+```
+
+```r
+grep("^ab", strings, value = TRUE)
+```
+
+```
+## [1] "abcd"
+```
+
+```r
+grep("ab$", strings, value = TRUE)
+```
+
+```
+## [1] "cdab"
+```
+
+```r
+grep("\\bab", strings, value = TRUE)
+```
+
+```
+## [1] "abcd"  "c abd"
+```
+
+
+#### Operators {-}
+
+  * `.`: matches any single character, as shown in the first example. 
+  * `[...]`: a character list, matches any one of the characters inside the square brackets. We can also use `-` inside the brackets to specify a range of characters.   
+  * `[^...]`: an inverted character list, similar to `[...]`, but matches any characters __except__ those inside the square brackets.  
+  * `\`: suppress the special meaning of metacharacters in regular expression, i.e. `$ * + . ? [ ] ^ { } | ( ) \`, similar to its usage in escape sequences. Since `\` itself needs to be escaped in R, we need to escape these metacharacters with double backslash like `\\$`.   
+  * `|`: an "or" operator, matches patterns on either side of the `|`.  
+  * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.    
+
+
+```r
+(strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12"))
+```
+
+```
+## [1] "^ab"   "ab"    "abc"   "abd"   "abe"   "ab 12"
+```
+
+```r
+grep("ab.", strings, value = TRUE)
+```
+
+```
+## [1] "abc"   "abd"   "abe"   "ab 12"
+```
+
+```r
+grep("ab[c-e]", strings, value = TRUE)
+```
+
+```
+## [1] "abc" "abd" "abe"
+```
+
+```r
+grep("ab[^c]", strings, value = TRUE)
+```
+
+```
+## [1] "abd"   "abe"   "ab 12"
+```
+
+```r
+grep("^ab", strings, value = TRUE)
+```
+
+```
+## [1] "ab"    "abc"   "abd"   "abe"   "ab 12"
+```
+
+```r
+grep("\\^ab", strings, value = TRUE)
+```
+
+```
+## [1] "^ab"
+```
+
+```r
+grep("abc|abd", strings, value = TRUE)
+```
+
+```
+## [1] "abc" "abd"
+```
+
+```r
+gsub("(ab) 12", "\\1 34", strings)
+```
+
+```
+## [1] "^ab"   "ab"    "abc"   "abd"   "abe"   "ab 34"
+```
+
+
+#### Character classes {-}
+
+Character classes allows to -- surprise! -- specify entire classes of characters, such as numbers, letters, etc. There are two flavors of character classes, one uses `[:` and `:]` around a predefined name inside square brackets and the other uses `\` and a special character. They are sometimes interchangeable.   
+
+  * `[:digit:]` or `\d`: digits, 0 1 2 3 4 5 6 7 8 9, equivalent to `[0-9]`.  
+  * `\D`: non-digits, equivalent to `[^0-9]`.  
+  * `[:lower:]`: lower-case letters, equivalent to `[a-z]`.  
+  * `[:upper:]`: upper-case letters, equivalent to `[A-Z]`.  
+  * `[:alpha:]`: alphabetic characters, equivalent to `[[:lower:][:upper:]]` or `[A-z]`.  
+  * `[:alnum:]`: alphanumeric characters, equivalent to `[[:alpha:][:digit:]]` or `[A-z0-9]`.   
+  * `\w`: word characters, equivalent to `[[:alnum:]_]` or `[A-z0-9_]`.  
+  * `\W`: not word, equivalent to `[^A-z0-9_]`.  
+  * `[:xdigit:]`: hexadecimal digits (base 16), 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f, equivalent to `[0-9A-Fa-f]`.
+  * `[:blank:]`: blank characters, i.e. space and tab.  
+  * `[:space:]`: space characters: tab, newline, vertical tab, form feed, carriage return, space.
+  * `\s`: space, ` `.  
+  * `\S`: not space.  
+  * `[:punct:]`: punctuation characters, ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~.
+  * `[:graph:]`: graphical (human readable) characters: equivalent to `[[:alnum:][:punct:]]`.
+  * `[:print:]`: printable characters, equivalent to `[[:alnum:][:punct:]\\s]`.
+  * `[:cntrl:]`: control characters, like `\n` or `\r`, `[\x00-\x1F\x7F]`.  
+
+Note:       
+* `[:...:]` has to be used inside square brackets, e.g. `[[:digit:]]`.     
+* `\` itself is a special character that needs escape, e.g. `\\d`. Do not confuse these regular expressions with R escape sequences such as `\t`.      
+
+
+#### `stringr` {-}
+
+In many cases, you will want to use the incredibly useful and tidy set of functions available in the `stringr` package.  (`stringr` is a core package in the `tidyverse`.) For example, below we've extracted the first (and then last) word as a character string from the `StreetName` variable.
+
+* `stringr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/strings.pdf
+
+
+
+```r
+library(Stat2Data)
+data(RailsTrails)
+RailsTrails <- RailsTrails %>% 
+  select(HouseNum, Bedrooms, Price2014, StreetName) 
+RailsTrails %>% head()
+```
+
+```
+##   HouseNum Bedrooms Price2014      StreetName
+## 1        1        3   210.729 Acrebrook Drive
+## 2        2        3   204.171       Autumn Dr
+## 3        3        3   338.662     Bridge Road
+## 4        4        3   276.250     Bridge Road
+## 5        5        4   169.173     Bridge Road
+## 6        6        3   211.487 Brierwood Drive
+```
+
+```r
+RailsTrails %>%
+  mutate(first_piece = stringr::word(StreetName, start = 1))
+```
+
+```
+##     HouseNum Bedrooms Price2014         StreetName first_piece
+## 1          1        3   210.729    Acrebrook Drive   Acrebrook
+## 2          2        3   204.171          Autumn Dr      Autumn
+## 3          3        3   338.662        Bridge Road      Bridge
+## 4          4        3   276.250        Bridge Road      Bridge
+## 5          5        4   169.173        Bridge Road      Bridge
+## 6          6        3   211.487    Brierwood Drive   Brierwood
+## 7          7        3   311.456      Bright Avenue      Bright
+## 8          8        4   377.857      Bright Street      Bright
+## 9          9        5   227.681       Burts Pit Rd       Burts
+## 10        10        3   224.366       Burts Pit Rd       Burts
+## 11        11        3   218.785     Carolyn Street     Carolyn
+## 12        12        3   269.620         Clement St     Clement
+## 13        13        4   447.842       Columbus Ave    Columbus
+## 14        14        3   386.446    Crescent Street    Crescent
+## 15        15        4   528.114    Crescent Street    Crescent
+## 16        16        3   221.220       Crestview Dr   Crestview
+## 17        17        5   320.206       Crestview Dr   Crestview
+## 18        18        3   179.487    Crestview Drive   Crestview
+## 19        19        4   243.639           Earle St       Earle
+## 20        20        4   325.666   Edgewood Terrace    Edgewood
+## 21        21        4   282.765     Federal Street     Federal
+## 22        22        2   198.686            Fern St        Fern
+## 23        23        3   168.761        Florence Rd    Florence
+## 24        24        3   200.871     Forest Glen Dr      Forest
+## 25        25        3   237.206    Forest Glen Dr.      Forest
+## 26        26        3   205.770  Forest Glen Drive      Forest
+## 27        27        4   287.489    Franklin Street    Franklin
+## 28        28        3   223.067       Golden Drive      Golden
+## 29        29        4   237.594   Grandview Street   Grandview
+## 30        30        4   275.218       Gregory Lane     Gregory
+## 31        31        4   280.283       Gregory Lane     Gregory
+## 32        32        3   237.789         Hancock St     Hancock
+## 33        33        3   191.694      Harold Street      Harold
+## 34        34        3   365.506       Hayes Avenue       Hayes
+## 35        35        4   474.245      Hillside Road    Hillside
+## 36        36        3   259.480    Hinckley Street    Hinckley
+## 37        37        3   326.891    Hinckley Street    Hinckley
+## 38        38        4   228.829     Jackson Street     Jackson
+## 39        39        4   426.500     Jackson Street     Jackson
+## 40        40        3   350.766       James Avenue       James
+## 41        41        4   279.187        Lake Street        Lake
+## 42        42        3   214.737        Laurel Park      Laurel
+## 43        43        2   212.959        Laurel Park      Laurel
+## 44        44        2   301.366        Laurel Park      Laurel
+## 45        45        2   144.366        Laurel Park      Laurel
+## 46        46        3   318.348        Laurel Park      Laurel
+## 47        47        1   185.141        Laurel Park      Laurel
+## 48        48        1   132.135        Laurel Park      Laurel
+## 49        49        2   200.219        Laurel Park      Laurel
+## 50        50        5   525.112     Liberty Street     Liberty
+## 51        51        3   210.701     Longview Drive    Longview
+## 52        52        3   185.508     Longview Drive    Longview
+## 53        53        4   209.945     Longview Drive    Longview
+## 54        54        1   142.702        Main Street        Main
+## 55        55        2   367.384  Maplewood Terrace   Maplewood
+## 56        56        3   201.443     Mary Jane Lane        Mary
+## 57        57        4   360.870          Meadow St      Meadow
+## 58        58        3   313.640          Middle St      Middle
+## 59        59        3   270.622          Middle St      Middle
+## 60        60        2   258.091    Nonotuck Street    Nonotuck
+## 61        61        4   357.303 North Maple Street       North
+## 62        62        2   289.946 North Maple Street       North
+## 63        63        3   296.142 North Maple Street       North
+## 64        64        3   331.387     Nutting Avenue     Nutting
+## 65        65        4   389.242           Olive St       Olive
+## 66        66        6   495.218         Pilgrim Dr     Pilgrim
+## 67        67        3   246.020            Pine St        Pine
+## 68        68        3   212.892     Pioneer Knolls     Pioneer
+## 69        69        3   384.140    Prospect Avenue    Prospect
+## 70        70        3   295.182    Prospect Street    Prospect
+## 71        71        3   520.147    Prospect Street    Prospect
+## 72        72        3   284.484  Ridgewood Terrace   Ridgewood
+## 73        73        3   228.565      Riverbank Rd.   Riverbank
+## 74        74        3   447.270    Riverside Drive   Riverside
+## 75        75        3   286.163    Riverside Drive   Riverside
+## 76        76        3   222.864    Rocky Hill Road       Rocky
+## 77        77        4   310.018        Rust Avenue        Rust
+## 78        78        3   211.725          Ryan Road        Ryan
+## 79        79        3   266.124          Ryan Road        Ryan
+## 80        80        3   214.289          Ryan Road        Ryan
+## 81        81        3   211.104          Ryan Road        Ryan
+## 82        82        2   216.992          Ryan Road        Ryan
+## 83        83        3   202.485          Ryan Road        Ryan
+## 84        84        4   429.368  South Main Street       South
+## 85        85        3   208.703      Sandy Hill Rd       Sandy
+## 86        86        4   249.413     Sherman Avenue     Sherman
+## 87        87        4   332.674  South Main Street       South
+## 88        88        5   356.265       South Street       South
+## 89        89        5   513.096       South Street       South
+## 90        90        4   236.498 Spruce Hill Avenue      Spruce
+## 91        91        4   295.772 Spruce Hill Avenue      Spruce
+## 92        92        2   421.460           State St       State
+## 93        93        2   233.023           State St       State
+## 94        94        3   279.814          Straw Ave       Straw
+## 95        95        4   347.408      Sumner Avenue      Sumner
+## 96        96        3   267.290        Swan Street        Swan
+## 97        97        6   879.328      Trumbull Road    Trumbull
+## 98        98        2   191.407     Turkey Hill Rd      Turkey
+## 99        99        3   467.861       Union Street       Union
+## 100      100        3   301.940      Valley Street      Valley
+## 101      101        4   534.865      Vernon Street      Vernon
+## 102      102        4   331.840      Warren Street      Warren
+## 103      103        4   320.805    Williams Street    Williams
+## 104      104        2   176.502        Winslow Ave     Winslow
+```
+
+```r
+RailsTrails %>%
+  mutate(last_piece = stringr::word(StreetName, start = -1))
+```
+
+```
+##     HouseNum Bedrooms Price2014         StreetName last_piece
+## 1          1        3   210.729    Acrebrook Drive      Drive
+## 2          2        3   204.171          Autumn Dr         Dr
+## 3          3        3   338.662        Bridge Road       Road
+## 4          4        3   276.250        Bridge Road       Road
+## 5          5        4   169.173        Bridge Road       Road
+## 6          6        3   211.487    Brierwood Drive      Drive
+## 7          7        3   311.456      Bright Avenue     Avenue
+## 8          8        4   377.857      Bright Street     Street
+## 9          9        5   227.681       Burts Pit Rd         Rd
+## 10        10        3   224.366       Burts Pit Rd         Rd
+## 11        11        3   218.785     Carolyn Street     Street
+## 12        12        3   269.620         Clement St         St
+## 13        13        4   447.842       Columbus Ave        Ave
+## 14        14        3   386.446    Crescent Street     Street
+## 15        15        4   528.114    Crescent Street     Street
+## 16        16        3   221.220       Crestview Dr         Dr
+## 17        17        5   320.206       Crestview Dr         Dr
+## 18        18        3   179.487    Crestview Drive      Drive
+## 19        19        4   243.639           Earle St         St
+## 20        20        4   325.666   Edgewood Terrace    Terrace
+## 21        21        4   282.765     Federal Street     Street
+## 22        22        2   198.686            Fern St         St
+## 23        23        3   168.761        Florence Rd         Rd
+## 24        24        3   200.871     Forest Glen Dr         Dr
+## 25        25        3   237.206    Forest Glen Dr.        Dr.
+## 26        26        3   205.770  Forest Glen Drive      Drive
+## 27        27        4   287.489    Franklin Street     Street
+## 28        28        3   223.067       Golden Drive      Drive
+## 29        29        4   237.594   Grandview Street     Street
+## 30        30        4   275.218       Gregory Lane       Lane
+## 31        31        4   280.283       Gregory Lane       Lane
+## 32        32        3   237.789         Hancock St         St
+## 33        33        3   191.694      Harold Street     Street
+## 34        34        3   365.506       Hayes Avenue     Avenue
+## 35        35        4   474.245      Hillside Road       Road
+## 36        36        3   259.480    Hinckley Street     Street
+## 37        37        3   326.891    Hinckley Street     Street
+## 38        38        4   228.829     Jackson Street     Street
+## 39        39        4   426.500     Jackson Street     Street
+## 40        40        3   350.766       James Avenue     Avenue
+## 41        41        4   279.187        Lake Street     Street
+## 42        42        3   214.737        Laurel Park       Park
+## 43        43        2   212.959        Laurel Park       Park
+## 44        44        2   301.366        Laurel Park       Park
+## 45        45        2   144.366        Laurel Park       Park
+## 46        46        3   318.348        Laurel Park       Park
+## 47        47        1   185.141        Laurel Park       Park
+## 48        48        1   132.135        Laurel Park       Park
+## 49        49        2   200.219        Laurel Park       Park
+## 50        50        5   525.112     Liberty Street     Street
+## 51        51        3   210.701     Longview Drive      Drive
+## 52        52        3   185.508     Longview Drive      Drive
+## 53        53        4   209.945     Longview Drive      Drive
+## 54        54        1   142.702        Main Street     Street
+## 55        55        2   367.384  Maplewood Terrace    Terrace
+## 56        56        3   201.443     Mary Jane Lane       Lane
+## 57        57        4   360.870          Meadow St         St
+## 58        58        3   313.640          Middle St         St
+## 59        59        3   270.622          Middle St         St
+## 60        60        2   258.091    Nonotuck Street     Street
+## 61        61        4   357.303 North Maple Street     Street
+## 62        62        2   289.946 North Maple Street     Street
+## 63        63        3   296.142 North Maple Street     Street
+## 64        64        3   331.387     Nutting Avenue     Avenue
+## 65        65        4   389.242           Olive St         St
+## 66        66        6   495.218         Pilgrim Dr         Dr
+## 67        67        3   246.020            Pine St         St
+## 68        68        3   212.892     Pioneer Knolls     Knolls
+## 69        69        3   384.140    Prospect Avenue     Avenue
+## 70        70        3   295.182    Prospect Street     Street
+## 71        71        3   520.147    Prospect Street     Street
+## 72        72        3   284.484  Ridgewood Terrace    Terrace
+## 73        73        3   228.565      Riverbank Rd.        Rd.
+## 74        74        3   447.270    Riverside Drive      Drive
+## 75        75        3   286.163    Riverside Drive      Drive
+## 76        76        3   222.864    Rocky Hill Road       Road
+## 77        77        4   310.018        Rust Avenue     Avenue
+## 78        78        3   211.725          Ryan Road       Road
+## 79        79        3   266.124          Ryan Road       Road
+## 80        80        3   214.289          Ryan Road       Road
+## 81        81        3   211.104          Ryan Road       Road
+## 82        82        2   216.992          Ryan Road       Road
+## 83        83        3   202.485          Ryan Road       Road
+## 84        84        4   429.368  South Main Street     Street
+## 85        85        3   208.703      Sandy Hill Rd         Rd
+## 86        86        4   249.413     Sherman Avenue     Avenue
+## 87        87        4   332.674  South Main Street     Street
+## 88        88        5   356.265       South Street     Street
+## 89        89        5   513.096       South Street     Street
+## 90        90        4   236.498 Spruce Hill Avenue     Avenue
+## 91        91        4   295.772 Spruce Hill Avenue     Avenue
+## 92        92        2   421.460           State St         St
+## 93        93        2   233.023           State St         St
+## 94        94        3   279.814          Straw Ave        Ave
+## 95        95        4   347.408      Sumner Avenue     Avenue
+## 96        96        3   267.290        Swan Street     Street
+## 97        97        6   879.328      Trumbull Road       Road
+## 98        98        2   191.407     Turkey Hill Rd         Rd
+## 99        99        3   467.861       Union Street     Street
+## 100      100        3   301.940      Valley Street     Street
+## 101      101        4   534.865      Vernon Street     Street
+## 102      102        4   331.840      Warren Street     Street
+## 103      103        4   320.805    Williams Street     Street
+## 104      104        2   176.502        Winslow Ave        Ave
+```
+
+
+#### Helpful tutorials/files {-}
+* `stringr` vignette: https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
+* [`stringr` package](https://stringr.tidyverse.org/) 
+* Jenny Bryan's STAT 545 notes: https://stat545.com/character-vectors.html
+* Jenny Bryan's STAT 545 lab: http://stat545.com/block022_regular-expression.html
+* Hadley Wickham's book [R for Data Science](https://r4ds.had.co.nz/strings.html)
+* [regexpal](http://regexpal.com/)    
+* [RegExr](http://www.regexr.com/)   
+* Regular expression in R [official document](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).  
+
+
+
+
+
+#### Fun examples {-}
+
+* The name Hilary: https://hilaryparker.com/2013/01/30/hilary-the-most-poisoned-baby-name-in-us-history/
+* Trump's tweets: http://varianceexplained.org/r/trump-tweets/
+* Trump's tweets, take two: http://varianceexplained.org/r/trump-followup/
+
 

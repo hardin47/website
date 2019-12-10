@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2019-12-02"
+date: "2019-12-10"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -61,5 +61,5 @@ You are responsible for reading the relevant chapters in the text.  The texts ar
 | 11/26/19  	| Project  |  | \@ref(Nov26) [Nov26] |
 | 12/3/19	| Catch-up |   |  |
 | 12/5/19	| In-class Exam 2|   |  |
-| 12/10/19  	| Reg Expr |  | \@ref(Dec10) [Dec10], \@ref(regexpr) [RegExpr] |
+| 12/10/19  	| Reg Expr |  | \@ref(Dec10) [Dec10], \@ref(regexpr) [RegExpr], \@ref(compstat) [CompStat] |
 

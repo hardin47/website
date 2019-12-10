@@ -1,0 +1,112 @@
+
+
+# Computational Statistics {#compstats}
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
+                      fig.height=3, fig.width=5,  
+                      cache=TRUE, fig.align = "center")
+
+library(tidyverse)
+library(caret)
+```
+
+
+## Wearing a Statistics Hat
+
+
+In this class, we've learned a number of ways of dealing with data in order to communicate the information provided in the data.  We have talked about data wrangling, visualization, inference, and classification techniques.  Many of the ideas fall within the paradigm of "data science."  But what makes it statistics?  What do statisticians bring to the table?
+
+Primarily, statisticians are good at thinking about variability.  We are also very skeptical.  You should try not to be too skeptical.  But be skeptical enough.
+
+> **Important Adage #1**:  The perfect is the enemy of the good enough. (Voltaire?)
+
+> **Important Adage #2**:  All models are wrong, but some are useful. (G.E.P. Box 1987)
+
+> Some good thoughts: http://simplystatistics.org/2014/05/22/10-things-statistics-taught-us-about-big-data-analysis/
+
+
+>  The statistics profession is caught at a confusing moment: the activities which preoccupied it over centuries are now in the limelight, but those activities are claimed to be bright shiny new, and carried out by (although not actually invented by) upstarts and strangers. [http://simplystatistics.org/2015/11/24/20-years-of-data-science-and-data-driven-discovery-from-music-to-genomics/]
+
+* **Samples**
+The data is a sample of the population.  Is it a good representation of the population?  Who got left out?  Were any of the variables missing?  Missing at random?  (Probably not.)
+
+> For O'Hagan's fire department, RAND built computer models that replicated when, where, and how often fires broke out in the city, and then predicted how quickly fire companies could respond to them. By showing which areas received faster and slower responses, RAND determined which companies could be closed with the least impact. In 1972, RAND recommended closing 13 companies, oddly including some of the busiest in the fire-prone South Bronx, and opening seven new ones, including units in suburban neighborhoods of Staten Island and the North Bronx.
+
+> RAND's first mistake was assuming that response time ï¿œ a mediocre measure of firefighting operations as a whole, but the only aspect that can be easily quantified ï¿œ was the only factor necessary for determining where companies should be opened and closed. To calculate these theoretical response times, RAND needed to gather real ones. But their sample was so small, unrepresentative and poorly compiled that the data indicated that traffic played no role in how quickly a fire company responded.
+
+> The models themselves were also full of mistakes and omissions. One assumed that fire companies were always available to respond to fires from their firehouse ï¿œ true enough on Staten Island, but a rarity in places like The Bronx, where every company in a neighborhood, sometimes in the entire borough, could be out fighting fires at the same time. Numerous corners were cut, with RAND reports routinely dismissing crucial legwork as "too laborious," and analysts writing that data discrepancies could "be ignored for many planning purposes."
+
+http://nypost.com/2010/05/16/why-the-bronx-burned/
+http://fivethirtyeight.com/datalab/why-the-bronx-really-burned/
+
+* **Sample Size(())
+Tiny samples show huge variability; huge samples will always give significance (tweets from first day of class).
+
+Sampling distribution of $\overline{x}$ ... http://www.rossmanchance.com/applets/OneSample.html?showBoth=1
+
+*Know your real sample size!!!*  One group project is using grocery store data with sales measured daily over the last 3 years.  With 10 stores... is your sample size $10\cdot 365\cdot 3 = 10,950$?  Or is the sample size 10 with $365\cdot3 = 1095$ variables?
+
+Also:  know whether your result is on an average or an individual and whether the "significance" is statistical only or whether it is also practical.
+
+
+* **Correlation v. Causation**
+
+> An article about handwriting appeared in the October 11, 2006 issue of the *Washington Post*. The article mentioned that among students who took the essay portion of the SAT exam in 2005-06, those who wrote in cursive style scored significantly higher on the essay, on average, than students who used printed block letters. Researchers wanted to know whether simply writing in cursive would be a way to increase scores.
+
+> The article also mentioned a different study in which the same one essay was given to all graders. But some graders were shown a cursive version of the essay and the other graders were shown a version with printed block letters. Researchers randomly decided which version the grader would receive. The average score assigned to the essay with the cursive style was significantly higher than the average score assigned to the essay with the printed block letters.
+[@ISCAM]
+
+
+Unless you are running a randomized experiment, you should **always** try to think of as many possible confounding variables as you can.
+
+* **Ensemble Learners**
+
+We've seen ideas of ensembles in bagging, in random forests, and on the first take home exam (average of the bootstrap confidence intervals).   *If the goal is prediction accuracy, average many predictions together.*  If different models use/provide different pieces of information, then the average predictors will balance the information and reduce the variability of the prediction.
+
+Note that you wouldn't want to average a set of ensemble learners if one of them was bad.  (E.g., if the relationship was quadratic and you fit one model to be quadratic and another to be linear... your average will be worse.)
+
+And of course... the world isn't always about prediction.  Sometimes it is about describing!  Simpler models (e.g., regression) get more to the heart of the impact of a specific variable on a response of interest.
+
+* **Supervised vs. Unsupervised**
+
+The classification models we've discussed are all supervised learning techniques.  The word *supervised* refers to the fact that we know the response variable of all of the training observations.  Next up, we'll discuss clustering which is an *unsupervised* technique -- none of the observations have a given response variable.  For example, we might want to cluster a few hundred melanoma patients based on their genetic data.  We are looking for patterns in who groups together, but we don't have a preconceived idea of which patients belong to which group.
+
+There are also semi-supervised techniques applied to data which have some observations that are labeled and some that are not.
+
+* **Regression to the mean**
+
+Regression to the mean is the phenomenon that extreme effects even out over time.  That is, if a measurement is extreme on the first measurement, it is likely to be closer to the mean on the second measurement.
+
+    * **Sports**  Sports Illustrated Jinx (you have to be good *and* lucky)
+    * **Drugs**  New pharmaceuticals are likely to be *less* effective than they seem at first.
+    * **Testing**  Best scores get worse, worst scores get better (be wary of interventions)
+
+* **Measuring Accuracy**
+
+Note that for any set of data, the observations are closer to the model built from them than they are to the model which fits the entire population.  But the more we adjust the model, the more we run the risk of overfitting it to the data.  (Draw a polynomial which way overfits the data.)
+
+    * Test / training data
+    * Cross validation -- do it without cheating  
+    * Choosing variables (standardizing!) can make you overfit... same with subsetting or removing points from your analysis.
+    * Define a metric for success and stick with it!
+    * Choose the algorithm (or algorithms!) that work, but do it up front.
+    * Choose hypotheses before looking at the data
+
+
+* **Exploratory Data Analysis**
+
+If you want to understand a dataset, you have to play around with it.  Graph it.  Look at summary statistics.  Look at bivariate relationships.  Plot with colors and other markers.
+
+
+## Computational Statistics
+
+
+The course has been a mix of computational statistics and data science procedures.  There are myriad other topics we could have covered.  Indeed, many of the most basic and important statistical ideas have computational counterparts that allow us to perform analyses when the calculus doesn't provide neat clean solutions.  Some that we've seen and some that we haven't seen include:
+
+* *Hypothesis Testing:*  Permutation tests
+* *Confidence Intervals:*  Bootstrapping
+* *Parameter Estimation:* The EM algorithm
+* *Bayesian Analysis:* Gibbs sampler, Metropolis-Hasting algorithm
+* *Polynomial regression:* Smoothing methods (e.g., loess)
+
