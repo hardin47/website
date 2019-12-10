@@ -625,7 +625,7 @@ Setting up and managing a database is a topic for a different day: here we focus
 
 > A regular expression ... is a sequence of characters that define a search pattern. Usually such patterns are used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique developed in theoretical computer science and formal language theory. [From https://en.wikipedia.org/wiki/Regular_expression]
 
-### Main tasks in character matching: {-}
+#### Main tasks in character matching: {-}
 1. basic string operations
 2. pattern matching (regular expressions)
 3. sentiment analysis
@@ -779,11 +779,11 @@ RailsTrails %>%
   mutate(last_piece = stringr::word(StreetName, start = -1)) %>% head()
 ```
 
-#### An example from my work
+#### An example from my work {-}
 
 Below are a handful of string characters that represent genomic sequences which were measured in an RNA Sequencing dataset.  The task below is to find  intergenic regions (IGR) and identify which coding sequences (CDS) bookend the intergenic regions.  Note that IGRs do not code for proteins while CDSs do.  Additionally, AS refers to anti-sense which identifies the genomic sequence in the opposite orientation (e.g., CGGATCC  vs CCTAGGC).  [The code below was written by Madison Hobbs, Scripps '19.]
 
-#####  The names of the genomic pieces
+#####  The names of the genomic pieces {-}
 ```{r}
 allCounts <- data.frame(Geneid = c("CDS:b2743:pcm:L-isoaspartate_protein_carboxylmethyltransferase_type_II:cds2705:-:626:NC_000913.3",
             "CDS:b2764:cysJ:sulfite_reductase2C_alpha_subunit2C_flavoprotein:cds2726:-:1799:NC_000913.3",
@@ -810,24 +810,26 @@ rna.name = ",rna[0-9].."
 ```
 
 
-We keep only the IGR and AS_IGR strings, and we separate the two book ends.  Note, the separation comes at the backslash.
+We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note, the separation comes at the backslash.
 ```{r}
 igr <- allCounts %>% filter(feature %in% c("IGR", "AS_IGR"))
 #igr$GeneidBackup = igr$Geneid
 igr <- igr %>% tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
+names(igr)
 igr
 ```
 
-For each of the two book end Genes, we need to separate out the feature from the rest.  Note that we write over feature1 in the second line of code below.  Both of the bookends for all sequences are CDS elements.
+For each of the two bookend Genes, we need to separate out the feature from the rest.  Note that we write over feature1 in the second line of code below.  Both of the bookends for all sequences are CDS elements.
 
 ```{r}
 igr$feature1 <- tidyr::separate(igr, Geneid1, c("feature1", "rest"), sep = "[,]")$feature1
 igr$feature1 <- tidyr::separate(igr, feature1, c("rest", "feature1"), sep = "[()]")$feature1
 igr$feature2 <- tidyr::separate(igr, Geneid2, c("feature2", "rest"), sep = "[,]")$feature2
+names(igr)
 igr
 ```
 
-As CDS, it is now important to find the actual genenames for each of the IGR sequences.  We also keep `bnum` which represents a unique gene identifier in *E. coli*.
+As CDS, it is now important to find the actual genenames for each of the IGR sequences.  We also keep each element's `bnum` which represents a unique gene identifier in *E. coli*.
 
 ```{r}
 igr$start.gene <- case_when(
@@ -846,7 +848,7 @@ igr <- igr %>% tidyr::separate(start.gene, into = c("comma", "start.gene"), sep 
   dplyr::select(-comma) %>% 
   tidyr::separate(end.gene, into = c("comma", "end.gene"), sep = "[,]") %>% 
   dplyr::select(-comma)
-
+names(igr)
 igr
 ```
 
