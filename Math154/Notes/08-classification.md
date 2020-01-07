@@ -425,14 +425,21 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 
 ## CART {#cart}
 
-See the following (amazing!) demonstration for tree intuition:  http://www.r2d3.us/visual-intro-to-machine-learning-part-1/
-
-
+Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  The build a recurssive binary tree step-by-step in order to model the differences between homes in SF and homes in NYC.
 
 <div class="figure" style="text-align: center">
-<img src="figs/ObamaClinton.jpg" alt="http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg Best information was whether or not the county was more than 20 percent black.   Then each successive node is split again on the best possible informative variable.  Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-12)http://graphics8.nytimes.com/images/2008/04/16/us/0416-nat-subOBAMA.jpg Best information was whether or not the county was more than 20 percent black.   Then each successive node is split again on the best possible informative variable.  Note that the leaves on the tree are reasonably homogenous. NYT, April 16, 2008.</p>
+<img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-12)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
+
+Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recurssive binary decision tree to show patterns in identity and political affiliation.   
+
+<div class="figure" style="text-align: center">
+<img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-13)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+</div>
+
+
 
 ### CART algorithm
 
@@ -640,7 +647,7 @@ tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude,
 rpart.plot::rpart.plot(tr.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -668,7 +675,7 @@ tree::partition.tree(tree.model,
                      add=TRUE) 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" />
 
 
 
@@ -773,7 +780,7 @@ tr.full.house$finalModel
 rpart.plot::rpart.plot(tr.full.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
 
 
 #### Cross Validation (model building!)  {-}
@@ -837,13 +844,13 @@ tree.cv.house
 rpart.plot::rpart.plot(tree.cv.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 plot(tree.cv.house)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-20-2.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Training / test data for model building AND model accuracy {-}
@@ -1069,7 +1076,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-21)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-23)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1266,7 +1273,7 @@ modFit.m
 plot(modFit.m)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1294,7 +1301,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
     ylim(c(0.04, 0.06))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
 
 ####  Variable Importance {-}
 
@@ -1325,7 +1332,7 @@ data.frame(importance = modFit.VI$finalModel$variable.importance,
     coord_flip() 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
 
 plot both the given labels as well as the predicted labels
 
@@ -1338,7 +1345,7 @@ ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length,
     geom_point(size=3)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1405,7 +1412,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-29)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-31)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -1419,7 +1426,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-30)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-32)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -1606,7 +1613,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-32)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-34)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -1615,17 +1622,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-33)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-34)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-36)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-37)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -1670,7 +1677,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-36)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-38)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -1701,7 +1708,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-37)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-39)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -1887,7 +1894,7 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
