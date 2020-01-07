@@ -425,14 +425,14 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 
 ## CART {#cart}
 
-Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  The build a recurssive binary tree step-by-step in order to model the differences between homes in SF and homes in NYC.
+Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
 <p class="caption">(\#fig:unnamed-chunk-12)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
-Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recurssive binary decision tree to show patterns in identity and political affiliation.   
+Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
