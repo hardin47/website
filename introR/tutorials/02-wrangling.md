@@ -20,7 +20,7 @@ As with data visualization, data wrangling is a fundamental part of being able t
 
 For plotting, analyses, model building, etc., it's important that the data be structured in a very particular way.   Hadley Wickham provides a thorough discussion and advice for cleaning up the data in @Wickham14.
 
-* *Tidy Data*: rows (cases/observational units) and columns (variables).  The key is that *every* row is a case and *every} column is a variable.  No exceptions.
+* *Tidy Data*: rows (cases/observational units) and columns (variables).  The key is that *every* row is a case and *every* column is a variable.  No exceptions.
 * Creating tidy data is not trivial.  We work with objects (often data tables), functions, and arguments (often variables).
 
 
@@ -41,14 +41,14 @@ https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALaj
 Within R (really within any type of computing language, Python, SQL, Java, etc.), we need to understand how to build data using the patterns of the language.  Some things to consider:
 
 
-* `object_name = function_name(arguments)` is a way of using a function to create a new object.
+* `object_name = function_name(data_table, arguments)` is a way of using a function to create a new object.
 * `object_name = data_table %>% function_name(arguments)` uses chaining syntax as an extension of the ideas of functions.  In chaining, the value on the left side of `%>%` becomes the *first argument* to the function on the right side.
 
 
 ``` 
 object_name = data_table %>%
 function_name(arguments) %>% 
-function_name(arguments)
+function_name(other arguments)
 ```
 is extended chaining.  `%>%` is never at the front of the line, it is always connecting one idea with the continuation of that idea on the next line.
 * In R, all functions take arguments in round parentheses (as opposed to subsetting observations or variables from data objects which happen with square parentheses).  Additionally, the spot to the left of `%>%` is always a data table.
@@ -67,8 +67,11 @@ The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the a
 From Hadley Wickham, how to think about tidy data.
 
 > Little bunny Foo Foo
+
 > Went hopping through the forest
+
 > Scooping up the field mice
+
 > And bopping them on the head
 
 The nursery rhyme could be created by a series of steps where the output from each step is saved as an object along the way.
