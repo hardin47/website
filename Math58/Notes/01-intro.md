@@ -1,9 +1,8 @@
 # Introduction {#intro}
 
 ## 1/21/20 Agenda {#Jan21}
-1. Questionnaire
-2. Syllabus & Course Outline
-3. Example: Friend or Foe
+1. Syllabus & Course Outline
+2. Example: Friend or Foe
   
 ## Course Logistics
 
@@ -56,7 +55,7 @@ The formal prerequisite is a semester of calculus, but we do almost no calculus 
 There is considerable overlap between Math 58 and Math 58B; you should not take both Math 58 and Math 58B.  The differences between the two sections lie in the examples as well as a handful of topics that are different across the two courses.  There is also quite a bit of overlap with other introductory statistics courses (e.g., Econ 57, Pysch 158, Politics 90, AP Statistics).  Some introductory statistics courses cover quite a bit of probability without getting deeply into inferential ideas.  We will focus on statistics instead of probability with an emphasis on understanding the intuition and mathematical derivations that inform the analysis tool.  We will also focus on how the computer can help us gain a deeper understanding of the analyses we are doing.
  
 
-**When should I take Math 154?**
+**When should I take Math 58 or Math 58B?**
 Introductory (Bio)Statistics should be taken as early in your undergraduate schedule as possible.  By taking Math 58(B) you will open up the possibilities for taking upper division statistics classes.  Additionally, the background covered in Math 58(B) will provide you with a deeper understanding of the concepts you are covering in your science and social science courses.
 
 **What is the workload for Math 58(B)?**
@@ -90,7 +89,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 This example comes from Investigation 1.1: Friend or Foe? @iscam.  The idea is to use simulation to determine how likely our data would be if nothing interesting was going on.
 
 
-> In a study reported in the November 2007 issue of Nature, researchers investigated whether infants take into account an individual’s actions towards others in evaluating that individual as appealing or aversive, perhaps laying for the foundation for social interaction (Hamlin, Wynn, and Bloom, 2007). In other words, do children who aren’t even yet talking still form impressions as to someone’s friendliness based on their actions? In one component of the study, 10-month-old infants were shown a “climber” character (a piece of wood with “googly” eyes glued onto it) that could not make it up a hill in two tries. Then the infants were shown two scenarios for the climber’s next try, one where the climber was pushed to the top of the hill by another character (the “helper” toy) and one where the climber was pushed back down the hill by another character (the “hinderer” toy). The infant was alternately shown
+> In a study reported in the November 2007 issue of *Nature*, researchers investigated whether infants take into account an individual’s actions towards others in evaluating that individual as appealing or aversive, perhaps laying for the foundation for social interaction (Hamlin, Wynn, and Bloom, 2007). In other words, do children who aren’t even yet talking still form impressions as to someone’s friendliness based on their actions? In one component of the study, 10-month-old infants were shown a “climber” character (a piece of wood with “googly” eyes glued onto it) that could not make it up a hill in two tries. Then the infants were shown two scenarios for the climber’s next try, one where the climber was pushed to the top of the hill by another character (the “helper” toy) and one where the climber was pushed back down the hill by another character (the “hinderer” toy). The infant was alternately shown
 these two scenarios several times. Then the child was presented with both pieces of wood (the helper and the hinderer characters) and asked to pick one to play with. Videos demonstrating this component of the study can be found at http://campuspress.yale.edu/infantlab/media/.
 
 > One important design consideration to keep in mind is that in order to equalize potential influencing factors such as shape, color, and position, the researchers varied the colors and shapes of the wooden characters and even on which side the toys were presented to the infants. The researchers found that 14 of the 16 infants chose the helper over the hinderer.

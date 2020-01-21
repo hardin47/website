@@ -35,4 +35,4 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | Day    	| Topic     	|  Book Chap   	|   Notes Section |
 |:-------	|:------------|:---------	|:--------------------	|
 | 1/21/20 	| Intro to Data / R |  | \@ref(intro) [intro],  \@ref(Jan21) [Jan21]|
-| 1/23/20	| Foundations for Inference | ISRS 2.1 - 2.3 |  \@ref(Jan23) [Jan23], \@ref(repro)  [repro] |
+| 1/23/20	| Foundations for Inference | ISRS 2.1 - 2.3 |  \@ref(Jan23) [Jan23], \@ref()  [] |
