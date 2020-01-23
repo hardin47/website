@@ -93,7 +93,7 @@ null_discrim <- discrim %>%
 
 # then visualize the null sampling distribution & p-value
 visualize(null_discrim, bins = 10) +
-  shade_p_value(obs_stat = diff_obs, direction = "right")
+  shade_p_value(obs_stat = diff_obs, direction = "greater")
 ```
 
 <img src="02-FoundInf_files/figure-html/unnamed-chunk-1-1.png" width="672" />
@@ -101,7 +101,7 @@ visualize(null_discrim, bins = 10) +
 ```r
 # calculate the actual p-value
 null_discrim %>%
-  get_p_value(obs_stat = diff_obs, direction = "right")
+  get_p_value(obs_stat = diff_obs, direction = "greater")
 ```
 
 ```
@@ -137,6 +137,10 @@ null_discrim %>%
 
 
 ### Other pieces of the process
+
+* A  **statistic** is a numerical measurement we get from the sample, a function of the data. [Also sometimes called an **estimate**.]
+
+* A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.
 
 * The **test statistic** is a quantity calculated from the data that is used to evaluate how compatible the data are with the result expected under the null hypothesis.
 
