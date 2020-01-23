@@ -1,4 +1,4 @@
-# Foundationa for Inference
+# Foundations for Inference
 
 ## 1/23/20 Agenda {#Jan23}
 1. Example: gender discrimination
@@ -8,16 +8,15 @@
 
 
 ### Vocabulary {-}
-* A  **statistic** is a numerical measurement we get from the sample, a function of the data.
+* A  **statistic** is a numerical measurement we get from the sample, a function of the data. [Also sometimes called an **estimate**.]
 * A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.
-* An  **estimator** is a function of the unobserved data that tries to approximate the unknown parameter value.
-* An  **estimate** is the value of the estimator for a given set of data.  [Estimate and statistic can be used interchangeably.]
+
 
 ## Examples
 
-### Examp: Gender Discrimination (@isrs, pg 61)
+### Examp: Gender Discrimination (@isrs, pg 61) {#ex:gend}
 
-> We consider a study investigating gender discrimination in the 1970s, which is set in the context of personnel decisions within a bank.^[Rosen B and Jerdee T. 1974. Influence of sex role stereotypes on personnel decisions. Journal ofApplied Psychology 59(1):9-14.] The research question we hope to answer is, "Are females discriminated against in promotion decisions made by male managers?"
+> We consider a study investigating gender discrimination in the 1970s, which is set in the context of personnel decisions within a bank.^[Rosen B and Jerdee T. 1974. Influence of sex role stereotypes on personnel decisions. Journal of Applied Psychology 59(1):9-14.] The research question we hope to answer is, "Are females discriminated against in promotion decisions made by male managers?"
 
 > The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.
 
@@ -42,12 +41,13 @@
 * What is the parameter?
     - $p_m - p_f$ = the true difference in the probability of a man being promoted minus the probability of a woman being promoted.
     
-H0: Null hypothesis. The variables gender and decision are independent. They have
-no relationship, and the observed difference between the proportion of males and
-females who were promoted, 29.2%, was due to chance.
+#### Hypotheses {-}
 
-HA: Alternative hypothesis. The variables gender and decision are not indepen-
-dent. The difference in promotion rates of 29.2% was not due    
+H0: Null hypothesis. The variables gender and decision are independent. They have no relationship, and therefore any observed difference between the proportion of males and females who were promoted is due to chance.
+
+HA: Alternative hypothesis. The variables gender and decision are not independent. Any observed difference between the proportion of males and females who were promoted is **not** due to chance.
+
+#### Computation {-}
 
 
 ```r
@@ -97,7 +97,7 @@ null_discrim <- discrim %>%
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # then visualize the null sampling distribution & p-value
-visualize(null_discrim) +
+visualize(null_discrim, bins = 10) +
   shade_p_value(obs_stat = diff_obs, direction = "two_sided")
 ```
 
@@ -116,8 +116,15 @@ null_discrim %>%
 ## 1    0.06
 ```
 
+#### Logic for what we believe {-}
 
-### Examp: Opportunity Cost
+1. We know that the study was an experiment, so there should be no **systematic** differences between the group who received "male" applications and "female" applications.
+
+2. We've ruled out random chance as the reason for the huge difference in proportions.  (We reject the null hypothesis.)
+
+3. We conclude that gender and decision are not independent.  That is, knowing the gender changes the probability of promotion.
+
+
 
 ## Structure of Hypothesis testing
 
@@ -173,6 +180,20 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 
 
 
-## Central Limit Theorem / Normal Distribution
+## Normality
+
+## 1/28/20 Agenda {#Jan28}
+1. Central Limit Theorm
+2. Mathematical approximation for one proportion
+
+
+### Central Limit Theorm {#CLT}
+
+## 1/30/20 Agenda {#Jan30}
+1. Normal distribution
+2. Calculting normal probabilities
+
+
+### The Normal Distribution {#norm}
 
 ## Confidence Intervals

@@ -17,6 +17,9 @@ Generally, statistics is the academic discipline which uses data to make claims 
 * *descriptive statistics* describe the sample at hand with no intent on making generalizations.
 * *inferential statistics* use a sample to make claims about a population
 
+### Vocabulary {-}
+* A  **statistic** is a numerical measurement we get from the sample, a function of the data. [Also sometimes called an **estimate**.]
+* A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.
 
 **What is the content of Math 58(B)?**
 This class will be an introduction to statistical ideas using R.  We will cover the majority of statistical methods which are used in standard analyses (e.g., t-tests, chi-squared analysis, confidence intervals, binomial tests, etc.).  The main inferential techniques will be covered using both theoretical approximations (e.g., the central limit theorem) as well as computational methods (e.g., permutation tests and bootstrapping).  Focus will be on understanding he methods and interpreting results.
@@ -116,6 +119,9 @@ these two scenarios several times. Then the child was presented with both pieces
 |          p-value $<$ 0.01 | $\rightarrow$ | very strong evidence against the null model |
 
 
+#### Computation {-}
+
+
 ```r
 library(infer)
 
@@ -161,7 +167,7 @@ null_help <- Infants %>%
   calculate(stat = "prop")
 
 # then visualize the null sampling distribution & p-value
-visualize(null_help) +
+visualize(null_help, bins = 13) +
   shade_p_value(obs_stat = p_obs, direction = "two_sided")
 ```
 
@@ -180,3 +186,12 @@ null_help %>%
 ## 1   0.002
 ```
 
+#### Logic for what we believe {-}
+
+1. If we look back to the study, we can tell that the researchers varied color, shape, side, etc. to make sure there was nothing systematic about how the infants chose the block (e.g., if they all watch *Blue's Clues* they might love the color blue, so we wouldn't always want the helper shape to be blue).  
+
+The excellent design survey rules out outside influence as the reason so many of the infants chose the helper shape.
+
+2. We ruled out random chance as the mechansim for the larger number of infants who chose the helper shape.  (We reject the null hypothesis.)
+
+3. We conclude that babies are inclined to be helpful.  That is, they are more likely to choose the helper than the hindered.  [Note:  we don't have any evidence for *why* they choose the helper.  That is, they might be predisposed.  They might be modeling their parents.  They might notice that *they* need a lot of help, etc.]

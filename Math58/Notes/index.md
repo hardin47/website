@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-01-22"
+date: "2020-01-23"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -35,4 +35,7 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | Day    	| Topic     	|  Book Chap   	|   Notes Section |
 |:-------	|:------------|:---------	|:--------------------	|
 | 1/21/20 	| Intro to Data / R |  | \@ref(intro) [intro],  \@ref(Jan21) [Jan21]|
-| 1/23/20	| Foundations for Inference | ISRS 2.1 - 2.3 |  \@ref(Jan23) [Jan23], \@ref()  [] |
+| 1/23/20	| Foundations for Inference | ISRS 2.1-2.3 |  \@ref(Jan23) [Jan23], \@ref(ex:gend)  [Examp: gender] |
+| 1/28/20	| Normality | ISRS 2.4-2.5 |  \@ref(Jan28) [Jan28], \@ref(CLT)  [CLT] |
+| 1/30/20	| Normality | ISRS 2.6-2.7 |  \@ref(Jan30) [Jan30], \@ref(norm)  [Normal Dist] |
+
