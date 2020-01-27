@@ -51,7 +51,7 @@ library(infer)
 # to control the randomness
 set.seed(47)
 
-# first create a data frame with the Infant data
+# first create a data frame with the discrimination data
 discrim <- data.frame(gender = c(rep("male", 24), rep("female", 24)),
                       decision = c(rep("promote", 21), rep("not", 3), 
                                    rep("promote", 14), rep("not", 10)))
@@ -70,7 +70,7 @@ discrim %>% head()
 ```
 
 ```r
-# then find the proportion who help
+# then find the difference in proportion who are promoted
 (diff_obs <- discrim %>%
     specify(decision ~ gender, success = "promote") %>%
     calculate(stat = "diff in props", order = c("male", "female")) )
@@ -181,21 +181,103 @@ In the video, a rider in the back of a taxi (played by Linklater himself) muses 
 What is the point?  Why did we see the video?  How does it relate the to the material from class?  What is the relationship to sampling distributions?
 
 
+###  All together:  structure of a hypothesis test
 
-## Normality
+* collect data, **specify** the variables of interest
+* provide the null (and alternative) **hypothesis** values (often statements about parameters)
+* **generate** a (null) sampling distribution to describe the variability of the statistic that was **calculated** along the way
+* **visualize** the distribution of the statistics under the null model
+* **get_p_value** to measure the consistency of the observed statistic and the possible values of the statistic under the null model
+* make a conclusion using words that describe the research setting
 
 ## 1/28/20 Agenda {#Jan28}
 1. Central Limit Theorm
 2. Mathematical approximation for one proportion
 
+## Normal Model
+
 
 ### Central Limit Theorm {#CLT}
 
+
+#### Example: Reese's Pieces {-}
+
+As with many of the examples, the Reese's Pieces example comes from @iscam.  The example focuses on how the samples of orange Reese's Pieces vary from sample to sample.  Today we aren't particularly interested in a specific research question, instead we are trying to understand the details of the model which describes how $\hat{p}$ varies from sample to sample.  [Spoiler: the distribution is going to look like a bell!  and the mathematical model which describes the variability is called the normal distribution.]
+
+Notes from the applet: http://www.rossmanchance.com/applets/OneProp/OneProp.htm?candy=1
+
+* How does the sampling distribution change as a function of $p$ and $n$?
+* When a normal distribution is placed on top of the empirical (computational) distribution, does it fit well?
+
+
+
+
+A *sampling distribution* is the probability distribution of all possible values of the *statistic* in all possible samples of the same size from the same population.  Note: increasing the sample size reduces the spread of the sampling distribution of a statistic (i.e., increases the precision).
+
+##### Normal Probability Curve {-}
+
+* symmetric
+* bell-shaped
+* centered at $\mu$
+* $\sigma$ shows the point of inflection
+* draw a picture **every** time you start a normal problem!
+
+The Central Limit Theorem
+
+> **The Central Limit Theorem** says that the sampling distribution of an  *average* will have a bell shaped distribution if $n$ is big enough.
+
+
+The sampling distribution of $\hat{p} = X/n$ can be thought of as taking lots of random samples from a population, calculating $\hat{p}$, and creating a histogram.  We can easily calculate what we'd expect from that sampling distribution if we know $p$, the true population proportion.  In fact, we saw two different sampling distributions (under two different hypotheses) in the Baseball example.
+
+
+
+Because $\hat{p}$ is actually an average (we talked about that with the birth data), the sampling distribution of $\hat{p}$ can be described by a normal distribution (as long as $n$ is big enough).
+
+\begin{eqnarray*}
+\hat{p} &=& \frac{X}{n}\\
+SD(\hat{p}) = \sigma_{\hat{p}} &=& \sqrt{\frac{p (1-p)}{n}}\\
+SE(\hat{p}) &=& \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\\
+\hat{p} &\sim& N\bigg(p, \frac{p(1-p)}{n} \bigg) \ \ \ \ \ \mbox{ (if the sample size is large enough)}\\
+\end{eqnarray*}
+
+
+We would expect 95% of our $\hat{p}$ values to be within 2 standard deviations of the mean.  That is, 95% of $\hat{p}$ are:
+\begin{eqnarray*}
+p \pm 2 \sqrt{\frac{p(1-p)}{n}}
+\end{eqnarray*}
+Or put differently, when referring to a randomly selected $\hat{p}$,
+\begin{eqnarray*}
+P\bigg( - 2 \sqrt{\frac{p(1-p)}{n}} \leq \hat{p} - p \leq 2 \sqrt{\frac{p(1-p)}{n}}\bigg) = 0.95\\
+P\bigg(\hat{p} - 2 \sqrt{\frac{p(1-p)}{n}} \leq  p \leq \hat{p} + 2 \sqrt{\frac{p(1-p)}{n}}\bigg) = 0.95
+\end{eqnarray*}
+
+We'd love to create our interval for $p$ using $\hat{p} \pm 2 \sqrt{\frac{p(1-p)}{n}}$, but we don't know $p$!  One option is to use $SE(\hat{p})$ in the estimate of the variability.
+
+##### The Empirical Rule {-}
+
+In a bell-shaped, symmetric distribution,
+
+| % of data | in what interval   |
+|:-------------|:----------------------------|
+|$\approx 68\%$ | of the observations fall within 1 st dev of the mean |
+|$\approx 95\%$ | of the observations fall within 2 st dev of the mean |
+|$\approx 99.7\%$ | of the observations fall within 3 st dev of the mean |
+
+
+
+
+<!--
+%Show gorilla move:
+%\url{viscog.beckman.uiuc.edu/flashmovie/15.php}
+-->
+
+
+
 ## 1/30/20 Agenda {#Jan30}
-1. Normal distribution
+1. Normal distribution (no q-q plots)
 2. Calculting normal probabilities
 
 
-### The Normal Distribution {#norm}
+### Normal Probabilities & z-scores {#norm}
 
 ## Confidence Intervals
