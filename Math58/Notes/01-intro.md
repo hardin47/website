@@ -1,5 +1,8 @@
 # Introduction {#intro}
 
+
+
+
 ## 1/21/20 Agenda {#Jan21}
 1. Syllabus & Course Outline
 2. Example: Friend or Foe
@@ -171,7 +174,7 @@ visualize(null_help, bins = 13) +
   shade_p_value(obs_stat = p_obs, direction = "two_sided")
 ```
 
-<img src="01-intro_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+<img src="01-intro_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # calculate the actual p-value

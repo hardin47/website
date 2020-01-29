@@ -1,5 +1,8 @@
 # Foundations for Inference
 
+
+
+
 ## 1/23/20 Agenda {#Jan23}
 1. Example: gender discrimination
 2. `infer` again
@@ -96,7 +99,7 @@ visualize(null_discrim, bins = 10) +
   shade_p_value(obs_stat = diff_obs, direction = "greater")
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # calculate the actual p-value
@@ -306,128 +309,6 @@ And the respective Z score is: $$ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1-p)}{n}}
 
 ```r
 library(mosaic)
-```
-
-```
-## Loading required package: dplyr
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## Loading required package: ggformula
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```
-## Loading required package: ggstance
-```
-
-```
-## 
-## Attaching package: 'ggstance'
-```
-
-```
-## The following objects are masked from 'package:ggplot2':
-## 
-##     geom_errorbarh, GeomErrorbarh
-```
-
-```
-## 
-## New to ggformula?  Try the tutorials: 
-## 	learnr::run_tutorial("introduction", package = "ggformula")
-## 	learnr::run_tutorial("refining", package = "ggformula")
-```
-
-```
-## Loading required package: mosaicData
-```
-
-```
-## Loading required package: Matrix
-```
-
-```
-## Registered S3 method overwritten by 'mosaic':
-##   method                           from   
-##   fortify.SpatialPolygonsDataFrame ggplot2
-```
-
-```
-## 
-## The 'mosaic' package masks several functions from core packages in order to add 
-## additional features.  The original behavior of these functions should not be affected by this.
-## 
-## Note: If you use the Matrix package, be sure to load it BEFORE loading mosaic.
-```
-
-```
-## 
-## Attaching package: 'mosaic'
-```
-
-```
-## The following object is masked from 'package:Matrix':
-## 
-##     mean
-```
-
-```
-## The following object is masked from 'package:ggplot2':
-## 
-##     stat
-```
-
-```
-## The following objects are masked from 'package:dplyr':
-## 
-##     count, do, tally
-```
-
-```
-## The following object is masked from 'package:infer':
-## 
-##     t_test
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     binom.test, cor, cor.test, cov, fivenum, IQR, median,
-##     prop.test, quantile, sd, t.test, var
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     max, mean, min, prod, range, sample, sum
-```
-
-```r
 # (a)
 (0.4 - 0.5) / sqrt(0.5*0.5/25)
 ```
@@ -440,27 +321,7 @@ library(mosaic)
 xpnorm(-1, 0, 1)
 ```
 
-```
-## 
-```
-
-```
-## If X ~ N(0, 1), then
-```
-
-```
-## 	P(X <= -1) = P(Z <= -1) = 0.1587
-```
-
-```
-## 	P(X >  -1) = P(Z >  -1) = 0.8413
-```
-
-```
-## 
-```
-
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553
@@ -479,27 +340,7 @@ xpnorm(-1, 0, 1)
 xpnorm(-3.16, 0, 1)
 ```
 
-```
-## 
-```
-
-```
-## If X ~ N(0, 1), then
-```
-
-```
-## 	P(X <= -3.16) = P(Z <= -3.16) = 0.0007888
-```
-
-```
-## 	P(X >  -3.16) = P(Z >  -3.16) = 0.9992
-```
-
-```
-## 
-```
-
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-2.png" width="672" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0007888457
@@ -518,27 +359,7 @@ xpnorm(-3.16, 0, 1)
 xpnorm(c(-1, 0.5), 0, 1)
 ```
 
-```
-## 
-```
-
-```
-## If X ~ N(0, 1), then
-```
-
-```
-## 	P(X <= -1.0) = P(Z <= -1.0) = 0.1587	P(X <=  0.5) = P(Z <=  0.5) = 0.6915
-```
-
-```
-## 	P(X >  -1.0) = P(Z >  -1.0) = 0.8413	P(X >   0.5) = P(Z >   0.5) = 0.3085
-```
-
-```
-## 
-```
-
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-3.png" width="672" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-3.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553 0.6914625
@@ -601,27 +422,7 @@ The Z score tells us that the minimum speed is only -1.33 standard deviations be
 xpnorm(-1.333, 0, 1, plot = TRUE)
 ```
 
-```
-## 
-```
-
-```
-## If X ~ N(0, 1), then
-```
-
-```
-## 	P(X <= -1.333) = P(Z <= -1.333) = 0.09127
-```
-
-```
-## 	P(X >  -1.333) = P(Z >  -1.333) = 0.9087
-```
-
-```
-## 
-```
-
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0912659
