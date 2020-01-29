@@ -185,19 +185,21 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 
 * collect data, **specify** the variables of interest
 * provide the null (and alternative) **hypothesis** values (often statements about parameters)
+   - the null claim is the science we want to reject
+   - the alternative claim is the science we want to prove
 * **generate** a (null) sampling distribution to describe the variability of the statistic that was **calculated** along the way
 * **visualize** the distribution of the statistics under the null model
 * **get_p_value** to measure the consistency of the observed statistic and the possible values of the statistic under the null model
 * make a conclusion using words that describe the research setting
 
 ## 1/28/20 Agenda {#Jan28}
-1. Central Limit Theorm
+1. Central Limit Theorem
 2. Mathematical approximation for one proportion
 
 ## Normal Model
 
 
-### Central Limit Theorm {#CLT}
+### Central Limit Therm {#CLT}
 
 
 #### Example: Reese's Pieces {-}
@@ -275,9 +277,355 @@ In a bell-shaped, symmetric distribution,
 
 ## 1/30/20 Agenda {#Jan30}
 1. Normal distribution (no q-q plots)
-2. Calculting normal probabilities
+2. Calculating normal probabilities
 
 
-### Normal Probabilities & z-scores {#norm}
+### Normal Probabilities & Z scores {#norm}
+
+#### Z score {-}
+
+> A **Z score** of an observation is the number of standard deviations it falls above or below the mean. We compute the Z score for an observation x that follows a distribution with mean $\mu$ and standard deviation $\sigma$ using
+
+$$ Z = \frac{x - \mu}{\sigma}$$
+
+#### Normal probabilities {-}
+
+We return to the Reese's Pieces example to investigate the probability of a particular number of orange candies, using the normal approximation. 
+
+Remember:  $$SD(\hat{p}) = \sqrt{\frac{p(1-p)}{n}}$$
+
+And the respective Z score is: $$ Z = \frac{\hat{p} - p}{\sqrt{\frac{p(1-p)}{n}}}$$
+
+(a) What is the probability that in a sample of 25 candies, you would get less than 40% orange (provided that the machine colors 50% of the candies orange).  Answer: 0.1587
+
+(b) What is the probability that in a sample of 250 candies, you would get less than 40% orange (provided that the machine colors 50% of the candies orange).  Answer: 0.0007888
+
+(c) What is the probability that in a sample of 25 candies, you would get between 40% and 55% orange (provided that the machine colors 50% of the candies orange).  Answer: 0.5328
+
+
+
+```r
+library(mosaic)
+```
+
+```
+## Loading required package: dplyr
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: ggformula
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```
+## Loading required package: ggstance
+```
+
+```
+## 
+## Attaching package: 'ggstance'
+```
+
+```
+## The following objects are masked from 'package:ggplot2':
+## 
+##     geom_errorbarh, GeomErrorbarh
+```
+
+```
+## 
+## New to ggformula?  Try the tutorials: 
+## 	learnr::run_tutorial("introduction", package = "ggformula")
+## 	learnr::run_tutorial("refining", package = "ggformula")
+```
+
+```
+## Loading required package: mosaicData
+```
+
+```
+## Loading required package: Matrix
+```
+
+```
+## Registered S3 method overwritten by 'mosaic':
+##   method                           from   
+##   fortify.SpatialPolygonsDataFrame ggplot2
+```
+
+```
+## 
+## The 'mosaic' package masks several functions from core packages in order to add 
+## additional features.  The original behavior of these functions should not be affected by this.
+## 
+## Note: If you use the Matrix package, be sure to load it BEFORE loading mosaic.
+```
+
+```
+## 
+## Attaching package: 'mosaic'
+```
+
+```
+## The following object is masked from 'package:Matrix':
+## 
+##     mean
+```
+
+```
+## The following object is masked from 'package:ggplot2':
+## 
+##     stat
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     count, do, tally
+```
+
+```
+## The following object is masked from 'package:infer':
+## 
+##     t_test
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     binom.test, cor, cor.test, cov, fivenum, IQR, median,
+##     prop.test, quantile, sd, t.test, var
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     max, mean, min, prod, range, sample, sum
+```
+
+```r
+# (a)
+(0.4 - 0.5) / sqrt(0.5*0.5/25)
+```
+
+```
+## [1] -1
+```
+
+```r
+xpnorm(-1, 0, 1)
+```
+
+```
+## 
+```
+
+```
+## If X ~ N(0, 1), then
+```
+
+```
+## 	P(X <= -1) = P(Z <= -1) = 0.1587
+```
+
+```
+## 	P(X >  -1) = P(Z >  -1) = 0.8413
+```
+
+```
+## 
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+
+```
+## [1] 0.1586553
+```
+
+```r
+# (b)
+(0.4 - 0.5) / sqrt(0.5*0.5/250)
+```
+
+```
+## [1] -3.162278
+```
+
+```r
+xpnorm(-3.16, 0, 1)
+```
+
+```
+## 
+```
+
+```
+## If X ~ N(0, 1), then
+```
+
+```
+## 	P(X <= -3.16) = P(Z <= -3.16) = 0.0007888
+```
+
+```
+## 	P(X >  -3.16) = P(Z >  -3.16) = 0.9992
+```
+
+```
+## 
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-2.png" width="672" />
+
+```
+## [1] 0.0007888457
+```
+
+```r
+# (c)
+(0.55 - 0.5) / sqrt(0.5*0.5/25)
+```
+
+```
+## [1] 0.5
+```
+
+```r
+xpnorm(c(-1, 0.5), 0, 1)
+```
+
+```
+## 
+```
+
+```
+## If X ~ N(0, 1), then
+```
+
+```
+## 	P(X <= -1.0) = P(Z <= -1.0) = 0.1587	P(X <=  0.5) = P(Z <=  0.5) = 0.6915
+```
+
+```
+## 	P(X >  -1.0) = P(Z >  -1.0) = 0.8413	P(X >   0.5) = P(Z >   0.5) = 0.3085
+```
+
+```
+## 
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-3.png" width="672" />
+
+```
+## [1] 0.1586553 0.6914625
+```
+
+Note that normal probabilities can be estimated for any variable that has a distribution which is well approximated by the bell shape given by a normal curve.  Below we calculate Z scores and probabilities for a non-proportion setting and then ask whether the values could possibly be normal.  (What do you think?)
+
+#### Example: Athletic comparison^[taken from https://askgoodquestions.blog/2019/08/26/8-end-of-the-alphabet/ by Allan Rossman, he borrowed from 2011 AP Statistics exam]
+
+The example below allows for a comparison between two athletes based on speed and strength.  The following information is provided about the sample of individuals who were measured:
+
+* Speed is measured by the time required to run a distance of 40 yards, with smaller times indicating more desirable (faster) speeds.  From the data, the times to run 40 yards have a mean of 4.60 seconds and a standard devotion of 0.15 seconds, with a minimum of 4.40 seconds.
+
+* Strength is measured by the amount of weight lifted, with more weight indicating more desirable (greater) strength  From the data, the amount of weight lifted has a mean of 310 pounds and a standard deviation of 25 pounds.
+
+
+|                      | mean     | std dev  | minimum  |
+|----------------------|----------|----------|----------|
+| Time to run 40 yards | 4.60 sec | 0.15 sec | 4.40 sec |
+| Amount lifted        | 310 lbs  | 25 lbs   | NA       |
+
+
+1. Calculate and interpret the Z score for a player who can lift weight of 370 pounds.
+
+$$Z = \frac{370-310}{25} = 2.4$$
+
+This z-score tells us that a player who can lift 370 pounds is lifting 2.4 SDs more than average.  Saying that this weight is 2.4 SDs away from the average would leave out important information about direction.
+
+
+2. Consider two players, A and B (with data given as below).  Which player should be selected for the team if only one player can be selected?
+
+|                      | Player A | Player B |
+|----------------------|----------|----------|
+| Time to run 40 yards | 4.42 sec | 4.57 sec |
+| Amount lifted        | 370 lbs  | 375 lbs  |
+
+
+At a first glance, we can see that A is faster, and B is stronger.  Understanding how each player performs (in strength and speed) relative to the rest of the players is the first step in answering the question.  We will calculate four Z scores, one for each player and each task:
+
+\begin{align*}
+Z_{Aspeed} =  \frac{4.42 - 4.6}{0.15} = -1.2\\
+Z_{Astrength} = \frac{370-310}{25} = 2.4\\
+Z_{Bspeed} =  \frac{4.57 - 4.6}{0.15} = -0.2\\
+Z_{Bstrength} = \frac{375-310}{25} = 2.6\\
+\end{align*}
+
+
+After calculating Z scores, it is found that Player B is only slightly stronger than Player A, but Player A is considerably faster than Player B.  Because the question advised us to consider both criteria as equally valuable, Player A is the better choice.
+
+3. Using the full information about the speed data, do you think that the distribution of 40 yard running times is approximately normal?
+
+NO! The minimum is too close to the mean for the normal distribution to provide a reasonable model.  What does "too close" mean here?  Let's see how many standard deviations the minimum is below the mean:
+
+$$ Z = \frac{4.4 - 4.6}{0.15} = -1.33 $$
+
+The Z score tells us that the minimum speed is only -1.33 standard deviations below the mean.  According to the normal distribution (see the plot below), we would expect about 9% of the observations to be lower than 4.4 seconds, so the normal distribution does not seem to be a great fit to these observations.
+
+
+```r
+xpnorm(-1.333, 0, 1, plot = TRUE)
+```
+
+```
+## 
+```
+
+```
+## If X ~ N(0, 1), then
+```
+
+```
+## 	P(X <= -1.333) = P(Z <= -1.333) = 0.09127
+```
+
+```
+## 	P(X >  -1.333) = P(Z >  -1.333) = 0.9087
+```
+
+```
+## 
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+
+```
+## [1] 0.0912659
+```
+
 
 ## Confidence Intervals
