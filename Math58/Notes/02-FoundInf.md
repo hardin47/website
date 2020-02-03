@@ -186,8 +186,9 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 
 ###  All together:  structure of a hypothesis test
 
+* decide on a research question (which will determine the test)
 * collect data, **specify** the variables of interest
-* provide the null (and alternative) **hypothesis** values (often statements about parameters)
+* state the null (and alternative) **hypothesis** values (often statements about parameters)
    - the null claim is the science we want to reject
    - the alternative claim is the science we want to prove
 * **generate** a (null) sampling distribution to describe the variability of the statistic that was **calculated** along the way
@@ -197,7 +198,7 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 
 ## 1/28/20 Agenda {#Jan28}
 1. Central Limit Theorem
-2. Mathematical approximation for one proportion
+2. Mathematical approximation for the distribution of one sample proportion
 
 ## Normal Model
 
@@ -232,21 +233,19 @@ The Central Limit Theorem
 > **The Central Limit Theorem** says that the sampling distribution of an  *average* will have a bell shaped distribution if $n$ is big enough.
 
 
-The sampling distribution of $\hat{p} = X/n$ can be thought of as taking lots of random samples from a population, calculating $\hat{p}$, and creating a histogram.  We can easily calculate what we'd expect from that sampling distribution if we know $p$, the true population proportion.  In fact, we saw two different sampling distributions (under two different hypotheses) in the Baseball example.
+The sampling distribution of $\hat{p} = X/n$ can be thought of as taking lots of random samples from a population, calculating $\hat{p}$, and creating a histogram.  We can easily calculate what we'd expect from that sampling distribution if we know $p$, the true population proportion.  
 
-
-
-Because $\hat{p}$ is actually an average (we talked about that with the birth data), the sampling distribution of $\hat{p}$ can be described by a normal distribution (as long as $n$ is big enough).
+Because $\hat{p}$ is actually an average, the sampling distribution of $\hat{p}$ can be described by a normal distribution (as long as $n$ is big enough).
 
 \begin{eqnarray*}
 \hat{p} &=& \frac{X}{n}\\
 SD(\hat{p}) = \sigma_{\hat{p}} &=& \sqrt{\frac{p (1-p)}{n}}\\
 SE(\hat{p}) &=& \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\\
-\hat{p} &\sim& N\bigg(p, \frac{p(1-p)}{n} \bigg) \ \ \ \ \ \mbox{ (if the sample size is large enough)}\\
+\hat{p} &\sim& N\bigg(p, \sqrt{\frac{p(1-p)}{n}} \bigg) \ \ \ \ \ \mbox{ (if the sample size is large enough)}\\
 \end{eqnarray*}
 
 
-We would expect 95% of our $\hat{p}$ values to be within 2 standard deviations of the mean.  That is, 95% of $\hat{p}$ are:
+Notice the slight difference between $SD$ (uses $p$) and $SE$ (uses $\hat{p}$).  We won't make a big deal of the difference here (and indeed, your book calls both equations $SD$).  We would expect 95% of our $\hat{p}$ values to be within 2 standard deviations of the mean.  That is, 95% of $\hat{p}$ are:
 \begin{eqnarray*}
 p \pm 2 \sqrt{\frac{p(1-p)}{n}}
 \end{eqnarray*}
@@ -377,7 +376,7 @@ The example below allows for a comparison between two athletes based on speed an
 
 
 |                      | mean     | std dev  | minimum  |
-|----------------------|----------|----------|----------|
+|:----------------------|:----------|:----------|:----------|
 | Time to run 40 yards | 4.60 sec | 0.15 sec | 4.40 sec |
 | Amount lifted        | 310 lbs  | 25 lbs   | NA       |
 
@@ -392,7 +391,7 @@ This z-score tells us that a player who can lift 370 pounds is lifting 2.4 SDs m
 2. Consider two players, A and B (with data given as below).  Which player should be selected for the team if only one player can be selected?
 
 |                      | Player A | Player B |
-|----------------------|----------|----------|
+|:----------------------|:----------|:----------|
 | Time to run 40 yards | 4.42 sec | 4.57 sec |
 | Amount lifted        | 370 lbs  | 375 lbs  |
 
@@ -428,5 +427,173 @@ xpnorm(-1.333, 0, 1, plot = TRUE)
 ## [1] 0.0912659
 ```
 
+## 2/4/20 Agenda {#Feb4}
+1. Theoretical basis for confidence intervals
+2. $z^*$  (different from Z score!)
+3. Example: extreme poverty
 
-## Confidence Intervals
+## Confidence Intervals {#CI}
+
+### Theoretical set-up
+
+#### Conditions for when the sampling distribution of $\hat{p}$ is nearly normal  (The Central Limit Theorem!!) {-} 
+
+The sampling distribution for $\hat{p}$, taken from a sample of size $n$ from a population with a true proportion $p$, is nearly normal when:
+
+1. the sample observations are independent
+2. we expected to see at least 10 successes and 10 failures in our samples.  Said differently, $np \geq 10$ and $n(1-p) \geq 10$.  This is sometimes called the **success-failure condition**.
+
+If the conditions are met, then the sampling distribution of $\hat{p}$ is nearly normal with mean $p$ and standard error:
+
+$$SE_{\hat{p}} = SE (\hat{p}) = \sqrt{\frac{p(1-p)}{n}}$$
+
+#### How far is $\hat{p}$ from $p$ ???  {-}
+
+Great news, the $SE(\hat{p})$ measures the distance we can expect between $\hat{p}$ from $p$!!!  Indeed, a Z score tells us the distance between $\hat{p}$ from $p$ in units of standard error.
+
+The normal distribution provides **percentages** for how often Z scores should fall in certain ranges.
+
+From the emirical rule, we would expect 95% of our $\hat{p}$ values to be within 2 standard deviations of the mean.  That is, 95% of $\hat{p}$ are:
+\begin{eqnarray*}
+p \pm 2 \sqrt{\frac{p(1-p)}{n}}
+\end{eqnarray*}
+Or put differently, when referring to a randomly selected $\hat{p}$,
+\begin{eqnarray*}
+P\bigg( p - 2 \sqrt{\frac{p(1-p)}{n}} \leq \hat{p} \leq p + 2 \sqrt{\frac{p(1-p)}{n}}\bigg) = 0.95\\
+P\bigg( - 2 \sqrt{\frac{p(1-p)}{n}} \leq \hat{p} - p \leq 2 \sqrt{\frac{p(1-p)}{n}}\bigg) = 0.95\\
+P\bigg(\hat{p} - 2 \sqrt{\frac{p(1-p)}{n}} \leq  p \leq \hat{p} + 2 \sqrt{\frac{p(1-p)}{n}}\bigg) = 0.95
+\end{eqnarray*}
+
+Putting it all together, we create a confidence interval for $p$ which says that 95% of all samples will create confidence intervals that capture the true (unknown $p$):
+
+$$95\% \mbox{ CI for }p:  \hat{p} \pm 1.96 \sqrt{\frac{p(1-p)}{n}}$$
+
+And if a different percentage is needed, change the multiplier appropriately:
+
+####  Confidence Interval Formula {-}
+
+$$\mbox{ CI for }p:  \hat{p} \pm z^* \sqrt{\frac{p(1-p)}{n}}$$
+
+What is $z^*$?  It is defined using the normal distribution which is centered at zero with a standard deviation of one.  
+
+For example, if a 99% confidence interval is desired, find the $z^*$ value that captures 99% of the observations between $-z^*$ and $z^*$.
+
+$$99\% \mbox{ CI for }p:  \hat{p} \pm 2.58 \sqrt{\frac{p(1-p)}{n}}$$
+
+
+```r
+xpnorm(c(-2.58, 2.58), 0, 1, plot = TRUE)
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.004940016 0.995059984
+```
+
+
+####  What does the percentage level *mean*? {-}
+
+A *confidence level* is the long-run percent of intervals that capture the true parameter.
+
+### Example: changes in extreme poverty
+
+#### In-class activity set-up {-}
+
+Recall from the in-class activity:
+
+Some of you may be familiar with Hans Rosling who founded the website https://www.gapminder.org/ and dedicated his life to promoting awareness of global health issues, see his Ted talks here: https://www.ted.com/playlists/474/the_best_hans_rosling_talks_yo.  One question he liked to ask is:
+
+> Has the percentage of the world’s population who live in extreme poverty doubled, halved, or remained about the same over the past twenty years?
+
+* Before you go on, answer the question.  Has the extreme poverty doubled, halved, or remained about the same?  What do you think?
+
+
+>The correct answer is that this percentage has halved, but only 5% of a sample of 1005 U.S. adults in 2017 got this right.  Rosling liked to say that chimpanzees would do better than people: With only three options, we would expect 33.33% of chimpanzees to answer correctly.
+
+* If in fact the students are randomly guessing, how many standard deviations away from the "random guess" value is 0.05?  [Hint:  use proportions and not percentages in your calculations.]
+
+note:  we covered this in class on Tuesday, so it's in the notes, but the formula doesn't show up in your text until the box on page 124 in section 3.1.1.
+
+Do not use the computer here (except as a calculator, and feel free to use a calculator or use the computer / R as a calculator).  Note:  you need to know how many people were asked, look above.
+
+**Solution**
+
+$$SD(\hat{p}) = \sqrt{p(1-p)/n} = \sqrt{(1/3)(2/3)/1005} = 0.0149$$
+
+
+```r
+sqrt((1/3)*(2/3)/1005)
+```
+
+```
+## [1] 0.01486999
+```
+
+How far is 0.05 from (1/3) in units of standard deviation?  That's just a Z score!  Yikes, the 5% value is MORE THAN 19 STANDARD DEVIATIONS BELOW RANDOM GUESSING!!!
+
+
+```r
+Z_p = (0.05 - (1/3)) / sqrt((1/3)*(2/3)/1005)
+Z_p
+```
+
+```
+## [1] -19.05404
+```
+
+
+* What does this say about humans doing so much *worse* than random guessing when answering the question about poverty?  (No hypothesis test here, just a reflection on the distance between the observed data and the random guess answer.)
+
+**Solution**
+
+Not only are humans *wrong*, but they are *wrong* at an extremely high rate.  That is, they are wrong in such a way that they can't possibly be guessing.  There must be something about the question that makes so many people get it wrong (maybe that they are all seeing the same media narrative which describes continued problems with extreme poverty?)
+
+We could find the percent of samples that would have produced such a small $\hat{p}$ if people were indeed random guessing.  Unsurprisingly, the proportion of such samples is exceedingly small:
+
+
+```r
+xpnorm(-19.05, 0, 1, plot=TRUE)
+```
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 3.28511e-81
+```
+
+
+#### Confidence Interval for true population proportion
+
+Given the extreme poverty set-up above, the question turns from one of a hypothesis test to one of a confidence interval.  Note that we are making one more change to the question, we are curious about the proportion of people who think that the rate has doubled.
+
+\begin{eqnarray*}
+p &=& \mbox{true proportion of people who incorrectly believe that the % of the}\\
+&=& \mbox{ world’s population who live in extreme poverty has doubled}\\
+\hat{p} &=& \mbox{sample proportion of people who incorrectly believe that the % of the}\\
+&=& \mbox{ world’s population who live in extreme poverty has doubled}
+\end{eqnarray*}
+
+It turns out that in the sample of 1005 adult Americans, 593 people thought that the rate had doubled.^[see results here: https://www.gapminder.org/ignorance/gms/]
+
+$$\hat{p} = \frac{593}{1005} = 0.59$$
+
+### Modifying CIs {#modCI}
+
+## 2/6/20 Agenda {#Feb6}
+1. Effects of sample size, $p$, and confidence level on CI
+
+
+## 2/11/20 Agenda {#Feb11}
+1. Simple Random Sampling
+2. Biased sampling
+
+## Sampling 
+
+
+## 2/13/20 Agenda {#Feb13}
+1. Type I & Type II errors
+2. Power
+
+## Errors & Power {#errors}
+
