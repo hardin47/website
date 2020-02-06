@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2020-02-03" />
+<meta name="date" content="2020-02-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -159,7 +159,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="2.9" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#Feb6"><i class="fa fa-check"></i><b>2.9</b> 2/6/20 Agenda</a></li>
 <li class="chapter" data-level="2.10" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#Feb11"><i class="fa fa-check"></i><b>2.10</b> 2/11/20 Agenda</a></li>
-<li class="chapter" data-level="2.11" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#sampling"><i class="fa fa-check"></i><b>2.11</b> Sampling</a></li>
+<li class="chapter" data-level="2.11" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#samp"><i class="fa fa-check"></i><b>2.11</b> Sampling</a></li>
 <li class="chapter" data-level="2.12" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#Feb13"><i class="fa fa-check"></i><b>2.12</b> 2/13/20 Agenda</a></li>
 <li class="chapter" data-level="2.13" data-path="foundations-for-inference.html"><a href="foundations-for-inference.html#errors"><i class="fa fa-check"></i><b>2.13</b> Errors &amp; Power</a></li>
 </ul></li>
@@ -631,7 +631,7 @@ Z_{Bstrength} = \frac{375-310}{25} = 2.6\\
 <h4>How far is <span class="math inline">\(\hat{p}\)</span> from <span class="math inline">\(p\)</span> ???</h4>
 <p>Great news, the <span class="math inline">\(SE(\hat{p})\)</span> measures the distance we can expect between <span class="math inline">\(\hat{p}\)</span> from <span class="math inline">\(p\)</span>!!! Indeed, a Z score tells us the distance between <span class="math inline">\(\hat{p}\)</span> from <span class="math inline">\(p\)</span> in units of standard error.</p>
 <p>The normal distribution provides <strong>percentages</strong> for how often Z scores should fall in certain ranges.</p>
-<p>From the emirical rule, we would expect 95% of our <span class="math inline">\(\hat{p}\)</span> values to be within 2 standard deviations of the mean. That is, 95% of <span class="math inline">\(\hat{p}\)</span> are:
+<p>From the empirical rule, we would expect 95% of our <span class="math inline">\(\hat{p}\)</span> values to be within 2 standard deviations of the mean. That is, 95% of <span class="math inline">\(\hat{p}\)</span> are:
 <span class="math display">\[\begin{eqnarray*}
 p \pm 2 \sqrt{\frac{p(1-p)}{n}}
 \end{eqnarray*}\]</span>
@@ -709,16 +709,44 @@ p &amp;=&amp; \mbox{true proportion of people who incorrectly believe that the %
 \end{eqnarray*}\]</span></p>
 <p>It turns out that in the sample of 1005 adult Americans, 593 people thought that the rate had doubled.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <p><span class="math display">\[\hat{p} = \frac{593}{1005} = 0.59\]</span></p>
+<p>A 95% confidence interval for the true proportion of adult Americans who think the rate has doubled is (0.56, 0.62). We are 95% confident that the true proportion of adult Americans who think the extreme poverty rate has doubled is between 0.56 and 0.62.</p>
+<p><span class="math display">\[ \hat{p} \pm 1.96 * \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\]</span></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="dv">593</span><span class="op">/</span><span class="dv">1005</span> <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((<span class="dv">593</span><span class="op">/</span><span class="dv">1005</span>)<span class="op">*</span>(<span class="dv">412</span><span class="op">/</span><span class="dv">1005</span>) <span class="op">/</span><span class="st"> </span><span class="dv">1005</span>)</a></code></pre></div>
+<pre><code>## [1] 0.5596421</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="dv">593</span><span class="op">/</span><span class="dv">1005</span> <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>((<span class="dv">593</span><span class="op">/</span><span class="dv">1005</span>)<span class="op">*</span>(<span class="dv">412</span><span class="op">/</span><span class="dv">1005</span>) <span class="op">/</span><span class="st"> </span><span class="dv">1005</span>)</a></code></pre></div>
+<pre><code>## [1] 0.6204574</code></pre>
 </div>
 </div>
 <div id="modCI" class="section level3">
 <h3><span class="header-section-number">2.8.3</span> Modifying CIs</h3>
+<div id="changing-n" class="section level4 unnumbered">
+<h4>Changing <span class="math inline">\(n\)</span></h4>
+<p>As we can see from the CI formula, increasing <span class="math inline">\(n\)</span> has the effect of <strong>decreasing</strong> the width of the CI.</p>
+<p><span class="math display">\[ \hat{p} \pm 1.96 * \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\]</span></p>
+</div>
+<div id="changing-p" class="section level4 unnumbered">
+<h4>Changing <span class="math inline">\(p\)</span></h4>
+<p>A different value of <span class="math inline">\(p\)</span> means that the sampling distribution will have a different center (and a different SE), but the coverage rate will not change, and the SE probably won’t change very much.</p>
+</div>
+<div id="changing-the-confidence-level" class="section level4 unnumbered">
+<h4>Changing the confidence level</h4>
+<p>The choice of <span class="math inline">\(z^*\)</span> determines (over, say, your lifetime as a scientist) the percent of your research confidence intervals that will capture the true parameter of interest. Note that the larger the <span class="math inline">\(z^*\)</span> value, the more likely it is that a sample will produce a CI which captures the true parameter.</p>
+<p>Note that <span class="math inline">\(z^* = 1.645\)</span> produces CIs that capture at a 90% rate. <span class="math inline">\(z^* = 2.58\)</span> produces CIs that capture at a 99% rate.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">xpnorm</span>(<span class="fl">1.645</span>, <span class="dv">0</span>, <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="02-FoundInf_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 0.9500151</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw">xpnorm</span>(<span class="fl">2.58</span>, <span class="dv">0</span>, <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="02-FoundInf_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 0.99506</code></pre>
+</div>
 </div>
 </div>
 <div id="Feb6" class="section level2">
 <h2><span class="header-section-number">2.9</span> 2/6/20 Agenda</h2>
 <ol style="list-style-type: decimal">
+<li>Putting together all the pieces of the CI</li>
 <li>Effects of sample size, <span class="math inline">\(p\)</span>, and confidence level on CI</li>
+<li>What is the confidence level?</li>
 </ol>
 </div>
 <div id="Feb11" class="section level2">
@@ -728,7 +756,7 @@ p &amp;=&amp; \mbox{true proportion of people who incorrectly believe that the %
 <li>Biased sampling</li>
 </ol>
 </div>
-<div id="sampling" class="section level2">
+<div id="samp" class="section level2">
 <h2><span class="header-section-number">2.11</span> Sampling</h2>
 </div>
 <div id="Feb13" class="section level2">
