@@ -599,6 +599,14 @@ $$ \hat{p} \pm 1.96 * \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$
 ## [1] 0.6204574
 ```
 
+Question: Survey researchers typically select only one random sample from a population, and then they produce a confidence interval based on that sample.How do we know whether the resulting confidence interval is successful in capturing the unknown value of the population parameter?  
+
+Answer: we don't know!  We never know if the interval actually captures the parameter or not.  We just know that over our lifetime as scientists, we will capture at the rate we set.
+
+Question: If we can’t know for sure whether the confidence interval contains the value of the population parameter, on what grounds can we be confident about this?
+
+Answer: well, we agree about the **process** that created the CI.  
+
 ### Modifying CIs {#modCI}
 
 #### Changing $n$ {-}
@@ -638,6 +646,10 @@ xpnorm(2.58, 0, 1)
 ## [1] 0.99506
 ```
 
+Question:  why don't we always use 99.99% CIs?
+
+Answer:  because the intervals would typically be too wide to provide any real information about the actual population parameter.
+
 ## 2/6/20 Agenda {#Feb6}
 1. Putting together all the pieces of the CI
 2. Effects of sample size, $p$, and confidence level on CI
@@ -650,6 +662,7 @@ xpnorm(2.58, 0, 1)
 2. Biased sampling
 
 ## Sampling {#samp}
+
 
 
 ## 2/13/20 Agenda {#Feb13}
