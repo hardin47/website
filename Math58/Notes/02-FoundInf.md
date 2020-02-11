@@ -663,7 +663,7 @@ Answer:  because the intervals would typically be too wide to provide any real i
 
 ## Sampling {#samp}
 
-### Example: aliens on Earth
+### Example: aliens on Earth^[From Allan Rossman: https://askgoodquestions.blog/2019/10/07/14-how-confident-are-you-part-1/]
 
 
 Assume that an alien has landed on Earth and wants to understand the gender diversity of humans.  Fortunately, the alien took a good statistics course on its home planet, so it knows to take a sample of human beings and produce a confidence interval for this proportion.  Unfortunately, the alien happens upon the 2019 US Senate as its sample of human beings.  The US Senate has 25 senators who self-identify as having a female gender (its most ever!) among its 100 members in 2019.
@@ -672,11 +672,17 @@ a) Calculate the alien’s 95% confidence interval. (uh... confidence interval f
 
 This calculation becomes .25 $\pm$ .085, which is the interval (.165 $\rightarrow$ .335).
 
-b) Interpret the interval.  The alien would be 95% confident that the proportion of all humans on earth who self identify as female is between .165 and .335.
+b) Interpret the interval.  
 
-c) Is this consistent with your experience living on this planet?  No, the actual proportion of humans who self identify as female is much larger than this interval, closer to 0.5.
+The alien would be 95% confident that the proportion of all humans on earth who self identify as female is between .165 and .335.
 
-d) What went wrong?  The alien did not select a random sample of humans.  In fact, the alien’s sampling method was very biased toward under-representing self-identifying females.
+c) Is this consistent with your experience living on this planet?  
+
+No, the actual proportion of humans who self identify as female is much larger than this interval, closer to 0.5.
+
+d) What went wrong?  
+
+The alien did not select a random sample of humans.  In fact, the alien’s sampling method was very biased toward under-representing self-identifying females.
 
 e) As we saw with the applet, about 5% of all 95% confidence intervals fail to capture the actual value of the population parameter.  Is that the explanation for what went wrong here?  
 
@@ -690,7 +696,7 @@ Confidence intervals are not appropriate when the data were collected with a bia
 
 Confidence intervals are not appropriate when you have access to the entire population of interest.  In this unusual and happy circumstance, you should simply describe the population.
 
-### Example: Gettysburg Address (taken from Inv 1.12, @iscam)
+### Example: Gettysburg Address^[From Inv 1.12, @iscam]
 
 > The authorship of literary works is often a topic for debate. Were some of the works attributed to Shakespeare actually written by Bacon or Marlowe? Which of the anonymously published Federalist Papers were written by Hamilton, which by Madison, which by Jay? Who were the authors of the writings contained in the Bible? The fields of “literary computing” and “forensic stylometry” examine ways of numerically analyzing authors’ works, looking at variables such as sentence length and rates of occurrence of specific words.
 
