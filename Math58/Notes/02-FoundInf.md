@@ -206,7 +206,7 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 ### Central Limit Therm {#CLT}
 
 
-#### Example: Reese's Pieces {-}
+#### Example: Reese's Pieces^[Inv 1.8, Chance & Rossman, ISCAM] {-}
 
 As with many of the examples, the Reese's Pieces example comes from @iscam.  The example focuses on how the samples of orange Reese's Pieces vary from sample to sample.  Today we aren't particularly interested in a specific research question, instead we are trying to understand the details of the model which describes how $\hat{p}$ varies from sample to sample.  [Spoiler: the distribution is going to look like a bell!  and the mathematical model which describes the variability is called the normal distribution.]
 
@@ -721,7 +721,7 @@ The in-class samples are again centered around 4.29 letters, but they are less v
 
 **convenience sample** where individuals who are easily accessible are more likely to be included in the sample. For instance, if a political survey is done by stopping people walking in the Bronx, it will not represent all of New York City. It is often difficult to discern what sub-population a convenience sample represents.
 
-**simple random sample**  equivalent to using a rafflee to select cases. This means that each case in the population has an equal chance of being included and there is no implied connection between the cases in the sample.
+**simple random sample**  equivalent to using a raffle to select cases. This means that each case in the population has an equal chance of being included and there is no implied connection between the cases in the sample.
 
 A **sampling distribution** is the distribution of all possible values of the *statistic* in all possible samples of the same size from the same population.
 
@@ -732,12 +732,71 @@ A **sampling distribution** is the distribution of all possible values of the *s
 ## 2/13/20 Agenda {#Feb13}
 1. Type I & Type II errors
 2. Power
+3. CI and HT together
 
 ## Errors & Power {#errors}
 
+* The *significance level*, $\alpha$, is a probability used as a criterion for rejecting the null hypothesis.  If the p-value for a test is less than or equal to $\alpha$, then the null hypothesis is rejected.  If the p-value is greater than $\alpha$, then the null hypothesis is not rejected.  **The significance level is a number calculated before the experiment  is run and not based on the dataset.**  (Often the significance level is set by the journal or granting agency.)
+
+* The *rejection region* is the values of the statistic we would need to be able to reject $H_0$. 
+
+*  A *type I error* is rejecting a true null hypothesis.  The significance level $\alpha$ sets the probability of committing a type I error.
+
+*  A *type II error* is failing to reject a false null hypothesis. 
+
+* The *power* of a test is the probability that a random sample will lead to rejection of a false null hypothesis.
+
+|      |                      |     Truth    |               |
+|------|----------------------|:------------:|:-------------:|
+|      |                      |  $H_0$ true  |   $H_A$ true  |
+| Test | Reject $H_0$         | type I error |    😄   |
+|      | Fail to reject $H_0$ |   😄  | type II error |
+
+
+### Example: baseball player^[Inv 1.7, Chance & Rossman, ISCAM] 
+
+The following example is taken from @iscam, and is used to explain many of the most important and nuanced ideas related to the structure of hypothesis testing.  I will provide the basic idea here, but you are encouraged to go to the applet on your own to convince yourself that the idea is true and that you understand why the idea is true.  http://www.rossmanchance.com/applets/power.html
+
+**Set-up:**  Assume that you are a manager of a professional baseball team.  One of your players has (for many years) been a 0.250 hitter.  That means every time he goes up to bat he has a 1 in 4 chance of hitting the ball (baseball aficionados may want to talk about baseball errors at this point, but we won't be mentioning baseball errors in today's example).
+
+Your player tells you that he has been working extremely hard over the off-season and has improved to become a 0.333 hitter.  That is, he now believes that every time he goes up to bat he has a 1 in 3 chance of hitting the ball. 
+
+You may be aware that profession baseball players who are good make a lot of money.  And an increase from hitting the ball 1 in 4 tries to 1 in 3 tries is worth many millions of dollars.  Of course, your player is trying to convince you that he is now worth many additional millions of dollars and should be paid accordingly.
+
+What should you do?  Well, you need him to convince you that he has, indeed, improved.
+
+Before we get started, we'll just ask one of our usual questions:  what is the parameter of interest?
+
+$p$ = baseball players **current** probability of hitting the ball
+
+###  Errors: lessons learned 
+
+You are encouraged to go to the applet on your own to convince yourself that  you understand why the ideas below are true.  http://www.rossmanchance.com/applets/power.html
+
+**What are the Type I and Type II errors/**  A Type I error means the manager became convinced the player is better than a 0.250 hitter but in reality he is just still a 0.250 hitter.  A Type II error means the player has improved but does not do well enough in his 20 at-bats to convince the manager.
+
+**Who is worried about which type of error?**  Player would like to minimize the probability of a Type II error – of the manager missing his improvement.  The manager would like to minimize the probability of a Type I error – incorrectly thinking the player has improved
+
+**What factors impact power? And how?**
+
+* Increasing sample size increases power.  As the sample size increases, the distribution of the sample proportion gets more narrow (the SE decreases).  The SE decrease means that the null and alternative curves overlap less.  You will always have the ability to take more observations, although it might be extremely expensive or time consuming to measure more data.
+
+* Increasing the significance level $\alpha$ will increase the power.  Ideally, the probabilities of both types of errors would be small, but unfortunately they are inversely related: as one error probability decreases, the other increases (unless other factors change also). What’s typically done in practice is to set the maximum allowable probability of Type I error in advance by setting the level of significance $\alpha$, the most common value is 0.05, followed by 0.10 and 0.01, and then determine the sample size necessary for the probability of a Type II error to be below a specific value.
+
+* Increasing the distance between the null and alternative will increase the power.  Unfortunately, you have very little control over the alternative value.  Your science will determine the alternative (in this case, the baseball player's ability determined his alternative value).  The better your science (i.e., the more non-null) it is, the better your chances are of convincing your audience (i.e., publishing) that your results are interesting.  (Consider this:  it is much easier to convince someone that 8th graders are taller, on average, than kindergartners than it is to convince someone that 1st graders are taller, on average than kindergartners.)
+
+**Why does the Type I error rate double if we consider two sides?**
+
+* Consider the situation where the null hypothesis really is true.  And you wait to make your alternative hypothesis until after you've seen the data.  You choose your rejection region to be the 5% tail region on **one** side.  You reject if the observed statistic is in that tail (reminder: in this example the null hypothesis is really true!).  Well, instead of making a Type I error 5% of the time, the process described above actually makes a "rejection" 10% of the time!
+
+**If a CI for $p$ does not overlap a particular number, why is it consistent with rejecting a null HT for that value of $p$?**
+
+* If a 95% CI does not overlap $p$  (for example, p=0.47), then $p$ and $\hat{p}$ are more than 1.96 SEs away from each other.  If $p$ and $\hat{p}$ are more than 1.96 SEs away from each other, then the Z score associate with $\hat{p}$ is larger (in absolute value) than 1.96 (by definition of the Z score!).  If the Z score is larger (in absolute value) than 1.96, then the two-sided p-value will be less than 0.05.
+
+
 <!--
 
-i took my dog to the vet to see if she had eaten anything she shouldn't have.  the vet took an x-ray and said "I do not see anythign foreign in her body, but that does not mean there is no foreign object eaten."  
+i took my dog to the vet to see if she had eaten anything she shouldn't have.  the vet took an x-ray and said "I do not see anything foreign in her body, but that does not mean there is no foreign object eaten."  
 
 we cannot accept the null.
 
