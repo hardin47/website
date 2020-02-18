@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-02-13"
+date: "2020-02-17"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -42,3 +42,5 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | 2/6/20	| Confidence Intervals | ISRS 2.8 |  \@ref(Feb6) [Feb6], \@ref(modCI)  [modifying CI] 
 | 2/11/20	| Sampling | ISRS 1.3-1.4 |  \@ref(Feb11) [Feb11], \@ref(samp)  [sampling] |
 | 2/13/20	| Errors & Power | ISRS 3.1 & 2.3 |  \@ref(Feb13) [Feb13], \@ref(errors) [Errors&Power] 
+| 2/18/20	| 58: Binomial distrib, 58B: RR & OR | ISCAM Chp 1 |  \@ref(Feb18M58) [Feb18 M58], \@ref(Feb18M58B) [Feb18 M58B] |
+| 2/20/20	| 58: Binomial Power, 58B: CIs for RR & OR| ISCAM 3.9-3.11 |  \@ref(Feb20M58) [Feb20 M58], \@ref(Feb20M58B) [Feb20 M58B]
