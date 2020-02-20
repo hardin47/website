@@ -781,6 +781,49 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 <blockquote>
 <p>Conclusions. Few clinical predictors could enhance the ability to predict which patients with pneumonia would have MERS-CoV. However, further prospective analysis and matched case-control studies may shed light on other predictors of infection.</p>
 </blockquote>
+<p>Consider the results above on diabetes. Of 17 cases, 13 had diabetes; of 82 controls, 35 had diabetes. So the data can be summarized as follows:</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1">MERSCoV &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">coronov =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;case&quot;</span>, <span class="dv">17</span>), <span class="kw">rep</span>(<span class="st">&quot;control&quot;</span>, <span class="dv">82</span>)),</a>
+<a class="sourceLine" id="cb69-2" data-line-number="2">                      <span class="dt">diab =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">13</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">4</span>), </a>
+<a class="sourceLine" id="cb69-3" data-line-number="3">                               <span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">35</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">47</span>)))</a>
+<a class="sourceLine" id="cb69-4" data-line-number="4"><span class="kw">table</span>(MERSCoV)</a></code></pre></div>
+<pre><code>##          diab
+## coronov   hasdiab nodiab
+##   case         13      4
+##   control      35     47</code></pre>
+<div id="ci-for-95-or" class="section level4 unnumbered">
+<h4>CI for 95% OR</h4>
+<p>As with the calculations above, we can find a CI for the true OR of diabetes for those with MRES-CoV and those without.</p>
+<p>We are 95% confident that the true odds of diabetes are between 1.31 times and 14.5 times higher for those with CoV than those without. Note that the results calculated here do not match with the results in the paper. It isn’t clear whether they did something different (possibly adjusting for other covariates) or whether there is a typo in their results.</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">4</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
+<pre><code>## [1] 4.364286</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
+<pre><code>## [1] 0.6138168</code></pre>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="kw">xqnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">plot=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<pre><code>## [1] 1.959964</code></pre>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
+<pre><code>## [1] 0.2703735</code></pre>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
+<pre><code>## [1] 2.676536</code></pre>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<pre><code>## [1] 1.310454</code></pre>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<pre><code>## [1] 14.53465</code></pre>
+<p>Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by <span class="math inline">\(\hat{OR}\)</span> = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
+<pre><code>## [1] 7.242857</code></pre>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
+<pre><code>## [1] 0.7944404</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<pre><code>## [1] 1.526401</code></pre>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<pre><code>## [1] 34.36776</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-10"></span>
+<img src="figs/CoV.jpg" alt="Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`" width="909" />
+<p class="caption">
+Figure 3.1: Al-Tawfig et al. <code>Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients</code>
+</p>
+</div>
+</div>
 </div>
 </div>
 <div id="Feb25" class="section level2">
@@ -832,6 +875,7 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 <ol start="8">
 <li id="fn8"><p>Inv 3.10, Chance &amp; Rossman, ISCAM<a href="inference-for-categorical-data.html#fnref8" class="footnote-back">↩</a></p></li>
 <li id="fn9"><p>“Tobacco Smoking as a Possible Etiologic Factor in Bronchiogenic Cancer,” 1950, Journal of the American Medical Association<a href="inference-for-categorical-data.html#fnref9" class="footnote-back">↩</a></p></li>
+<li id="fn10"><p>Jaffar A. Al-Tawfiq, Kareem Hinedi, Jihad Ghandour, Hanan Khairalla, Samir Musleh, Alaa Ujayli, Ziad A. Memish, Clinical Infectious Diseases, Volume 59, Issue 2, 15 July 2014, Pages 160–165, <a href="https://doi.org/10.1093/cid/ciu226" class="uri">https://doi.org/10.1093/cid/ciu226</a><a href="inference-for-categorical-data.html#fnref10" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
             </section>

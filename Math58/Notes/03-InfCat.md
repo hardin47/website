@@ -529,8 +529,7 @@ Note 5: $RR \approx OR$ if RR is very small (the denominator of the OR will be v
 
 The following study is a case-control study, so it is impossible to estimate the proportion of cases in the population.  However, you will notice that the authors don't try to do that.  They flip the explanatory and response variables so that the case status is predicting all of the other clinical variables.  In such a setting, the authors would have been able to present relative risk estimates, but they still chose to provide odds ratios (possibly because odds ratios are somewhat standard in the medical literature).
 
-Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients^[ 
-Jaffar A. Al-Tawfiq, Kareem Hinedi, Jihad Ghandour, Hanan Khairalla, Samir Musleh, Alaa Ujayli, Ziad A. Memish, Clinical Infectious Diseases, Volume 59, Issue 2, 15 July 2014, Pages 160–165, https://doi.org/10.1093/cid/ciu226]
+Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients^[Jaffar A. Al-Tawfiq, Kareem Hinedi, Jihad Ghandour, Hanan Khairalla, Samir Musleh, Alaa Ujayli, Ziad A. Memish, Clinical Infectious Diseases, Volume 59, Issue 2, 15 July 2014, Pages 160–165, https://doi.org/10.1093/cid/ciu226]
 
 > Background. There is a paucity of data regarding the differentiating characteristics of patients with laboratory-confirmed and those negative for Middle East respiratory syndrome coronavirus (MERS-CoV).
 
@@ -540,6 +539,128 @@ Jaffar A. Al-Tawfiq, Kareem Hinedi, Jihad Ghandour, Hanan Khairalla, Samir Musle
 
 > Conclusions. Few clinical predictors could enhance the ability to predict which patients with pneumonia would have MERS-CoV. However, further prospective analysis and matched case-control studies may shed light on other predictors of infection.
 
+Consider the results above on diabetes.  Of 17 cases, 13 had diabetes; of 82 controls, 35 had diabetes.  So the data can be summarized as follows:
+
+
+```r
+MERSCoV <- data.frame(coronov = c(rep("case", 17), rep("control", 82)),
+                      diab = c(rep("hasdiab", 13), rep("nodiab", 4), 
+                               rep("hasdiab", 35), rep("nodiab", 47)))
+table(MERSCoV)
+```
+
+```
+##          diab
+## coronov   hasdiab nodiab
+##   case         13      4
+##   control      35     47
+```
+
+####  CI for 95% OR {-}
+
+As with the calculations above, we can find a CI for the true OR of diabetes for those with MRES-CoV and those without.
+
+We are 95% confident that the true odds of diabetes are between 1.31 times and 14.5 times higher for those with CoV than those without.  Note that the results calculated here do not match with the results in the paper.  It isn't clear whether they did something different (possibly adjusting for other covariates) or whether there is a typo in their results.
+
+
+
+```r
+(ORhat = (13/4)/(35/47))
+```
+
+```
+## [1] 4.364286
+```
+
+```r
+(SE_lnOR = sqrt( 1/13 + 1/4 + 1/35 + 1/47))
+```
+
+```
+## [1] 0.6138168
+```
+
+```r
+xqnorm(0.975, 0, 1, plot=FALSE)
+```
+
+```
+## [1] 1.959964
+```
+
+```r
+log(ORhat) - 1.96 * SE_lnOR
+```
+
+```
+## [1] 0.2703735
+```
+
+```r
+log(ORhat) + 1.96 * SE_lnOR
+```
+
+```
+## [1] 2.676536
+```
+
+```r
+exp(log(ORhat) - 1.96 * SE_lnOR)
+```
+
+```
+## [1] 1.310454
+```
+
+```r
+exp(log(ORhat) + 1.96 * SE_lnOR)
+```
+
+```
+## [1] 14.53465
+```
+
+
+Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by $\hat{OR}$ = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).
+
+
+
+```r
+(ORhat = (13/2)/(35/39))
+```
+
+```
+## [1] 7.242857
+```
+
+```r
+(SE_lnOR = sqrt( 1/13 + 1/2 + 1/35 + 1/39))
+```
+
+```
+## [1] 0.7944404
+```
+
+```r
+exp(log(ORhat) - 1.96 * SE_lnOR)
+```
+
+```
+## [1] 1.526401
+```
+
+```r
+exp(log(ORhat) + 1.96 * SE_lnOR)
+```
+
+```
+## [1] 34.36776
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/CoV.jpg" alt="Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`" width="909" />
+<p class="caption">(\#fig:unnamed-chunk-10)Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`</p>
+</div>
 
 ## 2/25/20 Agenda {#Feb25}
 1. Difference in Proportion HT
