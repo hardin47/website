@@ -53,8 +53,8 @@ Solution:  1.B, 2.C, 3.B, 4.C, 5.A
 
 
 \begin{eqnarray*}
-P(X=x) &=& {n \choose x} p^x (1-p)^{n-x}\\
-{n \choose x} &=& \frac{ n!}{(n-x)! x!}
+P(X=k) &=& {n \choose k} p^k (1-p)^{n-k}\\
+{n \choose k} &=& \frac{ n!}{(n-k)! k!}
 \end{eqnarray*}
 
 In our example... $n=5$.  How many ways are there to get 2 successes?
@@ -73,9 +73,9 @@ The numerator represents the number of possibilities for each of the 5 questions
 In class: different groups work out the probability of 0, 1, 2, ... 5 correct answers.
 
 \begin{eqnarray*}
-P(X=0) = {5 \choose 0} (.2)^0(.8)^5  = 0.3277 && P(X=3) = {5 \choose 3} (.2)^3(.8)^2  = 0.0512\\
-P(X=1) = {5 \choose 1} (.2)^1(.8)^4  = 0.4096 && P(X=4) = {5 \choose 4} (.2)^4(.8)^1  = 0.0064\\
-P(X=2) = {5 \choose 2} (.2)^2(.8)^3  = 0.2048 && P(X=5) = {5 \choose 5} (.2)^5(.8)^0  = 0.0003\\
+P(X=0) = {5 \choose 0} (0.25)^0(0.75)^5  = 0.2373 && P(X=3) = {5 \choose 3} (0.25)^3(0.75)^2  = 0.0879\\
+P(X=1) = {5 \choose 1} (0.25)^1(0.75)^4  = 0.3955 && P(X=4) = {5 \choose 4} (0.25)^4(0.75)^1  = 0.0146\\
+P(X=2) = {5 \choose 2} (0.25)^2(0.75)^3  = 0.2637 && P(X=5) = {5 \choose 5} (0.25)^5(0.75)^0  = 0.0010\\
 \end{eqnarray*}
 
 
@@ -101,6 +101,103 @@ xpbinom(3, size = 5, prob = 0.25)  # P(X <= 3) vs. P(X > 3)
 ## [1] 0.984375
 ```
 
+### Binomial Hypothesis Testing
+
+Consider the example from the beginning of the semester on babies choosing the helper toy (instead of the hinderer), section \@ref(ex:helper).  Recall that 14 of the 16 babies chose the helper toy.
+
+Does the binomial distribution apply to this setting?  Let's check:
+
+* two choices?  Yes, helper or hinderer.
+* fixed $n$?  Yes, there were 16 babies.
+* $p$ same?  Presumably.  There is some inherent $p$ which represents the probability that a baby would choose a helper toy.  And we are choosing babies from a population with that $p$.
+* independent?  I hope so!  These babies don't know each other or tell each other about the experiment.
+
+If there really had been no inclination of the babies to choose the helper toy, how many babies would the researchers have needed to choose the helper in order to get published?
+
+Let's choose $\alpha = 0.01$.  That means that if $p=0.5$, then we should make a Type I error less than 1% of the time.  From the calculations below, we see that the rejection region is $\{ X \geq 14 \}$.  That is, for the researchers to reject the null hypothesis at the $\alpha = 0.01$ significance level, they would have needed to see 14, 15, or 16 babies choose the helper (out of 16).
+
+P(X \geq 12) = {16 \choose 12} (0.5)^{12}(0.5)^{4} + 0.0106 = 0.0384
+P(X \geq 13) = {16 \choose 13} (0.5)^{13}(0.5)^{3} + 2.09e-03 = 0.0106
+P(X \geq 14) = {16 \choose 14} (0.5)^{14}(0.5)^{2} + 2.59e-04 = 2.09e-03
+P(X \geq 15) = {16 \choose 15} (0.5)^{15}(0.5)^{1} + 1.53e-05 = 2.59e-04
+P(X = 16) = {16 \choose 16} (0.5)^{16}(0.5)^{0} = 1.53e-05
+
+
+```r
+xpbinom(12, 16, 0.5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.9893646
+```
+
+```r
+xpbinom(13, 16, 0.5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.9979095
+```
+
+### Binomial Power
+
+Let's say that the researchers had an inkling that babies liked helpers.  But they thought that probably only about 70% of babies preferred helpers.  The researchers then needed to decide if 16 babies was enough for them to do their research.  That is, if they only measure 16 babies, will they have convincing evidence that babies actually prefer the helper?  Said differently, with 16 babies, what is the power of the test?
+
+\begin{eqnarray*}
+\mbox{power} &=& P(X \geq 14 | p = 0.7)\\
+&=& P(X=14 | p=0.7) + P(X = 15 | p=0.7)  + P(X = 16 | p=0.7)\\
+&=& {16 \choose 14} (0.7)^{14}(0.3)^{2} + {16 \choose 15} (0.7)^{15}(0.3)^{1} + {16 \choose 16} (0.7)^{16}(0.3)^{0}\\
+&=& 0.099
+\end{eqnarray*}
+
+Yikes!  What if babies actually prefer the helper 90% of the time?
+
+$$\mbox{power} = P(X \geq 14 | p = 0.9) = 0.789$$
+
+
+```r
+1 - xpbinom(13, 16, 0.7)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.09935968
+```
+
+```r
+1 - xpbinom(13, 16, 0.9)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-3-2.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.7892493
+```
+
+
+### Binomial Confidence Intervals for $p$
+
+The binomial distribution does not allow for the "plus or minus" creation of a range of plausible values for the confidence interval.  Instead, hypothesis testing is used directly to come up with plausible values for the parameter $p$.  The method outlines below is much more tedious than the z - CI , but it does produce an exact interval for $p$ with the appropriate coverage level.
+
+
+Consider a confidence interval created in the following way:
+
+* Step 1: Collect data, calculate $\hat{p}$ for that particular dataset.
+* Step 2: Test a series of values for $p'$ using the observed $\hat{p}$ from the dataset at hand.
+* Step 3: List all the values for $p'$ that were not rejected.  Sort them and find the smallest and biggest value:  ($p_{small}, p_{big}$).
+
+Ask yourself whether the **true** parameter (let's call it $p$) is in the interval.  
+
+* If a type I error was made when $p$ was tested, then $p$ is not in the interval.
+* If $p$ was not rejected, then it is in the interval.
+
+How often will a type I error be made?  5% of the time.  Therefore ($p_{small}, p_{big}$) is a 95% CI for the true population parameter $p$.
+
 ## 2/18/20 Math 58B Agenda {#Feb18M58B}
 0. Math 58B Only
 1. Relative Risk
@@ -125,7 +222,7 @@ In particular, interest is in the ratio of probabilities.  [Note: the decision t
 
 $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}$$
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-2"><strong>(\#def:unnamed-chunk-2) </strong></span>**Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."</div>\EndKnitrBlock{definition}
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>**Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."</div>\EndKnitrBlock{definition}
 
 ### Inference on Relative Risk 
 
@@ -166,7 +263,7 @@ $$\mbox{odds} = \frac{\mbox{number of successes}}{\mbox{number of failures}}$$
 $$\mbox{Odds Ratio (OR)} = \frac{\mbox{odds of success in group 1}}{\mbox{odds of success in group 2}}$$
 
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-3"><strong>(\#def:unnamed-chunk-3) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-5"><strong>(\#def:unnamed-chunk-5) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
 
 
 ### Example: Smoking and Lung Cancer^[Inv 3.10, Chance & Rossman, ISCAM] 
@@ -210,7 +307,7 @@ RR &=& \frac{583/1159}{22/226} = 5.17\\
 OR &=& \frac{583/576}{22/204} = 9.39\\
 \end{eqnarray*}
 
-The risk of lung cancer is 5.17 times higher for those who heavy smoke than for those who don't smoke.
+<strike>The risk of lung cancer is 5.17 times higher for those who heavy smoke than for those who don't smoke.</strike>
 
 The odds of lung cancer is 9.39 times higher for those who heavy smoke than for those who don't smoke.
 
@@ -441,8 +538,20 @@ Jaffar A. Al-Tawfiq, Kareem Hinedi, Jihad Ghandour, Hanan Khairalla, Samir Musle
 > Conclusions. Few clinical predictors could enhance the ability to predict which patients with pneumonia would have MERS-CoV. However, further prospective analysis and matched case-control studies may shed light on other predictors of infection.
 
 
+## 2/25/20 Agenda {#Feb25}
+1. Difference in Proportion HT
+2. Difference in Proportion CT
+
 ## Difference of two proportions {#diffprop}
 
+## 2/27/20 Agenda {#Feb27}
+1. Observational Studies
+2. Experiments
 
+## Experiments
+
+## 3/3/20 Agenda {#Mar3}
+1. More than two proportions
+2. Chi-square analysis
 
 

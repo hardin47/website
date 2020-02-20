@@ -90,7 +90,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 </div>
 
 
-## Example: Friend or Foe
+## Example: Friend or Foe {#ex:helper}
 
 This example comes from Investigation 1.1: Friend or Foe? @iscam.  The idea is to use simulation to determine how likely our data would be if nothing interesting was going on.
 
