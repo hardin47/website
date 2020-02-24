@@ -41,6 +41,7 @@ The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the a
        * `n_distinct(x)`: count the number of unique values in the varaible (column) called `x`
        * `first_value(x), last_value(x)` and `nth_value(x, n)`: work similarly to `x[1], x[length(x)]`, and `x[n]` 
 
+* If you happen to be using a function that exists in `dplyr` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `dplyr::filter()`.
 
 ## Plotting
 
@@ -57,6 +58,8 @@ The R package `ggplot2` will be used for all visualizations.  Remember that the 
     * `geom_XXX` will put the `XXX`-type-of-plot onto the graph.
     * `aes` is the function which takes the **data columns** and puts them onto the graph.  `aes` is used only with data columns and you *always* need it if you are working with data variables.
     * A full set of types of plots is given here: https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf (and in many other places online).
+
+* If you happen to be using a function that exists in `ggplot2` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `ggplot2::xlim()`.
 
 
 ## Statistical Inference
@@ -110,13 +113,18 @@ nullstats %>%
 ```
 
 </ul>
+</ul>
+
+* If you happen to be using a function that exists in `infer` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `infer::specify()`.
+
 
 ##  Probability models
 
 Generally, we've used the `mosaic` package which calculates probabilities **and** adds a graphical representation so that the calculated values can be checked against your intuition.  Some of the functions we've used include:
 
 * `xpnorm` normal probabilities
-* `xqnorm` normal quantiles
+* `xqnorm` normal quantiles (cutoffs, z*)
 * `xpbinom` binomial probabilities
 
+* If you happen to be using a function that exists in `mosaic` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `mosaic::xpnorm()`.
 
