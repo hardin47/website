@@ -11,9 +11,21 @@ To help us navigate / remember when to use what, the following sections consolid
 
 * In Math 58B we also use the RR/OR applet by Ken Kleinman at: https://kenkleinman.shinyapps.io/odds-tool/
 
+## Data Structure
+
+Always, it is important to understand the format of the data.  For example, how many rows (observational units)?  How many columns (variables)?  Are the variables numbers or categories?  There are many ways to see the data, and it is highly recommended that you **regularly** check back to remind yourself of the data structure.
+
+* `glimpse()`  prints the data with variable types (but makes the columns into rows)
+* `names()` prints the column (variable) names
+* `str()`  is like `glimpse()` but provides a little more information about the structure of the dataframe
+* `head()` prints the first few rows of the dataframe  (`tail()` prints the last few rows)
+* click on the "environment" tab, then click on the name of the dataframe to see the data in the console
+
+
+
 ## Wrangling
 
-Data wrangling is used when working to change data in one format to another.  We have regularly used the pipe function (`%>%`) to layer commands.  Data wranging will be an even bigger part of the data analysis pipeline when we start to work with continuous variables (e.g., height).
+Data wrangling is used when working to change data in one format to another.  We have regularly used the pipe function (`%>%`) to layer commands.  Data wrangling will be an even bigger part of the data analysis pipeline when we start to work with continuous variables (e.g., height).
 
 The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the argument of a function.  The mapping goes to the first available argument in the function.  For example:
 
@@ -38,7 +50,7 @@ The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the a
     *  `summarize()`  collapses a data frame to a single row.  Some functions that are used within `summarize()` include:
        * `min(), max(), mean(), sum(), sd(), median()`, and `IQR()`
        * `n()`: number of observations in the current group
-       * `n_distinct(x)`: count the number of unique values in the varaible (column) called `x`
+       * `n_distinct(x)`: count the number of unique values in the variable (column) called `x`
        * `first_value(x), last_value(x)` and `nth_value(x, n)`: work similarly to `x[1], x[length(x)]`, and `x[n]` 
 
 * If you happen to be using a function that exists in `dplyr` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `dplyr::filter()`.
@@ -122,9 +134,9 @@ nullstats %>%
 
 Generally, we've used the `mosaic` package which calculates probabilities **and** adds a graphical representation so that the calculated values can be checked against your intuition.  Some of the functions we've used include:
 
-* `xpnorm` normal probabilities
-* `xqnorm` normal quantiles (cutoffs, z*)
-* `xpbinom` binomial probabilities
+* `xpnorm` normal probability
+* `xqnorm` normal quantile (also called: cutoff, z*)
+* `xpbinom` binomial probability
 
 * If you happen to be using a function that exists in `mosaic` and in a different package, you'll want to tell the computer to use the appropriate function.  For example, `mosaic::xpnorm()`.
 
