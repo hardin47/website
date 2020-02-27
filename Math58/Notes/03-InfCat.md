@@ -871,7 +871,7 @@ Random sampling and random allocation are **VERY DIFFERENT** concepts!  And most
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="80%" />
+<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="1901" />
 <p class="caption">(\#fig:randSleuth)Random Sample vs Randomized Experiment, taken from @sleuth</p>
 </div>
 
