@@ -889,9 +889,9 @@ In an ideal world, every study would have participants who were randomly sampled
 
 ## 3/3/20 Agenda {#Mar3}
 1. More than two proportions
-2. Chi-square test
+2. Chi-square goodness-of-fit test
 
-## One categorical variable ($\chi^2$ test) $\geq$ 2 levels {#chisq1}
+## Goodness-of-fit: One categorical variable ($\chi^2$ test) $\geq$ 2 levels {#chisq1}
 
 When testing a null hypothesis of a pre-specified set of proportions (or probabilities) across $K$ categories
 
@@ -994,14 +994,34 @@ H_A: && \mbox{ not the distribution in } H_0
 ## [1] 0.172959
 ```
 
+### How could we simulate power? {-}
+
+Consider the flax seed example,  As with the household ages example, use random digits.
+
+1. Come up with an alternative hypothesis that specified the probabilities of each type of seed.
+2. Allocate digits appropriately given the alternative model.
+3. Randomly generate 72 random digits (from 00 to 99) and collect data based on the alternative model.
+4. Calculate the statistic from the randomly generated data, and indicate whether it is above 11.07 (see below for the $\chi^2_5$ cutoff).
+5. Repeat 3 & 4 many many times.  The power will be estimated by the proportion of times you reject the null hypothesis when the alternative is true.
+
+
+```r
+xqchisq(.95, 5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 11.0705
+```
 
 ## 3/5/20 Agenda {#Mar5}
 1. More than two levels (two variables)
-2. Chi-square test
+2. Chi-square test of independence
 
-## Two categorical variables  ($\chi^2$ test) $\geq$ 2 levels each  {#chisq2}
+## Independence: Two categorical variables  ($\chi^2$ test) $\geq$ 2 levels each  {#chisq2}
 
-As when we were working with binary variables, most research questions have to do with 
+As when we were working with binary variables, most research questions have to do with two variables.  
 
 
 ## Reflection Questions
