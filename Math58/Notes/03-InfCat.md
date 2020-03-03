@@ -812,7 +812,7 @@ Determine if the following statements are true or false, and explain your reason
 2. Experiments
 3. Causation
 
-## Types of Studies
+## Types of Studies {#experim}
 
 The two basic types of studies encountered are **observational** and **experimental**.
 
@@ -848,6 +848,7 @@ Remembering the types of variables in most studies, we add one more category of 
 > Suppose the following 24 subjects have agreed to participate in such a study. Both males and female were recruited because females tend to have better balance (lower center of gravity). 
 
 >Females: Alisha, Alice, Betty, Martha, Audrey, Mary, Barbie, Anna
+
 >Males: Matt, Peter, Shawn, Brad, Michael, Kyle, Russ, Patrick, Bob, Kevin, Mitch, Marvin,
 Paul, Pedro, Roger, Sam
 
@@ -888,7 +889,119 @@ In an ideal world, every study would have participants who were randomly sampled
 
 ## 3/3/20 Agenda {#Mar3}
 1. More than two proportions
-2. Chi-square analysis
+2. Chi-square test
+
+## One categorical variable ($\chi^2$ test) $\geq$ 2 levels {#chisq1}
+
+When testing a null hypothesis of a pre-specified set of proportions (or probabilities) across $K$ categories
+
+$$\chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}$$
+
+has a null sampling distribution which is well-described by a chi-square distribution with $K-1$ degrees of freedom ...  if:
+
+* Each case that contributes a count to the table is **independent** of all the other cases in the table.
+* Each particular scenario (i.e. cell count) has at least 5 expected cases. (sample size criterion)
+
+If the conditions don't hold, then the test statistic won't have the predicted distribution, so any p-value calculations will be meaningless.
+
+### Example: Household Ages^[@activstats, "How Typical are Our Households' Ages"]
+
+Suppose we had a class picnic, and all the people in everyone's household showed up.  Would their ages be representative of the ages of all Americans?  Probably not.  After all, this is not a random sample!  But how unrepresentative are the ages? 
+
+The 2010 Census estimates^[https://www.census.gov/prod/cen2010/briefs/c2010br-03.pdf] the percent of people in the following age groups. 
+
+| Age   | 2010 Census Percent |
+|:-------:|------------------------:|
+| <18  | 24.03%                  |
+| 18-44 | 36.53%                  |
+| 45+   | 39.43%                  |
+
+####  Is the age distribution of the people from households in our class typical of that of all residents of the US? {-}
+
+Let's collect some data.  Note that we would never expect the last two columns to have the exact same values, even if the class *was* a perfect random sample.  (Why not?) 
+
+| Age   | 2010 Census Percent | Number Observed in Class | Expected  Number in Class |
+|:-------:|------------------------:|:--------------------------:|:---------------------------:|
+| <18  | 24.03%                  |                          |                           |
+| 18-44 | 36.53%                  |                          |                           |
+| 45+   | 39.43%                  |                          |                           |
+
+
+Somehow we need to measure how closely the observed data match the expected values.  We have the chi-square statistic ($\chi^2$):
+
+$$\chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}$$
+
+Let's use the data collected from class to calculate an observed $\chi^2$ test statistic.  Is it big enough to indicate that individuals from our class's households don't follow the 2010 Census proportions?  How would we know?  We need a null hypothesis!
+
+$H_0: p_1 = 0.2403, p_2 = 0.3653, p_3 = 0.3943$
+
+$H_A: \mbox{ not } H_0$
+
+The null hypothesis is as specified by the 2010 Census.  The alternative hypothesis is a deviation from that claim.
+
+But how would we know if the value of the observed test statistic is "large enough" ?  We need the **distribution** of the test statistic assuming the null hypothesis is true.  Let's generate it
+
+
+| Age   | Random Digits | Number Observed in Random Sample | Expected  Number in Random Sample |
+|:-------:|:------------------------:|:--------------------------:|:---------------------------:|
+| <18  | 0 - 25                 |         13                 |      $50 \cdot 0.2403 = 12.015$                     |
+| 18-44 | 26 - 60                  |        18                  |     $50 \cdot 0.3653 = 18.265$                      |
+| 45+   | 61 - 99                 |         19                 |     $50 \cdot 0.3943 = 19.715$                      |
+
+
+\begin{eqnarray*}
+\chi^2 &=& \frac{(13 - 12.015)^2}{12.015} + \frac{(18 - 18.265)^2}{18.265} + \frac{(19-19.715)^2}{19.715}\\
+&=& 0.1105
+\end{eqnarray*}
+
+
+
+### Example: Flax Seed
+
+Researchers studied a mutant type of flax seed that they hoped would produce oil for use in margarine and shortening.  The amount of palmitic acid in the flax seed was an important factor in this research; a related factor was whether the seed was brown or was variegated.  The seeds were classified into six combinations or palmitic acid and color.  According to a hypothesized genetic model, the six combinations should occur in a 3:6:3:1:2:1 ratio.
+
+| Color      | Acid Level   | Observed | Expected |
+|------------|--------------|:--------:|:--------:|
+| Brown      | Low          |    15    |   13.5   |
+| Brown      | Intermediate |    26    |    27    |
+| Brown      | High         |    15    |   13.5   |
+| Variegated | Low          |     0    |    4.5   |
+| Variegated | Intermediate |     8    |     9    |
+| Variegated | High         |     8    |    4.5   |
+| Total      |              |    72    |    72    |
+
+\begin{eqnarray*}
+H_0: && p_1 = 3/16, p_2=6/16, p_3 = 3/16, p_4 = 1/16, p_5=2/16, p_6 = 1/16\\
+H_A: && \mbox{ not the distribution in } H_0
+\end{eqnarray*}
+
+
+\begin{eqnarray*}
+\chi^2 &=& \frac{(15-13.5)^2}{13.5} + \frac{(26-27)^2}{27} + \frac{(15-13.5)^2}{13.5} + \frac{(0-4.5)^2}{4.5} + \frac{(8-9)^2}{9} + \frac{(8-4.5)^2}{4.5}\\
+&=& 7.71\\
+\mbox{p-value} &=& P(\chi^2_5 \geq 7.71)\\
+&=& 0.173\\
+\end{eqnarray*}
+
+
+```r
+1 - xpchisq(7.71, 5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.172959
+```
+
+
+## 3/5/20 Agenda {#Mar5}
+1. More than two levels (two variables)
+2. Chi-square test
+
+## Two categorical variables  ($\chi^2$ test) $\geq$ 2 levels each  {#chisq2}
+
+As when we were working with binary variables, most research questions have to do with 
 
 
 ## Reflection Questions

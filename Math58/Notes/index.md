@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-02-27"
+date: "2020-03-02"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -44,5 +44,7 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | 2/13/20	| Errors & Power | ISRS 3.1 & 2.3 |  \@ref(Feb13) [Feb13], \@ref(errors) [Errors&Power] |
 | 2/18/20	| 58: Binomial distrib, 58B: RR & OR | ISCAM Chp 1 |  \@ref(Feb18M58) [Feb18 M58], \@ref(Feb18M58B) [Feb18 M58B] |
 | 2/20/20	| 58: Binomial Power, 58B: CIs for RR & OR| ISCAM 3.9-3.11 |  \@ref(Feb20M58) [Feb20 M58], \@ref(Feb20M58B) [Feb20 M58B] |
-| 2/25/20	| Two binary variables | ISRS 3.2 |  \@ref(Feb25) [Feb25]  |
-| 2/27/20	| Experiments | ISRS 1.4 & 1.5 |  \@ref(Feb27) [Feb27] |
+| 2/25/20	| Two binary variables | ISRS 3.2 |  \@ref(Feb25) [Feb25] \@ref(diffprop) [Diff 2 Prop] |
+| 2/27/20	| Experiments | ISRS 1.4 & 1.5 |  \@ref(Feb27) [Feb27] \@ref(experim) [Experiments|
+| 3/3/20	| chi-sq one variable| ISRS 3.3 |  \@ref(Mar3) [Mar3] \@ref(chisq1) [ChiSq 1 Var] |
+| 3/5/20	| chi-sq two variables| ISRS 3.4 |  \@ref(Mar5) [Mar5] \@ref(chisq2) [ChiSq 2 Vars] |
