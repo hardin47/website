@@ -687,11 +687,13 @@ In an ideal world, every study would have participants who were randomly sampled
 
 ## Goodness-of-fit: One categorical variable ($\chi^2$ test) $\geq$ 2 levels {#chisq1}
 
-When testing a null hypothesis of a pre-specified set of proportions (or probabilities) across $K$ categories
+Consider $E_k$ which is the number expected in the $k^{th}$ category.  
 
-$$\chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}$$
+When testing a null hypothesis of a pre-specified set of proportions (or probabilities) across $K$ categories, the test statistics is:
 
-has a null sampling distribution which is well-described by a chi-square distribution with $K-1$ degrees of freedom ...  if:
+$$X^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}$$
+
+which has a null sampling distribution which is well-described by a chi-square distribution with $K-1$ degrees of freedom ...  if:
 
 * Each case that contributes a count to the table is **independent** of all the other cases in the table.
 * Each particular scenario (i.e. cell count) has at least 5 expected cases. (sample size criterion)
@@ -702,7 +704,7 @@ If the conditions don't hold, then the test statistic won't have the predicted d
 
 Suppose we had a class picnic, and all the people in everyone's household showed up.  Would their ages be representative of the ages of all Americans?  Probably not.  After all, this is not a random sample!  But how unrepresentative are the ages? 
 
-The 2010 Census estimates^[https://www.census.gov/prod/cen2010/briefs/c2010br-03.pdf] the percent of people in the following age groups. 
+The 2010 Census estimates^[https://www.census.gov/prod/cen2010/briefs/c2010br-03.pdf] the percent of people in the following age categories. 
 
 | Age   | 2010 Census Percent |
 |:-------:|------------------------:|
@@ -716,9 +718,9 @@ Let's collect some data.  Note that we would never expect the last two columns t
 
 | Age   | 2010 Census Percent | Number Observed in Class | Expected  Number in Class |
 |:-------:|------------------------:|:--------------------------:|:---------------------------:|
-| <18  | 24.03%                  |                          |                           |
-| 18-44 | 36.53%                  |                          |                           |
-| 45+   | 39.43%                  |                          |                           |
+| <18  | 24.03%                  |           5               |       12.015                    |
+| 18-44 | 36.54%                  |         22                 |    18.27                       |
+| 45+   | 39.43%                  |          23                |    19.715                       |
 
 
 Somehow we need to measure how closely the observed data match the expected values.  We have the chi-square statistic ($\chi^2$):
@@ -733,21 +735,33 @@ $H_A: \mbox{ not } H_0$
 
 The null hypothesis is as specified by the 2010 Census.  The alternative hypothesis is a deviation from that claim.
 
+The observed test statistic is:
+
+\begin{eqnarray*}
+X^2 &=& \frac{(5 - 12.015)^2}{12.015} + \frac{(22 - 18.265)^2}{18.27} + \frac{(23-19.715)^2}{19.715}\\
+&=& 5.41
+\end{eqnarray*}
+
 But how would we know if the value of the observed test statistic is "large enough" ?  We need the **distribution** of the test statistic assuming the null hypothesis is true.  Let's generate it
 
 
 | Age   | Random Digits | Number Observed in Random Sample | Expected  Number in Random Sample |
 |:-------:|:------------------------:|:--------------------------:|:---------------------------:|
 | <18  | 0 - 25                 |         13                 |      $50 \cdot 0.2403 = 12.015$                     |
-| 18-44 | 26 - 60                  |        18                  |     $50 \cdot 0.3653 = 18.265$                      |
+| 18-44 | 26 - 60                  |        18                  |     $50 \cdot 0.3654 = 18.27$                      |
 | 45+   | 61 - 99                 |         19                 |     $50 \cdot 0.3943 = 19.715$                      |
 
 
 \begin{eqnarray*}
-\chi^2 &=& \frac{(13 - 12.015)^2}{12.015} + \frac{(18 - 18.265)^2}{18.265} + \frac{(19-19.715)^2}{19.715}\\
+X^2 &=& \frac{(13 - 12.015)^2}{12.015} + \frac{(18 - 18.265)^2}{18.27} + \frac{(19-19.715)^2}{19.715}\\
 &=& 0.1105
 \end{eqnarray*}
 
+In class, we used random numbers (on pieces of paper) to generate the null sampling distribution of $X^2$.  It turns out, there is also a mathematical model which describes the variability of $X^2$:  the chi-square distribution with $K-1$ degrees of freedom.  The p-value below says that we can't reject $H_0$, we don't know that our household ages come from a distribution other than the census percentages.  (To be clear:  the conclusion is that we know nothing.  We don't have evidence to reject $H_0$.  But that also doesn't mean we know $H_0$ is true.  Unfortunately, we can't conclude anything.)
+
+```{r}
+1 - xpchisq(5.41, 2)
+```
 
 
 ### Example: Flax Seed
@@ -787,8 +801,8 @@ Consider the flax seed example,  As with the household ages example, use random 
 
 1. Come up with an alternative hypothesis that specified the probabilities of each type of seed.
 2. Allocate digits appropriately given the alternative model.
-3. Randomly generate 72 random digits (from 00 to 99) and collect data based on the alternative model.
-4. Calculate the statistic from the randomly generated data, and indicate whether it is above 11.07 (see below for the $\chi^2_5$ cutoff).
+3. Randomly generate 72 random digits (from 00 to 99) and collect *observed* data based on the **alternative** model.
+4. Calculate the test statistic from the randomly generated observed data (as compared to the expected counts under $H_0$), and indicate whether it is above 11.07 (see below for the $\chi^2_5$ cutoff).
 5. Repeat 3 & 4 many many times.  The power will be estimated by the proportion of times you reject the null hypothesis when the alternative is true.
 
 ```{r}
