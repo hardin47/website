@@ -691,7 +691,7 @@ Consider $E_k$ which is the number expected in the $k^{th}$ category.
 
 When testing a null hypothesis of a pre-specified set of proportions (or probabilities) across $K$ categories, the test statistics is:
 
-$$X^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}$$
+$$X^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k} \sim \chi^2_{K-1}$$
 
 which has a null sampling distribution which is well-described by a chi-square distribution with $K-1$ degrees of freedom ...  if:
 
@@ -795,7 +795,7 @@ H_A: && \mbox{ not the distribution in } H_0
 1 - xpchisq(7.71, 5)
 ```
 
-### How could we simulate power? {-}
+#### How could we simulate power? {-}
 
 Consider the flax seed example,  As with the household ages example, use random digits.
 
@@ -815,7 +815,101 @@ xqchisq(.95, 5)
 
 ## Independence: Two categorical variables  ($\chi^2$ test) $\geq$ 2 levels each  {#chisq2}
 
-As when we were working with binary variables, most research questions have to do with two variables.  
+As when we were working with binary variables, most research questions have to do with two variables.  Our main question now will be whether there is an association between two categorical variables of interest. 
+
+$H_0$:the two variables are independent
+
+$H_A$: the two variables are not independent
+
+How do we know if our test statistic is a big number or not?  Well, it turns out that the test statistic will have an approximate $\chi^2$ distribution with degrees of freedom = $(r- 1)\cdot (c-1)$ when $H_0$ is true.  As long as:
+
+* We have a random sample from the population.
+* We expect at least 1 observation in every cell ($E_i \geq 1 \forall i$)
+* We expect at least 5 observations in 80\% of the cells ($E_i \geq 5$ for 80\% of $i$)
+
+$$X^2 = \sum_{\mbox{all cells}} \frac{(Obs - Exp)^2}{Exp} \sim \chi^2_{(r-1)(c-1)}$$
+
+Consider the following (silly?) example data on CA vs. notCA and soda preference:
+
+|       | CA | no CA | total |
+|:-------|:----:|:-------:|:-----:|
+| Coke  |  72  |    8   |   80  |
+| Pepsi |  18  |    22   |   40  |
+| total | 90 | 30    |  120  |
+
+
+What if we had those same number of people in each group and category, but we wanted absolutely no association between the two variables of soda preference and location:
+
+
+|       | CA | no CA | total |
+|:-------|:----:|:-------:|:-----:|
+| Coke  |    |       |   80  |
+| Pepsi |    |       |   40  |
+| total | 90 | 30    |  120  |
+
+If the distribution of Coke and Pepsi preference were the same in CA vs not CA, how many Californians would prefer Coke?  60! 
+
+$$\mbox{# CA who prefer Coke} = 90 \cdot \frac{80}{120} = 60$$
+The rest of the table can be filled out in a similar manner:
+
+|       | CA | no CA | total |
+|:-------|:----:|:-------:|:-----:|
+| Coke  |  60  |    20   |   80  |
+| Pepsi | 30   |  10     |   40  |
+| total | 90 | 30    |  120  |
+
+The Coke & Pepsi example motivates the idea of how many observations we expect to see in each cell if there is no association between the variables.  Note that the expected number is almost always a decimal value.
+
+$$\mbox{Exp} = \frac{(\mbox{row total})(\mbox{col total})}{\mbox{table total}}$$
+
+
+### Example: Nightlights^[@iscam, Inv 5.3]
+
+> Myopia, or near-sightedness, typically develops during the childhood years. Recent studies have explored whether there is an association between development of myopia and the use of night-lights with infants. Quinn, Shin, Maguire, and Stone (1999) examined the type of light children aged 2-16 were exposed to. Between January and June 1998, the parents of 479 children who were seen as outpatients in a university pediatric ophthalmology clinic completed a questionnaire (children who had already developed serious eye conditions were excluded). One of the questions asked was "Under which lighting condition did/does your child sleep at night?" before the age of 2 years. The following two-way table classifies the children's eye condition and whether or not they slept with some kind of light (e.g., a night light or full room light) or in darkness.
+
+The data are given by the following R code:
+
+```{r fig.width = 8, fig.height = 4}
+lights <- data.frame(eyesight = c(rep("far", 40), rep("neither", 114), rep("near", 18),
+                           rep("far", 39), rep("neither", 115), rep("near", 78),
+                           rep("far", 12), rep("neither", 22), rep("near", 41)),
+                     lighting = c(rep("dark", 172), rep("nightlight", 232), rep("roomlight", 75)))
+
+table(lights)
+
+
+lights %>%
+  ggplot() +
+  geom_bar(aes(x = lighting, fill = eyesight), position = "fill")
+
+```
+
+$H_0$: There is no association between lighting condition and eye condition
+
+$H_A$: There is an association between lighting condition and eye condition
+
+* What are the observational units?
+
+* What are the explanatory and response variables?
+
+* Let's say that we conclude there is an association (we reject $H_0$).  Can we also conclude that lighting causes particular eye conditions?
+
+* Try to come up with as many confounding variables as possible.
+
+The chi-square test can be applied to the table of counts.  The test statistic is 56.513 with a very small p-value.
+
+```{r}
+lights %>%
+  select(eyesight, lighting) %>%
+  table() %>%
+  chisq.test()
+```
+
+
+The conclusion from Inv 5.3 in @iscam is excellent:
+
+> The segmented bar graph reveals that for the children in this sample the incidence of near-sightedness increases as the level of lighting increases. When we have a random sample with two categorical variables, we can perform a chi-square test of association. Because the expected counts are large (smallest is 14.25 > 5), we can apply the chi-square test to these data. The p-value of this chi-square test is essentially zero, which says that if there were no association between eye condition and lighting in the population, then it's virtually impossible for chance alone to produce a table in which the conditional distributions would differ by as much as they did in the actual study. Thus, the sample data provide overwhelming evidence that there is indeed an association between eye condition and
+lighting in the population of children like those in this study. A closer analysis of the table and the chi-square calculation reveals that there are many fewer children with near-sightedness than would be expected in the "darkness" group and many more children with near-sightedness than would be expected in the "room light" group. But remember, we cannot draw a cause-and-effect conclusion between lighting and eye condition because this is an observational study. Several confounding variables could explain the observed association. For example, perhaps near-sighted children tend to have near-sighted parents who prefer to leave a light on because of their own vision difficulties, while also passing this genetic predisposition on to their children. We also have to be careful in generalizing from this sample to a larger population because the children were making voluntary visits to an eye doctor and were not selected at random from a larger population.
 
 
 ## Reflection Questions
