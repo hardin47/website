@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2020-03-05" />
+<meta name="date" content="2020-03-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -440,6 +440,8 @@ P(X = 16) &amp;=&amp; {16 \choose 16} (0.5)^{16}(0.5)^{0} = 0.0000153\\
 
 <div id="inference-on-relative-risk" class="section level3">
 <h3><span class="header-section-number">4.7.1</span> Inference on Relative Risk</h3>
+<p>Due to some theory we won’t cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:</p>
+<p><span class="math display">\[\ln(\hat{RR}) \sim N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)\]</span></p>
 <table>
 <thead>
 <tr class="header">
@@ -698,6 +700,8 @@ OR &amp;=&amp; \frac{49/1}{51/899} = 863.75\\
 </div>
 <div id="inference-on-odds-ratios" class="section level3">
 <h3><span class="header-section-number">4.8.2</span> Inference on Odds Ratios</h3>
+<p>Due to some theory we won’t cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:</p>
+<p><span class="math display">\[\ln(\hat{OR}) \sim N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)\]</span></p>
 <table>
 <thead>
 <tr class="header">
@@ -1401,16 +1405,28 @@ The rest of the table can be filled out in a similar manner:</p>
 <li><p>Let’s say that we conclude there is an association (we reject <span class="math inline">\(H_0\)</span>). Can we also conclude that lighting causes particular eye conditions?</p></li>
 <li><p>Try to come up with as many confounding variables as possible.</p></li>
 </ul>
-<p>The chi-square test can be applied to the table of counts. The test statistic is 56.513 with a very small p-value.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">lights <span class="op">%&gt;%</span></a>
+<p>The chi-square test can be applied to the table of counts. The test statistic is 56.513 with a very small p-value. Note that the observed and expected tables can be pulled out of the <code>chisq.test()</code> output.</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">(chi.lights &lt;-<span class="st"> </span>lights <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb119-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(eyesight, lighting) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb119-3" data-line-number="3"><span class="st">  </span><span class="kw">table</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb119-4" data-line-number="4"><span class="st">  </span><span class="kw">chisq.test</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb119-4" data-line-number="4"><span class="st">  </span><span class="kw">chisq.test</span>())</a></code></pre></div>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  .
 ## X-squared = 56.513, df = 4, p-value = 1.565e-11</code></pre>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">chi.lights<span class="op">$</span>observed</a></code></pre></div>
+<pre><code>##          lighting
+## eyesight  dark nightlight roomlight
+##   far       40         39        12
+##   near      18         78        41
+##   neither  114        115        22</code></pre>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1">chi.lights<span class="op">$</span>expected</a></code></pre></div>
+<pre><code>##          lighting
+## eyesight      dark nightlight roomlight
+##   far     32.67641   44.07516  14.24843
+##   near    49.19415   66.35491  21.45094
+##   neither 90.12944  121.56994  39.30063</code></pre>
 <p>The conclusion from Inv 5.3 in <span class="citation">Chance and Rossman (<a href="#ref-iscam">2018</a>)</span> is excellent:</p>
 <blockquote>
 <p>The segmented bar graph reveals that for the children in this sample the incidence of near-sightedness increases as the level of lighting increases. When we have a random sample with two categorical variables, we can perform a chi-square test of association. Because the expected counts are large (smallest is 14.25 &gt; 5), we can apply the chi-square test to these data. The p-value of this chi-square test is essentially zero, which says that if there were no association between eye condition and lighting in the population, then it’s virtually impossible for chance alone to produce a table in which the conditional distributions would differ by as much as they did in the actual study. Thus, the sample data provide overwhelming evidence that there is indeed an association between eye condition and

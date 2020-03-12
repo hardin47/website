@@ -228,6 +228,10 @@ $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\
 
 ### Inference on Relative Risk 
 
+Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:
+
+$$\ln(\hat{RR}) \sim N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
+
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
 | response 1 |       A       |       B       |
@@ -381,6 +385,10 @@ IMPORTANT:  Relative risk cannot be used with case-control studies but odds rati
 
 ### Inference on Odds Ratios 
 
+
+Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:
+
+$$\ln(\hat{OR}) \sim N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
 
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
@@ -1134,14 +1142,14 @@ $H_A$: There is an association between lighting condition and eye condition
 
 * Try to come up with as many confounding variables as possible.
 
-The chi-square test can be applied to the table of counts.  The test statistic is 56.513 with a very small p-value.
+The chi-square test can be applied to the table of counts.  The test statistic is 56.513 with a very small p-value.  Note that the observed and expected tables can be pulled out of the `chisq.test()` output.
 
 
 ```r
-lights %>%
+(chi.lights <- lights %>%
   select(eyesight, lighting) %>%
   table() %>%
-  chisq.test()
+  chisq.test())
 ```
 
 ```
@@ -1150,6 +1158,30 @@ lights %>%
 ## 
 ## data:  .
 ## X-squared = 56.513, df = 4, p-value = 1.565e-11
+```
+
+```r
+chi.lights$observed
+```
+
+```
+##          lighting
+## eyesight  dark nightlight roomlight
+##   far       40         39        12
+##   near      18         78        41
+##   neither  114        115        22
+```
+
+```r
+chi.lights$expected
+```
+
+```
+##          lighting
+## eyesight      dark nightlight roomlight
+##   far     32.67641   44.07516  14.24843
+##   near    49.19415   66.35491  21.45094
+##   neither 90.12944  121.56994  39.30063
 ```
 
 
