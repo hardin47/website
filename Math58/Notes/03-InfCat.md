@@ -230,7 +230,7 @@ $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:
 
-$$\ln(\hat{RR}) \sim N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
+$$\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
 
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
@@ -252,6 +252,51 @@ To remember with relative risk:
 
 * The CI for $p_1/p_2$ is typically considered significant if 1 is not in the interval.  That is because usually the null hypothesis is $H_0: p_1 = p_2$ or equivalently, $H_0: p_1/p_2 = 1$.
 
+### Using `infer` for inference on RR
+
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+
+As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.
+
+**NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
+
+
+
+```r
+library(infer)
+WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
+                            smoking = c(rep("light", 22), rep("heavy", 583),
+                                        rep("light", 204), rep("heavy", 576)))
+
+(obs_RR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  calculate(stat = "ratio of props", order = c("cancer", "healthy")))
+```
+
+```
+## # A tibble: 1 x 1
+##    stat
+##   <dbl>
+## 1  1.30
+```
+
+```r
+null_RR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  infer::calculate(stat = "ratio of props", order= c("cancer", "healthy"))
+
+null_RR %>%
+  visualize() +
+  shade_p_value(obs_stat = obs_RR, direction = "right")
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+
+
 
 ## Odds Ratios (Math 58B only)
 
@@ -269,7 +314,7 @@ $$\mbox{odds} = \frac{\mbox{number of successes}}{\mbox{number of failures}}$$
 $$\mbox{Odds Ratio (OR)} = \frac{\mbox{odds of success in group 1}}{\mbox{odds of success in group 2}}$$
 
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-5"><strong>(\#def:unnamed-chunk-5) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-6"><strong>(\#def:unnamed-chunk-6) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
 
 
 ### Example: Smoking and Lung Cancer^[Inv 3.10, Chance & Rossman, ISCAM] 
@@ -388,7 +433,7 @@ IMPORTANT:  Relative risk cannot be used with case-control studies but odds rati
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:
 
-$$\ln(\hat{OR}) \sim N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
+$$\ln(\hat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
 
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
@@ -415,9 +460,7 @@ RR = \frac{p_1}{p_2} &>& 1\\
 OR &>& RR
 \end{eqnarray*}
 
-### Confidence Interval for OR (same idea for RR)
-
-Due to some theory that we won't cover:
+### Confidence Interval for OR (same idea as with RR)
 
 \begin{eqnarray*}
 SE(\ln (\hat{OR})) &\approx& \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}
@@ -533,6 +576,50 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 Note 5: $RR \approx OR$ if RR is very small (the denominator of the OR will be very similar to the denominator of the RR).
 
 
+
+### Using `infer` for inference on OR
+
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+
+As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample odds ratio under the null hypothesis that the population proportions are identical.
+
+**NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
+
+
+
+```r
+library(infer)
+WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
+                            smoking = c(rep("light", 22), rep("heavy", 583),
+                                        rep("light", 204), rep("heavy", 576)))
+
+(obs_OR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  calculate(stat = "odds ratio", order = c("cancer", "healthy")))
+```
+
+```
+## # A tibble: 1 x 1
+##    stat
+##   <dbl>
+## 1  9.39
+```
+
+```r
+null_OR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "odds ratio", order= c("cancer", "healthy"))
+
+null_OR %>%
+  visualize() +
+  shade_p_value(obs_stat = obs_OR, direction = "right")
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Example: MERS-CoV {#ex:cov}
@@ -669,7 +756,7 @@ exp(log(ORhat) + 1.96 * SE_lnOR)
 
 <div class="figure" style="text-align: center">
 <img src="figs/CoV.jpg" alt="Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`" width="909" />
-<p class="caption">(\#fig:unnamed-chunk-10)Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`</p>
+<p class="caption">(\#fig:unnamed-chunk-12)Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`</p>
 </div>
 
 ## 2/25/20 Agenda {#Feb25}
@@ -767,7 +854,7 @@ $$\mbox{p-value} = 2* P( Z \leq -1.522) = 0.128$$
 2*xpnorm(z_score,0,1)
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1278972
@@ -782,7 +869,7 @@ $$\mbox{p-value} = 2* P( Z \leq -1.522) = 0.128$$
 (z_star95 <- xqnorm(0.975, 0, 1))
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 1.959964
@@ -978,7 +1065,7 @@ In class, we used random numbers (on pieces of paper) to generate the null sampl
 1 - xpchisq(5.41, 2)
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.06687032
@@ -1017,7 +1104,7 @@ H_A: && \mbox{ not the distribution in } H_0
 1 - xpchisq(7.71, 5)
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.172959
@@ -1038,7 +1125,7 @@ Consider the flax seed example,  As with the household ages example, use random 
 xqchisq(.95, 5)
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 11.0705
@@ -1128,7 +1215,7 @@ lights %>%
   geom_bar(aes(x = lighting, fill = eyesight), position = "fill")
 ```
 
-<img src="03-InfCat_files/figure-html/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" />
+<img src="03-InfCat_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" />
 
 $H_0$: There is no association between lighting condition and eye condition
 

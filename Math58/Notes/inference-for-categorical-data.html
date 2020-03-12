@@ -202,12 +202,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#Feb20M58B"><i class="fa fa-check"></i><b>4.6</b> 2/20/20 Math 58B Agenda</a></li>
 <li class="chapter" data-level="4.7" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#relative-risk-math-58b-only"><i class="fa fa-check"></i><b>4.7</b> Relative Risk (Math 58B only)</a><ul>
 <li class="chapter" data-level="4.7.1" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#inference-on-relative-risk"><i class="fa fa-check"></i><b>4.7.1</b> Inference on Relative Risk</a></li>
+<li class="chapter" data-level="4.7.2" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#using-infer-for-inference-on-rr"><i class="fa fa-check"></i><b>4.7.2</b> Using <code>infer</code> for inference on RR</a></li>
 </ul></li>
 <li class="chapter" data-level="4.8" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#odds-ratios-math-58b-only"><i class="fa fa-check"></i><b>4.8</b> Odds Ratios (Math 58B only)</a><ul>
 <li class="chapter" data-level="4.8.1" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#example-smoking-and-lung-cancer"><i class="fa fa-check"></i><b>4.8.1</b> Example: Smoking and Lung Cancer</a></li>
 <li class="chapter" data-level="4.8.2" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#inference-on-odds-ratios"><i class="fa fa-check"></i><b>4.8.2</b> Inference on Odds Ratios</a></li>
-<li class="chapter" data-level="4.8.3" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#confidence-interval-for-or-same-idea-for-rr"><i class="fa fa-check"></i><b>4.8.3</b> Confidence Interval for OR (same idea for RR)</a></li>
-<li class="chapter" data-level="4.8.4" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#ex:cov"><i class="fa fa-check"></i><b>4.8.4</b> Example: MERS-CoV</a></li>
+<li class="chapter" data-level="4.8.3" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#confidence-interval-for-or-same-idea-as-with-rr"><i class="fa fa-check"></i><b>4.8.3</b> Confidence Interval for OR (same idea as with RR)</a></li>
+<li class="chapter" data-level="4.8.4" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#using-infer-for-inference-on-or"><i class="fa fa-check"></i><b>4.8.4</b> Using <code>infer</code> for inference on OR</a></li>
+<li class="chapter" data-level="4.8.5" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#ex:cov"><i class="fa fa-check"></i><b>4.8.5</b> Example: MERS-CoV</a></li>
 </ul></li>
 <li class="chapter" data-level="4.9" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#Feb25"><i class="fa fa-check"></i><b>4.9</b> 2/25/20 Agenda</a></li>
 <li class="chapter" data-level="4.10" data-path="inference-for-categorical-data.html"><a href="inference-for-categorical-data.html#diffprop"><i class="fa fa-check"></i><b>4.10</b> Difference of two proportions</a><ul>
@@ -441,7 +443,7 @@ P(X = 16) &amp;=&amp; {16 \choose 16} (0.5)^{16}(0.5)^{0} = 0.0000153\\
 <div id="inference-on-relative-risk" class="section level3">
 <h3><span class="header-section-number">4.7.1</span> Inference on Relative Risk</h3>
 <p>Due to some theory we won’t cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:</p>
-<p><span class="math display">\[\ln(\hat{RR}) \sim N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)\]</span></p>
+<p><span class="math display">\[\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)\]</span></p>
 <table>
 <thead>
 <tr class="header">
@@ -478,6 +480,36 @@ P(X = 16) &amp;=&amp; {16 \choose 16} (0.5)^{16}(0.5)^{0} = 0.0000153\\
 <li><p>The CI for <span class="math inline">\(p_1/p_2\)</span> is typically considered significant if 1 is not in the interval. That is because usually the null hypothesis is <span class="math inline">\(H_0: p_1 = p_2\)</span> or equivalently, <span class="math inline">\(H_0: p_1/p_2 = 1\)</span>.</p></li>
 </ul>
 </div>
+<div id="using-infer-for-inference-on-rr" class="section level3">
+<h3><span class="header-section-number">4.7.2</span> Using <code>infer</code> for inference on RR</h3>
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+<p>As with the difference in proportions, the <code>infer</code> syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.</p>
+<p><strong>NOTE</strong> in order to provide syntax that was comparable and correct for the RR and the OR, <code>smoking</code> has been specified as the response variable, and <code>lungs</code> has been specified as the explanatory variable.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="kw">library</span>(infer)</a>
+<a class="sourceLine" id="cb62-2" data-line-number="2">WynderGraham &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lungs =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;cancer&quot;</span>, <span class="dv">605</span>), <span class="kw">rep</span>(<span class="st">&quot;healthy&quot;</span>, <span class="dv">780</span>)),</a>
+<a class="sourceLine" id="cb62-3" data-line-number="3">                            <span class="dt">smoking =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;light&quot;</span>, <span class="dv">22</span>), <span class="kw">rep</span>(<span class="st">&quot;heavy&quot;</span>, <span class="dv">583</span>),</a>
+<a class="sourceLine" id="cb62-4" data-line-number="4">                                        <span class="kw">rep</span>(<span class="st">&quot;light&quot;</span>, <span class="dv">204</span>), <span class="kw">rep</span>(<span class="st">&quot;heavy&quot;</span>, <span class="dv">576</span>)))</a>
+<a class="sourceLine" id="cb62-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb62-6" data-line-number="6">(obs_RR &lt;-<span class="st"> </span>WynderGraham <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb62-7" data-line-number="7"><span class="st">  </span><span class="kw">specify</span>(smoking <span class="op">~</span><span class="st"> </span>lungs, <span class="dt">success =</span> <span class="st">&quot;heavy&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb62-8" data-line-number="8"><span class="st">  </span><span class="kw">calculate</span>(<span class="dt">stat =</span> <span class="st">&quot;ratio of props&quot;</span>, <span class="dt">order =</span> <span class="kw">c</span>(<span class="st">&quot;cancer&quot;</span>, <span class="st">&quot;healthy&quot;</span>)))</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##    stat
+##   &lt;dbl&gt;
+## 1  1.30</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">null_RR &lt;-<span class="st"> </span>WynderGraham <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-2" data-line-number="2"><span class="st">  </span><span class="kw">specify</span>(smoking <span class="op">~</span><span class="st"> </span>lungs, <span class="dt">success =</span> <span class="st">&quot;heavy&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-3" data-line-number="3"><span class="st">  </span><span class="kw">hypothesize</span>(<span class="dt">null =</span> <span class="st">&quot;independence&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-4" data-line-number="4"><span class="st">  </span><span class="kw">generate</span>(<span class="dt">reps =</span> <span class="dv">1000</span>, <span class="dt">type =</span> <span class="st">&quot;permute&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-5" data-line-number="5"><span class="st">  </span>infer<span class="op">::</span><span class="kw">calculate</span>(<span class="dt">stat =</span> <span class="st">&quot;ratio of props&quot;</span>, <span class="dt">order=</span> <span class="kw">c</span>(<span class="st">&quot;cancer&quot;</span>, <span class="st">&quot;healthy&quot;</span>))</a>
+<a class="sourceLine" id="cb64-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb64-7" data-line-number="7">null_RR <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-8" data-line-number="8"><span class="st">  </span><span class="kw">visualize</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-9" data-line-number="9"><span class="st">  </span><span class="kw">shade_p_value</span>(<span class="dt">obs_stat =</span> obs_RR, <span class="dt">direction =</span> <span class="st">&quot;right&quot;</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="odds-ratios-math-58b-only" class="section level2">
 <h2><span class="header-section-number">4.8</span> Odds Ratios (Math 58B only)</h2>
@@ -489,7 +521,7 @@ P(X = 16) &amp;=&amp; {16 \choose 16} (0.5)^{16}(0.5)^{0} = 0.0000153\\
 <p><span class="math display">\[\mbox{Odds Ratio (OR)} = \frac{\mbox{odds of success in group 1}}{\mbox{odds of success in group 2}}\]</span></p>
 
 <div class="definition">
-<span id="def:unnamed-chunk-5" class="definition"><strong>Definition 4.2  </strong></span><strong>Odds Ratio</strong> A related concept to risk is odds. It is often used in horse racing, where “success” is typically defined as losing. So, if the odds are 3 to 1 we would expect to lose 3/4 of the time. The odds ratio (OR) is the ratio of odds for each group. We say, “The odds of success is <strong>OR</strong> times higher for those in group 1 compared to those group 2.”
+<span id="def:unnamed-chunk-6" class="definition"><strong>Definition 4.2  </strong></span><strong>Odds Ratio</strong> A related concept to risk is odds. It is often used in horse racing, where “success” is typically defined as losing. So, if the odds are 3 to 1 we would expect to lose 3/4 of the time. The odds ratio (OR) is the ratio of odds for each group. We say, “The odds of success is <strong>OR</strong> times higher for those in group 1 compared to those group 2.”
 </div>
 
 <div id="example-smoking-and-lung-cancer" class="section level3">
@@ -701,7 +733,7 @@ OR &amp;=&amp; \frac{49/1}{51/899} = 863.75\\
 <div id="inference-on-odds-ratios" class="section level3">
 <h3><span class="header-section-number">4.8.2</span> Inference on Odds Ratios</h3>
 <p>Due to some theory we won’t cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:</p>
-<p><span class="math display">\[\ln(\hat{OR}) \sim N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)\]</span></p>
+<p><span class="math display">\[\ln(\hat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)\]</span></p>
 <table>
 <thead>
 <tr class="header">
@@ -742,9 +774,8 @@ OR &amp;&gt;&amp; RR
 \end{eqnarray*}\]</span></p>
 </div>
 </div>
-<div id="confidence-interval-for-or-same-idea-for-rr" class="section level3">
-<h3><span class="header-section-number">4.8.3</span> Confidence Interval for OR (same idea for RR)</h3>
-<p>Due to some theory that we won’t cover:</p>
+<div id="confidence-interval-for-or-same-idea-as-with-rr" class="section level3">
+<h3><span class="header-section-number">4.8.3</span> Confidence Interval for OR (same idea as with RR)</h3>
 <p><span class="math display">\[\begin{eqnarray*}
 SE(\ln (\hat{OR})) &amp;\approx&amp; \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}
 \end{eqnarray*}\]</span></p>
@@ -767,17 +798,17 @@ SE(\ln(\hat{OR})) &amp;=&amp; \sqrt{\frac{1}{583} + \frac{1}{576} + \frac{1}{22}
 90\% \mbox{ CI for } OR &amp;&amp; (e^{1.858}, e^{2.62})\\
 &amp;&amp; (6.41, 13.75)\\
 \end{eqnarray*}\]</span></p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">583</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">576</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">22</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">204</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">583</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">576</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">22</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">204</span>))</a></code></pre></div>
 <pre><code>## [1] 0.2319653</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="kw">xqnorm</span>(<span class="fl">0.95</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">plot=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1"><span class="kw">xqnorm</span>(<span class="fl">0.95</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">plot=</span><span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## [1] 1.644854</code></pre>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span></a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span></a></code></pre></div>
 <pre><code>## [1] 1.858005</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" data-line-number="1"><span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">+</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span></a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">+</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span></a></code></pre></div>
 <pre><code>## [1] 2.621285</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span>)</a></code></pre></div>
 <pre><code>## [1] 6.410936</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">+</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(<span class="fl">9.39</span>) <span class="op">+</span><span class="st"> </span><span class="fl">1.645</span><span class="op">*</span><span class="fl">0.232</span>)</a></code></pre></div>
 <pre><code>## [1] 13.75339</code></pre>
 <p>We are 90% confident that the true <span class="math inline">\(\ln(OR)\)</span> is between 1.858 and 2.62. We are 90% confident that the true <span class="math inline">\(OR\)</span> is between 6.41 and 13.75. That is, the true odds of getting lung cancer if you smoke heavily are somewhere between 6.41 and 13.75 times higher than if you don’t, with 90% confidence.</p>
 <p>Note 1: we use the theory which allows us to understand the sampling distribution for the <span class="math inline">\(\ln(\hat{OR}).\)</span> We use the <em>process</em> for creating CIs to transform back to <span class="math inline">\(OR\)</span>.</p>
@@ -803,8 +834,38 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 -->
 <p>Note 5: <span class="math inline">\(RR \approx OR\)</span> if RR is very small (the denominator of the OR will be very similar to the denominator of the RR).</p>
 </div>
+<div id="using-infer-for-inference-on-or" class="section level3">
+<h3><span class="header-section-number">4.8.4</span> Using <code>infer</code> for inference on OR</h3>
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+<p>As with the difference in proportions, the <code>infer</code> syntax can be used to simulate a sampling distribution of the sample odds ratio under the null hypothesis that the population proportions are identical.</p>
+<p><strong>NOTE</strong> in order to provide syntax that was comparable and correct for the RR and the OR, <code>smoking</code> has been specified as the response variable, and <code>lungs</code> has been specified as the explanatory variable.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">library</span>(infer)</a>
+<a class="sourceLine" id="cb77-2" data-line-number="2">WynderGraham &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lungs =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;cancer&quot;</span>, <span class="dv">605</span>), <span class="kw">rep</span>(<span class="st">&quot;healthy&quot;</span>, <span class="dv">780</span>)),</a>
+<a class="sourceLine" id="cb77-3" data-line-number="3">                            <span class="dt">smoking =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;light&quot;</span>, <span class="dv">22</span>), <span class="kw">rep</span>(<span class="st">&quot;heavy&quot;</span>, <span class="dv">583</span>),</a>
+<a class="sourceLine" id="cb77-4" data-line-number="4">                                        <span class="kw">rep</span>(<span class="st">&quot;light&quot;</span>, <span class="dv">204</span>), <span class="kw">rep</span>(<span class="st">&quot;heavy&quot;</span>, <span class="dv">576</span>)))</a>
+<a class="sourceLine" id="cb77-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb77-6" data-line-number="6">(obs_OR &lt;-<span class="st"> </span>WynderGraham <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb77-7" data-line-number="7"><span class="st">  </span><span class="kw">specify</span>(smoking <span class="op">~</span><span class="st"> </span>lungs, <span class="dt">success =</span> <span class="st">&quot;heavy&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb77-8" data-line-number="8"><span class="st">  </span><span class="kw">calculate</span>(<span class="dt">stat =</span> <span class="st">&quot;odds ratio&quot;</span>, <span class="dt">order =</span> <span class="kw">c</span>(<span class="st">&quot;cancer&quot;</span>, <span class="st">&quot;healthy&quot;</span>)))</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 1
+##    stat
+##   &lt;dbl&gt;
+## 1  9.39</code></pre>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">null_OR &lt;-<span class="st"> </span>WynderGraham <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-2" data-line-number="2"><span class="st">  </span><span class="kw">specify</span>(smoking <span class="op">~</span><span class="st"> </span>lungs, <span class="dt">success =</span> <span class="st">&quot;heavy&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-3" data-line-number="3"><span class="st">  </span><span class="kw">hypothesize</span>(<span class="dt">null =</span> <span class="st">&quot;independence&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-4" data-line-number="4"><span class="st">  </span><span class="kw">generate</span>(<span class="dt">reps =</span> <span class="dv">1000</span>, <span class="dt">type =</span> <span class="st">&quot;permute&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-5" data-line-number="5"><span class="st">  </span><span class="kw">calculate</span>(<span class="dt">stat =</span> <span class="st">&quot;odds ratio&quot;</span>, <span class="dt">order=</span> <span class="kw">c</span>(<span class="st">&quot;cancer&quot;</span>, <span class="st">&quot;healthy&quot;</span>))</a>
+<a class="sourceLine" id="cb79-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb79-7" data-line-number="7">null_OR <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-8" data-line-number="8"><span class="st">  </span><span class="kw">visualize</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb79-9" data-line-number="9"><span class="st">  </span><span class="kw">shade_p_value</span>(<span class="dt">obs_stat =</span> obs_OR, <span class="dt">direction =</span> <span class="st">&quot;right&quot;</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
 <div id="ex:cov" class="section level3">
-<h3><span class="header-section-number">4.8.4</span> Example: MERS-CoV</h3>
+<h3><span class="header-section-number">4.8.5</span> Example: MERS-CoV</h3>
 <p>The following study is a case-control study, so it is impossible to estimate the proportion of cases in the population. However, you will notice that the authors don’t try to do that. They flip the explanatory and response variables so that the case status is predicting all of the other clinical variables. In such a setting, the authors would have been able to present relative risk estimates, but they still chose to provide odds ratios (possibly because odds ratios are somewhat standard in the medical literature).</p>
 <p>Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
 <blockquote>
@@ -820,10 +881,10 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 <p>Conclusions. Few clinical predictors could enhance the ability to predict which patients with pneumonia would have MERS-CoV. However, further prospective analysis and matched case-control studies may shed light on other predictors of infection.</p>
 </blockquote>
 <p>Consider the results above on diabetes. Of 17 cases, 13 had diabetes; of 82 controls, 35 had diabetes. So the data can be summarized as follows:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1">MERSCoV &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">coronov =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;case&quot;</span>, <span class="dv">17</span>), <span class="kw">rep</span>(<span class="st">&quot;control&quot;</span>, <span class="dv">82</span>)),</a>
-<a class="sourceLine" id="cb74-2" data-line-number="2">                      <span class="dt">diab =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">13</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">4</span>), </a>
-<a class="sourceLine" id="cb74-3" data-line-number="3">                               <span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">35</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">47</span>)))</a>
-<a class="sourceLine" id="cb74-4" data-line-number="4"><span class="kw">table</span>(MERSCoV)</a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">MERSCoV &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">coronov =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;case&quot;</span>, <span class="dv">17</span>), <span class="kw">rep</span>(<span class="st">&quot;control&quot;</span>, <span class="dv">82</span>)),</a>
+<a class="sourceLine" id="cb80-2" data-line-number="2">                      <span class="dt">diab =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">13</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">4</span>), </a>
+<a class="sourceLine" id="cb80-3" data-line-number="3">                               <span class="kw">rep</span>(<span class="st">&quot;hasdiab&quot;</span>, <span class="dv">35</span>), <span class="kw">rep</span>(<span class="st">&quot;nodiab&quot;</span>, <span class="dv">47</span>)))</a>
+<a class="sourceLine" id="cb80-4" data-line-number="4"><span class="kw">table</span>(MERSCoV)</a></code></pre></div>
 <pre><code>##          diab
 ## coronov   hasdiab nodiab
 ##   case         13      4
@@ -832,30 +893,30 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 <h4>CI for 95% OR</h4>
 <p>As with the calculations above, we can find a CI for the true OR of diabetes for those with MRES-CoV and those without.</p>
 <p>We are 95% confident that the true odds of diabetes are between 1.31 times and 14.5 times higher for those with CoV than those without. Note that the results calculated here do not match with the results in the paper.</p>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">4</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">4</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
 <pre><code>## [1] 4.364286</code></pre>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">47</span>))</a></code></pre></div>
 <pre><code>## [1] 0.6138168</code></pre>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1"><span class="kw">xqnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">plot=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="kw">xqnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">plot=</span><span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## [1] 1.959964</code></pre>
-<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
 <pre><code>## [1] 0.2703735</code></pre>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1"><span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR</a></code></pre></div>
 <pre><code>## [1] 2.676536</code></pre>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
 <pre><code>## [1] 1.310454</code></pre>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
 <pre><code>## [1] 14.53465</code></pre>
 <p>Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by <span class="math inline">\(\hat{OR}\)</span> = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1">(<span class="dt">ORhat =</span> (<span class="dv">13</span><span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>(<span class="dv">35</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
 <pre><code>## [1] 7.242857</code></pre>
-<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">(<span class="dt">SE_lnOR =</span> <span class="kw">sqrt</span>( <span class="dv">1</span><span class="op">/</span><span class="dv">13</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">35</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">39</span>))</a></code></pre></div>
 <pre><code>## [1] 0.7944404</code></pre>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">-</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
 <pre><code>## [1] 1.526401</code></pre>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="kw">exp</span>(<span class="kw">log</span>(ORhat) <span class="op">+</span><span class="st"> </span><span class="fl">1.96</span> <span class="op">*</span><span class="st"> </span>SE_lnOR)</a></code></pre></div>
 <pre><code>## [1] 34.36776</code></pre>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-10"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-12"></span>
 <img src="figs/CoV.jpg" alt="Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`" width="909" />
 <p class="caption">
 Figure 4.1: Al-Tawfig et al. <code>Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients</code>
@@ -922,22 +983,22 @@ If <span class="math inline">\(H_0: p_1 = p_2\)</span> is true, then our best gu
 </ol>
 <p>The p-value for the test is 0.128 indicating that there is no evidence of a difference in the proportion of people affected by the shutdown across the two income groups. <strong>NOTE</strong> we cannot claim “no difference”!! We claim “there is no evidence of a difference.” Try to explain to yourself (or your classmate) the difference in those two claims.</p>
 <p><span class="math display">\[\mbox{p-value} = 2* P( Z \leq -1.522) = 0.128\]</span></p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">(p_pool &lt;-<span class="st"> </span>(<span class="dv">247</span><span class="op">+</span><span class="dv">77</span>)<span class="op">/</span><span class="st"> </span><span class="dv">614</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">(p_pool &lt;-<span class="st"> </span>(<span class="dv">247</span><span class="op">+</span><span class="dv">77</span>)<span class="op">/</span><span class="st"> </span><span class="dv">614</span>)</a></code></pre></div>
 <pre><code>## [1] 0.5276873</code></pre>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1">(z_score &lt;-<span class="st"> </span>(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(p_pool<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p_pool) <span class="op">*</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">448</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1">(z_score &lt;-<span class="st"> </span>(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(p_pool<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p_pool) <span class="op">*</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">448</span>)))</a></code></pre></div>
 <pre><code>## [1] -1.522447</code></pre>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="dv">2</span><span class="op">*</span><span class="kw">xpnorm</span>(z_score,<span class="dv">0</span>,<span class="dv">1</span>)</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1"><span class="dv">2</span><span class="op">*</span><span class="kw">xpnorm</span>(z_score,<span class="dv">0</span>,<span class="dv">1</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 0.1278972</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>A 95% confidence interval for (<span class="math inline">\(p_{&lt;40K}- p_{ \geq40K}\)</span>) ), where p is the proportion of those who said the government shutdown has not at all affected them personally, is (-0.16, 0.02).</li>
 </ol>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">(z_star95 &lt;-<span class="st"> </span><span class="kw">xqnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="dv">1</span>))</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1">(z_star95 &lt;-<span class="st"> </span><span class="kw">xqnorm</span>(<span class="fl">0.975</span>, <span class="dv">0</span>, <span class="dv">1</span>))</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 1.959964</code></pre>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1">(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">-</span><span class="st"> </span>z_star95<span class="op">*</span><span class="kw">sqrt</span>(<span class="fl">0.48</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.48</span>)<span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.55</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.55</span>)<span class="op">/</span><span class="dv">448</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">-</span><span class="st"> </span>z_star95<span class="op">*</span><span class="kw">sqrt</span>(<span class="fl">0.48</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.48</span>)<span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.55</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.55</span>)<span class="op">/</span><span class="dv">448</span>)</a></code></pre></div>
 <pre><code>## [1] -0.1600828</code></pre>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">+</span><span class="st"> </span>z_star95<span class="op">*</span><span class="kw">sqrt</span>(<span class="fl">0.48</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.48</span>)<span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.55</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.55</span>)<span class="op">/</span><span class="dv">448</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">(<span class="fl">0.48</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.55</span>) <span class="op">+</span><span class="st"> </span>z_star95<span class="op">*</span><span class="kw">sqrt</span>(<span class="fl">0.48</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.48</span>)<span class="op">/</span><span class="dv">160</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.55</span><span class="op">*</span>(<span class="dv">1</span><span class="fl">-0.55</span>)<span class="op">/</span><span class="dv">448</span>)</a></code></pre></div>
 <pre><code>## [1] 0.0200828</code></pre>
 <p>Determine if the following statements are true or false, and explain your reasoning if you identify the statement as false.<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a></p>
 <ol style="list-style-type: lower-alpha">
@@ -1169,8 +1230,8 @@ X^2 &amp;=&amp; \frac{(13 - 12.015)^2}{12.015} + \frac{(18 - 18.265)^2}{18.27} +
 &amp;=&amp; 0.1105
 \end{eqnarray*}\]</span></p>
 <p>In class, we used random numbers (on pieces of paper) to generate the null sampling distribution of <span class="math inline">\(X^2\)</span>. It turns out, there is also a mathematical model which describes the variability of <span class="math inline">\(X^2\)</span>: the chi-square distribution with <span class="math inline">\(K-1\)</span> degrees of freedom. The p-value below says that we can’t reject <span class="math inline">\(H_0\)</span>, we don’t know that our household ages come from a distribution other than the census percentages. (To be clear: the conclusion is that we know nothing. We don’t have evidence to reject <span class="math inline">\(H_0\)</span>. But that also doesn’t mean we know <span class="math inline">\(H_0\)</span> is true. Unfortunately, we can’t conclude anything.)</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">xpchisq</span>(<span class="fl">5.41</span>, <span class="dv">2</span>)</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">xpchisq</span>(<span class="fl">5.41</span>, <span class="dv">2</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 0.06687032</code></pre>
 </div>
 </div>
@@ -1241,8 +1302,8 @@ H_A: &amp;&amp; \mbox{ not the distribution in } H_0
 \mbox{p-value} &amp;=&amp; P(\chi^2_5 \geq 7.71)\\
 &amp;=&amp; 0.173\\
 \end{eqnarray*}\]</span></p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">xpchisq</span>(<span class="fl">7.71</span>, <span class="dv">5</span>)</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">xpchisq</span>(<span class="fl">7.71</span>, <span class="dv">5</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 0.172959</code></pre>
 <div id="how-could-we-simulate-power" class="section level4 unnumbered">
 <h4>How could we simulate power?</h4>
@@ -1254,8 +1315,8 @@ H_A: &amp;&amp; \mbox{ not the distribution in } H_0
 <li>Calculate the test statistic from the randomly generated observed data (as compared to the expected counts under <span class="math inline">\(H_0\)</span>), and indicate whether it is above 11.07 (see below for the <span class="math inline">\(\chi^2_5\)</span> cutoff).</li>
 <li>Repeat 3 &amp; 4 many many times. The power will be estimated by the proportion of times you reject the null hypothesis when the alternative is true.</li>
 </ol>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="kw">xqchisq</span>(.<span class="dv">95</span>, <span class="dv">5</span>)</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">xqchisq</span>(.<span class="dv">95</span>, <span class="dv">5</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 11.0705</code></pre>
 </div>
 </div>
@@ -1382,21 +1443,21 @@ The rest of the table can be filled out in a similar manner:</p>
 <p>Myopia, or near-sightedness, typically develops during the childhood years. Recent studies have explored whether there is an association between development of myopia and the use of night-lights with infants. Quinn, Shin, Maguire, and Stone (1999) examined the type of light children aged 2-16 were exposed to. Between January and June 1998, the parents of 479 children who were seen as outpatients in a university pediatric ophthalmology clinic completed a questionnaire (children who had already developed serious eye conditions were excluded). One of the questions asked was “Under which lighting condition did/does your child sleep at night?” before the age of 2 years. The following two-way table classifies the children’s eye condition and whether or not they slept with some kind of light (e.g., a night light or full room light) or in darkness.</p>
 </blockquote>
 <p>The data are given by the following R code:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1">lights &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">eyesight =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">40</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">114</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">18</span>),</a>
-<a class="sourceLine" id="cb116-2" data-line-number="2">                           <span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">39</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">115</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">78</span>),</a>
-<a class="sourceLine" id="cb116-3" data-line-number="3">                           <span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">12</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">22</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">41</span>)),</a>
-<a class="sourceLine" id="cb116-4" data-line-number="4">                     <span class="dt">lighting =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;dark&quot;</span>, <span class="dv">172</span>), <span class="kw">rep</span>(<span class="st">&quot;nightlight&quot;</span>, <span class="dv">232</span>), <span class="kw">rep</span>(<span class="st">&quot;roomlight&quot;</span>, <span class="dv">75</span>)))</a>
-<a class="sourceLine" id="cb116-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb116-6" data-line-number="6"><span class="kw">table</span>(lights)</a></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1">lights &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">eyesight =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">40</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">114</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">18</span>),</a>
+<a class="sourceLine" id="cb122-2" data-line-number="2">                           <span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">39</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">115</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">78</span>),</a>
+<a class="sourceLine" id="cb122-3" data-line-number="3">                           <span class="kw">rep</span>(<span class="st">&quot;far&quot;</span>, <span class="dv">12</span>), <span class="kw">rep</span>(<span class="st">&quot;neither&quot;</span>, <span class="dv">22</span>), <span class="kw">rep</span>(<span class="st">&quot;near&quot;</span>, <span class="dv">41</span>)),</a>
+<a class="sourceLine" id="cb122-4" data-line-number="4">                     <span class="dt">lighting =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;dark&quot;</span>, <span class="dv">172</span>), <span class="kw">rep</span>(<span class="st">&quot;nightlight&quot;</span>, <span class="dv">232</span>), <span class="kw">rep</span>(<span class="st">&quot;roomlight&quot;</span>, <span class="dv">75</span>)))</a>
+<a class="sourceLine" id="cb122-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb122-6" data-line-number="6"><span class="kw">table</span>(lights)</a></code></pre></div>
 <pre><code>##          lighting
 ## eyesight  dark nightlight roomlight
 ##   far       40         39        12
 ##   near      18         78        41
 ##   neither  114        115        22</code></pre>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">lights <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x =</span> lighting, <span class="dt">fill =</span> eyesight), <span class="dt">position =</span> <span class="st">&quot;fill&quot;</span>)</a></code></pre></div>
-<p><img src="03-InfCat_files/figure-html/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" data-line-number="1">lights <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb124-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb124-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x =</span> lighting, <span class="dt">fill =</span> eyesight), <span class="dt">position =</span> <span class="st">&quot;fill&quot;</span>)</a></code></pre></div>
+<p><img src="03-InfCat_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p><span class="math inline">\(H_0\)</span>: There is no association between lighting condition and eye condition</p>
 <p><span class="math inline">\(H_A\)</span>: There is an association between lighting condition and eye condition</p>
 <ul>
@@ -1406,22 +1467,22 @@ The rest of the table can be filled out in a similar manner:</p>
 <li><p>Try to come up with as many confounding variables as possible.</p></li>
 </ul>
 <p>The chi-square test can be applied to the table of counts. The test statistic is 56.513 with a very small p-value. Note that the observed and expected tables can be pulled out of the <code>chisq.test()</code> output.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">(chi.lights &lt;-<span class="st"> </span>lights <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(eyesight, lighting) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb119-3" data-line-number="3"><span class="st">  </span><span class="kw">table</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb119-4" data-line-number="4"><span class="st">  </span><span class="kw">chisq.test</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1">(chi.lights &lt;-<span class="st"> </span>lights <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb125-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(eyesight, lighting) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb125-3" data-line-number="3"><span class="st">  </span><span class="kw">table</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb125-4" data-line-number="4"><span class="st">  </span><span class="kw">chisq.test</span>())</a></code></pre></div>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  .
 ## X-squared = 56.513, df = 4, p-value = 1.565e-11</code></pre>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">chi.lights<span class="op">$</span>observed</a></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1">chi.lights<span class="op">$</span>observed</a></code></pre></div>
 <pre><code>##          lighting
 ## eyesight  dark nightlight roomlight
 ##   far       40         39        12
 ##   near      18         78        41
 ##   neither  114        115        22</code></pre>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1">chi.lights<span class="op">$</span>expected</a></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1">chi.lights<span class="op">$</span>expected</a></code></pre></div>
 <pre><code>##          lighting
 ## eyesight      dark nightlight roomlight
 ##   far     32.67641   44.07516  14.24843

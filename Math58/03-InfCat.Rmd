@@ -188,7 +188,7 @@ $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:
 
-$$\ln(\hat{RR}) \sim N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
+$$\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
 
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
@@ -209,6 +209,39 @@ To remember with relative risk:
 \end{eqnarray*}
 
 * The CI for $p_1/p_2$ is typically considered significant if 1 is not in the interval.  That is because usually the null hypothesis is $H_0: p_1 = p_2$ or equivalently, $H_0: p_1/p_2 = 1$.
+
+### Using `infer` for inference on RR
+
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+
+As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.
+
+**NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
+
+
+```{r message = FALSE, warning=FALSE}
+library(infer)
+WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
+                            smoking = c(rep("light", 22), rep("heavy", 583),
+                                        rep("light", 204), rep("heavy", 576)))
+
+(obs_RR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  calculate(stat = "ratio of props", order = c("cancer", "healthy")))
+
+null_RR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  infer::calculate(stat = "ratio of props", order= c("cancer", "healthy"))
+
+null_RR %>%
+  visualize() +
+  shade_p_value(obs_stat = obs_RR, direction = "right")
+```
+
 
 
 ## Odds Ratios (Math 58B only)
@@ -348,7 +381,7 @@ IMPORTANT:  Relative risk cannot be used with case-control studies but odds rati
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:
 
-$$\ln(\hat{OR}) \sim N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
+$$\ln(\hat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
 
 |            | explanatory 1 | explanatory 2 |
 |------------|:-------------:|:-------------:|
@@ -375,9 +408,7 @@ RR = \frac{p_1}{p_2} &>& 1\\
 OR &>& RR
 \end{eqnarray*}
 
-### Confidence Interval for OR (same idea for RR)
-
-Due to some theory that we won't cover:
+### Confidence Interval for OR (same idea as with RR)
 
 \begin{eqnarray*}
 SE(\ln (\hat{OR})) &\approx& \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}
@@ -453,6 +484,38 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 Note 5: $RR \approx OR$ if RR is very small (the denominator of the OR will be very similar to the denominator of the RR).
 
 
+
+### Using `infer` for inference on OR
+
+<!--
+devtools::install_github("tidymodels/infer", ref="develop")
+-->
+
+As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample odds ratio under the null hypothesis that the population proportions are identical.
+
+**NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
+
+
+```{r message = FALSE, warning=FALSE}
+library(infer)
+WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
+                            smoking = c(rep("light", 22), rep("heavy", 583),
+                                        rep("light", 204), rep("heavy", 576)))
+
+(obs_OR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  calculate(stat = "odds ratio", order = c("cancer", "healthy")))
+
+null_OR <- WynderGraham %>%
+  specify(smoking ~ lungs, success = "heavy") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "odds ratio", order= c("cancer", "healthy"))
+
+null_OR %>%
+  visualize() +
+  shade_p_value(obs_stat = obs_OR, direction = "right")
+```
 
 
 ### Example: MERS-CoV {#ex:cov}
