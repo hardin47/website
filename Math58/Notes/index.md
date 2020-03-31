@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-03-12"
+date: "2020-03-30"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -48,3 +48,13 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | 2/27/20	| Experiments | ISRS 1.4 & 1.5 |  \@ref(Feb27) [Feb27] \@ref(experim) [Experiments|
 | 3/3/20	| chi-sq one variable| ISRS 3.3 |  \@ref(Mar3) [Mar3] \@ref(chisq1) [ChiSq 1 Var] |
 | 3/5/20	| chi-sq two variables| ISRS 3.4 |  \@ref(Mar5) [Mar5] \@ref(chisq2) [ChiSq 2 Vars] |
+| 3/10/20	|review for Exam 1 |  |  |
+| 3/12/20	| Exam 1 |   |  |
+| 3/17/20	| Spring Break 1|  |   |
+| 3/19/20	| Spring Break 1 |  |  |
+| 3/24/20	| Spring Break 2 |  Census  | \@ref(census) [Census] |
+| 3/26/20	| Spring Break 2 | COVID-19  | \@ref(covid19) [COVID-19] |
+| 3/31/20	| Sampling Dist of $\overline{X}$| ISRS 4.1 & Inv 2.4 |  \@ref(Mar31) [Mar31] \@ref(mean1dist) [Dist 1 mean] |
+| 4/2/20	| Inference on $\mu$| ISRS 4.1 & Inv 2.5|  \@ref(Apr2) [Apr2] \@ref(mean1inf) [Inf 1 mean] |
+
+

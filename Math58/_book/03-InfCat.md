@@ -1,10 +1,6 @@
 # Inference for categorical data
 
-```{r global_options, include=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=2.5,
-                      fig.width=5, 
-                      fig.align = "center", cache=TRUE)
-```
+
 
 ## Inference for a single proportion
 
@@ -83,10 +79,26 @@ P(X=2) = {5 \choose 2} (0.25)^2(0.75)^3  = 0.2637 && P(X=5) = {5 \choose 5} (0.2
 \end{eqnarray*}
 
 
-```{r}
+
+```r
 library(mosaic)
 xpbinom(2, size = 5, prob = 0.25)  # P(X <= 2) vs. P(X > 2)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.8964844
+```
+
+```r
 xpbinom(3, size = 5, prob = 0.25)  # P(X <= 3) vs. P(X > 3)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-1-2.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.984375
 ```
 
 ### Binomial Hypothesis Testing
@@ -112,9 +124,25 @@ P(X \geq 15) &=& {16 \choose 15} (0.5)^{15}(0.5)^{1} + 0.0000153 = 0.000259\\
 P(X = 16) &=& {16 \choose 16} (0.5)^{16}(0.5)^{0} = 0.0000153\\
 \end{eqnarray*}
 
-```{r}
+
+```r
 xpbinom(12, 16, 0.5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.9893646
+```
+
+```r
 xpbinom(13, 16, 0.5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.9979095
 ```
 
 ### Binomial Power
@@ -132,9 +160,25 @@ Yikes!  What if babies actually prefer the helper 90% of the time?
 
 $$\mbox{power} = P(X \geq 14 | p = 0.9) = 0.789$$
 
-```{r}
+
+```r
 1 - xpbinom(13, 16, 0.7)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.09935968
+```
+
+```r
 1 - xpbinom(13, 16, 0.9)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-3-2.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.7892493
 ```
 
 
@@ -180,9 +224,7 @@ In particular, interest is in the ratio of probabilities.  [Note: the decision t
 
 $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}$$
 
-```{definition}
-**Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."
-```
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>**Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."</div>\EndKnitrBlock{definition}
 
 ### Inference on Relative Risk 
 
@@ -221,7 +263,8 @@ As with the difference in proportions, the `infer` syntax can be used to simulat
 **NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
 
 
-```{r message = FALSE, warning=FALSE}
+
+```r
 library(infer)
 WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
                             smoking = c(rep("light", 22), rep("heavy", 583),
@@ -230,7 +273,16 @@ WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
 (obs_RR <- WynderGraham %>%
   specify(smoking ~ lungs, success = "heavy") %>%
   calculate(stat = "ratio of props", order = c("cancer", "healthy")))
+```
 
+```
+## # A tibble: 1 x 1
+##    stat
+##   <dbl>
+## 1  1.30
+```
+
+```r
 null_RR <- WynderGraham %>%
   specify(smoking ~ lungs, success = "heavy") %>%
   hypothesize(null = "independence") %>%
@@ -241,6 +293,8 @@ null_RR %>%
   visualize() +
   shade_p_value(obs_stat = obs_RR, direction = "right")
 ```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -260,9 +314,7 @@ $$\mbox{odds} = \frac{\mbox{number of successes}}{\mbox{number of failures}}$$
 $$\mbox{Odds Ratio (OR)} = \frac{\mbox{odds of success in group 1}}{\mbox{odds of success in group 2}}$$
 
 
-```{definition}
-**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."
-```
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-6"><strong>(\#def:unnamed-chunk-6) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
 
 
 ### Example: Smoking and Lung Cancer^[Inv 3.10, Chance & Rossman, ISCAM] 
@@ -438,13 +490,53 @@ SE(\ln(\hat{OR})) &=& \sqrt{\frac{1}{583} + \frac{1}{576} + \frac{1}{22} + \frac
 && (6.41, 13.75)\\
 \end{eqnarray*}
 
-```{r}
+
+```r
 (SE_lnOR = sqrt( 1/583 + 1/576 + 1/22 + 1/204))
+```
+
+```
+## [1] 0.2319653
+```
+
+```r
 xqnorm(0.95, 0, 1, plot=FALSE)
+```
+
+```
+## [1] 1.644854
+```
+
+```r
 log(9.39) - 1.645*0.232
+```
+
+```
+## [1] 1.858005
+```
+
+```r
 log(9.39) + 1.645*0.232
+```
+
+```
+## [1] 2.621285
+```
+
+```r
 exp(log(9.39) - 1.645*0.232)
+```
+
+```
+## [1] 6.410936
+```
+
+```r
 exp(log(9.39) + 1.645*0.232)
+```
+
+```
+## [1] 13.75339
 ```
 
 We are 90% confident that the true $\ln(OR)$ is between 1.858 and 2.62.  We are 90% confident that the true $OR$ is between 6.41 and 13.75.  That is, the true odds of getting lung cancer if you smoke heavily are somewhere between 6.41 and 13.75 times higher than if you don't, with 90% confidence.
@@ -496,7 +588,8 @@ As with the difference in proportions, the `infer` syntax can be used to simulat
 **NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
 
 
-```{r message = FALSE, warning=FALSE}
+
+```r
 library(infer)
 WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
                             smoking = c(rep("light", 22), rep("heavy", 583),
@@ -505,7 +598,16 @@ WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
 (obs_OR <- WynderGraham %>%
   specify(smoking ~ lungs, success = "heavy") %>%
   calculate(stat = "odds ratio", order = c("cancer", "healthy")))
+```
 
+```
+## # A tibble: 1 x 1
+##    stat
+##   <dbl>
+## 1  9.39
+```
+
+```r
 null_OR <- WynderGraham %>%
   specify(smoking ~ lungs, success = "heavy") %>%
   hypothesize(null = "independence") %>%
@@ -516,6 +618,8 @@ null_OR %>%
   visualize() +
   shade_p_value(obs_stat = obs_OR, direction = "right")
 ```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Example: MERS-CoV {#ex:cov}
@@ -534,11 +638,19 @@ Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitaliz
 
 Consider the results above on diabetes.  Of 17 cases, 13 had diabetes; of 82 controls, 35 had diabetes.  So the data can be summarized as follows:
 
-```{r}
+
+```r
 MERSCoV <- data.frame(coronov = c(rep("case", 17), rep("control", 82)),
                       diab = c(rep("hasdiab", 13), rep("nodiab", 4), 
                                rep("hasdiab", 35), rep("nodiab", 47)))
 table(MERSCoV)
+```
+
+```
+##          diab
+## coronov   hasdiab nodiab
+##   case         13      4
+##   control      35     47
 ```
 
 ####  CI for 95% OR {-}
@@ -548,30 +660,104 @@ As with the calculations above, we can find a CI for the true OR of diabetes for
 We are 95% confident that the true odds of diabetes are between 1.31 times and 14.5 times higher for those with CoV than those without.  Note that the results calculated here do not match with the results in the paper. 
 
 
-```{r}
+
+```r
 (ORhat = (13/4)/(35/47))
+```
+
+```
+## [1] 4.364286
+```
+
+```r
 (SE_lnOR = sqrt( 1/13 + 1/4 + 1/35 + 1/47))
+```
+
+```
+## [1] 0.6138168
+```
+
+```r
 xqnorm(0.975, 0, 1, plot=FALSE)
+```
+
+```
+## [1] 1.959964
+```
+
+```r
 log(ORhat) - 1.96 * SE_lnOR
+```
+
+```
+## [1] 0.2703735
+```
+
+```r
 log(ORhat) + 1.96 * SE_lnOR
+```
+
+```
+## [1] 2.676536
+```
+
+```r
 exp(log(ORhat) - 1.96 * SE_lnOR)
+```
+
+```
+## [1] 1.310454
+```
+
+```r
 exp(log(ORhat) + 1.96 * SE_lnOR)
+```
+
+```
+## [1] 14.53465
 ```
 
 
 Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by $\hat{OR}$ = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).
 
 
-```{r}
+
+```r
 (ORhat = (13/2)/(35/39))
+```
+
+```
+## [1] 7.242857
+```
+
+```r
 (SE_lnOR = sqrt( 1/13 + 1/2 + 1/35 + 1/39))
+```
+
+```
+## [1] 0.7944404
+```
+
+```r
 exp(log(ORhat) - 1.96 * SE_lnOR)
+```
+
+```
+## [1] 1.526401
+```
+
+```r
 exp(log(ORhat) + 1.96 * SE_lnOR)
 ```
 
-```{r fig.cap = "Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/CoV.jpg")
 ```
+## [1] 34.36776
+```
+
+<div class="figure" style="text-align: center">
+<img src="figs/CoV.jpg" alt="Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`" width="909" />
+<p class="caption">(\#fig:unnamed-chunk-12)Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`</p>
+</div>
 
 ## 2/25/20 Agenda {#Feb25}
 1. Difference in Proportion HT
@@ -647,20 +833,62 @@ The p-value for the test is 0.128 indicating that there is no evidence of a diff
 
 $$\mbox{p-value} = 2* P( Z \leq -1.522) = 0.128$$
 
-```{r}
+
+```r
 (p_pool <- (247+77)/ 614)
+```
+
+```
+## [1] 0.5276873
+```
+
+```r
 (z_score <- (0.48 - 0.55) / sqrt(p_pool*(1-p_pool) *(1/160 + 1/448)))
+```
+
+```
+## [1] -1.522447
+```
+
+```r
 2*xpnorm(z_score,0,1)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.1278972
 ```
 
 
 2. A 95% confidence interval for ($p_{<40K}- p_{ \geq40K}$) ), where p is the proportion of those who said the government shutdown has not at all affected them personally, is (-0.16, 0.02).
 
 
-```{r}
+
+```r
 (z_star95 <- xqnorm(0.975, 0, 1))
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 1.959964
+```
+
+```r
 (0.48 - 0.55) - z_star95*sqrt(0.48*(1-0.48)/160 + 0.55*(1-0.55)/448)
+```
+
+```
+## [1] -0.1600828
+```
+
+```r
 (0.48 - 0.55) + z_star95*sqrt(0.48*(1-0.48)/160 + 0.55*(1-0.55)/448)
+```
+
+```
+## [1] 0.0200828
 ```
 
 Determine if the following statements are true or false, and explain your reasoning if you identify the statement as false.^[(a) FALSE (because the interval overlaps zero), (b) FALSE (We are 95% confident that 16% more to 2% fewer Americans who make \$40,000 or more per year are not at all personally affected by the government shutdown compared to those who less than \$40,000 per year.), (c) FALSE (it would be more narrow), (d) TRUE]
@@ -738,13 +966,15 @@ Random sampling and random allocation are **VERY DIFFERENT** concepts!  And most
 * **Random allocation** - each observational unit is equally likely to be assigned to any of the treatments (explanatory variable).
 
 
-```{r randSleuth, fig.cap = "Random Sample vs Randomized Experiment, taken from @sleuth", fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/randsampexp.png")
-```
+<div class="figure" style="text-align: center">
+<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="1901" />
+<p class="caption">(\#fig:randSleuth)Random Sample vs Randomized Experiment, taken from @sleuth</p>
+</div>
 
-```{r randgoodQ, fig.cap = "Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/", fig.width = 8, out.width = "80%", fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/randsampexp2.png")
-```
+<div class="figure" style="text-align: center">
+<img src="figs/randsampexp2.png" alt="Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/" width="80%" />
+<p class="caption">(\#fig:randgoodQ)Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/</p>
+</div>
 
 In an ideal world, every study would have participants who were randomly sampled from the population and randomly allocated to the treatments.  However, the limitations of ethical research makes simultaneously doing both random processes difficult.  Why is that?  Consider the following:
 
@@ -830,8 +1060,15 @@ X^2 &=& \frac{(13 - 12.015)^2}{12.015} + \frac{(18 - 18.265)^2}{18.27} + \frac{(
 
 In class, we used random numbers (on pieces of paper) to generate the null sampling distribution of $X^2$.  It turns out, there is also a mathematical model which describes the variability of $X^2$:  the chi-square distribution with $K-1$ degrees of freedom.  The p-value below says that we can't reject $H_0$, we don't know that our household ages come from a distribution other than the census percentages.  (To be clear:  the conclusion is that we know nothing.  We don't have evidence to reject $H_0$.  But that also doesn't mean we know $H_0$ is true.  Unfortunately, we can't conclude anything.)
 
-```{r}
+
+```r
 1 - xpchisq(5.41, 2)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.06687032
 ```
 
 
@@ -862,8 +1099,15 @@ H_A: && \mbox{ not the distribution in } H_0
 &=& 0.173\\
 \end{eqnarray*}
 
-```{r}
+
+```r
 1 - xpchisq(7.71, 5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 0.172959
 ```
 
 #### How could we simulate power? {-}
@@ -876,8 +1120,15 @@ Consider the flax seed example,  As with the household ages example, use random 
 4. Calculate the test statistic from the randomly generated observed data (as compared to the expected counts under $H_0$), and indicate whether it is above 11.07 (see below for the $\chi^2_5$ cutoff).
 5. Repeat 3 & 4 many many times.  The power will be estimated by the proportion of times you reject the null hypothesis when the alternative is true.
 
-```{r}
+
+```r
 xqchisq(.95, 5)
+```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+
+```
+## [1] 11.0705
 ```
 
 ## 3/5/20 Agenda {#Mar5}
@@ -940,20 +1191,31 @@ $$\mbox{Exp} = \frac{(\mbox{row total})(\mbox{col total})}{\mbox{table total}}$$
 
 The data are given by the following R code:
 
-```{r fig.width = 8, fig.height = 4}
+
+```r
 lights <- data.frame(eyesight = c(rep("far", 40), rep("neither", 114), rep("near", 18),
                            rep("far", 39), rep("neither", 115), rep("near", 78),
                            rep("far", 12), rep("neither", 22), rep("near", 41)),
                      lighting = c(rep("dark", 172), rep("nightlight", 232), rep("roomlight", 75)))
 
 table(lights)
+```
 
+```
+##          lighting
+## eyesight  dark nightlight roomlight
+##   far       40         39        12
+##   near      18         78        41
+##   neither  114        115        22
+```
 
+```r
 lights %>%
   ggplot() +
   geom_bar(aes(x = lighting, fill = eyesight), position = "fill")
-
 ```
+
+<img src="03-InfCat_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" />
 
 $H_0$: There is no association between lighting condition and eye condition
 
@@ -969,15 +1231,44 @@ $H_A$: There is an association between lighting condition and eye condition
 
 The chi-square test can be applied to the table of counts.  The test statistic is 56.513 with a very small p-value.  Note that the observed and expected tables can be pulled out of the `chisq.test()` output.
 
-```{r}
+
+```r
 (chi.lights <- lights %>%
   select(eyesight, lighting) %>%
   table() %>%
   chisq.test())
+```
 
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  .
+## X-squared = 56.513, df = 4, p-value = 1.565e-11
+```
+
+```r
 chi.lights$observed
+```
 
+```
+##          lighting
+## eyesight  dark nightlight roomlight
+##   far       40         39        12
+##   near      18         78        41
+##   neither  114        115        22
+```
+
+```r
 chi.lights$expected
+```
+
+```
+##          lighting
+## eyesight      dark nightlight roomlight
+##   far     32.67641   44.07516  14.24843
+##   near    49.19415   66.35491  21.45094
+##   neither 90.12944  121.56994  39.30063
 ```
 
 
@@ -1038,19 +1329,19 @@ Thursday's optional class meeting is about COVID-19 and how it connects to the i
 A good starting place for solid information about COVID-19:
 https://www.sciencemuseumgroup.org.uk/coronavirus-science-what-we-know-and-dont-know-about-the-virus/
  
-####  Visualizing the data: {-}
+####  Visualizing the data:
 
 I find these two dashboards to be among the best out there.  Good display, constantly being updated, reliable data.  
 
 * Coronavirus COVID-19 Global Cases by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University (JHU): https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6
-* COVID-19 Global Pandemic Real-time Report: https://ncov.dxy.cn/ncovh5/view/en_pneumonia?link=&share=&source=
+* COVID-19 Global Pandemic Real-time Reprort: https://ncov.dxy.cn/ncovh5/view/en_pneumonia?link=&share=&source=
 
 That said, it is also worth thinking about how to visualize the data and to do so responsibly.
 
 * Visualizing COVID-19 data (responsibly):  https://medium.com/nightingale/ten-considerations-before-you-create-another-chart-about-covid-19-27d3bd691be8
  
  
-#### Current medical studies on treatment of COVID-19: {-}
+#### Current medical studies on treatment of COVID-19:
 
 * French study investigating azithromycin – chloroquine on COVID-19.
  
@@ -1058,11 +1349,15 @@ https://www.sciencedirect.com/science/article/pii/S0924857920300996
  
 > French Confirmed COVID-19 patients were included in a single arm protocol from early March to March 16th, to receive 600mg of hydroxychloroquine daily and their viral load in nasopharyngeal swabs was tested daily in a hospital setting. Depending on their clinical presentation, azithromycin was added to the treatment. Untreated patients from another center and cases refusing the protocol were included as negative controls. Presence and absence of virus at Day6-post inclusion was considered the end point.
  
-> Assuming a 50% efficacy of hydroxychloroquine in reducing the viral load at day 7, a 85% power, a type I error rate of 5% and 10% loss to follow-up, we calculated that a total of 48 COVID-19 patients (i.e., 24 cases in the hydroxychloroquine group and 24 in the control group) would be required for the analysis (Fleiss with CC). Statistical differences were evaluated by Pearson's chi-square or Fisher's exact tests as categorical variables, as appropriate. Means of quantitative data were compared using Student's t-test.
+> Assuming a 50% efficacy of hydroxychloroquine in reducing the viral load at day 7, a 85% power, a type I error rate of 5% and 10% loss to follow-up, we calculated that a total of 48 COVID-19 patients (ie, 24 cases in the hydroxychloroquine group and 24 in the control group) would be required for the analysis (Fleiss with CC). Statistical differences were evaluated by Pearson's chi-square or Fisher's exact tests as categorical variables, as appropriate. Means of quantitative data were compared using Student's t-test.
  
-```{r fig.cap = "Gautret et al. Hydroxychloroquine and azithromycin as a treatment of COVID-19: results of an open-label non-randomized clinical trial", fig.width = 9, out.width = "80%", fig.align='center', echo=FALSE, fig.show='hold'}
-knitr::include_graphics(c("figs/covid1.jpg", "figs/covid2.jpg"))
-```
+<div class="figure" style="text-align: center">
+<img src="figs/covid1.jpg" alt="Gautret et al. `Hydroxychloroquine and azithromycin as a treatment of COVID-19: results of an open-label non-randomized clinical trial`" width="234" />
+<p class="caption">(\#fig:unnamed-chunk-201)Gautret et al. `Hydroxychloroquine and azithromycin as a treatment of COVID-19: results of an open-label non-randomized clinical trial`</p>
+</div><div class="figure" style="text-align: center">
+<img src="figs/covid2.jpg" alt="Gautret et al. `Hydroxychloroquine and azithromycin as a treatment of COVID-19: results of an open-label non-randomized clinical trial`" width="234" />
+<p class="caption">(\#fig:unnamed-chunk-202)Gautret et al. `Hydroxychloroquine and azithromycin as a treatment of COVID-19: results of an open-label non-randomized clinical trial`</p>
+</div>
  
  
 * In late March, WHO launches global megatrial of the four most promising coronavirus treatments (not any antibiotics).  The study, which could include many thousands of patients in dozens of countries, has been designed to be as simple as possible so that even hospitals overwhelmed by an onslaught of COVID-19 patients can participate.
@@ -1076,7 +1371,7 @@ https://www.sciencemag.org/news/2020/03/who-launches-global-megatrial-four-most-
 > The design is not double-blind, the gold standard in medical research, so there could be placebo effects from patients knowing they received a candidate drug. But WHO says it had to balance scientific rigor against speed. 
  
  
-####  Studies related to COVID-19: {-}
+####  Studies related to COVID-19
 
 * Medical studies discussing side effects of azithromycin – chloroquine treatment. https://threadreaderapp.com/thread/1242119303811514369.html
  
@@ -1092,15 +1387,16 @@ https://www.medrxiv.org/content/10.1101/2020.03.11.20031096v1 (not yet peer-revi
 The language might lead the reader to think "blood group A has a much higher risk for COVID-19" which is markedly untrue!  That is, significance is a completely different concept as compared to "a lot".
 
 
-####  Being careful with your analysis: {-}
+####  Being careful with your analysis
 
 * CDC report: "Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020"   https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm
  
 Pay attention to counts per group.  20-44 is 24 years.  65-74 is 9 years.
  
-```{r fig.cap = "CDC report: Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/covid3.jpg")
-```
+<div class="figure" style="text-align: center">
+<img src="figs/covid13.jpg" alt="CDC report: `Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020`"  />
+<p class="caption">(\#fig:unnamed-chunk-21)CDC report: `Severe Outcomes Among Patients with Coronavirus Disease 2019 (COVID-19) — United States, February 12–March 16, 2020`</p>
+</div>
  
  
 * There has been some talk about a 2% fatality rate, but fatality is incredibly difficult to measure so early in the disease.

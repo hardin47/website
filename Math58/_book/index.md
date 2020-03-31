@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "`r Sys.Date()`"
+date: "2020-03-30"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -20,48 +20,17 @@ Class notes for Math 58(B) at Pomona College: Introduction to (Bio)Statistics.  
 
 You are responsible for reading the relevant chapters in the text.  The text is very good & readable, so you should use it.  Also, you will have a much deeper understanding of the material if you spend time working through the applets at http://www.rossmanchance.com/iscam3/files.html.  You should make sure you are coming to class and also reading the materials associated with the activities. 
 
-```{r eval=FALSE, include = FALSE}
-install.packages("bookdown")
-# or the development version
-# devtools::install_github("rstudio/bookdown")
-
-setwd("~/gitRepos/website/Math58")
-#bookdown::render_book("index.Rmd", "bookdown::gitbook")
-
-bookdown::render_book("index.Rmd", output_dir = "Notes")
-```
-
-
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
 
 
 
-```{r include = FALSE, eval=FALSE}
-# iscam
-# http://www.rossmanchance.com/iscam3/files.html
-
-# openintro
-#https://www.openintro.org/
-
-# modern dive: https://moderndive.com/
-```
 
 
-```{r, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3, fig.width=5, 
-                      fig.align = "center")
 
-library(tidyverse)
-library(broom)
-library(caret)
-library(infer)
-library(emo)
-```
+
+
+
+
+
 
 | Day    	| Topic     	|  Book Chap   	|   Notes Section |
 |:-------	|:------------|:---------	|:--------------------	|
@@ -83,9 +52,9 @@ library(emo)
 | 3/12/20	| Exam 1 |   |  |
 | 3/17/20	| Spring Break 1|  |   |
 | 3/19/20	| Spring Break 1 |  |  |
-| 3/24/20	| Spring Break 2 |  Census  | \@ref(census) [Census] |
-| 3/26/20	| Spring Break 2 | COVID-19  | \@ref(covid19) [COVID-19] |
-| 3/31/20	| Sampling Dist of $\overline{X}$| ISRS 4.1 & Inv 2.4 |  \@ref(Mar31) [Mar31] \@ref(mean1dist) [Dist 1 mean] |
-| 4/2/20	| Inference on $\mu$| ISRS 4.1 & Inv 2.5|  \@ref(Apr2) [Apr2] \@ref(mean1inf) [Inf 1 mean] |
+| 3/24/20	| Spring Break 2 - Census |    | \@ref(census) [Census] |
+| 3/26/20	| Spring Break 2 - COVID-19|   | \@ref(covid19) [COVID-19] |
+| 3/31/20	| sampling dist of $\overline{X}$| ISRS 4.1 & Inv 2.4 |  \@ref(Mar31) [Mar31] \@ref(1meandist) [Dist 1 mean] |
+| 4/2/20	| inference on $\overline{X}$| ISRS 4.1 & Inv 2.5|  \@ref(Apr2) [Apr2] \@ref(1meaninf) [Inf 1 mean] |
 
 
