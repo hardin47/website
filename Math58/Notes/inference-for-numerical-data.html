@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2020-03-30" />
+<meta name="date" content="2020-04-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -350,16 +350,96 @@ where <span class="math inline">\(SD(\overline{X}) = \sigma/\sqrt{n}\)</span> an
 <h3><span class="header-section-number">5.4.1</span> Mathematical model for distribution of the sample mean</h3>
 <p>Before coming up with the mathematical model appropriate for this section, it is important to notice that we almost never know the true variability of the data (i.e., <span class="math inline">\(\sigma\)</span>). Instead, we almost always have to estimate <span class="math inline">\(\sigma\)</span> using <span class="math inline">\(s\)</span>, the sample standard deviation. It turns out that when the estimate of the variability is used in the denominator, the sampling distribution becomes more variability (longer tails). Recall that it is the tails of the distribution in which we are the most interested, so we don’t want to get those wrong!!</p>
 <p>If <span class="math inline">\(\sigma\)</span> is somehow known: <span class="math display">\[\frac{\overline{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)\]</span></p>
-<p>But in the more standard situation where <span class="math inline">\(\sigma\)</span> is estimated using <span class="math inline">\(s\)</span>: <span class="math display">\[\frac{\overline{X} - \mu}{s/\sqrt{n}} \sim t_{df = n-1}\]</span></p>
+<p>But in the more typical situation where <span class="math inline">\(\sigma\)</span> is estimated using <span class="math inline">\(s\)</span>: <span class="math display">\[\frac{\overline{X} - \mu}{s/\sqrt{n}} \sim t_{df = n-1}\]</span></p>
+<div id="hypothesis-testing" class="section level4">
+<h4><span class="header-section-number">5.4.1.1</span> Hypothesis testing</h4>
+<p>If <span class="math inline">\(H_0: \mu = \mu_0\)</span> is true, then we know that: <span class="math display">\[\frac{\overline{X} - \mu}{s/\sqrt{n}} \sim t_{df = n-1}\]</span></p>
+<p>That is, we can use the <span class="math inline">\(t_{df = n-1}\)</span> distribution to find the p-value for the test. Note, in R we we use the function <code>xpt</code> in the <code>mosaic</code> package.</p>
+</div>
+<div id="confidence-intervals" class="section level4">
+<h4><span class="header-section-number">5.4.1.2</span> Confidence intervals</h4>
+<p>In the setting where there is no null hypothesis and an interval estimate is needed, the interval is created in the exact same way as was done with proporitons using: <span class="math display">\[\overline{X} \pm t_{n-1}^* \cdot SE(\overline{X})\]</span></p>
+<p>Which is the same thing as: <span class="math display">\[\overline{X} \pm t_{n-1}^* \cdot s/ \sqrt{n}\]</span></p>
+</div>
 </div>
 <div id="example-healthy-body-temperature" class="section level3">
-<h3><span class="header-section-number">5.4.2</span> Example: healthy body temperature</h3>
+<h3><span class="header-section-number">5.4.2</span> Example: healthy body temperature<a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a></h3>
+<p>The study at hand is meant to determine whether the average healthy body temperature is actually 98.6 F.<a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a></p>
+<blockquote>
+<p>Body temperatures (oral temperatures using a digital thermometer) were recorded for healthy men and women, aged 18-40 years, who were volunteers in Shigella vaccine trials at the University of Maryland Center for Vaccine Development, Baltimore. For these adults, the mean body temperature was found to be 98.249 F with a standard deviation of 0.733 F.<a href="#fn20" class="footnote-ref" id="fnref20"><sup>20</sup></a></p>
+</blockquote>
+<p>In order to work through the analysis it is imperative that we understand the data that was collected as part of the research.</p>
+<table style="width:100%;">
+<colgroup>
+<col width="28%" />
+<col width="33%" />
+<col width="33%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">center</th>
+<th align="left">variability of data</th>
+<th align="left">variability of sample means</th>
+<th align="left">sample size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\overline{X} = 98.249\)</span> F</td>
+<td align="left"><span class="math inline">\(s = 0.733\)</span> F</td>
+<td align="left"><span class="math inline">\(SE(\overline{X}) = s/\sqrt{n} = 0.733 / \sqrt{13} = 0.2033\)</span></td>
+<td align="left"><span class="math inline">\(n=13\)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(\mu\)</span> = true ave healthy body temp (unknown!)</td>
+<td align="left"><span class="math inline">\(\sigma\)</span> = true sd of healthy body temps (unknown!)</td>
+<td align="left"><span class="math inline">\(SD(\overline{X}) = \sigma/\sqrt{n}\)</span> = unknown!</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<div id="hypothesis-test" class="section level4">
+<h4><span class="header-section-number">5.4.2.1</span> Hypothesis Test</h4>
+<p>The first research question we want to ask is: how surprising would it be to select a group of 13 participants who have an average healthy body temperature of 98.249 F ?</p>
+<p>The questions is set up perfectly for a hypothesis test!</p>
+<p><span class="math inline">\(H_0: \mu = 98.6\)</span></p>
+<p><span class="math inline">\(H_A: \mu \ne 98.6\)</span></p>
+<p>We use the t-distribution to investigate the claim.</p>
+<p><span class="math display">\[t-score = \frac{98.249 - 98.6}{0.733/\sqrt{130}} = -5.46\]</span></p>
+<p>How likely is the standardized version of our test statistic to happen if the null hypothesis is true? Well, if <span class="math inline">\(H_0\)</span> is true, then the t-statistics should have a t-distribution. So we can use the t-distribution to find the p-value (recall that the p-value is the probability of the data or more extreme if <span class="math inline">\(H_0\)</span> is true.)</p>
+<p>The test statistic is -5.46, and even a two-sided p-value (the area doubled) is way less than 0.001.</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" data-line-number="1"><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>mosaic<span class="op">::</span><span class="kw">xpt</span>(<span class="op">-</span><span class="fl">5.46</span>, <span class="dt">df =</span> <span class="dv">129</span>, <span class="dt">ncp =</span> <span class="dv">0</span>)</a></code></pre></div>
+<p><img src="04-InfNum_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 2.354246e-07</code></pre>
+</div>
+<div id="confidence-interval" class="section level4">
+<h4><span class="header-section-number">5.4.2.2</span> Confidence Interval</h4>
+<p>Possibly more interesting is the confidence interval which would tell us a range of plausible values for healthy body temperatures.</p>
+<p>The confidence interval is given by the following formula: <span class="math display">\[\overline{X} \pm t_{n-1}^* \cdot s/ \sqrt{n}\]</span></p>
+<p>and is calculated to be (98.121, 98.376). That is, we are 95% confident that the true average healthy body temperature is somewhere between 98.121 F and 98.376 F. Note that 98.6 F is not in the interval!!! Wow.</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" data-line-number="1">mosaic<span class="op">::</span><span class="kw">xqt</span>(.<span class="dv">975</span>, <span class="dt">df =</span> <span class="dv">129</span>)</a></code></pre></div>
+<p><img src="04-InfNum_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 1.978524</code></pre>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" data-line-number="1"><span class="fl">98.249</span> <span class="op">-</span><span class="st"> </span><span class="fl">1.9785</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.733</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">130</span>)</a></code></pre></div>
+<pre><code>## [1] 98.12181</code></pre>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="fl">98.249</span> <span class="op">+</span><span class="st"> </span><span class="fl">1.9785</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.733</span> <span class="op">/</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">130</span>)</a></code></pre></div>
+<pre><code>## [1] 98.37619</code></pre>
+</div>
 </div>
 </div>
 <div id="reflection-questions-2" class="section level2">
 <h2><span class="header-section-number">5.5</span> Reflection Questions</h2>
 
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="18">
+<li id="fn18"><p>Inv 2.5, Chance &amp; Rossman, ISCAM<a href="inference-for-numerical-data.html#fnref18" class="footnote-back">↩</a></p></li>
+<li id="fn19"><p>Conventional wisdom says that the reason 98.6 has hung around is because it translates to 35 C. Indeed, it it agreed that, to the nearest integer, the average healthy human body temperature is 35 C. But there is also some consensus that it is slightly lower than 35 C (if we are willing to use more significant digits). The idea is that we have hung on to 98.6 because the decimal <em>feels</em> like a precise measurement. In reality, it is just the conversion from 35 C to F.<a href="inference-for-numerical-data.html#fnref19" class="footnote-back">↩</a></p></li>
+<li id="fn20"><p>Mackowiak, Wasserman, &amp; Levine, <em>Journal of the American Medical Association</em>, 1992<a href="inference-for-numerical-data.html#fnref20" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
             </section>
 

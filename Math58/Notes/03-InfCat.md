@@ -1403,7 +1403,9 @@ Pay attention to counts per group.  20-44 is 24 years.  65-74 is 9 years.
 
 * What is the trade-off between putting a cap on the disease and resisting tracking our personal data?
 
-   - Can smart thermometers help track the coronavirus? https://www.nytimes.com/2020/03/18/health/coronavirus-fever-thermometers.html
+   - Can smart thermometers help track the coronavirus? (March 18, 2020) https://www.nytimes.com/2020/03/18/health/coronavirus-fever-thermometers.html
+   
+   - Follow-up:  Restrictions are Slowing Coronavirus Infections, New Data Suggests (March 30, 2020) https://www.nytimes.com/2020/03/30/health/coronavirus-restrictions-fevers.html?searchResultPosition=1
 
    - Social distancing scoreboard based on movement of mobile phones: https://www.unacast.com/covid19/social-distancing-scoreboard (info about their work: https://www.unacast.com/post/the-unacast-social-distancing-scoreboard)
  
