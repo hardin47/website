@@ -97,8 +97,8 @@ In order to work through the analysis it is imperative that we understand the da
 
 |          center                                  |             variability of data                                      |                                variability of sample means                   |  sample size    |
 |:--------------------------------------------|:---------------------------------------------------|:---------------------------------------------------|:------|
-| $\overline{X} = 98.249$ F                    | $s = 0.733$ F                                       | $SE(\overline{X}) = s/\sqrt{n} = 0.733 / \sqrt{13} = 0.2033$ | $n=13$ |
-| $\mu$ = true ave healthy body temp (unknown!) | $\sigma$ = true sd of healthy body temps (unknown!) | $SD(\overline{X}) = \sigma/\sqrt{n}$ = unknown!     |      |
+| $\overline{X} = 98.249$ F                    | $s = 0.733$ F                                       | $SE(\overline{X}) = \frac{s}{\sqrt{n}} = \frac{0.733}{\sqrt{130}} = 0.0643$ | $n=130$ |
+| $\mu$ = true ave healthy body temp (unknown!) | $\sigma$ = true sd of healthy body temps (unknown!) | $SD(\overline{X}) = \frac{\sigma}{\sqrt{n}}$ = unknown!     |      |
 
 
 ####  Hypothesis Test
