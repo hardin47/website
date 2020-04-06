@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-04-02"
+date: "2020-04-06"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -56,5 +56,7 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | 3/26/20	| Spring Break 2 | COVID-19  | \@ref(covid19) [COVID-19] |
 | 3/31/20	| Sampling Dist of $\overline{X}$| ISRS 4.1 & Inv 2.4 |  \@ref(Mar31) [Mar31] \@ref(mean1dist) [Dist 1 mean] |
 | 4/2/20	| Inference on $\mu$| ISRS 4.1 & Inv 2.5|  \@ref(Apr2) [Apr2] \@ref(mean1inf) [Inf 1 mean] |
+| 4/7/20	| Prediction Intervals | Inv 2.6 |  \@ref(Apr7) [Apr7] \@ref(predint) [Pred Int] |
+| 4/9/20	| Inference on $\mu_1 - \mu_2$| ISRS 4.3 & Inv 4.2|  \@ref(Apr9) [Apr9] \@ref(mean2inf) [Inf 2 means] |
 
 
