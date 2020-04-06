@@ -219,6 +219,14 @@ mosaic::xqt(.975, df = 129)
 ## [1] 99.70481
 ```
 
+## 4/9/20 Agenda {#Apr9}
+1. Sampling distirbution of $\overline{X}_1 - \overline{X}_2$
+2. Hypothesis testing of $\mu_1 - \mu_2$
+
+## 4/14/20 Agenda {#Apr14}
+1. Confidence Interval for $\mu_1 - \mu_2$
+
+
 ## Comparing two means {#mean2inf}
 
 
@@ -233,7 +241,8 @@ Consider the teacher salary data available in the OpenIntro textbook.
 
 
 ```r
-teachers <- read_delim("https://www.openintro.org/data/tab-delimited/teacher.txt", delim= "\t")
+teachers <- read_delim("https://www.openintro.org/data/tab-delimited/teacher.txt", 
+                       delim= "\t")
 ```
 
 
@@ -241,7 +250,7 @@ teachers <- read_delim("https://www.openintro.org/data/tab-delimited/teacher.txt
 
 The function which is typically used to do t-tests is the function `t.test`.  Note that the `t.test` function requires a complete dataset, not just the summary statistics.  However, the `t.test` can be used to do any of the variety of tests we've seen (and the ones we haven't seen!):  one sample t-test, two independent samples t-test (with or without equal variances), paired t-test.
 
-### One sample t-test  
+#### One sample t-test  
 
 For example, we might be interested in testing whether the average salary (of all teachers in St Louis) is above $47,000 a year.  The p-value is extremely small. We reject $H_0$.  That is, we can claim that the true average base salary is above $47,000. (Note, to calculate a CI, use `alternative = "two.sided"`.)
 
@@ -268,7 +277,7 @@ t.test(teachers$base, mu = 47000, alternative = "greater")
 ```
 
 
-### Two independent samples t-test
+#### Two independent samples t-test
 
 Or, maybe interest is in knowing whether the base salary for teachers with a BA degree is less than those with an MA degree, on average.  Note, $\mu$ denotes the average salary in the population group denoted by the subscript.  The p-value is 0.442, so we would not reject the null hypothesis.  (Note, to calculate a CI, use `alternative = "two.sided"`.)
 
