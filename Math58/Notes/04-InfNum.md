@@ -65,7 +65,7 @@ You should notice:
 
 ## 4/7/20 Agenda {#Apr7}
 1. Review of confidence interval for one mean
-2. Prediction Interval for observations
+2. Prediction Interval for a future observation
 
 ## Inference for a single mean, $\mu$ {#mean1inf}
 
@@ -91,9 +91,9 @@ Which is the same thing as: $$\overline{X} \pm t_{n-1}^* \cdot s/ \sqrt{n}$$
 
 #### Prediction Intervals (ISCAM 2.6, not in ISRS) {#predint}
 
-A prediction interval is **different** from a confidence interval!!!  Remember that a confidence interval is a range of values that try to capture a **parameter**.   A prediction interval is meant to capture 95% of the actual observations (see below for the example on healthy body temperatures).  Note that in order to capture the variability in the observations, we combine the variability of the center of the interval ($s/\sqrt{n}$) with the variability of the observations themselves ($s$).
+A prediction interval is **different** from a confidence interval!!!  Remember that a confidence interval is a range of values that try to capture a **parameter**.   A prediction interval is meant to capture 95% of future observations (see below for the example on healthy body temperatures).  Note that in order to capture the variability in the observations, we combine the variability of the center of the interval ($s/\sqrt{n}$) with the variability of the observations themselves ($s$).
 
-A $(1-\alpha)100%$ prediction interval will capture $(1-\alpha)100%$ of the observations (in the long run or in the population).
+A $(1-\alpha)100%$ prediction interval has a $(1-\alpha)$ probability of capturing a new observation from the population.
 
 $$\overline{X} \pm t_{n-1}^* \cdot s \sqrt{1 + \frac{1}{n}}$$
 
@@ -180,9 +180,9 @@ mosaic::xqt(.975, df = 129)
 
 #### Prediction interval for individual healthy body temperatures^[Inv 2.6, Chance & Rossman, ISCAM] 
 
-Note the fundamental difference between the **goal** of the confidence interval above and the **goal** of the prediction interval calculated in this section.  A confidence interval (*always*) is an interval of plausible values for a parameter.  A prediction interval (*always*) is for individual observations.
+Note the fundamental difference between the **goal** of the confidence interval above and the **goal** of the prediction interval calculated in this section.  A confidence interval is an interval of plausible values for a population parameter.  A prediction interval is for a future *individual* observations.
 
-A $(1-\alpha)100%$ prediction interval will capture $(1-\alpha)100%$ of the observations (in the long run or in the population).
+A $(1-\alpha)100%$ prediction interval has a $(1-\alpha)$ probability of capturing a new observation from the population.
 
 Here, a 95% prediction interval for healthy body temperatures can be calculated using:
 
@@ -190,7 +190,7 @@ $$\overline{X} \pm t_{n-1}^* \cdot s \cdot \sqrt{1 + \frac{1}{n}}$$
 
 $$98.249 \pm t_{129}^* \cdot 0.733 \cdot \sqrt{1 + \frac{1}{130}}$$
 
-Which gives a 95% prediction interval of (96.79 F, 99.70 F). That is, 95% of the individuals in the population will have a healthy body temperature between 96.79 F and 99.70 F  (a **much** wider range of values than the confidence interval!)
+Which gives a 95% prediction interval of (96.79 F, 99.70 F). There is a 0.95 probability that if I reach into the population, the person selected will have a healthy body temperature between 96.79 F and 99.70 F.  Said differently,  95% of the individuals in the population will have a healthy body temperature between 96.79 F and 99.70 F  (a **much** wider range of values than the confidence interval!)
 
 
 ```r
