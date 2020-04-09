@@ -179,14 +179,80 @@ mosaic::xqt(.975, df = 129)
 ```
 
 ## 4/9/20 Agenda {#Apr9}
-1. Sampling distirbution of $\overline{X}_1 - \overline{X}_2$
-2. Hypothesis testing of $\mu_1 - \mu_2$
+under the random sample model:
+
+1. Sampling distribution of $\overline{X}_1 - \overline{X}_2$
+2. Hypothesis testing (and CI) of $\mu_1 - \mu_2$
 
 ## 4/14/20 Agenda {#Apr14}
-1. Confidence Interval for $\mu_1 - \mu_2$
+under the random allocation model:
+
+1. Sampling distribution of $\overline{X}_1 - \overline{X}_2$
+2. Confidence interval (and HT) for $\mu_1 - \mu_2$
 
 
-## Comparing two means {#mean2inf}
+## Comparing two independent means {#mean2inf}
+
+It turns out that in *both* the setting where random samples are taken (e.g., NBA salaries) and the setting where random allocation is done (e.g., sleep deprivation), the t-distribution describes the distribution of the test statistic quite well.  Note that the variability associated with the difference in means uses the variability of both the samples (and their individual sample sizes!).
+
+\begin{eqnarray*}
+\mbox{parameter} &=& \mu_1 - \mu_2\\
+\mbox{statistic} &=& \overline{X}_1 - \overline{X}_2\\
+SE_{\overline{X}_1 - \overline{X}_2} &=& ?????
+\end{eqnarray*}
+
+In general, the math is done on the variance (which is just the squared standard deviations).
+\begin{eqnarray*}
+var(A - B) &=& var(A) + var(B)\\
+var(\overline{X}_1 - \overline{X}_2) &=& var(\overline{X}_1) + var(\overline{X}_2)\\
+&=& \sigma^2_1 / n_1 + \sigma^2_2 / n_2\\
+SE(\overline{X}_1 - \overline{X}_2) &=& \sqrt{s^2_1 / n_1 + s^2_2 / n_2}\\
+\end{eqnarray*}
+
+The above methods can be used when the samples are of different sizes and when the variability in the two samples is quite different ($s_1 \ne s_2$).  If we use the above procedures, the exact degrees of freedom are not straightforward to calculate:
+
+\begin{eqnarray*}
+df &=& \frac{ \bigg(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2} \bigg)^2}{ \bigg[ \frac{(s^2_1/n_1)^2}{n_1 - 1} + \frac{(s^2_2/n_2)^2}{n_2 - 1} \bigg] }\ \ \ \ \ \ \ \mbox{Yikes!!!!}\\
+df &\approx& \min \{ n_1 - 1, n_2 -1 \} \\
+\end{eqnarray*}
+
+With the SE appropriately defined, the hypothesis test and confidence interval follow the methods from earlier in the semester.
+
+$H_0: \mu_1 - \mu_2 = 0$  
+$H_A: \mu_1 - \mu_2 \ne 0$
+
+**When $H_0$ is true**:
+
+\begin{eqnarray*}
+t &=& \frac{(\overline{X}_1 - \overline{X}_2) - (\mu_1 - \mu_2)_0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}}\\
+&=& \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}}\\
+&\sim& t_{\min \{ n_1 - 1, n_2 -1 \} }
+\end{eqnarray*}
+
+Which means that the $t_{\min \{ n_1 - 1, n_2 -1 \} }$-distribution can be used to find a p-value associated with the t-score:
+$$\mbox{t-score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}}.$$
+
+Additionally, a $(1-\alpha)100$% confidence interval for $(\mu_1 - \mu_2)$ can be found by computing:
+
+$$(\overline{X}_1 - \overline{X}_2) \pm t_{\min \{ n_1 - 1, n_2 -1 \} }^* \cdot \sqrt{s_1^2 / n_1 + s_2^2 / n_2}.$$
+
+<!--
+$$(\overline{X}_1 - \overline{X}_2) ~ \sim N\bigg( (\mu_1 - \mu_2), \sqrt{\sigma_1^2 / n_1 + \sigma_2^2 / n_2} \bigg)$$
+
+$$\mbox{t-score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}} \sim t_{\min \{ n_1 - 1, n_2 -1 \} }$$
+
+
+Unfortunately, however Welch's t-test is not used as often as other t-tests (though there is research to show that Welch's t-test should be the default).  \\
+
+\medskip
+\noindent
+In particular, if the standard errors are reasonably similar ($\sigma_1 \approx \sigma_2$), a more powerful test is given by:
+\begin{eqnarray*}
+SE(\overline{X}_1 - \overline{X}_2) &=& \sqrt{s^2_p (1/ n_1 + 1 / n_2)}\\
+s^2_p &=& \frac{(n_1-1) s_1^2 + (n_2-1)s_2^2}{n_1 + n_2 -2}\\4
+df &=& n_1 + n_2 - 2
+\end{eqnarray*}
+-->
 
 
 ##  R code for inference on 1 or 2 means.
@@ -213,6 +279,7 @@ The function which is typically used to do t-tests is the function `t.test`.  No
 For example, we might be interested in testing whether the average salary (of all teachers in St Louis) is above $47,000 a year.  The p-value is extremely small. We reject $H_0$.  That is, we can claim that the true average base salary is above $47,000. (Note, to calculate a CI, use `alternative = "two.sided"`.)
 
 $H_0: \mu = 47,000$
+
 $H_A: \mu > 47,000$
 
 ```{r}
@@ -225,6 +292,7 @@ t.test(teachers$base, mu = 47000, alternative = "greater")
 Or, maybe interest is in knowing whether the base salary for teachers with a BA degree is less than those with an MA degree, on average.  Note, $\mu$ denotes the average salary in the population group denoted by the subscript.  The p-value is 0.442, so we would not reject the null hypothesis.  (Note, to calculate a CI, use `alternative = "two.sided"`.)
 
 $H_0: \mu_{BA} = \mu_{MA}$
+
 $H_A: \mu_{BA} < \mu_{MA}$
 
 ```{r}
@@ -297,28 +365,87 @@ null_dist %>%
 ### NBA Salaries example from ISCAM Inv 4.2 
 
 
-```{r eval = FALSE}
-salary <- read_delim("http://www.rossmanchance.com/iscam3/data/NBASalaries2017.txt", delim = "\t", 
-                     escape_double = FALSE, trim_ws = TRUE)
+There is R code in the ISCAM book.  I've written the series of steps in a slightly different way with the same results.
 
-westmean = 0; eastmean = 0; westsd = 0; eastsd = 0
+####  EDA
 
-for (i in 1:1000) {
-  westsample1 = sample(salary[which(conference == "western")], 20)
-  eastsample1 = sample(salary[which(conference == "eastern")], 20)
-  westmean[i]=mean(westsample1)
-  eastmean[i]=mean(eastsample1)
-  westsd[i] = sd(westsample1)
-  eastsd[i] = sd(eastsample1)
-}
+Before thinking about inference, let's look at the population (for 2017-18).  The information for today is the population because it includes the salaries of all NBA players in 2017.  We can see that in this particular year, the average salary in the Western conference is slightly higher.  
 
+```{r}
+NBAsalary <- read_delim("http://www.rossmanchance.com/iscam3/data/NBASalaries2017.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+
+
+ggplot(NBAsalary) +
+  geom_boxplot(aes(x=conference, y = salary))
+
+ggplot(NBAsalary) +
+  geom_histogram(aes(fill = conference, x = salary))
+
+ggplot(NBAsalary) +
+  geom_histogram(aes(x = salary)) + 
+  facet_wrap(~ conference)
+
+NBAsalary %>%
+  group_by(conference) %>%
+  summarize(mu = mean(salary), sigma = sd(salary), N = n(), min(salary), max(salary), median(salary))
 ```
 
-Equivalently, the code can be written in a tidy way:
 
-```{r eval=FALSE}
-salary %>%
-  group_by
+####  Sampling distribution for one mean
+
+One way to think about how the difference in means varies is to first visualize the variability in the distribution for a single mean (i.e., from one conference).  Let's look at the variability in the Eastern conference as well as the variability in the Western conference.
+
+Note that from the population analysis above, we see that $\sigma \approx 7$.  So the histograms below should have a standard deviation of close to $\sigma / \sqrt{20} = 1.5$.  Do they?
+
+Are the two histograms centered at the same place?  Should they be?
+
+```{r}
+NBAsalary %>%
+  filter(conference == "eastern") %>%
+  rep_sample_n(size = 20, replace = FALSE, reps = 500) %>%
+  summarise(mean_sal = mean(salary)) %>%
+  ggplot() +
+  geom_histogram(aes(x=mean_sal))
+
+NBAsalary %>%
+  filter(conference == "western") %>%
+  rep_sample_n(size = 20, replace = FALSE, reps = 500) %>%
+  summarise(mean_sal = mean(salary)) %>%
+  ggplot() +
+  geom_histogram(aes(x=mean_sal))
+```
+
+
+#### Sampling distribution for two means
+
+Note:  the code selects 20 random salaries from the Eastern NBA conference and 20 random salaries from the Western NBA conference.  Using those two different samples, a t-statistic is selected.  The whole process is repeated 1000 times.
+
+
+```{r}
+set.seed(4747)
+
+t_salaries <- c(1:1000)
+for(i in 1:1000){
+  
+  one_t<- NBAsalary %>%
+    group_by(conference) %>%
+    sample_n(size = 20, replace = FALSE) %>% 
+    summarize(mn = mean(salary), sd = sd(salary), n = n()) %>%
+    pivot_wider(names_from = conference, values_from = 2:4) %>%
+    summarize(tstat = (mn_eastern - mn_western) / 
+                sqrt(sd_eastern^2 / n_eastern + sd_western^2 / n_western)) %>%
+    pull()
+
+  t_salaries[i] <- one_t
+}
+
+t_salaries <- data.frame(tstat = t_salaries)
+
+t_salaries %>%
+  ggplot() +
+  geom_histogram(aes(x=tstat)) +
+  geom_vline(xintercept = 0)
+
 ```
 
 
