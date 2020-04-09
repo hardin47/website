@@ -528,9 +528,28 @@ NBAsalary %>%
 
 ####  Sampling distribution for one mean
 
+Before considering how the sample means vary, let's visualize samples from each conference.
+
+
+```r
+NBAsalary %>%
+  filter(conference == "eastern") %>%
+  sample_n(size = 20, replace = FALSE) %>%
+  ggplot() + 
+  geom_histogram(aes(x = salary)) + xlab("eastern salary")
+
+NBAsalary %>%
+  filter(conference == "western") %>%
+  sample_n(size = 20, replace = FALSE) %>%
+  ggplot() + 
+  geom_histogram(aes(x = salary)) + xlab("western salary")
+```
+
+<img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /><img src="04-InfNum_files/figure-html/unnamed-chunk-10-2.png" width="768" style="display: block; margin: auto;" />
+
 One way to think about how the difference in means varies is to first visualize the variability in the distribution for a single mean (i.e., from one conference).  Let's look at the variability in the Eastern conference as well as the variability in the Western conference.
 
-Note that from the population analysis above, we see that $\sigma \approx 7$.  So the histograms below should have a standard deviation of close to $\sigma / \sqrt{20} = 1.5$.  Do they?
+Note that from the population analysis above (full set of observations), we see that $\sigma \approx 7$.  So the histograms below should have a standard deviation of close to $\sigma / \sqrt{20} = 1.5$.  Do they?
 
 Are the two histograms centered at the same place?  Should they be?
 
@@ -539,23 +558,23 @@ Are the two histograms centered at the same place?  Should they be?
 NBAsalary %>%
   filter(conference == "eastern") %>%
   rep_sample_n(size = 20, replace = FALSE, reps = 500) %>%
-  summarise(mean_sal = mean(salary)) %>%
+  summarize(mean_sal = mean(salary)) %>%
   ggplot() +
   geom_histogram(aes(x=mean_sal))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 NBAsalary %>%
   filter(conference == "western") %>%
   rep_sample_n(size = 20, replace = FALSE, reps = 500) %>%
-  summarise(mean_sal = mean(salary)) %>%
+  summarize(mean_sal = mean(salary)) %>%
   ggplot() +
   geom_histogram(aes(x=mean_sal))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-10-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-11-2.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Sampling distribution for two means
@@ -567,7 +586,7 @@ Note:  the code selects 20 random salaries from the Eastern NBA conference and 2
 ```r
 set.seed(4747)
 
-t_salaries <- c(1:1000)
+t_salaries <- data.frame(meandiff = double(), tstat = double())
 for(i in 1:1000){
   
   one_t<- NBAsalary %>%
@@ -575,22 +594,30 @@ for(i in 1:1000){
     sample_n(size = 20, replace = FALSE) %>% 
     summarize(mn = mean(salary), sd = sd(salary), n = n()) %>%
     pivot_wider(names_from = conference, values_from = 2:4) %>%
-    summarize(tstat = (mn_eastern - mn_western) / 
-                sqrt(sd_eastern^2 / n_eastern + sd_western^2 / n_western)) %>%
-    pull()
+    summarize(meandiff = (mn_eastern - mn_western), 
+              tstat = (mn_eastern - mn_western) / 
+                sqrt(sd_eastern^2 / n_eastern + sd_western^2 / n_western)) 
 
-  t_salaries[i] <- one_t
+  t_salaries[i,] <- one_t
 }
 
-t_salaries <- data.frame(tstat = t_salaries)
 
+t_salaries %>%
+  ggplot() +
+  geom_histogram(aes(x=meandiff)) +
+  geom_vline(xintercept = 0)
+```
+
+<img src="04-InfNum_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
 t_salaries %>%
   ggplot() +
   geom_histogram(aes(x=tstat)) +
   geom_vline(xintercept = 0)
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
 
 
 ## Reflection Questions
