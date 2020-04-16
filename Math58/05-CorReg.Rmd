@@ -1,0 +1,219 @@
+# Correlation & Regression
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3.5,
+                      fig.width=5, 
+                      fig.align = "center", cache=TRUE)
+library(tidyverse)
+library(infer)
+library(mosaic)
+```
+
+## 4/16/20 Agenda {#Apr16}
+1. Definition of correlation (r)
+2. Interpretation of correlation (r)  
+3. (Probably not: Inference on $\rho$)
+
+
+The last topic of the semester will focus on modeling and inference using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
+
+To get started, consider a handful of variables taken on the top 80 PGA golfers in 2004.  The example comes from Investigation 5.7 in @iscam  
+
+```{r fig.cap = "Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/golf.jpg")
+```
+
+Rank the eight scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
+
+* What would the correlation be if there was a perfect positive relationship?
+* What would the correlation be if there was a perfect negative relationship?
+* What would the correlation be if there was no relationship?
+
+## Correlation {#cor}
+
+Correlation measures the association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
+
+> The *correlation coefficient* measures the strength and direction of the linear association between two numerical variables.
+
+### Estimating Correlation
+
+The value of the correlation is defined as:
+
+\begin{eqnarray*}
+r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i - \overline{x})^2} \sqrt{ \sum_i(y_i - \overline{y})^2}}\\
+&=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
+\end{eqnarray*}
+
+```{r fig.cap = "Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/golfcor.jpg")
+```
+
+
+For each red dot (on each plot), consider the distance the observation is from the $\overline{X}$ line and the $\overline{Y}$ line.  Is the observation (red dot) above both?  below both?  above one and below the other?  
+
+How does the particular red dot (observation) contribute to the correlation?  In a positive way (to make $r$ bigger)?  In a negative way (to make $r$ smaller)?
+
+Some ideas worth thinking about:
+
+* quadratic plots can have zero correlation yet a perfect functional relationship
+* $-1 \leq r \leq 1$
+* correlation does not imply causation (ice cream & boating accidents!)
+* for inference with $\rho$ as well as $\beta_1$, the data should come from a bivariate normal distribution.  That is, histograms of $X$ and $Y$ should both be normal, and the scatterplot should be a cloud.
+* correlation will go down when only a narrow range of X values is represented (see denominator of r).
+* measurement error biases the estimate of a correlation coefficient toward zero.
+
+
+### Coefficient of Determination -- $R^2$
+
+The coefficient of determination ($R^2$) is the square of the correlation (given above).  However, it also has an additional interpretation that will be useful for us.  It can measure how much of the original variability in Y is given by the regression line.  Both SSE and least-squares will be defined below when we fit a line to the scatter plot of observations.
+
+SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the line.
+
+\begin{eqnarray*}
+R^2 = \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})}
+\end{eqnarray*}
+
+$R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
+
+### Inference for correlation
+
+
+Note:  we won't actually cover inference for correlation in class, but the notes on inference for correlation are included so that you can see that the process is very similar to all of the other statistics seen in the course to this point.
+
+Parameter: $\rho$  
+Statistic: $r$  
+SE$_r: \sqrt{\frac{1-r^2}{n-2}}$   
+**BUT**, $r$ is only normally distributed when $\rho$ = 0!  Otherwise, the distribution of $r$ from sample to sample is skewed (think about the scenario when $\rho = 0.9$).
+
+
+#### Hypothesis Testing
+
+\begin{eqnarray*}
+H_0:&& \rho = 0\\
+H_A:&& \rho \ne 0\\
+t^* &=& \frac{r}{SE_r} = \frac{r}{\sqrt{(1-r^2)/(n-2)}}\\
+t^* &\sim& t_{n-2}  \mbox{ when } H_0 \mbox{ is true}
+\end{eqnarray*}
+
+#### Confidence Interval
+
+
+If $\rho \ne 0$, then the SE might be okay, but the sampling distribution of $r$ will not be normal (and thus will not be a $t$ when we use the SE).
+
+
+Let:
+
+\begin{eqnarray*}
+z &=& 0.5 \ln \bigg( \frac{1+r}{1-r} \bigg)\\
+\xi &=& 0.5 \ln \bigg( \frac{1+\rho}{1-\rho} \bigg)\\
+var(z) &=& \sqrt{\frac{1}{n-3}}\\
+95\% \mbox{ CI for } \xi : &&\\
+z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+\mbox{we're 95% confident that } && \\
+&&z - 1.96 \cdot  \sqrt{\frac{1}{n-3}} \leq \xi \leq z + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+&& a \leq \xi \leq b\\
+&& a \leq 0.5 \ln \bigg(\frac{1+\rho}{1-\rho} \bigg) \leq b\\
+&& \frac{e^{2a} - 1}{e^{2a} + 1} \leq \rho \leq \frac{e^{2b} - 1}{e^{2b} + 1}
+\end{eqnarray*}
+
+
+### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13]
+
+
+
+Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.
+
+
+
+```{r}
+cats <- read_table2("http://www.rossmanchance.com/iscam2/data/CatJumping.txt")
+
+cats %>%
+  select(bodymass, velocity) %>%
+  cor()
+```
+
+
+
+**HT:**  
+\begin{eqnarray*}
+H_0:&& \rho = 0\\
+H_a:&& \rho \ne 0\\
+t^* &=& \frac{r}{\sqrt{(1-r^2)/(n-2)}} = \frac{-0.496}{\sqrt{(1-0.496^2) / (18-2)}}= -2.2849\\
+p-value &=& 2 \cdot P(t_{18-2} \leq -2.2849) = 2\cdot(pt(-2.2849,16)) = 0.036 \mbox{  (borderline significant)}
+\end{eqnarray*}
+
+**CI:**  
+\begin{eqnarray*}
+95\% && \mbox{CI for } \xi : \\
+z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+&&\mbox{we're } 95\% \mbox{ confident that}\\
+&& 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{n-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+&& 0.5 \ln\bigg(\frac{1 - 0.496}{1+0.496}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{18-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1-0.496}{1+0.496}\bigg) + 1.96 \cdot \sqrt{\frac{1}{18-3}}\\
+&& -1.05 \leq \xi \leq -0.04\\
+&& \frac{e^{2\cdot -1.05} - 1}{e^{2\cdot -1.05} + 1} \leq \rho \leq \frac{e^{2\cdot -0.04} - 1}{e^{2\cdot -0.04} + 1}\\
+&& (-0.781, -0.04)
+\end{eqnarray*}
+
+
+```{r}
+summary(lm(velocity ~ bodymass, data = cats))
+```
+
+
+
+
+An alternative way to work with the output is in specific pieces (instead of the entire summary output).
+
+```{r}
+library(broom)
+
+lm(velocity ~ bodymass, data = cats) %>% tidy(conf.int = TRUE)
+```
+
+And to work with the residuals, use `augment()`.
+
+```{r}
+lm(velocity ~ bodymass, data = cats) %>% augment()
+
+lm(velocity ~ bodymass, data = cats) %>% augment() %>%
+  ggplot(aes(x = .fitted, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0)
+```
+
+
+
+## 4/21/20 Agenda {#Apr21}
+1. Least Squares estimation of the line
+2. Distribution of the least squares line from sample to sample
+
+## 4/23/20 Agenda {#Apr23}
+1. Inferential technical assumptions
+2. Residual Plots
+3. Transformations
+4. Prediction Intervals
+
+## Simple Linear Regression
+
+###  Least Squares estimation of the regression line {#ls}
+
+### Inference on the slope, $\beta_1$ {#infbeta1}
+
+## 4/28/20 Agenda {#Apr28}
+1. Multiple Linear Regression
+
+## 4/30/20 Agenda {#Apr30}
+1. Choosing model
+2. Residual Plots
+3. Prediction Intervals (harder to plot!)
+
+
+## Multiple Linear Regression {#MLR}
+
+### Model selection {#MLRmod}
+
+### Checking model assumptions
+
+
+

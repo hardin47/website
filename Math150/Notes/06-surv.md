@@ -991,6 +991,10 @@ http://powerandsamplesize.com/Calculators/Test-Time-To-Event-Data/Cox-PH-Equival
 * Investigating time-varying effects [@timevar]
 
 
+### Simulating survival data
+
+There is a package designed to simulate survival data, `simsurv`.  It allows for complex models, but there is some difficulty with scenarios with very few events or with binary explanatory variables.  Sam Brilleman spoke about the `simsurv` package at useR! 2018: https://www.youtube.com/watch?v=fJTYsncvpvI.
+
 
 ## R example: ProPublica Analysis {#Rsurv}
 
@@ -1147,12 +1151,12 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 ## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
 ##     rho = 0)
 ## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    106       16    32.66      8.50     22.70
-## score_factor=High    31       13     5.94      8.39      9.53
-## score_factor=Medium  63       24    14.40      6.41      8.93
+##                      N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    91       16     29.3      6.04     13.13
+## score_factor=High   52       20     11.6      6.11      7.80
+## score_factor=Medium 57       19     14.1      1.70      2.29
 ## 
-##  Chisq= 23.9  on 2 degrees of freedom, p= 7e-06
+##  Chisq= 14.1  on 2 degrees of freedom, p= 9e-04
 ```
 
 ```r
@@ -1164,12 +1168,12 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 ## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
 ##     rho = 1)
 ## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    106     13.6    27.70      7.22     21.61
-## score_factor=High    31     11.6     5.21      7.73      9.97
-## score_factor=Medium  63     20.4    12.59      4.83      7.72
+##                      N Observed Expected (O-E)^2/E (O-E)^2/V
+## score_factor=Low    91     13.8    24.54      4.68     11.69
+## score_factor=High   52     17.0     9.99      4.88      7.21
+## score_factor=Medium 57     15.8    12.04      1.16      1.82
 ## 
-##  Chisq= 23.1  on 2 degrees of freedom, p= 1e-05
+##  Chisq= 12.6  on 2 degrees of freedom, p= 0.002
 ```
 
 ```r
@@ -1196,11 +1200,11 @@ recidKMV2 %>% filter(race == "Caucasian") %>%
 ##     rho = 0)
 ## 
 ##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    111        3    3.554    0.0862     0.214
-## score_factor=High    31        2    0.759    2.0263     2.334
-## score_factor=Medium  64        1    1.687    0.2798     0.390
+## score_factor=Low    112        6    6.087   0.00126   0.00392
+## score_factor=High    25        2    0.966   1.10625   1.24725
+## score_factor=Medium  46        1    1.946   0.46016   0.58870
 ## 
-##  Chisq= 2.4  on 2 degrees of freedom, p= 0.3
+##  Chisq= 1.6  on 2 degrees of freedom, p= 0.5
 ```
 
 ```r
@@ -1214,11 +1218,11 @@ recidKMV2 %>% filter(race == "African-American") %>%
 ##     rho = 0)
 ## 
 ##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low     97        4     6.49     0.954     1.626
-## score_factor=High   107        6     4.44     0.550     0.776
-## score_factor=Medium  90        6     5.07     0.169     0.247
+## score_factor=Low     94        3     4.11     0.301     0.488
+## score_factor=High   131        6     3.77     1.322     2.037
+## score_factor=Medium  92        2     3.12     0.401     0.560
 ## 
-##  Chisq= 1.7  on 2 degrees of freedom, p= 0.4
+##  Chisq= 2  on 2 degrees of freedom, p= 0.4
 ```
 
 ```r
@@ -1231,11 +1235,11 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKMV2, rho=1)
 ##     rho = 1)
 ## 
 ##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    208     6.77    10.43     1.284    2.6070
-## score_factor=High   138     7.85     4.45     2.585    3.3914
-## score_factor=Medium 154     6.78     6.51     0.011    0.0163
+## score_factor=Low    206     8.77     9.63    0.0771     0.158
+## score_factor=High   156     7.78     4.87    1.7317     2.389
+## score_factor=Medium 138     2.96     5.00    0.8343     1.151
 ## 
-##  Chisq= 4  on 2 degrees of freedom, p= 0.1
+##  Chisq= 2.7  on 2 degrees of freedom, p= 0.3
 ```
 
 ```r
@@ -1386,10 +1390,9 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
 ```
 
 ```
-##                          rho    chisq     p
-## score_factorHigh    0.010310 3.26e-01 0.568
-## score_factorMedium -0.000149 6.79e-05 0.993
-## GLOBAL                    NA 4.28e-01 0.807
+##              chisq df   p
+## score_factor 0.457  2 0.8
+## GLOBAL       0.457  2 0.8
 ```
 
 ```r
@@ -1397,10 +1400,9 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="l
 ```
 
 ```
-##                        rho chisq      p
-## score_factorHigh   0.03092 2.930 0.0869
-## score_factorMedium 0.00944 0.272 0.6019
-## GLOBAL                  NA 3.045 0.2182
+##              chisq df    p
+## score_factor  3.04  2 0.22
+## GLOBAL        3.04  2 0.22
 ```
 
 ```r
@@ -1408,13 +1410,12 @@ cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=rec
 ```
 
 ```
-##                        rho   chisq      p
-## score_factorHigh   -0.0113  0.3962 0.5291
-## score_factorMedium -0.0174  0.9433 0.3314
-## raceCaucasian      -0.0454  6.3353 0.0118
-## age                -0.0429  5.6270 0.0177
-## sexMale            -0.0056  0.0958 0.7570
-## GLOBAL                  NA 13.7513 0.0173
+##                chisq df      p
+## score_factor  0.5254  2 0.7690
+## race          7.6193  1 0.0058
+## age           6.7511  1 0.0094
+## sex           0.0387  1 0.8440
+## GLOBAL       13.6196  5 0.0182
 ```
 
 Note the big p-values.  We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards.  If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.

@@ -150,7 +150,7 @@ Let's say the log odds of survival for given observed (log) burn areas $x$ and $
 \logit(p(x)) &=& \beta_0 + \beta_1 x\\
 \logit(p(x+1)) &=& \beta_0 + \beta_1 (x+1)\\
 \beta_1 &=& \logit(p(x+1)) - \logit(p(x))\\
-&=& \ln \bigg(\frac{p(x+1)}{1-p(x+1)} - \frac{p(x)}{1-p(x)} \bigg)\\
+&=& \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
 &=& \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 e^{\beta_1} &=& \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 \end{eqnarray*}
@@ -1518,11 +1518,11 @@ glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
 ##    term                       estimate std.error statistic p.value
 ##    <chr>                         <dbl>     <dbl>     <dbl>   <dbl>
 ##  1 (Intercept)            19.6            10754.  1.82e- 3   0.999
-##  2 as.factor(Length)10     0.000000432    13171.  3.28e-11   1.000
-##  3 as.factor(Length)10.5   0.000000430    15208.  2.82e-11   1.000
+##  2 as.factor(Length)10     0.000000432    13171.  3.28e-11   1.00 
+##  3 as.factor(Length)10.5   0.000000430    15208.  2.82e-11   1.00 
 ##  4 as.factor(Length)11   -18.9            10754. -1.75e- 3   0.999
 ##  5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
-##  6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.000
+##  6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.00 
 ##  7 as.factor(Length)13   -20.3            10754. -1.88e- 3   0.998
 ##  8 as.factor(Length)13.5 -20.7            10754. -1.92e- 3   0.998
 ##  9 as.factor(Length)14   -19.3            10754. -1.79e- 3   0.999
