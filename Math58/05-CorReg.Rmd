@@ -23,7 +23,7 @@ To get started, consider a handful of variables taken on the top 80 PGA golfers 
 knitr::include_graphics("figs/golf.jpg")
 ```
 
-Rank the eight scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
+Rank the seven scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
 
 * What would the correlation be if there was a perfect positive relationship?
 * What would the correlation be if there was a perfect negative relationship?
@@ -41,7 +41,7 @@ The value of the correlation is defined as:
 
 \begin{eqnarray*}
 r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i - \overline{x})^2} \sqrt{ \sum_i(y_i - \overline{y})^2}}\\
-&=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
+r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
 \end{eqnarray*}
 
 ```{r fig.cap = "Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
@@ -70,8 +70,12 @@ The coefficient of determination ($R^2$) is the square of the correlation (given
 SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the line.
 
 \begin{eqnarray*}
-R^2 = \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})}
+R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} \\
+ &=& \frac{Var(y_i) - Var(e_i)}{Var(y_i)} \\
+ &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
 \end{eqnarray*}
+
+[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $$e_i = y_i - \hat{y}_i.]$$
 
 $R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
 
@@ -128,6 +132,13 @@ Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to unde
 ```{r}
 cats <- read_table2("http://www.rossmanchance.com/iscam2/data/CatJumping.txt")
 
+ggplot(cats, aes(x=bodymass, y = velocity)) +
+  geom_point() +
+  geom_smooth(method = "lm", se=FALSE)
+```
+
+
+```{r}
 cats %>%
   select(bodymass, velocity) %>%
   cor()
@@ -189,16 +200,151 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
 2. Distribution of the least squares line from sample to sample
 
 ## 4/23/20 Agenda {#Apr23}
-1. Inferential technical assumptions
+1. Inferential technical conditions
 2. Residual Plots
 3. Transformations
 4. Prediction Intervals
 
 ## Simple Linear Regression
 
+*Regression* is a method that predicts the value of one numerical variable from that of another.  That is, as an extension to describing the degree of linearity of the relationship (correlation), the goal is now to create the best linear model -- often for prediction.  Note that many of the characteristics explored with correlation are applicable for regression.  However, correlation treats $X$ and $Y$ as interchangeable, whereas regression treats $X$ as fixed and known and $Y$ as random and unknown.  As we have previously, we call $X$ the explanatory variable, and $Y$ the response variable.  Again, we do not assume that there is any causal mechanism between $X$ and $Y$ even if they have a strong linear (or otherwise) relationship.
+
+
+
+#### Population Model {-}
+
+Notice the Greek letters representing parameters:
+
+\begin{eqnarray*}
+E[y|x] &=& \beta_0 + \beta_1 x \\
+y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
+\epsilon_i &=& y_i -  (\beta_0 + \beta_1 x_i)\\
+\end{eqnarray*}
+
+#### Predicted Values {-}
+
+The predicted values of Y from a regression line estimate the *mean value* of $Y$ for all individuals that have a given value of $X$.  Notice the Roman letters (English letters) represting statistics:
+
+\begin{eqnarray*}
+\hat{y} &=& b_0 + b_1 x\\
+\hat{y}_i &=& b_0 + b_1 x_i\\
+y_i &=& b_0 + b_1 x_i + e_i\\
+e_i &=& y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
+\end{eqnarray*}
+
+Notice, that we are predicting the **mean** value of the response variable at a given value of the explanatory variable!  
+
 ###  Least Squares estimation of the regression line {#ls}
 
+
+To find the values of the regression statistics, the sum of squared errors is minimized.
+
+**SSE:** Sum of squared errors (or residuals) is a measure of how closely the line fits to the points.  SSE is the value of the squared deviations calculated at the "best" possible values of $\beta_0$ and $\beta_1$ for a given dataset.
+
+\begin{eqnarray*}
+SSE = \sum_i (y_i - \hat{y}_i)^2 = \sum_i (y_i - (b_0 + b_1 x_i) )^2
+\end{eqnarray*}
+is minimized by the values:
+\begin{eqnarray*}
+b_0 = \overline{y} - b_1 \overline{x} & \ \ \ \ \ \ \ & b_1 = r \frac{s_y}{s_x}
+\end{eqnarray*}
+
+To find the "best" fitting line, we searched for the line that has the smallest residuals (SSE) in some sense.  In particular, the goal is to try to find the line that minimizes the following quantity: $$Q=\sum e_i^2 = \sum (y_i-(b_0+b_1x_i))^2.$$
+
+
+Finding $b_0$ and $b_1$ that minimize Q is a calculus problem.
+$$\frac{dQ}{db_0}=-2\sum (y_i-(b_0+b_1x_i)),\qquad \frac{dQ}{db_1}=-2\sum
+x_i(y_i-(b_0+b_1x_i))$$ 
+Setting both derivatives equal to 0 and solving for $b_0$ and $b_1$ yields the optimal values, denoted as $b_0$ and $b_1$
+
+One aspect of the optimization problem that is worth pointing out has to do with the role of the two variables of interest $X$ and $Y$.   If we switch the roles of $X$ and $Y$, the best fitting line will be different.  If the relationship was invariant to which variable we choose as a response, then switching the roles of $X$ and $Y$ should give a slope of $1/b_1$, which is not the case.  [Note that the role of $X$ and $Y$ **is** invariant when calculating the correlation but not when calculating the least squares regression line.]
+
+#### Residuals {-}
+
+Residuals measure the scatter of points above and below the least squares regression line.  We use the residuals in many of the calculations and interpretations of the model.  Indeed, the goal of the linear regression is to find a model that has small residuals.  That is, ideally, the known variable $X$ will tell us all there is to know about the unknown variable $Y$.
+
+\begin{eqnarray*}
+e_i &=& (y_i - \hat{y}_i)\\
+MSE&=& \frac{\sum_i (y_i - \hat{y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2\\
+SSE &=& \sum_i (y_i - \hat{y}_i)^2 = \sum_i (e_i)^2\\
+R^2 &=& 1 - \frac{Var(e_i)}{Var(y_i)}
+\end{eqnarray*}
+
+
 ### Inference on the slope, $\beta_1$ {#infbeta1}
+
+#### SE of the slope {-}
+
+\begin{eqnarray*}
+SE(b_1) &=& \sqrt{\frac{MSE}{\sum_i (x_i - \overline{x})^2}} = \sqrt{\frac{MSE}{(n-1)s_x^2}} = = \sqrt{\frac{\frac{\sum_i (y_i - \hat{y}_i)^2}{n-2}}{(n-1)s_x^2}}\\
+\end{eqnarray*}
+
+Just like any other statistic, the value of $b_1$ can be calculated for every sample.  The manner in which $b_1$ varies from sample to sample becomes the sampling distribution of the sample slope.  The SE of the slope will be the standard deviation associated with the sampling distribution of the slope.  The resulting inference theory is very similar to that which we saw with the mean.  The CLT describes $b_1$ to have a normal distribution, and estimating the $SE(b_1)$ induces extra variability which leads to a t-score test statistic with a t-distribution with df = $n-2$.
+
+\begin{eqnarray*}
+\mbox{t-score} = \frac{b_1 - \beta_1}{SE(b_1)} \sim t_{n-2}
+\end{eqnarray*}
+
+#### CI for the slope {-}
+
+\begin{eqnarray*}
+b_1- t^*_{\alpha/2, n-2} SE(b_1) \leq \beta_1 \leq b_1 + t^*_{\alpha/2, n-2} SE(b_1)
+\end{eqnarray*}
+
+Back to the housing data...
+\begin{eqnarray*}
+t_{\alpha/2,n-2} &=& qt(.975, 18-2) = 2.1199\\
+SE(b_1) &=& 26.4\\
+b_1 &=& 202\\
+b_1 &\pm& t_{\alpha/2, n-2} SE(b_1): 202 \pm 2.1199 \cdot 26.4\\
+&& (146.03, 257.97)\\
+\end{eqnarray*}
+
+That is, we are 95\% confident that the true average change in price associated with an additional square foot of house is between \$146.03 and \$257.97.
+
+
+#### HT for the slope {-}
+
+As mentioned previously,
+\begin{eqnarray*}
+\mbox{t-score} = \frac{b_1 - \beta_1}{SE(b_1)} \sim t_{n-2}
+\end{eqnarray*}
+
+Typically, interested is in testing whether or not the slope is zero.  The null hypothesis of $H_0: \beta_1 = 0$ addresses whether there is a non-zero linear relationship between $X$ and $Y$:
+
+\begin{eqnarray*}
+H_0:&& \mbox{ the slope of the regression line is zero}, \beta_1=0\\
+H_A:&& \mbox{ the slope of the regression line is not zero}, \beta_1 \ne 0\\
+\end{eqnarray*}
+
+As with previous tests, the alternative can be one- or two-sided (depending on the research question).
+
+
+Again, back to the housing data... (consider a two sided test)
+\begin{eqnarray*}
+t^* &=& 7.67\\
+p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
+\end{eqnarray*}
+
+
+
+#### Regression Technical Conditions {-}
+
+* **L:** At each value of X, there is a population of possible Y-values whose mean lies on the "true" regression line (**linearity**)
+* **I:** At each value of X, the Y-measurements represent a random sample from the population of possible Y-values (**independence**)  [Consider this example of lack of independence.  The researcher is trying to determine whether the number of pieces in a puzzle is linearly associated with the time to complete the puzzle.  At first we choose 2 people and let them do 10 puzzles each.  Then we let 20 independent people do the puzzles.  The first experiment will create a slope which is particular to the two people sampled (it may or may not be close to the parameter).  The second one will create a slope close to the 20 people sampled.  Note that the effective variability of the first model is based on n=2, but we *think* it is based on n=20 (if we don't notice the lack of independence).  The second slope is based on n=20, and so it will have the correct associated variability.]
+* **N:** At each value of X, the distribution of possible Y-values is normal (**normality**)
+* **E:** The variance of Y-values is the same at all values of X (**equal variance**)
+
+#### Residual Plots {-}
+
+
+Within a residual plot, you should be looking for the same types of things you want in a scatter plot:
+* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,
+* little noticeable curvature as we move from left to right along the X-axis, and
+* approximately equal variance of points above and below the line at all values of X.
+
+
+
 
 ## 4/28/20 Agenda {#Apr28}
 1. Multiple Linear Regression
