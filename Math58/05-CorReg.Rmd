@@ -121,29 +121,7 @@ z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
 \end{eqnarray*}
 
 
-### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13]
-
-
-
-Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.
-
-
-
-```{r}
-cats <- read_table2("http://www.rossmanchance.com/iscam2/data/CatJumping.txt")
-
-ggplot(cats, aes(x=bodymass, y = velocity)) +
-  geom_point() +
-  geom_smooth(method = "lm", se=FALSE)
-```
-
-
-```{r}
-cats %>%
-  select(bodymass, velocity) %>%
-  cor()
-```
-
+See the Cat Jumping^[@iscam, Inv 5.6 & 5.13] example below in section \@ref(ex:cat).
 
 
 **HT:**  
@@ -166,32 +144,6 @@ z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
 && (-0.781, -0.04)
 \end{eqnarray*}
 
-
-```{r}
-summary(lm(velocity ~ bodymass, data = cats))
-```
-
-
-
-
-An alternative way to work with the output is in specific pieces (instead of the entire summary output).
-
-```{r}
-library(broom)
-
-lm(velocity ~ bodymass, data = cats) %>% tidy(conf.int = TRUE)
-```
-
-And to work with the residuals, use `augment()`.
-
-```{r}
-lm(velocity ~ bodymass, data = cats) %>% augment()
-
-lm(velocity ~ bodymass, data = cats) %>% augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() +
-  geom_hline(yintercept = 0)
-```
 
 
 
@@ -223,7 +175,7 @@ y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
 
 #### Predicted Values {-}
 
-The predicted values of Y from a regression line estimate the *mean value* of $Y$ for all individuals that have a given value of $X$.  Notice the Roman letters (English letters) represting statistics:
+The predicted values of Y from a regression line estimate the *mean value* of $Y$ for all individuals that have a given value of $X$.  Notice the Roman letters (English letters) representing statistics:
 
 \begin{eqnarray*}
 \hat{y} &=& b_0 + b_1 x\\
@@ -291,7 +243,9 @@ Just like any other statistic, the value of $b_1$ can be calculated for every sa
 b_1- t^*_{\alpha/2, n-2} SE(b_1) \leq \beta_1 \leq b_1 + t^*_{\alpha/2, n-2} SE(b_1)
 \end{eqnarray*}
 
-Back to the housing data...
+
+See the Housing Prices^[@iscam, Inv 5.14] example below in section \@ref(ex:houses).
+
 \begin{eqnarray*}
 t_{\alpha/2,n-2} &=& qt(.975, 18-2) = 2.1199\\
 SE(b_1) &=& 26.4\\
@@ -338,10 +292,10 @@ p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
 #### Residual Plots {-}
 
 
-Within a residual plot, you should be looking for the same types of things you want in a scatter plot:
-* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,
-* little noticeable curvature as we move from left to right along the X-axis, and
-* approximately equal variance of points above and below the line at all values of X.
+Within a residual plot, you should be looking for the same types of things you want in a scatter plot:  
+* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,  
+* little noticeable curvature as we move from left to right along the X-axis, and  
+* approximately equal variance of points above and below the line at all values of X.  
 
 
 
@@ -360,6 +314,264 @@ Within a residual plot, you should be looking for the same types of things you w
 ### Model selection {#MLRmod}
 
 ### Checking model assumptions
+
+
+## R code for regression: 
+
+
+### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#ex:cat}
+
+
+
+Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.
+
+
+
+```{r}
+cats <- read_table2("http://www.rossmanchance.com/iscam2/data/CatJumping.txt")
+
+ggplot(cats, aes(x=bodymass, y = velocity)) +
+  geom_point() +
+  geom_smooth(method = "lm", se=FALSE)
+```
+
+
+####  Correlation {-}
+```{r}
+cats %>%
+  select(bodymass, velocity) %>%
+  cor()
+```
+
+
+
+
+
+#### Simple Linear Regression {-}
+
+```{r}
+summary(lm(velocity ~ bodymass, data = cats))
+```
+
+
+An alternative way to work with the output is in specific pieces (instead of the entire summary output).
+
+```{r}
+library(broom)
+
+lm(velocity ~ bodymass, data = cats) %>% tidy(conf.int = TRUE)
+```
+
+
+#### Residual Plot {-}
+
+And to work with the residuals, use `augment()`.
+
+```{r}
+lm(velocity ~ bodymass, data = cats) %>% augment()
+
+lm(velocity ~ bodymass, data = cats) %>% augment() %>%
+  ggplot(aes(x = .fitted, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0)
+```
+
+
+### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
+
+```{r message=FALSE, warning=FALSE}
+library(GGally)
+house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
+                   header=TRUE, sep="\t")
+names(house)
+```
+
+#### Descriptive Statistics {-}
+
+A good first step is to investigate how all the variables relate to one another.  The `ggpairs` function come from the R package `GGally`.
+
+```{r} 
+ggpairs(house, columns = c(1,2,4,5))
+```
+
+#### Simple Linear Regression {-}
+
+```{r}
+mod.sqft <- lm(price~sqft, data = house)
+mod.sqft %>% tidy()
+
+mod.bed <- lm(price ~ bedrooms, data=house)
+mod.bed %>% tidy()
+```
+
+The p-values for both explanatory variables (sqft and bedrooms) are significant.  Sqft seems more significant, and indeed, the first model has a higher $R^2$ - that is, a higher proportion of the variability in price is explained by sqft (42.07%) than by number of bedrooms (8.08%).  
+
+```{r}
+mod.sqft %>% glance()
+mod.bed %>% glance()
+```
+
+
+However, it is important for us to ask whether either of the relationships actually fit the technical conditions of the linear regression model.  We can see from the pairs plots that the relationships look **L**inear, we'll assume the variables were collected **I**ndependently, but the **N**ormality and the **E**quality of the error structure we can check using residual plots.
+
+```{r}
+mod.sqft %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for price as a function of sqft")
+
+mod.bed %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for price as a function of bedrooms")
+```
+
+For both of the plots, it seems like the residuals have higher variability for positive residuals.  Additionally, it seems that the variability of the residuals increases for larger fitted observations. 
+
+A natural log transformation should fix both of these problems.
+
+```{r}
+mod.lnsqft <- lm(log(price)~sqft, data = house)
+mod.lnbed <- lm(log(price) ~ bedrooms, data=house)
+
+
+mod.lnsqft %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for ln(price) as a function of sqft")
+
+mod.lnbed %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for ln(price) as a function of bedrooms")
+```
+
+
+Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.
+
+
+
+#### Multiple Linear Regression {-}
+
+Because the price variable had a large skew (and the `ln()` transformation helped the residuals), the following models will all use `ln(price)` as the response variable.   What happens when we try to predict `price` (actually `ln(price)`, here) using BOTH `sqft` and `bedrooms`?
+
+Note:  the natural log funciton in R is `log()`.
+
+```{r}
+lm(log(price) ~ sqft + bedrooms, data=house) %>% tidy()
+lm(log(price) ~ sqft + bedrooms, data=house) %>% glance()
+```
+
+```{r}
+lm(log(price) ~ sqft + baths, data=house) %>% tidy()
+lm(log(price) ~ sqft + baths, data=house) %>% glance()
+```
+
+```{r}
+lm(log(price) ~ sqft + bedrooms + baths, data=house) %>% tidy()
+lm(log(price) ~ sqft + bedrooms + baths, data=house) %>% glance()
+```
+
+
+**Sqft & bedrooms**
+
+Although the $R^2$ value went up (44.84% of variability in log price is explained by sqft and bedrooms), the p-value on bedrooms isn't significant.  The p-value here can be interpreted as a hypothesis test on the slope coefficient given the other variables in the model.
+
+0.353 = P(a slope of -.06827 or more extreme *if sqft is in the model* and there is no relationship between bedrooms and price)
+
+Our output says that once we have sqft in the model, we don't actually need to know anything about the number of bedrooms (even though bedrooms was a significant predictor on its own).
+
+**Sqft & bathrooms**
+
+Seems like we *really* don't need bathrooms!  The information about `sqft` is sufficient for predicting the price, and information about bathrooms doesn't help much at all.
+
+**Final model**
+
+The final model will be run on log(price) using only sqft. Note that the coefficients and the $R^2$ values change slightly (from the original analysis) because the response variable is logged.
+
+```{r}
+summary(mod.lnsqft)
+```
+
+
+#### Prediction {-}
+
+As with the prediction intervals we had when we had a single sample, we can now create intervals for either an average (a confidence interval) of an individual (a prediction interval).  
+
+##### Confidence interval: {-}
+
+```{r}
+predict(mod.lnsqft, newdata=data.frame(sqft=2000), interval="confidence")
+```
+
+I am 95% confident that the true average log price for a 2000 sqft home is between 12.79 ln\$ and 12.99 ln\$.  (The predicted value is in natural-log-dollars ... which is hard to interpret , but back-transforming can be a little tricky and beyond the scope of this semester).
+
+##### Prediction interval: {-}
+
+```{r}
+predict(mod.lnsqft, newdata=data.frame(sqft=2000), interval="prediction")
+```
+
+I am 95% of homes with 2000 sqft are between 11.99 ln\$ and 13.79 ln\$.  Now back-transforming is easy (because there are no averages), so 95% of homes with 2000 sqft are between $161,126 and $977,301 (which are just $e^{11.98994}$ and $e^{13.79255}$).
+
+##### Plotting confidence bounds: {-}
+
+
+A **confidence** interval around the line gives bounds on the parameter represented by the line.  So we are 95% confident that the true population line lies within the bounds.  Note that the interval is wider at the endpoints (because the variability is higher at the ends).
+
+```{r}
+houseConf <- mod.lnsqft %>% augment() %>%
+  cbind(predict(mod.lnsqft, interval="confidence") )  # cbind binds the columns together
+
+houseConf %>% head()
+
+ggplot(houseConf, aes(x=sqft)) + 
+  geom_point(aes(y=log.price.)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+```
+
+A **prediction** interval around the line bounds the individual points.  That is, 95% of the observations are captured inside the interval.  As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals
+
+```{r}
+housePred <- mod.lnsqft %>% augment() %>%
+  cbind(predict(mod.lnsqft, interval="prediction") )  # cbind binds the columns together
+
+housePred %>% head()
+
+ggplot(housePred, aes(x=sqft)) + 
+  geom_point(aes(y=log.price.)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+```
+
+
+##### Predicting with more than one explanatory variable: {-}
+
+The predict function still works to give estimates of the average value and the predicted individual values, but the plot is now much harder to draw because with three explanatory variables, we would need a 4-d plot to visualize the model and the predictions.
+
+```{r}
+sqftbedbathlm = lm(log(price)~sqft + bedrooms + baths, data=house)
+
+predict(sqftbedbathlm, 
+        newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
+        interval="confidence", level=.95)
+
+predict(sqftbedbathlm, 
+        newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
+        interval="prediction", level=.95)
+```
+
+Again, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
+
+
+
+
+
 
 
 
