@@ -134,13 +134,13 @@ p-value &=& 2 \cdot P(t_{18-2} \leq -2.2849) = 2\cdot(pt(-2.2849,16)) = 0.036 \m
 
 **CI:**  
 \begin{eqnarray*}
-95\% && \mbox{CI for } \xi : \\
-z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
-&&\mbox{we're } 95\% \mbox{ confident that}\\
-&& 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{n-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
-&& 0.5 \ln\bigg(\frac{1 - 0.496}{1+0.496}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{18-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1-0.496}{1+0.496}\bigg) + 1.96 \cdot \sqrt{\frac{1}{18-3}}\\
-&& -1.05 \leq \xi \leq -0.04\\
-&& \frac{e^{2\cdot -1.05} - 1}{e^{2\cdot -1.05} + 1} \leq \rho \leq \frac{e^{2\cdot -0.04} - 1}{e^{2\cdot -0.04} + 1}\\
+95\% \mbox{CI for } \xi :&& \\
+z \pm 1.96 \cdot \sqrt{\frac{1}{n-3}}&& \\
+\mbox{we're } 95\% \mbox{ confident that}&&\\
+ 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{n-3}} &\leq \xi \leq& 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+ 0.5 \ln\bigg(\frac{1 - 0.496}{1+0.496}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{18-3}} &\leq \xi \leq &0.5 \ln\bigg(\frac{1-0.496}{1+0.496}\bigg) + 1.96 \cdot \sqrt{\frac{1}{18-3}}\\
+ -1.05 &\leq \xi \leq &-0.04\\
+ \frac{e^{2\cdot -1.05} - 1}{e^{2\cdot -1.05} + 1} &\leq \rho \leq& \frac{e^{2\cdot -0.04} - 1}{e^{2\cdot -0.04} + 1}\\
 && (-0.781, -0.04)
 \end{eqnarray*}
 
@@ -292,10 +292,11 @@ p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
 #### Residual Plots {-}
 
 
-Within a residual plot, you should be looking for the same types of things you want in a scatter plot:  
-* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,  
-* little noticeable curvature as we move from left to right along the X-axis, and  
-* approximately equal variance of points above and below the line at all values of X.  
+Within a residual plot, you should be looking for the same types of things you want in a scatter plot.  [See the residual plots provided in section \@ref(ex:cat).]
+
+* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,   
+* little noticeable curvature as we move from left to right along the X-axis, and    
+* approximately equal variance of points above and below the line at all values of X.   
 
 
 
@@ -316,7 +317,7 @@ Within a residual plot, you should be looking for the same types of things you w
 ### Checking model assumptions
 
 
-## R code for regression: 
+## R code for regression 
 
 
 ### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#ex:cat}
@@ -374,6 +375,45 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
   geom_point() +
   geom_hline(yintercept = 0)
+```
+
+
+#### Confidence & Prediction Intervals {-}
+
+```{r}
+m_cats <- lm(velocity ~ bodymass, data = cats)
+
+predict(m_cats, newdata=data.frame(bodymass=4700), interval="confidence")
+predict(m_cats, newdata=data.frame(bodymass=4700), interval="prediction")
+```
+
+
+##### Plotting!  {-}
+
+```{r}
+catConf <- m_cats %>% augment() %>%
+  cbind(predict(m_cats, interval="confidence") )  # cbind binds the columns together
+
+catConf %>% head()
+
+ggplot(catConf, aes(x=bodymass)) + 
+  geom_point(aes(y=velocity)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+```
+
+
+
+```{r}
+catPred <- m_cats %>% augment() %>%
+  cbind(predict(m_cats, interval="prediction") )  # cbind binds the columns together
+
+catPred %>% head()
+
+ggplot(catPred, aes(x=bodymass)) + 
+  geom_point(aes(y=velocity)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
 

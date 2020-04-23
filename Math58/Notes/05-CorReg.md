@@ -129,13 +129,13 @@ p-value &=& 2 \cdot P(t_{18-2} \leq -2.2849) = 2\cdot(pt(-2.2849,16)) = 0.036 \m
 
 **CI:**  
 \begin{eqnarray*}
-95\% && \mbox{CI for } \xi : \\
-z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
-&&\mbox{we're } 95\% \mbox{ confident that}\\
-&& 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{n-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
-&& 0.5 \ln\bigg(\frac{1 - 0.496}{1+0.496}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{18-3}} \leq \xi \leq 0.5 \ln\bigg(\frac{1-0.496}{1+0.496}\bigg) + 1.96 \cdot \sqrt{\frac{1}{18-3}}\\
-&& -1.05 \leq \xi \leq -0.04\\
-&& \frac{e^{2\cdot -1.05} - 1}{e^{2\cdot -1.05} + 1} \leq \rho \leq \frac{e^{2\cdot -0.04} - 1}{e^{2\cdot -0.04} + 1}\\
+95\% \mbox{CI for } \xi :&& \\
+z \pm 1.96 \cdot \sqrt{\frac{1}{n-3}}&& \\
+\mbox{we're } 95\% \mbox{ confident that}&&\\
+ 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{n-3}} &\leq \xi \leq& 0.5 \ln\bigg(\frac{1+r}{1-r}\bigg) + 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
+ 0.5 \ln\bigg(\frac{1 - 0.496}{1+0.496}\bigg) - 1.96 \cdot  \sqrt{\frac{1}{18-3}} &\leq \xi \leq &0.5 \ln\bigg(\frac{1-0.496}{1+0.496}\bigg) + 1.96 \cdot \sqrt{\frac{1}{18-3}}\\
+ -1.05 &\leq \xi \leq &-0.04\\
+ \frac{e^{2\cdot -1.05} - 1}{e^{2\cdot -1.05} + 1} &\leq \rho \leq& \frac{e^{2\cdot -0.04} - 1}{e^{2\cdot -0.04} + 1}\\
 && (-0.781, -0.04)
 \end{eqnarray*}
 
@@ -287,10 +287,11 @@ p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
 #### Residual Plots {-}
 
 
-Within a residual plot, you should be looking for the same types of things you want in a scatter plot:  
-* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,  
-* little noticeable curvature as we move from left to right along the X-axis, and  
-* approximately equal variance of points above and below the line at all values of X.  
+Within a residual plot, you should be looking for the same types of things you want in a scatter plot.  [See the residual plots provided in section \@ref(ex:cat).]
+
+* a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,   
+* little noticeable curvature as we move from left to right along the X-axis, and    
+* approximately equal variance of points above and below the line at all values of X.   
 
 
 
@@ -311,7 +312,7 @@ Within a residual plot, you should be looking for the same types of things you w
 ### Checking model assumptions
 
 
-## R code for regression: 
+## R code for regression 
 
 
 ### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#ex:cat}
@@ -443,6 +444,103 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
 <img src="05-CorReg_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 
+#### Confidence & Prediction Intervals {-}
+
+
+```r
+m_cats <- lm(velocity ~ bodymass, data = cats)
+
+predict(m_cats, newdata=data.frame(bodymass=4700), interval="confidence")
+```
+
+```
+##        fit      lwr      upr
+## 1 337.1514 321.3081 352.9947
+```
+
+```r
+predict(m_cats, newdata=data.frame(bodymass=4700), interval="prediction")
+```
+
+```
+##        fit      lwr     upr
+## 1 337.1514 272.4378 401.865
+```
+
+
+##### Plotting!  {-}
+
+
+```r
+catConf <- m_cats %>% augment() %>%
+  cbind(predict(m_cats, interval="confidence") )  # cbind binds the columns together
+
+catConf %>% head()
+```
+
+```
+##   velocity bodymass  .fitted   .se.fit     .resid       .hat   .sigma
+## 1    334.5     3640 350.0793  7.582579 -15.579293 0.06563257 30.28374
+## 2    387.3     2670 361.9095 10.722878  25.390452 0.13125270 29.74812
+## 3    410.8     5600 326.1749 10.228079  84.625139 0.11941906 19.80527
+## 4    318.6     4130 344.1032  6.985435 -25.503185 0.05570221 29.80778
+## 5    368.7     3020 357.6409  9.384496  11.059101 0.10053270 30.41969
+## 6    358.8     2660 362.0315 10.763427  -3.231509 0.13224725 30.55520
+##       .cooksd .std.resid      fit      lwr      upr
+## 1 0.010414418 -0.5445423 350.0793 334.0049 366.1536
+## 2 0.063990821  0.9203785 361.9095 339.1781 384.6410
+## 3 0.629490813  3.0468951 326.1749 304.4923 347.8574
+## 4 0.023189898 -0.8867122 344.1032 329.2947 358.9116
+## 5 0.008674247  0.3939761 357.6409 337.7467 377.5351
+## 6 0.001046793 -0.1172061 362.0315 339.2141 384.8490
+```
+
+```r
+ggplot(catConf, aes(x=bodymass)) + 
+  geom_point(aes(y=velocity)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+
+```r
+catPred <- m_cats %>% augment() %>%
+  cbind(predict(m_cats, interval="prediction") )  # cbind binds the columns together
+
+catPred %>% head()
+```
+
+```
+##   velocity bodymass  .fitted   .se.fit     .resid       .hat   .sigma
+## 1    334.5     3640 350.0793  7.582579 -15.579293 0.06563257 30.28374
+## 2    387.3     2670 361.9095 10.722878  25.390452 0.13125270 29.74812
+## 3    410.8     5600 326.1749 10.228079  84.625139 0.11941906 19.80527
+## 4    318.6     4130 344.1032  6.985435 -25.503185 0.05570221 29.80778
+## 5    368.7     3020 357.6409  9.384496  11.059101 0.10053270 30.41969
+## 6    358.8     2660 362.0315 10.763427  -3.231509 0.13224725 30.55520
+##       .cooksd .std.resid      fit      lwr      upr
+## 1 0.010414418 -0.5445423 350.0793 285.3088 414.8498
+## 2 0.063990821  0.9203785 361.9095 295.1746 428.6445
+## 3 0.629490813  3.0468951 326.1749 259.7898 392.5599
+## 4 0.023189898 -0.8867122 344.1032 279.6352 408.5712
+## 5 0.008674247  0.3939761 357.6409 291.8183 423.4635
+## 6 0.001046793 -0.1172061 362.0315 295.2672 428.7958
+```
+
+```r
+ggplot(catPred, aes(x=bodymass)) + 
+  geom_point(aes(y=velocity)) + 
+  geom_line(aes(y=.fitted)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+
+
 ### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
 
 
@@ -466,7 +564,7 @@ A good first step is to investigate how all the variables relate to one another.
 ggpairs(house, columns = c(1,2,4,5))
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Simple Linear Regression {-}
 
@@ -536,7 +634,7 @@ mod.sqft %>% augment () %>%
   ggtitle("Residual plot for price as a function of sqft")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 mod.bed %>% augment () %>%
@@ -546,7 +644,7 @@ mod.bed %>% augment () %>%
   ggtitle("Residual plot for price as a function of bedrooms")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
 
 For both of the plots, it seems like the residuals have higher variability for positive residuals.  Additionally, it seems that the variability of the residuals increases for larger fitted observations. 
 
@@ -565,7 +663,7 @@ mod.lnsqft %>% augment () %>%
   ggtitle("Residual plot for ln(price) as a function of sqft")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 mod.lnbed %>% augment () %>%
@@ -575,7 +673,7 @@ mod.lnbed %>% augment () %>%
   ggtitle("Residual plot for ln(price) as a function of bedrooms")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-16-2.png" width="480" style="display: block; margin: auto;" />
 
 
 Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.
@@ -780,7 +878,7 @@ ggplot(houseConf, aes(x=sqft)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
 
 A **prediction** interval around the line bounds the individual points.  That is, 95% of the observations are captured inside the interval.  As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals
 
@@ -816,7 +914,7 @@ ggplot(housePred, aes(x=sqft)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Predicting with more than one explanatory variable: {-}
