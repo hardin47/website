@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2020-04-23" />
+<meta name="date" content="2020-04-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -296,6 +296,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.9" data-path="correlation-regression.html"><a href="correlation-regression.html#r-code-for-regression"><i class="fa fa-check"></i><b>6.9</b> R code for regression</a><ul>
 <li class="chapter" data-level="6.9.1" data-path="correlation-regression.html"><a href="correlation-regression.html#ex:cat"><i class="fa fa-check"></i><b>6.9.1</b> Example: Cat Jumping (Correlation &amp; SLR)</a></li>
 <li class="chapter" data-level="6.9.2" data-path="correlation-regression.html"><a href="correlation-regression.html#ex:houses"><i class="fa fa-check"></i><b>6.9.2</b> Example: Housing Prices (SLR &amp; MLR &amp; Prediction)</a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="correlation-regression.html"><a href="correlation-regression.html#reflection-questions-3"><i class="fa fa-check"></i><b>6.10</b> Reflection Questions</a><ul>
+<li class="chapter" data-level="6.10.1" data-path="correlation-regression.html"><a href="correlation-regression.html#correlation-simple-linear-regression-chapter-5-section-1-4"><i class="fa fa-check"></i><b>6.10.1</b> Correlation &amp; Simple Linear Regression: Chapter 5, Section 1-4</a></li>
+<li class="chapter" data-level="6.10.2" data-path="correlation-regression.html"><a href="correlation-regression.html#multiple-linear-regression-chapter-6-section-1-3"><i class="fa fa-check"></i><b>6.10.2</b> Multiple Linear Regression: Chapter 6, Section 1-3</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -591,11 +595,82 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 </div>
 <div id="MLR" class="section level2">
 <h2><span class="header-section-number">6.8</span> Multiple Linear Regression</h2>
+<p>As with simple linear regression, consider <span class="math inline">\(n\)</span> observations. The response variable for the <span class="math inline">\(i^{th}\)</span> individual is denoted by <span class="math inline">\(Y_i\)</span>, as before. The variation remaining in <span class="math inline">\(Y_i\)</span> that isn’t explained by our predictors will also remain the same, denoted by <span class="math inline">\(\epsilon_i\)</span> and called the random error. Since we now have more than one explanatory variable, we will need to add an additional subscript on <span class="math inline">\(X\)</span>, denoting the value of the <span class="math inline">\(k^{th}\)</span> predictor variable for the <span class="math inline">\(i^{th}\)</span> individual by <span class="math inline">\(X_{ik}\)</span>. Thus our model is now</p>
+<p><span class="math display">\[\begin{eqnarray*}
+Y_i&amp;=&amp;\beta_0+\beta_1X_{i1}+\beta_2X_{i2}+ \cdots + \beta_{p-1}X_{i,p-1} + \epsilon_i\\
+E[Y]&amp;=&amp;\beta_0+\beta_1X_{1}+\beta_2X_{2}+ \cdots + \beta_{p-1}X_{p-1}\\
+Y_i&amp;=&amp;b_0+b_1X_{i1}+b_2X_{i2}+ \cdots + b_{p-1}X_{i,p-1} + e_i\\
+\widehat{Y}&amp;=&amp;b_0+b_1X_{1}+b_2X_{2}+ \cdots + b_{p-1}X_{p-1}\\
+\end{eqnarray*}\]</span></p>
+<div id="fitting-the-model" class="section level4 unnumbered">
+<h4>Fitting the Model</h4>
+<p>To estimate the coefficients, use the same principle as before, that of least squares. That is, minimize
+<span class="math display">\[\sum_{i=1}^n(Y_i-(b_0+b_1X_{i1}+b_2X_{i2} + \cdots + b_{p-1}X_{i,p-1}))^2\]</span>
+We are interested in finding the least squares estimates (<span class="math inline">\(b_i\)</span>) of the parameters of the model <span class="math inline">\(\beta_i\)</span>.</p>
+</div>
 <div id="MLRmod" class="section level3">
 <h3><span class="header-section-number">6.8.1</span> Model selection</h3>
+<p>While there are many aspects of a linear model to consider (we offer an entire course! Math 158: Linear models), here we will focus on interpreting and testing single coefficients in the model.</p>
+<p>Consider the following model (based on R housing example below). We are predicting the price of a home (in <span class="math inline">\(\ln\)</span> units).</p>
+<p><span class="math display">\[\widehat{Y} = 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot \mbox{# bedrooms}\]</span></p>
+<p>Now, let’s compare two houses. The two houses have the exact same square feet (note, it doesn’t matter what the square feet is!!). House 1 (H1) has 4 bedrooms, house 2 (H2) has 3 bedrooms.</p>
+<p>The coefficient associated with the number of bedrooms indicates the change in price (in <span class="math inline">\(\ln\)</span> units) <strong>keeping all other variables constant</strong>. That is, if comparing the prediction of the average price of a home for two homes that have the same square feet but a one unit difference in bedrooms, the price of the home is predicted to be -0.0603 <span class="math inline">\(\ln\)</span> units less for the home with more bedrooms. (Does that seem to make sense? Same square feet, more bedrooms chop up the house and make it less desirable maybe?)</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\widehat{Y}_{H1} &amp;=&amp; 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot 4\\
+\widehat{Y}_{H2} &amp;=&amp; 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot 3\\
+\widehat{Y}_{H1} - \widehat{Y}_{H2} &amp;=&amp; (-0.0603 \cdot 4) - (-0.0603 \cdot 3) =  -0.0603\\
+\end{eqnarray*}\]</span></p>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb170-1" data-line-number="1">house =<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/housing.txt&quot;</span>, </a>
+<a class="sourceLine" id="cb170-2" data-line-number="2">                   <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)</a>
+<a class="sourceLine" id="cb170-3" data-line-number="3"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<pre><code>## # A tibble: 3 x 5
+##   term         estimate std.error statistic  p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
+## 2 sqft         0.000468 0.0000660      7.09 4.73e-10
+## 3 bedrooms    -0.0603   0.0572        -1.05 2.95e- 1</code></pre>
+<div id="inference-about-regression-parameters" class="section level4 unnumbered">
+<h4>Inference about Regression Parameters</h4>
+<p>However, the coefficient on <code>bedrooms</code> isn’t significant (that is, the associated p-value is larger than any reasonable level of significance, like <span class="math inline">\(\alpha = 0.05\)</span>). But wait, how is the p-value even calculated?</p>
+<p>The least squares coefficient estimate and the SE create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating <span class="math inline">\(p\)</span> parameters, so our degrees of freedom is <span class="math inline">\(n-p\)</span>).</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\end{eqnarray*}\]</span>
+A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math inline">\(\beta_k\)</span> is given by<span class="math display">\[b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}\]</span></p>
+<p>The t-test is done separately for EACH <span class="math inline">\(\beta\)</span> coefficient. The test addresses the effect of removing only the variable at hand. Both testing and interpretation of the regression coefficients are done <strong>with all other variables in the model</strong>.</p>
+<p>The coefficient on <code>bedrooms</code> is not significant <strong>given <code>sqft</code> is in the model</strong>. Note that if we don’t have <code>sqft</code>, then bedrooms acts as a surrogate for <code>sqft</code> and it <em>is</em> important (and significant!). In this case, however, <code>sqft</code> is a better predictor than <code>bedrooms</code>.</p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st">  </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   12.3      0.219      56.3  1.03e-66
+## 2 bedrooms       0.178    0.0587      3.03 3.31e- 3</code></pre>
+</div>
+<div id="which-variables-to-choose" class="section level4 unnumbered">
+<h4>Which variables to choose?</h4>
+<p>Again, there are numerous ways to build a model. Some important principles to keep in mind:</p>
+<ul>
+<li>ideally the variables in the model are significant (remove variables with high p-values)</li>
+<li>the LINE model conditions should hold (you may need to transform the response or explanatory variables)</li>
+<li>the variables should be consistent with the data context (be sure that your analysis is done with experts in the field)</li>
+</ul>
+</div>
 </div>
 <div id="checking-model-assumptions" class="section level3">
 <h3><span class="header-section-number">6.8.2</span> Checking model assumptions</h3>
+<p>As before, the LINE model conditions are checked by using residual plots. Note that in the housing example, the residual plot after log transformation on the response variable is improved.</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb174-1" data-line-number="1"><span class="kw">lm</span>(price <span class="op">~</span><span class="st">  </span>sqft, <span class="dt">data=</span>house)  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb174-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb174-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb174-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb174-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for price as a function of sqft&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st">  </span>sqft, <span class="dt">data=</span>house)  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb175-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb175-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb175-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb175-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for ln price as a function of sqft&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-5-2.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="r-code-for-regression" class="section level2">
@@ -603,24 +678,24 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 <div id="ex:cat" class="section level3">
 <h3><span class="header-section-number">6.9.1</span> Example: Cat Jumping<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a> (Correlation &amp; SLR)</h3>
 <p>Consider the cat data given in Investigations 5.6 and 5.13. The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation <span class="math inline">\(r=-0.496\)</span> between bodymass and velocity.</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb170-1" data-line-number="1">cats &lt;-<span class="st"> </span><span class="kw">read_table2</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/CatJumping.txt&quot;</span>)</a>
-<a class="sourceLine" id="cb170-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb170-3" data-line-number="3"><span class="kw">ggplot</span>(cats, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass, <span class="dt">y =</span> velocity)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb170-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb170-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1">cats &lt;-<span class="st"> </span><span class="kw">read_table2</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/CatJumping.txt&quot;</span>)</a>
+<a class="sourceLine" id="cb176-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb176-3" data-line-number="3"><span class="kw">ggplot</span>(cats, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass, <span class="dt">y =</span> velocity)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb176-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb176-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" /></p>
 <div id="correlation" class="section level4 unnumbered">
 <h4>Correlation</h4>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1">cats <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb171-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(bodymass, velocity) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb171-3" data-line-number="3"><span class="st">  </span><span class="kw">cor</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1">cats <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb177-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(bodymass, velocity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb177-3" data-line-number="3"><span class="st">  </span><span class="kw">cor</span>()</a></code></pre></div>
 <pre><code>##            bodymass   velocity
 ## bodymass  1.0000000 -0.4964022
 ## velocity -0.4964022  1.0000000</code></pre>
 </div>
 <div id="simple-linear-regression-1" class="section level4 unnumbered">
 <h4>Simple Linear Regression</h4>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="kw">summary</span>(<span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats))</a></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1"><span class="kw">summary</span>(<span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats))</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = velocity ~ bodymass, data = cats)
@@ -640,9 +715,9 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## Multiple R-squared:  0.2464, Adjusted R-squared:  0.1993 
 ## F-statistic: 5.232 on 1 and 16 DF,  p-value: 0.03613</code></pre>
 <p>An alternative way to work with the output is in specific pieces (instead of the entire summary output).</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1"><span class="kw">library</span>(broom)</a>
-<a class="sourceLine" id="cb175-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb175-3" data-line-number="3"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1"><span class="kw">library</span>(broom)</a>
+<a class="sourceLine" id="cb181-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb181-3" data-line-number="3"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>(<span class="dt">conf.int =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 7
 ##   term        estimate std.error statistic  p.value conf.low  conf.high
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
@@ -652,7 +727,7 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 <div id="residual-plot" class="section level4 unnumbered">
 <h4>Residual Plot</h4>
 <p>And to work with the residuals, use <code>augment()</code>.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 18 x 9
 ##    velocity bodymass .fitted .se.fit .resid   .hat .sigma .cooksd
 ##       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
@@ -675,28 +750,28 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 17     286.     7930    298.   21.1  -11.5  0.508    30.3 1.57e-1
 ## 18     352.     3550    351.    7.78   1.32 0.0692   30.6 7.97e-5
 ## # … with 1 more variable: .std.resid &lt;dbl&gt;</code></pre>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb179-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb179-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb179-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1"><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb185-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb185-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb185-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="confidence-prediction-intervals" class="section level4 unnumbered">
 <h4>Confidence &amp; Prediction Intervals</h4>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb180-1" data-line-number="1">m_cats &lt;-<span class="st"> </span><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats)</a>
-<a class="sourceLine" id="cb180-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb180-3" data-line-number="3"><span class="kw">predict</span>(m_cats, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">bodymass=</span><span class="dv">4700</span>), <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb186-1" data-line-number="1">m_cats &lt;-<span class="st"> </span><span class="kw">lm</span>(velocity <span class="op">~</span><span class="st"> </span>bodymass, <span class="dt">data =</span> cats)</a>
+<a class="sourceLine" id="cb186-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb186-3" data-line-number="3"><span class="kw">predict</span>(m_cats, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">bodymass=</span><span class="dv">4700</span>), <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 337.1514 321.3081 352.9947</code></pre>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb182-1" data-line-number="1"><span class="kw">predict</span>(m_cats, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">bodymass=</span><span class="dv">4700</span>), <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb188-1" data-line-number="1"><span class="kw">predict</span>(m_cats, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">bodymass=</span><span class="dv">4700</span>), <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr     upr
 ## 1 337.1514 272.4378 401.865</code></pre>
 <div id="plotting-1" class="section level5 unnumbered">
 <h5>Plotting!</h5>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">catConf &lt;-<span class="st"> </span>m_cats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb184-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(m_cats, <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
-<a class="sourceLine" id="cb184-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb184-4" data-line-number="4">catConf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb190-1" data-line-number="1">catConf &lt;-<span class="st"> </span>m_cats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb190-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(m_cats, <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
+<a class="sourceLine" id="cb190-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb190-4" data-line-number="4">catConf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>##   velocity bodymass  .fitted   .se.fit     .resid       .hat   .sigma
 ## 1    334.5     3640 350.0793  7.582579 -15.579293 0.06563257 30.28374
 ## 2    387.3     2670 361.9095 10.722878  25.390452 0.13125270 29.74812
@@ -711,15 +786,15 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 4 0.023189898 -0.8867122 344.1032 329.2947 358.9116
 ## 5 0.008674247  0.3939761 357.6409 337.7467 377.5351
 ## 6 0.001046793 -0.1172061 362.0315 339.2141 384.8490</code></pre>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb186-1" data-line-number="1"><span class="kw">ggplot</span>(catConf, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb186-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>velocity)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb186-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb186-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1">catPred &lt;-<span class="st"> </span>m_cats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb187-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(m_cats, <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
-<a class="sourceLine" id="cb187-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb187-4" data-line-number="4">catPred <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb192-1" data-line-number="1"><span class="kw">ggplot</span>(catConf, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb192-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>velocity)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb192-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb192-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1">catPred &lt;-<span class="st"> </span>m_cats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb193-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(m_cats, <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
+<a class="sourceLine" id="cb193-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb193-4" data-line-number="4">catPred <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>##   velocity bodymass  .fitted   .se.fit     .resid       .hat   .sigma
 ## 1    334.5     3640 350.0793  7.582579 -15.579293 0.06563257 30.28374
 ## 2    387.3     2670 361.9095 10.722878  25.390452 0.13125270 29.74812
@@ -734,120 +809,120 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 4 0.023189898 -0.8867122 344.1032 279.6352 408.5712
 ## 5 0.008674247  0.3939761 357.6409 291.8183 423.4635
 ## 6 0.001046793 -0.1172061 362.0315 295.2672 428.7958</code></pre>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1"><span class="kw">ggplot</span>(catPred, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb189-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>velocity)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb189-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb189-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="kw">ggplot</span>(catPred, <span class="kw">aes</span>(<span class="dt">x=</span>bodymass)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb195-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>velocity)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb195-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb195-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 </div>
 <div id="ex:houses" class="section level3">
 <h3><span class="header-section-number">6.9.2</span> Example: Housing Prices<a href="#fn25" class="footnote-ref" id="fnref25"><sup>25</sup></a> (SLR &amp; MLR &amp; Prediction)</h3>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb190-1" data-line-number="1"><span class="kw">library</span>(GGally)</a>
-<a class="sourceLine" id="cb190-2" data-line-number="2">house =<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/housing.txt&quot;</span>, </a>
-<a class="sourceLine" id="cb190-3" data-line-number="3">                   <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)</a>
-<a class="sourceLine" id="cb190-4" data-line-number="4"><span class="kw">names</span>(house)</a></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb196-1" data-line-number="1"><span class="kw">library</span>(GGally)</a>
+<a class="sourceLine" id="cb196-2" data-line-number="2">house =<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;http://www.rossmanchance.com/iscam2/data/housing.txt&quot;</span>, </a>
+<a class="sourceLine" id="cb196-3" data-line-number="3">                   <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)</a>
+<a class="sourceLine" id="cb196-4" data-line-number="4"><span class="kw">names</span>(house)</a></code></pre></div>
 <pre><code>## [1] &quot;sqft&quot;     &quot;price&quot;    &quot;City&quot;     &quot;bedrooms&quot; &quot;baths&quot;</code></pre>
 <div id="descriptive-statistics" class="section level4 unnumbered">
 <h4>Descriptive Statistics</h4>
 <p>A good first step is to investigate how all the variables relate to one another. The <code>ggpairs</code> function come from the R package <code>GGally</code>.</p>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb192-1" data-line-number="1"><span class="kw">ggpairs</span>(house, <span class="dt">columns =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>))</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb198-1" data-line-number="1"><span class="kw">ggpairs</span>(house, <span class="dt">columns =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>))</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="simple-linear-regression-2" class="section level4 unnumbered">
 <h4>Simple Linear Regression</h4>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1">mod.sqft &lt;-<span class="st"> </span><span class="kw">lm</span>(price<span class="op">~</span>sqft, <span class="dt">data =</span> house)</a>
-<a class="sourceLine" id="cb193-2" data-line-number="2">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1">mod.sqft &lt;-<span class="st"> </span><span class="kw">lm</span>(price<span class="op">~</span>sqft, <span class="dt">data =</span> house)</a>
+<a class="sourceLine" id="cb199-2" data-line-number="2">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)   65930.   60994.       1.08 2.83e- 1
 ## 2 sqft            202.      26.4      7.67 3.35e-11</code></pre>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1">mod.bed &lt;-<span class="st"> </span><span class="kw">lm</span>(price <span class="op">~</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house)</a>
-<a class="sourceLine" id="cb195-2" data-line-number="2">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1">mod.bed &lt;-<span class="st"> </span><span class="kw">lm</span>(price <span class="op">~</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house)</a>
+<a class="sourceLine" id="cb201-2" data-line-number="2">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 5
 ##   term        estimate std.error statistic p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 (Intercept)  220612.   107208.      2.06 0.0428 
 ## 2 bedrooms      76865.    28802.      2.67 0.00919</code></pre>
 <p>The p-values for both explanatory variables (sqft and bedrooms) are significant. Sqft seems more significant, and indeed, the first model has a higher <span class="math inline">\(R^2\)</span> - that is, a higher proportion of the variability in price is explained by sqft (42.07%) than by number of bedrooms (8.08%).</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb203-1" data-line-number="1">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 11
 ##   r.squared adj.r.squared  sigma statistic  p.value    df logLik   AIC
 ##       &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.421         0.414 2.22e5      58.8 3.35e-11     2 -1139. 2283.
 ## # … with 3 more variables: BIC &lt;dbl&gt;, deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb205-1" data-line-number="1">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 11
 ##   r.squared adj.r.squared  sigma statistic p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1    0.0808        0.0695 2.80e5      7.12 0.00919     2 -1158. 2321. 2329.
 ## # … with 2 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
 <p>However, it is important for us to ask whether either of the relationships actually fit the technical conditions of the linear regression model. We can see from the pairs plots that the relationships look <strong>L</strong>inear, we’ll assume the variables were collected <strong>I</strong>ndependently, but the <strong>N</strong>ormality and the <strong>E</strong>quality of the error structure we can check using residual plots.</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb201-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb201-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb201-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb201-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for price as a function of sqft&quot;</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb202-1" data-line-number="1">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb202-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb202-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb202-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb202-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for price as a function of bedrooms&quot;</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb207-1" data-line-number="1">mod.sqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb207-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb207-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb207-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb207-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for price as a function of sqft&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb208-1" data-line-number="1">mod.bed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb208-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb208-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb208-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb208-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for price as a function of bedrooms&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" /></p>
 <p>For both of the plots, it seems like the residuals have higher variability for positive residuals. Additionally, it seems that the variability of the residuals increases for larger fitted observations.</p>
 <p>A natural log transformation should fix both of these problems.</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb203-1" data-line-number="1">mod.lnsqft &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price)<span class="op">~</span>sqft, <span class="dt">data =</span> house)</a>
-<a class="sourceLine" id="cb203-2" data-line-number="2">mod.lnbed &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house)</a>
-<a class="sourceLine" id="cb203-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb203-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb203-5" data-line-number="5">mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb203-6" data-line-number="6"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb203-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb203-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb203-9" data-line-number="9"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for ln(price) as a function of sqft&quot;</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb204-1" data-line-number="1">mod.lnbed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb204-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb204-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb204-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb204-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for ln(price) as a function of bedrooms&quot;</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-16-2.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb209-1" data-line-number="1">mod.lnsqft &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price)<span class="op">~</span>sqft, <span class="dt">data =</span> house)</a>
+<a class="sourceLine" id="cb209-2" data-line-number="2">mod.lnbed &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house)</a>
+<a class="sourceLine" id="cb209-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb209-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb209-5" data-line-number="5">mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb209-6" data-line-number="6"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb209-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb209-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb209-9" data-line-number="9"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for ln(price) as a function of sqft&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb210-1" data-line-number="1">mod.lnbed <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span> () <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb210-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid))<span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb210-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb210-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb210-5" data-line-number="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Residual plot for ln(price) as a function of bedrooms&quot;</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;" /></p>
 <p>Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.</p>
 </div>
 <div id="multiple-linear-regression" class="section level4 unnumbered">
 <h4>Multiple Linear Regression</h4>
 <p>Because the price variable had a large skew (and the <code>ln()</code> transformation helped the residuals), the following models will all use <code>ln(price)</code> as the response variable. What happens when we try to predict <code>price</code> (actually <code>ln(price)</code>, here) using BOTH <code>sqft</code> and <code>bedrooms</code>?</p>
-<p>Note: the natural log funciton in R is <code>log()</code>.</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb205-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<p>Note: the natural log function in R is <code>log()</code>.</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term         estimate std.error statistic  p.value
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
 ## 2 sqft         0.000468 0.0000660      7.09 4.73e-10
 ## 3 bedrooms    -0.0603   0.0572        -1.05 2.95e- 1</code></pre>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb207-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb213-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.448         0.435 0.450      32.5 4.62e-11     3  -50.0  108.  118.
 ## # … with 2 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb209-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term         estimate std.error statistic  p.value
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept) 12.1      0.151        80.0   4.07e-78
 ## 2 sqft         0.000450 0.0000705     6.39  1.02e- 8
 ## 3 baths       -0.0377   0.0746       -0.505 6.15e- 1</code></pre>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.443         0.429 0.452      31.8 7.07e-11     3  -50.4  109.  118.
 ## # … with 2 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb213-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb219-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tidy</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 4 x 5
 ##   term         estimate std.error statistic  p.value
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -855,7 +930,7 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 2 sqft         0.000463 0.0000719     6.45  8.32e- 9
 ## 3 bedrooms    -0.0683   0.0730       -0.935 3.53e- 1
 ## 4 baths        0.0168   0.0947        0.177 8.60e- 1</code></pre>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb221-1" data-line-number="1"><span class="kw">lm</span>(<span class="kw">log</span>(price) <span class="op">~</span><span class="st"> </span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glance</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 11
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -869,7 +944,7 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 <p>Seems like we <em>really</em> don’t need bathrooms! The information about <code>sqft</code> is sufficient for predicting the price, and information about bathrooms doesn’t help much at all.</p>
 <p><strong>Final model</strong></p>
 <p>The final model will be run on log(price) using only sqft. Note that the coefficients and the <span class="math inline">\(R^2\)</span> values change slightly (from the original analysis) because the response variable is logged.</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="kw">summary</span>(mod.lnsqft)</a></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb223-1" data-line-number="1"><span class="kw">summary</span>(mod.lnsqft)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = log(price) ~ sqft, data = house)
@@ -894,14 +969,14 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 <p>As with the prediction intervals we had when we had a single sample, we can now create intervals for either an average (a confidence interval) of an individual (a prediction interval).</p>
 <div id="confidence-interval-1" class="section level5 unnumbered">
 <h5>Confidence interval:</h5>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb219-1" data-line-number="1"><span class="kw">predict</span>(mod.lnsqft, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>), <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1"><span class="kw">predict</span>(mod.lnsqft, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>), <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.89125 12.79211 12.99038</code></pre>
 <p>I am 95% confident that the true average log price for a 2000 sqft home is between 12.79 ln$ and 12.99 ln$. (The predicted value is in natural-log-dollars … which is hard to interpret , but back-transforming can be a little tricky and beyond the scope of this semester).</p>
 </div>
 <div id="prediction-interval" class="section level5 unnumbered">
 <h5>Prediction interval:</h5>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb221-1" data-line-number="1"><span class="kw">predict</span>(mod.lnsqft, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>), <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb227-1" data-line-number="1"><span class="kw">predict</span>(mod.lnsqft, <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>), <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.89125 11.98994 13.79255</code></pre>
 <p>I am 95% of homes with 2000 sqft are between 11.99 ln$ and 13.79 ln$. Now back-transforming is easy (because there are no averages), so 95% of homes with 2000 sqft are between $161,126 and $977,301 (which are just <span class="math inline">\(e^{11.98994}\)</span> and <span class="math inline">\(e^{13.79255}\)</span>).</p>
@@ -909,10 +984,10 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 <div id="plotting-confidence-bounds" class="section level5 unnumbered">
 <h5>Plotting confidence bounds:</h5>
 <p>A <strong>confidence</strong> interval around the line gives bounds on the parameter represented by the line. So we are 95% confident that the true population line lies within the bounds. Note that the interval is wider at the endpoints (because the variability is higher at the ends).</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb223-1" data-line-number="1">houseConf &lt;-<span class="st"> </span>mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb223-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(mod.lnsqft, <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
-<a class="sourceLine" id="cb223-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb223-4" data-line-number="4">houseConf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1">houseConf &lt;-<span class="st"> </span>mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb229-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(mod.lnsqft, <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
+<a class="sourceLine" id="cb229-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb229-4" data-line-number="4">houseConf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>##   log.price. sqft  .fitted    .se.fit      .resid       .hat    .sigma
 ## 1   12.73376 3392 13.48618 0.08417041 -0.75242702 0.03494894 0.4448768
 ## 2   13.71004 4100 13.78878 0.11696192 -0.07874048 0.06748451 0.4529518
@@ -927,16 +1002,16 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 4 3.268479e-03 -0.58696923 12.65019 12.52795 12.77244
 ## 5 2.130978e-05 -0.05807924 12.86731 12.76725 12.96738
 ## 6 1.961713e-04 -0.14865344 12.67755 12.55923 12.79587</code></pre>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1"><span class="kw">ggplot</span>(houseConf, <span class="kw">aes</span>(<span class="dt">x=</span>sqft)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb225-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>log.price.)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb225-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb225-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="kw">ggplot</span>(houseConf, <span class="kw">aes</span>(<span class="dt">x=</span>sqft)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb231-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>log.price.)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb231-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb231-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" /></p>
 <p>A <strong>prediction</strong> interval around the line bounds the individual points. That is, 95% of the observations are captured inside the interval. As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1">housePred &lt;-<span class="st"> </span>mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb226-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(mod.lnsqft, <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
-<a class="sourceLine" id="cb226-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb226-4" data-line-number="4">housePred <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" data-line-number="1">housePred &lt;-<span class="st"> </span>mod.lnsqft <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">augment</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb232-2" data-line-number="2"><span class="st">  </span><span class="kw">cbind</span>(<span class="kw">predict</span>(mod.lnsqft, <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>) )  <span class="co"># cbind binds the columns together</span></a>
+<a class="sourceLine" id="cb232-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb232-4" data-line-number="4">housePred <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>##   log.price. sqft  .fitted    .se.fit      .resid       .hat    .sigma
 ## 1   12.73376 3392 13.48618 0.08417041 -0.75242702 0.03494894 0.4448768
 ## 2   13.71004 4100 13.78878 0.11696192 -0.07874048 0.06748451 0.4529518
@@ -951,31 +1026,66 @@ p-value &amp;=&amp; 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \appr
 ## 4 3.268479e-03 -0.58696923 12.65019 11.74606 13.55433
 ## 5 2.130978e-05 -0.05807924 12.86731 11.96591 13.76872
 ## 6 1.961713e-04 -0.14865344 12.67755 11.77393 13.58116</code></pre>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1"><span class="kw">ggplot</span>(housePred, <span class="kw">aes</span>(<span class="dt">x=</span>sqft)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb228-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>log.price.)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb228-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb228-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
-<p><img src="05-CorReg_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb234-1" data-line-number="1"><span class="kw">ggplot</span>(housePred, <span class="kw">aes</span>(<span class="dt">x=</span>sqft)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb234-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>log.price.)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb234-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.fitted)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb234-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>lwr, <span class="dt">ymax=</span>upr), <span class="dt">fill=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.2</span>)</a></code></pre></div>
+<p><img src="05-CorReg_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" /></p>
 </div>
 <div id="predicting-with-more-than-one-explanatory-variable" class="section level5 unnumbered">
 <h5>Predicting with more than one explanatory variable:</h5>
 <p>The predict function still works to give estimates of the average value and the predicted individual values, but the plot is now much harder to draw because with three explanatory variables, we would need a 4-d plot to visualize the model and the predictions.</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1">sqftbedbathlm =<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price)<span class="op">~</span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house)</a>
-<a class="sourceLine" id="cb229-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb229-3" data-line-number="3"><span class="kw">predict</span>(sqftbedbathlm, </a>
-<a class="sourceLine" id="cb229-4" data-line-number="4">        <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>, <span class="dt">bedrooms=</span><span class="dv">3</span>, <span class="dt">baths=</span><span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb229-5" data-line-number="5">        <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>, <span class="dt">level=</span>.<span class="dv">95</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb235-1" data-line-number="1">sqftbedbathlm =<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(price)<span class="op">~</span>sqft <span class="op">+</span><span class="st"> </span>bedrooms <span class="op">+</span><span class="st"> </span>baths, <span class="dt">data=</span>house)</a>
+<a class="sourceLine" id="cb235-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb235-3" data-line-number="3"><span class="kw">predict</span>(sqftbedbathlm, </a>
+<a class="sourceLine" id="cb235-4" data-line-number="4">        <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>, <span class="dt">bedrooms=</span><span class="dv">3</span>, <span class="dt">baths=</span><span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb235-5" data-line-number="5">        <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>, <span class="dt">level=</span>.<span class="dv">95</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.91816 12.80085 13.03548</code></pre>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb231-1" data-line-number="1"><span class="kw">predict</span>(sqftbedbathlm, </a>
-<a class="sourceLine" id="cb231-2" data-line-number="2">        <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>, <span class="dt">bedrooms=</span><span class="dv">3</span>, <span class="dt">baths=</span><span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb231-3" data-line-number="3">        <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>, <span class="dt">level=</span>.<span class="dv">95</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb237-1" data-line-number="1"><span class="kw">predict</span>(sqftbedbathlm, </a>
+<a class="sourceLine" id="cb237-2" data-line-number="2">        <span class="dt">newdata=</span><span class="kw">data.frame</span>(<span class="dt">sqft=</span><span class="dv">2000</span>, <span class="dt">bedrooms=</span><span class="dv">3</span>, <span class="dt">baths=</span><span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb237-3" data-line-number="3">        <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>, <span class="dt">level=</span>.<span class="dv">95</span>)</a></code></pre></div>
 <pre><code>##        fit      lwr     upr
 ## 1 12.91816 12.00953 13.8268</code></pre>
 <p>Again, it is hard to back-transform the prediction for the <strong>average</strong> (we end up thinking about it as a median), but we can back-transform the interval of individual prices. 95% of homes with 2000sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="reflection-questions-3" class="section level2">
+<h2><span class="header-section-number">6.10</span> Reflection Questions</h2>
+<div id="correlation-simple-linear-regression-chapter-5-section-1-4" class="section level3">
+<h3><span class="header-section-number">6.10.1</span> Correlation &amp; Simple Linear Regression: Chapter 5, Section 1-4</h3>
+<ul>
+<li>Describe the linear model with multiple variables.</li>
+<li>Describe the error / residual term and how it is calculated with multiple variables.</li>
+<li>What are the (three-ish) statistics of interest in this chapter? What are the parameters of interest?</li>
+<li>What does correlation measure?</li>
+<li>How do we find the values of <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span> for estimating the least squares line?</li>
+<li>Why is it dangerous to extrapolate?</li>
+<li>How do we interpret <span class="math inline">\(R^2\)</span>? Why is that?</li>
+<li>What does it mean to say that <span class="math inline">\(b_1\)</span> has a sampling distribution? Why is it that we would never talk about the sampling distribution of <span class="math inline">\(\beta_1\)</span>?</li>
+<li>Why do we need the LINE technical conditions for the inference parts of the analysis but not for the estimation parts of the analysis?</li>
+<li>Is linear regression always appropriate when comparing two continuous variables?</li>
+<li>What are the LINE technical conditions? How are the conditions assessed?</li>
+<li>What are the three factors that influence the <span class="math inline">\(SE(b_1)\)</span>? (Note: when something influences <span class="math inline">\(SE(b_1)\)</span>, that means the inference is also effected. If you have a huge <span class="math inline">\(SE(b_1)\)</span>, it will be hard to tell if the slope is significant because the t value will be small.)</li>
+<li>What does it mean to do a randomization test for the slope? That is, explain the process of doing a randomization test here. (See shuffle options in the Analyzing Two Quantitative Variables applet.)</li>
+<li>Why would someone transform either of the variables?</li>
+<li>What is the difference between a confidence interval and a prediction interval? Which is bigger? Why does that make sense? How do the centers of the intervals differ? (They don’t. Why not?)</li>
+</ul>
+</div>
+<div id="multiple-linear-regression-chapter-6-section-1-3" class="section level3">
+<h3><span class="header-section-number">6.10.2</span> Multiple Linear Regression: Chapter 6, Section 1-3</h3>
+<ul>
+<li>Describe the linear model with multiple variables.</li>
+<li>Describe the error / residual term and how it is calculated with multiple variables.</li>
+<li>How does the model change when multiple variables are included?</li>
+<li>How are p-values interpreted now that there are multiple variables?</li>
+<li>How is <span class="math inline">\(R^2\)</span> interpreted? What is the difference between <span class="math inline">\(R^2\)</span> and <span class="math inline">\(R^2_{adj}\)</span>?</li>
+<li>How are variables chosen for the final model?</li>
+<li>How are the model conditions assessed?</li>
+</ul>
 
-</div>
-</div>
 </div>
 </div>
 </div>

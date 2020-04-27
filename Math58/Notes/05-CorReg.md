@@ -307,10 +307,121 @@ Within a residual plot, you should be looking for the same types of things you w
 
 ## Multiple Linear Regression {#MLR}
 
+As with simple linear regression, consider $n$ observations.  The response variable for the $i^{th}$ individual is denoted by $Y_i$, as before. The variation remaining in $Y_i$ that isn't explained by our predictors will also remain the same, denoted by $\epsilon_i$ and called the random error.  Since we now have more than one explanatory variable, we will need to add an additional subscript on $X$, denoting the value of the $k^{th}$ predictor variable for the $i^{th}$ individual by $X_{ik}$.  Thus our model is now 
+
+\begin{eqnarray*}
+Y_i&=&\beta_0+\beta_1X_{i1}+\beta_2X_{i2}+ \cdots + \beta_{p-1}X_{i,p-1} + \epsilon_i\\
+E[Y]&=&\beta_0+\beta_1X_{1}+\beta_2X_{2}+ \cdots + \beta_{p-1}X_{p-1}\\
+Y_i&=&b_0+b_1X_{i1}+b_2X_{i2}+ \cdots + b_{p-1}X_{i,p-1} + e_i\\
+\widehat{Y}&=&b_0+b_1X_{1}+b_2X_{2}+ \cdots + b_{p-1}X_{p-1}\\
+\end{eqnarray*}
+
+#### Fitting the Model {-}
+To estimate the coefficients, use the same principle as before, that of least squares.  That is, minimize
+$$\sum_{i=1}^n(Y_i-(b_0+b_1X_{i1}+b_2X_{i2} + \cdots + b_{p-1}X_{i,p-1}))^2$$
+We are interested in finding the least squares estimates ($b_i$) of the parameters of the model $\beta_i$.  
+
+
+
 ### Model selection {#MLRmod}
+
+While there are many aspects of a linear model to consider (we offer an entire course!  Math 158: Linear models), here we will focus on interpreting and testing single coefficients in the model.
+
+Consider the following model (based on R housing example below).  We are predicting the price of a home (in $\ln$ units).  
+
+$$\widehat{Y} = 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot \mbox{# bedrooms}$$
+
+
+Now, let's compare two houses.  The two houses have the exact same square feet (note, it doesn't matter what the square feet is!!).  House 1 (H1) has 4 bedrooms, house 2 (H2) has 3 bedrooms.
+
+The coefficient associated with the number of bedrooms indicates the change in price (in $\ln$ units) **keeping all other variables constant**.  That is, if comparing the prediction of the average price of a home for two homes that have the same square feet but a one unit difference in bedrooms, the price of the home is predicted to be -0.0603 $\ln$ units less for the home with more bedrooms.  (Does that seem to make sense?  Same square feet, more bedrooms chop up the house and make it less desirable maybe?)
+
+\begin{eqnarray*}
+\widehat{Y}_{H1} &=& 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot 4\\
+\widehat{Y}_{H2} &=& 12.2 + 0.000468 \cdot \mbox{sqft} - 0.0603 \cdot 3\\
+\widehat{Y}_{H1} - \widehat{Y}_{H2} &=& (-0.0603 \cdot 4) - (-0.0603 \cdot 3) =  -0.0603\\
+\end{eqnarray*}
+
+
+
+```r
+house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
+                   header=TRUE, sep="\t")
+lm(log(price) ~ sqft + bedrooms, data=house) %>% tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term         estimate std.error statistic  p.value
+##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
+## 2 sqft         0.000468 0.0000660      7.09 4.73e-10
+## 3 bedrooms    -0.0603   0.0572        -1.05 2.95e- 1
+```
+
+
+#### Inference about Regression Parameters {-}
+
+However, the coefficient on `bedrooms` isn't significant (that is, the associated p-value is larger than any reasonable level of significance, like $\alpha = 0.05$).  But wait, how is the p-value even calculated?
+
+The least squares coefficient estimate and the SE create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating $p$ parameters, so our degrees of freedom is $n-p$).
+
+\begin{eqnarray*}
+\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\end{eqnarray*}
+A $(1-\alpha)100\%$ CI for $\beta_k$ is given by$$b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}$$
+
+
+The t-test is done separately for EACH $\beta$ coefficient.   The test addresses the effect of removing only the variable at hand.  Both testing and interpretation of the regression coefficients are done **with all other variables in the model**.
+
+The coefficient on `bedrooms` is not significant **given `sqft` is in the model**.  Note that if we don't have `sqft`, then bedrooms acts as a surrogate for `sqft` and it *is* important (and significant!).  In this case, however, `sqft` is a better predictor than `bedrooms`.
+
+
+```r
+lm(log(price) ~  bedrooms, data=house) %>% tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   12.3      0.219      56.3  1.03e-66
+## 2 bedrooms       0.178    0.0587      3.03 3.31e- 3
+```
+
+#### Which variables to choose? {-}
+
+Again, there are numerous ways to build a model.  Some important principles to keep in mind:
+
+* ideally the variables in the model are significant (remove variables with high p-values)
+* the LINE model conditions should hold (you may need to transform the response or explanatory variables)
+* the variables should be consistent with the data context (be sure that your analysis is done with experts in the field)
+
 
 ### Checking model assumptions
 
+As before, the LINE model conditions are checked by using residual plots.  Note that in the housing example, the residual plot after log transformation on the response variable is improved.
+
+
+```r
+lm(price ~  sqft, data=house)  %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for price as a function of sqft")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+lm(log(price) ~  sqft, data=house)  %>% augment () %>%
+  ggplot(aes(x = .fitted, y = .resid))+ 
+  geom_point() + 
+  geom_hline(yintercept=0) +
+  ggtitle("Residual plot for ln price as a function of sqft")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-5-2.png" width="480" style="display: block; margin: auto;" />
 
 ## R code for regression 
 
@@ -332,7 +443,7 @@ ggplot(cats, aes(x=bodymass, y = velocity)) +
   geom_smooth(method = "lm", se=FALSE)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ####  Correlation {-}
@@ -441,7 +552,7 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
   geom_hline(yintercept = 0)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Confidence & Prediction Intervals {-}
@@ -502,7 +613,7 @@ ggplot(catConf, aes(x=bodymass)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -538,7 +649,7 @@ ggplot(catPred, aes(x=bodymass)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
@@ -564,7 +675,7 @@ A good first step is to investigate how all the variables relate to one another.
 ggpairs(house, columns = c(1,2,4,5))
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Simple Linear Regression {-}
 
@@ -634,7 +745,7 @@ mod.sqft %>% augment () %>%
   ggtitle("Residual plot for price as a function of sqft")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 mod.bed %>% augment () %>%
@@ -644,7 +755,7 @@ mod.bed %>% augment () %>%
   ggtitle("Residual plot for price as a function of bedrooms")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-18-2.png" width="480" style="display: block; margin: auto;" />
 
 For both of the plots, it seems like the residuals have higher variability for positive residuals.  Additionally, it seems that the variability of the residuals increases for larger fitted observations. 
 
@@ -663,7 +774,7 @@ mod.lnsqft %>% augment () %>%
   ggtitle("Residual plot for ln(price) as a function of sqft")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 mod.lnbed %>% augment () %>%
@@ -673,7 +784,7 @@ mod.lnbed %>% augment () %>%
   ggtitle("Residual plot for ln(price) as a function of bedrooms")
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-16-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;" />
 
 
 Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.
@@ -684,7 +795,7 @@ Though no residual plot will ever look perfect, these residual plots seem to fit
 
 Because the price variable had a large skew (and the `ln()` transformation helped the residuals), the following models will all use `ln(price)` as the response variable.   What happens when we try to predict `price` (actually `ln(price)`, here) using BOTH `sqft` and `bedrooms`?
 
-Note:  the natural log funciton in R is `log()`.
+Note:  the natural log function in R is `log()`.
 
 
 ```r
@@ -878,7 +989,7 @@ ggplot(houseConf, aes(x=sqft)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
 A **prediction** interval around the line bounds the individual points.  That is, 95% of the observations are captured inside the interval.  As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals
 
@@ -914,7 +1025,7 @@ ggplot(housePred, aes(x=sqft)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
 
-<img src="05-CorReg_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorReg_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ##### Predicting with more than one explanatory variable: {-}
@@ -951,7 +1062,35 @@ Again, it is hard to back-transform the prediction for the **average** (we end u
 
 
 
+## Reflection Questions
+
+### Correlation & Simple Linear Regression: Chapter 5, Section 1-4 
+
+* Describe the linear model with multiple variables.
+* Describe the error / residual term and how it is calculated with multiple variables.
+* What are the (three-ish) statistics of interest in this chapter?  What are the parameters of interest?
+* What does correlation measure?
+* How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
+* Why is it dangerous to extrapolate?
+* How do we interpret $R^2$?  Why is that? 
+* What does it mean to say that $b_1$ has a sampling distribution?  Why is it that we would never talk about the sampling distribution of $\beta_1$?
+* Why do we need the LINE technical conditions for the inference parts of the analysis but not for the estimation parts of the analysis?
+* Is linear regression always appropriate when comparing two continuous variables?
+* What are the LINE technical conditions?  How are the conditions assessed?
+* What are the three factors that influence the $SE(b_1)$?  (Note:  when something influences $SE(b_1)$, that means the inference is also effected.  If you have a huge $SE(b_1)$, it will be hard to tell if the slope is significant because the t value will be small.)
+* What does it mean to do a randomization test for the slope?  That is, explain the process of doing a randomization test here. (See shuffle options in the Analyzing Two Quantitative Variables applet.)
+* Why would someone transform either of the variables?
+* What is the difference between a confidence interval and a prediction interval?  Which is bigger?  Why does that make sense?  How do the centers of the intervals differ?  (They don't.  Why not?)
 
 
+### Multiple Linear Regression: Chapter 6, Section 1-3 
+
+* Describe the linear model with multiple variables.
+* Describe the error / residual term and how it is calculated with multiple variables.
+* How does the model change when multiple variables are included?
+* How are p-values interpreted now that there are multiple variables?
+* How is $R^2$ interpreted?  What is the difference between $R^2$ and $R^2_{adj}$?
+* How are variables chosen for the final model?
+* How are the model conditions assessed?
 
 
