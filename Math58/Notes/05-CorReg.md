@@ -1091,7 +1091,7 @@ While the entire paper is fascinating and does a great job describing different 
 
 ```r
 flu_1819 <- read_csv("1918_1919flu.csv", 
-                     col_types = cols(`Date of peak Excess death rate` = col_date(format = "%m/%d/%Y")))
+                     col_types = cols(`Date of peak Excess death rate` = col_date(format = "%m/%d/%y")))
 
 names(flu_1819) <- c("place", "responseTime", "daysNonpharm", "datePeak", 
                      "timePeak", "magPeak", "excessDeaths")
@@ -1103,12 +1103,12 @@ head(flu_1819)
 ## # A tibble: 6 x 7
 ##   place  responseTime daysNonpharm datePeak   timePeak magPeak excessDeaths
 ##   <chr>         <dbl>        <dbl> <date>        <dbl>   <dbl>        <dbl>
-## 1 Alban…            3           47 NA               15   162.          553.
-## 2 Balti…           10           43 NA                9   182.          559.
-## 3 Birmi…            9           48 NA               13    70.9         592.
-## 4 Bosto…           13           50 NA                8   160.          710 
-## 5 Buffa…           12           49 NA               12   141.          530.
-## 6 Cambr…           14           49 NA                8   126.          541
+## 1 Alban…            3           47 2018-10-24       15   162.          553.
+## 2 Balti…           10           43 2018-10-18        9   182.          559.
+## 3 Birmi…            9           48 2018-10-22       13    70.9         592.
+## 4 Bosto…           13           50 2018-10-03        8   160.          710 
+## 5 Buffa…           12           49 2018-10-22       12   141.          530.
+## 6 Cambr…           14           49 2018-10-03        8   126.          541
 ```
 
 
@@ -1348,7 +1348,7 @@ Gilead, a large pharmaceutical company, issued a press release describing result
 * two patient groups are 5-day and 10-day treatment courses (no placebo), randomized
 * patients on ventilators were not enrolled
 
-*The NY Times* covered the Gilead announement.
+*The NY Times* covered the Gilead announement.  Indeed, the outcome of the trials have important political ramifications as well.
 
 <div class="figure" style="text-align: center">
 <img src="figs/nyt_remdesivir.png" alt="Gilead remdesivir trial covered in the NYT, https://www.nytimes.com/2020/04/29/health/gilead-remdesivir-coronavirus.html" width="653" />
