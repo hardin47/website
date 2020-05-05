@@ -694,6 +694,190 @@ predict(sqftbedbathlm,
 Again, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
 
 
+### Example: 1918-19 Flu and Excess Deaths^[thanks to Laura Ring Kapitula at Grand Valley State University] {#ex:1819flu}
+
+As we are coming to know, measuring the impact of COVID-19 is difficult.  A recent NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.
+
+```{r fig.cap = "US Death Toll 2020, NY Times, April 28, 2020, https://www.nytimes.com/interactive/2020/04/28/us/coronavirus-death-toll-total.html", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/covid_excess.png")
+```
+
+While it is still too early to model COVID-19 well, we do have information from the 1918-19 Flu pandemic that was similar in many ways to the current COVID-19 pandemic.  In 2007, Markel et al. published research in the *Journal of the American Medical Association* detailing the results from different social distancing practices across the US, "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic" [JAMA, Aug 8, 2007, Vol 298, No 6].
+
+
+```{r fig.cap = "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354l", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/jama_covid.png")
+```
+
+Their conclusions are worth restating:
+
+> **Conclusions** These findings demonstrate a strong association between early, sustained, and layered application of nonpharmaceutical interventions and mitigating the consequences of the 1918-1919 influenza pandemic in the United States. In planning for future severe influenza pandemics, nonpharmaceutical interventions should be considered for inclusion as companion measures to developing effective vaccines and medications for prophylaxis and treatment.
+
+While the entire paper is fascinating and does a great job describing different interventions and related outcomes, we will focus on the regression analysis done to model the excess death rate.  The data used below come directly from page 647 of the manuscript.
+
+```{r fig.cap = "Note that figure 1b seems to have the y-axis mis-labelled (it should be magnitude of first mortality peak).  Table 4 uses a test other than linear regression (Wilcoxon rank sum test -- a two sample test of means done on ranked data rather than raw data) to compare the outcome variables broken into two groups:  below the median response time and above the median response time.", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/jama_scatterplot.png")
+```
+
+```{r warning=FALSE, message = FALSE}
+flu_1819 <- read_csv("1918_1919flu.csv", 
+                     col_types = cols(`Date of peak Excess death rate` = col_date(format = "%m/%d/%Y")))
+
+names(flu_1819) <- c("place", "responseTime", "daysNonpharm", "datePeak", 
+                     "timePeak", "magPeak", "excessDeaths")
+
+head(flu_1819)
+```
+
+
+#### Correlation between variables {-}
+
+To be consistent with the manuscript, Spearman correlation is used instead of Pearson.  Spearman is the Pearson correlation applied to the ranks of the observations (instead of the raw values of the observations).  Calculating Spearman has the impact of lessening the influence of outlying observations.
+
+The correlations calculated below match the values in the manuscript, but we repeat the analysis without St Paul, MN and Grand Rapids, MI to see their impact on the analysis.  I would not remove the two cities without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations.  Here it seems that there is some impact (e.g., excessDeaths and responseTime) but possibly the impact is only moderate.
+
+```{r}
+flu_1819 %>%
+  select(excessDeaths, magPeak, responseTime, daysNonpharm, timePeak) %>%
+  cor(method="spearman")
+
+
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place !=  "Grand Rapids, MI") %>%
+  select(excessDeaths, magPeak, responseTime, daysNonpharm, timePeak) %>%
+  cor(method="spearman")
+```
+
+#### Model building {-}
+
+Below, both St Paul and Grand Rapids have been removed from the model.  Again, in reporting the analysis (as the JAMA authors did correctly),  the two cities would not be removed without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations.
+
+Note that in predicting both `excessDeaths` and `magPeak` the most significant variable is `daysNonpharm`.  No other variable adds significantly to the model
+
+```{r}
+# excessDeaths as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  tidy()
+
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  responseTime, data = .) %>%
+  tidy()
+
+# magPeak as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+```
+
+#### Checking Residuals {-}
+
+Turns out the residuals for these models aren't great (maybe that is why the authors used ranked based methods like Spearman correlation and Wilcoxon rank sum test??? -- those tests have different technical conditions, not based in normal theory!)
+
+
+```{r}
+# excessDeaths as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, excessDeath vs days Nonparm")
+
+
+flu_1819 %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids NOT removed, excessDeath vs days Nonparm")
+
+
+
+
+# magPeak as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, magPeak vs days responseTime")
+
+
+flu_1819 %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids NOT removed, magPeak vs days responseTime")
+
+
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, log(magPeak) vs days responseTime")
+```
+
+#### What else do we know about COVID-19 right now?  {-}
+
+Clinical trials are starting to show up assessing know anti-viral pharmaceutical interventions on patients with COVID-19.  
+
+
+##### Study 1: {-}
+
+
+```{r fig.cap = "Remdesivir in adults with severe COVID-19: a randomised, double-blind, placebo-controlled, multicentre trial, https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/lancet_remdesivir.png")
+```
+
+> **Findings** Between Feb 6, 2020, and March 12, 2020, 237 patients were enrolled and randomly assigned to a treatment group (158 to remdesivir and 79 to placebo); one patient in the placebo group who withdrew after randomisation was not included in the ITT population. Remdesivir use was not associated with a difference in time to clinical improvement (hazard ratio 1·23 [95% CI 0·87–1·75]). Although not statistically significant, patients receiving remdesivir had a numerically faster time to clinical improvement than those receiving placebo among patients with symptom duration of 10 days or less (hazard ratio 1·52 [0·95–2·43]). Adverse events were reported in 102 (66%) of 155 remdesivir recipients versus 50 (64%) of 78 placebo recipients. Remdesivir was stopped early because of adverse events in 18 (12%) patients versus four (5%) patients who stopped placebo early.
+
+* animal studies have shown remdesivir inhibits SARS-CoV-2 replication
+* study was randomized, double-blind, placebo-controlled, multi-center
+* adults with laboratory-confirmed SARS-CoV-2 infection, low oxygen, pneumonia
+* randomly assigned in a 2:1 ratio to remdesivir vs placebo
+* **not statistically significant** !
+* patients on remdesivir had a numerically faster time to clinical improvement
+* trial was stopped before enrolling the expected number of patients because the outbreak of COVID-19 was brought under control
+
+
+
+
+##### Study 2: {-}
+
+Gilead, a large pharmaceutical company, issued a press release describing results from a clinical trial involving remdesivir.  They were mostly seeking to understand how long the treatment should continue and what are the adverse effects of the drug.
+
+```{r fig.cap = "Gilead press release (no peer reviewed publication yet), https://www.gilead.com/news-and-press/press-room/press-releases/2020/4/gilead-announces-results-from-phase-3-trial-of-investigational-antiviral-remdesivir-in-patients-with-severe-covid-19https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/gilead_remdesivir.png")
+```
+
+> In this study, the time to clinical improvement for 50 percent of patients was 10 days in the 5-day treatment group and 11 days in the 10-day treatment group. More than half of patients in both treatment groups were discharged from the hospital by Day 14 (5-day: 60.0%, n=120/200 vs.10-day: 52.3% n=103/197; p=0.14). At Day 14, 64.5 percent (n=129/200) of patients in the 5-day treatment group and 53.8 percent (n=106/197) of patients in the 10-day treatment group achieved clinical recovery.
+
+* two patient groups are 5-day and 10-day treatment courses (no placebo), randomized
+* patients on ventilators were not enrolled
 
 
 ## Reflection Questions

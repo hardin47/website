@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-04-27"
+date: "2020-05-05"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -64,4 +64,4 @@ You are responsible for reading the relevant chapters in the text.  The text is 
 | 4/23/20	| Inference on $\beta_1$ | ISRS 5.3 - 5.4 & Inv 5.13 - 5.14 |  \@ref(Apr23) [Apr23] \@ref(infbeta1) [Inf $\beta_1$] |
 | 4/28/20	| Multiple Linear Regression | ISRS 6.1 - 6.2 |  \@ref(Apr28) [Apr28] \@ref(MLR) [MLR] |
 | 4/30/20	| Model Selection | ISRS 6.3 - 6.4 |  \@ref(Apr30) [Apr30] \@ref(MLRmod) [MLR model] |
-| 5/5/20	|review for Exam 2 |  |  |
+| 5/5/20	|review |  |  \@ref(ex:1819flu) [1918-19 Flu]  |

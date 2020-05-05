@@ -1060,6 +1060,293 @@ predict(sqftbedbathlm,
 Again, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
 
 
+### Example: 1918-19 Flu and Excess Deaths^[thanks to Laura Ring Kapitula at Grand Valley State University] {#ex:1819flu}
+
+As we are coming to know, measuring the impact of COVID-19 is difficult.  A recent NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.
+
+<div class="figure" style="text-align: center">
+<img src="figs/covid_excess.png" alt="US Death Toll 2020, NY Times, April 28, 2020, https://www.nytimes.com/interactive/2020/04/28/us/coronavirus-death-toll-total.html" width="630" />
+<p class="caption">(\#fig:unnamed-chunk-29)US Death Toll 2020, NY Times, April 28, 2020, https://www.nytimes.com/interactive/2020/04/28/us/coronavirus-death-toll-total.html</p>
+</div>
+
+While it is still too early to model COVID-19 well, we do have information from the 1918-19 Flu pandemic that was similar in many ways to the current COVID-19 pandemic.  In 2007, Markel et al. published research in the *Journal of the American Medical Association* detailing the results from different social distancing practices across the US, "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic" [JAMA, Aug 8, 2007, Vol 298, No 6].
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/jama_covid.png" alt="Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354l" width="772" />
+<p class="caption">(\#fig:unnamed-chunk-30)Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354l</p>
+</div>
+
+Their conclusions are worth restating:
+
+> **Conclusions** These findings demonstrate a strong association between early, sustained, and layered application of nonpharmaceutical interventions and mitigating the consequences of the 1918-1919 influenza pandemic in the United States. In planning for future severe influenza pandemics, nonpharmaceutical interventions should be considered for inclusion as companion measures to developing effective vaccines and medications for prophylaxis and treatment.
+
+While the entire paper is fascinating and does a great job describing different interventions and related outcomes, we will focus on the regression analysis done to model the excess death rate.  The data used below come directly from page 647 of the manuscript.
+
+<div class="figure" style="text-align: center">
+<img src="figs/jama_scatterplot.png" alt="Note that figure 1b seems to have the y-axis mis-labelled (it should be magnitude of first mortality peak).  Table 4 uses a test other than linear regression (Wilcoxon rank sum test -- a two sample test of means done on ranked data rather than raw data) to compare the outcome variables broken into two groups:  below the median response time and above the median response time." width="794" />
+<p class="caption">(\#fig:unnamed-chunk-31)Note that figure 1b seems to have the y-axis mis-labelled (it should be magnitude of first mortality peak).  Table 4 uses a test other than linear regression (Wilcoxon rank sum test -- a two sample test of means done on ranked data rather than raw data) to compare the outcome variables broken into two groups:  below the median response time and above the median response time.</p>
+</div>
+
+
+```r
+flu_1819 <- read_csv("1918_1919flu.csv", 
+                     col_types = cols(`Date of peak Excess death rate` = col_date(format = "%m/%d/%Y")))
+
+names(flu_1819) <- c("place", "responseTime", "daysNonpharm", "datePeak", 
+                     "timePeak", "magPeak", "excessDeaths")
+
+head(flu_1819)
+```
+
+```
+## # A tibble: 6 x 7
+##   place  responseTime daysNonpharm datePeak   timePeak magPeak excessDeaths
+##   <chr>         <dbl>        <dbl> <date>        <dbl>   <dbl>        <dbl>
+## 1 Alban…            3           47 NA               15   162.          553.
+## 2 Balti…           10           43 NA                9   182.          559.
+## 3 Birmi…            9           48 NA               13    70.9         592.
+## 4 Bosto…           13           50 NA                8   160.          710 
+## 5 Buffa…           12           49 NA               12   141.          530.
+## 6 Cambr…           14           49 NA                8   126.          541
+```
+
+
+#### Correlation between variables {-}
+
+To be consistent with the manuscript, Spearman correlation is used instead of Pearson.  Spearman is the Pearson correlation applied to the ranks of the observations (instead of the raw values of the observations).  Calculating Spearman has the impact of lessening the influence of outlying observations.
+
+The correlations calculated below match the values in the manuscript, but we repeat the analysis without St Paul, MN and Grand Rapids, MI to see their impact on the analysis.  I would not remove the two cities without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations.  Here it seems that there is some impact (e.g., excessDeaths and responseTime) but possibly the impact is only moderate.
+
+
+```r
+flu_1819 %>%
+  select(excessDeaths, magPeak, responseTime, daysNonpharm, timePeak) %>%
+  cor(method="spearman")
+```
+
+```
+##              excessDeaths    magPeak responseTime daysNonpharm   timePeak
+## excessDeaths    1.0000000  0.7639686    0.3658238   -0.3925996 -0.1619664
+## magPeak         0.7639686  1.0000000    0.3090137   -0.5739853 -0.2541940
+## responseTime    0.3658238  0.3090137    1.0000000   -0.6808529 -0.7346764
+## daysNonpharm   -0.3925996 -0.5739853   -0.6808529    1.0000000  0.6135956
+## timePeak       -0.1619664 -0.2541940   -0.7346764    0.6135956  1.0000000
+```
+
+```r
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place !=  "Grand Rapids, MI") %>%
+  select(excessDeaths, magPeak, responseTime, daysNonpharm, timePeak) %>%
+  cor(method="spearman")
+```
+
+```
+##              excessDeaths    magPeak responseTime daysNonpharm   timePeak
+## excessDeaths    1.0000000  0.7402439    0.5093635   -0.4663501 -0.2989616
+## magPeak         0.7402439  1.0000000    0.4603040   -0.6752625 -0.4170257
+## responseTime    0.5093635  0.4603040    1.0000000   -0.6638306 -0.6969834
+## daysNonpharm   -0.4663501 -0.6752625   -0.6638306    1.0000000  0.6007545
+## timePeak       -0.2989616 -0.4170257   -0.6969834    0.6007545  1.0000000
+```
+
+#### Model building {-}
+
+Below, both St Paul and Grand Rapids have been removed from the model.  Again, in reporting the analysis (as the JAMA authors did correctly),  the two cities would not be removed without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations.
+
+Note that in predicting both `excessDeaths` and `magPeak` the most significant variable is `daysNonpharm`.  No other variable adds significantly to the model
+
+
+```r
+# excessDeaths as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term         estimate std.error statistic  p.value
+##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   552.       67.0        8.24 5.50e-10
+## 2 responseTime    5.57      3.90       1.43 1.62e- 1
+## 3 daysNonpharm   -0.828     0.503     -1.65 1.08e- 1
+```
+
+```r
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term         estimate std.error statistic  p.value
+##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)    628.      41.7       15.0  7.92e-18
+## 2 daysNonpharm    -1.25     0.412     -3.03 4.28e- 3
+```
+
+```r
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  responseTime, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term         estimate std.error statistic  p.value
+##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)    452.       28.8      15.7  1.90e-18
+## 2 responseTime     9.35      3.23      2.90 6.14e- 3
+```
+
+```r
+# magPeak as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term         estimate std.error statistic       p.value
+##   <chr>           <dbl>     <dbl>     <dbl>         <dbl>
+## 1 (Intercept)  167.        21.0      7.95   0.00000000132
+## 2 responseTime  -0.0555     1.22    -0.0455 0.964        
+## 3 daysNonpharm  -0.715      0.157   -4.55   0.0000541
+```
+
+```r
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 3 x 5
+##   term          estimate std.error statistic  p.value
+##   <chr>            <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   5.20       0.211     24.6    5.69e-25
+## 2 responseTime -0.000741   0.0123    -0.0603 9.52e- 1
+## 3 daysNonpharm -0.00769    0.00158   -4.86   2.05e- 5
+```
+
+#### Checking Residuals {-}
+
+Turns out the residuals for these models aren't great (maybe that is why the authors used ranked based methods like Spearman correlation and Wilcoxon rank sum test??? -- those tests have different technical conditions, not based in normal theory!)
+
+
+
+```r
+# excessDeaths as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, excessDeath vs days Nonparm")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+flu_1819 %>%
+  lm(excessDeaths ~  daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids NOT removed, excessDeath vs days Nonparm")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-35-2.png" width="480" style="display: block; margin: auto;" />
+
+```r
+# magPeak as the response variable:
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, magPeak vs days responseTime")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-35-3.png" width="480" style="display: block; margin: auto;" />
+
+```r
+flu_1819 %>%
+  lm(magPeak ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids NOT removed, magPeak vs days responseTime")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-35-4.png" width="480" style="display: block; margin: auto;" />
+
+```r
+flu_1819 %>%
+  filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
+  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  augment() %>%
+  ggplot() +
+  geom_point(aes(x=.fitted, y = .resid)) + 
+  geom_hline(yintercept = 0) +
+  ggtitle("St Paul & Grand Rapids removed, log(magPeak) vs days responseTime")
+```
+
+<img src="05-CorReg_files/figure-html/unnamed-chunk-35-5.png" width="480" style="display: block; margin: auto;" />
+
+#### What else do we know about COVID-19 right now?  {-}
+
+Clinical trials are starting to show up assessing know anti-viral pharmaceutical interventions on patients with COVID-19.  
+
+
+##### Study 1: {-}
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/lancet_remdesivir.png" alt="Remdesivir in adults with severe COVID-19: a randomised, double-blind, placebo-controlled, multicentre trial, https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext" width="752" />
+<p class="caption">(\#fig:unnamed-chunk-36)Remdesivir in adults with severe COVID-19: a randomised, double-blind, placebo-controlled, multicentre trial, https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext</p>
+</div>
+
+> **Findings** Between Feb 6, 2020, and March 12, 2020, 237 patients were enrolled and randomly assigned to a treatment group (158 to remdesivir and 79 to placebo); one patient in the placebo group who withdrew after randomisation was not included in the ITT population. Remdesivir use was not associated with a difference in time to clinical improvement (hazard ratio 1·23 [95% CI 0·87–1·75]). Although not statistically significant, patients receiving remdesivir had a numerically faster time to clinical improvement than those receiving placebo among patients with symptom duration of 10 days or less (hazard ratio 1·52 [0·95–2·43]). Adverse events were reported in 102 (66%) of 155 remdesivir recipients versus 50 (64%) of 78 placebo recipients. Remdesivir was stopped early because of adverse events in 18 (12%) patients versus four (5%) patients who stopped placebo early.
+
+* animal studies have shown remdesivir inhibits SARS-CoV-2 replication
+* study was randomized, double-blind, placebo-controlled, multi-center
+* adults with laboratory-confirmed SARS-CoV-2 infection, low oxygen, pneumonia
+* randomly assigned in a 2:1 ratio to remdesivir vs placebo
+* **not statistically significant** !
+* patients on remdesivir had a numerically faster time to clinical improvement
+* trial was stopped before enrolling the expected number of patients because the outbreak of COVID-19 was brought under control
+
+
+
+
+##### Study 2: {-}
+
+Gilead, a large pharmaceutical company, issued a press release describing results from a clinical trial involving remdesivir.  They were mostly seeking to understand how long the treatment should continue and what are the adverse effects of the drug.
+
+<div class="figure" style="text-align: center">
+<img src="figs/gilead_remdesivir.png" alt="Gilead press release (no peer reviewed publication yet), https://www.gilead.com/news-and-press/press-room/press-releases/2020/4/gilead-announces-results-from-phase-3-trial-of-investigational-antiviral-remdesivir-in-patients-with-severe-covid-19https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext" width="879" />
+<p class="caption">(\#fig:unnamed-chunk-37)Gilead press release (no peer reviewed publication yet), https://www.gilead.com/news-and-press/press-room/press-releases/2020/4/gilead-announces-results-from-phase-3-trial-of-investigational-antiviral-remdesivir-in-patients-with-severe-covid-19https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31022-9/fulltext</p>
+</div>
+
+> In this study, the time to clinical improvement for 50 percent of patients was 10 days in the 5-day treatment group and 11 days in the 10-day treatment group. More than half of patients in both treatment groups were discharged from the hospital by Day 14 (5-day: 60.0%, n=120/200 vs.10-day: 52.3% n=103/197; p=0.14). At Day 14, 64.5 percent (n=129/200) of patients in the 5-day treatment group and 53.8 percent (n=106/197) of patients in the 10-day treatment group achieved clinical recovery.
+
+* two patient groups are 5-day and 10-day treatment courses (no placebo), randomized
+* patients on ventilators were not enrolled
 
 
 ## Reflection Questions
