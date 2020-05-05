@@ -1073,8 +1073,8 @@ While it is still too early to model COVID-19 well, we do have information from 
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/jama_covid.png" alt="Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354l" width="772" />
-<p class="caption">(\#fig:unnamed-chunk-30)Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354l</p>
+<img src="figs/jama_covid.png" alt="Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354" width="772" />
+<p class="caption">(\#fig:unnamed-chunk-30)Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354</p>
 </div>
 
 Their conclusions are worth restating:
@@ -1348,6 +1348,12 @@ Gilead, a large pharmaceutical company, issued a press release describing result
 * two patient groups are 5-day and 10-day treatment courses (no placebo), randomized
 * patients on ventilators were not enrolled
 
+*The NY Times* covered the Gilead announement.
+
+<div class="figure" style="text-align: center">
+<img src="figs/nyt_remdesivir.png" alt="Gilead remdesivir trial covered in the NYT, https://www.nytimes.com/2020/04/29/health/gilead-remdesivir-coronavirus.html" width="653" />
+<p class="caption">(\#fig:unnamed-chunk-38)Gilead remdesivir trial covered in the NYT, https://www.nytimes.com/2020/04/29/health/gilead-remdesivir-coronavirus.html</p>
+</div>
 
 ## Reflection Questions
 
