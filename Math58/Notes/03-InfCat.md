@@ -1329,7 +1329,7 @@ Thursday's optional class meeting is about COVID-19 and how it connects to the i
 A good starting place for solid information about COVID-19:
 https://www.sciencemuseumgroup.org.uk/coronavirus-science-what-we-know-and-dont-know-about-the-virus/
 
-#### Dashboard for Predicting
+#### Dashboard for Predicting {-}
 
 * Statistician Create COVID-19 Dashboard to Predict Infection: https://magazine.amstat.org/blog/2020/06/01/dashboard-to-predict-infection/
 
@@ -1375,6 +1375,8 @@ https://www.sciencemag.org/news/2020/03/who-launches-global-megatrial-four-most-
  
 > The design is not double-blind, the gold standard in medical research, so there could be placebo effects from patients knowing they received a candidate drug. But WHO says it had to balance scientific rigor against speed. 
  
+
+* Teaching resources for introducing COVID-19 in class by Laura Le, Kari Lock Morgan, and Lucy D’Agostino McGowan: https://coronavirus-teaching-resources.netlify.app/
  
 ####  Studies related to COVID-19: {-}
 
