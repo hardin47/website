@@ -48,7 +48,7 @@ Or another plot that has gotten a lot of press is the following.  What is wrong 
 </div>
 
 
-The Georgia Deptartment of Health came out with a grouped barplot showing the number of COVID-19 cases by day in 5 populous counties in GA.  The bars were arranged in some kind of decreasing order, but at first glance, the typical reader will think that time is increasing along the x-axis.
+The Georgia Department of Health came out with a grouped barplot showing the number of COVID-19 cases by day in 5 populous counties in GA.  The bars were arranged in some kind of decreasing order, but at first glance, the typical reader will think that time is increasing along the x-axis.
 
 <div class="figure" style="text-align: center">
 <img src="figs/GAcovid.jpg" alt="May 10, 2020, Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="100%" />

@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2020-06-08"
+date: "2020-07-13"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -9,7 +9,7 @@ bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: hardin47/website/Math58/
-description: "Class notes for both Math 58 and Math 58B at Pomona College: Introduction to Statistics and Introduction to Biostatistics.  The notes are based extensively Introductory Statistics with Randomization and Simulation by Diez, Barr, and Cetinkaya-Rundel."
+description: "Class notes for both Math 58 and Math 58B at Pomona College: Introduction to Statistics and Introduction to Biostatistics.  The notes are based extensively on Introductory Statistics with Randomization and Simulation by Diez, Barr, and Cetinkaya-Rundel and Investigating Statistical Concepts, Applications, and Methods by Chance and Rossman."
 ---
 
 

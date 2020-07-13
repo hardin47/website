@@ -286,6 +286,9 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 * Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
 * Follow Jacob Fiksel's advice on how to connect to our classroom: https://github.com/jfiksel/github-classroom-for-students
 
+
+Admittedly, there is a steep learning curve with Git.  However, it is among the tools which you are most likely to use in your future endeavors, so spending a little time focusing on the concepts now may pay off big time in the future.  Beyond practicing and working through http://happygitwithr.com/, you may want to read a little bit about waht Git is doing behind the scences.  This reference: [Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) is very good and accessible.
+
 #### Tools: a GitHub merge conflict (demo) {-}
 
 * On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
