@@ -52,24 +52,6 @@ The Georgia Department of Health came out with a grouped barplot showing the num
 
 
 
-```r
-library(magick)
-
-img1 <- image_read("figs/GAcovid.jpg")
-img2 <- image_read("figs/GAcovid2.jpg")
-img3 <- image_read("figs/GAheatmap1.jpeg")
-img4 <- image_read("figs/GAheatmap2.jpeg")
-
-img1_with_border <- image_border(img1, "white", "10x10")
-img2_with_border <- image_border(img2, "white", "10x10")
-img3_with_border <- image_border(img3, "white", "10x10")
-img4_with_border <- image_border(img4, "white", "10x10")
-
-image_write(img1_with_border, "img1_with_border.png")
-image_write(img2_with_border, "img2_with_border.png")
-image_write(img3_with_border, "img3_with_border.png")
-image_write(img4_with_border, "img4_with_border.png")
-```
 
 <div class="figure" style="text-align: center">
 <img src="img1_with_border.png" alt="May 10, 2020 (left) and May 17, 2020 (right), Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="49%" /><img src="img2_with_border.png" alt="May 10, 2020 (left) and May 17, 2020 (right), Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="49%" />
