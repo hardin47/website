@@ -76,13 +76,13 @@ Indeed, it isn't always easy to know when to use a parallel construction.  Becau
 
 #### Some parallel examples {-}
 
-Before running code in parallel, it is valuable to know how many cores your computer has to work with.  Note that the `detectCores` function will provide information about the specific device you are using (`logical = FALSE` tells you only the physical cores which is likely what you want).  Note that after `makeCluster` the separate threads have information.  After `stopCluster`, the code is no longer connecting to the cluster structure.
+Before running code in parallel, it is valuable to know how many cores your computer has to work with.  Note that the `detectCores` function will provide information about the specific device you are using (`logical = FALSE` tells you only the physical cores which is likely what you want).  Note that after `makeCluster` the separate threads have information.  [The argument `setup_strategy = "sequential"` is a fix for working with R 4.0+.] After `stopCluster`, the code is no longer connecting to the cluster structure.
 
 ```{r error = TRUE}
 library(parallel)
 P <- detectCores(logical=FALSE)
 P
-cl <- makeCluster(P)
+cl <- makeCluster(P, setup_strategy = "sequential")
 cl[[1]]
 
 stopCluster(cl)
@@ -95,8 +95,8 @@ In the example below, we generate some Cauchy data and find the max of each samp
 
 ```{r}
 W <- 100
-P <- detectCores(logical=FALSE)
-cl <- makeCluster(P)
+P <- parallel::detectCores(logical=FALSE)
+cl <- parallel::makeCluster(P, setup_strategy = "sequential")
 
 func1 <- function(reps){
   max(rcauchy(reps))
@@ -112,7 +112,7 @@ There are many R functions which implement parallel processing.  For example, th
 
 ```{r warning=FALSE, error = FALSE}
 library(doParallel)
-cl <- parallel::makeCluster(P)
+cl <- parallel::makeCluster(P, setup_strategy = "sequential")
 
 doParallel::registerDoParallel(cl)
 foreach(reps = rep(50, 100), .combine = 'c') %dopar% {
@@ -136,7 +136,7 @@ iris_bs <- iris %>%
 ```
 
 ```{r warning=FALSE, error = FALSE}
-cl <- parallel::makeCluster(P)
+cl <- parallel::makeCluster(P, setup_strategy = "sequential")
 
 doParallel::registerDoParallel(cl)
 bsmean_PL <- foreach(i = 1:100, .combine = 'c') %dopar% {
@@ -339,6 +339,14 @@ We've obviously just scratched the surface here.  There are lots of other exampl
 
 For many statisticians, the go-to software language is R.  However, there is no doubt that Python is a very important language in data science.  Why not do both??
 
+```{r echo = FALSE, eval = FALSE}
+Sys.setenv(RETICULATE_PYTHON = "/usr/local/bin/python3")
+virtualenv_create("r-reticulate")
+virtualenv_install("r-reticulate", "statsmodels")
+
+#in the terminal: python3.7 -m pip install statsmodels
+```
+
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(reticulate)
@@ -503,7 +511,7 @@ We begin by demonstrating how SQL queries can be sent to a database.  It is nece
 library(mosaic)
 library(RMySQL)  
 con <- dbConnect(
-  MySQL(), host = "scidb.smith.edu", user = "waiuser", 
+  RMySQL::MySQL(), host = "scidb.smith.edu", user = "waiuser", 
   password = "smith_waiDB", dbname = "wai")
 ```
 
@@ -549,19 +557,17 @@ objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadl
 The setup process looks similar.
 
 ```{r}
-db <- src_mysql(dbname = "wai", host = "scidb.smith.edu", user = "waiuser", 
-          password="smith_waiDB")
-Measurements <- tbl(db, "Measurements")
+Measurements <- tbl(con, "Measurements")
 class(Measurements)
-PI_Info <- tbl(db, "PI_Info")
-Subject <- tbl(db, "Subject")
+PI_Info <- tbl(con, "PI_Info")
+Subject <- tbl(con, "Subject")
 ```
 
 We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
 
 ```{r}
 PI_Info  %>% summarise(total = n())
-PI_Info %>% select(-Email) %>% collect() %>% data.frame()   
+PI_Info %>% collect() %>% data.frame()   
 # be careful with collect() when dealing with large tables!
 ```
 
@@ -601,6 +607,12 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
 ```
 
+
+Always a good idea to terminate the SQL connection.
+
+```{r}
+dbDisconnect(con)
+```
 
 We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
 
