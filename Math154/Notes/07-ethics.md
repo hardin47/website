@@ -54,8 +54,13 @@ The Georgia Department of Health came out with a grouped barplot showing the num
 
 
 <div class="figure" style="text-align: center">
-<img src="img1_with_border.png" alt="May 10, 2020 (left) and May 17, 2020 (right), Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="49%" /><img src="img2_with_border.png" alt="May 10, 2020 (left) and May 17, 2020 (right), Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="49%" />
-<p class="caption">(\#fig:unnamed-chunk-5)May 10, 2020 (left) and May 17, 2020 (right), Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report</p>
+<img src="figs/GAcovid.jpg" alt="May 10, 2020, Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-5)May 10, 2020, Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/GAcovid2.jpg" alt="May 17, 2020, Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report" width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-6)May 17, 2020, Georgia Department of Health, COVID-19 cases for 5 counties across time. https://dph.georgia.gov/covid-19-daily-status-report</p>
 </div>
 
 
@@ -63,7 +68,7 @@ A few weeks later, the Georgia Department of Health came out with the following 
 
 <div class="figure" style="text-align: center">
 <img src="img3_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" /><img src="img4_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" />
-<p class="caption">(\#fig:unnamed-chunk-6)July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report</p>
+<p class="caption">(\#fig:unnamed-chunk-7)July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report</p>
 </div>
 
 
@@ -170,7 +175,7 @@ Consider a study done on a dataset of nearly 70,000 users of the online dating s
 
 <div class="figure" style="text-align: center">
 <img src="figs/okcupid.jpg" alt="Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-7)Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking.</p>
+<p class="caption">(\#fig:unnamed-chunk-8)Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking.</p>
 </div>
 
 ## Authorship
@@ -191,7 +196,7 @@ From the International Committee of Medical Journal Editors, http://www.icmje.or
 
 <div class="figure" style="text-align: center">
 <img src="figs/retraction.jpg" alt="The paper was retracted because the authors could not agree on the order of authorship." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-8)The paper was retracted because the authors could not agree on the order of authorship.</p>
+<p class="caption">(\#fig:unnamed-chunk-9)The paper was retracted because the authors could not agree on the order of authorship.</p>
 </div>
 
 ## Algorithms
@@ -225,7 +230,7 @@ Also keep in mind the various laws which are designed to protect privacy and civ
 
 <div class="figure" style="text-align: center">
 <img src="figs/recid1.jpg" alt="Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-9)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
+<p class="caption">(\#fig:unnamed-chunk-10)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
 </div>
 
 | DYLAN FUGETT 	| BERNARD PARKER 	|
@@ -240,7 +245,7 @@ Also keep in mind the various laws which are designed to protect privacy and civ
 
 <div class="figure" style="text-align: center">
 <img src="figs/recid2.jpg" alt="False positive and false negative rates broken down by race." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-10)False positive and false negative rates broken down by race.</p>
+<p class="caption">(\#fig:unnamed-chunk-11)False positive and false negative rates broken down by race.</p>
 </div>
 
 ### Algorithmic Justice League {-}
