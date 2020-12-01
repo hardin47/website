@@ -47,6 +47,26 @@ The two classes are remarkably similar in content and structure.  Indeed, there 
 | early in the semester | Binomial probabilities              | relative risk & odds ratios         |
 | later in the semester | introduction to multiple regression | introduction to logistic regression |
 
+**What are the Learning Outcomes for Math 58(B)?**
+
+Learning Goals for Introductory Statistics (Math 58 / Math 58B at Pomona College):
+
+* Given a study, identify population, sample, parameter, statistic, observational unit, and variable.
+* Describe the differences between, benefits of each, and conclusions which can be drawn in observational studies versus experiments.
+* Given a dataset and research query, create an appropriate figure in R.
+* Given a dataset and research query, compute appropriate statistics in R.
+* Describe the difference between the distribution of a sample of data and a sampling distribution of a particular statistic.
+* For a particular research question, identify whether the task requires descriptive analysis / model, graphic, confidence interval, or hypothesis test,
+* Apply the empirical rule to as an approximation to confidence intervals and hypothesis testing in settings of means and proportions.
+* Be able to describe in words what a p-value is and what it is not.
+* Write down appropriate null and alternative hypotheses, and choose the correct analysis technique.
+* Run the hypothesis test / confidence interval analysis in R.
+* Identify when it is and when it is not appropriate to summarize the relationship between two variables using a least squares line.
+* Describe the optimization procedure the leads to a least squares fit (although not necessarily to do the calculations).
+* Provide the settings in which a causal claim is warranted, and when a strong correlation is possibly due to spurious relationships.
+* Use a regression line to make predictions and distinguish between a prediction interval for an independent response as compared to a confidence interval for the slope parameter.
+* For each descriptive analysis, visualization, confidence interval, or hypothesis test, in words communicate the conclusion of the analysis in the original context of the data.
+* Use R Markdown to run reproducible analyses that include all aspects of the data analysis.
 
 **Who should take Math 58(B)?**
 Every educated citizen should have a basic understanding of statistics.  Ok, ok, I have my own biases, but I'm not the only person who thinks this!  (https://www.ted.com/talks/arthur_benjamin_s_formula_for_changing_math_education)  In terms of your academic interests, you should take introductory statistics if you would like to take upper division statistics or if you are planning to analyze data in a field outside of statistics (e.g., biology, EA, psychology, etc.).    Upper division statistics courses *require* introductory statistics, and it is not easy to just "learn" statistics on your own over the summer.  I highly recommend taking an introductory statistics course.
