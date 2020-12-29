@@ -117,11 +117,10 @@ surgery %>%
 
 ```
 ## # A tibble: 1 x 10
-##   estimate estimate1 estimate2 statistic p.value parameter conf.low
-##      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>
-## 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337
-## # … with 3 more variables: conf.high <dbl>, method <chr>,
-## #   alternative <chr>
+##   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
+##      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
+## 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
+## # … with 2 more variables: method <chr>, alternative <chr>
 ```
   
 * Look at SD and SEM

@@ -495,10 +495,10 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% tidy()
 ```
 
 ```
-## # A tibble: 1 x 7
-##   term      estimate std.error statistic p.value conf.low conf.high
-##   <chr>        <dbl>     <dbl>     <dbl>   <dbl>    <dbl>     <dbl>
-## 1 Treatment    -1.98      1.10     -1.80  0.0717    -4.13     0.175
+## # A tibble: 1 x 5
+##   term      estimate std.error statistic p.value
+##   <chr>        <dbl>     <dbl>     <dbl>   <dbl>
+## 1 Treatment    -1.98      1.10     -1.80  0.0717
 ```
 
 ```r
@@ -506,13 +506,14 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1    38      6          4.55      0.0329         4.42     0.0355
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
+## # A tibble: 1 x 18
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+## 1    38      6          4.55      0.0329         4.42     0.0355           3.24
+## # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+## #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+## #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+## #   BIC <dbl>, nobs <int>
 ```
 
 * **Note 1**: There is no intercept in the model.  The intercept is contained within the $h_0(t)$ parameter.  
@@ -622,15 +623,15 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
 ```
 
 ```
-## # A tibble: 6 x 7
-##   term        estimate std.error statistic  p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3    0.193      1.16
-## 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5    0.467      1.41
-## 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6    0.645      1.59
-## 4 dbpf90-100     1.51      0.243      6.22 4.97e-10    1.04       1.99
-## 5 dbpf100-110    1.84      0.254      7.23 4.86e-13    1.34       2.34
-## 6 dbpfover110    2.25      0.271      8.29 1.18e-16    1.72       2.78
+## # A tibble: 6 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3
+## 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5
+## 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6
+## 4 dbpf90-100     1.51      0.243      6.22 4.97e-10
+## 5 dbpf100-110    1.84      0.254      7.23 4.86e-13
+## 6 dbpfover110    2.25      0.271      8.29 1.18e-16
 ```
 
 * **Table 7.2**  
@@ -649,16 +650,16 @@ coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
 ```
 
 ```
-## # A tibble: 7 x 7
-##   term        estimate std.error statistic  p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 dbpf60-70      0.648    0.247       2.62 8.74e- 3    0.164     1.13 
-## 2 dbpf70-80      0.888    0.241       3.69 2.27e- 4    0.416     1.36 
-## 3 dbpf80-90      1.02     0.241       4.24 2.25e- 5    0.549     1.49 
-## 4 dbpf90-100     1.40     0.243       5.76 8.48e- 9    0.924     1.88 
-## 5 dbpf100-110    1.79     0.254       7.02 2.29e-12    1.29      2.28 
-## 6 dbpfover110    2.22     0.271       8.17 2.97e-16    1.69      2.75 
-## 7 sexmale        0.606    0.0528     11.5  1.54e-30    0.503     0.710
+## # A tibble: 7 x 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 dbpf60-70      0.648    0.247       2.62 8.74e- 3
+## 2 dbpf70-80      0.888    0.241       3.69 2.27e- 4
+## 3 dbpf80-90      1.02     0.241       4.24 2.25e- 5
+## 4 dbpf90-100     1.40     0.243       5.76 8.48e- 9
+## 5 dbpf100-110    1.79     0.254       7.02 2.29e-12
+## 6 dbpfover110    2.22     0.271       8.17 2.97e-16
+## 7 sexmale        0.606    0.0528     11.5  1.54e-30
 ```
 
 * **Table 7.3** 
@@ -677,22 +678,22 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
 ```
 
 ```
-## # A tibble: 13 x 7
-##    term            estimate std.error statistic  p.value conf.low conf.high
-##    <chr>              <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-##  1 dbpf60-70         0.603      0.352    1.71   8.66e- 2  -0.0867     1.29 
-##  2 dbpf70-80         0.887      0.342    2.60   9.44e- 3   0.217      1.56 
-##  3 dbpf80-90         1.26       0.341    3.68   2.30e- 4   0.589      1.93 
-##  4 dbpf90-100        1.55       0.347    4.46   8.29e- 6   0.866      2.23 
-##  5 dbpf100-110       2.03       0.358    5.67   1.41e- 8   1.33       2.74 
-##  6 dbpfover110       2.61       0.372    7.02   2.18e-12   1.88       3.34 
-##  7 sexmale           0.864      0.471    1.83   6.68e- 2  -0.0599     1.79 
-##  8 dbpf60-70:sexm…   0.0570     0.495    0.115  9.08e- 1  -0.912      1.03 
-##  9 dbpf70-80:sexm…  -0.0379     0.482   -0.0787 9.37e- 1  -0.982      0.906
-## 10 dbpf80-90:sexm…  -0.458      0.482   -0.951  3.42e- 1  -1.40       0.486
-## 11 dbpf90-100:sex…  -0.296      0.487   -0.608  5.43e- 1  -1.25       0.658
-## 12 dbpf100-110:se…  -0.508      0.509   -0.999  3.18e- 1  -1.51       0.489
-## 13 dbpfover110:se…  -0.913      0.549   -1.66   9.66e- 2  -1.99       0.164
+## # A tibble: 13 x 5
+##    term                estimate std.error statistic  p.value
+##    <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
+##  1 dbpf60-70             0.603      0.352    1.71   8.66e- 2
+##  2 dbpf70-80             0.887      0.342    2.60   9.44e- 3
+##  3 dbpf80-90             1.26       0.341    3.68   2.30e- 4
+##  4 dbpf90-100            1.55       0.347    4.46   8.29e- 6
+##  5 dbpf100-110           2.03       0.358    5.67   1.41e- 8
+##  6 dbpfover110           2.61       0.372    7.02   2.18e-12
+##  7 sexmale               0.864      0.471    1.83   6.68e- 2
+##  8 dbpf60-70:sexmale     0.0570     0.495    0.115  9.08e- 1
+##  9 dbpf70-80:sexmale    -0.0379     0.482   -0.0787 9.37e- 1
+## 10 dbpf80-90:sexmale    -0.458      0.482   -0.951  3.42e- 1
+## 11 dbpf90-100:sexmale   -0.296      0.487   -0.608  5.43e- 1
+## 12 dbpf100-110:sexmale  -0.508      0.509   -0.999  3.18e- 1
+## 13 dbpfover110:sexmale  -0.913      0.549   -1.66   9.66e- 2
 ```
 
 
@@ -721,25 +722,25 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% t
 ```
 
 ```
-## # A tibble: 16 x 7
-##    term            estimate std.error statistic  p.value conf.low conf.high
-##    <chr>              <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-##  1 dbpf60-70        0.415    0.352       1.18   2.38e- 1 -0.275     1.11   
-##  2 dbpf70-80        0.503    0.343       1.47   1.42e- 1 -0.168     1.18   
-##  3 dbpf80-90        0.648    0.344       1.89   5.92e- 2 -0.0252    1.32   
-##  4 dbpf90-100       0.661    0.351       1.88   5.99e- 2 -0.0274    1.35   
-##  5 dbpf100-110      1.13     0.363       3.12   1.83e- 3  0.420     1.84   
-##  6 dbpfover110      1.66     0.377       4.40   1.07e- 5  0.922     2.40   
-##  7 sexmale          0.685    0.472       1.45   1.46e- 1 -0.239     1.61   
-##  8 age              0.0475   0.00339    14.0    1.76e-44  0.0408    0.0541 
-##  9 bmi              0.0379   0.00675     5.62   1.94e- 8  0.0247    0.0512 
-## 10 scl              0.00577  0.000585    9.87   5.80e-23  0.00462   0.00692
-## 11 dbpf60-70:sexm…  0.160    0.495       0.323  7.47e- 1 -0.810     1.13   
-## 12 dbpf70-80:sexm…  0.167    0.482       0.346  7.29e- 1 -0.778     1.11   
-## 13 dbpf80-90:sexm… -0.131    0.482      -0.272  7.85e- 1 -1.08      0.814  
-## 14 dbpf90-100:sex…  0.236    0.488       0.483  6.29e- 1 -0.721     1.19   
-## 15 dbpf100-110:se…  0.0232   0.510       0.0455 9.64e- 1 -0.976     1.02   
-## 16 dbpfover110:se… -0.490    0.550      -0.891  3.73e- 1 -1.57      0.589
+## # A tibble: 16 x 5
+##    term                estimate std.error statistic  p.value
+##    <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
+##  1 dbpf60-70            0.415    0.352       1.18   2.38e- 1
+##  2 dbpf70-80            0.503    0.343       1.47   1.42e- 1
+##  3 dbpf80-90            0.648    0.344       1.89   5.92e- 2
+##  4 dbpf90-100           0.661    0.351       1.88   5.99e- 2
+##  5 dbpf100-110          1.13     0.363       3.12   1.83e- 3
+##  6 dbpfover110          1.66     0.377       4.40   1.07e- 5
+##  7 sexmale              0.685    0.472       1.45   1.46e- 1
+##  8 age                  0.0475   0.00339    14.0    1.76e-44
+##  9 bmi                  0.0379   0.00675     5.62   1.94e- 8
+## 10 scl                  0.00577  0.000585    9.87   5.80e-23
+## 11 dbpf60-70:sexmale    0.160    0.495       0.323  7.47e- 1
+## 12 dbpf70-80:sexmale    0.167    0.482       0.346  7.29e- 1
+## 13 dbpf80-90:sexmale   -0.131    0.482      -0.272  7.85e- 1
+## 14 dbpf90-100:sexmale   0.236    0.488       0.483  6.29e- 1
+## 15 dbpf100-110:sexmale  0.0232   0.510       0.0455 9.64e- 1
+## 16 dbpfover110:sexmale -0.490    0.550      -0.891  3.73e- 1
 ```
 
 ### Testing Proportional Hazards {#testingph}
@@ -1276,11 +1277,11 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
 ```
 
 ```
-## # A tibble: 2 x 7
-##   term            estimate std.error statistic   p.value conf.low conf.high
-##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…    1.08     0.0446      24.1 7.67e-129    0.990     1.16 
-## 2 score_factorMe…    0.704    0.0439      16.0 9.78e- 58    0.617     0.790
+## # A tibble: 2 x 5
+##   term               estimate std.error statistic   p.value
+##   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+## 1 score_factorHigh      1.08     0.0446      24.1 7.67e-129
+## 2 score_factorMedium    0.704    0.0439      16.0 9.78e- 58
 ```
 
 ```r
@@ -1288,13 +1289,14 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          617.   9.39e-135         654.  1.15e-142
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
+## # A tibble: 1 x 18
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+## 1 11426   3058          617.   9.39e-135         654.  1.15e-142           609.
+## # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+## #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+## #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+## #   BIC <dbl>, nobs <int>
 ```
 
 ```r
@@ -1303,12 +1305,12 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
 ```
 
 ```
-## # A tibble: 3 x 7
-##   term            estimate std.error statistic   p.value conf.low conf.high
-##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…    1.03     0.0460     22.3  3.96e-110    0.936    1.12  
-## 2 score_factorMe…    0.674    0.0445     15.2  7.45e- 52    0.586    0.761 
-## 3 raceCaucasian     -0.170    0.0396     -4.29 1.78e-  5   -0.248   -0.0924
+## # A tibble: 3 x 5
+##   term               estimate std.error statistic   p.value
+##   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+## 1 score_factorHigh      1.03     0.0460     22.3  3.96e-110
+## 2 score_factorMedium    0.674    0.0445     15.2  7.45e- 52
+## 3 raceCaucasian        -0.170    0.0396     -4.29 1.78e-  5
 ```
 
 ```r
@@ -1316,13 +1318,14 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          636.   1.65e-137         671.  3.72e-145
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
+## # A tibble: 1 x 18
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+## 1 11426   3058          636.   1.65e-137         671.  3.72e-145           626.
+## # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+## #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+## #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+## #   BIC <dbl>, nobs <int>
 ```
 
 ```r
@@ -1331,14 +1334,14 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 ```
 
 ```
-## # A tibble: 5 x 7
-##   term             estimate std.error statistic  p.value conf.low conf.high
-##   <chr>               <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 score_factorHigh   0.926    0.0471      19.6  7.63e-86   0.833     1.02  
-## 2 score_factorMed…   0.611    0.0452      13.5  1.54e-41   0.522     0.699 
-## 3 raceCaucasian     -0.120    0.0398      -3.01 2.63e- 3  -0.198    -0.0417
-## 4 age               -0.0137   0.00175     -7.82 5.38e-15  -0.0171   -0.0103
-## 5 sexMale            0.411    0.0502       8.19 2.53e-16   0.313     0.510
+## # A tibble: 5 x 5
+##   term               estimate std.error statistic  p.value
+##   <chr>                 <dbl>     <dbl>     <dbl>    <dbl>
+## 1 score_factorHigh     0.926    0.0471      19.6  7.63e-86
+## 2 score_factorMedium   0.611    0.0452      13.5  1.54e-41
+## 3 raceCaucasian       -0.120    0.0398      -3.01 2.63e- 3
+## 4 age                 -0.0137   0.00175     -7.82 5.38e-15
+## 5 sexMale              0.411    0.0502       8.19 2.53e-16
 ```
 
 ```r
@@ -1346,13 +1349,14 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 ```
 
 ```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          768.   8.91e-164         787.  7.45e-168
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
+## # A tibble: 1 x 18
+##       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+## 1 11426   3058          768.   8.91e-164         787.  7.45e-168           739.
+## # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+## #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+## #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+## #   BIC <dbl>, nobs <int>
 ```
 
 

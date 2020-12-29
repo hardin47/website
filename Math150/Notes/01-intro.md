@@ -1,5 +1,8 @@
 # Introduction {#intro}
 
+![We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/](covidvaccine.png)
+
+
 ## Course Goals
 
 Our goals in this course are: 
@@ -13,6 +16,7 @@ Our goals in this course are:
 * to understand the role of inherent variability and keep it in perspective when inferring results to a population.  
 * to critically evaluate medical results given in the mainstream media.  
 * to read published studies with skepticism.  Some people (in all fields!) wrongly believe that all studies published in a peer review publication must be 100% accurate and/or well designed studies.  In this course, you will learn the tools to recognize, interpret, and critique statistical results in medical literature.  
+
 
 
 

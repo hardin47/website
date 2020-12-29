@@ -433,8 +433,8 @@ glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% glance() %>%
 ```
 
 ```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
-## 1       525.386     434 -167.616 339.231 347.382  335.231         433
+##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+## 1       525.386     434 -167.616 339.231 347.382  335.231         433  435
 ```
 
 \begin{eqnarray*}
@@ -1038,10 +1038,10 @@ glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binom
 ```
 
 ```
-## # A tibble: 1 x 7
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
-## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748
+## # A tibble: 1 x 8
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759
 ```
 
 ```r
@@ -1049,10 +1049,10 @@ glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial"
 ```
 
 ```
-## # A tibble: 1 x 7
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
-## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754
+## # A tibble: 1 x 8
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759
 ```
 
 ```r
@@ -1229,8 +1229,8 @@ print(burn.glm)
 ##  
 ##  lrm(formula = burnresp ~ burnexpl, data = burnglm)
 ##  
-##                        Model Likelihood     Discrimination    Rank Discrim.    
-##                           Ratio Test           Indexes           Indexes       
+##                         Model Likelihood    Discrimination    Rank Discrim.    
+##                               Ratio Test           Indexes          Indexes    
 ##  Obs           435    LR chi2     190.15    R2       0.505    C       0.877    
 ##   0            127    d.f.             1    g        2.576    Dxy     0.753    
 ##   1            308    Pr(> chi2) <0.0001    gr      13.146    gamma   0.824    
@@ -1390,7 +1390,7 @@ Suppose that we build a classifier (logistic regression model) on a given data s
 
 
 ```r
-nests <- read_csv("~/Dropbox/teaching/math150/PracStatCD/Data Sets/Chapter 07/CSV Files/C7 Birdnest.csv",
+nests <- readr::read_csv("~/Dropbox/teaching/math150/PracStatCD/Data Sets/Chapter 07/CSV Files/C7 Birdnest.csv",
                   na="*")
 ```
 
@@ -1424,8 +1424,8 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 ```
 
 ```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
+##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 ###  Difference between `tidy` and `augment` and `glance`
@@ -1450,20 +1450,20 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
 ```
 
 ```
-## # A tibble: 95 x 10
-##    .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
-##    <chr>       <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
-##  1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
-##  2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
-##  3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
-##  4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
-##  5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
-##  6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
-##  7 8               0   17    -0.693   0.222 -0.900 0.0110   1.12 0.00280
-##  8 9               0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
-##  9 10              0   15    -0.558   0.237 -0.951 0.0130   1.12 0.00381
-## 10 11              1   11    -0.287   0.336  1.30  0.0276   1.12 0.0194 
-## # … with 85 more rows, and 1 more variable: .std.resid <dbl>
+## # A tibble: 95 x 9
+##    .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
+##    <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
+##  1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
+##  2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+##  3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+##  4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
+##  5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
+##  6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
+##  7 8                 0   17    -0.693 -0.900     -0.905 0.0110   1.12 0.00280
+##  8 9                 0   15    -0.558 -0.951     -0.958 0.0130   1.12 0.00381
+##  9 10                0   15    -0.558 -0.951     -0.958 0.0130   1.12 0.00381
+## 10 11                1   11    -0.287  1.30       1.32  0.0276   1.12 0.0194 
+## # … with 85 more rows
 ```
 
 ```r
@@ -1472,8 +1472,8 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 ```
 
 ```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
+##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
@@ -1501,8 +1501,8 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 ```
 
 ```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93
+##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
@@ -1536,8 +1536,8 @@ glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance()
 ```
 
 ```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
-## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61
+##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95
 ```
 
 Length plus a few other explanatory variables:
@@ -1562,8 +1562,8 @@ glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>%
 ```
 
 ```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual
-## 1       110.086      87 -51.6633 111.327 121.236  103.327          84
+##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+## 1       110.086      87 -51.6633 111.327 121.236  103.327          84   88
 ```
 
 ### Predicting Response
@@ -1643,8 +1643,8 @@ print(bird.lrm)
 ##  lrm(formula = `Closed?` ~ Length, data = nests)
 ##  
 ##  
-##                       Model Likelihood     Discrimination    Rank Discrim.    
-##                          Ratio Test           Indexes           Indexes       
+##                        Model Likelihood    Discrimination    Rank Discrim.    
+##                              Ratio Test           Indexes          Indexes    
 ##  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
 ##   0             64    d.f.            1    g        0.455    Dxy     0.276    
 ##   1             31    Pr(> chi2) 0.0777    gr       1.576    gamma   0.288    
@@ -1672,20 +1672,20 @@ head(bird.indiv)
 ```
 
 ```
-## # A tibble: 6 x 11
-##   .rownames Closed. Length .fitted .se.fit .resid   .hat .sigma .cooksd
-##   <chr>       <dbl>  <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
-## 1 1               0   20    -0.896   0.258 -0.827 0.0137   1.12 0.00288
-## 2 2               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
-## 3 4               1   20    -0.896   0.258  1.57  0.0137   1.11 0.0173 
-## 4 5               1   22.5  -1.07    0.325  1.65  0.0202   1.11 0.0305 
-## 5 6               0   18.5  -0.795   0.232 -0.863 0.0116   1.12 0.00267
-## 6 7               1   17    -0.693   0.222  1.48  0.0110   1.12 0.0112 
-## # … with 2 more variables: .std.resid <dbl>, probs <dbl>
+## # A tibble: 6 x 10
+##   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
+##   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
+## 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
+## 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+## 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+## 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
+## 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
+## 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
+## # … with 1 more variable: probs <dbl>
 ```
 
 ```r
-bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$Closed.)
+bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$`Closed?`)
 bird.perf <- ROCR::performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
 plot(bird.perf, colorize = TRUE)
 abline(a=0, b=1)

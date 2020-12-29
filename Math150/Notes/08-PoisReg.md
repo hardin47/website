@@ -79,8 +79,8 @@ example
 ```
 
 ```
-##  [1]  0.07250266  2.39114995  0.93022166  0.62369321  4.25084018
-##  [6]  1.45750156  2.75212953 10.21765703  7.30420453  0.24043747
+##  [1]  0.07250266  2.39114995  0.93022166  0.62369321  4.25084018  1.45750156
+##  [7]  2.75212953 10.21765703  7.30420453  0.24043747
 ```
 
 ```r
@@ -333,10 +333,10 @@ glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent,
 ```
 
 ```
-## # A tibble: 1 x 7
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
-## 1         3511.      29  -294.  600.  609.     427.          24
+## # A tibble: 1 x 8
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+## 1         3511.      29  -294.  600.  609.     427.          24    30
 ```
 
 ```r
@@ -345,10 +345,10 @@ glm(species ~ log(area) + scruz + adjacent,
 ```
 
 ```
-## # A tibble: 1 x 7
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int>
-## 1         3511.      29  -296.  600.  606.     431.          26
+## # A tibble: 1 x 8
+##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+## 1         3511.      29  -296.  600.  606.     431.          26    30
 ```
 
 ```r
@@ -380,16 +380,16 @@ glm(species ~ log(area) + scruz + adjacent,
 ```
 
 ```
-## # A tibble: 6 x 11
-##   species log.area. scruz adjacent .fitted .se.fit .resid   .hat .sigma
-##     <dbl>     <dbl> <dbl>    <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>
-## 1      58     3.22    0.6     1.84    4.61  0.0324 -4.57  0.105    4.04
-## 2      31     0.215  26.3   572.      3.36  0.0459  0.414 0.0605   4.15
-## 3       3    -1.56   58.7     0.78    2.76  0.0513 -3.96  0.0417   4.07
-## 4      25    -2.30   47.4     0.18    2.55  0.0568  3.01  0.0413   4.11
-## 5       2    -3.00    1.9   904.      2.27  0.0759 -3.01  0.0559   4.11
-## 6      18    -1.08    8       1.84    3.11  0.0544 -0.953 0.0661   4.15
-## # … with 2 more variables: .cooksd <dbl>, .std.resid <dbl>
+## # A tibble: 6 x 10
+##   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
+##     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
+## 1      58       3.22    0.6     1.84    4.61 -4.57      -4.83  0.105    4.04
+## 2      31       0.215  26.3   572.      3.36  0.414      0.427 0.0605   4.15
+## 3       3      -1.56   58.7     0.78    2.76 -3.96      -4.05  0.0417   4.07
+## 4      25      -2.30   47.4     0.18    2.55  3.01       3.08  0.0413   4.11
+## 5       2      -3.00    1.9   904.      2.27 -3.01      -3.10  0.0559   4.11
+## 6      18      -1.08    8       1.84    3.11 -0.953     -0.986 0.0661   4.15
+## # … with 1 more variable: .cooksd <dbl>
 ```
 
 ```r
@@ -454,16 +454,16 @@ glm(species ~ log(area) + scruz + adjacent,
 ```
 
 ```
-## # A tibble: 6 x 11
-##   species log.area. scruz adjacent .fitted .se.fit .resid   .hat .sigma
-##     <dbl>     <dbl> <dbl>    <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>
-## 1      58     3.22    0.6     1.84    4.61   0.133 -4.57  0.105    4.04
-## 2      31     0.215  26.3   572.      3.36   0.188  0.414 0.0605   4.15
-## 3       3    -1.56   58.7     0.78    2.76   0.210 -3.96  0.0417   4.07
-## 4      25    -2.30   47.4     0.18    2.55   0.233  3.01  0.0413   4.11
-## 5       2    -3.00    1.9   904.      2.27   0.311 -3.01  0.0559   4.11
-## 6      18    -1.08    8       1.84    3.11   0.223 -0.953 0.0661   4.15
-## # … with 2 more variables: .cooksd <dbl>, .std.resid <dbl>
+## # A tibble: 6 x 10
+##   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
+##     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
+## 1      58       3.22    0.6     1.84    4.61 -4.57      -1.18  0.105    4.04
+## 2      31       0.215  26.3   572.      3.36  0.414      0.104 0.0605   4.15
+## 3       3      -1.56   58.7     0.78    2.76 -3.96      -0.989 0.0417   4.07
+## 4      25      -2.30   47.4     0.18    2.55  3.01       0.752 0.0413   4.11
+## 5       2      -3.00    1.9   904.      2.27 -3.01      -0.758 0.0559   4.11
+## 6      18      -1.08    8       1.84    3.11 -0.953     -0.241 0.0661   4.15
+## # … with 1 more variable: .cooksd <dbl>
 ```
 
 ```r
