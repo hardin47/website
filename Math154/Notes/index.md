@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2020-07-21"
+date: "2021-01-04"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
