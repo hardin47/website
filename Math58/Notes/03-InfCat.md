@@ -20,6 +20,7 @@ $$\hat{p} \pm Z^* \cdot \sqrt{\hat{p}(1-\hat{p})}/n.$$
 IMPORTANT: recall, the above interval is a method for capturing the **parameter**.
 
 
+<!--
 ## 2/18/20 Math 58 Agenda {#Feb18M58}
 0. Math 58 Only
 1. Binomial distribution
@@ -30,12 +31,13 @@ IMPORTANT: recall, the above interval is a method for capturing the **parameter*
 1. Binomial hypothesis testing
 2. Power
 3. Confidence Intervals
+-->
 
-## Binomial distribution (Math 58 only)
+## Binomial distribution
 
-Math 58 (not Math 58B) will cover the binomial distribution which describes the exact probabilities associated with binary outcomes.
+The Binomial distribution describes the exact probabilities associated with binary outcomes.  We do not typically have time to cover the Binomial distribution in Introduction to Biostatistics.
 
-@isrs do not discuss the binomial distribution.  @iscam, however, provide quite a bit of detail about the binomial concepts in chapter 1.
+@ims do not discuss the binomial distribution.  @iscam, however, provide quite a bit of detail about the binomial concepts in chapter 1.
 
 
 ### Example: pop quiz 
@@ -200,6 +202,7 @@ Ask yourself whether the **true** parameter (let's call it $p$) is in the interv
 
 How often will a type I error be made?  5% of the time.  Therefore ($p_{small}, p_{big}$) is a 95% CI for the true population parameter $p$.
 
+<!--
 ## 2/18/20 Math 58B Agenda {#Feb18M58B}
 0. Math 58B Only
 1. Relative Risk
@@ -211,11 +214,9 @@ How often will a type I error be made?  5% of the time.  Therefore ($p_{small}, 
 0. Math 58B Only
 1. CI for relative risk
 2. CI for odds ratios
+-->
 
-## Relative Risk (Math 58B only)
-
-
-Math 58B (not Math 58) will cover relative risk, the ratio of two success proportions.
+## Relative Risk
 
 Previously (e.g., Gender discrimination example, \@ref(ex:gend)) when working with the proportion of success in two separate groups, the proportion of success was subtracted (see also lab 4).  Next week, differences in proportions will be revisited, see section \@ref(diffprop).  First up, the new statistic of interest will be relative risk, followed by odds ratios.
 
@@ -298,14 +299,12 @@ null_RR %>%
 
 
 
-## Odds Ratios (Math 58B only)
+## Odds Ratios
 
 Experience shows that very few introductory statistics students have seen odds or odds ratios in their prior mathematical or scientific study.  That makes odds ratios a **new** idea, but not a fundamentally hard idea.  Which is to say, it is perfectly acceptable to find relative risk a very intuitive idea that you can easily discuss and odds ratios a very strange idea which is hard to interpret.  Do not be discouraged!  Odds ratios are *not* fundamentally harder to understand than relative risk, they are simply a new idea.
 
-Math 58B (not Math 58) will cover odds ratios, the ratio of two success odds.
 
-
-@isrs do not discuss relative risk and odds ratios.  @iscam, however, provide quite a bit of detail about the concepts in Investigations 3.9, 3.10, 3.11.
+@ims do not discuss relative risk and odds ratios.  @iscam, however, provide quite a bit of detail about the concepts in Investigations 3.9, 3.10, 3.11.
 
 $$\mbox{risk} = \frac{\mbox{number of successes}}{\mbox{total number}}$$
 
@@ -759,9 +758,11 @@ exp(log(ORhat) + 1.96 * SE_lnOR)
 <p class="caption">(\#fig:unnamed-chunk-12)Al-Tawfig et al. `Middle East Respiratory Syndrome Coronavirus: A Case-Control Study of Hospitalized Patients`</p>
 </div>
 
+<!--
 ## 2/25/20 Agenda {#Feb25}
 1. Difference in Proportion HT
 2. Difference in Proportion CI
+-->
 
 ## Difference of two proportions {#diffprop}
 
@@ -901,90 +902,19 @@ Determine if the following statements are true or false, and explain your reason
 
 (d) A 95% confidence interval for($p_{ \geq40K} - p_{<40K}$) is (-0.02, 0.16).
 
-
+<!--
 ## 2/27/20 Agenda {#Feb27}
 1. Observational Studies
 2. Experiments
 3. Causation
-
-## Types of Studies {#experim}
-
-The two basic types of studies encountered are **observational** and **experimental**.
-
-* In an **experiment**, researchers assign treatments to cases.  That is, the researchers decide who gets which level of the treatment (also known as explanatory variable).  When the treatment is assigned randomly, the experiment is known as a **randomized experiment**.
-
-* In an **observational** study, the researchers observe both the explanatory and the response variable without interfering in how the data arise.
-
-Remembering the types of variables in most studies, we add one more category of variables: a **confounding** variable:
-
-* **Explanatory variable** is one that is a potential explanation for any changes (here smoking level).  
-* **Response variable** is the measured outcome of interest (here lung cancer).  
-* **Confounding variable** is a variable (typically not measured!) that is associated with both the explanatory and response variables.
-
-### Example: Hand Writing & SAT Scores^[@iscam, Inv 3.3]
-
-> An article about handwriting appeared in the October 11, 2006 issue of the Washington Post. The article mentioned that among students who took the essay portion of the SAT exam in 2005-06, those who wrote in cursive style scored significantly higher on the essay, on average, than students who used printed block letters. Researchers wanted to know whether simply writing in cursive would be a way to increase scores.
+-->
 
 
-* Identify the observational units, the variables, the types of variables, the parameter of interest, and the statistic which was measured.  What type of study was it?
-
-* **Q1** does writing in cursive **cause** higher scores?  What are some potential confounding variables?
-
-> The article also mentioned a different study in which the same one essay was given to all graders. But some graders were shown a cursive version of the essay and the other graders were shown a version with printed block letters. The average score assigned to the essay with the cursive style was *significantly* higher than the average score assigned to the essay with the printed block letters.
-
-* Do any of these change?  the observational units, the variables, the types of variables, the parameter of interest, and the statistic which was measured.  What type of study was it?
-
-* **Q2** can the conclusion include a causal statement now?  Why?  What changed?
-
-### Example: Have a Nice Trip^[@iscam, Inv 3.4]
-
-> An area of research in biomechanics and gerontology concerns falls and fall-related injuries, especially for elderly people. Recent studies have focused on how individuals respond to large postural disturbances (e.g., tripping, induced slips). One question is whether subjects can be instructed to improve their recovery from such perturbations. Suppose researchers want to compare two such recovery strategies, lowering (making the next step shorter, but in normal step time) and elevating (using a longer or normal step length with normal step time). Subjects will have first been trained on one of these two recovery strategies, and they will be asked to apply it after they feel themselves tripping. The researchers will then induce the subject to trip while walking (but harnessed for safety), using a concealed mechanical obstacle.
-
-> Suppose the following 24 subjects have agreed to participate in such a study. Both males and female were recruited because females tend to have better balance (lower center of gravity). 
-
->Females: Alisha, Alice, Betty, Martha, Audrey, Mary, Barbie, Anna
-
->Males: Matt, Peter, Shawn, Brad, Michael, Kyle, Russ, Patrick, Bob, Kevin, Mitch, Marvin,
-Paul, Pedro, Roger, Sam
-
-
-> The applet at http://www.rossmanchance.com/applets/Subjects.html is helpful for visualizing why confounding variables are removed when the treatment is randomly assigned.
-
-* **Q1** Why would we not want to allow all the women to be trained in the "lowering" technique and all the men trained in the "elevating" technique?
-
-* **Q2**  Why do we randomize the treatment?  How does it affect gender balance?  Height distribution? Gene distribution?  Factor "X"?
-
-* **Q3** What if gender balance across the two treatments is required for the study?  How is the treatment randomly allocated to the observational units?  That is, what would change from Q2?
-
-### Study conclusions
-
-The ideas surrounding study design typically connect to the question of causality:  is it possible or not to infer causality at the end of the study?  However, the words we use ("random allocation") sound a lot like the words we used when describing sampling ("random sample" or "random selection").
-
-Random sampling and random allocation are **VERY DIFFERENT** concepts!  And most importantly, the *conclusions* made from the two different study characteristics are different.  
-
-* **Random selection** or **Random sample** - each unit in the population is equally likely to be chosen for the sample.
-* **Random allocation** - each observational unit is equally likely to be assigned to any of the treatments (explanatory variable).
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="1901" />
-<p class="caption">(\#fig:randSleuth)Random Sample vs Randomized Experiment, taken from @sleuth</p>
-</div>
-
-<div class="figure" style="text-align: center">
-<img src="figs/randsampexp2.png" alt="Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/" width="80%" />
-<p class="caption">(\#fig:randgoodQ)Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/</p>
-</div>
-
-In an ideal world, every study would have participants who were randomly sampled from the population and randomly allocated to the treatments.  However, the limitations of ethical research makes simultaneously doing both random processes difficult.  Why is that?  Consider the following:
-
-* In a clinical trial, it makes sense to randomly allocate the subjects.  You cannot, however, randomly select people from the population to take part in the clinical trial.  Why not?
-
-* In a political poll, it seems reasonable that the participants who are called (not necessarily the people who respond!) are a random sample from the population.  It does not make sense, however, to randomly allocate those people to different treatments.  Why not?
-
+<!--
 ## 3/3/20 Agenda {#Mar3}
 1. More than two proportions
 2. Chi-square goodness-of-fit test
+-->
 
 ## Goodness-of-fit: One categorical variable ($\chi^2$ test) $\geq$ 2 levels {#chisq1}
 
@@ -1131,9 +1061,11 @@ xqchisq(.95, 5)
 ## [1] 11.0705
 ```
 
+<!--
 ## 3/5/20 Agenda {#Mar5}
 1. More than two levels (two variables)
 2. Chi-square test of independence
+-->
 
 ## Independence: Two categorical variables  ($\chi^2$ test) $\geq$ 2 levels each  {#chisq2}
 
@@ -1277,18 +1209,19 @@ The conclusion from Inv 5.3 in @iscam is excellent:
 > The segmented bar graph reveals that for the children in this sample the incidence of near-sightedness increases as the level of lighting increases. When we have a random sample with two categorical variables, we can perform a chi-square test of association. Because the expected counts are large (smallest is 14.25 > 5), we can apply the chi-square test to these data. The p-value of this chi-square test is essentially zero, which says that if there were no association between eye condition and lighting in the population, then it's virtually impossible for chance alone to produce a table in which the conditional distributions would differ by as much as they did in the actual study. Thus, the sample data provide overwhelming evidence that there is indeed an association between eye condition and
 lighting in the population of children like those in this study. A closer analysis of the table and the chi-square calculation reveals that there are many fewer children with near-sightedness than would be expected in the "darkness" group and many more children with near-sightedness than would be expected in the "room light" group. But remember, we cannot draw a cause-and-effect conclusion between lighting and eye condition because this is an observational study. Several confounding variables could explain the observed association. For example, perhaps near-sighted children tend to have near-sighted parents who prefer to leave a light on because of their own vision difficulties, while also passing this genetic predisposition on to their children. We also have to be careful in generalizing from this sample to a larger population because the children were making voluntary visits to an eye doctor and were not selected at random from a larger population.
 
+<!--
 ## 3/10/20 & 3/12/20 Agenda 
 1. Review for exam
 2. Exam 1
 
 ## 3/17/20 & 3/19/20 Agenda 
 Spring Break 1 !
-
+-->
 
 
 ## Reflection Questions
 
-### (no ISRS) Binomial probabilities (Math 58 only)
+### (no ISRS) Binomial probabilities (not covered)
 
 1. How can the binomial distribution be used to calculate probabilities?  
 2. What are the technical conditions of the binomial distribution?
@@ -1298,7 +1231,7 @@ Spring Break 1 !
 6. What is one reason to choose to use the binomial distribution?
 
 
-### (no ISRS) Relative Risk & Odds Ratios (Math 58B only)
+### (no ISRS) Relative Risk & Odds Ratios
 
 1. What is the differences between cross-classification, cohort, and case-control studies?
 2. When is it not appropriate to calculate differences or ratios of proportions?  Why isn't it appropriate?

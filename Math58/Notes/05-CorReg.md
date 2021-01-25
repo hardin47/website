@@ -2,11 +2,12 @@
 
 
 
+<!--
 ## 4/16/20 Agenda {#Apr16}
 1. Definition of correlation (r)
 2. Interpretation of correlation (r)  
 3. (Probably not: Inference on $\rho$)
-
+-->
 
 The last topic of the semester will focus on modeling and inference using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
 
@@ -141,7 +142,7 @@ z \pm 1.96 \cdot \sqrt{\frac{1}{n-3}}&& \\
 
 
 
-
+<!--
 ## 4/21/20 Agenda {#Apr21}
 1. Least Squares estimation of the line
 2. Distribution of the least squares line from sample to sample
@@ -151,6 +152,7 @@ z \pm 1.96 \cdot \sqrt{\frac{1}{n-3}}&& \\
 2. Residual Plots
 3. Transformations
 4. Prediction Intervals
+-->
 
 ## Simple Linear Regression
 
@@ -295,7 +297,7 @@ Within a residual plot, you should be looking for the same types of things you w
 
 
 
-
+<!--
 ## 4/28/20 Agenda {#Apr28}
 1. Multiple Linear Regression
 
@@ -303,7 +305,7 @@ Within a residual plot, you should be looking for the same types of things you w
 1. Choosing model
 2. Residual Plots
 3. Prediction Intervals (harder to plot!)
-
+-->
 
 ## Multiple Linear Regression {#MLR}
 

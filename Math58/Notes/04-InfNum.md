@@ -3,9 +3,11 @@
 
 
 
+<!--
 ## 3/31/20 Agenda {#Mar31}
 1. New statistics: mean, standard deviation, standard error of the mean
 2. Sampling distribution of the sample mean
+-->
 
 ## Important measures related to quantitative (numeric) variables
 
@@ -56,7 +58,7 @@ You should notice:
 * The sample size does *not* change the distribution of the dataset (the middle graph).  The middle graph will always be a representation of the population graph (left side); although with small sample sizes, the middle graph is somewhat sparse.
 * In an actual data analysis, we **only** see the middle graph.  We do not see the population graph (left side) or the sampling distribution (right side).
 
-
+<!--
 ## 4/2/20 Agenda {#Apr2}
 1. The t-distribution
 2. Standardized t-score 
@@ -66,6 +68,7 @@ You should notice:
 ## 4/7/20 Agenda {#Apr7}
 1. Review of confidence interval for one mean
 2. Prediction Interval for a future observation
+-->
 
 ## Inference for a single mean, $\mu$ {#mean1inf}
 
@@ -219,6 +222,7 @@ mosaic::xqt(.975, df = 129)
 ## [1] 99.70481
 ```
 
+<!--
 ## 4/9/20 Agenda {#Apr9}
 under the random sample model:
 
@@ -230,7 +234,7 @@ under the random allocation model:
 
 1. Sampling distribution of $\overline{X}_1 - \overline{X}_2$
 2. Confidence interval (and HT) for $\mu_1 - \mu_2$
-
+-->
 
 ## Comparing two independent means {#mean2inf}
 
@@ -312,9 +316,9 @@ teachers <- read_delim("https://www.openintro.org/data/tab-delimited/teacher.txt
 ```
 
 
-###  `t.test`
+###  `t.test()`
 
-The function which is typically used to do t-tests is the function `t.test`.  Note that the `t.test` function requires a complete dataset, not just the summary statistics.  However, the `t.test` can be used to do any of the variety of tests we've seen (and the ones we haven't seen!):  one sample t-test, two independent samples t-test (with or without equal variances), paired t-test.
+The function which is typically used to do t-tests is the function `t.test()`.  Note that the `t.test()` function requires a complete dataset, not just the summary statistics.  However, the `t.test()` can be used to do any of the variety of tests we've seen (and the ones we haven't seen!):  one sample t-test, two independent samples t-test (with or without equal variances), paired t-test.
 
 #### One sample t-test  
 
@@ -657,7 +661,7 @@ The reflection questions below that we will not cover are marked with an asteris
 7. How do you create a CI?  How do you interpret the CI?
 8. What if your data are NOT normal?  What strategies can you try out?
 
-####  * (not covering in Spring 2020) Paired sample, difference in means: Chapter 4, Section 2
+####  Paired sample, difference in means
 
 1. What changed about the studies (data structure) in section 4.2 as compared with 4.1 or 4.3?
 2. What is the statistic of interest now?  What is the parameter of interest?
@@ -668,7 +672,7 @@ The reflection questions below that we will not cover are marked with an asteris
 
 
 
-#### * (not covering in Spring 2020) ANOVA: Chapter 4, Section 4
+#### * (not covering in Spring 2021) ANOVA
 
 1. Why are these tests called ANalysis Of VAriance (ANOVA)?
 2. Describe the variability in the numerator and the variability in the denominator.  What does each measure?

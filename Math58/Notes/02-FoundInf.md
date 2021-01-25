@@ -3,11 +3,12 @@
 
 
 
+<!--
 ## 1/23/20 Agenda {#Jan23}
 1. Example: gender discrimination
 2. `infer` again
 3. Hypothesis testing structure
-
+-->
 
 
 
@@ -17,7 +18,7 @@
 
 > The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.
 
-> For each supervisor we recorded the gender associated with the assigned file and the promotion decision. Using the results of the study summarized in Table 2.1, we would like to evaluate if females are unfairly discriminated against in promotion decisions. In this study, a smaller proportion of females are promoted than males (0.583 versus 0.875), but it is unclear whether the difference provides convincing evidence that females are unfairly discriminated against.   (@isrs, pg 61) 
+> For each supervisor we recorded the gender associated with the assigned file and the promotion decision. Using the results of the study summarized in Table 2.1, we would like to evaluate if females are unfairly discriminated against in promotion decisions. In this study, a smaller proportion of females are promoted than males (0.583 versus 0.875), but it is unclear whether the difference provides convincing evidence that females are unfairly discriminated against.   (@ims, pg 61) 
 
 |   |        |          | decision     |       |
 |---|--------|----------|--------------|-------|
@@ -196,9 +197,11 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 * **get_p_value** to measure the consistency of the observed statistic and the possible values of the statistic under the null model
 * make a conclusion using words that describe the research setting
 
+<!--
 ## 1/28/20 Agenda {#Jan28}
 1. Central Limit Theorem
 2. Mathematical approximation for the distribution of one sample proportion
+-->
 
 ## Normal Model
 
@@ -276,11 +279,11 @@ In a bell-shaped, symmetric distribution,
 -->
 
 
-
+<!--
 ## 1/30/20 Agenda {#Jan30}
 1. Normal distribution (no q-q plots)
 2. Calculating normal probabilities
-
+-->
 
 ### Normal Probabilities & Z scores {#norm}
 
@@ -427,10 +430,12 @@ xpnorm(-1.333, 0, 1, plot = TRUE)
 ## [1] 0.0912659
 ```
 
+<!--
 ## 2/4/20 Agenda {#Feb4}
 1. Theoretical basis for confidence intervals
 2. $Z^*$  (different from Z score!)
 3. Example: extreme poverty
+-->
 
 ## Confidence Intervals {#CI}
 
@@ -650,16 +655,16 @@ Question:  why don't we always use 99.99% CIs?
 
 Answer:  because the intervals would typically be too wide to provide any real information about the actual population parameter.
 
+<!--
 ## 2/6/20 Agenda {#Feb6}
 1. Putting together all the pieces of the CI
 2. Effects of sample size, $p$, and confidence level on CI
 3. What is the confidence level?
 
-
-
 ## 2/11/20 Agenda {#Feb11}
 1. Biased sampling
 2. Simple Random Sampling
+-->
 
 ## Sampling {#samp}
 
@@ -729,10 +734,12 @@ A **sampling distribution** is the distribution of all possible values of the *s
 * the sampling distribution of a statistic does *not* depend on the population size! (we assume it is "big enough" so that the sample isn't basically the same set as the population.)
 * when characteristics of the resulting samples are systematically different from the population, we call the sampling mechanism *biased*.  If the distribution of the sample statistics, under repeated samples from the same population, is centered at the value of the population parameter, the distribution of the statistic is said to be *unbiased*.
 
+<!--
 ## 2/13/20 Agenda {#Feb13}
 1. Type I & Type II errors
 2. Power
 3. CI and HT together
+-->
 
 ## Errors & Power {#errors}
 
