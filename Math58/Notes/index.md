@@ -1,7 +1,7 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2021-01-25"
+date: "2021-01-26"
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -26,12 +26,17 @@ You are responsible for reading the relevant chapters in the text. The text is v
 
 
 
-| Day     | Topic               | Book Chap                 | Notes Section                     |
-|:--------|:--------------------|:--------------------------|:----------------------------------|
-| 1/25/21 | Intro               | ISCAM 1.1                 | \@ref(intro) [intro]              |
-| 1/27/21 | variables & studies | IMS 1.2, 1.4              | \@ref(experim) [Types of Studies] |
-| 2/1/21  | Correlation (r)     | IMS 3.1 & ISCAM 5.6 - 5.7 | \@ref(cor) [Cor]                  |
-| 2/3/21  | Least Squares line  | IMS 3.2 & Inv 5.10 - 5.11 | \@ref(ls) [LS line]               |
++----------------+---------------------+---------------------------+-----------------------------------+
+| Day            | Topic               | Book Chap                 | Notes Section                     |
++:===============+:====================+:==========================+:==================================+
+| 1/25/21        | Intro               | ISCAM 1.1                 | \@ref(intro) [Introduction]       |
++----------------+---------------------+---------------------------+-----------------------------------+
+| 1/27/21        | variables & studies | IMS 1.2, 1.4              | \@ref(experim) [Types of Studies] |
++----------------+---------------------+---------------------------+-----------------------------------+
+| 2/1/21         | Correlation (r)     | IMS 3.1 & ISCAM 5.6 - 5.7 | \@ref(cor) [correlation]          |
++----------------+---------------------+---------------------------+-----------------------------------+
+| 2/3/21         | Least Squares line  | IMS 3.2 & Inv 5.10 - 5.11 | \@ref(ls) [Least Sq]              |
++----------------+---------------------+---------------------------+-----------------------------------+
 
 ```{=html}
 <!--
