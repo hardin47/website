@@ -21,25 +21,11 @@ where $g(\cdot)$ is the link function.  For logistic regression, we use the logi
 \end{eqnarray*}
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:burnexamp"><strong>(\#exm:burnexamp) </strong></span>Surviving third-degree burns   
-These data refer to 435 adults who were treated for third-degree burns by the University of Southern California General Hospital Burn Center. The patients were grouped according to the area of third-degree burns on the body (measured in square cm). In the table below are recorded, for each midpoint of the groupings `log(area +1)`, the number of patients in the corresponding group who survived, and the number who died from the burns. [@burn]
-
-| log(area+1) midpoint	| survived 	| died 	| prop surv 	|
-|:-----------:	|:--------:	|:----:	|:---------:	|
-| 1.35 	| 13 	| 0 	| 1 	|
-| 1.60 	| 19 	| 0 	| 1 	|
-| 1.75 	| 67 	| 2 	| 0.971 	|
-| 1.85 	| 45 	| 5 	| 0.900 	|
-| 1.95 	| 71 	| 8 	| 0.899 	|
-| 2.05 	| 50 	| 20 	| 0.714 	|
-| 2.15 	| 35 	| 31 	| 0.530 	|
-| 2.25 	| 7 	| 49 	| 0.125 	|
-| 2.35 	| 1 	| 12 	| 0.077 	|
-  </div>\EndKnitrBlock{example}
 
 
 
-<img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+
+<img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" />
 
 We can see that the logit transformation linearizes the relationship.
 
@@ -49,7 +35,7 @@ A first idea might be to model the relationship between the probability of succe
 
 The functional form relating x and the probability of success looks like it could be an `S` shape.  But we'd have to do some work to figure out what the form of that `S` looks like.  Below I've given some different relationships between x and the probability of success using $\beta_0$ and $\beta_1$ values that are yet to be defined.  Regardless, we can see that by tuning the functional relationship of the `S` curve, we can get a good fit to the data.
 
-<img src="05-log_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" />
 
 S-curves ( `y = exp(linear) / (1+exp(linear))` ) for a variety of different parameter settings.  Note that the x-axis is some continuous variable `x` while the y-axis is the probability of success at that value of `x`.  More on this as we move through this model.
 
@@ -299,34 +285,22 @@ z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{eqnarray*}
 
 
-```r
-library(tidyverse); library(broom)
-glm(burnresp~burnexpl, data = burnglm, family="binomial")
 ```
-
-```
-## 
-## Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-## 
-## Coefficients:
-## (Intercept)     burnexpl  
-##       22.71       -10.66  
-## 
-## Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
-## Null Deviance:	    525.4 
-## Residual Deviance: 335.2 	AIC: 339.2
-```
-
-```r
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-## 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
+#> 
+#> Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
+#> 
+#> Coefficients:
+#> (Intercept)     burnexpl  
+#>        22.7        -10.7  
+#> 
+#> Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
+#> Null Deviance:	    525 
+#> Residual Deviance: 335 	AIC: 339
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
+#> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
 ```
 
 ### Likelihood Ratio Tests
@@ -347,17 +321,7 @@ If we are testing only one parameter value.  More generally,
 where $\nu$ is the number of extra parameters we estimate using the unconstrained likelihood (as compared to the constrained null likelihood).
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-6"><strong>(\#exm:unnamed-chunk-6) </strong></span>Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25$.
-\begin{eqnarray*}
-H_0:&& p=0.25\\
-H_1:&& p \ne 0.25\\
-\hat{p} &=& \frac{49}{147}\\
--2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &=& -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
-&=& -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
-&=& -2 \Bigg[ \ln \bigg( (0.25)^{49} (0.75)^{98} \bigg) - \ln \Bigg( \bigg( \frac{1}{3} \bigg)^{49} \bigg( \frac{2}{3} \bigg)^{98} \Bigg) \Bigg]\\
-&=& -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
-P( \chi^2_1 \geq 5.11) &=& 0.0238
-\end{eqnarray*}</div>\EndKnitrBlock{example}
+
 
 
 
@@ -386,55 +350,36 @@ That is, the difference in log likelihoods will be the opposite difference in de
 
 
 
-```r
-summary(glm(burnresp~burnexpl, data = burnglm, family="binomial"))
 ```
-
-```
-## 
-## Call:
-## glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.8518  -0.6998   0.1859   0.5239   2.2089  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)   22.708      2.266  10.021   <2e-16 ***
-## burnexpl     -10.662      1.083  -9.849   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 525.39  on 434  degrees of freedom
-## Residual deviance: 335.23  on 433  degrees of freedom
-## AIC: 339.23
-## 
-## Number of Fisher Scoring iterations: 6
-```
-
-```r
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-## 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
-```
-
-```r
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% glance() %>% 
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-## 1       525.386     434 -167.616 339.231 347.382  335.231         433  435
+#> 
+#> Call:
+#> glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
+#> 
+#> Deviance Residuals: 
+#>    Min      1Q  Median      3Q     Max  
+#> -2.852  -0.700   0.186   0.524   2.209  
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    22.71       2.27   10.02   <2e-16 ***
+#> burnexpl      -10.66       1.08   -9.85   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 525.39  on 434  degrees of freedom
+#> Residual deviance: 335.23  on 433  degrees of freedom
+#> AIC: 339.2
+#> 
+#> Number of Fisher Scoring iterations: 6
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
+#> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
+#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+#> 1       525.386     434 -167.616 339.231 347.382  335.231         433  435
 ```
 
 \begin{eqnarray*}
@@ -499,104 +444,52 @@ See the birdnest example, \@ref(birdexamp)
 
 Another worry when building models with multiple explanatory variables has to do with variables interacting.  That is, for one level of a variable, the relationship of the main predictor on the response is different.
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-8"><strong>(\#exm:unnamed-chunk-8) </strong></span>Consider a simple linear regression model on number of hours studied and exam grade.  Then addclass year to the model.  There would probably be a different slope for each class year in order to model the two variables most effectively.  For simplicity, consider only first year students and seniors.
 
-\begin{eqnarray*}
-E[\mbox{grade seniors}| \mbox{hours studied}] &=& \beta_{0s} + \beta_{1s} \mbox{hrs}\\
-E[\mbox{grade first years}| \mbox{hours studied}] &=& \beta_{0f} + \beta_{1f} \mbox{hrs}\\
-E[\mbox{grade}| \mbox{hours studied}] &=& \beta_{0} + \beta_{1} \mbox{hrs} + \beta_2 I(\mbox{year=senior}) + \beta_{3} \mbox{hrs} I(\mbox{year = senior})\\
-\beta_{0f} &=& \beta_{0}\\
-\beta_{0s} &=& \beta_0 + \beta_2\\
-\beta_{1f} &=& \beta_1\\
-\beta_{1s} &=& \beta_1 + \beta_3
-\end{eqnarray*}</div>\EndKnitrBlock{example}
 
 Why do we need the $I(\mbox{year=seniors})$ variable?
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-9"><strong>(\#def:unnamed-chunk-9) </strong></span>*Interaction* means that the effect of an explanatory variable on the outcome differs according to the level of another explanatory variable.  (Not the case with age on smoking and lung cancer above.  With the smoking example, age is a significant variable, but it does not interact with lung cancer.)</div>\EndKnitrBlock{definition}
+
 
 <!--
 Recall the homework assignment where APACHE score was a significant predictor of the odds of dying for treated black patients but not for untreated.  This is interaction.  The relationship between the explanatory variable (APACHE score) and the response (survival) changes depending on a 3rd variables (treated vs. untreated).
 -->
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-10"><strong>(\#exm:unnamed-chunk-10) </strong></span>The Heart and Estrogen/progestin Replacement Study (HERS) is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD.  Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo.  The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 [@HERS].
-
-The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.
-
-The hormone replacement regimen also increased the risk of clots in the veins (deep vein thrombosis) and lungs (pulmonary embolism).  The results of HERS are surprising in light of previous observational studies, which found lower rates of CHD in women who take postmenopausal estrogen.
- 
- 
-Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), `medcond`.  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.</div>\EndKnitrBlock{example}
 
 
 
-```r
-HERS <- read.table("~/Dropbox/teaching/math150/HERS.csv", 
-                   sep=",", header=T, na.strings=".")
-
-glm(medcond ~ age, data = HERS, family="binomial") %>% tidy()
-```
 
 ```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
-## 2 age           0.0162   0.00597      2.71 0.00664
-```
-
-```r
-glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept) -2.17      0.496       -4.37 0.0000124
-## 2 age          0.0189    0.00613      3.09 0.00203  
-## 3 weight       0.00528   0.00274      1.93 0.0542
-```
-
-```r
-glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic      p.value
-##   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
-## 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
-## 2 age           0.0185   0.00603      3.07 0.00217     
-## 3 diabetes      0.487    0.0882       5.52 0.0000000330
-```
-
-```r
-glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term         estimate std.error statistic     p.value
-##   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
-## 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
-## 2 age            0.0278   0.00707      3.93 0.0000844  
-## 3 diabetes       2.83     0.914        3.10 0.00192    
-## 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
-```
-
-```r
-glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term         estimate std.error statistic p.value
-##   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)  -0.991     0.511       -1.94  0.0526
-## 2 age           0.00885   0.00759      1.17  0.244 
-## 3 drinkany     -1.44      0.831       -1.73  0.0833
-## 4 age:drinkany  0.0168    0.0124       1.36  0.175
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+#> 2 age          0.0189    0.00613      3.09 0.00203  
+#> 3 weight       0.00528   0.00274      1.93 0.0542
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic      p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
+#> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+#> 2 age           0.0185   0.00603      3.07 0.00217     
+#> 3 diabetes      0.487    0.0882       5.52 0.0000000330
+#> # A tibble: 4 x 5
+#>   term         estimate std.error statistic     p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+#> 2 age            0.0278   0.00707      3.93 0.0000844  
+#> 3 diabetes       2.83     0.914        3.10 0.00192    
+#> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
+#> # A tibble: 4 x 5
+#>   term         estimate std.error statistic p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+#> 2 age           0.00885   0.00759      1.17  0.244 
+#> 3 drinkany     -1.44      0.831       -1.73  0.0833
+#> 4 age:drinkany  0.0168    0.0124       1.36  0.175
 ```
 
 Write out a few models *by hand*, does any of the significance change with respect to interaction?  Does the interpretation change with interaction?  In the last model, we might want to remove all the age information.  Age seems to be less important than drinking status. How do we decide?  How do we model?
@@ -605,27 +498,24 @@ Write out a few models *by hand*, does any of the significance change with respe
 
 **Simpson's paradox** is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-12"><strong>(\#exm:unnamed-chunk-12) </strong></span>Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).</div>\EndKnitrBlock{example}
 
 
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)  1159.       57.7      20.1  5.13e-25
-## 2 salary         -5.54      1.63     -3.39 1.39e- 3
-```
 
 ```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)   988.      31.9       31.0  6.20e-33
-## 2 salary          2.18     1.03       2.12 3.94e- 2
-## 3 frac           -2.78     0.228    -12.2  4.00e-16
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)  1159.       57.7      20.1  5.13e-25
+#> 2 salary         -5.54      1.63     -3.39 1.39e- 3
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   988.      31.9       31.0  6.20e-33
+#> 2 salary          2.18     1.03       2.12 3.94e- 2
+#> 3 frac           -2.78     0.228    -12.2  4.00e-16
 ```
 
-<img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;" />
 
 
 <!--
@@ -656,85 +546,37 @@ Write out a few models *by hand*, does any of the significance change with respe
 %After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 -->
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-14"><strong>(\#exm:unnamed-chunk-14) </strong></span>Consider the example on smoking and 20-year mortality (case) from section 3.4 of *Regression Methods in Biostatistics*, pg 52-53.
-
-| age 	| test 	| smoker 	| nonsmoker 	| prob smoke 	| odds smoke 	| empirical OR 	|
-|---------	|---------	|:------:	|:---------:	|:----------:	|:----------:	|:------------:	|
-| all 	| case 	| 139 	| 230 	| 0.377 	| 0.604 	| 0.685 	|
-|  	| control 	| 443 	| 502 	| 0.469 	| 0.882 	|  	|
-| 18-44 	| case 	| 61 	| 32 	| 0.656 	| 1.906 	| 1.627 	|
-|  	| control 	| 375 	| 320 	| 0.540 	| 1.172 	|  	|
-| 45-64 	| case 	| 34 	| 66 	| 0.340 	| 0.515 	| 1.308 	|
-|  	| control 	| 50 	| 127 	| 0.282 	| 0.394 	|  	|
-| 65+ 	| case 	| 44 	| 132 	| 0.250 	| 0.333 	| 1.019 	|
-|  	| control 	| 18 	| 55 	| 0.247 	| 0.327 	|  	|
-
-What we see is that the vast majority of the controls were young, and they had a high rate of smoking.  A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group.  However, within each group, the cases were more likely to smoke than the controls.
-
-After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 
 
-What would it mean to *adjust* for age in this context?  It means that we have to include it in the model:</div>\EndKnitrBlock{example}
-
-
-```r
-death <- c(rep(1,93),rep(0,695), rep(1,100),rep(0,177), rep(1,176), rep(0,73))
-smoke <- c(rep(1,61), rep(0,32), rep(1,375), rep(0,320), rep(1,34), rep(0,66), rep(1,50), rep(0,127), rep(1,44), rep(0,132), rep(1,18), rep(0,55))
-age <- c(rep("young", 788), rep("middle", 277), rep("old", 249) )
-
-
-glm( death ~ smoke, family="binomial") %>% tidy()
-```
 
 ```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
-## 2 smoke         -0.379    0.126      -3.01 2.59e- 3
-```
-
-```r
-glm( death ~ as.factor(age), family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term                estimate std.error statistic  p.value
-##   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)           -0.571     0.125     -4.56 5.01e- 6
-## 2 as.factor(age)old      1.45      0.187      7.75 9.00e-15
-## 3 as.factor(age)young   -1.44      0.167     -8.63 6.02e-18
-```
-
-```r
-glm( death ~ smoke + as.factor(age), family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term                estimate std.error statistic  p.value
-##   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)           -0.668     0.135     -4.96 7.03e- 7
-## 2 smoke                  0.312     0.154      2.03 4.25e- 2
-## 3 as.factor(age)old      1.47      0.188      7.84 4.59e-15
-## 4 as.factor(age)young   -1.52      0.173     -8.81 1.26e-18
-```
-
-```r
-glm( death ~ smoke * as.factor(age), family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 6 x 5
-##   term                      estimate std.error statistic  p.value
-##   <chr>                        <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)                 -0.655     0.152    -4.31  1.61e- 5
-## 2 smoke                        0.269     0.269     0.999 3.18e- 1
-## 3 as.factor(age)old            1.53      0.221     6.93  4.29e-12
-## 4 as.factor(age)young         -1.65      0.240    -6.88  6.00e-12
-## 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
-## 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
+#> 2 smoke         -0.379    0.126      -3.01 2.59e- 3
+#> # A tibble: 3 x 5
+#>   term                estimate std.error statistic  p.value
+#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)           -0.571     0.125     -4.56 5.01e- 6
+#> 2 as.factor(age)old      1.45      0.187      7.75 9.00e-15
+#> 3 as.factor(age)young   -1.44      0.167     -8.63 6.02e-18
+#> # A tibble: 4 x 5
+#>   term                estimate std.error statistic  p.value
+#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)           -0.668     0.135     -4.96 7.03e- 7
+#> 2 smoke                  0.312     0.154      2.03 4.25e- 2
+#> 3 as.factor(age)old      1.47      0.188      7.84 4.59e-15
+#> 4 as.factor(age)young   -1.52      0.173     -8.81 1.26e-18
+#> # A tibble: 6 x 5
+#>   term                      estimate std.error statistic  p.value
+#>   <chr>                        <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)                 -0.655     0.152    -4.31  1.61e- 5
+#> 2 smoke                        0.269     0.269     0.999 3.18e- 1
+#> 3 as.factor(age)old            1.53      0.221     6.93  4.29e-12
+#> 4 as.factor(age)young         -1.65      0.240    -6.88  6.00e-12
+#> 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
+#> 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1
 ```
 
 
@@ -778,44 +620,26 @@ What does it mean that the interaction terms are not significant in the last mod
 
 Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
 
-<img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" />
 
 
-```r
-glm(CandyYes ~ Coins, data = Offering, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
-## 2 Coins          0.286    0.0772      3.70 0.000213
-```
-
-```r
-glm(CandyYes ~ Small, data = Offering, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
-## 2 Small          0.184    0.0576      3.19 0.00142
-```
-
-```r
-glm(CandyYes ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   -17.0       7.80     -2.18  0.0296
-## 2 Coins           3.49      1.75      1.99  0.0461
-## 3 Small          -3.04      1.57     -1.93  0.0531
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+#> 2 Coins          0.286    0.0772      3.70 0.000213
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+#> 2 Small          0.184    0.0576      3.19 0.00142
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   -17.0       7.80     -2.18  0.0296
+#> 2 Coins           3.49      1.75      1.99  0.0461
+#> 3 Small          -3.04      1.57     -1.93  0.0531
 ```
 
 Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.
@@ -824,9 +648,7 @@ Notice that the directionality of the low coins changes when it is included in t
 
 ## Model Building {#logstep}
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-18"><strong>(\#exm:unnamed-chunk-18) </strong></span>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
-<!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
-</div>\EndKnitrBlock{example}
+
 
 <!--
 % added January 2019 ...  I need to read through, edit, etc.
@@ -874,137 +696,66 @@ Consider the HERS data described in your book (page 30); variable description al
 For now, we will try to predict whether the individuals had a medical condition, `medcond` (defined as a pre-existing and self-reported medical condition).  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.
 
 
-```r
-HERS <- read.table("~/Dropbox/teaching/math150/HERS.csv", 
-                   sep=",", header=T, na.strings=".")
-
-
-glm(medcond ~ age, data = HERS, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
-## 2 age           0.0162   0.00597      2.71 0.00664
-```
-
-```r
-glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept) -2.17      0.496       -4.37 0.0000124
-## 2 age          0.0189    0.00613      3.09 0.00203  
-## 3 weight       0.00528   0.00274      1.93 0.0542
-```
-
-```r
-glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 3 x 5
-##   term        estimate std.error statistic      p.value
-##   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
-## 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
-## 2 age           0.0185   0.00603      3.07 0.00217     
-## 3 diabetes      0.487    0.0882       5.52 0.0000000330
-```
-
-```r
-glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term         estimate std.error statistic     p.value
-##   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
-## 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
-## 2 age            0.0278   0.00707      3.93 0.0000844  
-## 3 diabetes       2.83     0.914        3.10 0.00192    
-## 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
-```
-
-```r
-glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term         estimate std.error statistic p.value
-##   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)  -0.991     0.511       -1.94  0.0526
-## 2 age           0.00885   0.00759      1.17  0.244 
-## 3 drinkany     -1.44      0.831       -1.73  0.0833
-## 4 age:drinkany  0.0168    0.0124       1.36  0.175
-```
-
-```r
-glm(medcond ~ age + weight + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 5 x 5
-##   term        estimate std.error statistic    p.value
-##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
-## 1 (Intercept) -1.87      0.505      -3.72  0.000203  
-## 2 age          0.0184    0.00620     2.96  0.00304   
-## 3 weight       0.00143   0.00285     0.500 0.617     
-## 4 diabetes     0.432     0.0924      4.68  0.00000288
-## 5 drinkany    -0.253     0.0835     -3.03  0.00248
-```
-
-```r
-glm(medcond ~ age , data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic   p.value
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-## 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
-## 2 age           0.0162   0.00597      2.71 0.00664
-```
-
-```r
-glm(medcond ~ weight , data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept) -0.769     0.198       -3.88 0.000106
-## 2 weight       0.00339   0.00267      1.27 0.204
-```
-
-```r
-glm(medcond ~ diabetes , data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
-## 2 diabetes       0.468    0.0878      5.34 9.55e- 8
-```
-
-```r
-glm(medcond ~ drinkany, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
-## 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+#> 2 age          0.0189    0.00613      3.09 0.00203  
+#> 3 weight       0.00528   0.00274      1.93 0.0542
+#> # A tibble: 3 x 5
+#>   term        estimate std.error statistic      p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
+#> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+#> 2 age           0.0185   0.00603      3.07 0.00217     
+#> 3 diabetes      0.487    0.0882       5.52 0.0000000330
+#> # A tibble: 4 x 5
+#>   term         estimate std.error statistic     p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+#> 2 age            0.0278   0.00707      3.93 0.0000844  
+#> 3 diabetes       2.83     0.914        3.10 0.00192    
+#> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
+#> # A tibble: 4 x 5
+#>   term         estimate std.error statistic p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+#> 2 age           0.00885   0.00759      1.17  0.244 
+#> 3 drinkany     -1.44      0.831       -1.73  0.0833
+#> 4 age:drinkany  0.0168    0.0124       1.36  0.175
+#> # A tibble: 5 x 5
+#>   term        estimate std.error statistic    p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
+#> 1 (Intercept) -1.87      0.505      -3.72  0.000203  
+#> 2 age          0.0184    0.00620     2.96  0.00304   
+#> 3 weight       0.00143   0.00285     0.500 0.617     
+#> 4 diabetes     0.432     0.0924      4.68  0.00000288
+#> 5 drinkany    -0.253     0.0835     -3.03  0.00248
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept) -0.769     0.198       -3.88 0.000106
+#> 2 weight       0.00339   0.00267      1.27 0.204
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+#> 2 diabetes       0.468    0.0878      5.34 9.55e- 8
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+#> 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5
 ```
 
 
@@ -1033,40 +784,22 @@ How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, 
 3. Continue removing variables until all variables are significant at the chosen $\alpha$ level.  
 
 
-```r
-glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% glance()
 ```
-
-```
-## # A tibble: 1 x 8
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
-## 1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759
-```
-
-```r
-glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% glance()
-```
-
-```
-## # A tibble: 1 x 8
-##   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
-##           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
-## 1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759
-```
-
-```r
-glm(medcond ~ age + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
-```
-
-```
-## # A tibble: 4 x 5
-##   term        estimate std.error statistic     p.value
-##   <chr>          <dbl>     <dbl>     <dbl>       <dbl>
-## 1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
-## 2 age           0.0176   0.00605      2.90 0.00369    
-## 3 diabetes      0.442    0.0895       4.94 0.000000786
-## 4 drinkany     -0.252    0.0834      -3.01 0.00257
+#> # A tibble: 1 x 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759
+#> # A tibble: 1 x 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759
+#> # A tibble: 4 x 5
+#>   term        estimate std.error statistic     p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
+#> 2 age           0.0176   0.00605      2.90 0.00369    
+#> 3 diabetes      0.442    0.0895       4.94 0.000000786
+#> 4 drinkany     -0.252    0.0834      -3.01 0.00257
 ```
 
 
@@ -1216,31 +949,23 @@ p(x=2.35) &=& \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.
 The pairs would be concordant if the first individual survived and the second didn't.  The pairs would be discordant if the first individual died and the second survived.
 
 
-```r
-# install.packages(c("Hmisc", "rms"))
-
-library(rms)   # you need this line!!
-burn.glm <- lrm(burnresp~burnexpl, data = burnglm)
-print(burn.glm)
 ```
-
-```
-## Logistic Regression Model
-##  
-##  lrm(formula = burnresp ~ burnexpl, data = burnglm)
-##  
-##                         Model Likelihood    Discrimination    Rank Discrim.    
-##                               Ratio Test           Indexes          Indexes    
-##  Obs           435    LR chi2     190.15    R2       0.505    C       0.877    
-##   0            127    d.f.             1    g        2.576    Dxy     0.753    
-##   1            308    Pr(> chi2) <0.0001    gr      13.146    gamma   0.824    
-##  max |deriv| 8e-11                          gp       0.313    tau-a   0.312    
-##                                             Brier    0.121                     
-##  
-##            Coef     S.E.   Wald Z Pr(>|Z|)
-##  Intercept  22.7083 2.2661 10.02  <0.0001 
-##  burnexpl  -10.6624 1.0826 -9.85  <0.0001 
-## 
+#> Logistic Regression Model
+#>  
+#>  lrm(formula = burnresp ~ burnexpl, data = burnglm)
+#>  
+#>                         Model Likelihood    Discrimination    Rank Discrim.    
+#>                               Ratio Test           Indexes          Indexes    
+#>  Obs           435    LR chi2     190.15    R2       0.505    C       0.877    
+#>   0            127    d.f.             1    g        2.576    Dxy     0.753    
+#>   1            308    Pr(> chi2) <0.0001    gr      13.146    gamma   0.824    
+#>  max |deriv| 8e-11                          gp       0.313    tau-a   0.312    
+#>                                             Brier    0.121                     
+#>  
+#>            Coef     S.E.   Wald Z Pr(>|Z|)
+#>  Intercept  22.7083 2.2661 10.02  <0.0001 
+#>  burnexpl  -10.6624 1.0826 -9.85  <0.0001 
+#> 
 ```
 
 The summary contains the following elements:
@@ -1278,13 +1003,7 @@ Recall that logistic regression can be used to predict the outcome of a binary e
 
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-22"><strong>(\#exm:unnamed-chunk-22) </strong></span>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
-\begin{eqnarray*}
-p(x=1.75) &=& \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
-p(x=2.35) &=& \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087\\
-x &=& \mbox{log area burned}
-\end{eqnarray*}
-What value would we assign to 1.75 or 2.35 or 15 for log(area) burned?  By changing our cutoff, we can fit an entire curve.  We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1).  Notice that the color band represents the probability cutoff for predicting a ``success."</div>\EndKnitrBlock{example}
+
 
 
 ![](ROCcurve_burn.jpg)
@@ -1389,10 +1108,6 @@ Suppose that we build a classifier (logistic regression model) on a given data s
 **Length of Bird Nest**  This example is from problem E1 in your text and includes 99 species of N. American passerine birds.  Recall that the response variable is binary and represents whether there is a small opening (`closed=1`) or a large opening (`closed=0`) for the nest.  The explanatory variable of interest was the length of the bird.
 
 
-```r
-nests <- readr::read_csv("~/Dropbox/teaching/math150/PracStatCD/Data Sets/Chapter 07/CSV Files/C7 Birdnest.csv",
-                  na="*")
-```
 
 
 ### Drop-in-deviance (Likelihood Ratio Test, LRT)
@@ -1406,26 +1121,14 @@ G &\sim& \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 where $\nu$ represents the difference in the number of parameters needed to estimate in the full model versus the null model.
 
 
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   0.457     0.753      0.607   0.544
-## 2 Length       -0.0677    0.0425    -1.59    0.112
-```
-
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 ###  Difference between `tidy` and `augment` and `glance`
@@ -1433,47 +1136,24 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 Note that `tidy` contains the same number of rows as the number of coefficients.  `augment` contains the same number of rows as number of observations.  `glance` always has one row (containing overall model information).
 
 
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   0.457     0.753      0.607   0.544
-## 2 Length       -0.0677    0.0425    -1.59    0.112
-```
-
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
-```
-
-```
-## # A tibble: 95 x 9
-##    .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
-##    <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
-##  1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
-##  2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-##  3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-##  4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
-##  5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
-##  6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
-##  7 8                 0   17    -0.693 -0.900     -0.905 0.0110   1.12 0.00280
-##  8 9                 0   15    -0.558 -0.951     -0.958 0.0130   1.12 0.00381
-##  9 10                0   15    -0.558 -0.951     -0.958 0.0130   1.12 0.00381
-## 10 11                1   11    -0.287  1.30       1.32  0.0276   1.12 0.0194 
-## # … with 85 more rows
-```
-
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
+#> # A tibble: 95 x 9
+#>   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
+#>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
+#> 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+#> 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+#> 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
+#> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
+#> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
+#> # … with 89 more rows
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
@@ -1483,215 +1163,126 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
 Length as a continuous explanatory variable:
 
 
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   0.457     0.753      0.607   0.544
-## 2 Length       -0.0677    0.0425    -1.59    0.112
-```
-
-```r
-glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
-## 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
 Length as a categorical explanatory variables:
 
 
-```r
-glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 34 x 5
-##    term                       estimate std.error statistic p.value
-##    <chr>                         <dbl>     <dbl>     <dbl>   <dbl>
-##  1 (Intercept)            19.6            10754.  1.82e- 3   0.999
-##  2 as.factor(Length)10     0.000000432    13171.  3.28e-11   1.00 
-##  3 as.factor(Length)10.5   0.000000430    15208.  2.82e-11   1.00 
-##  4 as.factor(Length)11   -18.9            10754. -1.75e- 3   0.999
-##  5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
-##  6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.00 
-##  7 as.factor(Length)13   -20.3            10754. -1.88e- 3   0.998
-##  8 as.factor(Length)13.5 -20.7            10754. -1.92e- 3   0.998
-##  9 as.factor(Length)14   -19.3            10754. -1.79e- 3   0.999
-## 10 as.factor(Length)14.5 -39.1            13171. -2.97e- 3   0.998
-## # … with 24 more rows
-```
-
-```r
-glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance() %>%
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-## 1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95
+#> # A tibble: 34 x 5
+#>   term                       estimate std.error statistic p.value
+#>   <chr>                         <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)            19.6            10754.  1.82e- 3   0.999
+#> 2 as.factor(Length)10     0.000000432    13171.  3.28e-11   1.00 
+#> 3 as.factor(Length)10.5   0.000000430    15208.  2.82e-11   1.00 
+#> 4 as.factor(Length)11   -18.9            10754. -1.75e- 3   0.999
+#> 5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
+#> 6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.00 
+#> # … with 28 more rows
+#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95
 ```
 
 Length plus a few other explanatory variables:
 
-```r
-glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% tidy()
 ```
-
-```
-## # A tibble: 4 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   -2.64     2.06      -1.28   0.201 
-## 2 Length        -0.114    0.0527    -2.17   0.0302
-## 3 Incubate       0.314    0.172      1.82   0.0684
-## 4 Color         -0.420    0.609     -0.690  0.490
-```
-
-```r
-glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% glance() %>% 
-  print.data.frame(digits=6)
-```
-
-```
-##   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-## 1       110.086      87 -51.6633 111.327 121.236  103.327          84   88
+#> # A tibble: 4 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   -2.64     2.06      -1.28   0.201 
+#> 2 Length        -0.114    0.0527    -2.17   0.0302
+#> 3 Incubate       0.314    0.172      1.82   0.0684
+#> 4 Color         -0.420    0.609     -0.690  0.490
+#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+#> 1       110.086      87 -51.6633 111.327 121.236  103.327          84   88
 ```
 
 ### Predicting Response
 
 
 
-```r
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
-bird.glm %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic p.value
-##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-## 1 (Intercept)   0.457     0.753      0.607   0.544
-## 2 Length       -0.0677    0.0425    -1.59    0.112
-```
-
-```r
-# predicting the linear part:
-# reasonable to use the SE to create CIs
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
-```
-
-```
-## $fit
-##     1 
-## -2.72 
-## 
-## $se.fit
-## [1] 1.3
-## 
-## $residual.scale
-## [1] 1
-```
-
-```r
-# predicting the probability of success (on the `scale` of the response variable):
-# do NOT use the SE to create a CI for the predicted value
-# instead, use the SE from `type="link" ` and transform the interval
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
-```
-
-```
-## $fit
-##      1 
-## 0.0616 
-## 
-## $se.fit
-##      1 
-## 0.0751 
-## 
-## $residual.scale
-## [1] 1
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
+#> $fit
+#>     1 
+#> -2.72 
+#> 
+#> $se.fit
+#> [1] 1.3
+#> 
+#> $residual.scale
+#> [1] 1
+#> $fit
+#>      1 
+#> 0.0616 
+#> 
+#> $se.fit
+#>      1 
+#> 0.0751 
+#> 
+#> $residual.scale
+#> [1] 1
 ```
 
 ### Measues of association
 
 
 
-```r
-# install.packages(c("Hmisc", "rms"))
-
-library(rms)   # you need this line!!
-bird.lrm <- lrm(`Closed?` ~ Length, data = nests)
-print(bird.lrm)
 ```
-
-```
-## Frequencies of Missing Values Due to Each Variable
-## Closed?  Length 
-##       0       4 
-## 
-## Logistic Regression Model
-##  
-##  lrm(formula = `Closed?` ~ Length, data = nests)
-##  
-##  
-##                        Model Likelihood    Discrimination    Rank Discrim.    
-##                              Ratio Test           Indexes          Indexes    
-##  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
-##   0             64    d.f.            1    g        0.455    Dxy     0.276    
-##   1             31    Pr(> chi2) 0.0777    gr       1.576    gamma   0.288    
-##  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
-##                                            Brier    0.210                     
-##  
-##            Coef    S.E.   Wald Z Pr(>|Z|)
-##  Intercept  0.4571 0.7530  0.61  0.5438  
-##  Length    -0.0677 0.0425 -1.59  0.1117  
-## 
+#> Frequencies of Missing Values Due to Each Variable
+#> Closed?  Length 
+#>       0       4 
+#> 
+#> Logistic Regression Model
+#>  
+#>  lrm(formula = `Closed?` ~ Length, data = nests)
+#>  
+#>  
+#>                        Model Likelihood    Discrimination    Rank Discrim.    
+#>                              Ratio Test           Indexes          Indexes    
+#>  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
+#>   0             64    d.f.            1    g        0.455    Dxy     0.276    
+#>   1             31    Pr(> chi2) 0.0777    gr       1.576    gamma   0.288    
+#>  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
+#>                                            Brier    0.210                     
+#>  
+#>            Coef    S.E.   Wald Z Pr(>|Z|)
+#>  Intercept  0.4571 0.7530  0.61  0.5438  
+#>  Length    -0.0677 0.0425 -1.59  0.1117  
+#> 
 ```
 
 
 ###  ROC curves
 
 
-```r
-library(ROCR)
-
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
-
-bird.indiv <- bird.glm %>% augment() %>% 
-  mutate(probs = predict(bird.glm, type = "response"))
-head(bird.indiv)
+```
+#> # A tibble: 6 x 10
+#>   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
+#>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
+#> 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+#> 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
+#> 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
+#> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
+#> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
+#> # … with 1 more variable: probs <dbl>
 ```
 
-```
-## # A tibble: 6 x 10
-##   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
-##   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
-## 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
-## 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-## 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-## 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
-## 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
-## 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
-## # … with 1 more variable: probs <dbl>
-```
-
-```r
-bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$`Closed?`)
-bird.perf <- ROCR::performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
-plot(bird.perf, colorize = TRUE)
-abline(a=0, b=1)
-```
-
-<img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Drawing interactions

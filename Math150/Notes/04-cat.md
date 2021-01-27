@@ -1,4 +1,6 @@
-# Analysis of Categorical Data (section 6.3) 
+# Analysis of Categorical Data 
+
+(Section 6.3 in @KuiperSklar.) 
 
 
 
@@ -9,8 +11,7 @@ In either an observational study or a randomized experiment, we are often intere
 * simulation
 * mathematical probability models.
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-2"><strong>(\#exm:unnamed-chunk-2) </strong></span>**Back Pain & Botox**, @iscam, @botox
-The randomized clinical trial examined whether the drug botulinum toxin A (Botox) is helpful for reducing pain among patients who suffer from chronic low back pain.  The 31 subjects who participated in the study were randomly assigned to one of two treatment groups: 16 received a placebo of normal saline and the other 15 received the drug itself.  The subjects' pain levels were evaluated at the beginning of the study and again after eight weeks.  The researchers found that 2 of the 16 subjects who received the saline experienced a substantial reduction in pain, compared to 9 of the 15 subjects who received the actual drug.</div>\EndKnitrBlock{example}
+
 
 1. Is this an experiment or an observational study?  
 2. Explain the importance of using the "placebo" treatment of saline.  
@@ -34,24 +35,13 @@ RR &=& 4.8
 
 
 
-```r
-backpain <- matrix(c(2,14,9,6),ncol=2,byrow=F)
-backpain
+```
+#>      [,1] [,2]
+#> [1,]    2    9
+#> [2,]   14    6
 ```
 
-```
-##      [,1] [,2]
-## [1,]    2    9
-## [2,]   14    6
-```
-
-```r
-backpain.bp <- barplot(backpain, plot=FALSE)
-barplot(backpain, names.arg=c("placebo","botulinum toxin A"))
-text(backpain.bp, c(backpain[1,]-1,backpain[2,]+backpain[1,]-1),t(backpain))
-```
-
-<img src="04-cat_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-cat_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 
@@ -83,7 +73,7 @@ http://www.rossmanchance.com/applets/TwowaySim/TwowaySim.html
     * Do our data support the researchers conjecture?
     * What if the actual data had been 7 successes in the treatment group (and 4 in the placebo group)?
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>**p-value**  The p-value is the probability of seeing our results or more extreme if there is nothing interesting going on with the data.  (This is the same definition of p-value that you will always use in this class and in your own research.)</div>\EndKnitrBlock{definition}
+
 
 
 Notice that regardless of whether or not the drug has an effect, the data will be different each time (think: new 31 people).  The small p-value allows us to draw cause-and-effect conclusions, but doesn't necessarily allow us to infer to a larger population.  Why not? 
@@ -98,7 +88,9 @@ Notice that regardless of whether or not the drug has an effect, the data will b
 
 
 
-## Fisher's Exact Test (section 6.4) {#fisher}
+## Fisher's Exact Test {#fisher}
+
+(Section 6.4 in @KuiperSklar.)
 
 Because we have a fixed sample, we can't use the Binomial distribution to figure out associated probabilities. Instead, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.
 
@@ -119,7 +111,7 @@ SSSNN, SSNSN, SSNNS, SNSSN, SNSNS, SNNSS, NSSSN, NSSNS, NSNSS, NNSSS  [5!/ 3! 2!
 
 So, how many different ways can I select 11 people (out of 31) to be my "pain reduction" group?  That is the total number of different groups of size 11 from 31.  But really, we want our groups to be of a certain breakdown.  We need 2 (of 16) to have gotten the placebo and 9 (of 15) to have gotten the Botox treatment.
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-5"><strong>(\#def:unnamed-chunk-5) </strong></span>**Hyp Geom Prob**  For any $2 \times 2$ table when there are N observations with M total successes , the probability of observing x successes in a sample of size n is:</div>\EndKnitrBlock{definition}
+
 
 \begin{eqnarray*}
 P(X=x) = \frac{\# \mbox{ of ways to select x successes and n-x failures}}{\# \mbox{ of ways to select n subjects}} = \frac{ { M \choose x} {N-M \choose n-x}}{{N \choose n}}\\
@@ -140,10 +132,13 @@ Is this a one- or two-sided test?  Why?  [Note:  the assumptions here are that t
 Note also that we get an exact probability with no assumptions about sample size (we can use Fisher's Exact Test even when true probabilities are close to 0 or 1.]
 
 
-## Testing independence of two categorical variables (sections 6.5, 6.6, 6.7) {#chisq}
+## Testing independence of two categorical variables {#chisq}
 
+(Sections 6.5, 6.6, 6.7 in @KuiperSklar.)
 
-### $\chi^2$ tests (section 6.6)
+### $\chi^2$ tests 
+
+(Section 6.6 in @KuiperSklar.)
 
 2x2... but also rxc ($\pi_a = \pi_b = \pi_c$)
 
@@ -168,7 +163,7 @@ where $\pi=P(\mbox{success})$ for each of groups 1,2,3.
 
 How do we get expected frequencies?  The same mathematics hold regardless of the type of test (i.e., sampling mechanism used to collect the data). If, in fact,the variables are independent, then we should be able to multiply their probabilities.  If the probabilities are the same, we expect the overall proportion of each response variable to be the same as the proportion of the response variable in each explanatory group.  And the math in the example below follows directly.
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-6"><strong>(\#exm:unnamed-chunk-6) </strong></span>The table below show the observed distributions of ABO blood type in three random samples of African Americans living in different locations.  The three datasets, collected in the 1950s by three different investigators, are reproduced in [@bloodtype].</div>\EndKnitrBlock{example}
+
 
 
 |       	|       	|  Location 	|        	|            	|       	|
@@ -249,9 +244,11 @@ use chi-square if you have multiple populations
 use z-test if you want one-sided tests or confidence intervals.
 
 
-## Parameter Estimation (section 6.8) {#catest}
+## Parameter Estimation {#catest}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-7"><strong>(\#def:unnamed-chunk-7) </strong></span>**Data Types** Data are often classified as</div>\EndKnitrBlock{definition}
+(Section 6.8 in @KuiperSklar.)
+
+
 
 * Categorical - each unit is assigned to a category  
 * Quantitative - each observational unit is assigned a numerical value  
@@ -259,12 +256,10 @@ use z-test if you want one-sided tests or confidence intervals.
 
 
 ```
-Table 6.6 on page 193 of the textbook is excellent and worth looking at.
+Table 6.6 on page 193 of @KuiperSklar is excellent and worth looking at.
 ```
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-8"><strong>(\#exm:unnamed-chunk-8) </strong></span>**Popcorn & Lung Disease** @iscam
 
-How can we tell if popcorn production is related to lung disease?  Consider High / Low exposure:</div>\EndKnitrBlock{example}
 
 |     	|  low exposure 	| high exposure 	|   	|
 |-----------------------	|:--:	|:--:	|:---:	|
@@ -328,7 +323,7 @@ The main idea here is to determine whether two categorical variables are indepen
 
 ### Relative Risk
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-9"><strong>(\#def:unnamed-chunk-9) </strong></span>**Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."</div>\EndKnitrBlock{definition}
+
 
 \begin{eqnarray*}
 \mbox{relative risk} &=& \frac{\mbox{risk group 1}}{\mbox{risk group 2}}\\
@@ -353,7 +348,7 @@ SE(\ln (\hat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac
 
 A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-10"><strong>(\#def:unnamed-chunk-10) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
+
 
 \begin{eqnarray*}
 \mbox{odds} &=& \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
@@ -391,11 +386,7 @@ OR &>& RR
 * **Response variable** is the measured outcome of interest (here airway obstruction).  
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-11"><strong>(\#exm:unnamed-chunk-11) </strong></span>**Smoking \& Lung Cancer** @iscam
 
-After World War II, evidence began mounting that there was a link between cigarette smoking and pulmonary carcinoma (lung cancer).  In the 1950s, two now classic articles were published on the subject.  One of these studies was conducted in the United States by @wynder.  They found records from a large number (684) of patients with proven bronchiogenic carcinoma (a specific form of lung cancer) in hospitals in California, Colorado, Missouri, New Jersey, New York, Ohio, Pennsylvania, and Utah.  They personally interviewed 634 of the subjects to identify their smoking habits, occupation, exposure to dust and fumes, alcohol intake, education, and cause of death of parents and siblings.  Thirty-three subjects completed mailed questionnaires, and information for the other 17 was obtained from family members or close acquaintances.  Of those in the study, the researchers focused on 605 male patients with the same form of lung cancer.  Another 1332 hospital patients with similar age and economic distribution (including 780 males) without lung cancer were interviewed by these researchers in St. Louis and by other researchers in Boston, Cleveland, and Hines, Illinois.
-
-The following two-way table replicates the counts for the 605 male patients with the same form of cancer and for the "control-group" of 780 males.</div>\EndKnitrBlock{example}
 
 
 
@@ -502,8 +493,7 @@ OR &=& \frac{49/1}{51/899} = 863.75\\
 OR is the same no matter which variable you choose as explanatory versus response!  Though, in general, we still prefer to know baseline odds or baseline risk (which we can't know with a case-control study).
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-12"><strong>(\#exm:unnamed-chunk-12) </strong></span>**More on Smoking & Lung Cancer**, @iscam
-Now we have a cohort prospective study.  (Previously we had a case-control retrospective study).  Now do we have baseline risk estimates?  Yes!  But be careful, we can't conclude causation, because the study is still observational.</div>\EndKnitrBlock{example}
+
 
 
 ### Confidence Interval for OR
@@ -579,25 +569,27 @@ Note 6: $RR \approx OR$ if RR is very small (the denominator of the OR will be v
 
 
 
-## Types of Studies (section 6.9) {#studies}
+## Types of Studies {#studies}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-13"><strong>(\#def:unnamed-chunk-13) </strong></span>**Explanatory variable** is one that is a potential explanation for any changes in the response variable.</div>\EndKnitrBlock{definition}
+(Section 6.9 of @KuiperSklar.)
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-14"><strong>(\#def:unnamed-chunk-14) </strong></span>**Response variable** is the measured outcome of interest.</div>\EndKnitrBlock{definition}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-15"><strong>(\#def:unnamed-chunk-15) </strong></span>**Case-control study:** identify observational units by response</div>\EndKnitrBlock{definition}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-16"><strong>(\#def:unnamed-chunk-16) </strong></span>**Cohort study:** identify observational units by explanatory variable</div>\EndKnitrBlock{definition}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-17"><strong>(\#def:unnamed-chunk-17) </strong></span>**Cross-classification study:** identify observational units regardless of levels of the variable.</div>\EndKnitrBlock{definition}
+
+
+
+
+
+
 
 ### Retrospective versus Prospective Studies
 
 After much research (and asking many people who do not all agree!), I finally came across a definition of retrospective that I like.  Note, however, that many many books *define* retrospective as synonymous with case-control.  That is, they define a retrospective study to be one in which the observational units were chosen based on their status of the response variable.  I disagree with that definition.  As you see below, retrospective studies are defined based on the when the variables were *measured*.  I've also given a quote from the Kuiper text where retrospective is defined as any study where historic data are collected (I like this definition less).
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-18"><strong>(\#def:unnamed-chunk-18) </strong></span>A **prospective** study watches for outcomes, such as the development of a disease, during the study period.  The explanatory variables are *measured* before the response variable occurs.</div>\EndKnitrBlock{definition}
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-19"><strong>(\#def:unnamed-chunk-19) </strong></span>A **retrospective** study looks backwards and examines exposures to suspected risk or protection factors in relation to an outcome that is established at the start of the study.   The explanatory variables are *measured* after the response has happened.</div>\EndKnitrBlock{definition}
+
+
 
 > Studies can be classified further as either prospective or retrospective. We define a prospective study as one in which exposure and covariate measurements are made before the cases of illness occur. In a retrospective study these measurements are made after the cases have already occurred... Early writers referred to cohort studies as prospective studies and to case-control studies as retrospective studies because cohort studies usually begin with identification of the exposure status and then measure disease occurrence, whereas case-control studies usually begin by identifying cases and controls and then measure exposure status. The terms prospective and retrospective, however, are more usefully employed to describe the **timing of disease occurrence with respect to exposure measurement**. For example, case-control studies can be either prospective or retrospective.  A prospective case-control study uses exposure measurements taken before disease, whereas a retrospective case-control study uses measurements taken after disease.  [@modepi, page 74]
 
@@ -637,13 +629,15 @@ Disadvantages from: http://sphweb.bumc.bu.edu/otlt/MPH-Modules/EP/EP713_CohortSt
 * cohort, retrospective: the exposure and outcomes have already happened (i.e., death records)    
 * cohort, prospective: follows the selected participants to assess the proportion who develop the disease of interest  
 
-#### Which test? (section 6.1) {-}
+#### Which test? {-}
+
+(Section 6.1 of @KuiperSklar.)
 
 It turns out that the tests above (independence, homogeneity of proportions, homogeneity of odds) are typically equivalent with respect to their conclusions.  However, they each have particular assumptions about what they are testing, but that we can generally use any of them for our hypotheses of interest.  However, we need to be very careful about our **interpretations**!
 
 
 
-(no goodness of fit, section 6.11)
+(No goodness of fit, section 6.11 of @KuiperSklar.)
 
 ## R Example (categorical data): Botox and back pain
 
@@ -651,69 +645,40 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 ###  Entering and visualizing the data
 
 
-```r
-backpain <- matrix(c(2,14,9,6),ncol=2,byrow=F)
-backpain
+```
+#>      [,1] [,2]
+#> [1,]    2    9
+#> [2,]   14    6
 ```
 
-```
-##      [,1] [,2]
-## [1,]    2    9
-## [2,]   14    6
-```
-
-```r
-backpain.bp <- barplot(backpain, plot=FALSE)
-barplot(backpain, names.arg=c("placebo","botulinum toxin A"))
-text(backpain.bp, c(backpain[1,]-1,backpain[2,]+backpain[1,]-1),t(backpain))
-```
-
-<img src="04-cat_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-cat_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Fisher's Exact Test
 
 
-```r
-fisher.test(backpain)
 ```
-
-```
-## 
-## 	Fisher's Exact Test for Count Data
-## 
-## data:  backpain
-## p-value = 0.009147
-## alternative hypothesis: true odds ratio is not equal to 1
-## 95 percent confidence interval:
-##  0.008475855 0.710710371
-## sample estimates:
-## odds ratio 
-##  0.1040127
-```
-
-```r
-# their CI is an inversion of the HT
-# an approximate SE for the ln(OR) is given by:
-se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
-se.lnOR
-```
-
-```
-## [1] 0.9215239
+#> 
+#> 	Fisher's Exact Test for Count Data
+#> 
+#> data:  backpain
+#> p-value = 0.009
+#> alternative hypothesis: true odds ratio is not equal to 1
+#> 95 percent confidence interval:
+#>  0.00848 0.71071
+#> sample estimates:
+#> odds ratio 
+#>      0.104
+#> [1] 0.922
 ```
 
 ### Chi-squared Analysis
 
 
-```r
-chisq.test(backpain)
 ```
-
-```
-## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
-## 
-## data:  backpain
-## X-squared = 5.6964, df = 1, p-value = 0.017
+#> 
+#> 	Pearson's Chi-squared test with Yates' continuity correction
+#> 
+#> data:  backpain
+#> X-squared = 6, df = 1, p-value = 0.02
 ```

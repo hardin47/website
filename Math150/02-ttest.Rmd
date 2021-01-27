@@ -1,6 +1,7 @@
-# t-tests vs. SLR
+# t-tests vs SLR
 ```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3, fig.width=5, 
+                       out.width="95%",
                       fig.align = "center")
 
 library(tidyverse)
@@ -30,9 +31,13 @@ Note that in the example, mortality rates are compared for patients electing to 
 surgeryurl <- url("https://www.causeweb.org/tshs/datasets/surgery_timing.Rdata")
 load(surgeryurl)
 surgery <- stata_data
+head(surgery)  %>%
+  select(age, gender, race, hour, dow, month, complication, bmi, everything(), -ahrq_ccs) %>%
+  kable(caption = "Varibles associated with the surgery data.") %>%
+ kable_styling()
 ```
 
-```{r}
+```{r echo = TRUE}
 surgery %>%
  dplyr::filter(month %in% c("Jul", "Aug")) %>%
  dplyr::group_by(month) %>%
@@ -40,14 +45,16 @@ surgery %>%
 ```
 
 
-## t-test (book: 2.1) {#ttest}
+## t-test {#ttest}
+
+(Section 2.1 in @KuiperSklar.)
+
 A t-test is a test of means.  For the surgery timing data, the groups would ideally have similar age distributions.  Why? What are the advantages and disadvantages of running a retrospective cohort study?
   
   
 The two-sample t-test starts with the assumption that the population means of the two groups are equal, $H_0: \mu_1 = \mu_2$.  The sample means $\overline{y}_1$ and $\overline{y}_2$ will always be different.  How different must the $\overline{y}$ values be in order to reject the null hypothesis?
 
-```{definition}
-(Model 1)
+##### Model 1: {-}
 
 \begin{align}
 y_{1j} &= \mu_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
@@ -55,8 +62,7 @@ y_{2j} &= \mu_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
 \epsilon_{ij} &\sim N(0,\sigma^2)\\
 E[Y_i] &= \mu_i
 \end{align}
-```
-  
+
 That is, we are assuming that for each group the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean.  Note that we have assumed that the variances of the two groups are equal.  We have also assumed that there is independence between and within the groups.
   
 Note: we will assume the *population variances* are equal if neither *sample variance* is more than twice as big as the other.
@@ -86,7 +92,7 @@ df &= n_1 + n_2 -2\\
 \end{align}
   
 The same analysis can be done in R (with and without tydying the output):
-```{r}
+```{r echo = TRUE}
 surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   t.test(age ~ month, data = .)
@@ -102,7 +108,7 @@ surgery %>%
 * Why do we use the t-distribution?
 * Why is the big p-value important?  (It's a good thing!)  How do we interpret the p-value?
 * What can we conclude?
-* applet from [@iscam]: [http://www.rossmanchance.com/applets/SampleMeans/SampleMeans.html]
+* applet from [@iscam]: [http://www.rossmanchance.com/applets/2021/sampling/OneSample.html]
 * What are the model assumptions? (independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2)$, ... basically all the assumptions are given in the original linear model)
 
  
@@ -133,10 +139,12 @@ What is the point?  Why watch the video?  How does it relate the to the material
     
     
 ## ANOVA {-}
-Skip ANOVA in your text (2.4 and part of 2.9)
+Skip ANOVA in your text (2.4 and part of 2.9 in @KuiperSklar).
   
   
-## Simple Linear Regression (book: 2.3) {#tslr}
+## Simple Linear Regression {#tslr}
+
+(Section 2.3 in @KuiperSklar.)
   
 Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a {\sc linear} relationship between two variables.  It typically has the form of:
 
@@ -150,7 +158,7 @@ For this model, the deterministic component ($\beta_0 + \beta_1 x$) is a linear 
     
 How can we use this model to describe the two sample means case we discussed on the esophageal data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
     
-(For the color game, the natural way to code is 1 for the color distracter and 0 for the standard game. Why?)
+(For the color game in the text, the natural way to code is 1 for the color distracter and 0 for the standard game. Why?  What does $\beta_0$ represent?  What does $\beta_1$ represent?)
   
 \begin{align}
 \mu_1 &= \beta_0 + \beta_1 (0) = \beta_0 \\
@@ -175,9 +183,8 @@ b_0 = \hat{\beta}_0 &= \frac{\sum y_i - b_1 \sum x_i}{n}\\
 \end{align}
   
 
-```{definition}
-(Model 2)
-  
+##### Model 2: {-}
+
 \begin{align}
 y_{i} &= \beta_0 + \beta_1 x_i + \epsilon_i \ \ \ \ i=1, 2, \ldots, n\\
 \epsilon_{i} &\sim N(0,\sigma^2)\\
@@ -185,11 +192,23 @@ E[Y_i] &= \beta_0 + \beta_1 x_i\\
 \hat{y}_i &= b_0 + b_1 x_i
 \end{align}
 
-```
-
 That is, we are assuming that for each observation the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean at their value for the explanatory variable, $x_i$.  Note that we have assumed that the variance is constant across any level of the explanatory variable.  We have also assumed that there is independence across individuals.  **[Note: there are no assumptions about the distribution of the explanatory variable, $X$]**.
   
-  
+Note the similarity in running a `t.test()` and a linear model (`lm()`):
+
+```{r echo = TRUE}
+surgery %>%
+  dplyr::filter(month %in% c("Jul", "Aug")) %>%
+  t.test(age ~ month, data = .) %>%
+  tidy()
+
+surgery %>%
+  dplyr::filter(month %in% c("Jul", "Aug")) %>%
+  lm(age ~ month, data = .) %>%
+  tidy()
+```
+
+
 * What are the similarities in the t-test vs. SLR models?
      * predicting average
      * assuming independent, constant errors
@@ -199,11 +218,13 @@ That is, we are assuming that for each observation the true population *average*
      * two samples for the t-test (two variables for the regression... or is that a similarity??)
      * both variables are quantitative in SLR
   
-## Confidence Intervals (section 2.11) 
+## Confidence Intervals
+
+(Section 2.11 in @KuiperSklar.)
+
+A fantastic applet for visualizing what it means to have 95% confidence:  [http://www.rossmanchance.com/applets/2021/confsim/ConfSim.html]
   
-  [http://www.rossmanchance.com/applets/NewConfsim/Confsim.html]
-  
-In general, the format of a confidence interval is (INTERPRETATION!!!!):
+In general, the format of a confidence interval is give below... what is the interpretation?  Remember, the interval is for a given parameter and the "coverage" happens in alternative universes with repeated sampling.  We're 95% confident that the interval captures the parameter.
 
 ```
 estimate +/- critical value x standard error of the estimate
@@ -235,6 +256,6 @@ Recall what you've learned about how good random samples lead to inference about
   
 ![Figure taken from [@iscam]](randsampValloc.jpg)
   
-Note: no ANOVA (section 2.4) or normal probability plots (section 2.8)
+Note: no ANOVA (section 2.4 in @KuiperSklar) or normal probability plots (section 2.8 in @KuiperSklar).
   
 

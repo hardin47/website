@@ -228,10 +228,10 @@ The two basic types of studies encountered are **observational** and **experimen
 
 * In an **observational** study, the researchers observe both the explanatory and the response variable without interfering in how the data arise.
 
-Remembering the types of variables in most studies, we add one more category of variables: a **confounding** variable:
+The three most important types of variables in most studies, include the variables which are part of the model and then one more category of variables, **confounding**:
 
-* **Explanatory variable** is one that is a potential explanation for any changes (here smoking level).  
-* **Response variable** is the measured outcome of interest (here lung cancer).  
+* **Explanatory variable** is one that is a potential explanation for any changes (e.g., smoking level).  
+* **Response variable** is the measured outcome of interest (e.g., lung cancer).  
 * **Confounding variable** is a variable (typically not measured!) that is associated with both the explanatory and response variables.
 
 ### Example: Hand Writing & SAT Scores^[@iscam, Inv 3.3]

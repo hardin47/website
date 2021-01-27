@@ -59,7 +59,7 @@ b_1 &=& r(x,y) \frac{s_x}{s_y}\\
 
 The regression line will always pass through the point $(\overline{x}, \overline{y})$.
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-2"><strong>(\#def:unnamed-chunk-2) </strong></span>An estimate is *unbiased* if, over many repeated samples drawn from the population, the average value of the estimates based on the different samples would equal the population value of the parameter being estimated.  That is, a statistic is unbiased if the mean of its sampling distribution is the population parameter.</div>\EndKnitrBlock{definition}
+
 
 
 ## Correlation
@@ -184,7 +184,7 @@ How would you interpret the associated interval?
 Read section 4.7 (no loess, ignore the multiple predictors part, )
 
 
-\BeginKnitrBlock{theorem}<div class="theorem"><span class="theorem" id="thm:unnamed-chunk-3"><strong>(\#thm:unnamed-chunk-3) </strong></span>*High leverage points* are x-outliers with the potential to exert undue influence on regression coefficient estimates.  *Influential points* are points that have exerted undue influence on the regression coefficient estimates.</div>\EndKnitrBlock{theorem}
+
 
 Note: typically we think of more data as better; more values will tend to decrease the sampling variability of our statistic.  But if I give you a lot more data and put it all at $\overline{x}$, $SE(b_1)$ stays exactly the same.  Why??
 
@@ -250,68 +250,49 @@ The data below represents 10 different variables on health of a country measured
 
 ### Reading the data into R
 
-```r
-happy <- read_delim("~/Dropbox/teaching/math150/spring17/happyPlanet.txt", delim="\t")
-glimpse(happy)  
 ```
-
-```
-## Rows: 143
-## Columns: 11
-## $ Country        <chr> "Albania", "Algeria", "Angola", "Argentina", "Armenia"…
-## $ Region         <dbl> 7, 3, 4, 1, 7, 2, 2, 7, 5, 7, 2, 1, 4, 5, 1, 7, 4, 1, …
-## $ Happiness      <dbl> 5.5, 5.6, 4.3, 7.1, 5.0, 7.9, 7.8, 5.3, 5.3, 5.8, 7.6,…
-## $ LifeExpectancy <dbl> 76.2, 71.7, 41.7, 74.8, 71.7, 80.9, 79.4, 67.1, 63.1, …
-## $ Footprint      <dbl> 2.2, 1.7, 0.9, 2.5, 1.4, 7.8, 5.0, 2.2, 0.6, 3.9, 5.1,…
-## $ HLY            <dbl> 41.7, 40.1, 17.8, 53.4, 36.1, 63.7, 61.9, 35.4, 33.1, …
-## $ HPI            <dbl> 47.91, 51.23, 26.78, 58.95, 48.28, 36.64, 47.69, 41.21…
-## $ HPIRank        <dbl> 54, 40, 130, 15, 48, 102, 57, 85, 31, 104, 64, 27, 134…
-## $ GDPperCapita   <dbl> 5316, 7062, 2335, 14280, 4945, 31794, 33700, 5016, 205…
-## $ HDI            <dbl> 0.801, 0.733, 0.446, 0.869, 0.775, 0.962, 0.948, 0.746…
-## $ Population     <dbl> 3.15, 32.85, 16.10, 38.75, 3.02, 20.40, 8.23, 8.39, 15…
+#> Rows: 143
+#> Columns: 11
+#> $ Country        <chr> "Albania", "Algeria", "Angola", "Argentina", "Armenia"…
+#> $ Region         <dbl> 7, 3, 4, 1, 7, 2, 2, 7, 5, 7, 2, 1, 4, 5, 1, 7, 4, 1, …
+#> $ Happiness      <dbl> 5.5, 5.6, 4.3, 7.1, 5.0, 7.9, 7.8, 5.3, 5.3, 5.8, 7.6,…
+#> $ LifeExpectancy <dbl> 76.2, 71.7, 41.7, 74.8, 71.7, 80.9, 79.4, 67.1, 63.1, …
+#> $ Footprint      <dbl> 2.2, 1.7, 0.9, 2.5, 1.4, 7.8, 5.0, 2.2, 0.6, 3.9, 5.1,…
+#> $ HLY            <dbl> 41.7, 40.1, 17.8, 53.4, 36.1, 63.7, 61.9, 35.4, 33.1, …
+#> $ HPI            <dbl> 47.9, 51.2, 26.8, 59.0, 48.3, 36.6, 47.7, 41.2, 54.1, …
+#> $ HPIRank        <dbl> 54, 40, 130, 15, 48, 102, 57, 85, 31, 104, 64, 27, 134…
+#> $ GDPperCapita   <dbl> 5316, 7062, 2335, 14280, 4945, 31794, 33700, 5016, 205…
+#> $ HDI            <dbl> 0.801, 0.733, 0.446, 0.869, 0.775, 0.962, 0.948, 0.746…
+#> $ Population     <dbl> 3.15, 32.85, 16.10, 38.75, 3.02, 20.40, 8.23, 8.39, 15…
 ```
 
 
 ### Running the linear model (lm)
 
 
-```r
-happy.lm = lm(LifeExpectancy ~ Happiness, data=happy) 
-
-happy.lm %>% tidy()
 ```
-
-```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-## 1 (Intercept)    28.2      2.28       12.4 2.76e-24
-## 2 Happiness       6.69     0.375      17.8 5.78e-38
+#> # A tibble: 2 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)    28.2      2.28       12.4 2.76e-24
+#> 2 Happiness       6.69     0.375      17.8 5.78e-38
 ```
 
 ### Ouptut
 
 Some analyses will need the residuals, fitted values, or coefficients individually.
 
-```r
-happy.lm %>% augment()
 ```
-
-```
-## # A tibble: 143 x 8
-##    LifeExpectancy Happiness .fitted  .resid .std.resid    .hat .sigma   .cooksd
-##             <dbl>     <dbl>   <dbl>   <dbl>      <dbl>   <dbl>  <dbl>     <dbl>
-##  1           76.2       5.5    65.0  11.2       1.83   0.00765   6.09 0.0128   
-##  2           71.7       5.6    65.7   6.00      0.980  0.00737   6.14 0.00357  
-##  3           41.7       4.3    57.0 -15.3      -2.51   0.0168    6.02 0.0539   
-##  4           74.8       7.1    75.7  -0.944    -0.155  0.0122    6.16 0.000148 
-##  5           71.7       5      61.7  10.0       1.64   0.0101    6.10 0.0138   
-##  6           80.9       7.9    81.1  -0.198    -0.0326 0.0216    6.16 0.0000118
-##  7           79.4       7.8    80.4  -1.03     -0.169  0.0202    6.16 0.000295 
-##  8           67.1       5.3    63.7   3.40      0.557  0.00842   6.16 0.00132  
-##  9           63.1       5.3    63.7  -0.596    -0.0975 0.00842   6.16 0.0000404
-## 10           68.7       5.8    67.0   1.66      0.271  0.00705   6.16 0.000260 
-## # … with 133 more rows
+#> # A tibble: 143 x 8
+#>   LifeExpectancy Happiness .fitted  .resid .std.resid    .hat .sigma   .cooksd
+#>            <dbl>     <dbl>   <dbl>   <dbl>      <dbl>   <dbl>  <dbl>     <dbl>
+#> 1           76.2       5.5    65.0  11.2       1.83   0.00765   6.09 0.0128   
+#> 2           71.7       5.6    65.7   6.00      0.980  0.00737   6.14 0.00357  
+#> 3           41.7       4.3    57.0 -15.3      -2.51   0.0168    6.02 0.0539   
+#> 4           74.8       7.1    75.7  -0.944    -0.155  0.0122    6.16 0.000148 
+#> 5           71.7       5      61.7  10.0       1.64   0.0101    6.10 0.0138   
+#> 6           80.9       7.9    81.1  -0.198    -0.0326 0.0216    6.16 0.0000118
+#> # … with 137 more rows
 ```
 
 
@@ -323,41 +304,23 @@ happy.lm %>% augment %>% ggplot(aes(x = .fitted, y = .resid)) + geom_point() +
          geom_hline(yintercept=0)
 ```
 
-<img src="03-SLR_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+<img src="03-SLR_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 Intervals of interest: mean response, individual response, and parameter(s).
 
-```r
-predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("conf"), level=.95)
 ```
-
-```
-##        fit      lwr      upr
-## 1 54.99531 53.24675 56.74387
-## 2 75.07444 73.78057 76.36830
-```
-
-```r
-predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("pred"), level=.95)
-```
-
-```
-##        fit      lwr      upr
-## 1 54.99531 42.72945 67.26117
-## 2 75.07444 62.86510 87.28377
-```
-
-```r
-happy.lm %>% tidy(conf.int = TRUE)
-```
-
-```
-## # A tibble: 2 x 7
-##   term        estimate std.error statistic  p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 (Intercept)    28.2      2.28       12.4 2.76e-24    23.7      32.7 
-## 2 Happiness       6.69     0.375      17.8 5.78e-38     5.95      7.43
+#>    fit  lwr  upr
+#> 1 55.0 53.2 56.7
+#> 2 75.1 73.8 76.4
+#>    fit  lwr  upr
+#> 1 55.0 42.7 67.3
+#> 2 75.1 62.9 87.3
+#> # A tibble: 2 x 7
+#>   term        estimate std.error statistic  p.value conf.low conf.high
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+#> 1 (Intercept)    28.2      2.28       12.4 2.76e-24    23.7      32.7 
+#> 2 Happiness       6.69     0.375      17.8 5.78e-38     5.95      7.43
 ```
   
   
@@ -367,25 +330,17 @@ We skipped the residuals section, so you are not responsible for finding residua
   
 
 
-```r
-happy.lm %>% augment()
 ```
-
-```
-## # A tibble: 143 x 8
-##    LifeExpectancy Happiness .fitted  .resid .std.resid    .hat .sigma   .cooksd
-##             <dbl>     <dbl>   <dbl>   <dbl>      <dbl>   <dbl>  <dbl>     <dbl>
-##  1           76.2       5.5    65.0  11.2       1.83   0.00765   6.09 0.0128   
-##  2           71.7       5.6    65.7   6.00      0.980  0.00737   6.14 0.00357  
-##  3           41.7       4.3    57.0 -15.3      -2.51   0.0168    6.02 0.0539   
-##  4           74.8       7.1    75.7  -0.944    -0.155  0.0122    6.16 0.000148 
-##  5           71.7       5      61.7  10.0       1.64   0.0101    6.10 0.0138   
-##  6           80.9       7.9    81.1  -0.198    -0.0326 0.0216    6.16 0.0000118
-##  7           79.4       7.8    80.4  -1.03     -0.169  0.0202    6.16 0.000295 
-##  8           67.1       5.3    63.7   3.40      0.557  0.00842   6.16 0.00132  
-##  9           63.1       5.3    63.7  -0.596    -0.0975 0.00842   6.16 0.0000404
-## 10           68.7       5.8    67.0   1.66      0.271  0.00705   6.16 0.000260 
-## # … with 133 more rows
+#> # A tibble: 143 x 8
+#>   LifeExpectancy Happiness .fitted  .resid .std.resid    .hat .sigma   .cooksd
+#>            <dbl>     <dbl>   <dbl>   <dbl>      <dbl>   <dbl>  <dbl>     <dbl>
+#> 1           76.2       5.5    65.0  11.2       1.83   0.00765   6.09 0.0128   
+#> 2           71.7       5.6    65.7   6.00      0.980  0.00737   6.14 0.00357  
+#> 3           41.7       4.3    57.0 -15.3      -2.51   0.0168    6.02 0.0539   
+#> 4           74.8       7.1    75.7  -0.944    -0.155  0.0122    6.16 0.000148 
+#> 5           71.7       5      61.7  10.0       1.64   0.0101    6.10 0.0138   
+#> 6           80.9       7.9    81.1  -0.198    -0.0326 0.0216    6.16 0.0000118
+#> # … with 137 more rows
 ```
 
 

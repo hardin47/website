@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-01-25"
+date: "2021-01-27"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -39,9 +39,9 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | Week    	| Topic                      	|  Book Chp   	|   Notes Section |
 |:---------	|:---------------------------	|:----------------:	|:----------------:	|
 | 1/25/21 	| t-tests / SLR  | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr) [t-test] |
-| 1/27/21 	| SLR | 2 |  \@ref(SLR)  [SLR]   |
+| 1/27/21 	| SLR | 2 |  \@ref(SLR) [SLR]   |
 | 2/1/21 	| SLR | 2 | \@ref(intervals), \@ref(cat) [SLR CI] |
-| 2/3/21  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [.Fisher's Exact Test] |
+| 2/3/21  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [Fisher's Exact Test] |
 | 2/8/21 	| Contingency Analysis | 6 |  \@ref(studies) [Types of studies], \@ref(chisq) [ChiSq test]
 | 2/10/21 	| Contingency Analysis | 6 | \@ref(catest) [RR and OR] |
 | 2/15/21 	| Logistic Regression | 7 | \@ref(logmodel) [Log Reg] |
