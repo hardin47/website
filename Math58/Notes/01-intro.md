@@ -14,7 +14,7 @@
 Generally, statistics is the academic discipline which uses data to make claims and predictions about larger populations of interest.  It is the science of collecting, wrangling, visualizing, and analyzing data as a representation of a larger whole.  It is worth noting that probability represents the majority of mathematical tools used in statistics, but probability as a discipline does not work with data.  Having taken a probability class may help you with some of the mathematics covered in the course, but it is not a substitute for understanding the basics of introductory statistics.
 
 <div class="figure" style="text-align: center">
-<img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="228" />
+<img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="95%" />
 <p class="caption">(\#fig:unnamed-chunk-1)Probability vs. Statistics</p>
 </div>
 
@@ -101,12 +101,12 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="796" />
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="80%" />
 <p class="caption">(\#fig:unnamed-chunk-2)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="484" />
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="95%" />
 <p class="caption">(\#fig:unnamed-chunk-3)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
 </div>
 
@@ -195,7 +195,7 @@ visualize(null_help, bins = 13) +
   shade_p_value(obs_stat = p_obs, direction = "two_sided")
 ```
 
-<img src="01-intro_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="01-intro_files/figure-html/unnamed-chunk-4-1.png" width="95%" style="display: block; margin: auto;" />
 
 ```r
 # calculate the actual p-value
@@ -280,12 +280,12 @@ Random sampling and random allocation are **VERY DIFFERENT** concepts!  And most
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="1901" />
+<img src="figs/randsampexp.png" alt="Random Sample vs Randomized Experiment, taken from @sleuth" width="95%" />
 <p class="caption">(\#fig:randSleuth)Random Sample vs Randomized Experiment, taken from @sleuth</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/randsampexp2.png" alt="Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/" width="80%" />
+<img src="figs/randsampexp2.png" alt="Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/" width="95%" />
 <p class="caption">(\#fig:randgoodQ)Random Sample vs Randomized Experiment, taken from https://askgoodquestions.blog/</p>
 </div>
 

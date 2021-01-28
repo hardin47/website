@@ -1,6 +1,9 @@
 # Introduction {#intro}
 
-![We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/](covidvaccine.png)
+<div class="figure" style="text-align: center">
+<img src="figs/covidvaccine.png" alt="We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/" width="60%" />
+<p class="caption">(\#fig:unnamed-chunk-1)We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/</p>
+</div>
 
 
 ## Course Goals
@@ -21,7 +24,10 @@ Our goals in this course are:
 
 
 
-![Probability vs. Statistics](probstat.jpg)
+<div class="figure" style="text-align: center">
+<img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-2)Probability vs. Statistics</p>
+</div>
 
 
 
@@ -41,11 +47,16 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 * All computing assignments should be turned in using R Markdown compiled to pdf.
 
 
-![Taken from *Modern Drive: An introduction to statistical and data sciences via R*, by Ismay and Kim, https://ismayc.github.io/moderndiver-book/](RRstudio.jpg)
+<div class="figure" style="text-align: center">
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-3)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
+</div>
 
 
-
-![Image credit:  Jessica Ward, https://jkrward.github.io/, PhD student at Newcastle University](cookingRstudio.jpg)
+<div class="figure" style="text-align: center">
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-4)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
+</div>
 
 
 

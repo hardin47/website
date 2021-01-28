@@ -460,8 +460,11 @@ Note the CI on pgs 54/55, there is a typo.  The correct interval for $\mu_1 - \m
   
 Recall what you've learned about how good random samples lead to inference about a population.  On the other hand, in order to make a causal conclusion, you need a randomized experiment with random allocation of the treatments (impossible to happen in many settings).  Random sampling and random allocation are DIFFERENT ideas that should be clear in your mind.
   
-![Figure taken from [@iscam]](randsampValloc.jpg)
+
+<div class="figure" style="text-align: center">
+<img src="figs/randsampValloc.jpg" alt="Figure taken from [@iscam]" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-6)Figure taken from [@iscam]</p>
+</div>
   
 Note: no ANOVA (section 2.4 in @KuiperSklar) or normal probability plots (section 2.8 in @KuiperSklar).
   
-
