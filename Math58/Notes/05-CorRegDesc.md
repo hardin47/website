@@ -11,7 +11,7 @@
 
 The next topic will focus on modeling using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
 
-To get started, consider a handful of crop types taken from [Our World in Data](https://ourworldindata.org/crop-yields) as part of [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-01).  Each point in each plot represents a different country.  The x and y variables represent the proprotion of total yield in the last 50 years which is due to that crop type. 
+To get started, consider a handful of crop types taken from [Our World in Data](https://ourworldindata.org/crop-yields) as part of [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-01).  Each point in each plot represents a different country.  The x and y variables represent the proportion of total yield in the last 50 years which is due to that crop type. 
 
 
 
@@ -22,7 +22,7 @@ To get started, consider a handful of crop types taken from [Our World in Data](
 </div>
 
 
-Order the six scatterplots from strongest negative to strongest positive relationship.  Some questions to ask yourself:
+Order the six scatterplots from strongest negative to strongest positive linear relationship.  Some questions to ask yourself:
 
 * What would the correlation be if there was a perfect positive relationship?
 * What would the correlation be if there was a perfect negative relationship?
@@ -64,7 +64,7 @@ Some ideas worth thinking about:
 * correlation will go down when only a narrow range of X values is represented (see denominator of r).
 * measurement error biases the estimate of a correlation coefficient toward zero.
 
-We can calculate the correlation value for each of the crop plots:
+We can calculate the correlation value for each of the crop plots and order them from strongest negative to strongest positive linear relationship: $A \rightarrow D \rightarrow B \rightarrow C \rightarrow E \rightarrow F$
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Correlation of percentage of total yield across different crops.</caption>
