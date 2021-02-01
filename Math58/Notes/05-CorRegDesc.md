@@ -117,11 +117,11 @@ We can calculate the correlation value for each of the crop plots and order them
 </table>
 
 
-### Coefficient of Determination -- $R^2$
+### Coefficient of Determination: $R^2$
 
 The coefficient of determination ($R^2$) is the square of the correlation (given above).  However, it also has an additional interpretation that will be useful for us.  It can measure how much of the original variability in Y is given by the regression line.  Both SSE and least-squares will be defined below when we fit a line to the scatter plot of observations.
 
-SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the line.
+SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the regression line (see Section \@ref(slr)).
 
 \begin{eqnarray*}
 R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} \\
@@ -129,7 +129,7 @@ R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} 
  &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
 \end{eqnarray*}
 
-[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $e_i = y_i - \hat{y}_i.]$
+The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  \begin{align}e_i=y_i-\hat{y}_i\end{align}
 
 $R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
 
@@ -147,7 +147,7 @@ $R^2$ can be used even in models with many explanatory variables.  As such, the 
 4. Prediction Intervals
 -->
 
-## Simple Linear Regression
+## Simple Linear Regression {#slr}
 
 *Regression* is a method that predicts the value of one numerical variable from that of another.  That is, as an extension to describing the degree of linearity of the relationship (correlation), the goal is now to create the best linear model -- often for prediction.  Note that many of the characteristics explored with correlation are applicable for regression.  However, correlation treats $X$ and $Y$ as interchangeable, whereas regression treats $X$ as fixed and known and $Y$ as random and unknown.  As we have previously, we call $X$ the explanatory variable, and $Y$ the response variable.  Again, we do not assume that there is any causal mechanism between $X$ and $Y$ even if they have a strong linear (or otherwise) relationship.
 
