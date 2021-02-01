@@ -55,7 +55,7 @@ z &\pm& 1.96 \cdot \sqrt{\frac{1}{n-3}}\\
 \end{eqnarray*}
 
 
-See the Cat Jumping^[@iscam, Inv 5.6 & 5.13] example below in section \@ref(ex:cat).
+See the Cat Jumping^[@iscam, Inv 5.6 & 5.13] example below in section \@ref(ex:cat2).
 
 
 **HT:**  
@@ -145,7 +145,7 @@ b_1- t^*_{\alpha/2, n-2} SE(b_1) \leq \beta_1 \leq b_1 + t^*_{\alpha/2, n-2} SE(
 \end{eqnarray*}
 
 
-See the Housing Prices^[@iscam, Inv 5.14] example below in section \@ref(ex:houses).
+See the Housing Prices^[@iscam, Inv 5.14] example below in section \@ref(ex:houses2).
 
 \begin{eqnarray*}
 t_{\alpha/2,n-2} &=& qt(.975, 18-2) = 2.1199\\
@@ -193,7 +193,7 @@ p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
 #### Residual Plots {-}
 
 
-Within a residual plot, you should be looking for the same types of things you want in a scatter plot.  [See the residual plots provided in section \@ref(ex:cat).]
+Within a residual plot, you should be looking for the same types of things you want in a scatter plot.  [See the residual plots provided in section \@ref(ex:cat2).]
 
 * a roughly symmetric cloud of points above and below the horizontal line at zero, with a higher density of points close to the line than far from the line,   
 * little noticeable curvature as we move from left to right along the X-axis, and    
@@ -336,7 +336,7 @@ lm(log(price) ~  sqft, data=house)  %>% augment () %>%
 ## R code for regression 
 
 
-### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#ex:cat}
+### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#ex:cat2}
 
 
 
@@ -561,7 +561,7 @@ ggplot(catPred, aes(x=bodymass)) +
 <img src="06-CorRegInf_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
 
-### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
+### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses2}
 
 
 ```r

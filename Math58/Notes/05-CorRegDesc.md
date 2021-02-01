@@ -11,14 +11,18 @@
 
 The next topic will focus on modeling using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
 
-To get started, consider a handful of variables taken on the top 80 PGA golfers in 2004.  The example comes from Investigation 5.7 in @iscam  
+To get started, consider a handful of crop types taken from [Our World in Data](https://ourworldindata.org/crop-yields) as part of [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-01).  Each point in each plot represents a different country.  The x and y variables represent the proprotion of total yield in the last 50 years which is due to that crop type. 
+
+
+
 
 <div class="figure" style="text-align: center">
-<img src="figs/golf.jpg" alt="Investigation 5.7, `Drive for show, putt for dough`, @iscam" width="80%" />
-<p class="caption">(\#fig:unnamed-chunk-1)Investigation 5.7, `Drive for show, putt for dough`, @iscam</p>
+<img src="05-CorRegDesc_files/figure-html/plots6-1.png" alt="The % of total yield for different crops (across the last 50 years).  Each point represents a country." width="672" />
+<p class="caption">(\#fig:plots6)The % of total yield for different crops (across the last 50 years).  Each point represents a country.</p>
 </div>
 
-Rank the seven scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
+
+Order the six scatterplots from strongest negative to strongest positive relationship.  Some questions to ask yourself:
 
 * What would the correlation be if there was a perfect positive relationship?
 * What would the correlation be if there was a perfect negative relationship?
@@ -26,7 +30,7 @@ Rank the seven scatterplots from strongest negative to strongest positive.  Some
 
 ## Correlation {#cor}
 
-Correlation measures the association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
+Correlation measures the **linear** association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
 
 > The *correlation coefficient* measures the strength and direction of the linear association between two numerical variables.
 
@@ -39,10 +43,12 @@ r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i 
 r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
 \end{eqnarray*}
 
+
 <div class="figure" style="text-align: center">
-<img src="figs/golfcor.jpg" alt="Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam" width="80%" />
-<p class="caption">(\#fig:unnamed-chunk-2)Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam</p>
+<img src="05-CorRegDesc_files/figure-html/plots6ave-1.png" alt="The % of total yield for different crops (across the last 50 years).  Each point represents a country.  Now lines at the average x and average y values have been superimposed onto the plots." width="672" />
+<p class="caption">(\#fig:plots6ave)The % of total yield for different crops (across the last 50 years).  Each point represents a country.  Now lines at the average x and average y values have been superimposed onto the plots.</p>
 </div>
+
 
 
 For each red dot (on each plot), consider the distance the observation is from the $\overline{X}$ line and the $\overline{Y}$ line.  Is the observation (red dot) above both?  below both?  above one and below the other?  
@@ -58,6 +64,58 @@ Some ideas worth thinking about:
 * correlation will go down when only a narrow range of X values is represented (see denominator of r).
 * measurement error biases the estimate of a correlation coefficient toward zero.
 
+We can calculate the correlation value for each of the crop plots:
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-2)Correlation of percentage of total yield across different crops.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Graph </th>
+   <th style="text-align:left;"> x-variable </th>
+   <th style="text-align:left;"> y-variable </th>
+   <th style="text-align:right;"> correlation </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> A </td>
+   <td style="text-align:left;"> potatoes </td>
+   <td style="text-align:left;"> bananas </td>
+   <td style="text-align:right;"> -0.54 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> B </td>
+   <td style="text-align:left;"> soybeans </td>
+   <td style="text-align:left;"> cassava </td>
+   <td style="text-align:right;"> 0.16 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> C </td>
+   <td style="text-align:left;"> maize </td>
+   <td style="text-align:left;"> cassava </td>
+   <td style="text-align:right;"> 0.46 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> D </td>
+   <td style="text-align:left;"> cocoa </td>
+   <td style="text-align:left;"> bananas </td>
+   <td style="text-align:right;"> -0.44 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> E </td>
+   <td style="text-align:left;"> peas </td>
+   <td style="text-align:left;"> barley </td>
+   <td style="text-align:right;"> 0.69 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> F </td>
+   <td style="text-align:left;"> wheat </td>
+   <td style="text-align:left;"> barley </td>
+   <td style="text-align:right;"> 0.85 </td>
+  </tr>
+</tbody>
+</table>
+
 
 ### Coefficient of Determination -- $R^2$
 
@@ -71,7 +129,7 @@ R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} 
  &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
 \end{eqnarray*}
 
-[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $$e_i = y_i - \hat{y}_i.]$$
+[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $e_i = y_i - \hat{y}_i.]$
 
 $R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
 
@@ -213,35 +271,37 @@ And to work with the residuals, use `augment()`.
 
 
 ```r
-lm(velocity ~ bodymass, data = cats) %>% augment()
+cats %>%
+lm(velocity ~ bodymass, data = .) %>% augment()
 ```
 
 ```
 ## # A tibble: 18 x 8
-##    velocity bodymass .fitted .resid .std.resid   .hat .sigma   .cooksd
-##       <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>     <dbl>
-##  1     334.     3640    350. -15.6     -0.545  0.0656   30.3 0.0104   
-##  2     387.     2670    362.  25.4      0.920  0.131    29.7 0.0640   
-##  3     411.     5600    326.  84.6      3.05   0.119    19.8 0.629    
-##  4     319.     4130    344. -25.5     -0.887  0.0557   29.8 0.0232   
-##  5     369.     3020    358.  11.1      0.394  0.101    30.4 0.00867  
-##  6     359.     2660    362.  -3.23    -0.117  0.132    30.6 0.00105  
-##  7     345.     3240    355. -10.4     -0.366  0.0853   30.4 0.00624  
-##  8     325.     5140    332.  -7.19    -0.254  0.0844   30.5 0.00297  
-##  9     301.     3690    349. -48.1     -1.68   0.0639   27.7 0.0962   
-## 10     332.     3620    350. -18.5     -0.648  0.0664   30.2 0.0149   
-## 11     313.     5310    330. -17.1     -0.608  0.0957   30.2 0.0196   
-## 12     317.     5560    327.  -9.86    -0.354  0.116    30.4 0.00823  
-## 13     376.     3970    346.  29.5      1.03   0.0572   29.5 0.0321   
-## 14     372.     3770    348.  23.9      0.834  0.0615   29.9 0.0228   
-## 15     314.     5100    332. -18.0     -0.634  0.0820   30.2 0.0179   
-## 16     368.     2950    358.   9.01     0.322  0.106    30.5 0.00614  
-## 17     286.     7930    298. -11.5     -0.552  0.508    30.3 0.157    
-## 18     352.     3550    351.   1.32     0.0463 0.0692   30.6 0.0000797
+##    velocity bodymass .fitted .resid   .hat .sigma   .cooksd .std.resid
+##       <dbl>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>     <dbl>      <dbl>
+##  1     334.     3640    350. -15.6  0.0656   30.3 0.0104       -0.545 
+##  2     387.     2670    362.  25.4  0.131    29.7 0.0640        0.920 
+##  3     411.     5600    326.  84.6  0.119    19.8 0.629         3.05  
+##  4     319.     4130    344. -25.5  0.0557   29.8 0.0232       -0.887 
+##  5     369.     3020    358.  11.1  0.101    30.4 0.00867       0.394 
+##  6     359.     2660    362.  -3.23 0.132    30.6 0.00105      -0.117 
+##  7     345.     3240    355. -10.4  0.0853   30.4 0.00624      -0.366 
+##  8     325.     5140    332.  -7.19 0.0844   30.5 0.00297      -0.254 
+##  9     301.     3690    349. -48.1  0.0639   27.7 0.0962       -1.68  
+## 10     332.     3620    350. -18.5  0.0664   30.2 0.0149       -0.648 
+## 11     313.     5310    330. -17.1  0.0957   30.2 0.0196       -0.608 
+## 12     317.     5560    327.  -9.86 0.116    30.4 0.00823      -0.354 
+## 13     376.     3970    346.  29.5  0.0572   29.5 0.0321        1.03  
+## 14     372.     3770    348.  23.9  0.0615   29.9 0.0228        0.834 
+## 15     314.     5100    332. -18.0  0.0820   30.2 0.0179       -0.634 
+## 16     368.     2950    358.   9.01 0.106    30.5 0.00614       0.322 
+## 17     286.     7930    298. -11.5  0.508    30.3 0.157        -0.552 
+## 18     352.     3550    351.   1.32 0.0692   30.6 0.0000797     0.0463
 ```
 
 ```r
-lm(velocity ~ bodymass, data = cats) %>% augment() %>%
+cats %>%
+lm(velocity ~ bodymass, data = .) %>% augment() %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
   geom_point() +
   geom_hline(yintercept = 0)
@@ -250,101 +310,6 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
 <img src="05-CorRegDesc_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 
-#### Confidence & Prediction Intervals {-}
-
-
-```r
-m_cats <- lm(velocity ~ bodymass, data = cats)
-
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="confidence")
-```
-
-```
-##        fit      lwr      upr
-## 1 337.1514 321.3081 352.9947
-```
-
-```r
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="prediction")
-```
-
-```
-##        fit      lwr     upr
-## 1 337.1514 272.4378 401.865
-```
-
-
-##### Plotting!  {-}
-
-
-```r
-catConf <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="confidence") )  # cbind binds the columns together
-
-catConf %>% head()
-```
-
-```
-##   velocity bodymass  .fitted     .resid .std.resid       .hat   .sigma
-## 1    334.5     3640 350.0793 -15.579293 -0.5445423 0.06563257 30.28374
-## 2    387.3     2670 361.9095  25.390452  0.9203785 0.13125270 29.74812
-## 3    410.8     5600 326.1749  84.625139  3.0468951 0.11941906 19.80527
-## 4    318.6     4130 344.1032 -25.503185 -0.8867122 0.05570221 29.80778
-## 5    368.7     3020 357.6409  11.059101  0.3939761 0.10053270 30.41969
-## 6    358.8     2660 362.0315  -3.231509 -0.1172061 0.13224725 30.55520
-##       .cooksd      fit      lwr      upr
-## 1 0.010414418 350.0793 334.0049 366.1536
-## 2 0.063990821 361.9095 339.1781 384.6410
-## 3 0.629490813 326.1749 304.4923 347.8574
-## 4 0.023189898 344.1032 329.2947 358.9116
-## 5 0.008674247 357.6409 337.7467 377.5351
-## 6 0.001046793 362.0315 339.2141 384.8490
-```
-
-```r
-ggplot(catConf, aes(x=bodymass)) + 
-  geom_point(aes(y=velocity)) + 
-  geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
-```
-
-<img src="05-CorRegDesc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
-
-
-
-
-```r
-catPred <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="prediction") )  # cbind binds the columns together
-
-catPred %>% head()
-```
-
-```
-##   velocity bodymass  .fitted     .resid .std.resid       .hat   .sigma
-## 1    334.5     3640 350.0793 -15.579293 -0.5445423 0.06563257 30.28374
-## 2    387.3     2670 361.9095  25.390452  0.9203785 0.13125270 29.74812
-## 3    410.8     5600 326.1749  84.625139  3.0468951 0.11941906 19.80527
-## 4    318.6     4130 344.1032 -25.503185 -0.8867122 0.05570221 29.80778
-## 5    368.7     3020 357.6409  11.059101  0.3939761 0.10053270 30.41969
-## 6    358.8     2660 362.0315  -3.231509 -0.1172061 0.13224725 30.55520
-##       .cooksd      fit      lwr      upr
-## 1 0.010414418 350.0793 285.3088 414.8498
-## 2 0.063990821 361.9095 295.1746 428.6445
-## 3 0.629490813 326.1749 259.7898 392.5599
-## 4 0.023189898 344.1032 279.6352 408.5712
-## 5 0.008674247 357.6409 291.8183 423.4635
-## 6 0.001046793 362.0315 295.2672 428.7958
-```
-
-```r
-ggplot(catPred, aes(x=bodymass)) + 
-  geom_point(aes(y=velocity)) + 
-  geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
-```
-
-<img src="05-CorRegDesc_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
@@ -370,7 +335,7 @@ A good first step is to investigate how all the variables relate to one another.
 ggpairs(house, columns = c(1,2,4,5))
 ```
 
-<img src="05-CorRegDesc_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-CorRegDesc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ## Reflection Questions

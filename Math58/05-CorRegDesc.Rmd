@@ -18,13 +18,101 @@ library(mosaic)
 
 The next topic will focus on modeling using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
 
-To get started, consider a handful of variables taken on the top 80 PGA golfers in 2004.  The example comes from Investigation 5.7 in @iscam  
+To get started, consider a handful of crop types taken from [Our World in Data](https://ourworldindata.org/crop-yields) as part of [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-01).  Each point in each plot represents a different country.  The x and y variables represent the proprotion of total yield in the last 50 years which is due to that crop type. 
 
-```{r fig.cap = "Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/golf.jpg")
+
+```{r echo = FALSE}
+library(naniar)
+crops_country <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/key_crop_yields.csv') %>%
+  rename(wheat = `Wheat (tonnes per hectare)`,
+         rice = `Rice (tonnes per hectare)`,
+         maize = `Maize (tonnes per hectare)`,
+         soybeans = `Soybeans (tonnes per hectare)`,
+         potatoes = `Potatoes (tonnes per hectare)`,
+         beans = `Beans (tonnes per hectare)`,
+         peas = `Peas (tonnes per hectare)`,
+         cassava = `Cassava (tonnes per hectare)`,
+         barley = `Barley (tonnes per hectare)`,
+         cocoa = `Cocoa beans (tonnes per hectare)`,
+         bananas = `Bananas (tonnes per hectare)`) %>% 
+    filter(!is.na(Code)) %>%  # remove continents, etc.
+  group_by(Code) %>%  # to sum and percent by country
+  summarize(swheat = sum(wheat, na.rm = TRUE),
+            srice = sum(rice, na.rm = TRUE),
+            smaize = sum(maize, na.rm = TRUE),
+            ssoybeans = sum(soybeans, na.rm = TRUE),
+            spotatoes = sum(potatoes, na.rm = TRUE),
+            sbeans = sum(beans, na.rm = TRUE),
+            speas = sum(peas, na.rm = TRUE),
+            scassava = sum(cassava, na.rm = TRUE),
+            sbarley = sum(barley, na.rm = TRUE),
+            scocoa = sum(cocoa, na.rm = TRUE),
+            sbananas = sum(bananas, na.rm = TRUE),
+            pwheat = 100*swheat / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            price = 100*srice / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pmaize = 100*smaize / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            psoybeans = 100*ssoybeans / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            ppotatoes = 100*spotatoes / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pbeans = 100*sbeans / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            ppeas = 100*speas / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pcassava = 100*scassava / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pbarley = 100*sbarley / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pcocoa = 100*scocoa / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            pbananas = 100*sbananas / (swheat + srice + smaize + ssoybeans + spotatoes + sbeans + speas + scassava + sbarley + scocoa + sbananas),
+            ) %>%
+  replace_with_na_all(condition = ~.x == 0)%>%
+  mutate(nmiss = rowSums(is.na(.))/2) %>%
+  filter(nmiss <= 5)  # filter out countries that don't have data for most of the crops.
 ```
 
-Rank the seven scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
+```{r plots6, fig.cap="The % of total yield for different crops (across the last 50 years).  Each point represents a country.", warning=FALSE, fig.width=7, fig.height = 10, echo = FALSE}
+sb <- ggplot(crops_country) +
+  geom_point(aes(x = psoybeans, y = pbananas)) +
+  xlim(c(0,6)) + 
+  xlab("% soybeans") +
+  ylab("% bananas")
+
+sc <- ggplot(crops_country) +
+  geom_point(aes(x = psoybeans, y = pcassava)) +
+  xlim(c(0,6)) + 
+  xlab("% soybeans") +
+  ylab("% cassava")
+
+mc <- ggplot(crops_country) +
+  geom_point(aes(x = pmaize, y = pcassava)) +
+  xlim(c(0,15)) + 
+  xlab("% maize") +
+  ylab("% cassava")
+
+peb <- ggplot(crops_country) +
+  geom_point(aes(x = ppotatoes, y = pbananas)) +
+  xlim(c(0,60)) + 
+  xlab("% potatoes") +
+  ylab("% bananas")
+
+cb <- ggplot(crops_country) +
+  geom_point(aes(x = pcocoa, y = pbananas)) +
+  xlab("% cocoa") +
+  ylab("% bananas")
+
+wb <- ggplot(crops_country) +
+  geom_point(aes(x = pwheat, y = pbarley)) +
+  xlab("% wheat") +
+  ylab("% barley")
+
+pob <- ggplot(crops_country) +
+  geom_point(aes(x = ppeas, y = pbarley)) +
+  xlab("% peas") +
+  ylab("% barley")
+
+ggpubr::ggarrange( peb, sc, mc, cb, pob, wb, 
+                   labels = c("A", "B", "C", "D", "E", "F"),
+                   ncol = 2, nrow = 3)
+
+```
+
+
+Order the six scatterplots from strongest negative to strongest positive relationship.  Some questions to ask yourself:
 
 * What would the correlation be if there was a perfect positive relationship?
 * What would the correlation be if there was a perfect negative relationship?
@@ -32,7 +120,7 @@ Rank the seven scatterplots from strongest negative to strongest positive.  Some
 
 ## Correlation {#cor}
 
-Correlation measures the association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
+Correlation measures the **linear** association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
 
 > The *correlation coefficient* measures the strength and direction of the linear association between two numerical variables.
 
@@ -45,9 +133,47 @@ r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i 
 r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
 \end{eqnarray*}
 
-```{r fig.cap = "Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/golfcor.jpg")
+
+```{r plots6ave, fig.cap="The % of total yield for different crops (across the last 50 years).  Each point represents a country.  Now lines at the average x and average y values have been superimposed onto the plots.", echo = FALSE, warning=FALSE, fig.width=7}
+
+pwheatmn <- mean(crops_country$pwheat, na.rm = TRUE)
+pbarleymn <- mean(crops_country$pbarley, na.rm = TRUE)
+ppotatoesmn <- mean(crops_country$ppotatoes, na.rm = TRUE)
+pbananasmn <- mean(crops_country$pbananas, na.rm = TRUE)
+
+textdf1 <- data.frame(
+  x = c(15, 1, 1, 15),
+  y = c(12.5, 12.5, .5, .5),
+  text = c("I", "II", "III", "IV"))
+
+textdf2 <- data.frame(
+  x = c(60, 0, 0, 60),
+  y = c(70, 70, 0, 0),
+  text = c("I", "II", "III", "IV"))
+
+wb2 <- ggplot(crops_country, aes(x = pwheat, y = pbarley)) +
+  geom_point(color = "red") +
+  geom_vline(xintercept = pwheatmn) +
+  geom_hline(yintercept = pbarleymn) +
+  xlab("% wheat") +
+  ylab("% barley") +
+  geom_text(data = textdf1, aes(x = x, y = y, label = text), size = 8)
+  
+
+peb2 <- ggplot(crops_country) +
+  geom_point(aes(x = ppotatoes, y = pbananas), color = "red") +
+  geom_vline(xintercept = ppotatoesmn) +
+  geom_hline(yintercept = pbananasmn) +
+  xlim(c(0,60)) + 
+  xlab("% potatoes") +
+  ylab("% bananas") +
+  geom_text(data = textdf2, aes(x = x, y = y, label = text), size = 8)
+
+
+ggpubr::ggarrange(  wb2, peb2,
+                   ncol = 2, nrow = 1)
 ```
+
 
 
 For each red dot (on each plot), consider the distance the observation is from the $\overline{X}$ line and the $\overline{Y}$ line.  Is the observation (red dot) above both?  below both?  above one and below the other?  
@@ -63,6 +189,26 @@ Some ideas worth thinking about:
 * correlation will go down when only a narrow range of X values is represented (see denominator of r).
 * measurement error biases the estimate of a correlation coefficient toward zero.
 
+We can calculate the correlation value for each of the crop plots:
+
+```{r echo = FALSE}
+library(kableExtra)
+temptbl <- tribble(
+ ~variable,  ~col1, ~col2, ~corval,
+ "A", "potatoes", "bananas", round(cor(crops_country$ppotatoes, crops_country$pbananas, use = "pairwise.complete.obs"), digits = 2),
+ "B", "soybeans", "cassava", round(cor(crops_country$psoybeans, crops_country$pcassava, use = "pairwise.complete.obs"), digits = 2),
+ "C", "maize", "cassava", round(cor(crops_country$pmaize, crops_country$pcassava, use = "pairwise.complete.obs"), digits = 2),
+ "D", "cocoa", "bananas", round(cor(crops_country$pcocoa, crops_country$pbananas, use = "pairwise.complete.obs"), digits = 2),
+ "E", "peas", "barley", round(cor(crops_country$ppeas, crops_country$pbarley, use = "pairwise.complete.obs"), digits = 2),
+ "F", "wheat", "barley", round(cor(crops_country$pwheat, crops_country$pbarley, use = "pairwise.complete.obs"), digits = 2),
+)
+
+temptbl %>%
+ kable(caption = "Correlation of percentage of total yield across different crops.",
+  col.names = c("Graph", "x-variable", "y-variable", "correlation")) %>%
+ kable_styling() 
+```
+
 
 ### Coefficient of Determination -- $R^2$
 
@@ -76,7 +222,7 @@ R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} 
  &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
 \end{eqnarray*}
 
-[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $$e_i = y_i - \hat{y}_i.]$$
+[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $e_i = y_i - \hat{y}_i.]$
 
 $R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
 
@@ -198,52 +344,17 @@ cats %>%
 And to work with the residuals, use `augment()`.
 
 ```{r}
-lm(velocity ~ bodymass, data = cats) %>% augment()
+cats %>%
+lm(velocity ~ bodymass, data = .) %>% augment()
 
-lm(velocity ~ bodymass, data = cats) %>% augment() %>%
+cats %>%
+lm(velocity ~ bodymass, data = .) %>% augment() %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
   geom_point() +
   geom_hline(yintercept = 0)
 ```
 
 
-#### Confidence & Prediction Intervals {-}
-
-```{r}
-m_cats <- lm(velocity ~ bodymass, data = cats)
-
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="confidence")
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="prediction")
-```
-
-
-##### Plotting!  {-}
-
-```{r}
-catConf <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="confidence") )  # cbind binds the columns together
-
-catConf %>% head()
-
-ggplot(catConf, aes(x=bodymass)) + 
-  geom_point(aes(y=velocity)) + 
-  geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
-```
-
-
-
-```{r}
-catPred <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="prediction") )  # cbind binds the columns together
-
-catPred %>% head()
-
-ggplot(catPred, aes(x=bodymass)) + 
-  geom_point(aes(y=velocity)) + 
-  geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
-```
 
 
 ### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#ex:houses}
