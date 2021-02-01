@@ -4,6 +4,21 @@
 
 To motivate the technical details which are vital to understanding survival analysis, consider the following example [@gerds].
 
+#### Example {-}
+In class -- experience the Titanic going down.
+
+* The Titanic is sinking.  How long can you hold your breath?  
+* Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).  
+* Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).  
+* Accrual period will last about a minute.  
+* When I say "stop" (about another minute), everyone should end their time clocks (this is the end of the follow-up period).  
+* Each participant will have a recorded time as well as an indicator as to whether or not they have died.  
+  
+
+Based on the data, we would like to calculate:  
+1. What is the probability of surviving 40 seconds?  
+2. What is the median survival time?  
+3. What is the average survival time?  
 
 
 
@@ -14,6 +29,13 @@ To motivate the technical details which are vital to understanding survival anal
 
 The next example is given in your text [@KuiperSklar (chapter 9)] as part of the motivation for survival analysis.  [I can't figure out why it insists on being numbered wrong.]
 
+#### Example {-}
+
+Class chocolate melting activity 
+
+* Each student should be randomly assigned to a white or milk chocolate chip (flip a coin)  
+* When the instructor gives approval, students should place either a white or milk chocolate chip into their mouths and record the time until it completely melts.  
+* Treat the study as if it could only be done for a specified period of time (this may require some experimenting, but 60 seconds has worked well).  If the actual time is less than 60 seconds, then the actual time will be complete.  The student should submit the data (chip color, actual time, censoring status); 1=observed, 0=censored. Any chips that are "swallowed" prior to 60 seconds should be regarded as censored.
 
 
 Survival analysis is typically done with a prospective study (see censoring below) on a cohort of patients (observational or experimental) to determine some clinical outcome.  We will also usually measure covariates of interest: treatment, clinical variables measured at recruitment, etc.
@@ -72,6 +94,43 @@ Said differently:  within any subgroup of interest, the subjects who are censore
     * Subjects who drop out because the study ends  
     * Subjects who drop out because they move away  
 
+#### Example {-}
+
+Suppose we have the following melting times (in seconds) of milk chocolate chips for 7 students where the maximum time allowed for the experiment was 60 seconds:  
+
+\begin{center}
+\begin{tabular}{r|ccccccc}
+Student & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+\hline
+Time & 35 & 30 & 60 & 45 & 25 & 55 & 30 \\
+\end{tabular}
+\end{center}
+
+To find the estimated proportion of chocolate chips that have not melted after 45 seconds we use the **empirical survival function**,  $\hat{S}(45)_E$.
+\begin{eqnarray*}
+\hat{S}(45)_E &=& \frac{\mbox{number of chips that have not melted after 45 seconds}}{\mbox{total number of chips in the sample}}\\
+&=& 2/7 = 0.286\\
+\hat{S}(t)_E &=& \frac{\mbox{number of individuals yet to experience the event at time } t}{\mbox{number of individuals in the study}}\\
+&=& \frac{\mbox{number of event times greater than } t}{\mbox{number of individuals in the study}}\\
+\end{eqnarray*}
+
+What if some of the observations are incomplete (i.e., censored)?  
+
+| Student 	| 1 	| 2 	| 3 	| 4 	| 5 	| 6 	| 7 	|
+|--------:	|:------:	|:--:	|:------:	|:--:	|:--:	|:--:	|:------:	|
+| Time 	| $35^+$ 	| 30 	| $60^+$ 	| 45 	| 25 	| 55 	| $30^+$ 	|
+  
+  
+One way to deal with censored observations is to remove them from the study.  We would consider our sample to be only those observations that have complete information.  
+
+| Student 	| 2 	| 4 	| 5 	| 6 	|
+|--------:	|:--:	|:--:	|:--:	|:--:	|
+| Time 	| 30 	| 45 	| 25 	| 55 	|
+
+\begin{eqnarray*}
+\hat{S}(45)_E &=& \frac{\mbox{number of chips that have not melted after 45 seconds}}{\mbox{total number of chips in the sample}}\\
+&=& 1/4 = 0.25\\
+\end{eqnarray*}
 
 
 
@@ -116,6 +175,28 @@ If there is no censoring at time $t_i$, then $n_i - d_i = n_{i+1}$.  The Kaplan-
 &=& \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
 &=& \frac{m(t)}{n}
 \end{eqnarray*}
+
+#### Example {-}
+milk chocolate times by hand.
+
+
+| $t_i$ 	| $n_i$ 	| $d_i$ 	| $n_i - d_i$ 	| $\frac{n_i - d_i}{n_i}$ 	|
+|:-----:	|:-----:	|:-----:	|:-----------:	|:-----------------------:	|
+| 25 	| 7 	| 1 	| 6 	| 6/7= 0.857 	|
+| 30 	| 6 	| 1 	| 5 	| 5/6 = 0.833 	|
+| 35 	| 4 	| 0 	| 4 	| 4/4 = 1 	|
+| 45 	| 3 	| 1 	| 2 	| 2/3 = 0.667 	|
+| 55 	| 2 	| 1 	| 1 	| 1/2=0.5 	|
+| 60 	| 1 	| 0 	| 1 	| 1/1=1 	|
+
+| time interval 	| $\hat{S}(t)_{KM}$ 	|
+|:-------------:	|:---------------------------:	|
+| $[0,25)$ 	| 1 	|
+| $[25,30)$ 	| 0.857 	|
+| $[30, 35)$ 	| 0.857 $\cdot$ 0.833 = 0.714 	|
+| $[35,45)$ 	| 0.714 $\cdot$ 1 = 0.714 	|
+| $[45,55)$ 	| 0.714 $\cdot$ 0.667 = 0.476 	|
+| $[55,60)$ 	| 0.476 $\cdot$ 0.5 = 0.238 	|
 
 
 
@@ -284,7 +365,7 @@ h(t) =k && \Rightarrow S(t) = e^{-kt}
 If $h(t) =k \rightarrow S(t) = e^{-kt}$.
 
 Plots of different hazard functions and their corresponding survival functions.
-<img src="06-surv_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Estimating $h(t)$ ala Kaplan-Meier
@@ -304,7 +385,7 @@ Suppose that $h_0(t)$ and $h_1(t)$ are the hazard functions for patients on cont
 R is called the **hazard ratio**.  $h_0(t)$ can be anything as long as $h_1(t)$ is proportional.  Note in the pictures below that no one dies between 3 and 7 days, the survival curves are flat over that interval.
 
 
-<img src="06-surv_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" />
 
 Consider the notion of risk of death:
 \begin{eqnarray*}
@@ -381,6 +462,8 @@ L(\beta) &=&  \prod_{i=1}^n \Bigg( \frac{e^{\beta x_i}}{\sum_{k:t_k \geq t_i} e^
 \end{eqnarray*}
 $b$ is found using numerical methods (as it was with logistic regression).  
 
+#### Example {-}
+Consider the following data from a prostate cancer study.  The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group.  The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES).  The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer.  The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).
 
 
 
@@ -456,6 +539,27 @@ As before, we can consider nested models and compare their likelihoods.
 
 
 
+#### Example {-}  
+
+**Framingham Heart Study** [@Dupont (section 3.10)] Long-term follow-up and cardiovascular risk factor data on almost 5000 residents of the town of Framingham, MA.  Recruitment started in 1948 (went for 40+ years).  These data are 4699 patients who were free of coronary heart disease at their baseline exam:
+  
+| variable |  |  code          |  
+|----------	|:-:	|--------------------------------------------------------	|
+| sex 	| = 	| gender coded as 	|
+|  	|  	| 1=if subject is male 	|
+|  	|  	| 0= if subject is female 	|
+| sbp 	| = 	| systolic blood pressure (SBP) in mm Hg 	|
+| dbp 	| = 	| diastolic blood pressure (DBP) in mm Hg 	|
+| scl 	| = 	| serum cholesterol (SCL) in mg/100ml 	|
+| chdfate 	| = 	| 1= if the patient develops CHD at the end of follow-up 	|
+|  	|  	| 0= otherwise 	|
+| followup 	| = 	| the subject's follow-up in days 	|
+| age 	| = 	| age in years 	|
+| bmi 	| = 	| body mass index (BMI) =weight/height$^2$ in kg/m$^2$ 	|
+| month 	| = 	| month of year in which baseline exam occurred 	|
+| id 	| = 	| a patient identification variable (numbered 1 to 4699) 	|
+  
+We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).
 
 
 
@@ -854,12 +958,12 @@ The GitHub repo with data and code is here: https://github.com/propublica/compas
 
 
 ### Kaplan-Meier survival curve
-<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-12-2.png" width="80%" style="display: block; margin: auto;" />
 
-<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-19-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;" />
 
 different options for CI
-<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-5.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-5.png" width="80%" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
@@ -888,7 +992,7 @@ General recidivism
 #>  Chisq= 12.6  on 2 degrees of freedom, p= 0.002
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" />
 
 Violent recidivism
 
@@ -925,7 +1029,7 @@ Violent recidivism
 #>  Chisq= 2.7  on 2 degrees of freedom, p= 0.3
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-22-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-22-3.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-3.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Cox Proportional Hazards models
@@ -979,12 +1083,12 @@ Violent recidivism
 
 
 Using the `rms` package, we can plot CIs for each of the relevant HRs for the model at hand:
-<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
-<img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1011,10 +1115,10 @@ Note the big p-values.  We do not reject the null hypothesis, so we conclude tha
 
 The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals.  The ordering of the residuals in the list is the same order as the predictors were entered in the cox model.  So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function.  By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors.  Leaving out the list number results in plots for all the predictors being generated at one time.  In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.
 
-<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ###  Coxph diagnostics ... look into all the different arguments of the function!
 
-<img src="06-surv_files/figure-html/unnamed-chunk-28-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
 

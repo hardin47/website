@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-01-27"
+date: "2021-02-01"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
@@ -22,7 +22,7 @@ description: "Class notes for Math 150 at Pomona College: Methods in Biostatisti
 Class notes for Math 150 at Pomona College: Methods in Biostatistics.  The notes are based primarily on the text **Practicing Statistics**, [@KuiperSklar].
 
 
-You are responsible for reading your text.  Your text is very good & readable, so you should use it.  Your text is not, however, overly technical.  You should make sure you are coming to class and also reading the materials associated with the activities. 
+You are responsible for reading your text.  Your text is very good & readable, so you should use it.  Your text is not, however, overly technical.  You should make sure you are coming to class and asking lots of questions.
 
 
 
@@ -39,8 +39,8 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | Week    	| Topic                      	|  Book Chp   	|   Notes Section |
 |:---------	|:---------------------------	|:----------------:	|:----------------:	|
 | 1/25/21 	| t-tests / SLR  | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr) [t-test] |
-| 1/27/21 	| SLR | 2 |  \@ref(SLR) [SLR]   |
-| 2/1/21 	| SLR | 2 | \@ref(intervals), \@ref(cat) [SLR CI] |
+| 1/27/21 	| SLR | 2 |  \@ref(tslr) [t-test as SLR]   |
+| 2/1/21 	| SLR | 2 | \@ref(SLR) [SLR] |
 | 2/3/21  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [Fisher's Exact Test] |
 | 2/8/21 	| Contingency Analysis | 6 |  \@ref(studies) [Types of studies], \@ref(chisq) [ChiSq test]
 | 2/10/21 	| Contingency Analysis | 6 | \@ref(catest) [RR and OR] |

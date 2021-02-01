@@ -72,11 +72,44 @@
 <span class="header-section-number">6</span> Survival Analysis<a class="anchor" aria-label="anchor" href="#survival-analysis"><i class="fas fa-link"></i></a>
 </h1>
 <p>To motivate the technical details which are vital to understanding survival analysis, consider the following example <span class="citation">(<a href="references.html#ref-gerds" role="doc-biblioref">Gerds 2016</a>)</span>.</p>
+<div id="example-9" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-9"><i class="fas fa-link"></i></a>
+</h4>
+<p>In class – experience the Titanic going down.</p>
+<ul>
+<li>The Titanic is sinking. How long can you hold your breath?<br>
+</li>
+<li>Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).<br>
+</li>
+<li>Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).<br>
+</li>
+<li>Accrual period will last about a minute.<br>
+</li>
+<li>When I say “stop” (about another minute), everyone should end their time clocks (this is the end of the follow-up period).<br>
+</li>
+<li>Each participant will have a recorded time as well as an indicator as to whether or not they have died.</li>
+</ul>
+<p>Based on the data, we would like to calculate:<br>
+1. What is the probability of surviving 40 seconds?<br>
+2. What is the median survival time?<br>
+3. What is the average survival time?</p>
 <p><span class="math display">\[\begin{eqnarray*}
 &amp; &amp;\\
 &amp; &amp; \\
 \end{eqnarray*}\]</span></p>
 <p>The next example is given in your text <span class="citation">(<a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar 2013</a> (chapter 9))</span> as part of the motivation for survival analysis. [I can’t figure out why it insists on being numbered wrong.]</p>
+</div>
+<div id="example-10" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-10"><i class="fas fa-link"></i></a>
+</h4>
+<p>Class chocolate melting activity</p>
+<ul>
+<li>Each student should be randomly assigned to a white or milk chocolate chip (flip a coin)<br>
+</li>
+<li>When the instructor gives approval, students should place either a white or milk chocolate chip into their mouths and record the time until it completely melts.<br>
+</li>
+<li>Treat the study as if it could only be done for a specified period of time (this may require some experimenting, but 60 seconds has worked well). If the actual time is less than 60 seconds, then the actual time will be complete. The student should submit the data (chip color, actual time, censoring status); 1=observed, 0=censored. Any chips that are “swallowed” prior to 60 seconds should be regarded as censored.</li>
+</ul>
 <p>Survival analysis is typically done with a prospective study (see censoring below) on a cohort of patients (observational or experimental) to determine some clinical outcome. We will also usually measure covariates of interest: treatment, clinical variables measured at recruitment, etc.</p>
 <blockquote>
 <p><strong>Key Point</strong>: the outcome of interest (death, recurrence, etc.) may <em>not</em> occur</p>
@@ -93,6 +126,7 @@ m(t) &amp;=&amp; \mbox{number of patients for whom } t_i &gt; t \mbox{ (die late
 d(t) &amp;=&amp; \mbox{number of patients for whom } t_i \leq t \mbox{ (die sooner)}\\
 \end{eqnarray*}\]</span></p></li>
 </ul>
+</div>
 <div id="timedata" class="section level2" number="6.1">
 <h2>
 <span class="header-section-number">6.1</span> Time-to-event data<a class="anchor" aria-label="anchor" href="#timedata"><i class="fas fa-link"></i></a>
@@ -145,6 +179,62 @@ Where <span class="math inline">\(T\)</span> is a random variable representing t
 </ul>
 </li>
 </ul>
+</div>
+<div id="example-11" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-11"><i class="fas fa-link"></i></a>
+</h4>
+<p>Suppose we have the following melting times (in seconds) of milk chocolate chips for 7 students where the maximum time allowed for the experiment was 60 seconds:</p>
+<p>To find the estimated proportion of chocolate chips that have not melted after 45 seconds we use the <strong>empirical survival function</strong>, <span class="math inline">\(\hat{S}(45)_E\)</span>.
+<span class="math display">\[\begin{eqnarray*}
+\hat{S}(45)_E &amp;=&amp; \frac{\mbox{number of chips that have not melted after 45 seconds}}{\mbox{total number of chips in the sample}}\\
+&amp;=&amp; 2/7 = 0.286\\
+\hat{S}(t)_E &amp;=&amp; \frac{\mbox{number of individuals yet to experience the event at time } t}{\mbox{number of individuals in the study}}\\
+&amp;=&amp; \frac{\mbox{number of event times greater than } t}{\mbox{number of individuals in the study}}\\
+\end{eqnarray*}\]</span></p>
+<p>What if some of the observations are incomplete (i.e., censored)?</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">Student</th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">Time</td>
+<td align="center"><span class="math inline">\(35^+\)</span></td>
+<td align="center">30</td>
+<td align="center"><span class="math inline">\(60^+\)</span></td>
+<td align="center">45</td>
+<td align="center">25</td>
+<td align="center">55</td>
+<td align="center"><span class="math inline">\(30^+\)</span></td>
+</tr></tbody>
+</table></div>
+<p>One way to deal with censored observations is to remove them from the study. We would consider our sample to be only those observations that have complete information.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">Student</th>
+<th align="center">2</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">Time</td>
+<td align="center">30</td>
+<td align="center">45</td>
+<td align="center">25</td>
+<td align="center">55</td>
+</tr></tbody>
+</table></div>
+<p><span class="math display">\[\begin{eqnarray*}
+\hat{S}(45)_E &amp;=&amp; \frac{\mbox{number of chips that have not melted after 45 seconds}}{\mbox{total number of chips in the sample}}\\
+&amp;=&amp; 1/4 = 0.25\\
+\end{eqnarray*}\]</span></p>
 <p>By treating censored observations as complete, we assume that the event times are shorter than what they actually are (thereby underestimating the true probability of survival). By removing the censored observations from the data, we lose information. By treating censored observations as complete we bias the estimate based on the remaining times; by ignoring censored observations, we reduce the power of the inferential model.</p>
 </div>
 </div>
@@ -185,6 +275,96 @@ If there are no deaths at time <span class="math inline">\(t_i\)</span>, then <s
 &amp;=&amp; \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
 &amp;=&amp; \frac{m(t)}{n}
 \end{eqnarray*}\]</span></p>
+<div id="example-12" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-12"><i class="fas fa-link"></i></a>
+</h4>
+<p>milk chocolate times by hand.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="center"><span class="math inline">\(t_i\)</span></th>
+<th align="center"><span class="math inline">\(n_i\)</span></th>
+<th align="center"><span class="math inline">\(d_i\)</span></th>
+<th align="center"><span class="math inline">\(n_i - d_i\)</span></th>
+<th align="center"><span class="math inline">\(\frac{n_i - d_i}{n_i}\)</span></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">25</td>
+<td align="center">7</td>
+<td align="center">1</td>
+<td align="center">6</td>
+<td align="center">6/7= 0.857</td>
+</tr>
+<tr class="even">
+<td align="center">30</td>
+<td align="center">6</td>
+<td align="center">1</td>
+<td align="center">5</td>
+<td align="center">5/6 = 0.833</td>
+</tr>
+<tr class="odd">
+<td align="center">35</td>
+<td align="center">4</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">4/4 = 1</td>
+</tr>
+<tr class="even">
+<td align="center">45</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2/3 = 0.667</td>
+</tr>
+<tr class="odd">
+<td align="center">55</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1/2=0.5</td>
+</tr>
+<tr class="even">
+<td align="center">60</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1/1=1</td>
+</tr>
+</tbody>
+</table></div>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="center">time interval</th>
+<th align="center"><span class="math inline">\(\hat{S}(t)_{KM}\)</span></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center"><span class="math inline">\([0,25)\)</span></td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\([25,30)\)</span></td>
+<td align="center">0.857</td>
+</tr>
+<tr class="odd">
+<td align="center"><span class="math inline">\([30, 35)\)</span></td>
+<td align="center">0.857 <span class="math inline">\(\cdot\)</span> 0.833 = 0.714</td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\([35,45)\)</span></td>
+<td align="center">0.714 <span class="math inline">\(\cdot\)</span> 1 = 0.714</td>
+</tr>
+<tr class="odd">
+<td align="center"><span class="math inline">\([45,55)\)</span></td>
+<td align="center">0.714 <span class="math inline">\(\cdot\)</span> 0.667 = 0.476</td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\([55,60)\)</span></td>
+<td align="center">0.476 <span class="math inline">\(\cdot\)</span> 0.5 = 0.238</td>
+</tr>
+</tbody>
+</table></div>
+</div>
 <div id="KMCI" class="section level3" number="6.2.1">
 <h3>
 <span class="header-section-number">6.2.1</span> CI for KM curve<a class="anchor" aria-label="anchor" href="#KMCI"><i class="fas fa-link"></i></a>
@@ -355,7 +535,7 @@ h(t) =k &amp;&amp; \Rightarrow S(t) = e^{-kt}
 </h4>
 <p>If <span class="math inline">\(h(t) =k \rightarrow S(t) = e^{-kt}\)</span>.</p>
 <div class="inline-figure">Plots of different hazard functions and their corresponding survival functions.
-<img src="06-surv_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;">
+<img src="06-surv_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;">
 </div>
 </div>
 <div id="estimating-ht-ala-kaplan-meier" class="section level3" number="6.3.1">
@@ -377,7 +557,7 @@ h(t) =k &amp;&amp; \Rightarrow S(t) = e^{-kt}
 \frac{h_1(t)}{h_0(t)} = R \ \ \ \ \ \forall t
 \end{eqnarray*}\]</span>
 R is called the <strong>hazard ratio</strong>. <span class="math inline">\(h_0(t)\)</span> can be anything as long as <span class="math inline">\(h_1(t)\)</span> is proportional. Note in the pictures below that no one dies between 3 and 7 days, the survival curves are flat over that interval.</p>
-<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>Consider the notion of risk of death:
 <span class="math display">\[\begin{eqnarray*}
 \mbox{risk of death by } t + \Delta t \mbox{ given alive at } t= \left\{
@@ -447,6 +627,11 @@ L(\beta) &amp;=&amp;  \prod_{i=1}^n \Bigg( \frac{e^{\beta x_i}}{\sum_{k:t_k \geq
 \ln L(\beta) &amp;=&amp; \sum_{i=1}^n \delta_i \bigg[ \beta x_i - \ln (\sum_{k:t_k \geq t_i} e^{\beta x_k}) \bigg]
 \end{eqnarray*}\]</span>
 <span class="math inline">\(b\)</span> is found using numerical methods (as it was with logistic regression).</p>
+</div>
+<div id="example-13" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-13"><i class="fas fa-link"></i></a>
+</h4>
+<p>Consider the following data from a prostate cancer study. The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran’s Administration Cooperative Urological Research Group. The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES). The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer. The full data set is given in <span class="citation"><a href="references.html#ref-AndHerz" role="doc-biblioref">Andrews and Herzberg</a> (<a href="references.html#ref-AndHerz" role="doc-biblioref">1985</a>)</span>, but the data used in this example are from patients presenting with Stage III cancer and given in <span class="citation"><a href="references.html#ref-Collett" role="doc-biblioref">Collett</a> (<a href="references.html#ref-Collett" role="doc-biblioref">2015</a>)</span> (page 8).</p>
 <pre><code>#&gt; # A tibble: 6 x 7
 #&gt;   Treatment  Time Status   Age  Haem  Size Gleason
 #&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
@@ -518,6 +703,87 @@ is the hazard function for the <span class="math inline">\(i^{th}\)</span> patie
 &amp;&amp; \\
 2 ( \ln L_{\mbox{full model}} - \ln L_{\mbox{reduced model}} ) &amp;=&amp; \mbox{test stat}\\
 \end{eqnarray*}\]</span></p>
+</div>
+<div id="example-14" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-14"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Framingham Heart Study</strong> <span class="citation">(<a href="references.html#ref-Dupont" role="doc-biblioref">Dupont 2009</a> (section 3.10))</span> Long-term follow-up and cardiovascular risk factor data on almost 5000 residents of the town of Framingham, MA. Recruitment started in 1948 (went for 40+ years). These data are 4699 patients who were free of coronary heart disease at their baseline exam:</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>variable</th>
+<th align="center"></th>
+<th>code</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>sex</td>
+<td align="center">=</td>
+<td>gender coded as</td>
+</tr>
+<tr class="even">
+<td></td>
+<td align="center"></td>
+<td>1=if subject is male</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center"></td>
+<td>0= if subject is female</td>
+</tr>
+<tr class="even">
+<td>sbp</td>
+<td align="center">=</td>
+<td>systolic blood pressure (SBP) in mm Hg</td>
+</tr>
+<tr class="odd">
+<td>dbp</td>
+<td align="center">=</td>
+<td>diastolic blood pressure (DBP) in mm Hg</td>
+</tr>
+<tr class="even">
+<td>scl</td>
+<td align="center">=</td>
+<td>serum cholesterol (SCL) in mg/100ml</td>
+</tr>
+<tr class="odd">
+<td>chdfate</td>
+<td align="center">=</td>
+<td>1= if the patient develops CHD at the end of follow-up</td>
+</tr>
+<tr class="even">
+<td></td>
+<td align="center"></td>
+<td>0= otherwise</td>
+</tr>
+<tr class="odd">
+<td>followup</td>
+<td align="center">=</td>
+<td>the subject’s follow-up in days</td>
+</tr>
+<tr class="even">
+<td>age</td>
+<td align="center">=</td>
+<td>age in years</td>
+</tr>
+<tr class="odd">
+<td>bmi</td>
+<td align="center">=</td>
+<td>body mass index (BMI) =weight/height<span class="math inline">\(^2\)</span> in kg/m<span class="math inline">\(^2\)</span>
+</td>
+</tr>
+<tr class="even">
+<td>month</td>
+<td align="center">=</td>
+<td>month of year in which baseline exam occurred</td>
+</tr>
+<tr class="odd">
+<td>id</td>
+<td align="center">=</td>
+<td>a patient identification variable (numbered 1 to 4699)</td>
+</tr>
+</tbody>
+</table></div>
+<p>We look at the K-M survival curves broken down by diastolic blood pressure. The logrank statistic comparing all 7 groups is highly significant (<span class="math inline">\(p &lt; 10^{-52}\)</span>), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).</p>
 <p><span class="math display">\[\begin{eqnarray*}
 dbp_{ij} &amp;=&amp; \left\{
 \begin{array}{ll}
@@ -1026,10 +1292,10 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 <h3>
 <span class="header-section-number">6.5.2</span> Kaplan-Meier survival curve<a class="anchor" aria-label="anchor" href="#kaplan-meier-survival-curve"><i class="fas fa-link"></i></a>
 </h3>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="80%" style="display: block; margin: auto;"></p>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-19-2.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-12-2.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;"></p>
 <p>different options for CI
-<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-20-4.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-20-5.png" width="80%" style="display: block; margin: auto;"></p>
+<img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-14-3.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-14-4.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-14-5.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div id="log-rank-test-rho0-and-the-wilcoxon-test-rho1" class="section level3" number="6.5.3">
 <h3>
@@ -1056,7 +1322,7 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 #&gt; score_factor=Medium 57     15.8    12.04      1.16      1.82
 #&gt; 
 #&gt;  Chisq= 12.6  on 2 degrees of freedom, p= 0.002</code></pre>
-<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>Violent recidivism</p>
 <pre><code>#&gt; Call:
 #&gt; survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
@@ -1088,7 +1354,7 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 #&gt; score_factor=Medium 138     2.96     5.00    0.8343     1.151
 #&gt; 
 #&gt;  Chisq= 2.7  on 2 degrees of freedom, p= 0.3</code></pre>
-<p><img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-22-2.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-22-3.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-16-3.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div id="cox-proportional-hazards-models" class="section level3" number="6.5.4">
 <h3>
@@ -1138,13 +1404,13 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 #&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,
 #&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</code></pre>
 <p>Using the <code>rms</code> package, we can plot CIs for each of the relevant HRs for the model at hand:
-<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;"></p>
+<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div id="checking-proportional-hazards-with-the-plot-of-ln-lnst" class="section level3" number="6.5.5">
 <h3>
 <span class="header-section-number">6.5.5</span> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span><a class="anchor" aria-label="anchor" href="#checking-proportional-hazards-with-the-plot-of-ln-lnst"><i class="fas fa-link"></i></a>
 </h3>
-<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.</p>
 </div>
 <div id="checking-proportional-hazards-with-cox.zph" class="section level3" number="6.5.6">
@@ -1165,13 +1431,13 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 #&gt; GLOBAL       13.6196  5 0.0182</code></pre>
 <p>Note the big p-values. We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards. If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.</p>
 <p>The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.</p>
-<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 <div id="coxph-diagnostics-look-into-all-the-different-arguments-of-the-function" class="section level3" number="6.5.7">
 <h3>
 <span class="header-section-number">6.5.7</span> Coxph diagnostics … look into all the different arguments of the function!<a class="anchor" aria-label="anchor" href="#coxph-diagnostics-look-into-all-the-different-arguments-of-the-function"><i class="fas fa-link"></i></a>
 </h3>
-<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-28-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;"></div>
 
 </div>
 </div>
@@ -1235,7 +1501,7 @@ where <span class="math inline">\(\pi_1\)</span> is the proportion of the sample
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-01-27.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-02-01.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

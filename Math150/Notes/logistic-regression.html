@@ -77,18 +77,87 @@
 </h2>
 <p>During investigation of the US space shuttle <em>Challenger</em> disaster, it was learned that project managers had judged the probability of mission failure to be 0.00001, whereas engineers working on the project had estimated failure probability at 0.005. The difference between these two probabilities, 0.00499 was discounted as being too small to worry about. Is a different picture provided by considering odds? How is it interpreted?</p>
 <p>The logistic regression model is a <em>generalized</em> linear model. That is, a linear model as a function of the expected value of the response variable. We can now model binary response variables.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 GLM: g(E[Y | X]) = \beta_0 + \beta_1 X
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 where <span class="math inline">\(g(\cdot)\)</span> is the link function. For logistic regression, we use the logit link function:
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \mathrm{logit}(p) = \ln \bigg( \frac{p}{1-p} \bigg)
-\end{eqnarray*}\]</span></p>
-<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"></div>
+\end{align}\]</span></p>
+<div id="ex:burnexamp" class="section level4" number="5.1.0.1">
+<h4>
+<span class="header-section-number">5.1.0.1</span> Surviving Third-degree Burns<a class="anchor" aria-label="anchor" href="#ex:burnexamp"><i class="fas fa-link"></i></a>
+</h4>
+<p>These data refer to 435 adults who were treated for third-degree burns by the University of Southern California General Hospital Burn Center. The patients were grouped according to the area of third-degree burns on the body (measured in square cm). In the table below are recorded, for each midpoint of the groupings <code><a href="https://rdrr.io/r/base/Log.html">log(area +1)</a></code>, the number of patients in the corresponding group who survived, and the number who died from the burns. <span class="citation">(<a href="references.html#ref-burn" role="doc-biblioref">Fan, Heckman, and Wand 1995</a>)</span></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="center">log(area+1) midpoint</th>
+<th align="center">survived</th>
+<th align="center">died</th>
+<th align="center">prop surv</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">1.35</td>
+<td align="center">13</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">1.60</td>
+<td align="center">19</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">1.75</td>
+<td align="center">67</td>
+<td align="center">2</td>
+<td align="center">0.971</td>
+</tr>
+<tr class="even">
+<td align="center">1.85</td>
+<td align="center">45</td>
+<td align="center">5</td>
+<td align="center">0.900</td>
+</tr>
+<tr class="odd">
+<td align="center">1.95</td>
+<td align="center">71</td>
+<td align="center">8</td>
+<td align="center">0.899</td>
+</tr>
+<tr class="even">
+<td align="center">2.05</td>
+<td align="center">50</td>
+<td align="center">20</td>
+<td align="center">0.714</td>
+</tr>
+<tr class="odd">
+<td align="center">2.15</td>
+<td align="center">35</td>
+<td align="center">31</td>
+<td align="center">0.530</td>
+</tr>
+<tr class="even">
+<td align="center">2.25</td>
+<td align="center">7</td>
+<td align="center">49</td>
+<td align="center">0.125</td>
+</tr>
+<tr class="odd">
+<td align="center">2.35</td>
+<td align="center">1</td>
+<td align="center">12</td>
+<td align="center">0.077</td>
+</tr>
+</tbody>
+</table></div>
+<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-2-1.png" width="95%" style="display: block; margin: auto;"></div>
 <p>We can see that the logit transformation linearizes the relationship.</p>
 <p>A first idea might be to model the relationship between the probability of success (that the patient survives) and the explanatory variable <code><a href="https://rdrr.io/r/base/Log.html">log(area +1)</a></code> as a simple linear regression model. However, the scatterplot of the proportions of patients surviving a third-degree burn against the explanatory variable shows a distinct curved relationship between the two variables, rather than a linear one. It seems that a transformation of the data is in place.</p>
 <p>The functional form relating x and the probability of success looks like it could be an <code>S</code> shape. But we’d have to do some work to figure out what the form of that <code>S</code> looks like. Below I’ve given some different relationships between x and the probability of success using <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> values that are yet to be defined. Regardless, we can see that by tuning the functional relationship of the <code>S</code> curve, we can get a good fit to the data.</p>
-<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="95%" style="display: block; margin: auto;"></div>
 <p>S-curves ( <code>y = exp(linear) / (1+exp(linear))</code> ) for a variety of different parameter settings. Note that the x-axis is some continuous variable <code>x</code> while the y-axis is the probability of success at that value of <code>x</code>. More on this as we move through this model.</p>
 <p>Why doesn’t linear regression work here?</p>
 <ul>
@@ -100,73 +169,74 @@ where <span class="math inline">\(g(\cdot)\)</span> is the link function. For lo
 </li>
 <li>Note: it <em>does</em> work to think about values inside (0,1) as probabilities</li>
 </ul>
+</div>
 <div id="the-logistic-model" class="section level3" number="5.1.1">
 <h3>
 <span class="header-section-number">5.1.1</span> The logistic model<a class="anchor" aria-label="anchor" href="#the-logistic-model"><i class="fas fa-link"></i></a>
 </h3>
 <p>Instead of trying to model the using <em>linear regression</em>, let’s say that we consider the relationship between the variable <span class="math inline">\(x\)</span> and the probability of success to be given by the following generalized linear model. (The logistic model is just one model, there isn’t anything magical about it. We do have good reasons for how we defined it, but that doesn’t mean there aren’t other good ways to model the relationship.)</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 p(x) = \frac{e^{\beta_0 + \beta_1 x}}{1+e^{\beta_0 + \beta_1 x}}
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 Where <span class="math inline">\(p(x)\)</span> is the probability of success (here surviving a burn). <span class="math inline">\(\beta_1\)</span> still determines the direction and <em>slope</em> of the line. <span class="math inline">\(\beta_0\)</span> now determines the location (median survival).</p>
 <ul>
-<li><p><strong>Note 1</strong> What is the probability of success for a patient with covariate of <span class="math inline">\(x = -\beta_0 / \beta_1\)</span>?<br><span class="math display">\[\begin{eqnarray*}
-x &amp;=&amp; - \beta_0 / \beta_1\\
-\beta_0 + \beta_1 x &amp;=&amp; 0\\
-e^{0} &amp;=&amp; 1\\
-p(-\beta_0 / \beta_1) &amp;=&amp; p(x) = 0.5
-\end{eqnarray*}\]</span>
+<li><p><strong>Note 1</strong> What is the probability of success for a patient with covariate of <span class="math inline">\(x = -\beta_0 / \beta_1\)</span>?<br><span class="math display">\[\begin{align}
+x &amp;= - \beta_0 / \beta_1\\
+\beta_0 + \beta_1 x &amp;= 0\\
+e^{0} &amp;= 1\\
+p(-\beta_0 / \beta_1) &amp;= p(x) = 0.5
+\end{align}\]</span>
 (for a given <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_0\)</span> determines the median survival value)</p></li>
 <li><p><strong>Note 2</strong> If <span class="math inline">\(x=0\)</span>,
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 p(0) = \frac{e^{\beta_0}}{1+e^{\beta_0}}
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 <span class="math inline">\(x=0\)</span> can often be thought of as the baseline condition, and the probability at <span class="math inline">\(x=0\)</span> takes the place of thinking about the intercept in a linear regression.</p></li>
-<li><p><strong>Note 3</strong><br><span class="math display">\[\begin{eqnarray*}
+<li><p><strong>Note 3</strong><br><span class="math display">\[\begin{align}
 1 - p(x) = \frac{1}{1+e^{\beta_0 + \beta_1 x}}
-\end{eqnarray*}\]</span><br>
+\end{align}\]</span><br>
 gives the probability of failure.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \frac{p(x)}{1-p(x)} = e^{\beta_0 + \beta_1 x}
-\end{eqnarray*}\]</span><br>
+\end{align}\]</span><br>
 gives the odds of success.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \ln \bigg( \frac{p(x)}{1-p(x)} \bigg) = \beta_0 + \beta_1 x
-\end{eqnarray*}\]</span><br>
+\end{align}\]</span><br>
 gives the <span class="math inline">\(\ln\)</span> odds of success .</p></li>
 <li><p><strong>Note 4</strong> Every type of generalized linear model has a link function. Ours is called the <em>logit</em>. The link is the relationship between the response variable and the <em>linear</em> function in x.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \mathrm{logit}(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 &lt; \star &lt; 1
-\end{eqnarray*}\]</span></p></li>
+\end{align}\]</span></p></li>
 </ul>
 <div id="model-assumptions-1" class="section level4" number="5.1.1.1">
 <h4>
 <span class="header-section-number">5.1.1.1</span> model assumptions<a class="anchor" aria-label="anchor" href="#model-assumptions-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>Just like in linear regression, our <code>Y</code> response is the only random component.</p>
-<p><span class="math display">\[\begin{eqnarray*}
-y &amp;=&amp; \begin{cases}
+<p><span class="math display">\[\begin{align}
+y &amp;= \begin{cases}
 1 &amp; \mbox{ died}\\
 0 &amp; \mbox{ survived}
 \end{cases}
-\end{eqnarray*}\]</span></p>
-<p><span class="math display">\[\begin{eqnarray*}
-Y &amp;\sim&amp; \mbox{Bernoulli}(p)\\
-P(Y=y) &amp;=&amp; p^y(1-p)^{1-y}
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+Y &amp;\sim \mbox{Bernoulli}(p)\\
+P(Y=y) &amp;= p^y(1-p)^{1-y}
+\end{align}\]</span></p>
 <!--
-%\begin{eqnarray*}
-%Y &\sim& \mbox{Binomial}(m,p)\\
-%P(Y=y) &=& {m \choose y}p^y(1-p)^{m-y}\\
-%E(Y/m) &=& p\\
-%E(Y) &=& m p\\
-%Var(Y) &=& m p (1-p)
-%\end{eqnarray*}
+%\begin{align}
+%Y &\sim \mbox{Binomial}(m,p)\\
+%P(Y=y) &= {m \choose y}p^y(1-p)^{m-y}\\
+%E(Y/m) &= p\\
+%E(Y) &= m p\\
+%Var(Y) &= m p (1-p)
+%\end{align}
 -->
 <p>When each person is at risk for a different covariate (i.e., explanatory variable), they each end up with a different probability of success.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^{\beta_0 + \beta_1 x_i}}\bigg)
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <ul>
 <li>independent trials<br>
 </li>
@@ -183,23 +253,23 @@ Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^
 <span class="header-section-number">5.1.1.2</span> interpreting coefficients<a class="anchor" aria-label="anchor" href="#interpreting-coefficients"><i class="fas fa-link"></i></a>
 </h4>
 <p>Let’s say the log odds of survival for given observed (log) burn areas <span class="math inline">\(x\)</span> and <span class="math inline">\(x+1\)</span> are:
-<span class="math display">\[\begin{eqnarray*}
-\mathrm{logit}(p(x)) &amp;=&amp; \beta_0 + \beta_1 x\\
-\mathrm{logit}(p(x+1)) &amp;=&amp; \beta_0 + \beta_1 (x+1)\\
-\beta_1 &amp;=&amp; \mathrm{logit}(p(x+1)) - \mathrm{logit}(p(x))\\
-&amp;=&amp; \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
-&amp;=&amp; \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
-e^{\beta_1} &amp;=&amp; \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+\mathrm{logit}(p(x)) &amp;= \beta_0 + \beta_1 x\\
+\mathrm{logit}(p(x+1)) &amp;= \beta_0 + \beta_1 (x+1)\\
+\beta_1 &amp;= \mathrm{logit}(p(x+1)) - \mathrm{logit}(p(x))\\
+&amp;= \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
+&amp;= \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+e^{\beta_1} &amp;= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+\end{align}\]</span></p>
 <p><span class="math inline">\(e^{\beta_1}\)</span> is the <em>odds ratio</em> for dying associated with a one unit increase in x. [<span class="math inline">\(\beta_1\)</span> is the change in log-odds associated with a one unit increase in x.</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 \mathrm{logit}(\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <p>(Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to <code>log(area +1)= 1.90</code>, and patients with burns corresponding
 to <code>log(area +1)= 2.00</code>. The odds ratio <span class="math inline">\(\hat{OR}_{1.90, 2.00}\)</span> is given by
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \hat{OR}_{1.90, 2.00} = e^{-10.662} (1.90-2.00) = e^{1.0662} = 2.904
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 That is, the odds of survival for a patient with <code>log(area+1)= 1.90</code> is 2.9 times higher than the odds of survival for a patient with <code>log(area+1)= 2.0</code>.)</p>
 <p>What about the RR (relative risk) or difference in risks? It won’t be constant for a given <span class="math inline">\(X\)</span>, so it must be calculated as a function of <span class="math inline">\(X\)</span>.</p>
 </div>
@@ -209,23 +279,23 @@ That is, the odds of survival for a patient with <code>log(area+1)= 1.90</code> 
 <span class="header-section-number">5.1.2</span> constant OR, varying RR<a class="anchor" aria-label="anchor" href="#constant-or-varying-rr"><i class="fas fa-link"></i></a>
 </h3>
 <p>The previous model specifies that the OR is constant for any value of <span class="math inline">\(X\)</span> which is not true about RR. Using the burn data, convince yourself that the RR isn’t constant. Try computing the RR at 1.5 versus 2.5, then again at 1 versus 2.
-<span class="math display">\[\begin{eqnarray*}
-\mathrm{logit}(\hat{p}) &amp;=&amp; 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
-\hat{p(x)} &amp;=&amp; \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
-\end{eqnarray*}\]</span></p>
-<p><span class="math display">\[\begin{eqnarray*}
-\hat{p}(1) &amp;=&amp; 0.9999941\\
-\hat{p}(1.5) &amp;=&amp; 0.9987889\\
-\hat{p}(2) &amp;=&amp; 0.7996326\\
-\hat{p}(2.5) &amp;=&amp; 0.01894664\\
-\hat{RR}_{1, 2} &amp;=&amp; 1.250567\\
-\hat{RR}_{1.5, 2.5} &amp;=&amp; 52.71587\\
-\end{eqnarray*}\]</span></p>
-<p><span class="math display">\[\begin{eqnarray*}
-\hat{RR} &amp;=&amp; \frac{\frac{e^{b_0 + b_1 x}}{1+e^{b_0 + b_1 x}}}{\frac{e^{b_0 + b_1 (x+1)}}{1+e^{b_0 + b_1 (x+1)}}}\\
-&amp;=&amp; \frac{\frac{e^{b_0}e^{b_1 x}}{1+e^{b_0}e^{b_1 x}}}{\frac{e^{b_0} e^{b_1 x} e^{b_1}}{1+e^{b_0}e^{b_1 x} e^{b_1}}}\\
-&amp;=&amp; \frac{1+e^{b_0}e^{b_1 x}e^{b_1}}{e^{b_1}(1+e^{b_0}e^{b_1 x})}\\
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+\mathrm{logit}(\hat{p}) &amp;= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
+\hat{p(x)} &amp;= \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\hat{p}(1) &amp;= 0.9999941\\
+\hat{p}(1.5) &amp;= 0.9987889\\
+\hat{p}(2) &amp;= 0.7996326\\
+\hat{p}(2.5) &amp;= 0.01894664\\
+\hat{RR}_{1, 2} &amp;= 1.250567\\
+\hat{RR}_{1.5, 2.5} &amp;= 52.71587\\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\hat{RR} &amp;= \frac{\frac{e^{b_0 + b_1 x}}{1+e^{b_0 + b_1 x}}}{\frac{e^{b_0 + b_1 (x+1)}}{1+e^{b_0 + b_1 (x+1)}}}\\
+&amp;= \frac{\frac{e^{b_0}e^{b_1 x}}{1+e^{b_0}e^{b_1 x}}}{\frac{e^{b_0} e^{b_1 x} e^{b_1}}{1+e^{b_0}e^{b_1 x} e^{b_1}}}\\
+&amp;= \frac{1+e^{b_0}e^{b_1 x}e^{b_1}}{e^{b_1}(1+e^{b_0}e^{b_1 x})}\\
+\end{align}\]</span>
 (see log-linear model below, <a href="logistic-regression.html#altmodels">5.1.2.1</a> )</p>
 <div id="altmodels" class="section level4" number="5.1.2.1">
 <h4>
@@ -236,27 +306,27 @@ That is, the odds of survival for a patient with <code>log(area+1)= 1.90</code> 
 <li>
 <strong>complementary log-log</strong><br>
 The complementary log-log model is used when you have a rate of, for example, infection, model by instances of contact (based on a Poisson model).
-<span class="math display">\[\begin{eqnarray*}
-p(k) &amp;=&amp; 1-(1-\lambda)^k\\
-\ln[ - \ln (1-p(k))] &amp;=&amp; \ln[-\ln(1-\lambda)] + \ln(k)\\
-\ln[ - \ln (1-p(k))] &amp;=&amp; \beta_0 + 1 \cdot \ln(k)\\
-\ln[ - \ln (1-p(k))] &amp;=&amp; \beta_0 + \beta_1 x\\
-p(x) &amp;=&amp; 1 - \exp [ -\exp(\beta_0 + \beta_1 x) ]
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+p(k) &amp;= 1-(1-\lambda)^k\\
+\ln[ - \ln (1-p(k))] &amp;= \ln[-\ln(1-\lambda)] + \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;= \beta_0 + 1 \cdot \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;= \beta_0 + \beta_1 x\\
+p(x) &amp;= 1 - \exp [ -\exp(\beta_0 + \beta_1 x) ]
+\end{align}\]</span>
 </li>
 <li>
 <strong>linear</strong><br>
 The excess (or additive) risk model can modeled by using simple linear regression:
-<span class="math display">\[\begin{eqnarray*}
-p(x) &amp;=&amp; \beta_0 + \beta_1 x
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+p(x) &amp;= \beta_0 + \beta_1 x
+\end{align}\]</span>
 which we have already seen is problematic for a variety of reasons. However, any <strong>unit increase in <span class="math inline">\(x\)</span> gives a <span class="math inline">\(\beta_1\)</span> increase in the risk</strong> (for <em>all</em> values of <span class="math inline">\(x\)</span>).</li>
 <li>
 <strong>log-linear</strong><br>
 As long as we do not have a case-control study, we can model the risk using a log-linear model.
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \ln (p(x)) = \beta_0 + \beta_1 x
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 The regression coefficient, <span class="math inline">\(\beta_1\)</span>, has the interpretation of the <strong>logarithm of the relative risk associated with a unit increase in <span class="math inline">\(x\)</span></strong>. Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]). As a result, convergence of standard fitting algorithms may be unreliable in some cases.</li>
 </ul>
 </div>
@@ -271,51 +341,51 @@ The regression coefficient, <span class="math inline">\(\beta_1\)</span>, has th
 <span class="header-section-number">5.2.1</span> Maximum Likelihood Estimation<a class="anchor" aria-label="anchor" href="#maximum-likelihood-estimation"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall how we estimated the coefficients for linear regression. We minimized the residual sum of squares:
-<span class="math display">\[\begin{eqnarray*}
-RSS &amp;=&amp; \sum_i (Y_i - \hat{Y}_i)^2\\
- &amp;=&amp; \sum_i (Y_i - (b_0 + b_1 X_i))^2
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+RSS &amp;= \sum_i (Y_i - \hat{Y}_i)^2\\
+ &amp;= \sum_i (Y_i - (b_0 + b_1 X_i))^2
+\end{align}\]</span>
 That is, we take derivatives with respect to both <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span>, set them equal to zero (take second derivatives to ensure minimums), and solve for <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span>. It turns out that we’ve also <em>maximized the normal likelihood</em>.
-<span class="math display">\[\begin{eqnarray*}
-L(\underline{y} | b_0, b_1, \underline{x}) &amp;=&amp; \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
-&amp;=&amp; \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+L(\underline{y} | b_0, b_1, \underline{x}) &amp;= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
+&amp;= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
+\end{align}\]</span></p>
 <p>What does that even mean? Likelihood? Maximizing the likelihood? WHY??? The likelihood is the probability distribution of the data given <em>specific</em> values of the unknown parameters.</p>
 <p>Consider a toy example describing, for example, flipping coins. Let’s say <span class="math inline">\(X \sim Bin(p, n=4).\)</span> We have 4 trials and <span class="math inline">\(X=1\)</span>. Would you guess <span class="math inline">\(p=0.49\)</span>?? No, you would guess <span class="math inline">\(p=0.25\)</span>… you <em>maximized</em> the likelihood of <strong>seeing your data</strong>.
-<span class="math display">\[\begin{eqnarray*}
-P(X=1 | p) &amp;=&amp; {4 \choose 1} p^1 (1-p)^{4-1}\\
-P(X=1 | p = 0.9) &amp;=&amp; 0.0036 \\
-P(X=1 | p = 0.75) &amp;=&amp; 0.047 \\
-P(X=1 | p = 0.5) &amp;=&amp; 0.25\\
-P(X=1 | p = 0.05) &amp;=&amp; 0.171\\
-P(X=1 | p = 0.15) &amp;=&amp; 0.368\\
-P(X=1 | p = 0.25) &amp;=&amp; 0.422\\
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+P(X=1 | p) &amp;= {4 \choose 1} p^1 (1-p)^{4-1}\\
+P(X=1 | p = 0.9) &amp;= 0.0036 \\
+P(X=1 | p = 0.75) &amp;= 0.047 \\
+P(X=1 | p = 0.5) &amp;= 0.25\\
+P(X=1 | p = 0.05) &amp;= 0.171\\
+P(X=1 | p = 0.15) &amp;= 0.368\\
+P(X=1 | p = 0.25) &amp;= 0.422\\
+\end{align}\]</span></p>
 <p>Or, we can think about it as a set of independent binary responses, <span class="math inline">\(Y_1, Y_2, \ldots Y_n\)</span>. Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
-<span class="math display">\[\begin{eqnarray*}
-P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &amp;=&amp; P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
-&amp;=&amp; p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
-&amp;=&amp; p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &amp;= P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
+&amp;= p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
+&amp;= p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
+\end{align}\]</span>
 where <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> represents a particular observed series of 0 or 1 outcomes and <span class="math inline">\(p\)</span> is a probability <span class="math inline">\(0 \leq p \leq 1\)</span>. Once <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> have been observed, they are fixed values. Maximum likelihood estimates are functions of sample data that are derived by finding the value of <span class="math inline">\(p\)</span> that maximizes the likelihood functions.</p>
 <p>To maximize the likelihood, we use the natural log of the likelihood (because we know we’ll get the same answer):
-<span class="math display">\[\begin{eqnarray*}
-\ln L(p) &amp;=&amp; \ln \Bigg(p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)} \Bigg)\\
-&amp;=&amp; \sum_i y_i \ln(p) + (n- \sum_i y_i) \ln (1-p)\\
-\frac{ \partial \ln L(p)}{\partial p} &amp;=&amp; \sum_i y_i \frac{1}{p} + (n - \sum_i y_i) \frac{-1}{(1-p)} = 0\\
-0 &amp;=&amp; (1-p) \sum_i y_i + p (n-\sum_i y_i) \\
-\hat{p} &amp;=&amp; \frac{ \sum_i y_i}{n}
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+\ln L(p) &amp;= \ln \Bigg(p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)} \Bigg)\\
+&amp;= \sum_i y_i \ln(p) + (n- \sum_i y_i) \ln (1-p)\\
+\frac{ \partial \ln L(p)}{\partial p} &amp;= \sum_i y_i \frac{1}{p} + (n - \sum_i y_i) \frac{-1}{(1-p)} = 0\\
+0 &amp;= (1-p) \sum_i y_i + p (n-\sum_i y_i) \\
+\hat{p} &amp;= \frac{ \sum_i y_i}{n}
+\end{align}\]</span></p>
 <p>Using the logistic regression model makes the likelihood substantially more complicated because the probability of success changes for each individual. Recall:
-<span class="math display">\[\begin{eqnarray*}
-p_i = p(x_i) &amp;=&amp; \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+p_i = p(x_i) &amp;= \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
+\end{align}\]</span>
 which gives a likelihood of:
-<span class="math display">\[\begin{eqnarray*}
-L(\underline{p}) &amp;=&amp; \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
-\mbox{&amp; a loglikelihood of}: &amp;&amp;\\
-\ln L(\underline{p}) &amp;=&amp; \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+L(\underline{p}) &amp;= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
+\mbox{&amp; a loglikelihood of}: &amp;\\
+\ln L(\underline{p}) &amp;= \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
+\end{align}\]</span></p>
 <p>Why use maximum likelihood estimates?</p>
 <ul>
 <li>Estimates are essentially unbiased.<br>
@@ -339,9 +409,9 @@ L(\underline{p}) &amp;=&amp; \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + 
 <span class="header-section-number">5.3.1</span> Wald Tests &amp; Intervals<a class="anchor" aria-label="anchor" href="#wald-tests-intervals"><i class="fas fa-link"></i></a>
 </h3>
 <p>Because we will use maximum likelihood parameter estimates, we can also use large sample theory to find the SEs and consider the estimates to have normal distributions (for large sample sizes). However, <span class="citation">(<a href="references.html#ref-menard" role="doc-biblioref">Menard 1995</a>)</span> warns that for large coefficients, standard error is inflated, lowering the Wald statistic (chi-square) value. <span class="citation">(<a href="references.html#ref-agresti" role="doc-biblioref">Agresti 1996</a>)</span> states that the likelihood-ratio test is more reliable for small sample sizes than the Wald test.</p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 z = \frac{b_1 - \beta_1}{SE(b_1)}
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <pre><code>#&gt; 
 #&gt; Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
 #&gt; 
@@ -363,39 +433,53 @@ z = \frac{b_1 - \beta_1}{SE(b_1)}
 <span class="header-section-number">5.3.2</span> Likelihood Ratio Tests<a class="anchor" aria-label="anchor" href="#likelihood-ratio-tests"><i class="fas fa-link"></i></a>
 </h3>
 <p><span class="math inline">\(\frac{L(p_0)}{L(\hat{p})}\)</span> gives us a sense of whether the null value or the observed value produces a higher likelihood. Recall:
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 L(\hat{\underline{p}}) &gt; L(p_0)
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 always. [Where <span class="math inline">\(\hat{\underline{p}}\)</span> is the maximum likelihood estimate for the probability of success (here it will be a vector of probabilities, each based on the same MLE estimates of the linear parameters). ] The above inequality holds because <span class="math inline">\(\hat{\underline{p}}\)</span> maximizes the likelihood.</p>
 <p>We can show that if <span class="math inline">\(H_0\)</span> is true,
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) \sim \chi^2_1
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 If we are testing only one parameter value. More generally,
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 -2 \ln \bigg( \frac{\max L_0}{\max L} \bigg) \sim \chi^2_\nu
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 where <span class="math inline">\(\nu\)</span> is the number of extra parameters we estimate using the unconstrained likelihood (as compared to the constrained null likelihood).</p>
+<div id="example-1" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>Consider a data set with 147 people. 49 got cancer and 98 didn’t. Let’s test whether the true proportion of people who get cancer is <span class="math inline">\(p=0.25\)</span>.
+<span class="math display">\[\begin{align}
+H_0:&amp; p=0.25\\
+H_1:&amp; p \ne 0.25\\
+\hat{p} &amp;= \frac{49}{147}\\
+-2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &amp;= -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
+&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
+&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{49} (0.75)^{98} \bigg) - \ln \Bigg( \bigg( \frac{1}{3} \bigg)^{49} \bigg( \frac{2}{3} \bigg)^{98} \Bigg) \Bigg]\\
+&amp;= -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
+P( \chi^2_1 \geq 5.11) &amp;= 0.0238
+\end{align}\]</span></p>
 <p>But really, usually likelihood ratio tests are more interesting. In fact, usually, we use them to test whether the coefficients are zero:</p>
-<p><span class="math display">\[\begin{eqnarray*}
-H_0: &amp;&amp; \beta_1 =0\\
-H_1: &amp;&amp; \beta_1 \ne 0\\
-p_0 &amp;=&amp; \frac{e^{\hat{\beta}_0}}{1 + e^{\hat{\beta}_0}}
-\end{eqnarray*}\]</span>
+<p><span class="math display">\[\begin{align}
+H_0: &amp; \beta_1 =0\\
+H_1: &amp; \beta_1 \ne 0\\
+p_0 &amp;= \frac{e^{\hat{\beta}_0}}{1 + e^{\hat{\beta}_0}}
+\end{align}\]</span>
 where <span class="math inline">\(\hat{\beta}_0\)</span> is fit from a model without any explanatory variable, <span class="math inline">\(x\)</span>.</p>
 <p><strong>Important note:</strong>
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \mbox{deviance} = \mbox{constant} - 2 \ln(\mbox{likelihood})
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 That is, the difference in log likelihoods will be the opposite difference in deviances:
-<span class="math display">\[\begin{eqnarray*}
-\mbox{test stat} &amp;=&amp; \chi^2\\
-&amp;=&amp; -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
-&amp;=&amp; -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
-&amp;=&amp; \mbox{deviance}_0 - \mbox{deviance}_{model}\\
-&amp;=&amp; \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
-&amp;=&amp; \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+\mbox{test stat} &amp;= \chi^2\\
+&amp;= -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
+&amp;= -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&amp;= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{align}\]</span></p>
 <pre><code>#&gt; 
 #&gt; Call:
 #&gt; glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
@@ -425,19 +509,20 @@ That is, the difference in log likelihoods will be the opposite difference in de
 #&gt; 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
 #&gt;   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
 #&gt; 1       525.386     434 -167.616 339.231 347.382  335.231         433  435</code></pre>
-<p><span class="math display">\[\begin{eqnarray*}
-\mbox{test stat} &amp;=&amp; G\\
-&amp;=&amp; -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
-&amp;=&amp; -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
-&amp;=&amp; \mbox{deviance}_0 - \mbox{deviance}_{model}\\
-&amp;=&amp; \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
-&amp;=&amp; \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{test stat} &amp;= G\\
+&amp;= -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
+&amp;= -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&amp;= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{align}\]</span></p>
 <p>So, the LRT here is (see columns of <code>null deviance</code> and <code>deviance</code>):
-<span class="math display">\[\begin{eqnarray*}
-G &amp;=&amp; 525.39 - 335.23 = 190.16\\
-p-value &amp;=&amp; P(\chi^2_1 \geq 190.16) = 0
-\end{eqnarray*}\]</span></p>
+<span class="math display">\[\begin{align}
+G &amp;= 525.39 - 335.23 = 190.16\\
+p-value &amp;= P(\chi^2_1 \geq 190.16) = 0
+\end{align}\]</span></p>
+</div>
 <div id="modeling-categorical-predictors-with-multiple-levels" class="section level4" number="5.3.2.1">
 <h4>
 <span class="header-section-number">5.3.2.1</span> modeling categorical predictors with multiple levels<a class="anchor" aria-label="anchor" href="#modeling-categorical-predictors-with-multiple-levels"><i class="fas fa-link"></i></a>
@@ -476,7 +561,7 @@ p-value &amp;=&amp; P(\chi^2_1 \geq 190.16) = 0
 </tbody>
 </table></div>
 <p>Source: <span class="citation">(<a href="references.html#ref-snoring" role="doc-biblioref">Norton and Dunn 1985</a>)</span></p>
-<p><span class="math display">\[\begin{eqnarray*}
+<p><span class="math display">\[\begin{align}
 X_1 = \begin{cases}
   1 &amp; \text{for occasionally} \\
   0 &amp; \text{otherwise} \\
@@ -489,11 +574,11 @@ X_3 = \begin{cases}
   1 &amp; \text{for always} \\
   0 &amp; \text{otherwise} \\
 \end{cases}
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <p>Our new model becomes:
-<span class="math display">\[\begin{eqnarray*}
+<span class="math display">\[\begin{align}
 \mathrm{logit}(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
-\end{eqnarray*}\]</span></p>
+\end{align}\]</span></p>
 <p>We can use the drop-in-deviance test to test the effect of any or all of the parameters (of which there are now <em>four</em>) in the model.</p>
 <p>See the birdnest example, <a href="logistic-regression.html#birdexamp">5.8</a></p>
 </div>
@@ -509,10 +594,31 @@ X_3 = \begin{cases}
 <span class="header-section-number">5.4.1</span> Interaction<a class="anchor" aria-label="anchor" href="#interaction"><i class="fas fa-link"></i></a>
 </h3>
 <p>Another worry when building models with multiple explanatory variables has to do with variables interacting. That is, for one level of a variable, the relationship of the main predictor on the response is different.</p>
+<div id="example-3" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-3"><i class="fas fa-link"></i></a>
+</h4>
+<p>Consider a simple linear regression model on number of hours studied and exam grade. Then addclass year to the model. There would probably be a different slope for each class year in order to model the two variables most effectively. For simplicity, consider only first year students and seniors.</p>
+<p><span class="math display">\[\begin{align}
+E[\mbox{grade seniors}| \mbox{hours studied}] &amp;= \beta_{0s} + \beta_{1s} \mbox{hrs}\\
+E[\mbox{grade first years}| \mbox{hours studied}] &amp;= \beta_{0f} + \beta_{1f} \mbox{hrs}\\
+E[\mbox{grade}| \mbox{hours studied}] &amp;= \beta_{0} + \beta_{1} \mbox{hrs} + \beta_2 I(\mbox{year=senior}) + \beta_{3} \mbox{hrs} I(\mbox{year = senior})\\
+\beta_{0f} &amp;= \beta_{0}\\
+\beta_{0s} &amp;= \beta_0 + \beta_2\\
+\beta_{1f} &amp;= \beta_1\\
+\beta_{1s} &amp;= \beta_1 + \beta_3
+\end{align}\]</span></p>
 <p>Why do we need the <span class="math inline">\(I(\mbox{year=seniors})\)</span> variable?</p>
 <!--
 Recall the homework assignment where APACHE score was a significant predictor of the odds of dying for treated black patients but not for untreated.  This is interaction.  The relationship between the explanatory variable (APACHE score) and the response (survival) changes depending on a 3rd variables (treated vs. untreated).
 -->
+</div>
+<div id="example-4" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-4"><i class="fas fa-link"></i></a>
+</h4>
+<p>The Heart and Estrogen/progestin Replacement Study (HERS) is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD. Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo. The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 <span class="citation">(<a href="references.html#ref-HERS" role="doc-biblioref">Hulley et al. 1998</a>)</span>.</p>
+<p>The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.</p>
+<p>The hormone replacement regimen also increased the risk of clots in the veins (deep vein thrombosis) and lungs (pulmonary embolism). The results of HERS are surprising in light of previous observational studies, which found lower rates of CHD in women who take postmenopausal estrogen.</p>
+<p>Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls" class="uri">http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls</a> For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), <code>medcond</code>. We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.</p>
 <pre><code>#&gt; # A tibble: 2 x 5
 #&gt;   term        estimate std.error statistic   p.value
 #&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
@@ -546,11 +652,16 @@ Recall the homework assignment where APACHE score was a significant predictor of
 #&gt; 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
 <p>Write out a few models <em>by hand</em>, does any of the significance change with respect to interaction? Does the interpretation change with interaction? In the last model, we might want to remove all the age information. Age seems to be less important than drinking status. How do we decide? How do we model?</p>
 </div>
+</div>
 <div id="simpsons-paradox" class="section level3" number="5.4.2">
 <h3>
 <span class="header-section-number">5.4.2</span> Simpson’s Paradox<a class="anchor" aria-label="anchor" href="#simpsons-paradox"><i class="fas fa-link"></i></a>
 </h3>
 <p><strong>Simpson’s paradox</strong> is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.</p>
+<div id="example-5" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-5"><i class="fas fa-link"></i></a>
+</h4>
+<p>Back to linear regression to consider Simpson’s Paradox. Consider data on SAT scores across different states with information on educational expenditure. The correlation between SAT score and average teacher salary is negative with the combined data. However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam. The fewer students who take the exam, the higher the SAT score. That’s because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).</p>
 <pre><code>#&gt; # A tibble: 2 x 5
 #&gt;   term        estimate std.error statistic  p.value
 #&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -562,7 +673,7 @@ Recall the homework assignment where APACHE score was a significant predictor of
 #&gt; 1 (Intercept)   988.      31.9       31.0  6.20e-33
 #&gt; 2 salary          2.18     1.03       2.12 3.94e- 2
 #&gt; 3 frac           -2.78     0.228    -12.2  4.00e-16</code></pre>
-<p><img src="05-log_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;"><img src="05-log_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;"></p>
 <!--
 %Consider the following data on twenty-year vital status by smoking behavior: %(pgs 52-53 in VGSM)
 %\begin{center}
@@ -590,6 +701,99 @@ Recall the homework assignment where APACHE score was a significant predictor of
 
 %After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 -->
+</div>
+<div id="example-6" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-6"><i class="fas fa-link"></i></a>
+</h4>
+<p>Consider the example on smoking and 20-year mortality (case) from section 3.4 of <em>Regression Methods in Biostatistics</em>, pg 52-53.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>age</th>
+<th>test</th>
+<th align="center">smoker</th>
+<th align="center">nonsmoker</th>
+<th align="center">prob smoke</th>
+<th align="center">odds smoke</th>
+<th align="center">empirical OR</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>all</td>
+<td>case</td>
+<td align="center">139</td>
+<td align="center">230</td>
+<td align="center">0.377</td>
+<td align="center">0.604</td>
+<td align="center">0.685</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">443</td>
+<td align="center">502</td>
+<td align="center">0.469</td>
+<td align="center">0.882</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>18-44</td>
+<td>case</td>
+<td align="center">61</td>
+<td align="center">32</td>
+<td align="center">0.656</td>
+<td align="center">1.906</td>
+<td align="center">1.627</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">375</td>
+<td align="center">320</td>
+<td align="center">0.540</td>
+<td align="center">1.172</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>45-64</td>
+<td>case</td>
+<td align="center">34</td>
+<td align="center">66</td>
+<td align="center">0.340</td>
+<td align="center">0.515</td>
+<td align="center">1.308</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">50</td>
+<td align="center">127</td>
+<td align="center">0.282</td>
+<td align="center">0.394</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>65+</td>
+<td>case</td>
+<td align="center">44</td>
+<td align="center">132</td>
+<td align="center">0.250</td>
+<td align="center">0.333</td>
+<td align="center">1.019</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td align="center">18</td>
+<td align="center">55</td>
+<td align="center">0.247</td>
+<td align="center">0.327</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table></div>
+<p>What we see is that the vast majority of the controls were young, and they had a high rate of smoking. A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group. However, within each group, the cases were more likely to smoke than the controls.</p>
+<p>After <em>adjusting</em> for age, smoking is no longer significant. But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson’s Paradox. The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.</p>
+<p>What would it mean to <em>adjust</em> for age in this context? It means that we have to include it in the model:</p>
 <pre><code>#&gt; # A tibble: 2 x 5
 #&gt;   term        estimate std.error statistic  p.value
 #&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -618,33 +822,34 @@ Recall the homework assignment where APACHE score was a significant predictor of
 #&gt; 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
 #&gt; 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1</code></pre>
 <p>Using the additive model above:
-<span class="math display">\[\begin{eqnarray*}
-\mathrm{logit}(p(x_1, x_2) ) &amp;=&amp; \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
-OR &amp;=&amp; \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
-x_1 &amp;=&amp; \begin{cases}
+<span class="math display">\[\begin{align}
+\mathrm{logit}(p(x_1, x_2) ) &amp;= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
+OR &amp;= \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
+x_1 &amp;= \begin{cases}
 0 &amp; \mbox{ don't smoke}\\
 1 &amp; \mbox{ smoke}\\
 \end{cases}\\
-x_2 &amp;=&amp; \begin{cases}
+x_2 &amp;= \begin{cases}
 \mbox{young} &amp; \mbox{18-44 years old}\\
 \mbox{middle} &amp; \mbox{45-64 years old}\\
 \mbox{old} &amp; \mbox{65+ years old}\\
 \end{cases}
-\end{eqnarray*}\]</span>
+\end{align}\]</span>
 where we are modeling the probability of 20-year mortality using smoking status and age group.</p>
-<p><strong>Note 1:</strong> We can see from above that the coefficients for each variable are significantly different from zero. That is, the variables are important in predicting odds of survival.<br><strong>Note 2:</strong> We can see that smoking becomes less significant as we add age into the model. That is because age and smoking status are so highly associated (think of the coin example).<br><strong>Note 3:</strong> We can estimate any of the OR (of dying for smoke vs not smoke) from the given coefficients:<br><span class="math display">\[\begin{eqnarray*}
-\mbox{simple model} &amp;&amp;\\
-\mbox{overall OR} &amp;=&amp; e^{-0.37858 } = 0.6848332\\
-&amp;&amp; \\
-\mbox{additive model} &amp;&amp;\\
-\mbox{young, middle, old OR} &amp;=&amp; e^{ 0.3122} = 1.3664\\
-&amp;&amp; \\
-\mbox{interaction model} &amp;&amp;\\
-\mbox{young OR} &amp;=&amp; e^{0.2689 + 0.2177} = 1.626776\\
-\mbox{middle OR} &amp;=&amp; e^{0.2689} = 1.308524\\
-\mbox{old OR} &amp;=&amp; e^{0.2689 + -0.2505} = 1.018570\\
-\end{eqnarray*}\]</span>
+<p><strong>Note 1:</strong> We can see from above that the coefficients for each variable are significantly different from zero. That is, the variables are important in predicting odds of survival.<br><strong>Note 2:</strong> We can see that smoking becomes less significant as we add age into the model. That is because age and smoking status are so highly associated (think of the coin example).<br><strong>Note 3:</strong> We can estimate any of the OR (of dying for smoke vs not smoke) from the given coefficients:<br><span class="math display">\[\begin{align}
+\mbox{simple model} &amp;\\
+\mbox{overall OR} &amp;= e^{-0.37858 } = 0.6848332\\
+&amp; \\
+\mbox{additive model} &amp;\\
+\mbox{young, middle, old OR} &amp;= e^{ 0.3122} = 1.3664\\
+&amp; \\
+\mbox{interaction model} &amp;\\
+\mbox{young OR} &amp;= e^{0.2689 + 0.2177} = 1.626776\\
+\mbox{middle OR} &amp;= e^{0.2689} = 1.308524\\
+\mbox{old OR} &amp;= e^{0.2689 + -0.2505} = 1.018570\\
+\end{align}\]</span>
 What does it mean that the interaction terms are not significant in the last model?</p>
+</div>
 </div>
 </div>
 <div id="multicol" class="section level2" number="5.5">
@@ -652,7 +857,7 @@ What does it mean that the interaction terms are not significant in the last mod
 <span class="header-section-number">5.5</span> Multicolinearity<a class="anchor" aria-label="anchor" href="#multicol"><i class="fas fa-link"></i></a>
 </h2>
 <p>Consider the following data set collected from church offering plates in 62 consecutive Sundays. Also noted is whether there was enough change to buy a candy bar for $1.25.</p>
-<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></div>
 <pre><code>#&gt; # A tibble: 2 x 5
 #&gt;   term        estimate std.error statistic   p.value
 #&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
@@ -675,6 +880,10 @@ What does it mean that the interaction terms are not significant in the last mod
 <h2>
 <span class="header-section-number">5.6</span> Model Building<a class="anchor" aria-label="anchor" href="#logstep"><i class="fas fa-link"></i></a>
 </h2>
+<div id="example-7" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-7"><i class="fas fa-link"></i></a>
+</h4>
+<p>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Sage who knows 85 topics. With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics. The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage. A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.<br><!-- %(Taken from American Statistician article that I refereed, August 2012.) --></p>
 <!--
 % added January 2019 ...  I need to read through, edit, etc.
 
@@ -699,6 +908,7 @@ If you know (or are willing to assume) the covariates that you want to adjust fo
 See here: https://stats.stackexchange.com/questions/37564/r-code-question-model-selection-based-on-individual-significance-in-regression/37609#37609 for simulation examples where screening/model selection can either include meaningless variables, or leave out important ones.
 \end{itemize}
 -->
+</div>
 <div id="formal-model-building" class="section level3" number="5.6.1">
 <h3>
 <span class="header-section-number">5.6.1</span> Formal Model Building<a class="anchor" aria-label="anchor" href="#formal-model-building"><i class="fas fa-link"></i></a>
@@ -833,18 +1043,18 @@ BIC: Bayesian Information Criteria = <span class="math inline">\(-2 \ln\)</span>
 <ul>
 <li>The big model (with all of the interaction terms) has a deviance of 3585.7; the additive model has a deviance of 3594.8.</li>
 </ul>
-<p><span class="math display">\[\begin{eqnarray*}
-G &amp;=&amp; 3594.8 - 3585.7= 9.1\\
-p-value &amp;=&amp; P(\chi^2_6 \geq 9.1)= 1 - pchisq(9.1, 6) = 0.1680318
-\end{eqnarray*}\]</span>
+<p><span class="math display">\[\begin{align}
+G &amp;= 3594.8 - 3585.7= 9.1\\
+p-value &amp;= P(\chi^2_6 \geq 9.1)= 1 - pchisq(9.1, 6) = 0.1680318
+\end{align}\]</span>
 We cannot reject the null hypothesis, so we know that we don’t need the 6 interaction terms. Next we will check whether we need weight.</p>
 <ul>
 <li>The additive model has a deviance of 3594.8; the model without weight is 3597.3.</li>
 </ul>
-<p><span class="math display">\[\begin{eqnarray*}
-G &amp;=&amp; 3597.3 - 3594.8 =2.5\\
-p-value &amp;=&amp; P(\chi^2_1 \geq 2.5)= 1 - pchisq(2.5, 1) = 0.1138463
-\end{eqnarray*}\]</span>
+<p><span class="math display">\[\begin{align}
+G &amp;= 3597.3 - 3594.8 =2.5\\
+p-value &amp;= P(\chi^2_1 \geq 2.5)= 1 - pchisq(2.5, 1) = 0.1138463
+\end{align}\]</span>
 We cannot reject the null hypothesis, so we know that we don’t need the weight in the model either.</p>
 </div>
 </div>
@@ -987,9 +1197,9 @@ We cannot reject the null hypothesis, so we know that we don’t need the weight
 <span class="header-section-number">5.7.1</span> Measures of Association<a class="anchor" aria-label="anchor" href="#measures-of-association"><i class="fas fa-link"></i></a>
 </h3>
 <p>With logistic regression, we don’t have residuals, so we don’t have a value like <span class="math inline">\(R^2\)</span>. We can, however, measure whether or not the estimated model is consistent with the data. That is, is the model able to discriminate between successes and failures.</p>
-<div id="back-to-the-burn-data-refexmburnexamp" class="section level4" number="5.7.1.1">
+<div id="back-to-the-burn-data-refexburnexamp" class="section level4" number="5.7.1.1">
 <h4>
-<span class="header-section-number">5.7.1.1</span> back to the burn data <a href="#exm:burnexamp"><strong>??</strong></a>:<a class="anchor" aria-label="anchor" href="#back-to-the-burn-data-refexmburnexamp"><i class="fas fa-link"></i></a>
+<span class="header-section-number">5.7.1.1</span> back to the burn data <a href="logistic-regression.html#ex:burnexamp">5.1.0.1</a>:<a class="anchor" aria-label="anchor" href="#back-to-the-burn-data-refexburnexamp"><i class="fas fa-link"></i></a>
 </h4>
 <p>Consider looking at all the pairs of successes and failures. In the burn data we have 308 survivors and 127 deaths = 39,116 pairs of people. Given a particular pair, if the observation corresponding to a survivor has a <em>higher</em> probability of success than the observation corresponding to a death, we call the pair <em>concordant</em>. If the observation corresponding to a survivor has a <em>lower</em> probability of success than the observation corresponding to a death, we call the pair <em>discordant</em>. Tied pairs occur when the observed survivor has the same estimated probability as the observed death.</p>
 <ul>
@@ -1001,10 +1211,10 @@ We cannot reject the null hypothesis, so we know that we don’t need the weight
 <li>tau-a: Kendall’s tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).</li>
 </ul>
 <p>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
-<span class="math display">\[\begin{eqnarray*}
-p(x=1.75) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
-p(x=2.35) &amp;=&amp; \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+p(x=1.75) &amp;= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
+\end{align}\]</span>
 The pairs would be concordant if the first individual survived and the second didn’t. The pairs would be discordant if the first individual died and the second survived.</p>
 <pre><code>#&gt; Logistic Regression Model
 #&gt;  
@@ -1091,6 +1301,16 @@ The pairs would be concordant if the first individual survived and the second di
 </li>
 <li>false discovery rate = 1 - PPV = FP / (FP + TP)</li>
 </ul>
+<div id="example-8" class="section level4 unnumbered">
+<h4>Example<a class="anchor" aria-label="anchor" href="#example-8"><i class="fas fa-link"></i></a>
+</h4>
+<p>For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+<span class="math display">\[\begin{align}
+p(x=1.75) &amp;= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087\\
+x &amp;= \mbox{log area burned}
+\end{align}\]</span>
+What value would we assign to 1.75 or 2.35 or 15 for log(area) burned? By changing our cutoff, we can fit an entire curve. We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1). Notice that the color band represents the probability cutoff for predicting a ``success."</p>
 <div class="inline-figure"><img src="ROCcurve_burn.jpg"></div>
 <p>A: Let’s say we use prob=0.25 as a cutoff:</p>
 <div class="inline-table"><table class="table table-sm">
@@ -1127,10 +1347,10 @@ The pairs would be concordant if the first individual survived and the second di
 </tr>
 </tbody>
 </table></div>
-<p><span class="math display">\[\begin{eqnarray*}
-\mbox{sensitivity} &amp;=&amp; TPR = 300/308 = 0.974\\
-\mbox{specificity} &amp;=&amp; 61 / 127 = 0.480, \mbox{1 - specificity} =  FPR = 0.520\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 300/308 = 0.974\\
+\mbox{specificity} &amp;= 61 / 127 = 0.480, \mbox{1 - specificity} =  FPR = 0.520\\
+\end{align}\]</span></p>
 <p>B: Let’s say we use prob=0.7 as a cutoff:</p>
 <div class="inline-table"><table class="table table-sm">
 <thead><tr class="header">
@@ -1166,10 +1386,10 @@ The pairs would be concordant if the first individual survived and the second di
 </tr>
 </tbody>
 </table></div>
-<p><span class="math display">\[\begin{eqnarray*}
-\mbox{sensitivity} &amp;=&amp; TPR = 265/308 = 0.860\\
-\mbox{specificity} &amp;=&amp; 92/127 = 0.724, \mbox{1 - specificity} = FPR = 0.276\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 265/308 = 0.860\\
+\mbox{specificity} &amp;= 92/127 = 0.724, \mbox{1 - specificity} = FPR = 0.276\\
+\end{align}\]</span></p>
 <p>C: Let’s say we use prob=0.9 as a cutoff:</p>
 <div class="inline-table"><table class="table table-sm">
 <thead><tr class="header">
@@ -1205,15 +1425,16 @@ The pairs would be concordant if the first individual survived and the second di
 </tr>
 </tbody>
 </table></div>
-<p><span class="math display">\[\begin{eqnarray*}
-\mbox{sensitivity} &amp;=&amp; TPR = 144/308 = 0.467\\
-\mbox{specificity} &amp;=&amp; 120/127 = 0.945, \mbox{1 - specificity} = FPR = 0.055\\
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 144/308 = 0.467\\
+\mbox{specificity} &amp;= 120/127 = 0.945, \mbox{1 - specificity} = FPR = 0.055\\
+\end{align}\]</span></p>
 <p>D: all models will go through (0,0) <span class="math inline">\(\rightarrow\)</span> predict everything negative, prob=1 as your cutoff</p>
 <p>E: all models will go through (1,1) <span class="math inline">\(\rightarrow\)</span> predict everything positive, prob=0 as your cutoff</p>
 <p>F: you have a model that gives perfect sensitivity (no FN!) and specificity (no FP)</p>
 <p>G: random guessing. If classifier randomly guess, it should get half the positives correct and half the negatives correct. If it guesses 90% of the positives correctly, it will also guess 90% of the negatives to be positive.</p>
 <p>H: is worse than random guessing. Note that the opposite classifier to (H) might be quite good!</p>
+</div>
 </div>
 <div id="cv" class="section level3" number="5.7.3">
 <h3>
@@ -1279,11 +1500,11 @@ The pairs would be concordant if the first individual survived and the second di
 <span class="header-section-number">5.8.1</span> Drop-in-deviance (Likelihood Ratio Test, LRT)<a class="anchor" aria-label="anchor" href="#drop-in-deviance-likelihood-ratio-test-lrt"><i class="fas fa-link"></i></a>
 </h3>
 <p><span class="math inline">\(\chi^2\)</span>: The Likelihood ratio test also tests whether the response is explained by the explanatory variable. We can output the deviance ( = K - 2 * log-likelihood) for both the full (maximum likelihood!) and reduced (null) models.
-<span class="math display">\[\begin{eqnarray*}
-G &amp;=&amp; 2 \cdot \ln(L(MLE)) - 2 \cdot \ln(L(null))\\
-&amp;=&amp; \mbox{null (restricted) deviance - residual (full model) deviance}\\
-G &amp;\sim&amp; \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
-\end{eqnarray*}\]</span>
+<span class="math display">\[\begin{align}
+G &amp;= 2 \cdot \ln(L(MLE)) - 2 \cdot \ln(L(null))\\
+&amp;= \mbox{null (restricted) deviance - residual (full model) deviance}\\
+G &amp;\sim \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
+\end{align}\]</span>
 where <span class="math inline">\(\nu\)</span> represents the difference in the number of parameters needed to estimate in the full model versus the null model.</p>
 <pre><code>#&gt; # A tibble: 2 x 5
 #&gt;   term        estimate std.error statistic p.value
@@ -1421,7 +1642,7 @@ where <span class="math inline">\(\nu\)</span> represents the difference in the 
 #&gt; 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
 #&gt; 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
 #&gt; # … with 1 more variable: probs &lt;dbl&gt;</code></pre>
-<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-log_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 <div id="drawing-interactions" class="section level3" number="5.8.7">
 <h3>
@@ -1502,7 +1723,7 @@ where <span class="math inline">\(\nu\)</span> represents the difference in the 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-01-27.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-02-01.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
