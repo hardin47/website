@@ -812,7 +812,7 @@ we cannot accept the null.
 
 ## Reflection Questions
 
-### hypothesis testing: Chapter 2, Sections 1-4 
+### hypothesis testing: IMS Chapter 5
 
 1. What is the difference between a statistic and a parameter?
 2. In a typical study, do you have one statistic or more than one statistic?  And do you know the value of the statistic?
@@ -822,7 +822,7 @@ we cannot accept the null.
 6. What is the difference between a one- and two-sided hypothesis?
 7. What is the difference between a null hypothesis and an alternative hypothesis?
 
-### normal model: Chapter 2, Sections 5-7 
+### normal model: IMS Section 5.3 
 
 1. What does it mean for something to have a normal distribution?
 2. How can you use the normal curve to calculate percentages or probabilities?
@@ -831,7 +831,7 @@ we cannot accept the null.
 5. What technical conditions are important in order for the central limit theorem to apply?
 6. What does a Z score measure?
 
-### confidence intervals: Chapter 2, Section 8
+### confidence intervals: IMS Section 5.2
 
 1. What is a confidence interval?
 2. Part of the CI interpretation includes a phrase "95% confident."  Explain what 95% means.
@@ -841,7 +841,7 @@ we cannot accept the null.
 6. When using the normal distribution to create a confidence interval for $p$, how is the critical value for, say, a 94.7% interval calculated?
 
 
-### sampling: Chapter 1, Sections 3-4
+### sampling: IMS Section 1.3
 
 
 1. Why is it good to take random samples?
@@ -851,7 +851,7 @@ we cannot accept the null.
 5. What is the difference between practical significance and statistical significance?
 
 
-### errors & power: Chapter  2, Section 3 
+### errors & power: IMS Section 6.2
 
 1. Why is it never okay to accept $H_0$?
 2. What is the difference between a Type I and Type II error?

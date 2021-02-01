@@ -626,15 +626,10 @@ t_salaries %>%
 
 ## Reflection Questions
 
-In the interest of pairing down topics for Spring 2020, the following topics will not be covered:
-
-* all of the computational tests associated with two means (e.g., bootstrapping, randomization test, etc.).  This includes the following sections in the books that we will not cover:  ISCAM Inv 2.9, 4.4, 4.9, 4.11 & ISRS 4.5.
-* we will not discussed paired samples (e.g., "before and after", "left and right car tires", etc.).  This includes the following sections in the books that we will not cover: ISCAM Inv 4.8, 4.9, 4.10, 4.11 & ISRS 4.2.
-* we will not cover ANVOA.  This includes the following sections in the books that we will not cover: ISCAM Inv 5.4, 5.5 & ISRS 4.4.
 
 The reflection questions below that we will not cover are marked with an asterisk *.
 
-### 1 quantitative variable: Chapter 4, Section 1 
+### 1 quantitative variable: IMS Section 7.1
 
 1. What changed about the studies (data structure) from Chapters 2 & 3?
 2. What is the statistic of interest now?  What is the parameter of interest?
@@ -650,7 +645,7 @@ The reflection questions below that we will not cover are marked with an asteris
 
 
 
-###  2 means (1 quantitative variable, 1 binary variable): Chapter 4, Section 3
+###  2 means (1 quantitative variable, 1 binary variable): IMS Section 7.2
 
 1. What changed about the studies (data structure) from section 4.1?
 2. What is the statistic of interest now?  What is the parameter of interest?
@@ -661,7 +656,7 @@ The reflection questions below that we will not cover are marked with an asteris
 7. How do you create a CI?  How do you interpret the CI?
 8. What if your data are NOT normal?  What strategies can you try out?
 
-####  Paired sample, difference in means
+####  Paired sample, difference in means: IMS Section 7.3
 
 1. What changed about the studies (data structure) in section 4.2 as compared with 4.1 or 4.3?
 2. What is the statistic of interest now?  What is the parameter of interest?
@@ -672,7 +667,7 @@ The reflection questions below that we will not cover are marked with an asteris
 
 
 
-#### * (not covering in Spring 2021) ANOVA
+#### * (not covering in Spring 2021) ANOVA: IMS Section 7.5
 
 1. Why are these tests called ANalysis Of VAriance (ANOVA)?
 2. Describe the variability in the numerator and the variability in the denominator.  What does each measure?

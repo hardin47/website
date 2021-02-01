@@ -1,4 +1,4 @@
-# Correlation & Regression
+# Inference on Correlation & Regression {#reginf}
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3.5,
@@ -7,6 +7,7 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3.5,
 library(tidyverse)
 library(infer)
 library(mosaic)
+library(broom)
 ```
 
 <!--
@@ -16,72 +17,13 @@ library(mosaic)
 3. (Probably not: Inference on $\rho$)
 -->
 
-The last topic of the semester will focus on modeling and inference using two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale.   
+The last topic of the semester will focus on inference in the setting with two quantitative variables.  That is, both the explanatory and the response variables are measured on a numeric scale, we model them using correlation and least square regression, and then we ask whether the lines could have come from a population with no relationship (i.e., the null hypothesis).   
 
-To get started, consider a handful of variables taken on the top 80 PGA golfers in 2004.  The example comes from Investigation 5.7 in @iscam  
-
-```{r fig.cap = "Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/golf.jpg")
-```
-
-Rank the seven scatterplots from strongest negative to strongest positive.  Some questions to ask yourself:
-
-* What would the correlation be if there was a perfect positive relationship?
-* What would the correlation be if there was a perfect negative relationship?
-* What would the correlation be if there was no relationship?
-
-## Correlation {#cor}
+### Inference for correlation
 
 Correlation measures the association between two numerical variables.  [Note, that when describing how two categorical (or one numerical & one categorical) variables vary together, they are said to be *associated* instead of *correlated*.]  
 
 > The *correlation coefficient* measures the strength and direction of the linear association between two numerical variables.
-
-### Estimating Correlation
-
-The value of the correlation is defined as:
-
-\begin{eqnarray*}
-r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i - \overline{x})^2} \sqrt{ \sum_i(y_i - \overline{y})^2}}\\
-r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
-\end{eqnarray*}
-
-```{r fig.cap = "Scatterplots with average X and Y values superimposed.  Investigation 5.7, `Drive for show, putt for dough`, @iscam", out.width="80%", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/golfcor.jpg")
-```
-
-
-For each red dot (on each plot), consider the distance the observation is from the $\overline{X}$ line and the $\overline{Y}$ line.  Is the observation (red dot) above both?  below both?  above one and below the other?  
-
-How does the particular red dot (observation) contribute to the correlation?  In a positive way (to make $r$ bigger)?  In a negative way (to make $r$ smaller)?
-
-Some ideas worth thinking about:
-
-* quadratic plots can have zero correlation yet a perfect functional relationship
-* $-1 \leq r \leq 1$
-* correlation does not imply causation (ice cream & boating accidents!)
-* for inference with $\rho$ as well as $\beta_1$, the data should come from a bivariate normal distribution.  That is, histograms of $X$ and $Y$ should both be normal, and the scatterplot should be a cloud.
-* correlation will go down when only a narrow range of X values is represented (see denominator of r).
-* measurement error biases the estimate of a correlation coefficient toward zero.
-
-
-### Coefficient of Determination -- $R^2$
-
-The coefficient of determination ($R^2$) is the square of the correlation (given above).  However, it also has an additional interpretation that will be useful for us.  It can measure how much of the original variability in Y is given by the regression line.  Both SSE and least-squares will be defined below when we fit a line to the scatter plot of observations.
-
-SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the line.
-
-\begin{eqnarray*}
-R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} \\
- &=& \frac{Var(y_i) - Var(e_i)}{Var(y_i)} \\
- &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
-\end{eqnarray*}
-
-[The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  $$e_i = y_i - \hat{y}_i.]$$
-
-$R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
-
-### Inference for correlation
-
 
 Note:  we won't actually cover inference for correlation in class, but the notes on inference for correlation are included so that you can see that the process is very similar to all of the other statistics seen in the course to this point.
 
@@ -101,7 +43,6 @@ t^* &\sim& t_{n-2}  \mbox{ when } H_0 \mbox{ is true}
 \end{eqnarray*}
 
 #### Confidence Interval
-
 
 If $\rho \ne 0$, then the SE might be okay, but the sampling distribution of $r$ will not be normal (and thus will not be a $t$ when we use the SE).
 
@@ -188,44 +129,10 @@ e_i &=& y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
 
 Notice, that we are predicting the **mean** value of the response variable at a given value of the explanatory variable!  
 
-###  Least Squares estimation of the regression line {#ls}
-
-
-To find the values of the regression statistics, the sum of squared errors is minimized.
-
-**SSE:** Sum of squared errors (or residuals) is a measure of how closely the line fits to the points.  SSE is the value of the squared deviations calculated at the "best" possible values of $\beta_0$ and $\beta_1$ for a given dataset.
-
-\begin{eqnarray*}
-SSE = \sum_i (y_i - \hat{y}_i)^2 = \sum_i (y_i - (b_0 + b_1 x_i) )^2
-\end{eqnarray*}
-is minimized by the values:
-\begin{eqnarray*}
-b_0 = \overline{y} - b_1 \overline{x} & \ \ \ \ \ \ \ & b_1 = r \frac{s_y}{s_x}
-\end{eqnarray*}
-
-To find the "best" fitting line, we searched for the line that has the smallest residuals (SSE) in some sense.  In particular, the goal is to try to find the line that minimizes the following quantity: $$Q=\sum e_i^2 = \sum (y_i-(b_0+b_1x_i))^2.$$
-
-
-Finding $b_0$ and $b_1$ that minimize Q is a calculus problem.
-$$\frac{dQ}{db_0}=-2\sum (y_i-(b_0+b_1x_i)),\qquad \frac{dQ}{db_1}=-2\sum
-x_i(y_i-(b_0+b_1x_i))$$ 
-Setting both derivatives equal to 0 and solving for $b_0$ and $b_1$ yields the optimal values, denoted as $b_0$ and $b_1$
-
-One aspect of the optimization problem that is worth pointing out has to do with the role of the two variables of interest $X$ and $Y$.   If we switch the roles of $X$ and $Y$, the best fitting line will be different.  If the relationship was invariant to which variable we choose as a response, then switching the roles of $X$ and $Y$ should give a slope of $1/b_1$, which is not the case.  [Note that the role of $X$ and $Y$ **is** invariant when calculating the correlation but not when calculating the least squares regression line.]
-
-#### Residuals {-}
-
-Residuals measure the scatter of points above and below the least squares regression line.  We use the residuals in many of the calculations and interpretations of the model.  Indeed, the goal of the linear regression is to find a model that has small residuals.  That is, ideally, the known variable $X$ will tell us all there is to know about the unknown variable $Y$.
-
-\begin{eqnarray*}
-e_i &=& (y_i - \hat{y}_i)\\
-MSE&=& \frac{\sum_i (y_i - \hat{y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2\\
-SSE &=& \sum_i (y_i - \hat{y}_i)^2 = \sum_i (e_i)^2\\
-R^2 &=& 1 - \frac{Var(e_i)}{Var(y_i)}
-\end{eqnarray*}
-
 
 ### Inference on the slope, $\beta_1$ {#infbeta1}
+
+As in section \@ref(ls), the slope is calculated by using least squares.
 
 #### SE of the slope {-}
 
@@ -391,12 +298,20 @@ Again, there are numerous ways to build a model.  Some important principles to k
 As before, the LINE model conditions are checked by using residual plots.  Note that in the housing example, the residual plot after log transformation on the response variable is improved.
 
 ```{r}
+
+library(tidyverse)
+library(broom)
+house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
+                   header=TRUE, sep="\t")
+
 lm(price ~  sqft, data=house)  %>% augment () %>%
-  ggplot(aes(x = .fitted, y = .resid))+ 
+  ggplot(aes(x = .fitted, y = .resid)) + 
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for price as a function of sqft")
+```
 
+```{r eval = FALSE}
 lm(log(price) ~  sqft, data=house)  %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -541,7 +456,7 @@ mod.bed %>% glance()
 
 However, it is important for us to ask whether either of the relationships actually fit the technical conditions of the linear regression model.  We can see from the pairs plots that the relationships look **L**inear, we'll assume the variables were collected **I**ndependently, but the **N**ormality and the **E**quality of the error structure we can check using residual plots.
 
-```{r}
+```{r eval = FALSE}
 mod.sqft %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -562,8 +477,9 @@ A natural log transformation should fix both of these problems.
 ```{r}
 mod.lnsqft <- lm(log(price)~sqft, data = house)
 mod.lnbed <- lm(log(price) ~ bedrooms, data=house)
+```
 
-
+```{r eval = FALSE}
 mod.lnsqft %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -657,7 +573,7 @@ houseConf <- mod.lnsqft %>% augment() %>%
 houseConf %>% head()
 
 ggplot(houseConf, aes(x=sqft)) + 
-  geom_point(aes(y=log.price.)) + 
+  geom_point(aes(y=`log(price)`)) + 
   geom_line(aes(y=.fitted)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
@@ -671,7 +587,7 @@ housePred <- mod.lnsqft %>% augment() %>%
 housePred %>% head()
 
 ggplot(housePred, aes(x=sqft)) + 
-  geom_point(aes(y=log.price.)) + 
+  geom_point(aes(y=`log(price)`)) + 
   geom_line(aes(y=.fitted)) +
   geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
 ```
@@ -831,8 +747,9 @@ flu_1819 %>%
   geom_point(aes(x=.fitted, y = .resid)) + 
   geom_hline(yintercept = 0) +
   ggtitle("St Paul & Grand Rapids NOT removed, magPeak vs days responseTime")
+```
 
-
+```{r eval = FALSE}
 flu_1819 %>%
   filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
   lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
@@ -889,7 +806,7 @@ knitr::include_graphics("figs/nyt_remdesivir.png")
 
 ## Reflection Questions
 
-### Correlation & Simple Linear Regression: Chapter 5, Section 1-4 
+### Correlation & Simple Linear Regression: IMS Sections 8.1 & 8.2
 
 * Describe the linear model with multiple variables.
 * Describe the error / residual term and how it is calculated with multiple variables.
@@ -908,7 +825,7 @@ knitr::include_graphics("figs/nyt_remdesivir.png")
 * What is the difference between a confidence interval and a prediction interval?  Which is bigger?  Why does that make sense?  How do the centers of the intervals differ?  (They don't.  Why not?)
 
 
-### Multiple Linear Regression: Chapter 6, Section 1-3 
+### Multiple Linear Regression: IMS Chapter 4 & Section 8.4
 
 * Describe the linear model with multiple variables.
 * Describe the error / residual term and how it is calculated with multiple variables.
