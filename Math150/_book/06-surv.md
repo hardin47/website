@@ -4,7 +4,8 @@
 
 To motivate the technical details which are vital to understanding survival analysis, consider the following example [@gerds].
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-2"><strong>(\#exm:unnamed-chunk-2) </strong></span>In class -- experience the Titanic going down.
+#### Example {-}
+In class -- experience the Titanic going down.
 
 * The Titanic is sinking.  How long can you hold your breath?  
 * Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).  
@@ -17,7 +18,8 @@ To motivate the technical details which are vital to understanding survival anal
 Based on the data, we would like to calculate:  
 1. What is the probability of surviving 40 seconds?  
 2. What is the median survival time?  
-3. What is the average survival time?  </div>\EndKnitrBlock{example}
+3. What is the average survival time?  
+
 
 
 \begin{eqnarray*}
@@ -27,12 +29,14 @@ Based on the data, we would like to calculate:
 
 The next example is given in your text [@KuiperSklar (chapter 9)] as part of the motivation for survival analysis.  [I can't figure out why it insists on being numbered wrong.]
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-3"><strong>(\#exm:unnamed-chunk-3) </strong></span>
+#### Example {-}
+
 Class chocolate melting activity 
 
 * Each student should be randomly assigned to a white or milk chocolate chip (flip a coin)  
 * When the instructor gives approval, students should place either a white or milk chocolate chip into their mouths and record the time until it completely melts.  
-* Treat the study as if it could only be done for a specified period of time (this may require some experimenting, but 60 seconds has worked well).  If the actual time is less than 60 seconds, then the actual time will be complete.  The student should submit the data (chip color, actual time, censoring status); 1=observed, 0=censored. Any chips that are "swallowed" prior to 60 seconds should be regarded as censored.</div>\EndKnitrBlock{example}
+* Treat the study as if it could only be done for a specified period of time (this may require some experimenting, but 60 seconds has worked well).  If the actual time is less than 60 seconds, then the actual time will be complete.  The student should submit the data (chip color, actual time, censoring status); 1=observed, 0=censored. Any chips that are "swallowed" prior to 60 seconds should be regarded as censored.
+
 
 Survival analysis is typically done with a prospective study (see censoring below) on a cohort of patients (observational or experimental) to determine some clinical outcome.  We will also usually measure covariates of interest: treatment, clinical variables measured at recruitment, etc.
 
@@ -90,7 +94,8 @@ Said differently:  within any subgroup of interest, the subjects who are censore
     * Subjects who drop out because the study ends  
     * Subjects who drop out because they move away  
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-4"><strong>(\#exm:unnamed-chunk-4) </strong></span>
+#### Example {-}
+
 Suppose we have the following melting times (in seconds) of milk chocolate chips for 7 students where the maximum time allowed for the experiment was 60 seconds:  
 
 \begin{center}
@@ -125,7 +130,8 @@ One way to deal with censored observations is to remove them from the study.  We
 \begin{eqnarray*}
 \hat{S}(45)_E &=& \frac{\mbox{number of chips that have not melted after 45 seconds}}{\mbox{total number of chips in the sample}}\\
 &=& 1/4 = 0.25\\
-\end{eqnarray*}</div>\EndKnitrBlock{example}
+\end{eqnarray*}
+
 
 
 By treating censored observations as complete, we assume that the event times are shorter than what they actually are (thereby underestimating the true probability of survival).  By removing the censored observations from the data, we lose information.  By treating censored observations as complete we bias the estimate based on the remaining times; by ignoring censored observations, we reduce the power of the inferential model.
@@ -170,7 +176,8 @@ If there is no censoring at time $t_i$, then $n_i - d_i = n_{i+1}$.  The Kaplan-
 &=& \frac{m(t)}{n}
 \end{eqnarray*}
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-5"><strong>(\#exm:unnamed-chunk-5) </strong></span>milk chocolate times by hand.
+#### Example {-}
+milk chocolate times by hand.
 
 
 | $t_i$ 	| $n_i$ 	| $d_i$ 	| $n_i - d_i$ 	| $\frac{n_i - d_i}{n_i}$ 	|
@@ -190,7 +197,8 @@ If there is no censoring at time $t_i$, then $n_i - d_i = n_{i+1}$.  The Kaplan-
 | $[35,45)$ 	| 0.714 $\cdot$ 1 = 0.714 	|
 | $[45,55)$ 	| 0.714 $\cdot$ 0.667 = 0.476 	|
 | $[55,60)$ 	| 0.476 $\cdot$ 0.5 = 0.238 	|
-</div>\EndKnitrBlock{example}
+
+
 
 ### CI for KM curve {#KMCI}
 
@@ -357,7 +365,7 @@ h(t) =k && \Rightarrow S(t) = e^{-kt}
 If $h(t) =k \rightarrow S(t) = e^{-kt}$.
 
 Plots of different hazard functions and their corresponding survival functions.
-<img src="06-surv_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Estimating $h(t)$ ala Kaplan-Meier
@@ -377,7 +385,7 @@ Suppose that $h_0(t)$ and $h_1(t)$ are the hazard functions for patients on cont
 R is called the **hazard ratio**.  $h_0(t)$ can be anything as long as $h_1(t)$ is proportional.  Note in the pictures below that no one dies between 3 and 7 days, the survival curves are flat over that interval.
 
 
-<img src="06-surv_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" />
 
 Consider the notion of risk of death:
 \begin{eqnarray*}
@@ -454,65 +462,41 @@ L(\beta) &=&  \prod_{i=1}^n \Bigg( \frac{e^{\beta x_i}}{\sum_{k:t_k \geq t_i} e^
 \end{eqnarray*}
 $b$ is found using numerical methods (as it was with logistic regression).  
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-8"><strong>(\#exm:unnamed-chunk-8) </strong></span>Consider the following data from a prostate cancer study.  The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group.  The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES).  The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer.  The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).</div>\EndKnitrBlock{example}
+#### Example {-}
+Consider the following data from a prostate cancer study.  The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group.  The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES).  The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer.  The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).
 
 
-```r
-library(survival)
-prostate <- readr::read_csv("PROSTATE.csv")
-head(prostate)
-```
 
 ```
-## # A tibble: 6 x 7
-##   Treatment  Time Status   Age  Haem  Size Gleason
-##       <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl>
-## 1         1    65      0    67  13.4    34       8
-## 2         2    61      0    60  14.6     4      10
-## 3         2    60      0    77  15.6     3       8
-## 4         1    58      0    64  16.2     6       9
-## 5         2    51      0    65  14.1    21       9
-## 6         1    51      0    61  13.5     8       8
-```
-
-```r
-coxph(Surv(Time,Status) ~ Treatment, data = prostate)
-```
-
-```
-## Call:
-## coxph(formula = Surv(Time, Status) ~ Treatment, data = prostate)
-## 
-##              coef exp(coef) se(coef)      z      p
-## Treatment -1.9780    0.1384   1.0982 -1.801 0.0717
-## 
-## Likelihood ratio test=4.55  on 1 df, p=0.03293
-## n= 38, number of events= 6
-```
-
-```r
-coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% tidy()
-```
-
-```
-## # A tibble: 1 x 7
-##   term      estimate std.error statistic p.value conf.low conf.high
-##   <chr>        <dbl>     <dbl>     <dbl>   <dbl>    <dbl>     <dbl>
-## 1 Treatment    -1.98      1.10     -1.80  0.0717    -4.13     0.175
-```
-
-```r
-coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
-```
-
-```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1    38      6          4.55      0.0329         4.42     0.0355
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
+#> # A tibble: 6 x 7
+#>   Treatment  Time Status   Age  Haem  Size Gleason
+#>       <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl>
+#> 1         1    65      0    67  13.4    34       8
+#> 2         2    61      0    60  14.6     4      10
+#> 3         2    60      0    77  15.6     3       8
+#> 4         1    58      0    64  16.2     6       9
+#> 5         2    51      0    65  14.1    21       9
+#> 6         1    51      0    61  13.5     8       8
+#> Call:
+#> coxph(formula = Surv(Time, Status) ~ Treatment, data = prostate)
+#> 
+#>           coef exp(coef) se(coef)  z    p
+#> Treatment -2.0       0.1      1.1 -2 0.07
+#> 
+#> Likelihood ratio test=5  on 1 df, p=0.03
+#> n= 38, number of events= 6
+#> # A tibble: 1 x 5
+#>   term      estimate std.error statistic p.value
+#>   <chr>        <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 Treatment    -1.98      1.10     -1.80  0.0717
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1    38      6          4.55      0.0329         4.42     0.0355           3.24
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 * **Note 1**: There is no intercept in the model.  The intercept is contained within the $h_0(t)$ parameter.  
@@ -555,7 +539,8 @@ As before, we can consider nested models and compare their likelihoods.
 
 
 
-\BeginKnitrBlock{example}<div class="example"><span class="example" id="exm:unnamed-chunk-10"><strong>(\#exm:unnamed-chunk-10) </strong></span>
+#### Example {-}  
+
 **Framingham Heart Study** [@Dupont (section 3.10)] Long-term follow-up and cardiovascular risk factor data on almost 5000 residents of the town of Framingham, MA.  Recruitment started in 1948 (went for 40+ years).  These data are 4699 patients who were free of coronary heart disease at their baseline exam:
   
 | variable |  |  code          |  
@@ -574,23 +559,10 @@ As before, we can consider nested models and compare their likelihoods.
 | month 	| = 	| month of year in which baseline exam occurred 	|
 | id 	| = 	| a patient identification variable (numbered 1 to 4699) 	|
   
-We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).</div>\EndKnitrBlock{example}
+We look at the K-M survival curves broken down by diastolic blood pressure.   The logrank statistic comparing all 7 groups is highly significant ($p < 10^{-52}$), and the pairwise logrank tests for adjacent pairs of risk groups are also all significant (though be careful with multiple comparisons!).
 
 
-```r
-heart <- readr::read_csv("framingham.csv")
 
-heart <- heart %>% 
-  mutate(dbpf = ifelse(dbp <= 60, "under60", 
-                             ifelse(dbp <=70, "60-70",
-                                    ifelse(dbp <= 80, "70-80",
-                                           ifelse(dbp <=90, "80-90",
-                                                 ifelse(dbp <=100, "90-100",
-                                                        ifelse(dbp <=110, "100-110", "over110"))))))) %>%
-  mutate(dbpf = factor(dbpf,
-                       levels = c("under60", "60-70", "70-80","80-90", "90-100","100-110","over110")),
-         sex = ifelse(sex == 1, "male", "female"))
-```
 
 \begin{eqnarray*}
 dbp_{ij} &=& \left\{
@@ -617,20 +589,16 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\}
 We can use the model with dbp as categorical to check whether dbp could be used as a continuous variable.  Indeed, it seems that the model is linear (in ln(HR)) with respect to dbp.  One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
 ```
-
-```
-## # A tibble: 6 x 7
-##   term        estimate std.error statistic  p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3    0.193      1.16
-## 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5    0.467      1.41
-## 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6    0.645      1.59
-## 4 dbpf90-100     1.51      0.243      6.22 4.97e-10    1.04       1.99
-## 5 dbpf100-110    1.84      0.254      7.23 4.86e-13    1.34       2.34
-## 6 dbpfover110    2.25      0.271      8.29 1.18e-16    1.72       2.78
+#> # A tibble: 6 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3
+#> 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5
+#> 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6
+#> 4 dbpf90-100     1.51      0.243      6.22 4.97e-10
+#> 5 dbpf100-110    1.84      0.254      7.23 4.86e-13
+#> 6 dbpfover110    2.25      0.271      8.29 1.18e-16
 ```
 
 * **Table 7.2**  
@@ -644,21 +612,17 @@ We say the effects are multiplicative because we are adding in the exponent, so 
      * The change in deviance is 133 ($H_0: \gamma =0$), so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0$, so we need gender in the model.
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
 ```
-
-```
-## # A tibble: 7 x 7
-##   term        estimate std.error statistic  p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 dbpf60-70      0.648    0.247       2.62 8.74e- 3    0.164     1.13 
-## 2 dbpf70-80      0.888    0.241       3.69 2.27e- 4    0.416     1.36 
-## 3 dbpf80-90      1.02     0.241       4.24 2.25e- 5    0.549     1.49 
-## 4 dbpf90-100     1.40     0.243       5.76 8.48e- 9    0.924     1.88 
-## 5 dbpf100-110    1.79     0.254       7.02 2.29e-12    1.29      2.28 
-## 6 dbpfover110    2.22     0.271       8.17 2.97e-16    1.69      2.75 
-## 7 sexmale        0.606    0.0528     11.5  1.54e-30    0.503     0.710
+#> # A tibble: 7 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 dbpf60-70      0.648     0.247      2.62 8.74e- 3
+#> 2 dbpf70-80      0.888     0.241      3.69 2.27e- 4
+#> 3 dbpf80-90      1.02      0.241      4.24 2.25e- 5
+#> 4 dbpf90-100     1.40      0.243      5.76 8.48e- 9
+#> 5 dbpf100-110    1.79      0.254      7.02 2.29e-12
+#> 6 dbpfover110    2.22      0.271      8.17 2.97e-16
+#> # … with 1 more row
 ```
 
 * **Table 7.3** 
@@ -672,27 +636,17 @@ h_i(t) &=& h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma male_i + \
     * Note the marked differences between the estimates in table 7.2 and 7.3.  The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises.  Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.  
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
 ```
-
-```
-## # A tibble: 13 x 7
-##    term            estimate std.error statistic  p.value conf.low conf.high
-##    <chr>              <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-##  1 dbpf60-70         0.603      0.352    1.71   8.66e- 2  -0.0867     1.29 
-##  2 dbpf70-80         0.887      0.342    2.60   9.44e- 3   0.217      1.56 
-##  3 dbpf80-90         1.26       0.341    3.68   2.30e- 4   0.589      1.93 
-##  4 dbpf90-100        1.55       0.347    4.46   8.29e- 6   0.866      2.23 
-##  5 dbpf100-110       2.03       0.358    5.67   1.41e- 8   1.33       2.74 
-##  6 dbpfover110       2.61       0.372    7.02   2.18e-12   1.88       3.34 
-##  7 sexmale           0.864      0.471    1.83   6.68e- 2  -0.0599     1.79 
-##  8 dbpf60-70:sexm…   0.0570     0.495    0.115  9.08e- 1  -0.912      1.03 
-##  9 dbpf70-80:sexm…  -0.0379     0.482   -0.0787 9.37e- 1  -0.982      0.906
-## 10 dbpf80-90:sexm…  -0.458      0.482   -0.951  3.42e- 1  -1.40       0.486
-## 11 dbpf90-100:sex…  -0.296      0.487   -0.608  5.43e- 1  -1.25       0.658
-## 12 dbpf100-110:se…  -0.508      0.509   -0.999  3.18e- 1  -1.51       0.489
-## 13 dbpfover110:se…  -0.913      0.549   -1.66   9.66e- 2  -1.99       0.164
+#> # A tibble: 13 x 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 dbpf60-70      0.603     0.352      1.71 8.66e- 2
+#> 2 dbpf70-80      0.887     0.342      2.60 9.44e- 3
+#> 3 dbpf80-90      1.26      0.341      3.68 2.30e- 4
+#> 4 dbpf90-100     1.55      0.347      4.46 8.29e- 6
+#> 5 dbpf100-110    2.03      0.358      5.67 1.41e- 8
+#> 6 dbpfover110    2.61      0.372      7.02 2.18e-12
+#> # … with 7 more rows
 ```
 
 
@@ -716,30 +670,17 @@ When should we transform a continuous variable into a factor variable?
 * **factor** There are lots of coefficients to estimate, so we lose df  
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
 ```
-
-```
-## # A tibble: 16 x 7
-##    term            estimate std.error statistic  p.value conf.low conf.high
-##    <chr>              <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-##  1 dbpf60-70        0.415    0.352       1.18   2.38e- 1 -0.275     1.11   
-##  2 dbpf70-80        0.503    0.343       1.47   1.42e- 1 -0.168     1.18   
-##  3 dbpf80-90        0.648    0.344       1.89   5.92e- 2 -0.0252    1.32   
-##  4 dbpf90-100       0.661    0.351       1.88   5.99e- 2 -0.0274    1.35   
-##  5 dbpf100-110      1.13     0.363       3.12   1.83e- 3  0.420     1.84   
-##  6 dbpfover110      1.66     0.377       4.40   1.07e- 5  0.922     2.40   
-##  7 sexmale          0.685    0.472       1.45   1.46e- 1 -0.239     1.61   
-##  8 age              0.0475   0.00339    14.0    1.76e-44  0.0408    0.0541 
-##  9 bmi              0.0379   0.00675     5.62   1.94e- 8  0.0247    0.0512 
-## 10 scl              0.00577  0.000585    9.87   5.80e-23  0.00462   0.00692
-## 11 dbpf60-70:sexm…  0.160    0.495       0.323  7.47e- 1 -0.810     1.13   
-## 12 dbpf70-80:sexm…  0.167    0.482       0.346  7.29e- 1 -0.778     1.11   
-## 13 dbpf80-90:sexm… -0.131    0.482      -0.272  7.85e- 1 -1.08      0.814  
-## 14 dbpf90-100:sex…  0.236    0.488       0.483  6.29e- 1 -0.721     1.19   
-## 15 dbpf100-110:se…  0.0232   0.510       0.0455 9.64e- 1 -0.976     1.02   
-## 16 dbpfover110:se… -0.490    0.550      -0.891  3.73e- 1 -1.57      0.589
+#> # A tibble: 16 x 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 dbpf60-70      0.415     0.352      1.18 0.238    
+#> 2 dbpf70-80      0.503     0.343      1.47 0.142    
+#> 3 dbpf80-90      0.648     0.344      1.89 0.0592   
+#> 4 dbpf90-100     0.661     0.351      1.88 0.0599   
+#> 5 dbpf100-110    1.13      0.363      3.12 0.00183  
+#> 6 dbpfover110    1.66      0.377      4.40 0.0000107
+#> # … with 10 more rows
 ```
 
 ### Testing Proportional Hazards {#testingph}
@@ -760,8 +701,22 @@ S_1(t) &=& \bigg[ e^{- \int_0^t h_0(x) dx} \bigg]^{e^\beta}\\
 \ln(-\ln(S_1(t))) &=& \beta + \ln [-\ln(S_0(t))]\\
 \end{eqnarray*}
 
+#### Test 1 for PH
+
 That is to say, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta$.
 
+
+Note that if $h_0(t)$ is a constant (i.e., $h_i(t) = const e^\beta$), then
+
+\begin{eqnarray*}
+S(t) &=& e^{-\int_0^t h(x) dx}\\
+&=& e^{-e^\beta t}\\
+\ln S(t) &=& -e^\beta t\\
+- \ln S(t) &=& e^\beta t\\
+\ln(- \ln S(t)) &=& \beta + \ln(t)\\
+\end{eqnarray*}
+
+Which is to say that if $ln(- ln S(t))$ is linear in $\ln(t)$, then $h_0(t)$ is not only PH but also constant for all $t$.
 
 #### Time dependent covariates
 
@@ -795,7 +750,9 @@ h_i(t) = e^{\beta_1 x_{i1} + \beta_2 x_{i2}} h_0(t)\\
 
 If $\beta_2 < 0$, the relative hazard decreases with time.  If $\beta_2 > 0$, the relative hazard increases with time.
 
-The test of interest will be:
+#### Test 2 for PH
+
+The PH test of interest will be:
 \begin{eqnarray*}
 H_0: \beta_2 = 0
 \end{eqnarray*}
@@ -830,9 +787,13 @@ Using the weights above, we can calculate the average value for the $l^{th}$ cov
 
 The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time $t_j$, is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set:
 \begin{eqnarray*}
-\mbox{Schoenfeld resid } = x_{il} - \bar{x}_l(\beta, t_j)
+\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)
 \end{eqnarray*}
-The idea is for the plot to be flat.  What if there is a strong linear trend for the residuals?  What would that say about the time dependency?
+Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i$.
+
+#### Test 3 for PH
+
+The idea is for the plot to be flat.  What if there is a strong linear trend for the residuals?  What would that say about the time dependency?  Imagine a scatterplot where the residual is very positively linearly associated with time.  If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < < $ then $x_i$ is much smaller than expected.  That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
 
 #### Solutions
 
@@ -971,6 +932,10 @@ http://powerandsamplesize.com/Calculators/Test-Time-To-Event-Data/Cox-PH-Equival
 * Investigating time-varying effects [@timevar]
 
 
+### Simulating survival data
+
+There is a package designed to simulate survival data, `simsurv`.  It allows for complex models, but there is some difficulty with scenarios with very few events or with binary explanatory variables.  Sam Brilleman spoke about the `simsurv` package at useR! 2018: https://www.youtube.com/watch?v=fJTYsncvpvI.
+
 
 ## R example: ProPublica Analysis {#Rsurv}
 
@@ -988,398 +953,161 @@ The GitHub repo with data and code is here: https://github.com/propublica/compas
 
 
 
-```r
-library(survival)
-recid <- readr::read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv")
-
-recid <- dplyr::select(recid, age, c_charge_degree, race, age_cat, score_text, sex, priors_count, 
-                    days_b_screening_arrest, decile_score, is_recid, two_year_recid, 
-                    c_jail_in, c_jail_out) %>% 
-        filter(days_b_screening_arrest <= 30) %>%
-        filter(days_b_screening_arrest >= -30) %>%
-        filter(is_recid != -1) %>%
-        filter(c_charge_degree != "O") %>%
-        filter(score_text != 'N/A')
-        
-recid <- recid %>% mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) %>%
-      mutate(crime_factor = factor(c_charge_degree)) %>%
-      mutate(age_factor = as.factor(age_cat)) %>%
-      within(age_factor <- relevel(age_factor, ref = 1)) %>%
-      mutate(race_factor = factor(race,
-                                  labels = c("African-American", 
-                                             "Asian",
-                                             "Caucasian", 
-                                             "Hispanic", 
-                                             "Native American",
-                                             "Other"))) %>%
-      within(race_factor <- relevel(race_factor, ref = 3)) %>%
-      mutate(gender_factor = factor(sex, labels= c("Female","Male"))) %>%
-      within(gender_factor <- relevel(gender_factor, ref = 2)) %>%
-      mutate(score_factor = factor(score_text != "Low", labels = c("LowScore","HighScore")))
-```
 
 
-```r
-recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv"), score_text != "N/A"), end > start) %>%
-        mutate(race_factor = factor(race,
-                                  labels = c("African-American", 
-                                             "Asian",
-                                             "Caucasian", 
-                                             "Hispanic", 
-                                             "Native American",
-                                             "Other"))) %>%
-        within(race_factor <- relevel(race_factor, ref = 3)) %>%
-        mutate(score_factor = factor(score_text)) %>%
-        within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start) %>%
-        filter(race %in% c("African-American", "Caucasian"))
-
-recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-violent-parsed.csv"), score_text != "N/A"), end > start) %>%
-        mutate(race_factor = factor(race,
-                                  labels = c("African-American", 
-                                             "Asian",
-                                             "Caucasian", 
-                                             "Hispanic", 
-                                             "Native American",
-                                             "Other"))) %>%
-        within(race_factor <- relevel(race_factor, ref = 3)) %>%
-        mutate(score_factor = factor(score_text)) %>%
-        within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start) %>%
-        filter(race %in% c("African-American", "Caucasian"))
-```
 
 
 ### Kaplan-Meier survival curve
+<img src="06-surv_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-12-2.png" width="80%" style="display: block; margin: auto;" />
 
-```r
-recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
-plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
-legend(10,.4, c("low", "high", "medium"),lty=2:4)
-
-survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" />
-
-
-```r
-ggsurvplot(recid.surv[1], conf.int=TRUE, censor=F) + ggtitle("Low Only")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot(recid.surv, conf.int=TRUE, censor=F, risk.table = TRUE)
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;" />
 
 different options for CI
-
-```r
-set.seed(4747)
-recidKM2 <- recidKM %>% sample_n(200)  # CI on a smaller random sample just to see the different CIs
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F) + ggtitle("No CI")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="log"), censor=F, conf.int=T) + ggtitle("Log CI")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="log-log"), censor=F, conf.int=T) + ggtitle("Log-Log CI")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="plain"), censor=F, conf.int=T) + ggtitle("Plain CI")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-20-4.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-                 data=recidKM2, facet.by = "race")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-20-5.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-5.png" width="80%" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
 General recidivism
 
-```r
-survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
+```
+#> Call:
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
+#>     rho = 0)
+#> 
+#>                      N Observed Expected (O-E)^2/E (O-E)^2/V
+#> score_factor=Low    91       16     29.3      6.04     13.13
+#> score_factor=High   52       20     11.6      6.11      7.80
+#> score_factor=Medium 57       19     14.1      1.70      2.29
+#> 
+#>  Chisq= 14.1  on 2 degrees of freedom, p= 9e-04
+#> Call:
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
+#>     rho = 1)
+#> 
+#>                      N Observed Expected (O-E)^2/E (O-E)^2/V
+#> score_factor=Low    91     13.8    24.54      4.68     11.69
+#> score_factor=High   52     17.0     9.99      4.88      7.21
+#> score_factor=Medium 57     15.8    12.04      1.16      1.82
+#> 
+#>  Chisq= 12.6  on 2 degrees of freedom, p= 0.002
 ```
 
-```
-## Call:
-## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
-##     rho = 0)
-## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    106       16    32.66      8.50     22.70
-## score_factor=High    31       13     5.94      8.39      9.53
-## score_factor=Medium  63       24    14.40      6.41      8.93
-## 
-##  Chisq= 23.9  on 2 degrees of freedom, p= 7e-06
-```
-
-```r
-survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
-```
-
-```
-## Call:
-## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
-##     rho = 1)
-## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    106     13.6    27.70      7.22     21.61
-## score_factor=High    31     11.6     5.21      7.73      9.97
-## score_factor=Medium  63     20.4    12.59      4.83      7.72
-## 
-##  Chisq= 23.1  on 2 degrees of freedom, p= 1e-05
-```
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" />
 
 Violent recidivism
 
-```r
-set.seed(4747)
-recidKMV2 <- recidKMV %>%
-  sample_n(500)
-
-recidKMV2 %>% filter(race == "Caucasian") %>%
-  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+```
+#> Call:
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+#>     rho = 0)
+#> 
+#>                       N Observed Expected (O-E)^2/E (O-E)^2/V
+#> score_factor=Low    112        6    6.087   0.00126   0.00392
+#> score_factor=High    25        2    0.966   1.10625   1.24725
+#> score_factor=Medium  46        1    1.946   0.46016   0.58870
+#> 
+#>  Chisq= 1.6  on 2 degrees of freedom, p= 0.5
+#> Call:
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+#>     rho = 0)
+#> 
+#>                       N Observed Expected (O-E)^2/E (O-E)^2/V
+#> score_factor=Low     94        3     4.11     0.301     0.488
+#> score_factor=High   131        6     3.77     1.322     2.037
+#> score_factor=Medium  92        2     3.12     0.401     0.560
+#> 
+#>  Chisq= 2  on 2 degrees of freedom, p= 0.4
+#> Call:
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKMV2, 
+#>     rho = 1)
+#> 
+#>                       N Observed Expected (O-E)^2/E (O-E)^2/V
+#> score_factor=Low    206     8.77     9.63    0.0771     0.158
+#> score_factor=High   156     7.78     4.87    1.7317     2.389
+#> score_factor=Medium 138     2.96     5.00    0.8343     1.151
+#> 
+#>  Chisq= 2.7  on 2 degrees of freedom, p= 0.3
 ```
 
-```
-## Call:
-## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
-##     rho = 0)
-## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    111        3    3.554    0.0862     0.214
-## score_factor=High    31        2    0.759    2.0263     2.334
-## score_factor=Medium  64        1    1.687    0.2798     0.390
-## 
-##  Chisq= 2.4  on 2 degrees of freedom, p= 0.3
-```
-
-```r
-recidKMV2 %>% filter(race == "African-American") %>%
-  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
-```
-
-```
-## Call:
-## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
-##     rho = 0)
-## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low     97        4     6.49     0.954     1.626
-## score_factor=High   107        6     4.44     0.550     0.776
-## score_factor=Medium  90        6     5.07     0.169     0.247
-## 
-##  Chisq= 1.7  on 2 degrees of freedom, p= 0.4
-```
-
-```r
-survdiff(Surv(timefollow,event) ~ score_factor, data=recidKMV2, rho=1)
-```
-
-```
-## Call:
-## survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKMV2, 
-##     rho = 1)
-## 
-##                       N Observed Expected (O-E)^2/E (O-E)^2/V
-## score_factor=Low    208     6.77    10.43     1.284    2.6070
-## score_factor=High   138     7.85     4.45     2.585    3.3914
-## score_factor=Medium 154     6.78     6.51     0.011    0.0163
-## 
-##  Chisq= 4  on 2 degrees of freedom, p= 0.1
-```
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-           censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-                 data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
-  ggtitle("Violent Recidivism")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-22-2.png" width="672" style="display: block; margin: auto;" />
-
-```r
-as.data.frame(recidKMV2) %>%  # must be a data.frame see "." below:
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .), 
-                 data = ., censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
-  ggtitle("Violent Recidivism")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-22-3.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-3.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Cox Proportional Hazards models
 
 
-```r
-# Just score_factor
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
+```
+#> # A tibble: 2 x 5
+#>   term               estimate std.error statistic   p.value
+#>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 score_factorHigh      1.08     0.0446      24.1 7.67e-129
+#> 2 score_factorMedium    0.704    0.0439      16.0 9.78e- 58
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          617.   9.39e-135         654.  1.15e-142           609.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
+#> # A tibble: 3 x 5
+#>   term               estimate std.error statistic   p.value
+#>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 score_factorHigh      1.03     0.0460     22.3  3.96e-110
+#> 2 score_factorMedium    0.674    0.0445     15.2  7.45e- 52
+#> 3 raceCaucasian        -0.170    0.0396     -4.29 1.78e-  5
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          636.   1.65e-137         671.  3.72e-145           626.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
+#> # A tibble: 5 x 5
+#>   term               estimate std.error statistic  p.value
+#>   <chr>                 <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 score_factorHigh     0.926    0.0471      19.6  7.63e-86
+#> 2 score_factorMedium   0.611    0.0452      13.5  1.54e-41
+#> 3 raceCaucasian       -0.120    0.0398      -3.01 2.63e- 3
+#> 4 age                 -0.0137   0.00175     -7.82 5.38e-15
+#> 5 sexMale              0.411    0.0502       8.19 2.53e-16
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          768.   8.91e-164         787.  7.45e-168           739.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
-```
-## # A tibble: 2 x 7
-##   term            estimate std.error statistic   p.value conf.low conf.high
-##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…    1.08     0.0446      24.1 7.67e-129    0.990     1.16 
-## 2 score_factorMe…    0.704    0.0439      16.0 9.78e- 58    0.617     0.790
-```
 
-```r
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
-```
+Using the `rms` package, we can plot CIs for each of the relevant HRs for the model at hand:
+<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" />
 
-```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          617.   9.39e-135         654.  1.15e-142
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
-```
-
-```r
-# score_factor and race
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
-```
-
-```
-## # A tibble: 3 x 7
-##   term            estimate std.error statistic   p.value conf.low conf.high
-##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 score_factorHi…    1.03     0.0460     22.3  3.96e-110    0.936    1.12  
-## 2 score_factorMe…    0.674    0.0445     15.2  7.45e- 52    0.586    0.761 
-## 3 raceCaucasian     -0.170    0.0396     -4.29 1.78e-  5   -0.248   -0.0924
-```
-
-```r
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
-```
-
-```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          636.   1.65e-137         671.  3.72e-145
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
-```
-
-```r
-# score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% tidy()
-```
-
-```
-## # A tibble: 5 x 7
-##   term             estimate std.error statistic  p.value conf.low conf.high
-##   <chr>               <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
-## 1 score_factorHigh   0.926    0.0471      19.6  7.63e-86   0.833     1.02  
-## 2 score_factorMed…   0.611    0.0452      13.5  1.54e-41   0.522     0.699 
-## 3 raceCaucasian     -0.120    0.0398      -3.01 2.63e- 3  -0.198    -0.0417
-## 4 age               -0.0137   0.00175     -7.82 5.38e-15  -0.0171   -0.0103
-## 5 sexMale            0.411    0.0502       8.19 2.53e-16   0.313     0.510
-```
-
-```r
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% glance()
-```
-
-```
-## # A tibble: 1 x 15
-##       n nevent statistic.log p.value.log statistic.sc p.value.sc
-##   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>
-## 1 11426   3058          768.   8.91e-164         787.  7.45e-168
-## # … with 9 more variables: statistic.wald <dbl>, p.value.wald <dbl>,
-## #   r.squared <dbl>, r.squared.max <dbl>, concordance <dbl>,
-## #   std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>
-```
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
-
-```r
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
-           censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
 ### Checking proportional hazards with cox.zph
 
 
-```r
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
 ```
-
-```
-##                          rho    chisq     p
-## score_factorHigh    0.010310 3.26e-01 0.568
-## score_factorMedium -0.000149 6.79e-05 0.993
-## GLOBAL                    NA 4.28e-01 0.807
-```
-
-```r
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="log")
-```
-
-```
-##                        rho chisq      p
-## score_factorHigh   0.03092 2.930 0.0869
-## score_factorMedium 0.00944 0.272 0.6019
-## GLOBAL                  NA 3.045 0.2182
-```
-
-```r
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
-```
-
-```
-##                        rho   chisq      p
-## score_factorHigh   -0.0113  0.3962 0.5291
-## score_factorMedium -0.0174  0.9433 0.3314
-## raceCaucasian      -0.0454  6.3353 0.0118
-## age                -0.0429  5.6270 0.0177
-## sexMale            -0.0056  0.0958 0.7570
-## GLOBAL                  NA 13.7513 0.0173
+#>              chisq df   p
+#> score_factor 0.457  2 0.8
+#> GLOBAL       0.457  2 0.8
+#>              chisq df    p
+#> score_factor  3.04  2 0.22
+#> GLOBAL        3.04  2 0.22
+#>                chisq df      p
+#> score_factor  0.5254  2 0.7690
+#> race          7.6193  1 0.0058
+#> age           6.7511  1 0.0094
+#> sex           0.0387  1 0.8440
+#> GLOBAL       13.6196  5 0.0182
 ```
 
 Note the big p-values.  We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards.  If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.
@@ -1387,20 +1115,10 @@ Note the big p-values.  We do not reject the null hypothesis, so we conclude tha
 
 The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals.  The ordering of the residuals in the list is the same order as the predictors were entered in the cox model.  So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function.  By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors.  Leaving out the list number results in plots for all the predictors being generated at one time.  In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.
 
-
-```r
-ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ###  Coxph diagnostics ... look into all the different arguments of the function!
 
-
-```r
-ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
-```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
 

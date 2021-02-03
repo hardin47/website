@@ -6,9 +6,11 @@ Though we've discussed the relationship between tests of means and simple linear
 
 The data below represents 10 different variables on health of a country measured on 143 countries.  Data taken from [@Lock5], originally from the Happy Planet Index Project [http://www.happyplanetindex.org/].  Region of the world is coded as 1 = Latin America, 2 = Western nations, 3 = Middle East, 4 = Sub-Saharan Africa, 5 = South Asia, 6 = East Asia, 7 = former Communist countries.  We are going to investigate happiness and life expectancy.  
 
-## Transformations
+## Inference on the Linear Model
 
-### Model assumptions {-}
+In order to make an inferential claims on a linear regression model (e.g., p-values on hypotheses about coefficients, confidence intervals for coefficients, confidence interval for the line, prediction interval for the points, ...), we have a set of technical conditions that provide the mathematical structure leading to the t-procedures (e.g., t-test).  A course more focused on linear regression would spend time discussing how robust the model is to various deviations from the following technical conditions.  For now, we will say that sometimes transformations of either the explanatory or response variables can be an effective way to mitigate deviations from the model.
+
+### Technical Conditions 
 
 
 * The average value for the response variable is a linear function of the explanatory variable.
@@ -16,7 +18,7 @@ The data below represents 10 different variables on health of a country measured
 * The error terms have a mean of zero.
 * The error terms have a constant variance of $\sigma^2$.
 * The error terms are independent (and identically distributed).
-* [http://www.rossmanchance.com/applets/RegSim/RegCoeff.html]
+* [http://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm]
 
 How do we tell whether the assumptions are met?  We can't always.  But it's good to look at plots: scatter plot, residual plot, histograms of residuals.  We denote the residuals for this model as:
 
@@ -61,7 +63,9 @@ b_1 &= r(x,y) \frac{s_x}{s_y}\\
 
 The regression line will always pass through the point $(\overline{x}, \overline{y})$.
 
-
+::: {.definition}
+An estimate is *unbiased* if, over many repeated samples drawn from the population, the average value of the estimates based on the different samples would equal the population value of the parameter being estimated.  That is, a statistic is unbiased if the mean of its sampling distribution is the population parameter.
+:::
 
 
 ## Correlation
@@ -91,7 +95,7 @@ r(x,y) &= \frac{cov(x,y)}{s_x s_y}\\
 
 
 ## Errors / Residuals
-Recall, $\epsilon_i \sim N(0, \sigma^2)$.  How do we estimate $\sigma^2$?
+Recall, part of the technical conditions required that $\epsilon_i \sim N(0, \sigma^2)$.  How do we estimate $\sigma^2$?
 
 \begin{align}
 RSS &= \sum (y_i - \hat{y}_i)^2 \ \ \ \mbox{ residual sum of squares}\\
@@ -124,6 +128,8 @@ $R^2$ is the proportion of total variability explained by the regression line (t
 
 
 ### Testing $\beta_1$
+If the technical conditions hold, the mathematics describing the sampling distribution of $b_1$ are well defined.  That is:
+
 If $H_0: \beta=0$ is true, then
 \begin{align}
 \frac{b_1 - 0}{SE(b_1)} \sim t_{n-2}
@@ -183,7 +189,9 @@ How would you interpret the associated interval?
 
 **We are skipping Section \@ref(infl); you are not responsible for it.**
 
-
+::: {.theorem}
+*High leverage points* are x-outliers with the potential to exert undue influence on regression coefficient estimates.  *Influential points* are points that have exerted undue influence on the regression coefficient estimates.
+:::
 
 Note: typically we think of more data as better; more values will tend to decrease the sampling variability of our statistic.  But if I give you a lot more data and put it all at $\overline{x}$, $SE(b_1)$ stays exactly the same.  Why??
 
@@ -244,7 +252,6 @@ DFBETAS_i &= \frac{b_1 - b_{1(i)}}{\frac{s_{y|x, (i)}}{\sqrt{(n-1)} s_x}}\\
   
 
 The data below represents 10 different variables on health of a country measured on 143 countries.  Data taken from [@Lock5], originally from the Happy Planet Index Project [http://www.happyplanetindex.org/].  Region of the world is coded as 1 = Latin America, 2 = Western nations, 3 = Middle East, 4 = Sub-Saharan Africa, 5 = South Asia, 6 = East Asia, 7 = former Communist countries.  We are going to investigate happiness and life expectancy.  
-
 
 
 ### Reading the data into R
@@ -309,7 +316,7 @@ happy.lm %>%
          geom_hline(yintercept=0)
 ```
 
-<img src="03-SLR_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="03-SLR_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 Intervals of interest: mean response, individual response, and parameter(s).

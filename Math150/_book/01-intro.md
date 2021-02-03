@@ -1,5 +1,11 @@
 # Introduction {#intro}
 
+<div class="figure" style="text-align: center">
+<img src="figs/covidvaccine.png" alt="We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/" width="60%" />
+<p class="caption">(\#fig:unnamed-chunk-1)We reject the null hypothesis based on the 'hot damn, check out this chart' test. https://xkcd.com/2400/</p>
+</div>
+
+
 ## Course Goals
 
 Our goals in this course are: 
@@ -17,7 +23,41 @@ Our goals in this course are:
 
 
 
-![Probability vs. Statistics](probstat.jpg)
+
+<div class="figure" style="text-align: center">
+<img src="figs/probstat.jpg" alt="Probability vs. Statistics" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-2)Probability vs. Statistics</p>
+</div>
+
+
+
+## Using R
+
+Much work will be done in R using RStudio as a front end.  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  
+
+
+* You may use R on the Pomona server:  https://rstudio.campus.pomona.edu/  (All Pomona students will be able to log in immediately.  Non-Pomona students need to go to ITS at Pomona to get Pomona login information.)
+
+* If you want to use R on your own machine, you may.  Please make sure all components are updated:
+R is freely available at http://www.r-project.org/ and is already installed on college computers. Additionally, installing R Studio is required http://rstudio.org/.
+
+
+* http://swirlstats.com/ is a great way to walk through learning the basics of R.
+
+* All computing assignments should be turned in using R Markdown compiled to pdf.
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-3)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="95%" />
+<p class="caption">(\#fig:unnamed-chunk-4)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
+</div>
+
 
 
 ### Experimental Design {-}

@@ -1,7 +1,8 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2021-02-01"
+date: "2021-02-03"
+knit: bookdown::render_book
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
 documentclass: book
@@ -26,20 +27,21 @@ You are responsible for reading the relevant chapters in the text. The text is v
 
 
 
-| Day     | Topic               | Book Chap                 | Notes Section                     |
-|:--------|:--------------------|:--------------------------|:----------------------------------|
-| 1/25/21 | Intro               | ISCAM 1.1                 | \@ref(intro) [Introduction]       |
-| 1/27/21 | variables & studies | IMS 1.2, 1.4              | \@ref(experim) [Types of Studies] |
-| 2/1/21  | Correlation (r)     | IMS 3.1 & ISCAM 5.6 - 5.7 | \@ref(cor) [correlation]          |
-| 2/3/21  | Least Squares line  | IMS 3.2 & Inv 5.10 - 5.11 | \@ref(ls) [Least Sq]              |
+| Day     | Topic                          | Book Chap                 | Notes Section                      |
+|:--------|:-------------------------------|:--------------------------|:-----------------------------------|
+| 1/25/21 | Intro                          | ISCAM 1.1                 | \@ref(intro): Introduction         |
+| 1/27/21 | variables & studies            | IMS 1.2, 1.4              | \@ref(experim): Types of Studies   |
+| 2/1/21  | Correlation (r)                | IMS 3.1 & ISCAM 5.6 - 5.7 | \@ref(cor): correlation            |
+| 2/3/21  | Least Squares line             | IMS 3.2 & Inv 5.8         | \@ref(ls): Least Squares           |
+| 2/8/21  | Intro to Hyp Test              | IMS 5.1                   | \@ref(ex:gend): Hypothesis Testing |
+| 2/10/21 | Intro to Hyp Test              | IMS 5.1                   | \@ref(ex:gend): Hypothesis Testing |
+| 2/15/21 | Bootstrapping                  | IMS 5.2                   | \@ref(boot): Bootstrap             |
+| 2/17/21 | Bootstrap Confidence Intervals | IMS 5.2                   | \@ref(bootCI): Boot CI             |
+| 2/22/21 | Normality                      | IMS 5.3                   | \@ref(CLT): CLT                    |
+| 2/24/21 | Normality                      | IMS 5.3                   | \@ref(norm): Normal Dist           |
 
 ```{=html}
 <!--
-| 2/8/21 | Intro to Hyp Test | IMS 5 | \@ref(ex:gend)  [Examp: gender] |
-| 1/28/21   | Normality | ISRS 2.4-2.5 |   \@ref(CLT)  [CLT] |
-| 1/30/21   | Normality | ISRS 2.6-2.7 |  \@ref(norm)  [Normal Dist] |
-| 2/4/21    | Confidence Intervals | ISRS 2.8 |  \@ref(CI)  [CI] |
-| 2/6/21    | Confidence Intervals | ISRS 2.8 |  \@ref(modCI)  [modifying CI] 
 | 2/11/21   | Sampling | ISRS 1.3-1.4 |   \@ref(samp)  [sampling] |
 | 2/13/21   | Errors & Power | ISRS 3.1 & 2.3 |   \@ref(errors) [Errors&Power] |
 | 2/18/21   |RR & OR | ISCAM Chp 1 |   |
@@ -67,3 +69,4 @@ You are responsible for reading the relevant chapters in the text. The text is v
 | 5/5/21    |review |  |  \@ref(ex:1819flu) [1918-19 Flu]  |
 -->
 ```
+\`\`\`
