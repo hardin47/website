@@ -89,7 +89,7 @@ The randomized clinical trial examined whether the drug botulinum toxin A (Botox
 </li>
 <li>Explain the importance of using the “placebo” treatment of saline.<br>
 </li>
-<li>Create the two-way table for summarizing the data, putting the explanatory variable as the columns and the response as rows.<br>
+<li>Create the two-way table for summarizing the data, putting the explanatory variable as the rows and the response variable as the columns<br>
 </li>
 <li>Calculate the conditional proportions of pain reduction in the two groups. Display the results as a segmented bar graph. Comment on the preliminary analysis.</li>
 </ol>
@@ -102,16 +102,16 @@ The randomized clinical trial examined whether the drug botulinum toxin A (Botox
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>placebo</td>
-<td>2</td>
-<td>14</td>
-<td>16</td>
-</tr>
-<tr class="even">
 <td>Botox</td>
 <td>9</td>
 <td>6</td>
 <td>15</td>
+</tr>
+<tr class="even">
+<td>placebo</td>
+<td>2</td>
+<td>14</td>
+<td>16</td>
 </tr>
 <tr class="odd">
 <td></td>
@@ -126,11 +126,27 @@ The randomized clinical trial examined whether the drug botulinum toxin A (Botox
 \mbox{risk}_{\mbox{Botox}} = \frac{9}{15} &amp;=&amp; 0.6\\
 RR &amp;=&amp; 4.8
 \end{eqnarray*}\]</span></p>
-<pre><code>#&gt;          outcome
-#&gt; treatment no reduction reduction
-#&gt;   Botox              6         9
-#&gt;   placebo           14         2</code></pre>
-<p><img src="04-cat_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"><img src="04-cat_files/figure-html/unnamed-chunk-2-2.png" width="80%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">backpain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"placebo"</span>, <span class="fl">16</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Botox"</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span>,
+                     outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"reduction"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"no_reduction"</span>, <span class="fl">14</span><span class="op">)</span>, 
+                                 <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"reduction"</span>, <span class="fl">9</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"no_reduction"</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">backpain</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt;          outcome</span>
+<span class="co">#&gt; treatment no_reduction reduction</span>
+<span class="co">#&gt;   Botox              6         9</span>
+<span class="co">#&gt;   placebo           14         2</span></code></pre></div>
+<p>Note that sometimes it makes sense for the y-axis to be count and sometimes it makes sense for the y-axis to be percent. Probably doesn’t matter much here, you should choose the bar plot that seems most informative to you.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">backpain</span> <span class="op">%&gt;%</span>
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_bar</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">outcome</span><span class="op">)</span>, position <span class="op">=</span> <span class="st">"fill"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ylab</span><span class="op">(</span><span class="st">"percentage"</span><span class="op">)</span>
+
+<span class="va">backpain</span> <span class="op">%&gt;%</span>
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_bar</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">outcome</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-cat_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;"></div>
 <ol start="5" style="list-style-type: decimal">
 <li><p>If there was no association between the treatment and the back pain relief, about how many of the 11 “successes” would you expect to see in each group? Did the researchers observe more successes in the saline group than expected (if the drug had no effect) or fewer successes than expected? Is this in the direction conjectured by the researchers?</p></li>
 <li><p>Is is <em>possible</em> that the drug has absolutely no effect on back pain? That the differences were simply due to chance or random variability? How likely is that?</p></li>
@@ -219,38 +235,94 @@ RR &amp;=&amp; 4.8
 </tbody>
 </table></div>
 </div>
+<div id="inferFET" class="section level3" number="4.1.1">
+<h3>
+<span class="header-section-number">4.1.1</span> Simulation using R<a class="anchor" aria-label="anchor" href="#inferFET"><i class="fas fa-link"></i></a>
+</h3>
+<p>The simulation from the applet can be recreated using the <strong>infer</strong> package in R. Note the different pieces of the simulation using functions like <code><a href="https://infer.tidymodels.org/reference/specify.html">specify()</a></code>, <code><a href="https://infer.tidymodels.org/reference/hypothesize.html">hypothesize()</a></code>, <code><a href="https://infer.tidymodels.org/reference/generate.html">generate()</a></code>, and <code><a href="https://infer.tidymodels.org/reference/calculate.html">calculate()</a></code>. Also notice that this particular function works best using the difference in proportions (which we discussed in class is equivalent to recording the single count of Botox patients who had reduced back pain).</p>
+<p>Step 1. Calculate the observed difference in proportion of patients with reduced back pain. Note that as with linear regression we continue to use the syntax: <code>responsevariable ~ explanatoryvariable</code>.</p>
+<p>Step 2. Go through the simulation steps, just like the applet.</p>
+<ul>
+<li>
+<code><a href="https://infer.tidymodels.org/reference/specify.html">specify()</a></code> the variables<br>
+</li>
+<li>
+<code><a href="https://infer.tidymodels.org/reference/hypothesize.html">hypothesize()</a></code> about the null claim<br>
+</li>
+<li>
+<code><a href="https://infer.tidymodels.org/reference/generate.html">generate()</a></code> many permutions of the data<br>
+</li>
+<li>
+<code><a href="https://infer.tidymodels.org/reference/calculate.html">calculate()</a></code> the statistic of interest for all the different permutations</li>
+</ul>
+<p>Step 3. Plot a histogram representing the differences in proportions for all the many permuted tables. The plot represents the distribution of the differences in proportion under the null hypothesis.</p>
+<p>Step 4. Calculate the p-value from the sampling distribution generated in Step 3.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/infer">infer</a></span><span class="op">)</span>
+
+<span class="co"># Step 1.</span>
+<span class="va">diff_props</span> <span class="op">&lt;-</span> <span class="va">backpain</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">treatment</span>, success <span class="op">=</span> <span class="st">"reduction"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/calculate.html">calculate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"diff in props"</span><span class="op">)</span>
+
+<span class="va">diff_props</span>  <span class="co"># print to screen to see the observed difference</span>
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;    stat</span>
+<span class="co">#&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 0.475</span>
+
+<span class="co"># Step 2.</span>
+<span class="va">nulldist</span> <span class="op">&lt;-</span> <span class="va">backpain</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">treatment</span>, success <span class="op">=</span> <span class="st">"reduction"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/hypothesize.html">hypothesize</a></span><span class="op">(</span>null <span class="op">=</span> <span class="st">"independence"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/generate.html">generate</a></span><span class="op">(</span>reps <span class="op">=</span> <span class="fl">1000</span>, type <span class="op">=</span> <span class="st">"permute"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/calculate.html">calculate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"diff in props"</span><span class="op">)</span>
+
+<span class="co"># Step 3.</span>
+<span class="fu"><a href="https://infer.tidymodels.org/reference/visualize.html">visualize</a></span><span class="op">(</span><span class="va">nulldist</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/shade_p_value.html">shade_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">diff_props</span>, direction <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span>
+
+<span class="co"># Step 4.</span>
+<span class="va">nulldist</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://infer.tidymodels.org/reference/get_p_value.html">get_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">diff_props</span>, direction <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   p_value</span>
+<span class="co">#&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0.999</span></code></pre></div>
+<div class="inline-figure"><img src="04-cat_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
 </div>
 <div id="fisher" class="section level2" number="4.2">
 <h2>
 <span class="header-section-number">4.2</span> Fisher’s Exact Test<a class="anchor" aria-label="anchor" href="#fisher"><i class="fas fa-link"></i></a>
 </h2>
-<p>(Section 6.4 in <span class="citation"><a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar</a> (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
-<p>Because we have a fixed sample, we can’t use the Binomial distribution to figure out associated probabilities. Instead, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.</p>
+<p>(Section 6.4 in <span class="citation"><a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar</a> (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>, great detailed explanation!)</p>
+<p>Because we have a fixed sample, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.</p>
 <div class="inline-table"><table class="table table-sm">
 <thead><tr class="header">
 <th></th>
-<th align="center">placebo</th>
-<th align="center">Botox</th>
-<th align="center"></th>
+<th>pain reduction</th>
+<th>no pain reduction</th>
+<th></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>pain reduction</td>
-<td align="center">2 = x</td>
-<td align="center">9</td>
-<td align="center">11 = n</td>
+<td>Botox</td>
+<td>9 = x</td>
+<td>6</td>
+<td>15 = n</td>
 </tr>
 <tr class="even">
-<td>no pain reduction</td>
-<td align="center">14</td>
-<td align="center">6</td>
-<td align="center">20</td>
+<td>placebo</td>
+<td>2</td>
+<td>14</td>
+<td>16</td>
 </tr>
 <tr class="odd">
 <td></td>
-<td align="center">16 = M</td>
-<td align="center">15 = N - M</td>
-<td align="center">31 = N</td>
+<td>11 = M</td>
+<td>20 = N - M</td>
+<td>31 = N</td>
 </tr>
 </tbody>
 </table></div>
@@ -269,12 +341,12 @@ P(X=x) = \frac{\# \mbox{ of ways to select x successes and n-x failures}}{\# \mb
 <p>Find the P(X=2)</p>
 <p>We can now find EXACT probabilities associated with the following hypotheses.
 <span class="math display">\[\begin{eqnarray*}
-&amp;&amp;H_0: \pi_{pl} = \pi_{Btx}\\
-&amp;&amp;H_a: \pi_{pl} &lt; \pi_{Btx}\\
-&amp;&amp;\pi = \mbox{true probability of no pain}\\
+&amp;&amp;H_0: p_{pl} = p_{btx}\\
+&amp;&amp;H_a: p_{pl} &lt; p_{btx}\\
+&amp;&amp;p = \mbox{true probability of no pain}\\
 \end{eqnarray*}\]</span></p>
-<p>Is this a one- or two-sided test? Why? [Note: the assumptions here are that the row and column totals are fixed – a <strong>conditional test of independence</strong>. However, the research project in the back of chapter 6 extends the permutation test to demonstrated that the probabilities hold even under alternative technical conditions.</p>
-<p>Note also that we get an exact probability with no assumptions about sample size (we can use Fisher’s Exact Test even when true probabilities are close to 0 or 1.]</p>
+<p>Is this a one- or two-sided test? Why? [Note: the conditions here include that the row and column totals are fixed – a <strong>conditional test of independence</strong>. However, the research project in the back of chapter 6 extends the permutation test to demonstrated that the probabilities hold even under alternative technical conditions.</p>
+<p>Note also that we get an exact probability with no conditions needed about the sample size being big enough (we can use Fisher’s Exact Test even when true probabilities are close to 0 or 1.]</p>
 </div>
 <div id="chisq" class="section level2" number="4.3">
 <h2>
@@ -286,7 +358,7 @@ P(X=x) = \frac{\# \mbox{ of ways to select x successes and n-x failures}}{\# \mb
 <span class="header-section-number">4.3.1</span> <span class="math inline">\(\chi^2\)</span> tests<a class="anchor" aria-label="anchor" href="#chi2-tests"><i class="fas fa-link"></i></a>
 </h3>
 <p>(Section 6.6 in <span class="citation"><a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar</a> (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
-<p>2x2… but also rxc (<span class="math inline">\(\pi_a = \pi_b = \pi_c\)</span>)</p>
+<p>2x2… but also rxc (<span class="math inline">\(p_a = p_b = p_c\)</span>)</p>
 <p>We can also use <span class="math inline">\(\chi^2\)</span> tests to evaluate <span class="math inline">\(r \times c\)</span> contingency tables. Our main question now will be whether there is an association between two categorical variables of interest. Note that we are now generalizing what we did with the Botox and back pain example. Are the two variables independent? If the two variables are independent, then the state of one variable is not related to the probability of the different outcomes of the other variable.</p>
 <p>If the data were sampled in such a way that we have random samples of both the explanatory and response variables (e.g., cross classification study), then we typically do a test of association:</p>
 <p><span class="math display">\[\begin{eqnarray*}
@@ -295,10 +367,10 @@ H_a: &amp;&amp; \mbox{ the two variables are not independent}
 \end{eqnarray*}\]</span></p>
 <p>If the data are sampled in such a way that the response is measured across specified populations (as in the example below), we typically do a test of homogeneity of proportions. For example,</p>
 <p><span class="math display">\[\begin{eqnarray*}
-H_0: &amp;&amp; \pi_1 = \pi_2 = \pi_3\\
+H_0: &amp;&amp; p_1 = p_2 = p_3\\
 H_a: &amp;&amp; \mbox{not } H_0
 \end{eqnarray*}\]</span>
-where <span class="math inline">\(\pi=P(\mbox{success})\)</span> for each of groups 1,2,3.</p>
+where <span class="math inline">\(p=P(\mbox{success})\)</span> for each of groups 1,2,3.</p>
 <p>How do we get expected frequencies? The same mathematics hold regardless of the type of test (i.e., sampling mechanism used to collect the data). If, in fact,the variables are independent, then we should be able to multiply their probabilities. If the probabilities are the same, we expect the overall proportion of each response variable to be the same as the proportion of the response variable in each explanatory group. And the math in the example below follows directly.</p>
 <div class="example">
 <p><span id="exm:unlabeled-div-6" class="example"><strong>Example 4.2  </strong></span>The table below show the observed distributions of ABO blood type in three random samples of African Americans living in different locations. The three datasets, collected in the 1950s by three different investigators, are reproduced in <span class="citation">(<a href="references.html#ref-bloodtype" role="doc-biblioref">Mourant, Kopec, and Domaniewsa-Sobczak 1976</a>)</span>.</p>
@@ -529,9 +601,9 @@ p_1 = 0.001 &amp; p_2 = 0.157 &amp; \Delta = 0.156\\
 <p>To ensure the accuracy of the test, check whether np and n(1-p) is bigger than 5 in both samples is usually adequate. A more precise check is <span class="math inline">\(n_s \hat{p}_c\)</span> and <span class="math inline">\(n_s(1-\hat{p}_c)\)</span> are both greater than 5; <span class="math inline">\(n_s\)</span> is the smaller of the two sample sizes and <span class="math inline">\(\hat{p}_c\)</span>is the sample proportion when the two samples are combined into one.</p>
 <p>Note:
 <span class="math display">\[\begin{eqnarray*}
-\hat{p}_1 - \hat{p}_2 \sim N\Bigg(\pi_1 - \pi_2, \sqrt{\frac{\pi_1(1-\pi_1)}{n_1} + \frac{\pi_2(1-\pi_2)}{n_2}}\Bigg)
+\hat{p}_1 - \hat{p}_2 \sim N\Bigg(p_1 - p_2, \sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}}\Bigg)
 \end{eqnarray*}\]</span></p>
-<p>When testing independence, we assume that <span class="math inline">\(\pi_1=\pi_2\)</span>, so we use the pooled estimate of the proportion to calculate the SE:
+<p>When testing independence, we assume that <span class="math inline">\(p_1=p_2\)</span>, so we use the pooled estimate of the proportion to calculate the SE:
 <span class="math display">\[\begin{eqnarray*}
 SE(\hat{p}_1 - \hat{p}_2) = \sqrt{ \hat{p}_c(1-\hat{p}_c) \bigg(\frac{1}{n_1} + \frac{1}{n_2}\bigg)}
 \end{eqnarray*}\]</span></p>
@@ -559,7 +631,7 @@ SE(\hat{p}_1 - \hat{p}_2) = \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\ha
 <p><span class="math display">\[\begin{eqnarray*}
 \mbox{relative risk} &amp;=&amp; \frac{\mbox{risk group 1}}{\mbox{risk group 2}}\\
 &amp;=&amp;  \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}\\
-\mbox{RR} &amp;=&amp; \frac{p_1}{p_2} = \frac{\pi_1}{\pi_2}\\
+\mbox{RR} &amp;=&amp; \frac{p_1}{p_2} = \frac{p_1}{p_2}\\
 \hat{\mbox{RR}} &amp;=&amp; \frac{\hat{p}_1}{\hat{p}_2}
 \end{eqnarray*}\]</span></p>
 <p><span class="math inline">\(\hat{RR}\)</span> in the popcorn example is <span class="math inline">\(\frac{15/58}{6/58} = 2.5\)</span>. We say, “The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group.” What about</p>
@@ -586,7 +658,7 @@ SE(\ln (\hat{RR})) &amp;\approx&amp; \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1}
 &amp;=&amp; \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
 \hat{\mbox{odds}} &amp;=&amp; \hat{\theta}\\
 \mbox{odds ratio} &amp;=&amp; \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
-\mbox{OR} &amp;=&amp; \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{\pi_1/(1-\pi_1)}{\pi_2/(1-\pi_2)}\\
+\mbox{OR} &amp;=&amp; \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
 \hat{\mbox{OR}} &amp;=&amp; \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
 \end{eqnarray*}\]</span></p>
 <p><span class="math inline">\(\hat{OR}\)</span> in the popcorn example is <span class="math inline">\(\frac{15/43}{6/52} = 3.02\)</span>. We say, “The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group.”</p>
@@ -594,13 +666,13 @@ SE(\ln (\hat{RR})) &amp;\approx&amp; \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1}
 <h4>
 <span class="header-section-number">4.4.3.1</span> OR is more extreme than RR<a class="anchor" aria-label="anchor" href="#or-is-more-extreme-than-rr"><i class="fas fa-link"></i></a>
 </h4>
-<p>Without loss of generality, assume the true <span class="math inline">\(RR &gt; 1\)</span>, implying <span class="math inline">\(\pi_1 / \pi_2 &gt; 1\)</span> and <span class="math inline">\(\pi_1 &gt; \pi_2\)</span>.</p>
+<p>Without loss of generality, assume the true <span class="math inline">\(RR &gt; 1\)</span>, implying <span class="math inline">\(p_1 / p_2 &gt; 1\)</span> and <span class="math inline">\(p_1 &gt; p_2\)</span>.</p>
 <p>Note the following sequence of consequences:</p>
 <p><span class="math display">\[\begin{eqnarray*}
-RR = \frac{\pi_1}{\pi_2} &amp;&gt;&amp; 1\\
-\frac{1 - \pi_1}{1 - \pi_2} &amp;&lt;&amp; 1\\
-\frac{ 1 / (1 - \pi_1)}{1 / (1 - \pi_2)} &amp;&gt;&amp; 1\\
-\frac{\pi_1}{\pi_2} \cdot \frac{ 1 / (1 - \pi_1)}{1 / (1 - \pi_2)} &amp;&gt;&amp; \frac{\pi_1}{\pi_2}\\
+RR = \frac{p_1}{p_2} &amp;&gt;&amp; 1\\
+\frac{1 - p_1}{1 - p_2} &amp;&lt;&amp; 1\\
+\frac{ 1 / (1 - p_1)}{1 / (1 - p_2)} &amp;&gt;&amp; 1\\
+\frac{p_1}{p_2} \cdot \frac{ 1 / (1 - p_1)}{1 / (1 - p_2)} &amp;&gt;&amp; \frac{p_1}{p_2}\\
 OR &amp;&gt;&amp; RR
 \end{eqnarray*}\]</span></p>
 </div>
@@ -826,7 +898,7 @@ Now we have a cohort prospective study. (Previously we had a case-control retros
 <p><span class="math display">\[\begin{eqnarray*}
 SE(\ln (\hat{OR})) &amp;\approx&amp; \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
 \end{eqnarray*}\]</span></p>
-<p>Note that your book introduces <span class="math inline">\(SE(\ln(\hat{OR}))\)</span> in the context of hypothesis testing where the null, <span class="math inline">\(H_0: \pi_1 = \pi_2\)</span>, is assumed to be true. If the null is true, you’d prefer an estimate for the proportion of success to be based on the entire sample:</p>
+<p>Note that your book introduces <span class="math inline">\(SE(\ln(\hat{OR}))\)</span> in the context of hypothesis testing where the null, <span class="math inline">\(H_0: p_1 = p_2\)</span>, is assumed to be true. If the null is true, you’d prefer an estimate for the proportion of success to be based on the entire sample:</p>
 <p><span class="math display">\[\begin{eqnarray*}
 SE(\ln (\hat{OR})) &amp;\approx&amp; \sqrt{\frac{1}{n_1 \hat{p} (1-\hat{p})} + \frac{1}{n_2 \hat{p}(1-\hat{p})}}
 \end{eqnarray*}\]</span></p>
@@ -958,7 +1030,7 @@ OR &amp;=&amp; RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 <h4>Which test?<a class="anchor" aria-label="anchor" href="#which-test"><i class="fas fa-link"></i></a>
 </h4>
 <p>(Section 6.1 of <span class="citation"><a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar</a> (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
-<p>It turns out that the tests above (independence, homogeneity of proportions, homogeneity of odds) are typically equivalent with respect to their conclusions. However, they each have particular assumptions about what they are testing, but that we can generally use any of them for our hypotheses of interest. However, we need to be very careful about our <strong>interpretations</strong>!</p>
+<p>It turns out that the tests above (independence, homogeneity of proportions, homogeneity of odds) are typically equivalent with respect to their conclusions. However, they each have particular conditions related to what they are testing, but that we can generally use any of them for our hypotheses of interest. However, we need to be very careful about our <strong>interpretations</strong>!</p>
 <p>(No goodness of fit, section 6.11 of <span class="citation"><a href="references.html#ref-KuiperSklar" role="doc-biblioref">Kuiper and Sklar</a> (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
 </div>
 </div>
@@ -975,7 +1047,7 @@ OR &amp;=&amp; RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 #&gt; treatment no reduction reduction
 #&gt;   Botox              6         9
 #&gt;   placebo           14         2</code></pre>
-<p><img src="04-cat_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"><img src="04-cat_files/figure-html/unnamed-chunk-3-2.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="04-cat_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"><img src="04-cat_files/figure-html/unnamed-chunk-6-2.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div id="fishers-exact-test" class="section level3" number="4.6.2">
 <h3>
@@ -1014,7 +1086,9 @@ OR &amp;=&amp; RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#analysis-of-categorical-data"><span class="header-section-number">4</span> Analysis of Categorical Data</a></li>
-<li><a class="nav-link" href="#cat"><span class="header-section-number">4.1</span> Categorical Inference</a></li>
+<li>
+<a class="nav-link" href="#cat"><span class="header-section-number">4.1</span> Categorical Inference</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#inferFET"><span class="header-section-number">4.1.1</span> Simulation using R</a></li></ul>
+</li>
 <li><a class="nav-link" href="#fisher"><span class="header-section-number">4.2</span> Fisher’s Exact Test</a></li>
 <li>
 <a class="nav-link" href="#chisq"><span class="header-section-number">4.3</span> Testing independence of two categorical variables</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#chi2-tests"><span class="header-section-number">4.3.1</span> \(\chi^2\) tests</a></li></ul>

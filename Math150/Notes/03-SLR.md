@@ -256,7 +256,9 @@ The data below represents 10 different variables on health of a country measured
 
 ### Reading the data into R
 
-```
+```r
+happy <- read_delim("~/Dropbox/teaching/MA150/spring17/happyPlanet.txt", delim="\t")
+glimpse(happy)  
 #> Rows: 143
 #> Columns: 11
 #> $ Country        <chr> "Albania", "Algeria", "Angola", "Argentina", "Armenia"…
@@ -276,7 +278,10 @@ The data below represents 10 different variables on health of a country measured
 ### Running the linear model (lm)
 
 
-```
+```r
+happy.lm = lm(LifeExpectancy ~ Happiness, data=happy) 
+
+happy.lm %>% tidy()
 #> # A tibble: 2 x 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
@@ -288,7 +293,8 @@ The data below represents 10 different variables on health of a country measured
 
 Some analyses will need the residuals, fitted values, or coefficients individually.
 
-```
+```r
+happy.lm %>% augment()
 #> # A tibble: 143 x 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
@@ -321,13 +327,17 @@ happy.lm %>%
 
 Intervals of interest: mean response, individual response, and parameter(s).
 
-```
+```r
+predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("conf"), level=.95)
 #>    fit  lwr  upr
 #> 1 55.0 53.2 56.7
 #> 2 75.1 73.8 76.4
+predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("pred"), level=.95)
 #>    fit  lwr  upr
 #> 1 55.0 42.7 67.3
 #> 2 75.1 62.9 87.3
+
+happy.lm %>% tidy(conf.int = TRUE)
 #> # A tibble: 2 x 7
 #>   term        estimate std.error statistic  p.value conf.low conf.high
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
@@ -342,7 +352,8 @@ We skipped the residuals section, so you are not responsible for finding residua
   
 
 
-```
+```r
+happy.lm %>% augment()
 #> # A tibble: 143 x 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
