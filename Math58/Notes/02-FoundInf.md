@@ -18,7 +18,7 @@
 
 > The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.
 
-> For each supervisor we recorded the gender associated with the assigned file and the promotion decision. Using the results of the study summarized in Table 2.1, we would like to evaluate if females are unfairly discriminated against in promotion decisions. In this study, a smaller proportion of females are promoted than males (0.583 versus 0.875), but it is unclear whether the difference provides convincing evidence that females are unfairly discriminated against.   (@ims, pg 61) 
+> For each supervisor we recorded the gender associated with the assigned file and the promotion decision. Using the results of the study summarized in Table 2.1, we would like to evaluate if females are unfairly discriminated against in promotion decisions. In this study, a smaller proportion of females are promoted than males (0.583 versus 0.875), but it is unclear whether the difference provides convincing evidence that females are unfairly discriminated against.   (@ims) 
 
 |   |        |          | decision     |       |
 |---|--------|----------|--------------|-------|
@@ -33,8 +33,8 @@
 * What are the observational units?
     - supervisor
 * What are the variables?  What type of variables?
-    - (1) whether the resume was male or female (categorical)
-    - (2) decision to promote or not promote (categorical)
+    - (1) whether the resume was male or female (explanatory, categorical)
+    - (2) decision to promote or not promote (response, categorical)
 * What is the statistic?
     - $\hat{p}_m - \hat{p}_f$ = 21/24 - 14/24 = 0.292  (the difference between the proportion of men who were promoted and the proportion of women who were promoted)
 * What is the parameter?
@@ -191,11 +191,20 @@ What is the point?  Why did we see the video?  How does it relate the to the mat
 * collect data, **specify** the variables of interest
 * state the null (and alternative) **hypothesis** values (often statements about parameters)
    - the null claim is the science we want to reject
-   - the alternative claim is the science we want to prove
+   - the alternative claim is the science we want to demonstrate
 * **generate** a (null) sampling distribution to describe the variability of the statistic that was **calculated** along the way
 * **visualize** the distribution of the statistics under the null model
 * **get_p_value** to measure the consistency of the observed statistic and the possible values of the statistic under the null model
 * make a conclusion using words that describe the research setting
+
+
+::: {.example}
+**Randomization test on Gerrymandering:**
+
+Note that the idea of creating a null distribution can apply to a wide range of possible settings.  The key is to swap observations around under the null hypothesis where "randomizing under the null hypothesis" helps get the researcher to a conclusion.  
+
+Below is a youtube video describing permuting (i.e., randomizing) different voting boundaries to come up with a null distribution of districts.  The problem (as stated) is not possible to describe using mathematical functions, but we can derive a solution using computational approaches. [https://www.youtube.com/watch?v=gRCZR_BbjTo]
+:::
 
 <!--
 ## 1/28/20 Agenda {#Jan28}

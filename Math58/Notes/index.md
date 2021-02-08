@@ -1,7 +1,7 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2021-02-03"
+date: "2021-02-08"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
@@ -32,7 +32,7 @@ You are responsible for reading the relevant chapters in the text. The text is v
 | 1/25/21 | Intro                          | ISCAM 1.1                 | \@ref(intro): Introduction         |
 | 1/27/21 | variables & studies            | IMS 1.2, 1.4              | \@ref(experim): Types of Studies   |
 | 2/1/21  | Correlation (r)                | IMS 3.1 & ISCAM 5.6 - 5.7 | \@ref(cor): correlation            |
-| 2/3/21  | Least Squares line             | IMS 3.2 & Inv 5.8         | \@ref(ls): Least Squares           |
+| 2/3/21  | Least Squares line             | IMS 3.2 & ISCAM 5.8       | \@ref(ls): Least Squares           |
 | 2/8/21  | Intro to Hyp Test              | IMS 5.1                   | \@ref(ex:gend): Hypothesis Testing |
 | 2/10/21 | Intro to Hyp Test              | IMS 5.1                   | \@ref(ex:gend): Hypothesis Testing |
 | 2/15/21 | Bootstrapping                  | IMS 5.2                   | \@ref(boot): Bootstrap             |
