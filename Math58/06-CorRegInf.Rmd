@@ -298,11 +298,11 @@ Again, there are numerous ways to build a model.  Some important principles to k
 As before, the LINE model conditions are checked by using residual plots.  Note that in the housing example, the residual plot after log transformation on the response variable is improved.
 
 ```{r}
-
 library(tidyverse)
 library(broom)
 house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
-                   header=TRUE, sep="\t")
+                   header=TRUE, sep="\t") %>%
+  mutate(ln_price = log(price))
 
 lm(price ~  sqft, data=house)  %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
@@ -311,8 +311,8 @@ lm(price ~  sqft, data=house)  %>% augment () %>%
   ggtitle("Residual plot for price as a function of sqft")
 ```
 
-```{r eval = FALSE}
-lm(log(price) ~  sqft, data=house)  %>% augment () %>%
+```{r}
+lm(ln_price ~  sqft, data=house)  %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
@@ -424,7 +424,8 @@ ggplot(catPred, aes(x=bodymass)) +
 ```{r message=FALSE, warning=FALSE}
 library(GGally)
 house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
-                   header=TRUE, sep="\t")
+                   header=TRUE, sep="\t") %>%
+  mutate(ln_price = log(price))
 names(house)
 ```
 
@@ -456,7 +457,7 @@ mod.bed %>% glance()
 
 However, it is important for us to ask whether either of the relationships actually fit the technical conditions of the linear regression model.  We can see from the pairs plots that the relationships look **L**inear, we'll assume the variables were collected **I**ndependently, but the **N**ormality and the **E**quality of the error structure we can check using residual plots.
 
-```{r eval = FALSE}
+```{r}
 mod.sqft %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -475,11 +476,11 @@ For both of the plots, it seems like the residuals have higher variability for p
 A natural log transformation should fix both of these problems.
 
 ```{r}
-mod.lnsqft <- lm(log(price)~sqft, data = house)
-mod.lnbed <- lm(log(price) ~ bedrooms, data=house)
+mod.lnsqft <- lm(ln_price ~ sqft, data = house)
+mod.lnbed <- lm(ln_price ~ bedrooms, data=house)
 ```
 
-```{r eval = FALSE}
+```{r}
 mod.lnsqft %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -751,8 +752,9 @@ flu_1819 %>%
 
 ```{r eval = FALSE}
 flu_1819 %>%
+  mutate(ln_magPeak = log(magPeak)) %>%
   filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
-  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  lm(ln_magPeak ~ responseTime + daysNonpharm, data = .) %>%
   augment() %>%
   ggplot() +
   geom_point(aes(x=.fitted, y = .resid)) + 

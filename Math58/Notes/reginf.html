@@ -344,7 +344,8 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span>
 <span class="va">house</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam2/data/housing.txt"</span>, 
-                   header<span class="op">=</span><span class="cn">TRUE</span>, sep<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span>
+                   header<span class="op">=</span><span class="cn">TRUE</span>, sep<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">mutate</span><span class="op">(</span>ln_price <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">price</span> <span class="op">~</span>  <span class="va">sqft</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span>  <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -353,11 +354,12 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for price as a function of sqft"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;"></div>
 <div class="sourceCode" id="cb186"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span>  <span class="va">sqft</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span>  <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_price</span> <span class="op">~</span>  <span class="va">sqft</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span>  <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for ln price as a function of sqft"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 </div>
 <div id="r-code-for-regression-1" class="section level2" number="8.3">
@@ -531,9 +533,10 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <div class="sourceCode" id="cb207"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggobi.github.io/ggally">GGally</a></span><span class="op">)</span>
 <span class="va">house</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam2/data/housing.txt"</span>, 
-                   header<span class="op">=</span><span class="cn">TRUE</span>, sep<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span>
+                   header<span class="op">=</span><span class="cn">TRUE</span>, sep<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">mutate</span><span class="op">(</span>ln_price <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">house</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "sqft"     "price"    "City"     "bedrooms" "baths"</code></pre>
+<pre><code>## [1] "sqft"     "price"    "City"     "bedrooms" "baths"    "ln_price"</code></pre>
 <div id="descriptive-statistics-1" class="section level4 unnumbered">
 <h4>Descriptive Statistics<a class="anchor" aria-label="anchor" href="#descriptive-statistics-1"><i class="fas fa-link"></i></a>
 </h4>
@@ -582,30 +585,34 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for price as a function of sqft"</span><span class="op">)</span>
-
-<span class="va">mod.bed</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for price as a function of sqft"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb219"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod.bed</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for price as a function of bedrooms"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-17-2.png" width="480" style="display: block; margin: auto;"></div>
 <p>For both of the plots, it seems like the residuals have higher variability for positive residuals. Additionally, it seems that the variability of the residuals increases for larger fitted observations.</p>
 <p>A natural log transformation should fix both of these problems.</p>
-<div class="sourceCode" id="cb219"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod.lnsqft</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span><span class="op">~</span><span class="va">sqft</span>, data <span class="op">=</span> <span class="va">house</span><span class="op">)</span>
-<span class="va">mod.lnbed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">bedrooms</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb220"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod.lnsqft</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_price</span> <span class="op">~</span> <span class="va">sqft</span>, data <span class="op">=</span> <span class="va">house</span><span class="op">)</span>
+<span class="va">mod.lnbed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_price</span> <span class="op">~</span> <span class="va">bedrooms</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod.lnsqft</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for ln(price) as a function of sqft"</span><span class="op">)</span>
-
-<span class="va">mod.lnbed</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for ln(price) as a function of sqft"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb222"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod.lnbed</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span> <span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Residual plot for ln(price) as a function of bedrooms"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;"></div>
 <p>Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.</p>
 </div>
 <div id="multiple-linear-regression" class="section level4 unnumbered">
@@ -613,7 +620,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 </h4>
 <p>Because the price variable had a large skew (and the <code>ln()</code> transformation helped the residuals), the following models will all use <code>ln(price)</code> as the response variable. What happens when we try to predict <code>price</code> (actually <code>ln(price)</code>, here) using BOTH <code>sqft</code> and <code>bedrooms</code>?</p>
 <p>Note: the natural log function in R is <code><a href="https://rdrr.io/r/base/Log.html">log()</a></code>.</p>
-<div class="sourceCode" id="cb221"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb223"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">bedrooms</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term         estimate std.error statistic  p.value
@@ -621,14 +628,14 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 ## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
 ## 2 sqft         0.000468 0.0000660      7.09 4.73e-10
 ## 3 bedrooms    -0.0603   0.0572        -1.05 2.95e- 1</code></pre>
-<div class="sourceCode" id="cb223"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb225"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">bedrooms</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.448         0.435 0.450      32.5 4.62e-11     2  -50.0  108.  118.
 ## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb225"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb227"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">baths</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   term         estimate std.error statistic  p.value
@@ -636,14 +643,14 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 ## 1 (Intercept) 12.1      0.151        80.0   4.07e-78
 ## 2 sqft         0.000450 0.0000705     6.39  1.02e- 8
 ## 3 baths       -0.0377   0.0746       -0.505 6.15e- 1</code></pre>
-<div class="sourceCode" id="cb227"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb229"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">baths</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.443         0.429 0.452      31.8 7.07e-11     2  -50.4  109.  118.
 ## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
-<div class="sourceCode" id="cb229"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb231"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">bedrooms</span> <span class="op">+</span> <span class="va">baths</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 5
 ##   term         estimate std.error statistic  p.value
@@ -652,7 +659,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 ## 2 sqft         0.000463 0.0000719     6.45  8.32e- 9
 ## 3 bedrooms    -0.0683   0.0730       -0.935 3.53e- 1
 ## 4 baths        0.0168   0.0947        0.177 8.60e- 1</code></pre>
-<div class="sourceCode" id="cb231"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb233"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">sqft</span> <span class="op">+</span> <span class="va">bedrooms</span> <span class="op">+</span> <span class="va">baths</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
@@ -667,7 +674,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <p>Seems like we <em>really</em> don’t need bathrooms! The information about <code>sqft</code> is sufficient for predicting the price, and information about bathrooms doesn’t help much at all.</p>
 <p><strong>Final model</strong></p>
 <p>The final model will be run on log(price) using only sqft. Note that the coefficients and the <span class="math inline">\(R^2\)</span> values change slightly (from the original analysis) because the response variable is logged.</p>
-<div class="sourceCode" id="cb233"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb235"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mod.lnsqft</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
 ## Call:
@@ -695,7 +702,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <div id="confidence-interval-1" class="section level5 unnumbered">
 <h5>Confidence interval:<a class="anchor" aria-label="anchor" href="#confidence-interval-1"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb235"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb237"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mod.lnsqft</span>, newdata<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>sqft<span class="op">=</span><span class="fl">2000</span><span class="op">)</span>, interval<span class="op">=</span><span class="st">"confidence"</span><span class="op">)</span></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.89125 12.79211 12.99038</code></pre>
@@ -704,7 +711,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <div id="prediction-interval" class="section level5 unnumbered">
 <h5>Prediction interval:<a class="anchor" aria-label="anchor" href="#prediction-interval"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb237"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb239"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mod.lnsqft</span>, newdata<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>sqft<span class="op">=</span><span class="fl">2000</span><span class="op">)</span>, interval<span class="op">=</span><span class="st">"prediction"</span><span class="op">)</span></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.89125 11.98994 13.79255</code></pre>
@@ -714,7 +721,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <h5>Plotting confidence bounds:<a class="anchor" aria-label="anchor" href="#plotting-confidence-bounds"><i class="fas fa-link"></i></a>
 </h5>
 <p>A <strong>confidence</strong> interval around the line gives bounds on the parameter represented by the line. So we are 95% confident that the true population line lies within the bounds. Note that the interval is wider at the endpoints (because the variability is higher at the ends).</p>
-<div class="sourceCode" id="cb239"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb241"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">houseConf</span> <span class="op">&lt;-</span> <span class="va">mod.lnsqft</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mod.lnsqft</span>, interval<span class="op">=</span><span class="st">"confidence"</span><span class="op">)</span> <span class="op">)</span>  <span class="co"># cbind binds the columns together</span>
 
@@ -733,14 +740,14 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 ## 4 12.65019 12.52795 12.77244
 ## 5 12.86731 12.76725 12.96738
 ## 6 12.67755 12.55923 12.79587</code></pre>
-<div class="sourceCode" id="cb241"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb243"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">houseConf</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">sqft</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">`log(price)`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">.fitted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>ymin<span class="op">=</span><span class="va">lwr</span>, ymax<span class="op">=</span><span class="va">upr</span><span class="op">)</span>, fill<span class="op">=</span><span class="st">"blue"</span>, alpha<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>A <strong>prediction</strong> interval around the line bounds the individual points. That is, 95% of the observations are captured inside the interval. As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals</p>
-<div class="sourceCode" id="cb242"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">housePred</span> <span class="op">&lt;-</span> <span class="va">mod.lnsqft</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mod.lnsqft</span>, interval<span class="op">=</span><span class="st">"prediction"</span><span class="op">)</span> <span class="op">)</span>  <span class="co"># cbind binds the columns together</span>
 
@@ -759,7 +766,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 ## 4 12.65019 11.74606 13.55433
 ## 5 12.86731 11.96591 13.76872
 ## 6 12.67755 11.77393 13.58116</code></pre>
-<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb246"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">housePred</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">sqft</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">`log(price)`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">.fitted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -770,7 +777,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
 <h5>Predicting with more than one explanatory variable:<a class="anchor" aria-label="anchor" href="#predicting-with-more-than-one-explanatory-variable"><i class="fas fa-link"></i></a>
 </h5>
 <p>The predict function still works to give estimates of the average value and the predicted individual values, but the plot is now much harder to draw because with three explanatory variables, we would need a 4-d plot to visualize the model and the predictions.</p>
-<div class="sourceCode" id="cb245"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb247"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sqftbedbathlm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span><span class="op">~</span><span class="va">sqft</span> <span class="op">+</span> <span class="va">bedrooms</span> <span class="op">+</span> <span class="va">baths</span>, data<span class="op">=</span><span class="va">house</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">sqftbedbathlm</span>, 
@@ -778,7 +785,7 @@ A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math 
         interval<span class="op">=</span><span class="st">"confidence"</span>, level<span class="op">=</span><span class="fl">.95</span><span class="op">)</span></code></pre></div>
 <pre><code>##        fit      lwr      upr
 ## 1 12.91816 12.80085 13.03548</code></pre>
-<div class="sourceCode" id="cb247"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb249"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">sqftbedbathlm</span>, 
         newdata<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>sqft<span class="op">=</span><span class="fl">2000</span>, bedrooms<span class="op">=</span><span class="fl">3</span>, baths<span class="op">=</span><span class="fl">2</span><span class="op">)</span>, 
         interval<span class="op">=</span><span class="st">"prediction"</span>, level<span class="op">=</span><span class="fl">.95</span><span class="op">)</span></code></pre></div>
@@ -817,7 +824,7 @@ Figure 8.2: Nonpharmaceutical Interventions Implemented by US Cities During the 
 Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should be magnitude of first mortality peak). Table 4 uses a test other than linear regression (Wilcoxon rank sum test – a two sample test of means done on ranked data rather than raw data) to compare the outcome variables broken into two groups: below the median response time and above the median response time.
 </p>
 </div>
-<div class="sourceCode" id="cb249"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb251"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"1918_1919flu.csv"</span>, 
                      col_types <span class="op">=</span> <span class="fu">cols</span><span class="op">(</span>`Date of peak Excess death rate` <span class="op">=</span> <span class="fu">col_date</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"%m/%d/%y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
@@ -839,7 +846,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 </h4>
 <p>To be consistent with the manuscript, Spearman correlation is used instead of Pearson. Spearman is the Pearson correlation applied to the ranks of the observations (instead of the raw values of the observations). Calculating Spearman has the impact of lessening the influence of outlying observations.</p>
 <p>The correlations calculated below match the values in the manuscript, but we repeat the analysis without St Paul, MN and Grand Rapids, MI to see their impact on the analysis. I would not remove the two cities without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations. Here it seems that there is some impact (e.g., excessDeaths and responseTime) but possibly the impact is only moderate.</p>
-<div class="sourceCode" id="cb251"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb253"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">excessDeaths</span>, <span class="va">magPeak</span>, <span class="va">responseTime</span>, <span class="va">daysNonpharm</span>, <span class="va">timePeak</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">cor</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"spearman"</span><span class="op">)</span></code></pre></div>
@@ -849,7 +856,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 ## responseTime    0.3658238  0.3090137    1.0000000   -0.6808529 -0.7346764
 ## daysNonpharm   -0.3925996 -0.5739853   -0.6808529    1.0000000  0.6135956
 ## timePeak       -0.1619664 -0.2541940   -0.7346764    0.6135956  1.0000000</code></pre>
-<div class="sourceCode" id="cb253"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb255"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span>  <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">excessDeaths</span>, <span class="va">magPeak</span>, <span class="va">responseTime</span>, <span class="va">daysNonpharm</span>, <span class="va">timePeak</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -866,7 +873,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 </h4>
 <p>Below, both St Paul and Grand Rapids have been removed from the model. Again, in reporting the analysis (as the JAMA authors did correctly), the two cities would not be removed without a justifiable reason (something that makes them fundamentally different from the other cities, worth not including in the model); however, it is worth re-calculations just to investigate the impact of individual observations.</p>
 <p>Note that in predicting both <code>excessDeaths</code> and <code>magPeak</code> the most significant variable is <code>daysNonpharm</code>. No other variable adds significantly to the model</p>
-<div class="sourceCode" id="cb255"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb257"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># excessDeaths as the response variable:</span>
 <span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -878,7 +885,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 ## 1 (Intercept)   552.       67.0        8.24 5.50e-10
 ## 2 responseTime    5.57      3.90       1.43 1.62e- 1
 ## 3 daysNonpharm   -0.828     0.503     -1.65 1.08e- 1</code></pre>
-<div class="sourceCode" id="cb257"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb259"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">excessDeaths</span> <span class="op">~</span>  <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -888,7 +895,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)    628.      41.7       15.0  7.92e-18
 ## 2 daysNonpharm    -1.25     0.412     -3.03 4.28e- 3</code></pre>
-<div class="sourceCode" id="cb259"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb261"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">excessDeaths</span> <span class="op">~</span>  <span class="va">responseTime</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -898,7 +905,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)    452.       28.8      15.7  1.90e-18
 ## 2 responseTime     9.35      3.23      2.90 6.14e- 3</code></pre>
-<div class="sourceCode" id="cb261"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb263"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># magPeak as the response variable:</span>
 <span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -910,7 +917,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 ## 1 (Intercept)  167.        21.0      7.95   0.00000000132
 ## 2 responseTime  -0.0555     1.22    -0.0455 0.964        
 ## 3 daysNonpharm  -0.715      0.157   -4.55   0.0000541</code></pre>
-<div class="sourceCode" id="cb263"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">magPeak</span><span class="op">)</span> <span class="op">~</span> <span class="va">responseTime</span> <span class="op">+</span> <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -926,7 +933,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
 <h4>Checking Residuals<a class="anchor" aria-label="anchor" href="#checking-residuals"><i class="fas fa-link"></i></a>
 </h4>
 <p>Turns out the residuals for these models aren’t great (maybe that is why the authors used ranked based methods like Spearman correlation and Wilcoxon rank sum test??? – those tests have different technical conditions, not based in normal theory!)</p>
-<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># excessDeaths as the response variable:</span>
 <span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -937,7 +944,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"St Paul &amp; Grand Rapids removed, excessDeath vs days Nonparm"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb266"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb268"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">excessDeaths</span> <span class="op">~</span>  <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -946,7 +953,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"St Paul &amp; Grand Rapids NOT removed, excessDeath vs days Nonparm"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-35-2.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># magPeak as the response variable:</span>
 <span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -957,7 +964,7 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"St Paul &amp; Grand Rapids removed, magPeak vs days responseTime"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-35-3.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb268"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb270"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">magPeak</span> <span class="op">~</span> <span class="va">responseTime</span> <span class="op">+</span> <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -966,10 +973,11 @@ Figure 8.3: Note that figure 1b seems to have the y-axis mis-labelled (it should
   <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"St Paul &amp; Grand Rapids NOT removed, magPeak vs days responseTime"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-CorRegInf_files/figure-html/unnamed-chunk-35-4.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb271"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flu_1819</span> <span class="op">%&gt;%</span>
+  <span class="fu">mutate</span><span class="op">(</span>ln_magPeak <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">magPeak</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">place</span> <span class="op">!=</span> <span class="st">"St Paul, MN"</span> <span class="op">&amp;</span> <span class="va">place</span> <span class="op">!=</span> <span class="st">"Grand Rapids, MI"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">magPeak</span><span class="op">)</span> <span class="op">~</span> <span class="va">responseTime</span> <span class="op">+</span> <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_magPeak</span> <span class="op">~</span> <span class="va">responseTime</span> <span class="op">+</span> <span class="va">daysNonpharm</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
@@ -1122,7 +1130,7 @@ Figure 8.6: Gilead remdesivir trial covered in the NYT, <a href="https://www.nyt
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Introduction to (Bio)Statistics</strong>" was written by Jo Hardin. It was last built on 2021-02-08.</p>
+    <p>"<strong>Introduction to (Bio)Statistics</strong>" was written by Jo Hardin. It was last built on 2021-02-09.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

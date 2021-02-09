@@ -313,7 +313,8 @@ As before, the LINE model conditions are checked by using residual plots.  Note 
 library(tidyverse)
 library(broom)
 house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
-                   header=TRUE, sep="\t")
+                   header=TRUE, sep="\t") %>%
+  mutate(ln_price = log(price))
 
 lm(price ~  sqft, data=house)  %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
@@ -326,12 +327,14 @@ lm(price ~  sqft, data=house)  %>% augment () %>%
 
 
 ```r
-lm(log(price) ~  sqft, data=house)  %>% augment () %>%
+lm(ln_price ~  sqft, data=house)  %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for ln price as a function of sqft")
 ```
+
+<img src="06-CorRegInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
 
 ## R code for regression 
 
@@ -567,12 +570,13 @@ ggplot(catPred, aes(x=bodymass)) +
 ```r
 library(GGally)
 house = read.table("http://www.rossmanchance.com/iscam2/data/housing.txt", 
-                   header=TRUE, sep="\t")
+                   header=TRUE, sep="\t") %>%
+  mutate(ln_price = log(price))
 names(house)
 ```
 
 ```
-## [1] "sqft"     "price"    "City"     "bedrooms" "baths"
+## [1] "sqft"     "price"    "City"     "bedrooms" "baths"    "ln_price"
 ```
 
 #### Descriptive Statistics {-}
@@ -652,7 +656,11 @@ mod.sqft %>% augment () %>%
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for price as a function of sqft")
+```
 
+<img src="06-CorRegInf_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
 mod.bed %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
@@ -660,14 +668,16 @@ mod.bed %>% augment () %>%
   ggtitle("Residual plot for price as a function of bedrooms")
 ```
 
+<img src="06-CorRegInf_files/figure-html/unnamed-chunk-17-2.png" width="480" style="display: block; margin: auto;" />
+
 For both of the plots, it seems like the residuals have higher variability for positive residuals.  Additionally, it seems that the variability of the residuals increases for larger fitted observations. 
 
 A natural log transformation should fix both of these problems.
 
 
 ```r
-mod.lnsqft <- lm(log(price)~sqft, data = house)
-mod.lnbed <- lm(log(price) ~ bedrooms, data=house)
+mod.lnsqft <- lm(ln_price ~ sqft, data = house)
+mod.lnbed <- lm(ln_price ~ bedrooms, data=house)
 ```
 
 
@@ -677,13 +687,19 @@ mod.lnsqft %>% augment () %>%
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for ln(price) as a function of sqft")
+```
 
+<img src="06-CorRegInf_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
 mod.lnbed %>% augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for ln(price) as a function of bedrooms")
 ```
+
+<img src="06-CorRegInf_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;" />
 
 
 Though no residual plot will ever look perfect, these residual plots seem to fit the technical conditions of the model better than the untransformed data.
@@ -1197,8 +1213,9 @@ flu_1819 %>%
 
 ```r
 flu_1819 %>%
+  mutate(ln_magPeak = log(magPeak)) %>%
   filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
-  lm(log(magPeak) ~ responseTime + daysNonpharm, data = .) %>%
+  lm(ln_magPeak ~ responseTime + daysNonpharm, data = .) %>%
   augment() %>%
   ggplot() +
   geom_point(aes(x=.fitted, y = .resid)) + 
