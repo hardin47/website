@@ -660,7 +660,7 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 [$1 - \frac{X_2}{n_2} > 1 - \frac{X_1}{n_1} \rightarrow \frac{1 - \frac{X_2}{n_2}}{1 - \frac{X_1}{n_1}} > 1$]
 
 
-Note 6: $RR \approx OR$ if RR is very small (the denominator of the OR will be very similar to the denominator of the RR).
+Note 6: $RR \approx OR$ if the risk is small (the denominator of the OR will be very similar to the denominator of the RR).
 
 
 
@@ -754,11 +754,25 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 ###  Entering and visualizing the data
 
 
-```
+```r
+backpain <- data.frame(treatment = c(rep("placebo", 16), rep("Botox", 15)),
+                     outcome = c(rep("reduction", 2), rep("no reduction", 14), 
+                                 rep("reduction", 9), rep("no reduction", 6)))
+backpain %>%
+  table()
 #>          outcome
 #> treatment no reduction reduction
 #>   Botox              6         9
 #>   placebo           14         2
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome), position = "fill") +
+  ylab("percentage")
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome))
 ```
 
 <img src="04-cat_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-6-2.png" width="80%" style="display: block; margin: auto;" />
@@ -767,7 +781,10 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 ### Fisher's Exact Test
 
 
-```
+```r
+backpain %>%
+  table() %>%
+  fisher.test()
 #> 
 #> 	Fisher's Exact Test for Count Data
 #> 
@@ -779,13 +796,21 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 #> sample estimates:
 #> odds ratio 
 #>      0.104
+
+# their CI is an inversion of the HT
+# an approximate SE for the ln(OR) is given by:
+se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
+se.lnOR
 #> [1] 0.922
 ```
 
 ### Chi-squared Analysis
 
 
-```
+```r
+backpain %>%
+  table() %>%
+  chisq.test()
 #> 
 #> 	Pearson's Chi-squared test with Yates' continuity correction
 #> 
