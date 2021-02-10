@@ -214,19 +214,21 @@ As usual, state the following:  observational units, variables, population of in
 
 Let $p$ = probability of cheating (for anyone in the larger population, say of all graduate students studying business in the US)
 
-$H_0: p_e = p_{pp}$ 
+$H_0: p_e = p_{pp}$  
 $H_A: p_e \ne p_{pp}$
 
-The statistic of interest is the difference in sample proportions:  $\hat{p}_e = \hat{p}_{pp} = 0.287$
+The statistic of interest is the difference in sample proportions:  $\hat{p}_e - \hat{p}_{pp} = 0.287$
 
 
-Using the [two-way tables applet](http://www.rossmanchance.com/applets/2021/chisqshuffle/ChiSqShuffle.htm?FET=1) from @iscam, we see a two-sided p-value of (approximately) 0.04.
-
-What if the number of observations were half as big with the same proportions? (12 of 13 who used e-mail were guilty of lying about the pot size, compared to 7 of 11 who used paper and pencil.)  The two-sided p-value is (approximately) 0.13.
-
-What if the number of observations were twice as big with the same proportions? (48 of 52 who used e-mail were guilty of lying about the pot size, compared to 28 of 44 who used paper and pencil. The two-sided p-value is virtually zero.
+* Using the [two-way tables applet](http://www.rossmanchance.com/applets/2021/chisqshuffle/ChiSqShuffle.htm?FET=1) from @iscam, we see a two-sided p-value of (approximately) 0.04.  
+* What if the number of observations were half as big with the same proportions? (12 of 13 who used e-mail were guilty of lying about the pot size, compared to 7 of 11 who used paper and pencil.)  The two-sided p-value is (approximately) 0.13.  
+* What if the number of observations were twice as big with the same proportions? (48 of 52 who used e-mail were guilty of lying about the pot size, compared to 28 of 44 who used paper and pencil. The two-sided p-value is virtually zero.
 
 The original data shows borderline evidence to reject the null hypothesis  The half data is not at all convincing (we'd have to start over with our science).  The double data is extremely convincing.  That is all to say that when the variables are truly independent, a difference of 28.7% is a lot for large samples but not so much for small samples.
+
+(For the conclusion below, let's assume that the decision to reject $H_0$ happens when the p-value is less than 0.05.)
+
+**Conclusion:** (for the original data) Because the p-value was less than 0.05, we can reject the null hypothesis.  We conclude that the probability of cheating is larger for those who use email as compared to those who use pencil & paper.  Because the treatment was randomly allocated, we believe that it is the email vs pencil & paper that led to the increase in cheating.  Unlikely that we can generalize to all people, but it is probably reasonable to generalize to students of business at that institution, maybe even at all institutions.  
 :::
 
 <!--
