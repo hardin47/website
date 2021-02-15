@@ -10,9 +10,21 @@
 3. Hypothesis testing structure
 -->
 
+## Randomization Test {#randtest}
 
+Hypothesis testing is arguably the most fundamental process for decision making in statistics.
+The particular hypothesis test given here is called a Randomization Test.  Many other hypothesis tests (with slightly different structure but all of the same pieces) will be seen throughout the course.
 
-## Example: Gender Discrimination {#ex:gend}
+::: {.definition}
+**Randomization Test**
+
+A hypothesis test that is based on simulated random assignment of the explanatory variable.  Each of the simulations is done under the condition that there is no association between the explanatory variable and the response variable.
+::: 
+
+In this section we describe the structure of a randomization test within the framework of an example on gender discrimination. 
+
+::: {.example #gend} 
+**Gender Discrimination**
 
 > We consider a study investigating gender discrimination in the 1970s, which is set in the context of personnel decisions within a bank.^[Rosen B and Jerdee T. 1974. Influence of sex role stereotypes on personnel decisions. Journal of Applied Psychology 59(1):9-14.] The research question we hope to answer is, "Are females discriminated against in promotion decisions made by male managers?"
 
@@ -26,6 +38,7 @@
 |   | male   | 21       | 3            | 24    |
 |   | female | 14       | 10           | 24    |
 |   | total  | 35       | 13           | 48    |
+:::
 
 
 #### Always Ask {-}
@@ -237,6 +250,83 @@ The original data shows borderline evidence to reject the null hypothesis  The h
 2. Mathematical approximation for the distribution of one sample proportion
 -->
 
+
+## Confidence Intervals {#CI}
+
+Randomization tests are best suited for modeling experiments where the treatment (explanatory variable) has been randomly assigned to the observational units and there is an attempt to answer a simple yes/no question.
+
+For example, consider the following research questions that can be well assessed with a randomization test:
+
+* Does this vaccine make it less likely that a person will get malaria as compared to not getting the vaccine? 
+* Does drinking caffeine versus not drinking caffeine affect how quickly a person can tap their finger? 
+* Can we predict which candidate will win the upcoming election?  
+
+In this section, however, we are instead interested in estimating (not testing) the unknown value of a population parameter.  For example,
+
+* How much less likely am I to get malaria if I get the vaccine? 
+* How much faster (or slower) can a person tap their finger, on average, if they drink caffeine first? 
+* What proportion of the vote will go to candidate A? 
+
+For now, we explore the situation where focus is on a single proportion, and we introduce a new simulation method, bootstrapping.
+
+### Bootstrapping {#boot}
+
+Bootstrapping is best suited for modeling studies where the data have been generated through random sampling from a population.
+The goal of bootstrapping is to get an understanding of the variability of a statistic (from sample to sample).
+The variability of the statistic can be combined with the point estimate of the statistic in order to make claims about the population parameter.
+
+In some cases (indeed, even in the case described here with one proportion!) a mathematical model can be used to describe the variability of a statistic of interest.  We will encounter the mathematical models (including distributions such as the normal distribution, the t-distribution and the chi squared distribution) in later sections.  However, for now, we will approximate the distribution of a statistic using repeated sampling.
+
+> The **distribution** of a statistic (called the **Sampling Distribution**) contains information (through, for example, a graph like a histogram or a mathematical model) on the possible values of the statistic and how often each of those values is likely to appear.
+
+Recall (Example \@ref(ex:helper) and Kissing example in HW) that with a hypothesized value of the true proportion (e.g., $p=0.5$ with babies helping; $p=0.8$ in kissing), we can understand / graph the possible values of $\hat{p}$ under repeated samples.
+That is, if the true proportion of people who kiss to the right is $p=0.8$, then if we select randomly from a bag with 80% red marbles (and 20% white marbles) we can understand the variability associated with the sample proportion of couples who kiss to the right in a sample of 124 couples.
+
+::: {.example #outyoutube}
+Let's say you want to find out what proportion of videos on YouTube take place outside.  You don't have any idea what the true value is, but you'd like to estimate the population value.  You take a random sample of 128 videos (there are lots of websites which will take random samples of YouTube videos, but tbh, I don't know how "random" they actually are), and you find that 37 of them take place outside.
+:::
+
+If you had originally hypothesized that 47% of YouTube videos happen outside, then the variability of the sample proportion can be described by the following histogram.  That is to say, if each student in our class individually took a random sample of 128 YouTube videos (and again, with the condition that p = 0.47), their sample proportions would vary as below.  To do the simualtion with the computer, think about repeatedly selecting 128 marbles from a bag with 47% red.
+
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+
+
+But remember we are trying to model the situation where there is *not* a hypothesized value of the parameter in mind.  That is, we need to use only the information in the sample to estimate the unknown characteristics about the population.
+
+Due to theory that is beyond the scope of this book, it turns out that the if resamples are taken from the sample, they will vary around $\hat{p}$ in the same way that individual samples will vary around $p$.  Let's break that down a little bit.
+
+As we saw in the figure above, when $p=0.47$, the sample proportions vary from about 0.37 to 0.57, and they are centered at 0.47.  That is, the sample proportions ($\hat{p}$ values) vary around $p=0.47$ by about plus or minus 0.1.  Also, note that the shape of the distribution is reasonably bell-shaped and symmetric.
+
+What happens if we use the **data** as a pseudo-population?  In the actual dataset, 37 of the 128 videos took place outside.  So $\hat{p} = 0.29$.  If the bag of marbles now has 29% red marbles (and 71% white marbles), how would the new bootstrapped sample proportions ($\hat{p}_{BS}$) vary?  Note that with 29% red marbles in the bag, each resample has a bootstrapped proportion which now varies around 0.29!  The range of possible values is still roughly plus or minus 0.1, and the shape of the distribution is bell-shaped and symmetric.
+
+
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+::: {.definition}
+**Resample.**  To resample is to select observations from the observed sample one at a time, measure them, replace them back into the population, and repeat until the new "resample" is exactly the same size as the original sample.
+
+Note the physical object which connects to resampling is a bag of marbles.  For example, in the kissing setting, the bag of marbles has 37 red marbles and 91 white marbles.  By *replacing* the marble after it has been selected and its color recorded, we are effectively creating an infinitely large bag of marbles with 29% red.
+
+The bootstrap process is typically referred to as **resampling with replacement**.
+:::
+
+Two good applets for understanding bootstrapping and sampling distributions are:
+* StatKey (*Statistics: Unlocking the Power of Data*)  http://www.lock5stat.com/StatKey/bootstrap_1_cat/bootstrap_1_cat.html
+* ISCAM http://www.rossmanchance.com/applets/2021/oneprop/OneProp.htm
+
+### Bootstrapping Confidence Intervals {#bootCI}
+
+A point estimate (also called a statistic) gives a single value for the best guess of the parameter of interest.
+Although it is the best guess, it is rarely perfect, and we expect that there is some error (i.e., variability) in the estimated value.
+A **confidence interval** provides a range of plausible values for the parameter.  
+
+
+> If you are two feet from me, then I am two feet from you.
+
+
 ## Normal Model
 
 
@@ -357,7 +447,7 @@ library(mosaic)
 xpnorm(-1, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553
@@ -376,7 +466,7 @@ xpnorm(-1, 0, 1)
 xpnorm(-3.16, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0007888457
@@ -395,7 +485,7 @@ xpnorm(-3.16, 0, 1)
 xpnorm(c(-1, 0.5), 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-3.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-3.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553 0.6914625
@@ -458,7 +548,7 @@ The Z score tells us that the minimum speed is only -1.33 standard deviations be
 xpnorm(-1.333, 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0912659
@@ -471,14 +561,8 @@ xpnorm(-1.333, 0, 1, plot = TRUE)
 3. Example: extreme poverty
 -->
 
-## Confidence Intervals {#CI}
 
-### Bootstrapping {#boot}
-
-### Bootstrapping Confidence Intervals {#boot}
-
-
-### Theoretical set-up {#normCI}
+### Normal Theory Confidence Intervals {#normCI}
 
 #### Conditions for when the sampling distribution of $\hat{p}$ is nearly normal  (The Central Limit Theorem!!) {-} 
 
@@ -529,7 +613,7 @@ $$99\% \mbox{ CI for }p:  \hat{p} \pm 2.58 \sqrt{\frac{p(1-p)}{n}}$$
 xpnorm(c(-2.58, 2.58), 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.004940016 0.995059984
@@ -600,7 +684,7 @@ We could find the percent of samples that would have produced such a small $\hat
 xpnorm(-19.05, 0, 1, plot=TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 3.28511e-81
@@ -674,7 +758,7 @@ Note that $Z^* = 1.645$ produces CIs that capture at a 90% rate.  $Z^* = 2.58$ p
 xpnorm(1.645, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.9500151
@@ -684,7 +768,7 @@ xpnorm(1.645, 0, 1)
 xpnorm(2.58, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-11-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.99506

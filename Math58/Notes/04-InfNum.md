@@ -377,16 +377,15 @@ t.test(base ~ degree, alternative = "less", data = teachers)
 
 
 
-### `infer`
+### Bootstrapping in R
 
-We aren't going to cover the bootstrapping or randomization tests for the quantitative variables.  But notice that the `infer` syntax is almost identical to that which we covered when we were working with proportions.
-
-Also, notice that the computational approach gives almost identical answers to the mathematical model (t-distribution) from above.
+Notice that the simulation syntax is almost identical to that which we covered when we were working with proportions.  Also, notice that the computational approach gives almost identical answers to the mathematical model (t-distribution) from above.
 
 #### One sample bootstrapping on mean
 
 
 ```r
+library(infer)
 set.seed(47)
 # calculate the observed test statistic
 # note that we could use `stat = "median"` or `stat = "t"`
