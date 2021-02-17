@@ -240,18 +240,20 @@ L(\underline{y} | b_0, b_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigm
 
 What does that even mean?  Likelihood?  Maximizing the likelihood? WHY???  The likelihood is the probability distribution of the data given *specific* values of the unknown parameters.
 
+Consider a toy example where you take a sample of size 4 from a binary population and get: failure, success, failure, failure (FSFF))
+
 Consider a toy example describing, for example, flipping coins. Let's say $X \sim Bin(p, n=4).$  We have 4 trials and $X=1$.  Would you guess $p=0.49$??  No, you would guess $p=0.25$... you *maximized* the likelihood of **seeing your data**.
 \begin{align}
-P(X=1 | p) &= {4 \choose 1} p^1 (1-p)^{4-1}\\
-P(X=1 | p = 0.9) &= 0.0036 \\
-P(X=1 | p = 0.75) &= 0.047 \\
-P(X=1 | p = 0.5) &= 0.25\\
-P(X=1 | p = 0.05) &= 0.171\\
-P(X=1 | p = 0.15) &= 0.368\\
-P(X=1 | p = 0.25) &= 0.422\\
+P(FSFF| p) &=  p^1 (1-p)^{4-1}\\
+P(FSFF | p = 0.9) &= 0.0009 \\
+P(FSFF | p = 0.75) &= 0.0117 \\
+P(FSFF | p = 0.5) &= 0.0625\\
+P(FSFF | p = 0.25) &= 0.105\\
+P(FSFF | p = 0.15) &= 0.092\\
+P(FSFF | p = 0.05) &= 0.043\\
 \end{align}
 
-Or, we can think about it as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n$.  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
+Think about the example as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n$.  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
 \begin{align}
 P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &= P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
 &= p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
