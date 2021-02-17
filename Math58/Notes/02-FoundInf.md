@@ -286,7 +286,7 @@ That is, if the true proportion of people who kiss to the right is $p=0.8$, then
 Let's say you want to find out what proportion of videos on YouTube take place outside.  You don't have any idea what the true value is, but you'd like to estimate the population value.  You take a random sample of 128 videos (there are lots of websites which will take random samples of YouTube videos, but tbh, I don't know how "random" they actually are), and you find that 37 of them take place outside.
 :::
 
-If you had originally hypothesized that 47% of YouTube videos happen outside, then the variability of the sample proportion can be described by the following histogram.  That is to say, if each student in our class individually took a random sample of 128 YouTube videos (and again, with the condition that p = 0.47), their sample proportions would vary as below.  To do the simualtion with the computer, think about repeatedly selecting 128 marbles from a bag with 47% red.
+If you had originally hypothesized that 47% of YouTube videos happen outside, then the variability of the sample proportion can be described by the following histogram.  That is to say, if each student in our class individually took a random sample of 128 YouTube videos (and again, with the condition that p = 0.47), their sample proportions would vary as below.  To do the simulation with the computer, think about repeatedly selecting 128 marbles from a bag with 47% red.
 
 
 <img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
@@ -321,11 +321,37 @@ Two good applets for understanding bootstrapping and sampling distributions are:
 
 A point estimate (also called a statistic) gives a single value for the best guess of the parameter of interest.
 Although it is the best guess, it is rarely perfect, and we expect that there is some error (i.e., variability) in the estimated value.
-A **confidence interval** provides a range of plausible values for the parameter.  
+A **confidence interval** provides a range of plausible values for the parameter.
+A **confidence level** is the long-run percent of intervals that capture the true parameter.
+
+Reminder of where we are:  
+* The goal is to find an interval of plausible values for a parameter, the true proportion $p$. 
+* We are working with only *one* dataset, that is, one sample proportion $\hat{p}$.
+* We can resample from the original dataset (where resample is called bootstrapping) to find out the shape of how sample proportions vary. 
+* Due to theory that is beyond the scope of this book, it turns out that the if resamples are taken from the sample, they will vary around $\hat{p}$ in the same way that individual samples will vary around $p$. 
 
 
 > If you are two feet from me, then I am two feet from you.
 
+
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>**95% Bootstrap Percentile Confidence Interval for $p$**  
+  
+From the bootstrapped proportions, find the bootstrap value at 2.5\% and 97.5\% and refer to them as "lower" and "upper" respectively.
+
+The interval given by:  (lower, upper)  will be a 95% confidence interval for $p$.
+
+Note that the "95%" value is the confidence level and describes how often the process outlined above will actually work to capture the true parameter of interest.</div>\EndKnitrBlock{definition}
+
+As you might suspect, if the goal is to create intervals that capture the true parameter at a lower rate (say, 90%) then the endpoints of the interval will be taken from the 5% and 95% bootstrapped proportion values.
+If the goal is to create intervals that capture the true parameter at a higher rate (say, 99%) then the endpoints of the interval will be taken from the 0.5% and 99.5% bootstrapped proportion values.
+The larger confidence level will capture the true parameter at a higher rate (which is a good thing!), but it comes at a cost of also creating an interval that is much wider than a 90% interval.
+An interval that is too wide will not be helpful in trying to understand the population at hand (which is why we don't attempt to create "100% intervals" which would be given by (0,1), useless for learning anything new).
+
+####  A note on sample size
+
+By working with the applets, you may notice that the variability of the proportions decreases substantially with larger sample sizes.  However the *rate* by which an confidence procedure captures the parameter is completely separated from the value of the sample sizes.
+The confidence procedure will capture at the set rate regardless of sample size.
+A larger sample size will create more narrow intervals (than a small sample size), but it will not capture the true parameter any more often.
 
 ## Normal Model
 
@@ -447,7 +473,7 @@ library(mosaic)
 xpnorm(-1, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553
@@ -466,7 +492,7 @@ xpnorm(-1, 0, 1)
 xpnorm(-3.16, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0007888457
@@ -485,7 +511,7 @@ xpnorm(-3.16, 0, 1)
 xpnorm(c(-1, 0.5), 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-3.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-3.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553 0.6914625
@@ -548,7 +574,7 @@ The Z score tells us that the minimum speed is only -1.33 standard deviations be
 xpnorm(-1.333, 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0912659
@@ -613,7 +639,7 @@ $$99\% \mbox{ CI for }p:  \hat{p} \pm 2.58 \sqrt{\frac{p(1-p)}{n}}$$
 xpnorm(c(-2.58, 2.58), 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.004940016 0.995059984
@@ -640,8 +666,6 @@ Some of you may be familiar with Hans Rosling who founded the website https://ww
 >The correct answer is that this percentage has halved, but only 5% of a sample of 1005 U.S. adults in 2017 got this right.  Rosling liked to say that chimpanzees would do better than people: With only three options, we would expect 33.33% of chimpanzees to answer correctly.
 
 * If in fact the students are randomly guessing, how many standard deviations away from the "random guess" value is 0.05?  [Hint:  use proportions and not percentages in your calculations.]
-
-note:  we covered this in class on Tuesday, so it's in the notes, but the formula doesn't show up in your text until the box on page 124 in section 3.1.1.
 
 Do not use the computer here (except as a calculator, and feel free to use a calculator or use the computer / R as a calculator).  Note:  you need to know how many people were asked, look above.
 
@@ -684,7 +708,7 @@ We could find the percent of samples that would have produced such a small $\hat
 xpnorm(-19.05, 0, 1, plot=TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 3.28511e-81
@@ -727,7 +751,8 @@ $$ \hat{p} \pm 1.96 * \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$
 ## [1] 0.6204574
 ```
 
-Question: Survey researchers typically select only one random sample from a population, and then they produce a confidence interval based on that sample.How do we know whether the resulting confidence interval is successful in capturing the unknown value of the population parameter?  
+Question: Survey researchers typically select only one random sample from a population, and then they produce a confidence interval based on that sample.
+How do we know whether the resulting confidence interval is successful in capturing the unknown value of the population parameter?  
 
 Answer: we don't know!  We never know if the interval actually captures the parameter or not.  We just know that over our lifetime as scientists, we will capture at the rate we set.
 
@@ -758,7 +783,7 @@ Note that $Z^* = 1.645$ produces CIs that capture at a 90% rate.  $Z^* = 2.58$ p
 xpnorm(1.645, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.9500151
@@ -768,7 +793,7 @@ xpnorm(1.645, 0, 1)
 xpnorm(2.58, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-11-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.99506
