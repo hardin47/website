@@ -275,7 +275,7 @@ p_i = p(x_i) &= \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
 which gives a likelihood of:
 \begin{align}
 L(\underline{p}) &= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
-\mbox{& a loglikelihood of}: &\\
+\mbox{and a log likelihood of}: &\\
 \ln L(\underline{p}) &= \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
 \end{align}
 
@@ -298,17 +298,10 @@ z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{align}
 
 
-```
-#> 
-#> Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#> 
-#> Coefficients:
-#> (Intercept)     burnexpl  
-#>        22.7        -10.7  
-#> 
-#> Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
-#> Null Deviance:	    525 
-#> Residual Deviance: 335 	AIC: 339
+```r
+burnglm %>%
+  glm(burnresp~burnexpl, data = ., family="binomial") %>% 
+  tidy()
 #> # A tibble: 2 x 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
@@ -376,35 +369,10 @@ That is, the difference in log likelihoods will be the opposite difference in de
 
 
 ```
-#> 
-#> Call:
-#> glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#> 
-#> Deviance Residuals: 
-#>    Min      1Q  Median      3Q     Max  
-#> -2.852  -0.700   0.186   0.524   2.209  
-#> 
-#> Coefficients:
-#>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    22.71       2.27   10.02   <2e-16 ***
-#> burnexpl      -10.66       1.08   -9.85   <2e-16 ***
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#> (Dispersion parameter for binomial family taken to be 1)
-#> 
-#>     Null deviance: 525.39  on 434  degrees of freedom
-#> Residual deviance: 335.23  on 433  degrees of freedom
-#> AIC: 339.2
-#> 
-#> Number of Fisher Scoring iterations: 6
-#> # A tibble: 2 x 5
-#>   term        estimate std.error statistic  p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-#> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
-#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-#> 1       525.386     434 -167.616 339.231 347.382  335.231         433  435
+#> # A tibble: 1 x 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1          525.     434  -168.  339.  347.     335.         433   435
 ```
 
 \begin{align}
@@ -503,24 +471,31 @@ Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For
 
 
 
-```
+```r
+HERS <- read.table("~/Dropbox/teaching/MA150/HERS.csv", 
+                   sep=",", header=T, na.strings=".")
+
+glm(medcond ~ age, data = HERS, family="binomial") %>% tidy()
 #> # A tibble: 2 x 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
 #> 2 age           0.0162   0.00597      2.71 0.00664
+glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
 #> # A tibble: 3 x 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
 #> 2 age          0.0189    0.00613      3.09 0.00203  
 #> 3 weight       0.00528   0.00274      1.93 0.0542
+glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
 #> # A tibble: 3 x 5
 #>   term        estimate std.error statistic      p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
 #> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
 #> 2 age           0.0185   0.00603      3.07 0.00217     
 #> 3 diabetes      0.487    0.0882       5.52 0.0000000330
+glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
 #> # A tibble: 4 x 5
 #>   term         estimate std.error statistic     p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
@@ -528,6 +503,7 @@ Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For
 #> 2 age            0.0278   0.00707      3.93 0.0000844  
 #> 3 diabetes       2.83     0.914        3.10 0.00192    
 #> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
+glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
 #> # A tibble: 4 x 5
 #>   term         estimate std.error statistic p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>

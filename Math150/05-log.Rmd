@@ -344,7 +344,7 @@ p_i = p(x_i) &= \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
 which gives a likelihood of:
 \begin{align}
 L(\underline{p}) &= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
-\mbox{& a loglikelihood of}: &\\
+\mbox{and a log likelihood of}: &\\
 \ln L(\underline{p}) &= \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
 \end{align}
 
@@ -366,10 +366,10 @@ Because we will use maximum likelihood parameter estimates, we can also use larg
 z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{align}
 
-```{r, message=FALSE, warning=FALSE}
-library(tidyverse); library(broom)
-glm(burnresp~burnexpl, data = burnglm, family="binomial")
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% tidy()
+```{r, echo = TRUE, message=FALSE, warning=FALSE}
+burnglm %>%
+  glm(burnresp~burnexpl, data = ., family="binomial") %>% 
+  tidy()
 ```
 
 ### Likelihood Ratio Tests
@@ -431,12 +431,9 @@ That is, the difference in log likelihoods will be the opposite difference in de
 
 
 ```{r}
-summary(glm(burnresp~burnexpl, data = burnglm, family="binomial"))
-
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% tidy()
-
-glm(burnresp~burnexpl, data = burnglm, family="binomial") %>% glance() %>% 
-  print.data.frame(digits=6)
+burnglm %>% 
+  glm(burnresp~burnexpl, data = ., family="binomial") %>% 
+  glance() 
 ```
 
 \begin{align}
@@ -536,7 +533,7 @@ Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For
 
 
 
-```{r warning=FALSE, message=FALSE}
+```{r echo = TRUE, warning=FALSE, message=FALSE}
 HERS <- read.table("~/Dropbox/teaching/MA150/HERS.csv", 
                    sep=",", header=T, na.strings=".")
 
@@ -695,17 +692,17 @@ Offering <- read_csv("~/Dropbox/teaching/coins.csv")
 
 Offering <- Offering %>%
   mutate(Small= Dimes + Nickels + Pennies) %>%
-  mutate(CandyYes = ifelse(Dollars > 1.25, 1, 0))
+  mutate(Candy = as.factor(ifelse(Dollars > 1.25, "yes", "no")))
 
-ggpairs(Offering)
+ggpairs(Offering[,c(1,2,7,8)])
 ```
 
 ```{r warning=FALSE, message=FALSE}
-glm(CandyYes ~ Coins, data = Offering, family="binomial") %>% tidy()
+glm(Candy ~ Coins, data = Offering, family="binomial") %>% tidy()
 
-glm(CandyYes ~ Small, data = Offering, family="binomial") %>% tidy()
+glm(Candy ~ Small, data = Offering, family="binomial") %>% tidy()
 
-glm(CandyYes ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
+glm(Candy ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
 ```
 
 Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.

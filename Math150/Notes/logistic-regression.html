@@ -383,7 +383,7 @@ p_i = p(x_i) &amp;= \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
 which gives a likelihood of:
 <span class="math display">\[\begin{align}
 L(\underline{p}) &amp;= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
-\mbox{&amp; a loglikelihood of}: &amp;\\
+\mbox{and a log likelihood of}: &amp;\\
 \ln L(\underline{p}) &amp;= \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
 \end{align}\]</span></p>
 <p>Why use maximum likelihood estimates?</p>
@@ -412,21 +412,15 @@ L(\underline{p}) &amp;= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x
 <p><span class="math display">\[\begin{align}
 z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{align}\]</span></p>
-<pre><code>#&gt; 
-#&gt; Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#&gt; 
-#&gt; Coefficients:
-#&gt; (Intercept)     burnexpl  
-#&gt;        22.7        -10.7  
-#&gt; 
-#&gt; Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
-#&gt; Null Deviance:       525 
-#&gt; Residual Deviance: 335   AIC: 339
-#&gt; # A tibble: 2 x 5
-#&gt;   term        estimate std.error statistic  p.value
-#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-#&gt; 2 burnexpl       -10.7      1.08     -9.85 6.95e-23</code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">burnglm</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">burnresp</span><span class="op">~</span><span class="va">burnexpl</span>, data <span class="op">=</span> <span class="va">.</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 5</span>
+<span class="co">#&gt;   term        estimate std.error statistic  p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)     22.7      2.27     10.0  1.23e-23</span>
+<span class="co">#&gt; 2 burnexpl       -10.7      1.08     -9.85 6.95e-23</span></code></pre></div>
 </div>
 <div id="likelihood-ratio-tests" class="section level3" number="5.3.2">
 <h3>
@@ -480,35 +474,10 @@ That is, the difference in log likelihoods will be the opposite difference in de
 &amp;= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
 &amp;= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
 \end{align}\]</span></p>
-<pre><code>#&gt; 
-#&gt; Call:
-#&gt; glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#&gt; 
-#&gt; Deviance Residuals: 
-#&gt;    Min      1Q  Median      3Q     Max  
-#&gt; -2.852  -0.700   0.186   0.524   2.209  
-#&gt; 
-#&gt; Coefficients:
-#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    
-#&gt; (Intercept)    22.71       2.27   10.02   &lt;2e-16 ***
-#&gt; burnexpl      -10.66       1.08   -9.85   &lt;2e-16 ***
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; 
-#&gt; (Dispersion parameter for binomial family taken to be 1)
-#&gt; 
-#&gt;     Null deviance: 525.39  on 434  degrees of freedom
-#&gt; Residual deviance: 335.23  on 433  degrees of freedom
-#&gt; AIC: 339.2
-#&gt; 
-#&gt; Number of Fisher Scoring iterations: 6
-#&gt; # A tibble: 2 x 5
-#&gt;   term        estimate std.error statistic  p.value
-#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-#&gt; 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
-#&gt;   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-#&gt; 1       525.386     434 -167.616 339.231 347.382  335.231         433  435</code></pre>
+<pre><code>#&gt; # A tibble: 1 x 8
+#&gt;   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#&gt;           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+#&gt; 1          525.     434  -168.  339.  347.     335.         433   435</code></pre>
 <p><span class="math display">\[\begin{align}
 \mbox{test stat} &amp;= G\\
 &amp;= -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
@@ -619,37 +588,46 @@ Recall the homework assignment where APACHE score was a significant predictor of
 <p>The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.</p>
 <p>The hormone replacement regimen also increased the risk of clots in the veins (deep vein thrombosis) and lungs (pulmonary embolism). The results of HERS are surprising in light of previous observational studies, which found lower rates of CHD in women who take postmenopausal estrogen.</p>
 <p>Data available at: <a href="http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls" class="uri">http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls</a> For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), <code>medcond</code>. We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.</p>
-<pre><code>#&gt; # A tibble: 2 x 5
-#&gt;   term        estimate std.error statistic   p.value
-#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-#&gt; 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
-#&gt; 2 age           0.0162   0.00597      2.71 0.00664
-#&gt; # A tibble: 3 x 5
-#&gt;   term        estimate std.error statistic   p.value
-#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-#&gt; 1 (Intercept) -2.17      0.496       -4.37 0.0000124
-#&gt; 2 age          0.0189    0.00613      3.09 0.00203  
-#&gt; 3 weight       0.00528   0.00274      1.93 0.0542
-#&gt; # A tibble: 3 x 5
-#&gt;   term        estimate std.error statistic      p.value
-#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
-#&gt; 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
-#&gt; 2 age           0.0185   0.00603      3.07 0.00217     
-#&gt; 3 diabetes      0.487    0.0882       5.52 0.0000000330
-#&gt; # A tibble: 4 x 5
-#&gt;   term         estimate std.error statistic     p.value
-#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
-#&gt; 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
-#&gt; 2 age            0.0278   0.00707      3.93 0.0000844  
-#&gt; 3 diabetes       2.83     0.914        3.10 0.00192    
-#&gt; 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
-#&gt; # A tibble: 4 x 5
-#&gt;   term         estimate std.error statistic p.value
-#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 (Intercept)  -0.991     0.511       -1.94  0.0526
-#&gt; 2 age           0.00885   0.00759      1.17  0.244 
-#&gt; 3 drinkany     -1.44      0.831       -1.73  0.0833
-#&gt; 4 age:drinkany  0.0168    0.0124       1.36  0.175</code></pre>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">HERS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"~/Dropbox/teaching/MA150/HERS.csv"</span>, 
+                   sep<span class="op">=</span><span class="st">","</span>, header<span class="op">=</span><span class="cn">T</span>, na.strings<span class="op">=</span><span class="st">"."</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">medcond</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">HERS</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 5</span>
+<span class="co">#&gt;   term        estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)  -1.60     0.401       -4.00 0.0000624</span>
+<span class="co">#&gt; 2 age           0.0162   0.00597      2.71 0.00664</span>
+<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">medcond</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">weight</span>, data <span class="op">=</span> <span class="va">HERS</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 3 x 5</span>
+<span class="co">#&gt;   term        estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept) -2.17      0.496       -4.37 0.0000124</span>
+<span class="co">#&gt; 2 age          0.0189    0.00613      3.09 0.00203  </span>
+<span class="co">#&gt; 3 weight       0.00528   0.00274      1.93 0.0542</span>
+<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">medcond</span> <span class="op">~</span> <span class="va">age</span><span class="op">+</span><span class="va">diabetes</span>, data <span class="op">=</span> <span class="va">HERS</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 3 x 5</span>
+<span class="co">#&gt;   term        estimate std.error statistic      p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  </span>
+<span class="co">#&gt; 2 age           0.0185   0.00603      3.07 0.00217     </span>
+<span class="co">#&gt; 3 diabetes      0.487    0.0882       5.52 0.0000000330</span>
+<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">medcond</span> <span class="op">~</span> <span class="va">age</span><span class="op">*</span><span class="va">diabetes</span>, data <span class="op">=</span> <span class="va">HERS</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 4 x 5</span>
+<span class="co">#&gt;   term         estimate std.error statistic     p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)   -2.52     0.478       -5.26 0.000000141</span>
+<span class="co">#&gt; 2 age            0.0278   0.00707      3.93 0.0000844  </span>
+<span class="co">#&gt; 3 diabetes       2.83     0.914        3.10 0.00192    </span>
+<span class="co">#&gt; 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986</span>
+<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">medcond</span> <span class="op">~</span> <span class="va">age</span><span class="op">*</span><span class="va">drinkany</span>, data <span class="op">=</span> <span class="va">HERS</span>, family<span class="op">=</span><span class="st">"binomial"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 4 x 5</span>
+<span class="co">#&gt;   term         estimate std.error statistic p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)  -0.991     0.511       -1.94  0.0526</span>
+<span class="co">#&gt; 2 age           0.00885   0.00759      1.17  0.244 </span>
+<span class="co">#&gt; 3 drinkany     -1.44      0.831       -1.73  0.0833</span>
+<span class="co">#&gt; 4 age:drinkany  0.0168    0.0124       1.36  0.175</span></code></pre></div>
 <p>Write out a few models <em>by hand</em>, does any of the significance change with respect to interaction? Does the interpretation change with interaction? In the last model, we might want to remove all the age information. Age seems to be less important than drinking status. How do we decide? How do we model?</p>
 </div>
 </div>
@@ -1723,7 +1701,7 @@ where <span class="math inline">\(\nu\)</span> represents the difference in the 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-02-09.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-02-17.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
