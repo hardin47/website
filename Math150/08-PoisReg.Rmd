@@ -112,10 +112,15 @@ ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30)
 Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables.  Because the sample size is limited, we group the age variable into 5 year increments.  Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean.  It might also be good to find the sample mean per group and plot the Poisson probabilities onto each bar.
 
 ```{r echo=FALSE}
-elephants <- elephants %>% dplyr::mutate(AGEgroups = ifelse(AGE <=30, "(20,30]", 
-                                                            ifelse(AGE <=40, "(30,40]", "(40,55]")))
-ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30) + facet_grid(~AGEgroups)
+elephants <- elephants %>% 
+  mutate(AGEgroups = case_when(
+    AGE <=30 ~ "(20,30]",
+    AGE <=40 ~ "(30,40]",
+    TRUE ~ "(40,55]"))
 
+ggplot(elephants, aes(x=MATINGS)) + 
+  geom_histogram(bins=30) + 
+  facet_grid(~AGEgroups)
 ```
 
 **Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in the following section \@ref(overdis).

@@ -19,6 +19,17 @@ The related data set contains 32,001 elective general surgical patients. Age, ge
 
 Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August.  We'd like to compare the average age of the participants from the July group to the August group.  Even if the mortality difference is significant, we can't conclude causation because it was an observational study.  However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing.  How different are the groups based on clinical variables?
 
+
+```r
+surgeryurl <- url("https://www.causeweb.org/tshs/datasets/surgery_timing.Rdata")
+load(surgeryurl)
+surgery <- stata_data
+head(surgery)  %>%
+  select(age, gender, race, hour, dow, month, complication, bmi, everything(), -ahrq_ccs) %>%
+  kable(caption = "Varibles associated with the surgery data.") %>%
+ kable_styling()
+```
+
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
  <thead>
@@ -247,7 +258,7 @@ Note: we will assume the *population variances* are equal if neither *sample var
   
 
 
-#### Example1 {-}
+::: {.example}
 Are the mean ages of the July vs August patients statistically different? (why two sided?)
   
 \begin{align}
@@ -268,7 +279,8 @@ df &= n_1 + n_2 -2\\
 &= 5499\\
 \mbox{p-value} &= 2 \cdot (1-pt(1.15,5499)) = 0.25\\
 \end{align}
-  
+:::
+
 The same analysis can be done in R (with and without tidying the output):
 
 ```r
@@ -320,9 +332,9 @@ Considerations when running a t-test:
 
 
    
-#### Example 2 {-}
+::: {.example}
 Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2$.
-
+:::
   
 ### What is an Alternative Hypothesis?
   

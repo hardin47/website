@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-02-17"
+date: "2021-02-22"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -42,14 +42,14 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 1/27/21 	| SLR | 2 |  \@ref(tslr): t-test as SLR   |
 | 2/1/21 	| SLR | 2 | \@ref(SLR): SLR |
 | 2/3/21  	| Contingency Analysis | 6 | \@ref(fisher) & \@ref(catest): Fisher's Exact Test |
-| 2/8/21 	| Contingency Analysis | 6 |  \@ref(studies): Types of studies, \@ref(catest): RR and OR
-| 2/10/21 	| Contingency Analysis | 6 | \@ref(chisq): ChiSq test |
+| 2/8/21 	| Contingency Analysis | 6 |  \@ref(studies): Types of studies; \@ref(catest): RR and OR
+| 2/10/21 	| Contingency Analysis | 6 | \@ref(ciOR): Conf Int|
 | 2/15/21 	| Logistic Regression | 7 | \@ref(logmodel): Log Reg |
-| 2/17/21 	| | | \@ref(logMLE), \@ref(loginf): Log MLE and Inference |
-| 2/22/21 	| Logistic Regression | 7 | \@ref(multlog), \@ref(multicol): Multiple Log Reg |
-| 2/24/21 	| | | \@ref(logstep): Model Build |
-| 3/1/21  	| Logistic Regression | 7 | \@ref(roc): ROC |
-| 3/3/21  	| | | \@ref(cv): Cross Validation | 
+| 2/17/21 	| | | \@ref(logMLE): MLE |
+| 2/22/21 	| Logistic Regression | 7 | \@ref(loginf): Inference |
+| 2/24/21 	| | | \@ref(multlog), \@ref(multicol): Multiple Log Reg |
+| 3/1/21  	| Logistic Regression | 7 | \@ref(logstep): Model Build |
+| 3/3/21  	| | | \@ref(cv): Cross Validation; \@ref(roc): ROC | 
 | 3/8/21 	| Spring Break | |
 | 3/10/21 	| Spring Break |  	|
 | 3/15/21 	| Catch-up / Review | |

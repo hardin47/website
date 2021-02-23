@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE,
   #cache = TRUE,
-  echo = FALSE, # hide code unless otherwise noted in chunk options
+  #echo = FALSE, # hide code unless otherwise noted in chunk options
   out.width = "80%",
   fig.align = 'center',
   fig.width = 6,
