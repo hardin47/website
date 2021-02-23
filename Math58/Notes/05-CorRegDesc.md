@@ -342,13 +342,14 @@ ggpairs(house, columns = c(1,2,4,5))
 
 ### Correlation & Simple Linear Regression: Chapter 3
 
-* Describe the linear model with multiple variables.
-* Describe the error / residual term and how it is calculated with multiple variables.
-* What are the (three-ish) statistics of interest in this chapter?  What are the parameters of interest?
 * What does correlation measure?
+* What values of correlation ($r$) would indicate large positive correlation?  What about a large negative correlation?
+* Sketch a scatterplot that has a strong relationship between the two variables but a correlation of virtually zero (hint: your plot will not be linear).
+* How is $R^2$ interpreted?  Why is that?  Make the argument which uses the ideas of "percent of variability in the response variable"? 
+* In a linear model what is an error / residual term and how it is calculated?
 * How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
+* Is least squares the only possible way to fit a line to a cloud of points?  How else might we do it?  Why do we tend to use least squares?
 * Why is it dangerous to extrapolate?
-* How do we interpret $R^2$?  Why is that? 
 * Is linear regression always appropriate when comparing two continuous variables?
 
 
