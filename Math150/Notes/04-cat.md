@@ -613,11 +613,11 @@ So, a $(1-\alpha)100\%$ CI for the $\ln(OR)$ is:
 
 Which gives a $(1-\alpha)100\%$ CI for the $OR$:
 \begin{eqnarray*}
-(e^{\ln(OR) - z_{1-\alpha/2} SE(\ln(OR))}, e^{\ln(OR) + z_{1-\alpha/2} SE(\ln(OR))})
+(e^{\ln(\hat{OR}) - z_{1-\alpha/2} SE(\ln(\hat{OR}))}, e^{\ln(\hat{OR}) + z_{1-\alpha/2} SE(\ln(\hat{OR}))})
 \end{eqnarray*}
 
 
-Back to the example... OR = 28.9.
+Back to the example... $OR = 28.9.$
 \begin{eqnarray*}
 SE(\ln(\hat{OR})) &=& \sqrt{\frac{1}{182*0.67*(1-0.67)} + \frac{1}{122*0.0656*(1-0.0656)}}\\
 &=& 0.398\\
