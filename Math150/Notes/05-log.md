@@ -535,25 +535,61 @@ Write out a few models *by hand*, does any of the significance change with respe
 **Simpson's paradox** is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.
 
 ::: {.example}
-Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
+Back to linear regression to consider Simpson's Paradox in the wild.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
 
 
+<img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;" />
 
-```
+
+```r
+head(SAT)
+#>        state expend ratio salary frac verbal math  sat         fracgrp
+#> 1    Alabama   4.41  17.2   31.1    8    491  538 1029    low fraction
+#> 2     Alaska   8.96  17.6   48.0   47    445  489  934 medium fraction
+#> 3    Arizona   4.78  19.3   32.2   27    448  496  944 medium fraction
+#> 4   Arkansas   4.46  17.1   28.9    6    482  523 1005    low fraction
+#> 5 California   4.99  24.0   41.1   45    417  485  902 medium fraction
+#> 6   Colorado   5.44  18.4   34.6   29    462  518  980 medium fraction
+lm(sat ~ salary, data=SAT) %>% tidy()
 #> # A tibble: 2 x 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)  1159.       57.7      20.1  5.13e-25
 #> 2 salary         -5.54      1.63     -3.39 1.39e- 3
+lm(sat ~ salary + frac, data=SAT) %>% tidy()
 #> # A tibble: 3 x 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)   988.      31.9       31.0  6.20e-33
 #> 2 salary          2.18     1.03       2.12 3.94e- 2
 #> 3 frac           -2.78     0.228    -12.2  4.00e-16
+lm(sat ~ salary * frac, data=SAT) %>% tidy()
+#> # A tibble: 4 x 5
+#>   term         estimate std.error statistic  p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept) 1082.       54.4       19.9   3.00e-24
+#> 2 salary        -0.720     1.70      -0.424 6.73e- 1
+#> 3 frac          -5.03      1.09      -4.62  3.15e- 5
+#> 4 salary:frac    0.0648    0.0308     2.11  4.05e- 2
+lm(sat ~ salary + fracgrp, data=SAT) %>% tidy()
+#> # A tibble: 4 x 5
+#>   term                   estimate std.error statistic  p.value
+#>   <chr>                     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)             1002.      31.8       31.5  8.55e-33
+#> 2 salary                     1.09     0.988      1.10 2.76e- 1
+#> 3 fracgrpmedium fraction  -112.      14.3       -7.82 5.46e-10
+#> 4 fracgrphigh fraction    -150.      12.8      -11.7  2.09e-15
+lm(sat ~ salary * fracgrp, data=SAT) %>% tidy()
+#> # A tibble: 6 x 5
+#>   term                           estimate std.error statistic  p.value
+#>   <chr>                             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)                   1012.         55.8    18.1    4.85e-22
+#> 2 salary                           0.768       1.77    0.435  6.65e- 1
+#> 3 fracgrpmedium fraction        -107.        103.     -1.04   3.03e- 1
+#> 4 fracgrphigh fraction          -175.         79.2    -2.21   3.27e- 2
+#> 5 salary:fracgrpmedium fraction   -0.0918      2.93   -0.0313 9.75e- 1
+#> 6 salary:fracgrphigh fraction      0.692       2.28    0.303  7.63e- 1
 ```
-
-<img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;" />
 :::
 
 <!--
@@ -687,7 +723,7 @@ What does it mean that the interaction terms are not significant in the last mod
 ::: {.example}
 Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
 
-<img src="05-log_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1439,7 +1475,7 @@ plot(bird.perf, colorize = TRUE)
 abline(a=0, b=1)
 ```
 
-<img src="05-log_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Drawing interactions

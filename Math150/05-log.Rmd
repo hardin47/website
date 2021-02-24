@@ -564,7 +564,7 @@ Write out a few models *by hand*, does any of the significance change with respe
 **Simpson's paradox** is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.
 
 ::: {.example}
-Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
+Back to linear regression to consider Simpson's Paradox in the wild.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
 
 
 ```{r echo=FALSE}
@@ -574,12 +574,10 @@ trellis.par.set(theme=col.mosaic(bw=TRUE)); options(digits=3)
 mod1 = lm(sat ~ salary, data=SAT)
 #confint(mod1)
 #summary(mod1)$r.squared
-lm(sat ~ salary, data=SAT) %>% tidy()
 
 mod2 = lm(sat ~ salary + frac, data=SAT)
 #confint(mod2)
 #summary(mod2)$r.squared
-lm(sat ~ salary + frac, data=SAT) %>% tidy()
 
 SAT = transform(SAT, fracgrp = cut(frac, breaks=c(0, 22, 49, 81),
                                    labels=c("low fraction", "medium fraction", "high fraction")))
@@ -591,6 +589,15 @@ xyplot(sat ~ salary, type=c("r", "p"),
 xyplot(sat ~ salary, groups=fracgrp, auto.key=TRUE, 
         type=c("p", "r"), xlab="Average teacher salary",
        ylab="State average SAT",data=SAT)
+```
+
+```{r}
+head(SAT)
+lm(sat ~ salary, data=SAT) %>% tidy()
+lm(sat ~ salary + frac, data=SAT) %>% tidy()
+lm(sat ~ salary * frac, data=SAT) %>% tidy()
+lm(sat ~ salary + fracgrp, data=SAT) %>% tidy()
+lm(sat ~ salary * fracgrp, data=SAT) %>% tidy()
 ```
 :::
 
