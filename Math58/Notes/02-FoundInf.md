@@ -604,7 +604,7 @@ $$SE_{\hat{p}} = SE (\hat{p}) = \sqrt{\frac{p(1-p)}{n}}$$
 
 #### How far is $\hat{p}$ from $p$ ???  {-}
 
-Great news, the $SE(\hat{p})$ measures the distance we can expect between $\hat{p}$ from $p$!!!  Indeed, a Z score tells us the distance between $\hat{p}$ from $p$ in units of standard error.
+Great news, the $SE(\hat{p})$ measures the distance we can expect between $\hat{p}$ from $p \ !!!$  Indeed, a Z score tells us the distance between $\hat{p}$ from $p$ in units of standard error.
 
 The normal distribution provides **percentages** for how often Z scores should fall in certain ranges.
 
@@ -634,6 +634,10 @@ What is $Z^*$?  It is defined using the normal distribution which is centered at
 For example, if a 99% confidence interval is desired, find the $Z^*$ value that captures 99% of the observations between $-Z^*$ and $Z^*$.
 
 $$99\% \mbox{ CI for }p:  \hat{p} \pm 2.58 \sqrt{\frac{p(1-p)}{n}}$$
+
+::: {.definition}
+$Z^*$ is a value taken from a standard normal distribution (that is, N(mean = 0, sd = 1)) that contains a pre-specified amount of area between $-Z^*$ and $+Z^*$.
+:::
 
 
 ```r
@@ -902,16 +906,16 @@ A **sampling distribution** is the distribution of all possible values of the *s
 
 * The *power* of a test is the probability that a random sample will lead to rejection of a false null hypothesis.
 
-|      |                      |     Truth    |               |
+|      |                      |     Test    |               |
 |------|----------------------|:------------:|:-------------:|
-|      |                      |  $H_0$ true  |   $H_A$ true  |
-| Test | Reject $H_0$         | type I error |    😄   |
-|      | Fail to reject $H_0$ |   😄  | type II error |
+|      |                      |  Reject $H_0$  |  Fail to reject $H_0$ |
+| Truth | $H_0$ true        | type I error |    😄   |
+|      | $H_A$ true |   😄  | type II error |
 
 
 ### Example: baseball player^[Inv 1.7, Chance & Rossman, ISCAM] 
 
-The following example is taken from @iscam, and is used to explain many of the most important and nuanced ideas related to the structure of hypothesis testing.  I will provide the basic idea here, but you are encouraged to go to the applet on your own to convince yourself that the idea is true and that you understand why the idea is true.  http://www.rossmanchance.com/applets/power.html
+The following example is taken from @iscam, and is used to explain many of the most important and nuanced ideas related to the structure of hypothesis testing.  I will provide the basic idea here, but you are encouraged to go to the applet on your own to convince yourself that the idea is true and that you understand why the idea is true.  http://www.rossmanchance.com/applets/2021/power/power.html
 
 **Set-up:**  Assume that you are a manager of a professional baseball team.  One of your players has (for many years) been a 0.250 hitter.  That means every time he goes up to bat he has a 1 in 4 chance of hitting the ball (baseball aficionados may want to talk about baseball errors at this point, but we won't be mentioning baseball errors in today's example).
 
@@ -927,7 +931,7 @@ $p$ = baseball players **current** probability of hitting the ball
 
 ###  Errors: lessons learned 
 
-You are encouraged to go to the applet on your own to convince yourself that  you understand why the ideas below are true.  http://www.rossmanchance.com/applets/power.html
+You are encouraged to go to the applet on your own to convince yourself that  you understand why the ideas below are true.  http://www.rossmanchance.com/applets/2021/power/power.html
 
 **What are the Type I and Type II errors/**  A Type I error means the manager became convinced the player is better than a 0.250 hitter but in reality he is just still a 0.250 hitter.  A Type II error means the player has improved but does not do well enough in his 20 at-bats to convince the manager.
 
