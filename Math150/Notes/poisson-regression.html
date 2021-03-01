@@ -76,7 +76,7 @@
 <span class="header-section-number">8.1</span> Regression Models<a class="anchor" aria-label="anchor" href="#regPois"><i class="fas fa-link"></i></a>
 </h2>
 <p>Consider the following example from <span class="citation"><a href="references.html#ref-poole" role="doc-biblioref">Poole</a> (<a href="references.html#ref-poole" role="doc-biblioref">1989</a>)</span> (described in <span class="citation"><a href="references.html#ref-sleuth" role="doc-biblioref">Ramsey and Schafer</a> (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>) on age and mating success (number of successful matings) in male African Elephants.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">elephants</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"elephants.csv"</span><span class="op">)</span>
 
 <span class="fu">ggplot</span><span class="op">(</span><span class="va">elephants</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/jitter.html">jitter</a></span><span class="op">(</span><span class="va">AGE</span><span class="op">)</span>, y<span class="op">=</span><span class="va">MATINGS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -131,7 +131,7 @@ where the observed counts come from a Poisson model: <span class="math inline">\
 <ol style="list-style-type: decimal">
 <li>The first is to remember that the average (i.e., expected value) of the logs is not the log of the averages. So in the Poisson model, the linear function measures the log of the average, and in the normal model, the linear function measures the average of the logs.</li>
 </ol>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
 <span class="va">example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>
 <span class="va">example</span>
@@ -177,7 +177,7 @@ where the observed counts come from a Poisson model: <span class="math inline">\
 <p><strong>Technical Condition 1, Line:</strong> The Poisson model implies that the log of the mean will be a linear function of the explanatory variable:</p>
 <p><span class="math display">\[\ln(\mu_i) = \beta_0 + \beta_1 X_i,\]</span>
 which means we’d really like to plot <span class="math inline">\(\mu_i\)</span> as a function of the explanatory variable. Unfortunately, <span class="math inline">\(\mu_i\)</span> is unknown, and so cannot be plotted. We can, however, plot the log of the average value of the response for a group of x values which are close to one another. In the plot below, we’ve grouped observations based on the age of the elephants being within 3 years of years of each other. It is actually quite linear! The points that don’t follow the linear relationship are based on age groups with very few observations.</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">matelogmean</span> <span class="op">&lt;-</span> <span class="va">elephants</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>agecut <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">AGE</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">26.5</span>,<span class="fl">53.5</span>,by<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">group_by</span><span class="op">(</span><span class="va">agecut</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -280,7 +280,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="header-section-number">8.3</span> R Poisson Example<a class="anchor" aria-label="anchor" href="#r-poisson-example"><i class="fas fa-link"></i></a>
 </h2>
 <p>The R example is taken from data given in the textbook. The scientific question relates to predicting the total number of observed <code>species</code> on the Galapagos archipelago related to island <code>area</code> (km<span class="math inline">\(^2\)</span>), <code>elevation</code> (m), distance (km) to the <code>nearest</code> neighbor and to the largest island (km<span class="math inline">\(^2\)</span>) in the archipelago Santa Cruz (<code>scruz</code>), and the area of the <code>adjacent</code> island (km<span class="math inline">\(^2\)</span>). We could also consider an additional response variable which is the island <code>endemic</code> species count.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">galap</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"Galapagos.csv"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">galap</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 8</span>
@@ -292,14 +292,14 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="co">#&gt; 4 Champion         25        9  0.1         46     1.9  47.4     0.18</span>
 <span class="co">#&gt; 5 Coamano           2        1  0.05        77     1.9   1.9   904.  </span>
 <span class="co">#&gt; 6 DaphneMajor      18       11  0.34       119     8     8       1.84</span></code></pre></div>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">galap</span>, <span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">species</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">adjacent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="08-PoisReg_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
 <div id="glm" class="section level3" number="8.3.1">
 <h3>
 <span class="header-section-number">8.3.1</span> glm<a class="anchor" aria-label="anchor" href="#glm"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
     data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
@@ -317,7 +317,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="header-section-number">8.3.2</span> drop in deviance<a class="anchor" aria-label="anchor" href="#drop-in-deviance"><i class="fas fa-link"></i></a>
 </h3>
 <p>It seems like we might not need either <code><a href="https://rdrr.io/r/base/Log.html">log(elevation)</a></code> or <code>nearest</code>. A drop in deviance test will help:</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
     data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1 x 8</span>
@@ -343,7 +343,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="header-section-number">8.3.3</span> residuals<a class="anchor" aria-label="anchor" href="#residuals-1"><i class="fas fa-link"></i></a>
 </h3>
 <p>Keep in mind that the expectation of a Poisson model is that the residuals will be more variable for larger predicted values. The <code>broom</code> package provides <code>.resid</code>uals which are the observed value minus the fitted value. I <em>think</em> that <code>.std.resid</code> is the Pearson residual.</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
     data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 10</span>
@@ -371,7 +371,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="header-section-number">8.3.4</span> quasiPoisson<a class="anchor" aria-label="anchor" href="#quasipoisson"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that all of the above analyses can be done using the overdispersed quasiPoisson model.</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
     data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
@@ -393,7 +393,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <span class="co">#&gt; 2 log(area)    0.342     0.0304       11.3  1.63e-11</span>
 <span class="co">#&gt; 3 scruz       -0.00354   0.00197      -1.80 8.36e- 2</span>
 <span class="co">#&gt; 4 adjacent    -0.000221  0.000104     -2.12 4.35e- 2</span></code></pre></div>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
     data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 10</span>
@@ -466,7 +466,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-02-24.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-03-01.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

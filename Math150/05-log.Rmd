@@ -543,7 +543,7 @@ Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For
 :::
 
 
-```{r echo = FALSE, warning=FALSE, message=FALSE}
+```{r include = FALSE, warning=FALSE, message=FALSE}
 HERS <- read.table("~/Dropbox/teaching/MA150/HERS.csv", 
                    sep=",", header=T, na.strings=".")
 ```
@@ -734,7 +734,32 @@ Notice that the directionality of the low coins changes when it is included in t
 ## Model Building {#logstep}
 
 ::: {.example}
-Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
+Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  
+
+The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  
+
+A better strategy is to select the second not by considering what they  know regarding the entire agenda, but by looking for the person who knows more about the topics that the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
+
+|    Individual    |    # topics   |     Pair    |    # topics      |
+|--------------|-----------|---------------------|------------|
+|     Sage     |     85    |     Sage & Bruno    |     95     |
+|     Bruno    |     80    |     Sage & Beta     |     93     |
+|     Luna     |     55    |     Sage & Luna     |     92     |
+|     Beta     |     45    |     Bruno & Beta    |     90     |
+|              |           |     Bruno & Luna    |     90     |
+|              |           |     Beta & Luna     |     100    |
+
+```{r echo = FALSE, eval = FALSE, include = FALSE}
+beta <- c(1:45)
+luna <- c(46:100)
+sage <- c(1:40, 46:90)
+bruno <- c(6:40, 56:100)
+```
+
+With forward selection, which two are chosen?^[Sage & Bruno]
+
+With backward selection, which two are chosen?^[Beta & Luna]
+
 <!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
 :::
 
@@ -783,7 +808,7 @@ Consider the HERS data described in your book (page 30); variable description al
 
 For now, we will try to predict whether the individuals had a medical condition, `medcond` (defined as a pre-existing and self-reported medical condition).  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.
 
-```{r}
+```{r echo = FALSE}
 HERS <- read.table("~/Dropbox/teaching/MA150/HERS.csv", 
                    sep=",", header=T, na.strings=".")
 ```
@@ -886,7 +911,7 @@ Generally:  the idea is to use a model building strategy with some criteria ($\c
 
 Taken from https://onlinecourses.science.psu.edu/stat501/node/332.
 
-Model building is definitely an ``art."  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
+Model building is definitely an "art."  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
 
 #### The first step {-}
 
@@ -946,8 +971,10 @@ And, most of all, don't forget that there is not necessarily only one good model
 
 #### Another Model Building Strategy
 
-![Another strategy for model building. Figure taken from [@sleuth]](sleuthmodelbuild.jpg)
 
+```{r fig.cap = "Another strategy for model building. Figure taken from [@sleuth].", out.width = "90%", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/sleuthmodelbuild.png")
+```
 
 
 <!--
@@ -964,21 +991,26 @@ And, most of all, don't forget that there is not necessarily only one good model
 
 With logistic regression, we don't have residuals, so we don't have a value like $R^2$.  We can, however, measure whether or not the estimated model is consistent with the data.  That is, is the model able to discriminate between successes and failures.
 
-#### back to the burn data \@ref(ex:burnexamp):
-Consider looking at all the pairs of successes and failures.  In the burn data we have 308 survivors and 127 deaths = 39,116 pairs of people.  Given a particular pair, if the observation corresponding to a survivor has a *higher* probability of success than the observation corresponding to a death, we call the pair *concordant*.  If the observation corresponding to a survivor has a *lower* probability of success than the observation corresponding to a death, we call the pair *discordant*.  Tied pairs occur when the observed survivor has the same estimated probability as the observed death.
+We'd like to choose a model that produces high probabilities of success for those observations where success was recorded and low probabilities of success for those observation where failure was recorded.  In other words, we want mostly **concordant** pairs.
 
-* $D_{xy}$: Somers' D is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.  
-* gamma: Goodman-Kruskal gamma is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.  
-* tau-a: Kendall's tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
+Given a particular pair of observations where one was a success and the other was a failure, if the observation corresponding to a success has a *higher* probability of success than the observation corresponding to a failure, we call the pair *concordant*.  If the observation corresponding to a success has a *lower* probability of success than the observation corresponding to a failure, we call the pair *discordant*.  Tied pairs occur when the observed success has the same estimated probability as the observed failure.
 
+#### Back to the burn data \@ref(ex:burnexamp):
+Consider looking at all the pairs of successes and failures in the burn data, we have 308 survivors and 127 deaths = 39,116 pairs of individuals.  
 
-
-For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+One pair of individuals has burn areas of 1.75 and 2.35.
 \begin{align}
 p(x=1.75) &= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
 p(x=2.35) &= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
 \end{align}
 The pairs would be concordant if the first individual survived and the second didn't.  The pairs would be discordant if the first individual died and the second survived.
+
+Ideally the model chosen would have a large number of concordant pairs.  The following metrics quantify the concordance across the entire model with respect to the observed data:
+
+* $D_{xy}$: **Somers' D** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.  
+* gamma: **Goodman-Kruskal gamma** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.  
+* tau-a: **Kendall's tau-a** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
+
 
 ```{r}
 # install.packages(c("Hmisc", "rms"))
@@ -1033,10 +1065,9 @@ x &= \mbox{log area burned}
 What value would we assign to 1.75 or 2.35 or 15 for log(area) burned?  By changing our cutoff, we can fit an entire curve.  We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1).  Notice that the color band represents the probability cutoff for predicting a ``success."
 :::
 
-
-![](ROCcurve_burn.jpg)
-
-
+```{r fig.cap = "ROC curve.  Color indicates the probability cutoff used to determine predictions.", out.width = "90%", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/ROCcurve_burn.png")
+```
 
 
 A: Let's say we use prob=0.25 as a cutoff: 
@@ -1129,13 +1160,17 @@ Suppose that we build a classifier (logistic regression model) on a given data s
     * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are all basically the same, the variability will be higher.  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.  
 
 
+```{r fig.cap = "4-fold CV is depicted.  Notice that the holdout group is never used as part of the coefficient estimation process.", out.width = "90%", fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/CV.png")
+```
+
 ## R: Birdnest Example {#birdexamp}
 
 
 
 **Length of Bird Nest**  This example is from problem E1 in your text and includes 99 species of N. American passerine birds.  Recall that the response variable is binary and represents whether there is a small opening (`closed=1`) or a large opening (`closed=0`) for the nest.  The explanatory variable of interest was the length of the bird.
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, echo = FALSE}
 nests <- readr::read_csv("~/Dropbox/teaching/MA150/PracStatCD/Data Sets/Chapter 07/CSV Files/C7 Birdnest.csv",
                   na="*")
 ```
