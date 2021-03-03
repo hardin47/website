@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-03-01"
+date: "2021-03-03"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -49,11 +49,11 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 2/22/21 	| Logistic Regression | 7 | \@ref(loginf): Inference |
 | 2/24/21 	| | | \@ref(multlog), \@ref(multicol): Multiple Log Reg |
 | 3/1/21  	| Logistic Regression | 7 | \@ref(logstep): Model Build |
-| 3/3/21  	| | | \@ref(cv): Cross Validation; \@ref(roc): ROC | 
+| 3/3/21  	| | |  \@ref(roc): ROC | 
 | 3/8/21 	| Spring Break | |
 | 3/10/21 	| Spring Break |  	|
-| 3/15/21 	| Catch-up / Review | |
-| 3/17/21 	| Exam 1 (Wednesday) |  (2, 6, 7) 	|
+| 3/15/21 	| Cross Validation | \@ref(cv): Cross Validation; |
+| 3/17/21 	| Review / Exam 1 (Wednesday) |  (2, 6, 7) 	|
 | 3/22/21 	| Survival Analysis | 9 | \@ref(timedata), \@ref(KM): KM curves |
 | 3/24/21 	| | | \@ref(KMCI): KM CI  |
 | 3/29/21  	| Survival Analysis | 9 |  \@ref(logrank): Log Rank test|
