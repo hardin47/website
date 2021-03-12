@@ -13,7 +13,7 @@ GLM: g(E[Y | X]) = \beta_0 + \beta_1 X
 \end{align}
 where $g(\cdot)$ is the link function.  For logistic regression, we use the logit link function:
 \begin{align}
-\logit (p) = \ln \bigg( \frac{p}{1-p} \bigg)
+\mbox{logit} (p) = \ln \bigg( \frac{p}{1-p} \bigg)
 \end{align}
 
 
@@ -99,7 +99,7 @@ gives the $\ln$ odds of success .
 
 * **Note 4** Every type of generalized linear model has a link function. Ours is called the *logit*.  The link is the relationship between the response variable and the *linear* function in x.
 \begin{align}
-\logit(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 < \star < 1
+\mbox{logit}(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 < \star < 1
 \end{align}
 
 
@@ -146,9 +146,9 @@ Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^
 
 Let's say the log odds of survival for given observed (log) burn areas $x$ and $x+1$ are:
 \begin{align}
-\logit(p(x)) &= \beta_0 + \beta_1 x\\
-\logit(p(x+1)) &= \beta_0 + \beta_1 (x+1)\\
-\beta_1 &= \logit(p(x+1)) - \logit(p(x))\\
+\mbox{logit}(p(x)) &= \beta_0 + \beta_1 x\\
+\mbox{logit}(p(x+1)) &= \beta_0 + \beta_1 (x+1)\\
+\beta_1 &= \mbox{logit}(p(x+1)) - \mbox{logit}(p(x))\\
 &= \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
 &= \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 e^{\beta_1} &= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
@@ -157,7 +157,7 @@ e^{\beta_1} &= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 $e^{\beta_1}$ is the *odds ratio* for dying associated with a one unit increase in x. [$\beta_1$ is the change in log-odds associated with a one unit increase in x.
 
 \begin{align}
-\logit (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
+\mbox{logit} (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
 \end{align}
 
 (Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to `log(area +1)= 1.90`, and patients with burns corresponding
@@ -174,7 +174,7 @@ What about the RR (relative risk) or difference in risks?  It won't be constant 
 
 The previous model specifies that the OR is constant for any value of $X$ which is not true about RR.  Using the burn data, convince yourself that the RR isn't constant.  Try computing the RR at 1.5 versus 2.5, then again at 1 versus 2.
 \begin{align}
-\logit (\hat{p}) &= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
+\mbox{logit} (\hat{p}) &= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
 \hat{p}(x) &= \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
 \end{align}
 
@@ -233,7 +233,7 @@ RSS &= \sum_i (Y_i - \hat{Y}_i)^2\\
 \end{align}
 That is, we take derivatives with respect to both $\beta_0$ and $\beta_1$, set them equal to zero (take second derivatives to ensure minimums), and solve to get $b_0$ and $b_1$.  It turns out that we've also *maximized the normal likelihood*.
 \begin{align}
-L(\underline{y} | \beta_0, \geta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
 &= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
 \end{align}
 
@@ -432,7 +432,7 @@ X_3 = \begin{cases}
 
 Our new model becomes:
 \begin{align}
-\logit(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
+\mbox{logit}(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
 \end{align}
 
 
@@ -684,7 +684,7 @@ glm( death ~ smoke * as.factor(age), family="binomial") %>% tidy()
 
 Using the additive model above:
 \begin{align}
-\logit (p(x_1, x_2) ) &= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
+\mbox{logit} (p(x_1, x_2) ) &= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
 OR &= \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
 x_1 &= \begin{cases}
 0 & \mbox{ don't smoke}\\
