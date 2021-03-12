@@ -1502,6 +1502,298 @@ abline(a=0, b=1)
 
 <img src="05-log_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" />
 
+### Cross Validation on nest data
+
+Note that the syntax here is slightly different from what we've seen previously.  From the **caret** and **plotROC** packages:
+
+* `train()` to partition the data into 4 groups and run the logistic regression separately
+* `geom_roc()` to plot the ROC curve for each partition
+
+
+
+```r
+library(caret)
+library(plotROC)
+
+nests <- nests %>%
+  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
+                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
+         
+bird_cv <- train(Closed ~ Length + Incubate + Nestling,
+                 data = nests,
+                 na.action = na.omit,
+                 method = "glm", 
+                 family = "binomial",
+                 trControl = trainControl(method = "cv", number = 4,
+                                          classProbs = TRUE,
+                                          savePredictions = TRUE))
+
+bird_cv
+#> Generalized Linear Model 
+#> 
+#> 99 samples
+#>  3 predictor
+#>  2 classes: 'no', 'yes' 
+#> 
+#> No pre-processing
+#> Resampling: Cross-Validated (4 fold) 
+#> Summary of sample sizes: 64, 65, 65, 64 
+#> Resampling results:
+#> 
+#>   Accuracy  Kappa
+#>   0.744     0.39
+bird_cv$pred
+#>    pred obs      no     yes rowIndex parameter Resample
+#> 1    no yes 0.78172 0.21828        2      none    Fold1
+#> 2    no  no 0.66440 0.33560        8      none    Fold1
+#> 3    no  no 0.98078 0.01922        9      none    Fold1
+#> 4   yes yes 0.03380 0.96620       12      none    Fold1
+#> 5   yes  no 0.14553 0.85447       14      none    Fold1
+#> 6    no  no 0.97293 0.02707       15      none    Fold1
+#> 7    no  no 0.96506 0.03494       17      none    Fold1
+#> 8    no yes 0.99265 0.00735       20      none    Fold1
+#> 9    no yes 0.74705 0.25295       29      none    Fold1
+#> 10  yes yes 0.29244 0.70756       31      none    Fold1
+#> 11   no  no 0.97189 0.02811       37      none    Fold1
+#> 12   no  no 0.93430 0.06570       39      none    Fold1
+#> 13   no  no 0.66556 0.33444       41      none    Fold1
+#> 14   no  no 0.99304 0.00696       43      none    Fold1
+#> 15   no  no 0.99192 0.00808       44      none    Fold1
+#> 16   no yes 0.79640 0.20360       50      none    Fold1
+#> 17   no yes 0.90387 0.09613       58      none    Fold1
+#> 18   no  no 0.94913 0.05087       68      none    Fold1
+#> 19   no  no 0.89999 0.10001       77      none    Fold1
+#> 20   no  no 0.94028 0.05972       78      none    Fold1
+#> 21   no  no 0.91622 0.08378       83      none    Fold1
+#> 22  yes  no 0.20081 0.79919       84      none    Fold1
+#> 23   no  no 0.58927 0.41073        6      none    Fold2
+#> 24  yes  no 0.47159 0.52841        7      none    Fold2
+#> 25  yes yes 0.14335 0.85665       13      none    Fold2
+#> 26   no  no 0.52513 0.47487       16      none    Fold2
+#> 27   no  no 0.95487 0.04513       19      none    Fold2
+#> 28  yes yes 0.38568 0.61432       22      none    Fold2
+#> 29  yes yes 0.40044 0.59956       23      none    Fold2
+#> 30  yes yes 0.48563 0.51437       34      none    Fold2
+#> 31   no  no 0.64775 0.35225       35      none    Fold2
+#> 32  yes yes 0.20741 0.79259       51      none    Fold2
+#> 33  yes  no 0.32163 0.67837       54      none    Fold2
+#> 34   no  no 0.77898 0.22102       61      none    Fold2
+#> 35   no  no 0.97186 0.02814       63      none    Fold2
+#> 36   no  no 0.97035 0.02965       66      none    Fold2
+#> 37   no  no 0.92835 0.07165       67      none    Fold2
+#> 38   no  no 0.84018 0.15982       74      none    Fold2
+#> 39   no yes 0.77419 0.22581       75      none    Fold2
+#> 40   no  no 0.96562 0.03438       76      none    Fold2
+#> 41   no  no 0.93660 0.06340       79      none    Fold2
+#> 42   no yes 0.54512 0.45488       80      none    Fold2
+#> 43  yes  no 0.47950 0.52050       81      none    Fold2
+#> 44   no yes 0.85929 0.14071        3      none    Fold3
+#> 45   no yes 0.69331 0.30669        4      none    Fold3
+#> 46   no  no 0.88424 0.11576       10      none    Fold3
+#> 47  yes yes 0.01648 0.98352       11      none    Fold3
+#> 48  yes  no 0.18530 0.81470       21      none    Fold3
+#> 49  yes yes 0.00672 0.99328       24      none    Fold3
+#> 50  yes yes 0.44697 0.55303       28      none    Fold3
+#> 51  yes yes 0.37794 0.62206       32      none    Fold3
+#> 52  yes yes 0.04899 0.95101       36      none    Fold3
+#> 53   no  no 0.79767 0.20233       40      none    Fold3
+#> 54   no  no 0.96188 0.03812       45      none    Fold3
+#> 55  yes  no 0.30910 0.69090       52      none    Fold3
+#> 56   no  no 0.80464 0.19536       59      none    Fold3
+#> 57   no  no 0.90273 0.09727       60      none    Fold3
+#> 58   no  no 0.92046 0.07954       62      none    Fold3
+#> 59   no  no 0.90729 0.09271       64      none    Fold3
+#> 60   no  no 0.95989 0.04011       65      none    Fold3
+#> 61   no  no 0.84880 0.15120       73      none    Fold3
+#> 62  yes  no 0.33589 0.66411       82      none    Fold3
+#> 63   no  no 0.64052 0.35948       85      none    Fold3
+#> 64  yes  no 0.49079 0.50921       86      none    Fold3
+#> 65   no  no 0.65523 0.34477        1      none    Fold4
+#> 66   no yes 0.76096 0.23904        5      none    Fold4
+#> 67   no  no 0.80946 0.19054       18      none    Fold4
+#> 68   no yes 0.65319 0.34681       25      none    Fold4
+#> 69  yes yes 0.25490 0.74510       26      none    Fold4
+#> 70  yes yes 0.08773 0.91227       27      none    Fold4
+#> 71   no yes 0.62828 0.37172       30      none    Fold4
+#> 72   no yes 0.68147 0.31853       33      none    Fold4
+#> 73   no  no 0.89723 0.10277       38      none    Fold4
+#> 74   no  no 0.58574 0.41426       42      none    Fold4
+#> 75   no  no 0.98125 0.01875       46      none    Fold4
+#> 76   no  no 0.91422 0.08578       47      none    Fold4
+#> 77   no  no 0.97125 0.02875       48      none    Fold4
+#> 78   no  no 0.74722 0.25278       49      none    Fold4
+#> 79   no  no 0.62378 0.37622       53      none    Fold4
+#> 80  yes yes 0.39682 0.60318       55      none    Fold4
+#> 81   no  no 0.67110 0.32890       56      none    Fold4
+#> 82   no  no 0.86786 0.13214       57      none    Fold4
+#> 83   no  no 0.88165 0.11835       69      none    Fold4
+#> 84   no  no 0.93564 0.06436       70      none    Fold4
+#> 85   no  no 0.87613 0.12387       71      none    Fold4
+#> 86   no  no 0.87369 0.12631       72      none    Fold4
+
+bird_cv_plot <- bird_cv$pred %>%
+  ggplot() + 
+  geom_roc(aes(m = yes, d = obs, color = Resample))
+
+
+bird_cv_plot +  
+  geom_abline(slope = 1, intercept = 0) +
+  geom_roc(aes(m = yes, d = obs), color = "black")
+
+calc_auc(bird_cv_plot)
+#>   PANEL group   AUC
+#> 1     1     1 0.686
+#> 2     1     2 0.847
+#> 3     1     3 0.806
+#> 4     1     4 0.876
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;" />
+
+
+We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better?
+
+
+```r
+bird_cv_length <- train(Closed ~ Length,
+                 data = nests,
+                 na.action = na.omit,
+                 method = "glm", 
+                 family = "binomial",
+                 trControl = trainControl(method = "cv", number = 4,
+                                          classProbs = TRUE,
+                                          savePredictions = TRUE))
+
+bird_cv_length
+#> Generalized Linear Model 
+#> 
+#> 99 samples
+#>  1 predictor
+#>  2 classes: 'no', 'yes' 
+#> 
+#> No pre-processing
+#> Resampling: Cross-Validated (4 fold) 
+#> Summary of sample sizes: 72, 71, 71, 71 
+#> Resampling results:
+#> 
+#>   Accuracy  Kappa
+#>   0.684     0.04
+bird_cv_length$pred
+#>    pred obs    no     yes rowIndex parameter Resample
+#> 1    no  no 0.706 0.29351        1      none    Fold1
+#> 2    no yes 0.706 0.29351        3      none    Fold1
+#> 3    no  no 0.620 0.37998        8      none    Fold1
+#> 4    no yes 0.638 0.36184       11      none    Fold1
+#> 5    no yes 0.706 0.29351       14      none    Fold1
+#> 6    no  no 0.800 0.20041       19      none    Fold1
+#> 7    no  no 0.955 0.04499       24      none    Fold1
+#> 8    no yes 0.506 0.49421       35      none    Fold1
+#> 9    no yes 0.525 0.47479       36      none    Fold1
+#> 10   no yes 0.673 0.32676       37      none    Fold1
+#> 11   no  no 0.545 0.45545       38      none    Fold1
+#> 12   no  no 0.752 0.24757       48      none    Fold1
+#> 13   no  no 0.647 0.35291       54      none    Fold1
+#> 14   no yes 0.698 0.30164       56      none    Fold1
+#> 15   no  no 0.673 0.32676       58      none    Fold1
+#> 16   no  no 0.682 0.31826       59      none    Fold1
+#> 17   no  no 0.602 0.39846       62      none    Fold1
+#> 18   no  no 0.583 0.41723       63      none    Fold1
+#> 19   no  no 0.564 0.43625       66      none    Fold1
+#> 20   no  no 0.564 0.43625       68      none    Fold1
+#> 21   no  no 0.673 0.32676       71      none    Fold1
+#> 22   no  no 0.564 0.43625       73      none    Fold1
+#> 23   no  no 0.611 0.38918       78      none    Fold1
+#> 24   no  no 0.681 0.31923        5      none    Fold2
+#> 25   no  no 0.681 0.31923       12      none    Fold2
+#> 26   no yes 0.636 0.36370       16      none    Fold2
+#> 27   no  no 0.668 0.33227       17      none    Fold2
+#> 28   no  no 0.781 0.21890       21      none    Fold2
+#> 29   no yes 0.641 0.35913       25      none    Fold2
+#> 30   no yes 0.608 0.39161       27      none    Fold2
+#> 31   no yes 0.641 0.35913       28      none    Fold2
+#> 32   no yes 0.604 0.39633       30      none    Fold2
+#> 33   no yes 0.622 0.37755       31      none    Fold2
+#> 34   no yes 0.694 0.30646       34      none    Fold2
+#> 35   no  no 0.694 0.30646       42      none    Fold2
+#> 36   no  no 0.718 0.28181       47      none    Fold2
+#> 37   no  no 0.774 0.22575       53      none    Fold2
+#> 38   no yes 0.694 0.30646       61      none    Fold2
+#> 39   no  no 0.622 0.37755       67      none    Fold2
+#> 40   no  no 0.632 0.36829       69      none    Fold2
+#> 41   no  no 0.636 0.36370       70      none    Fold2
+#> 42   no  no 0.641 0.35913       72      none    Fold2
+#> 43   no  no 0.702 0.29811       75      none    Fold2
+#> 44   no  no 0.650 0.35007       76      none    Fold2
+#> 45   no  no 0.641 0.35913       81      none    Fold2
+#> 46   no  no 0.650 0.35007       83      none    Fold2
+#> 47   no  no 0.714 0.28583       92      none    Fold2
+#> 48   no yes 0.672 0.32758        6      none    Fold3
+#> 49   no  no 0.657 0.34290        9      none    Fold3
+#> 50   no  no 0.687 0.31262       13      none    Fold3
+#> 51   no  no 0.759 0.24069       20      none    Fold3
+#> 52   no  no 0.766 0.23447       22      none    Fold3
+#> 53   no yes 0.625 0.37452       29      none    Fold3
+#> 54   no yes 0.641 0.35856       33      none    Fold3
+#> 55   no yes 0.680 0.32005       39      none    Fold3
+#> 56   no  no 0.680 0.32005       43      none    Fold3
+#> 57   no  no 0.680 0.32005       44      none    Fold3
+#> 58   no  no 0.723 0.27692       46      none    Fold3
+#> 59   no  no 0.706 0.29445       50      none    Fold3
+#> 60   no  no 0.756 0.24385       51      none    Fold3
+#> 61   no  no 0.740 0.26004       52      none    Fold3
+#> 62   no yes 0.680 0.32005       55      none    Fold3
+#> 63   no yes 0.649 0.35069       65      none    Fold3
+#> 64   no yes 0.672 0.32758       84      none    Fold3
+#> 65   no  no 0.676 0.32381       86      none    Fold3
+#> 66   no  no 0.702 0.29804       87      none    Fold3
+#> 67   no  no 0.680 0.32005       88      none    Fold3
+#> 68   no yes 0.657 0.34290       89      none    Fold3
+#> 69   no  no 0.633 0.36650       90      none    Fold3
+#> 70   no  no 0.641 0.35856       91      none    Fold3
+#> 71   no  no 0.653 0.34678       94      none    Fold3
+#> 72   no yes 0.773 0.22747        2      none    Fold4
+#> 73   no yes 0.833 0.16750        4      none    Fold4
+#> 74   no  no 0.683 0.31742        7      none    Fold4
+#> 75  yes yes 0.463 0.53700       10      none    Fold4
+#> 76   no yes 0.520 0.47996       15      none    Fold4
+#> 77   no  no 0.944 0.05614       18      none    Fold4
+#> 78   no yes 0.997 0.00328       23      none    Fold4
+#> 79   no yes 0.539 0.46099       26      none    Fold4
+#> 80   no yes 0.577 0.42343       32      none    Fold4
+#> 81   no yes 0.683 0.31742       40      none    Fold4
+#> 82   no  no 0.773 0.22747       41      none    Fold4
+#> 83   no  no 0.887 0.11300       45      none    Fold4
+#> 84   no  no 0.887 0.11300       49      none    Fold4
+#> 85   no  no 0.649 0.35130       57      none    Fold4
+#> 86   no  no 0.539 0.46099       60      none    Fold4
+#> 87   no  no 0.613 0.38675       64      none    Fold4
+#> 88   no  no 0.759 0.24113       74      none    Fold4
+#> 89   no  no 0.613 0.38675       77      none    Fold4
+#> 90   no  no 0.631 0.36884       79      none    Fold4
+#> 91   no  no 0.631 0.36884       80      none    Fold4
+#> 92   no  no 0.558 0.44213       82      none    Fold4
+#> 93   no  no 0.715 0.28537       85      none    Fold4
+#> 94   no  no 0.631 0.36884       93      none    Fold4
+#> 95   no  no 0.558 0.44213       95      none    Fold4
+
+bird_cv_length_plot <- bird_cv_length$pred %>%
+  ggplot() + 
+  geom_roc(aes(m = yes, d = obs, color = Resample))
+
+
+bird_cv_length_plot +  
+  geom_abline(slope = 1, intercept = 0) +
+  geom_roc(aes(m = yes, d = obs), color = "black")
+
+calc_auc(bird_cv_length_plot)
+#>   PANEL group   AUC
+#> 1     1     1 0.509
+#> 2     1     2 0.750
+#> 3     1     3 0.781
+#> 4     1     4 0.574
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-32-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Drawing interactions
 

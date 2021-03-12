@@ -1278,6 +1278,75 @@ abline(a=0, b=1)
 
 ```
 
+### Cross Validation on nest data
+
+Note that the syntax here is slightly different from what we've seen previously.  From the **caret** and **plotROC** packages:
+
+* `train()` to partition the data into 4 groups and run the logistic regression separately
+* `geom_roc()` to plot the ROC curve for each partition
+
+
+```{r}
+library(caret)
+library(plotROC)
+
+nests <- nests %>%
+  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
+                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
+         
+bird_cv <- train(Closed ~ Length + Incubate + Nestling,
+                 data = nests,
+                 na.action = na.omit,
+                 method = "glm", 
+                 family = "binomial",
+                 trControl = trainControl(method = "cv", number = 4,
+                                          classProbs = TRUE,
+                                          savePredictions = TRUE))
+
+bird_cv
+bird_cv$pred
+
+bird_cv_plot <- bird_cv$pred %>%
+  ggplot() + 
+  geom_roc(aes(m = yes, d = obs, color = Resample))
+
+
+bird_cv_plot +  
+  geom_abline(slope = 1, intercept = 0) +
+  geom_roc(aes(m = yes, d = obs), color = "black")
+
+calc_auc(bird_cv_plot)
+
+```
+
+
+We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better?
+
+```{r}
+bird_cv_length <- train(Closed ~ Length,
+                 data = nests,
+                 na.action = na.omit,
+                 method = "glm", 
+                 family = "binomial",
+                 trControl = trainControl(method = "cv", number = 4,
+                                          classProbs = TRUE,
+                                          savePredictions = TRUE))
+
+bird_cv_length
+bird_cv_length$pred
+
+bird_cv_length_plot <- bird_cv_length$pred %>%
+  ggplot() + 
+  geom_roc(aes(m = yes, d = obs, color = Resample))
+
+
+bird_cv_length_plot +  
+  geom_abline(slope = 1, intercept = 0) +
+  geom_roc(aes(m = yes, d = obs), color = "black")
+
+calc_auc(bird_cv_length_plot)
+
+```
 
 ### Drawing interactions
 

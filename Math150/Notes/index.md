@@ -52,7 +52,7 @@ You are responsible for reading your text.  Your text is very good & readable, s
 | 3/3/21  	| | |  \@ref(roc): ROC | 
 | 3/8/21 	| Spring Break | |
 | 3/10/21 	| Spring Break |  	|
-| 3/15/21 	| Cross Validation | \@ref(cv): Cross Validation; |
+| 3/15/21 	| Cross Validation |    |    \@ref(cv): Cross Validation; |
 | 3/17/21 	| Review / Exam 1 (Wednesday) |  (2, 6, 7) 	|
 | 3/22/21 	| Survival Analysis | 9 | \@ref(timedata), \@ref(KM): KM curves |
 | 3/24/21 	| | | \@ref(KMCI): KM CI  |
