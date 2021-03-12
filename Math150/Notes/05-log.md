@@ -1401,8 +1401,8 @@ glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>%
 
 
 ```r
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
-bird.glm %>% tidy()
+bird_glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+bird_glm %>% tidy()
 #> # A tibble: 2 x 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
@@ -1411,7 +1411,7 @@ bird.glm %>% tidy()
 
 # predicting the linear part:
 # reasonable to use the SE to create CIs
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
 #> $fit
 #>     1 
 #> -2.72 
@@ -1425,7 +1425,7 @@ predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
 # predicting the probability of success (on the `scale` of the response variable):
 # do NOT use the SE to create a CI for the predicted value
 # instead, use the SE from `type="link" ` and transform the interval
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 #> $fit
 #>      1 
 #> 0.0616 
@@ -1446,8 +1446,8 @@ predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 # install.packages(c("Hmisc", "rms"))
 
 library(rms)   # you need this line!!
-bird.lrm <- lrm(`Closed?` ~ Length, data = nests)
-print(bird.lrm)
+bird_lrm <- lrm(`Closed?` ~ Length, data = nests)
+print(bird_lrm)
 #> Frequencies of Missing Values Due to Each Variable
 #> Closed?  Length 
 #>       0       4 
@@ -1476,28 +1476,37 @@ print(bird.lrm)
 
 
 ```r
-library(ROCR)
+library(plotROC)
 
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+nests <- nests %>%
+  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
+                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
 
-bird.indiv <- bird.glm %>% augment() %>% 
-  mutate(probs = predict(bird.glm, type = "response"))
-head(bird.indiv)
+bird_glm <- glm(Closed ~ Length, data = nests, family="binomial")
+
+bird_indiv <- bird_glm %>% augment() %>% 
+  mutate(probs = predict(bird_glm, type = "response"))
+head(bird_indiv)
 #> # A tibble: 6 x 10
-#>   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
-#>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
-#> 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
-#> 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-#> 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-#> 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
-#> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
-#> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
-#> # … with 1 more variable: probs <dbl>
+#>   .rownames Closed Length .fitted .resid .std.resid   .hat .sigma .cooksd probs
+#>   <chr>     <fct>   <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl> <dbl>
+#> 1 1         no       20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288 0.290
+#> 2 2         yes      20    -0.896  1.57       1.58  0.0137   1.11 0.0173  0.290
+#> 3 4         yes      20    -0.896  1.57       1.58  0.0137   1.11 0.0173  0.290
+#> 4 5         yes      22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305  0.256
+#> 5 6         no       18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267 0.311
+#> 6 7         yes      17    -0.693  1.48       1.49  0.0110   1.12 0.0112  0.333
 
-bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$`Closed?`)
-bird.perf <- ROCR::performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
-plot(bird.perf, colorize = TRUE)
-abline(a=0, b=1)
+bird_cv_plot <- bird_indiv %>%
+  ggplot() + 
+  geom_roc(aes(d = Closed, m = .fitted)) +
+  geom_abline(intercept = 0, slope = 1)
+
+bird_cv_plot
+
+calc_auc(bird_cv_plot)
+#>   PANEL group   AUC
+#> 1     1    -1 0.638
 ```
 
 <img src="05-log_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" />
@@ -1515,10 +1524,6 @@ Note that the syntax here is slightly different from what we've seen previously.
 library(caret)
 library(plotROC)
 
-nests <- nests %>%
-  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
-                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
-         
 bird_cv <- train(Closed ~ Length + Incubate + Nestling,
                  data = nests,
                  na.action = na.omit,

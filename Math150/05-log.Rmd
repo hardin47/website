@@ -1235,17 +1235,17 @@ glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>%
 
 
 ```{r}
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
-bird.glm %>% tidy()
+bird_glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+bird_glm %>% tidy()
 
 # predicting the linear part:
 # reasonable to use the SE to create CIs
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
 
 # predicting the probability of success (on the `scale` of the response variable):
 # do NOT use the SE to create a CI for the predicted value
 # instead, use the SE from `type="link" ` and transform the interval
-predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 ```
 
 ### Measues of association
@@ -1255,27 +1255,34 @@ predict(bird.glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 # install.packages(c("Hmisc", "rms"))
 
 library(rms)   # you need this line!!
-bird.lrm <- lrm(`Closed?` ~ Length, data = nests)
-print(bird.lrm)
+bird_lrm <- lrm(`Closed?` ~ Length, data = nests)
+print(bird_lrm)
 ```
 
 
 ###  ROC curves
 
 ```{r}
-library(ROCR)
+library(plotROC)
 
-bird.glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+nests <- nests %>%
+  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
+                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
 
-bird.indiv <- bird.glm %>% augment() %>% 
-  mutate(probs = predict(bird.glm, type = "response"))
-head(bird.indiv)
+bird_glm <- glm(Closed ~ Length, data = nests, family="binomial")
 
-bird.ROC.info <- ROCR::prediction(bird.indiv$probs, bird.indiv$`Closed?`)
-bird.perf <- ROCR::performance(bird.ROC.info, measure = "tpr", x.measure = "fpr")
-plot(bird.perf, colorize = TRUE)
-abline(a=0, b=1)
+bird_indiv <- bird_glm %>% augment() %>% 
+  mutate(probs = predict(bird_glm, type = "response"))
+head(bird_indiv)
 
+bird_cv_plot <- bird_indiv %>%
+  ggplot() + 
+  geom_roc(aes(d = Closed, m = .fitted)) +
+  geom_abline(intercept = 0, slope = 1)
+
+bird_cv_plot
+
+calc_auc(bird_cv_plot)
 ```
 
 ### Cross Validation on nest data
@@ -1290,10 +1297,6 @@ Note that the syntax here is slightly different from what we've seen previously.
 library(caret)
 library(plotROC)
 
-nests <- nests %>%
-  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
-                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
-         
 bird_cv <- train(Closed ~ Length + Incubate + Nestling,
                  data = nests,
                  na.action = na.omit,
