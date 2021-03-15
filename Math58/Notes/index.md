@@ -58,11 +58,11 @@ You are responsible for reading the relevant chapters in the text. The text is v
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
 | 3/10/21 | Spring Break                    |                           |                                                 |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
-| 3/15/21 | two proportions                 | IMS 6.2                   |     \@ref(diffprop): difference in proportions  |
+| 3/15/21 | two proportions                 | IMS 6.2                   | \@ref(diffprop): difference in proportions      |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
-| 3/17/21 | relative risk & odds ratios     |     ISCAM 3.9-3.11        | \@ref(rr): relative risk, \@ref(or): odds ratio |
+| 3/17/21 | relative risk & odds ratios     | ISCAM 3.9 - 3.11          | \@ref(rr): relative risk, \@ref(or): odds ratio |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
-| 3/22/21 | chi-square test of independence |     IMS 6.3               |     \@ref(chisq2)                               |
+| 3/22/21 | chi-square test of independence | IMS 6.3                   | \@ref(chisq2): chi-sq test                      |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
 
 ```{=html}
