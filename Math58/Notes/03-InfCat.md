@@ -216,7 +216,7 @@ How often will a type I error be made?  5% of the time.  Therefore ($p_{small}, 
 2. CI for odds ratios
 -->
 
-## Relative Risk
+## Relative Risk {#rr}
 
 Previously (e.g., Gender discrimination example, \@ref(ex:gend)) when working with the proportion of success in two separate groups, the proportion of success was subtracted (see also lab 4).  Next week, differences in proportions will be revisited, see section \@ref(diffprop).  First up, the new statistic of interest will be relative risk, followed by odds ratios.
 
@@ -299,7 +299,7 @@ null_RR %>%
 
 
 
-## Odds Ratios
+## Odds Ratios {#or}
 
 Experience shows that very few introductory statistics students have seen odds or odds ratios in their prior mathematical or scientific study.  That makes odds ratios a **new** idea, but not a fundamentally hard idea.  Which is to say, it is perfectly acceptable to find relative risk a very intuitive idea that you can easily discuss and odds ratios a very strange idea which is hard to interpret.  Do not be discouraged!  Odds ratios are *not* fundamentally harder to understand than relative risk, they are simply a new idea.
 
