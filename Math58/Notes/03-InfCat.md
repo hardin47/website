@@ -233,10 +233,10 @@ Due to some theory we won't cover, there is a fairly good mathematical approxima
 
 $$\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
 
-|            | explanatory 1 | explanatory 2 |
+|            | response 1 | response 2 |
 |------------|:-------------:|:-------------:|
-| response 1 |       A       |       B       |
-| response 2 |       C       |       D       |
+| explanatory 1 |       A       |       C       |
+| explanatory 2 |       B       |       D       |
 
 * **Statistic:** $$\hat{p}_1 / \hat{p}_2 = \frac{A/(A+C) }{B/ (B+D)}$$
 * **Null Hypothesis:** $$H_0: p_1/p_2 = 1$$
@@ -434,10 +434,10 @@ Due to some theory we won't cover, there is a fairly good mathematical approxima
 
 $$\ln(\hat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
 
-|            | explanatory 1 | explanatory 2 |
+|            | response 1 | response 2 |
 |------------|:-------------:|:-------------:|
-| response 1 |       A       |       B       |
-| response 2 |       C       |       D       |
+| explanatory 1 |       A       |       C       |
+| explanatory 2 |       B       |       D       |
 
 * **Statistic:** $$\hat{OR} = \frac{A D}{B C}$$
 * **Null Hypothesis:** $$H_0: OR = 1$$
