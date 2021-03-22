@@ -98,13 +98,10 @@ Said differently:  within any subgroup of interest, the subjects who are censore
 
 Suppose we have the following melting times (in seconds) of milk chocolate chips for 7 students where the maximum time allowed for the experiment was 60 seconds:  
 
-\begin{center}
-\begin{tabular}{r|ccccccc}
-Student & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
-\hline
-Time & 35 & 30 & 60 & 45 & 25 & 55 & 30 \\
-\end{tabular}
-\end{center}
+
+| Student |  1 |  2 |  3 |  4 |  5 |  6 |  7 |
+|--------:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|    Time | 35 | 30 | 60 | 45 | 25 | 55 | 30 |
 
 To find the estimated proportion of chocolate chips that have not melted after 45 seconds we use the **empirical survival function**,  $\hat{S}(45)_E$.
 \begin{eqnarray*}
