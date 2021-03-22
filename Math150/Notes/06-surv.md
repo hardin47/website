@@ -27,7 +27,7 @@ Based on the data, we would like to calculate:
 & & \\
 \end{eqnarray*}
 
-The next example is given in your text [@KuiperSklar (chapter 9)] as part of the motivation for survival analysis.  [I can't figure out why it insists on being numbered wrong.]
+The next example is given in your text [@KuiperSklar (chapter 9)] as part of the motivation for survival analysis.
 
 ::: {.example}
 
