@@ -189,7 +189,7 @@ $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the relative risk varies from sample to sample:
 
-$$\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
+$$\ln(\widehat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg)$$
 
 |            | response 1 | response 2 |
 |------------|:-------------:|:-------------:|
@@ -198,6 +198,8 @@ $$\ln(\hat{RR})  \stackrel{\mbox{approx}}{\sim}   N\Bigg(\ln(RR), \sqrt{\frac{1}
 
 * **Statistic:** $$\hat{p}_1 / \hat{p}_2 = \frac{A/(A+C) }{B/ (B+D)}$$
 * **Null Hypothesis:** $$H_0: p_1/p_2 = 1$$
+* **Z Score:** (note the null hypothesized value is $\ln(1) = 0$) 
+$$\mbox{Z score} = \frac{\ln(\widehat{RR}) - 0}{\sqrt{ \frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}}$$
 * **CI:** The CI is for the true relative risk in the population, $p_1/p_2$
 
 $$\mbox{exponentiate} \Bigg[ \ln(\hat{p}_1/\hat{p}_2) \pm z^*\sqrt{ \frac{1}{A} - \frac{1}{A+C} + \frac{1}{B} - \frac{1}{B+D}}\Bigg]$$
@@ -212,10 +214,6 @@ To remember with relative risk:
 * The CI for $p_1/p_2$ is typically considered significant if 1 is not in the interval.  That is because usually the null hypothesis is $H_0: p_1 = p_2$ or equivalently, $H_0: p_1/p_2 = 1$.
 
 ### Using `infer` for inference on RR
-
-<!--
-devtools::install_github("tidymodels/infer", ref="develop")
--->
 
 As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.
 
@@ -380,18 +378,20 @@ IMPORTANT:  Relative risk cannot be used with case-control studies but odds rati
 
 Due to some theory we won't cover, there is a fairly good mathematical approximation which describes how the natural log of the odds ratio varies from sample to sample:
 
-$$\ln(\hat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
+$$\ln(\widehat{OR}) \stackrel{\mbox{approx}}{\sim}  N\Bigg(\ln(OR), \sqrt{\frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg)$$
 
 |            | response 1 | response 2 |
 |------------|:-------------:|:-------------:|
 | explanatory 1 |       A       |       C       |
 | explanatory 2 |       B       |       D       |
 
-* **Statistic:** $$\hat{OR} = \frac{A D}{B C}$$
+* **Statistic:** $$\widehat{OR} = \frac{A D}{B C}$$
 * **Null Hypothesis:** $$H_0: OR = 1$$
+* **Z Score:** (note the hypothesized value is $\ln(1) = 0$) 
+$$\mbox{Z score} = \frac{\ln(\widehat{OR}) - 0}{\sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}}$$ 
 * **CI:** The CI is for the true odds ratio in the population, $OR$
 
-$$\mbox{exponentiate} \Bigg[ \ln{\hat{OR}} \pm z^* \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg]$$
+$$\mbox{exponentiate} \Bigg[ \ln{\widehat{OR}} \pm z^* \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}\Bigg]$$
 
 #### OR is more extreme than RR
 
@@ -410,13 +410,13 @@ OR &>& RR
 ### Confidence Interval for OR (same idea as with RR)
 
 \begin{eqnarray*}
-SE(\ln (\hat{OR})) &\approx& \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}
+SE(\ln (\widehat{OR})) &\approx& \sqrt{ \frac{1}{A} + \frac{1}{B} + \frac{1}{C} + \frac{1}{D}}
 \end{eqnarray*}
 
 
 So, a $(1-\alpha)100\%$ CI for the $\ln(OR)$ is:
 \begin{eqnarray*}
-\ln(\hat{OR}) \pm z_{1-\alpha/2} SE(\ln(\hat{OR}))
+\ln(\widehat{OR}) \pm z_{1-\alpha/2} SE(\ln(\widehat{OR}))
 \end{eqnarray*}
 
 Which gives a $(1-\alpha)100\%$ CI for the $OR$:
@@ -428,7 +428,7 @@ Which gives a $(1-\alpha)100\%$ CI for the $OR$:
 $\frac{583/576}{22/204} = 9.39$
 Back to the example... OR = 9.39.
 \begin{eqnarray*}
-SE(\ln(\hat{OR})) &=& \sqrt{\frac{1}{583} + \frac{1}{576} + \frac{1}{22} + \frac{1}{204}}\\
+SE(\ln(\widehat{OR})) &=& \sqrt{\frac{1}{583} + \frac{1}{576} + \frac{1}{22} + \frac{1}{204}}\\
 &=& 0.232\\
 90\% \mbox{ CI for } \ln(OR) && \ln(9.39) \pm 1.645 \cdot 0.232\\
 && 2.24 \pm 1.645 \cdot 0.232\\
@@ -450,7 +450,7 @@ We are 90% confident that the true $\ln(OR)$ is between 1.858 and 2.62.  We are 
 
 
 
-Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR$.
+Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\widehat{OR}).$  We use the *process* for creating CIs to transform back to $OR$.
 
 <!--
 Note 2: We do not use the t-distribution here because we are not estimating the population standard deviation.
@@ -558,7 +558,7 @@ exp(log(ORhat) + 1.96 * SE_lnOR)
 ```
 
 
-Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by $\hat{OR}$ = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).
+Working backwards from their percentages, if 13 is 87% of their cases, then there are 15 cases. If 35 is 47% of their controls, then there are 74 controls. Using the revised numbers, the odds ratio would by $\widehat{OR}$ = (13/2)/(35/39) = 7.24, with a CI of (1.53, 34.37).
 
 
 ```{r}
@@ -941,7 +941,7 @@ Spring Break 1 !
 4. What do we do when we we can't calculate statistics based on proportions?  Why does this ``fix" work?
 5. What is the statistic of interest?  What is the parameter of interest?
 6. Why do we look at the natural log of the RR and the natural log of the OR when finding confidence intervals for the respective parameters?
-7. How do you calculate the SE for the $\ln(\hat{RR})$ and $\ln(\hat{OR})$?
+7. How do you calculate the SE for the $\ln(\widehat{RR})$ and $\ln(\widehat{OR})$?
 8. Once you have the CI for $\ln(RR)$ or for $\ln(OR)$, what do you do?  Why does that process work?
 
 
