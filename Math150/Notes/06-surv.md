@@ -1057,9 +1057,9 @@ survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 
 
 ```r
-ggsurvplot(recid.surv[1], conf.int=TRUE, censor=F) + ggtitle("Low Only")
+ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
 
-ggsurvplot(recid.surv, conf.int=TRUE, censor=F, risk.table = TRUE)
+ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;" />
@@ -1246,7 +1246,7 @@ Using the `rms` package, we can plot CIs for each of the relevant HRs for the mo
 recid.data <- recidKM %>%
   select(timefollow, event, score_factor, race, age, sex)
 recid.final <- rms::cph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recid.data)
-ddist <- datadist(recid.data)
+ddist <- rms::datadist(recid.data)
 options(datadist = 'ddist')
 plot(summary(recid.final), log = TRUE)
 ```
