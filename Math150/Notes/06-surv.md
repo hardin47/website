@@ -292,34 +292,34 @@ H_0: && S_1(t) = S_2(t) \ \ \ \ \ \forall t \mbox{ parameters!}\\
 H_1: && S_1(t) \ne S_2(t) \ \ \ \ \ \mbox{ for some } t\\
 \end{eqnarray*}
 
-We want to test whether the curves are the same over all $t$ (or different at any $t$).  Let's consider a particular time, the $j^{th}$ time point:
+We want to test whether the curves are the same over all $t$ (or different at any $t$).  Let's consider a particular time, the $j^{th}$ event time (we don't look at the censored times, because we only consider when the curve changes / steps):
 
 |  	| Group 1	| Group 2 	| Total 	|
 |---------:	|:-----------------:	|:-----------------:	|-------------	|
-| died 	| $d_{1j}$ 	| $d_{2j}$ 	| $D_j$ 	|
-| survived 	| $n_{1j} - d_{1j}$ 	| $n_{2j} - d_{2j}$ 	| $N_j - D_j$ 	|
-|  	| $n_{1j}$ 	| $n_{2j}$ 	| $N_j$ 	|
+| died 	| $d_{1j}$ 	| $d_{2j}$ 	| $d_j$ 	|
+| survived 	| $n_{1j} - d_{1j}$ 	| $n_{2j} - d_{2j}$ 	| $n_j - d_j$ 	|
+|  	| $n_{1j}$ 	| $n_{2j}$ 	| $n_j$ 	|
 
 Because it's a $2x2$ table with fixed margins, we only need to consider one group.  If survival is similar for the two groups, we'd expect:
 \begin{eqnarray*}
-d_{1j} &\approx& \frac{D_j}{N_j}n_{1j}\\
+d_{1j} &\approx& \frac{d_j}{n_j}n_{1j}\\
 d_{1j} &=& \mbox{observed}\\
-\frac{D_j}{N_j} n_{1j} &=& E(d_{1j} | D_j) \\
-var(d_{1j}) &=& \frac{n_{1j} n_{2j} D_j (N_j - D_j)}{N_j^2(N_j-1)}\\
+\frac{d_j}{n_j} n_{1j} &=& E(d_{1j} | d_j) = E_{1j} \\
+var(d_{1j}) &=& \frac{n_{1j} n_{2j} d_j (n_j - d_j)}{n_j^2(n_j-1)} = V_{1j}\\
 \end{eqnarray*}
 where the variance is derived from the hypergeometric distribution.
 
 To estimate the overall difference between the observed and expected death counts:
 \begin{eqnarray*}
-\sum_j d_{1j} - \sum_j E(d_{1j} | D_j) = \sum_j d_{1j} - \sum_j \frac{D_j}{N_j}n_{1j}
+\sum_j d_{1j} - \sum_j E(d_{1j} | d_j) = \sum_j d_{1j} - \sum_j \frac{d_j}{n_j}n_{1j}
 \end{eqnarray*}
 The overall variability:
 \begin{eqnarray*}
-\sum_j var(d_{1j}|D_j)
+\sum_j var(d_{1j}|d_j)
 \end{eqnarray*}
-The test statistic we use to compare the observed and expected frequency of deaths.  (Sum over all of the death (or recurrence) times.)
+The test statistic we use to compare the observed and expected frequency of deaths.  (Sum over all of the death (or event) times.)
 \begin{eqnarray*}
-T = \frac{(|\sum_j d_{1j} - \sum_j E(d_{1j} | D_j)| - 0.5)^2}{\sum_j var(d_{1j}|D_j)} \sim \chi^2_1
+T = \frac{(|\sum_j d_{1j} - \sum_j E(d_{1j} | d_j)| - 0.5)^2}{\sum_j var(d_{1j}|d_j)} \sim \chi^2_1
 \end{eqnarray*}
 
 
