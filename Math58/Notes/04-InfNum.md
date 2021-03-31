@@ -136,7 +136,7 @@ The test statistic is -5.46, and even a two-sided p-value (the area doubled) is 
 
 
 ```r
-2 * mosaic::xpt(-5.46, df = 129)
+2*mosaic::xpt(-5.46, df = 129)
 ```
 
 <img src="04-InfNum_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" />
@@ -145,6 +145,7 @@ The test statistic is -5.46, and even a two-sided p-value (the area doubled) is 
 ## [1] 2.354246e-07
 ```
 
+Conclusion: We definitely reject $H_0$.  There is no way this sample of 130 people came from a population with a true average healthy body temperature of 98.6. 
 
 ####  Confidence interval for true average healthy body temperature
 
