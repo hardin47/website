@@ -118,7 +118,7 @@ In order to work through the analysis it is imperative that we understand the da
 
 ####  Hypothesis test on true average healthy body temperature
 
-The first research question we want to ask is:  how surprising would it be to select a group of 13 participants who have an average healthy body temperature of 98.249 F ?
+The first research question we want to ask is:  how surprising would it be to select a group of 130 participants who have an average healthy body temperature of 98.249 F ?
 
 The questions is set up perfectly for a hypothesis test!
 
@@ -136,7 +136,7 @@ The test statistic is -5.46, and even a two-sided p-value (the area doubled) is 
 
 
 ```r
-2 * mosaic::xpt(-5.46, df = 129, ncp = 0)
+2 * mosaic::xpt(-5.46, df = 129)
 ```
 
 <img src="04-InfNum_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" />
@@ -306,7 +306,7 @@ df &=& n_1 + n_2 - 2
 
 ##  R code for inference on 1 or 2 means.
 
-Above, R is used primarily as a calculator and a way to find the appropriate values from the t-distribution (using `mosaic::xpt` and `mosaic::xqt`  $\rightarrow$ note that along with the first argument (either a probability or a place on the x-axis) it is important to add the degrees of freedom `df` and possibly the argument `ncp=0` which centers the graph at zero).
+Above, R is used primarily as a calculator and a way to find the appropriate values from the t-distribution (using `mosaic::xpt` and `mosaic::xqt`  $\rightarrow$ note that along with the first argument (either a probability or a place on the x-axis) it is important to add the degrees of freedom `df`).
 
 Consider the teacher salary data available in the OpenIntro textbook.  
 
