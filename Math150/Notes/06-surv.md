@@ -419,17 +419,17 @@ h_0(t) & \mbox{control}
 S_i(t) &=& (S_0(t))^{e^\beta}\\
 \end{eqnarray*}
 
-We don't yet know how to run this model and estimate the parameters, but still, we can probably do it.  Right?  We run a **Cox proportional hazards model**, get $b$, and estimate the RR using: $\hat{RR} = e^{b}$!  It turns out that for large samples (as with logistic regression, the CI and tests below are again called Wald CI and tests),
+We don't yet know how to run this model and estimate the parameters, but still, we can probably do it.  Right?  We run a **Cox proportional hazards model**, get $b$, and estimate the HR using: $\widehat{HR} = e^{b}$!  It turns out that for large samples (as with logistic regression, the CI and tests below are again called Wald CI and tests),
 
 \begin{eqnarray*}
 b \sim N: && \\
 && 95\% \mbox{ CI for } \beta: b \pm 1.96 SE(b)\\
-&& 95\% \mbox{ CI for } RR: (e^{b - 1.96 SE(b)}, e^{b + 1.96 SE(b)})\\
+&& 95\% \mbox{ CI for } HR: (e^{b - 1.96 SE(b)}, e^{b + 1.96 SE(b)})\\
 \end{eqnarray*}
 
-And we can test RR by using $\beta$:
+And we can test HR by using $\beta$:
 \begin{eqnarray*}
-H_0:&& \beta=0 \iff RR = 1\\
+H_0:&& \beta=0 \iff HR = 1\\
 Z &=& \frac{b - 0 }{SE(b)}
 \end{eqnarray*}
 
