@@ -1,7 +1,7 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2021-03-31"
+date: "2021-04-07"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
@@ -72,7 +72,7 @@ You are responsible for reading the relevant chapters in the text. The text is v
 +-----------+---------------------------------+---------------------------+-------------------------------------------------+
 | 4/5/21 \| | two means                       | IMS 7.2                   | \@ref(mean2inf): two means                      |
 +-----------+---------------------------------+---------------------------+-------------------------------------------------+
-| 4/7/21 \| | paired means                    | IMS 7.3 / 7.4             | \@ref(mean2infpair): paired means               |
+| 4/7/21 \| | t-procedures                    | IMS 7.4                   |                                                 |
 +-----------+---------------------------------+---------------------------+-------------------------------------------------+
 | 4/12/21   | ANOVA                           | IMS 7.5                   | \@ref(ANOVA): ANOVA                             |
 +-----------+---------------------------------+---------------------------+-------------------------------------------------+
