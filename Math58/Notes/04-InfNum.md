@@ -29,11 +29,13 @@ What measures can we look at to get a first sense of whether  two groups are dif
 
 * Summaries often used when variable has a bell-shaped distribution
 
-\begin{eqnarray*}
-\mbox{sample mean} &=& \overline{X} = \frac{1}{n} \sum_{i=1}^n X_i\\
-\mbox{sample standard deviation} &=& s = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{X})^2}\\
-\mbox{sample variance} &=& s^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{X})^2
-\end{eqnarray*}
+$$
+\begin{align*}
+\mbox{sample mean} &= \overline{X} = \frac{1}{n} \sum_{i=1}^n X_i\\
+\mbox{sample standard deviation} &= s = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{X})^2}\\
+\mbox{sample variance} &= s^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{X})^2
+\end{align*}
+$$
 
 Loosely, the standard deviation is the size of the typical deviation from the mean of the data set.  Note that we divide by $n-1$ instead of by $n$ because the true deviation is defined as the average of the observations from the true mean $\mu$, and, in fact, they will always be closer to $\overline{X}$ than to $\mu$.
 
@@ -335,7 +337,7 @@ Cuckoo %>%
   geom_boxplot(aes(x = Bird, y = Length))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="960" style="display: block; margin: auto;" />
 :::
 
 The key to understanding ANOVA is to breaking down the variability into two different pieces.  The first is the variability within each separate group.  Sometimes it is referred to as the variability of the residuals (left over after the groups are formed).  The second is the variability across the different groups.
@@ -355,8 +357,8 @@ The mean square treatment of ANOVA represents variation among the means of the t
 
 $$
 \begin{align*}
-MSE&=& \frac{\sum_{i=1}^I s_i^2(n_i -1)}{N-I}\\
-\overline{x} &=& \frac{\sum_{i=1}^I n_i \overline{x}_i}{N}\\
+MSE&= \frac{\sum_{i=1}^I s_i^2(n_i -1)}{N-I}\\
+\overline{x} &= \frac{\sum_{i=1}^I n_i \overline{x}_i}{N}\\
 \end{align*}
 $$
 
@@ -438,10 +440,10 @@ R^2 &=& 42.94 / 137.188 = 0.313
 If, in fact, the research question addresses a prespecified comparison of means, the two independent sample t-test applies directly.  Note that the two differences have to do with the estimated SE.  We now estimate the SE using *all* of the data (even though our primary interest is in only 2 of the groups).
 
 
-$$\hat{\sigma^2} = s_p^2 &=& \frac{(n_1-1)s_1^2 + (n_2 - 1) s_2^2 + \cdots + (n_k -1)s_k^2}{n_1 + n_2 + \cdots + n_k -k}$$
+$$\hat{\sigma}^2 = s_p^2 = \frac{(n_1-1)s_1^2 + (n_2 - 1) s_2^2 + \cdots + (n_k -1)s_k^2}{n_1 + n_2 + \cdots + n_k -k}$$
 
 Additionally, because $k$ means are estimated in in order to calculate the variability, there are $n-k$ degrees of freedom.  Therefore, a $(1-\alpha)100\%$ confidence interval for $\mu_i - \mu_j$ is
-$$\overline{Y}_i - \overline{Y}_j \pm t_{(\alpha/2,N-k)} s_p \sqrt{1/n_i + 1/n_j}$$
+$$\overline{X}_i - \overline{X}_j \pm t_{(\alpha/2,N-k)} s_p \sqrt{1/n_i + 1/n_j}$$
 
 Let's say we were originally interested in whether the eggs hatched in meadow pipit and tree pipit nests were significantly different sizes, on average.  
 
@@ -450,7 +452,7 @@ $$
 s_p^2 &=  MS_{resid} = 0.827\\
 (22.99 - 23.09) &\pm  t_{(.05, 120-6)} \sqrt{0.827} \sqrt{1/45 + 1/15}\\
 & (-0.55, 0.35)\\
-xqt(0.05, 114) &= -1.658
+\verb;xqt;(0.05, 114) &= -1.658
 \end{align*}
 $$
 
