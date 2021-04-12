@@ -372,7 +372,7 @@ H_A:&amp;&amp; \mbox{not } H_0
 <span class="va">Cuckoo</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_boxplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Bird</span>, y <span class="op">=</span> <span class="va">Length</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="960" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;"></div>
 </div>
 <p>The key to understanding ANOVA is to breaking down the variability into two different pieces. The first is the variability within each separate group. Sometimes it is referred to as the variability of the residuals (left over after the groups are formed). The second is the variability across the different groups.</p>
 <p><strong>mean square error</strong>
@@ -396,9 +396,9 @@ MSE&amp;= \frac{\sum_{i=1}^I s_i^2(n_i -1)}{N-I}\\
 <span class="header-section-number">7.5.1</span> ANOVA F-test<a class="anchor" aria-label="anchor" href="#anova-f-test"><i class="fas fa-link"></i></a>
 </h3>
 <p>Under the null hypothesis that the population means of all the groups are the same, the value for <span class="math inline">\(MS_{groups}\)</span> should be similar to the value for <span class="math inline">\(MS_{error}\)</span>. Regardless of the null hypothesis, <span class="math inline">\(MS_{error}\)</span> will always be a good measure of the within group variability. If the groups are really different, <span class="math inline">\(MS_{groups}\)</span> will overestimate the within group variability. Under <span class="math inline">\(H_0\)</span>:</p>
-<p><span class="math display">\[F^* = \frac{MST}{MSE} \sim F_{I-1, N-I}\]</span></p>
-<p>If, in fact, the population means are different, <span class="math inline">\(F^*\)</span> will be much larger than expected from the null sampling distribution.</p>
-<p><span class="math display">\[p-value = P(F_{I-1, N-I} \geq F^*)\]</span></p>
+<p><span class="math display">\[F = \frac{MST}{MSE} \sim F_{I-1, N-I}\]</span></p>
+<p>If, in fact, the population means are different, <span class="math inline">\(F\)</span> will be much larger than expected from the null sampling distribution.</p>
+<p><span class="math display">\[\mbox{p-value} = P(F_{I-1, N-I} \geq F)\]</span></p>
 <p>Rejecting the null hypothesis says that at least one of the population means is different from the others. Not rejecting the null hypothesis says that the data are consistent with the null hypothesis (not that we are sure the null hypothesis is true).</p>
 </div>
 <div id="anova-table" class="section level3" number="7.5.2">
@@ -430,7 +430,7 @@ MSE&amp;= \frac{\sum_{i=1}^I s_i^2(n_i -1)}{N-I}\\
 <td><span class="math inline">\(I-1\)</span></td>
 <td><span class="math inline">\(MST\)</span></td>
 <td><span class="math inline">\(\frac{MST}{MSE}\)</span></td>
-<td><span class="math inline">\(P(F_{I-1, N-I} \geq F^*)\)</span></td>
+<td><span class="math inline">\(P(F_{I-1, N-I} \geq F)\)</span></td>
 </tr>
 <tr class="even">
 <td>error</td>
@@ -474,9 +474,96 @@ well-behaved.</li>
 condition being met if the treatments are randomly assigned). If the first two conditions are not met,
 then suitable transformations may be useful.</p>
 </div>
-<div id="thought-experiment" class="section level3" number="7.5.4">
+<div id="anova-r-code" class="section level3" number="7.5.4">
 <h3>
-<span class="header-section-number">7.5.4</span> Thought experiment<a class="anchor" aria-label="anchor" href="#thought-experiment"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.5.4</span> ANOVA R code<a class="anchor" aria-label="anchor" href="#anova-r-code"><i class="fas fa-link"></i></a>
+</h3>
+<p>Notice that the variable which describes the host bird is called <code>Bird</code>. But in the output, there are FIVE rows describing different birds. The <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code> function (linear model) creates five new 0/1 (binary) variables as a way to write down one linear model describing six different birds.</p>
+<p><strong>Converting the <code>Bird</code> variable:</strong></p>
+<p><span class="math display">\[
+\begin{align}
+X_{mdw\_pippit} = \begin{cases}
+  1 &amp; \text{if mdw_pippit} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_{robin} = \begin{cases}
+  1 &amp; \text{if robin} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_{tree\_pippit} = \begin{cases}
+  1 &amp; \text{if tree_pippit} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+\end{align}
+\]</span></p>
+<p><span class="math display">\[
+\begin{align}
+X_{wagtail} = \begin{cases}
+  1 &amp; \text{if wagtail} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_{wren} = \begin{cases}
+  1 &amp; \text{if wren} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+\end{align}
+\]</span></p>
+<p>So the model which describes the average egg length (denoted with the <span class="math inline">\(\hat{Y}\)</span> notation) can be written as the following:</p>
+<p><span class="math display">\[\hat{Y} = 23.12 - 0.82 \cdot X_{mdw\_pippit} - 0.54\cdot X_{robin} - 0.03\cdot X_{tree\_pippit} - 0.2 1\cdot X_{wagtail} - 1.99 \cdot X_{wren}\]</span>
+You might have noticed that there is no variable or coefficient for the <code>hedge_sparrow</code>. That’s because the <code>hedge_sparrow</code> lives in the intercept! The model has to choose a baseline (that’s just how it works) which means all the other averages are compared to the <code>hedge_sparrow</code> baseline.</p>
+<p>We will talk about this model in more detail in Chapter <a href="reginf.html#reginf">8</a> on Multiple Regression and inference, but for now notice that the <code>mdw_pippit</code> and <code>wren</code> are significantly different from the <code>hedge_sparrow</code> (p-values are small), but the <code>robin</code>, <code>tree_pippit</code> and <code>wagtail</code> are not significantly different from the <code>hedge_sparrow</code> (p-values are big).</p>
+<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Cuckoo</span> <span class="op">%&gt;%</span>
+  <span class="fu">group_by</span><span class="op">(</span><span class="va">Bird</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">summarize</span><span class="op">(</span>mean_length <span class="op">=</span> <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">mean</a></span><span class="op">(</span><span class="va">Length</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 6 x 2
+##   Bird          mean_length
+##   &lt;fct&gt;               &lt;dbl&gt;
+## 1 hedge_sparrow        23.1
+## 2 mdw_pippit           22.3
+## 3 robin                22.6
+## 4 tree_pippit          23.1
+## 5 wagtail              22.9
+## 6 wren                 21.1</code></pre>
+<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Cuckoo</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Length</span> <span class="op">~</span> <span class="va">Bird</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 6 x 5
+##   term            estimate std.error statistic   p.value
+##   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)      23.1        0.243   95.1    1.87e-110
+## 2 Birdmdw_pippit   -0.823      0.278   -2.96   3.79e-  3
+## 3 Birdrobin        -0.546      0.333   -1.64   1.03e-  1
+## 4 Birdtree_pippit  -0.0314     0.338   -0.0930 9.26e-  1
+## 5 Birdwagtail      -0.218      0.338   -0.645  5.20e-  1
+## 6 Birdwren         -1.99       0.338   -5.89   3.91e-  8</code></pre>
+<p>The ANOVA output is also given by running the <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code> command. Notice that the F statistic is 10.388 with a very small p-value. The small p-value associated with the ANOVA F-test means that we can reject the null hypothesis (of equal population means across bird hosts). Our conclusion is that at least one of the bird hosts has a different average Cuckoo egg length than the other hosts.</p>
+<div class="sourceCode" id="cb161"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Cuckoo</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Length</span> <span class="op">~</span> <span class="va">Bird</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic      p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.313         0.283 0.909      10.4 0.0000000315     5  -156.  326.  345.
+## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<div class="sourceCode" id="cb163"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Cuckoo</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Length</span> <span class="op">~</span> <span class="va">Bird</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Length
+##            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Bird        5 42.940  8.5879  10.388 3.152e-08 ***
+## Residuals 114 94.248  0.8267                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div id="thought-experiment" class="section level3" number="7.5.5">
+<h3>
+<span class="header-section-number">7.5.5</span> Thought experiment<a class="anchor" aria-label="anchor" href="#thought-experiment"><i class="fas fa-link"></i></a>
 </h3>
 <p>As with many of the other tests we’ve covered, the ANOVA setting can be evaluated mathematically (as seen in these notes) <em>and</em> computationally, using a randomization test. How would you set up a simulation to create a null sampling distribution for the question at hand? The important pieces of the simulation will include:</p>
 <ul>
@@ -485,9 +572,9 @@ then suitable transformations may be useful.</p>
 <li>How will you shuffle the observed data values to force the null hypothesis to be true?</li>
 <li>How many shuffles do you need to accurately describe the null sampling distribution?</li>
 </ul>
-<div id="r2" class="section level4" number="7.5.4.1">
+<div id="r2" class="section level4" number="7.5.5.1">
 <h4>
-<span class="header-section-number">7.5.4.1</span> <span class="math inline">\(R^2\)</span><a class="anchor" aria-label="anchor" href="#r2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.5.5.1</span> <span class="math inline">\(R^2\)</span><a class="anchor" aria-label="anchor" href="#r2"><i class="fas fa-link"></i></a>
 </h4>
 <p>We won’t show it, but <span class="math inline">\(SSTO = SST + SSE\)</span>.</p>
 <p><span class="math display">\[\begin{eqnarray*}
@@ -501,9 +588,9 @@ R^2 &amp;=&amp; 42.94 / 137.188 = 0.313
 \end{eqnarray*}\]</span>
 31.3% of the variability in egg lengths can be explained by the differences in host birds (that is, can be explained by where the cuckoo decides to lay the egg).</p>
 </div>
-<div id="post-hoc-comparison-of-means" class="section level4" number="7.5.4.2">
+<div id="post-hoc-comparison-of-means" class="section level4" number="7.5.5.2">
 <h4>
-<span class="header-section-number">7.5.4.2</span> Post-hoc comparison of means<a class="anchor" aria-label="anchor" href="#post-hoc-comparison-of-means"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.5.5.2</span> Post-hoc comparison of means<a class="anchor" aria-label="anchor" href="#post-hoc-comparison-of-means"><i class="fas fa-link"></i></a>
 </h4>
 <p>If, in fact, the research question addresses a prespecified comparison of means, the two independent sample t-test applies directly. Note that the two differences have to do with the estimated SE. We now estimate the SE using <em>all</em> of the data (even though our primary interest is in only 2 of the groups).</p>
 <p><span class="math display">\[\hat{\sigma}^2 = s_p^2 = \frac{(n_1-1)s_1^2 + (n_2 - 1) s_2^2 + \cdots + (n_k -1)s_k^2}{n_1 + n_2 + \cdots + n_k -k}\]</span></p>
@@ -520,9 +607,9 @@ s_p^2 &amp;=  MS_{resid} = 0.827\\
 \]</span></p>
 <p>We’re 90% confident that the true difference in average cuckoo egg length for meadow pipits minus tree pipits is between -0.55 mm and 0.35mm. Because zero is contained in the interval, we cannot tell which type of bird hosts larger eggs.</p>
 </div>
-<div id="multiple-comparisons" class="section level4" number="7.5.4.3">
+<div id="multiple-comparisons" class="section level4" number="7.5.5.3">
 <h4>
-<span class="header-section-number">7.5.4.3</span> Multiple Comparisons<a class="anchor" aria-label="anchor" href="#multiple-comparisons"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.5.5.3</span> Multiple Comparisons<a class="anchor" aria-label="anchor" href="#multiple-comparisons"><i class="fas fa-link"></i></a>
 </h4>
 <p>As you might expect, if you have 10 groups, <strong>all of which come from the same population</strong>, you might wrongly conclude that some of the means are <em>significantly</em> different. If you try pairwise comparisons on all 10 groups, you’ll have <span class="math inline">\({10 \choose 2} = 45\)</span> comparisons. Out of the 45 CI, you’d expect 2.25 of them to not contain the true difference (of zero); equivalently, you’d expect 2.25 tests to reject the true <span class="math inline">\(H_0\)</span>. In an overall test of comparing all 10 groups simultaneously, you can’t use size as a performance measure anymore.</p>
 <p><strong>FWER</strong>
@@ -541,7 +628,7 @@ The Familywise Error Rate (FWER) is the probability of making one or more type I
 <p>This data set contains teacher salaries from 2009-2010 for 71 teachers employed by the St. Louis Public School in Michigan, as well as several covariates.
 Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http://stlouis.edzone.net" class="uri">http://stlouis.edzone.net</a></p>
 </blockquote>
-<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb165"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">teachers</span> <span class="op">&lt;-</span> <span class="fu">read_delim</span><span class="op">(</span><span class="st">"https://www.openintro.org/data/tab-delimited/teacher.txt"</span>, 
                        delim<span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></code></pre></div>
 <div id="t.test" class="section level3" number="7.6.1">
@@ -556,7 +643,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <p>For example, we might be interested in testing whether the average salary (of all teachers in St Louis) is above $47,000 a year. The p-value is extremely small. We reject <span class="math inline">\(H_0\)</span>. That is, we can claim that the true average base salary is above $47,000. (Note, to calculate a CI, use <code>alternative = "two.sided"</code>.)</p>
 <p><span class="math inline">\(H_0: \mu = 47,000\)</span></p>
 <p><span class="math inline">\(H_A: \mu &gt; 47,000\)</span></p>
-<div class="sourceCode" id="cb158"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb166"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">teachers</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">base</span><span class="op">)</span> <span class="op">%&gt;%</span>
 <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/ttest.html">t.test</a></span><span class="op">(</span>mu <span class="op">=</span> <span class="fl">47000</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></code></pre></div>
@@ -579,7 +666,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <p>Or, maybe interest is in knowing whether the base salary for teachers with a BA degree is less than those with an MA degree, on average. Note, <span class="math inline">\(\mu\)</span> denotes the average salary in the population group denoted by the subscript. The p-value is 0.442, so we would not reject the null hypothesis. (Note, to calculate a CI, use <code>alternative = "two.sided"</code>.)</p>
 <p><span class="math inline">\(H_0: \mu_{BA} = \mu_{MA}\)</span></p>
 <p><span class="math inline">\(H_A: \mu_{BA} &lt; \mu_{MA}\)</span></p>
-<div class="sourceCode" id="cb160"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb168"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">teachers</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/ttest.html">t.test</a></span><span class="op">(</span><span class="va">base</span> <span class="op">~</span> <span class="va">degree</span>, alternative <span class="op">=</span> <span class="st">"less"</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
@@ -604,7 +691,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <h4>
 <span class="header-section-number">7.6.2.1</span> One sample bootstrapping on mean<a class="anchor" aria-label="anchor" href="#one-sample-bootstrapping-on-mean"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb162"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb170"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/infer">infer</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
 <span class="co"># calculate the observed test statistic</span>
@@ -616,7 +703,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 ##     stat
 ##    &lt;dbl&gt;
 ## 1 56416.</code></pre>
-<div class="sourceCode" id="cb164"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb172"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create the null sampling distribution</span>
 <span class="va">null_dist</span> <span class="op">&lt;-</span> <span class="va">teachers</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span>response <span class="op">=</span> <span class="va">base</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -627,8 +714,8 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <span class="co"># visualize the null sampling distribution</span>
 <span class="fu"><a href="https://infer.tidymodels.org/reference/visualize.html">visualize</a></span><span class="op">(</span><span class="va">null_dist</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/shade_p_value.html">shade_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">x_bar_base</span>, direction <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb165"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb173"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate the p-value</span>
 <span class="va">null_dist</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/get_p_value.html">get_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">x_bar_base</span>, direction <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></code></pre></div>
@@ -642,7 +729,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <span class="header-section-number">7.6.2.2</span> Two independent samples comparing two means<a class="anchor" aria-label="anchor" href="#two-independent-samples-comparing-two-means"><i class="fas fa-link"></i></a>
 </h4>
 <p>p-value is now 0.464 (very close to 0.442 given by the smooth t-distribution curve).</p>
-<div class="sourceCode" id="cb167"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb175"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
 <span class="co"># calculate the observed test statistic</span>
 <span class="op">(</span> <span class="va">diff_x_bar_base</span> <span class="op">&lt;-</span> <span class="va">teachers</span> <span class="op">%&gt;%</span>
@@ -652,7 +739,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 ##    stat
 ##   &lt;dbl&gt;
 ## 1  352.</code></pre>
-<div class="sourceCode" id="cb169"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb177"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create the null sampling distribution</span>
 <span class="va">null_dist</span> <span class="op">&lt;-</span> <span class="va">teachers</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">base</span> <span class="op">~</span> <span class="va">degree</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -663,8 +750,8 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <span class="co"># visualize the null sampling distribution</span>
 <span class="fu"><a href="https://infer.tidymodels.org/reference/visualize.html">visualize</a></span><span class="op">(</span><span class="va">null_dist</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/shade_p_value.html">shade_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">diff_x_bar_base</span>, direction <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb170"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb178"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate the p-value</span>
 <span class="va">null_dist</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/get_p_value.html">get_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">diff_x_bar_base</span>, direction <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></code></pre></div>
@@ -684,23 +771,23 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <span class="header-section-number">7.6.3.1</span> EDA<a class="anchor" aria-label="anchor" href="#eda"><i class="fas fa-link"></i></a>
 </h4>
 <p>Before thinking about inference, let’s look at the population (for 2017-18). The information for today is the population because it includes the salaries of all NBA players in 2017. We can see that in this particular year, the average salary in the Western conference is slightly higher.</p>
-<div class="sourceCode" id="cb172"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb180"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">NBAsalary</span> <span class="op">&lt;-</span> <span class="fu">read_delim</span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam3/data/NBASalaries2017.txt"</span>, delim <span class="op">=</span> <span class="st">"\t"</span>, escape_double <span class="op">=</span> <span class="cn">FALSE</span>, trim_ws <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 
 <span class="fu">ggplot</span><span class="op">(</span><span class="va">NBAsalary</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_boxplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">conference</span>, y <span class="op">=</span> <span class="va">salary</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb173"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb181"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">NBAsalary</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">conference</span>, x <span class="op">=</span> <span class="va">salary</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-10-2.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb174"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb182"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">NBAsalary</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">conference</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-10-3.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb175"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-12-3.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb183"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">NBAsalary</span> <span class="op">%&gt;%</span>
   <span class="fu">group_by</span><span class="op">(</span><span class="va">conference</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>mu <span class="op">=</span> <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">mean</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">sd</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span>, N <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">min</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span>, <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">max</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span>, <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">median</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -715,7 +802,7 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <span class="header-section-number">7.6.3.2</span> Sampling distribution for one mean<a class="anchor" aria-label="anchor" href="#sampling-distribution-for-one-mean"><i class="fas fa-link"></i></a>
 </h4>
 <p>Before considering how the sample means vary, let’s visualize samples from each conference.</p>
-<div class="sourceCode" id="cb177"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb185"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">NBAsalary</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">conference</span> <span class="op">==</span> <span class="st">"eastern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">sample_n</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">20</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -727,33 +814,33 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
   <span class="fu">sample_n</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">20</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">xlab</span><span class="op">(</span><span class="st">"western salary"</span><span class="op">)</span></code></pre></div>
-<p><img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"><img src="04-InfNum_files/figure-html/unnamed-chunk-11-2.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="04-InfNum_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"><img src="04-InfNum_files/figure-html/unnamed-chunk-13-2.png" width="768" style="display: block; margin: auto;"></p>
 <p>One way to think about how the difference in means varies is to first visualize the variability in the distribution for a single mean (i.e., from one conference). Let’s look at the variability in the Eastern conference as well as the variability in the Western conference.</p>
 <p>Note that from the population analysis above (full set of observations), we see that <span class="math inline">\(\sigma \approx 7\)</span>. So the histograms below should have a standard deviation of close to <span class="math inline">\(\sigma / \sqrt{20} = 1.5\)</span>. Do they?</p>
 <p>Are the two histograms centered at the same place? Should they be?</p>
-<div class="sourceCode" id="cb178"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb186"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">NBAsalary</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">conference</span> <span class="op">==</span> <span class="st">"eastern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/rep_sample_n.html">rep_sample_n</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">20</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, reps <span class="op">=</span> <span class="fl">500</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>mean_sal <span class="op">=</span> <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">mean</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">mean_sal</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb179"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb187"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">NBAsalary</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">conference</span> <span class="op">==</span> <span class="st">"western"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://infer.tidymodels.org/reference/rep_sample_n.html">rep_sample_n</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">20</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, reps <span class="op">=</span> <span class="fl">500</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">summarize</span><span class="op">(</span>mean_sal <span class="op">=</span> <span class="fu"><a href="https://projectmosaic.github.io/mosaic/reference/aggregating.html">mean</a></span><span class="op">(</span><span class="va">salary</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">mean_sal</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-14-2.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="sampling-distribution-for-two-means" class="section level4" number="7.6.3.3">
 <h4>
 <span class="header-section-number">7.6.3.3</span> Sampling distribution for two means<a class="anchor" aria-label="anchor" href="#sampling-distribution-for-two-means"><i class="fas fa-link"></i></a>
 </h4>
 <p>Note: the code selects 20 random salaries from the Eastern NBA conference and 20 random salaries from the Western NBA conference. Using those two different samples, a t-statistic is selected. The whole process is repeated 1000 times.</p>
-<div class="sourceCode" id="cb180"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb188"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
 
 <span class="va">t_salaries</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>meandiff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html">double</a></span><span class="op">(</span><span class="op">)</span>, tstat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html">double</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -776,13 +863,13 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">meandiff</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb181"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb189"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">t_salaries</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">tstat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04-InfNum_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 </div>
 </div>
@@ -884,7 +971,8 @@ Posted on opendata.socrata.com by Jeff Kowalski. Original source: <a href="http:
 <li><a class="nav-link" href="#anova-f-test"><span class="header-section-number">7.5.1</span> ANOVA F-test</a></li>
 <li><a class="nav-link" href="#anova-table"><span class="header-section-number">7.5.2</span> ANOVA table</a></li>
 <li><a class="nav-link" href="#technical-conditions"><span class="header-section-number">7.5.3</span> Technical Conditions</a></li>
-<li><a class="nav-link" href="#thought-experiment"><span class="header-section-number">7.5.4</span> Thought experiment</a></li>
+<li><a class="nav-link" href="#anova-r-code"><span class="header-section-number">7.5.4</span> ANOVA R code</a></li>
+<li><a class="nav-link" href="#thought-experiment"><span class="header-section-number">7.5.5</span> Thought experiment</a></li>
 </ul>
 </li>
 <li>

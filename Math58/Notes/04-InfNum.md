@@ -337,7 +337,7 @@ Cuckoo %>%
   geom_boxplot(aes(x = Bird, y = Length))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="960" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" />
 :::
 
 The key to understanding ANOVA is to breaking down the variability into two different pieces.  The first is the variability within each separate group.  Sometimes it is referred to as the variability of the residuals (left over after the groups are formed).  The second is the variability across the different groups.
@@ -366,11 +366,11 @@ $$
 
 Under the null hypothesis that the population means of all the groups are the same, the value for $MS_{groups}$ should be similar to the value for $MS_{error}$.  Regardless of the null hypothesis, $MS_{error}$ will always be a good measure of the within group variability.  If the groups are really different, $MS_{groups}$ will overestimate the within group variability.  Under $H_0$:
 
-$$F^* = \frac{MST}{MSE} \sim F_{I-1, N-I}$$
+$$F = \frac{MST}{MSE} \sim F_{I-1, N-I}$$
 
-If, in fact, the population means are different, $F^*$ will be much larger than expected from the  null sampling distribution.
+If, in fact, the population means are different, $F$ will be much larger than expected from the  null sampling distribution.
 
-$$p-value = P(F_{I-1, N-I} \geq F^*)$$
+$$\mbox{p-value} = P(F_{I-1, N-I} \geq F)$$
 
 Rejecting the null hypothesis says that at least one of the population means is different from the others.  Not rejecting the null hypothesis says that the data are consistent with the null hypothesis (not that we are sure the null hypothesis is true).
 
@@ -381,7 +381,7 @@ An ANOVA table summarizes the F-test (and more: see Math 158) above.
 
 | Source    | SS                                                   | df    | MS    | F                 | p                          |
 |-----------|------------------------------------------------------|-------|-------|-------------------|----------------------------|
-| treatment | $\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2$ | $I-1$ | $MST$ | $\frac{MST}{MSE}$ | $P(F_{I-1, N-I} \geq F^*)$ |
+| treatment | $\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2$ | $I-1$ | $MST$ | $\frac{MST}{MSE}$ | $P(F_{I-1, N-I} \geq F)$ |
 | error | $\sum_{i=1}^I s_i^2(n_i -1)$  | $n-I$ | $MSE$ |  | |
 | Total | $\sum_{i=1}^I \sum_{j=1}^{n_i} (x_{ij} - \overline{x})^2$| $n-1$ | | |  |
 
@@ -405,6 +405,120 @@ well-behaved.
 For simplicity, we will apply the same checks for a randomized experiment as well (with the last
 condition being met if the treatments are randomly assigned). If the first two conditions are not met,
 then suitable transformations may be useful.
+
+###  ANOVA R code
+
+Notice that the variable which describes the host bird is called `Bird`.  But in the output, there are FIVE rows describing different birds.  The `lm()` function (linear model) creates five new 0/1 (binary) variables as a way to write down one linear model describing six different birds.
+
+**Converting the `Bird` variable:**
+
+$$
+\begin{align}
+X_{mdw\_pippit} = \begin{cases}
+  1 & \text{if mdw_pippit} \\
+  0 & \text{otherwise} \\
+\end{cases}
+X_{robin} = \begin{cases}
+  1 & \text{if robin} \\
+  0 & \text{otherwise} \\
+\end{cases}
+X_{tree\_pippit} = \begin{cases}
+  1 & \text{if tree_pippit} \\
+  0 & \text{otherwise} \\
+\end{cases}
+\end{align}
+$$
+
+$$
+\begin{align}
+X_{wagtail} = \begin{cases}
+  1 & \text{if wagtail} \\
+  0 & \text{otherwise} \\
+\end{cases}
+X_{wren} = \begin{cases}
+  1 & \text{if wren} \\
+  0 & \text{otherwise} \\
+\end{cases}
+\end{align}
+$$
+
+So the model which describes the average egg length (denoted with the $\hat{Y}$ notation) can be written as the following:
+
+$$\hat{Y} = 23.12 - 0.82 \cdot X_{mdw\_pippit} - 0.54\cdot X_{robin} - 0.03\cdot X_{tree\_pippit} - 0.2 1\cdot X_{wagtail} - 1.99 \cdot X_{wren}$$
+You might have noticed that there is no variable or coefficient for the `hedge_sparrow`.  That's because the `hedge_sparrow` lives in the intercept!  The model has to choose a baseline (that's just how it works) which means all the other averages are compared to the `hedge_sparrow` baseline.
+
+We will talk about this model in more detail in Chapter \@ref(reginf) on Multiple Regression and inference, but for now notice that the `mdw_pippit` and `wren` are significantly different from the `hedge_sparrow` (p-values are small), but the `robin`, `tree_pippit` and `wagtail` are not significantly different from the `hedge_sparrow` (p-values are big). 
+
+
+```r
+Cuckoo %>%
+  group_by(Bird) %>%
+  summarize(mean_length = mean(Length))
+```
+
+```
+## # A tibble: 6 x 2
+##   Bird          mean_length
+##   <fct>               <dbl>
+## 1 hedge_sparrow        23.1
+## 2 mdw_pippit           22.3
+## 3 robin                22.6
+## 4 tree_pippit          23.1
+## 5 wagtail              22.9
+## 6 wren                 21.1
+```
+
+```r
+Cuckoo %>%
+  lm(Length ~ Bird, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 6 x 5
+##   term            estimate std.error statistic   p.value
+##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)      23.1        0.243   95.1    1.87e-110
+## 2 Birdmdw_pippit   -0.823      0.278   -2.96   3.79e-  3
+## 3 Birdrobin        -0.546      0.333   -1.64   1.03e-  1
+## 4 Birdtree_pippit  -0.0314     0.338   -0.0930 9.26e-  1
+## 5 Birdwagtail      -0.218      0.338   -0.645  5.20e-  1
+## 6 Birdwren         -1.99       0.338   -5.89   3.91e-  8
+```
+
+The ANOVA output is also given by running the `lm()` command. Notice that the F statistic is 10.388 with a very small p-value.  The small p-value associated with the ANOVA F-test means that we can reject the null hypothesis (of equal population means across bird hosts).  Our conclusion is that at least one of the bird hosts has a different average Cuckoo egg length than the other hosts.
+
+
+```r
+Cuckoo %>%
+  lm(Length ~ Bird, data = .) %>%
+  glance()
+```
+
+```
+## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic      p.value    df logLik   AIC   BIC
+##       <dbl>         <dbl> <dbl>     <dbl>        <dbl> <dbl>  <dbl> <dbl> <dbl>
+## 1     0.313         0.283 0.909      10.4 0.0000000315     5  -156.  326.  345.
+## # … with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
+```
+
+```r
+Cuckoo %>%
+  lm(Length ~ Bird, data = .) %>%
+  anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: Length
+##            Df Sum Sq Mean Sq F value    Pr(>F)    
+## Bird        5 42.940  8.5879  10.388 3.152e-08 ***
+## Residuals 114 94.248  0.8267                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ### Thought experiment
 
@@ -587,7 +701,7 @@ visualize(null_dist) +
   shade_p_value(obs_stat = x_bar_base, direction = "greater")
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # calculate the p-value
@@ -636,7 +750,7 @@ visualize(null_dist) +
   shade_p_value(obs_stat = diff_x_bar_base, direction = "greater")
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # calculate the p-value
@@ -670,14 +784,14 @@ ggplot(NBAsalary) +
   geom_boxplot(aes(x=conference, y = salary))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 ggplot(NBAsalary) +
   geom_histogram(aes(fill = conference, x = salary))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-10-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 ggplot(NBAsalary) +
@@ -685,7 +799,7 @@ ggplot(NBAsalary) +
   facet_wrap(~ conference)
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-10-3.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-12-3.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 NBAsalary %>%
@@ -721,7 +835,7 @@ NBAsalary %>%
   geom_histogram(aes(x = salary)) + xlab("western salary")
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /><img src="04-InfNum_files/figure-html/unnamed-chunk-11-2.png" width="768" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /><img src="04-InfNum_files/figure-html/unnamed-chunk-13-2.png" width="768" style="display: block; margin: auto;" />
 
 One way to think about how the difference in means varies is to first visualize the variability in the distribution for a single mean (i.e., from one conference).  Let's look at the variability in the Eastern conference as well as the variability in the Western conference.
 
@@ -739,7 +853,7 @@ NBAsalary %>%
   geom_histogram(aes(x=mean_sal))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 NBAsalary %>%
@@ -750,7 +864,7 @@ NBAsalary %>%
   geom_histogram(aes(x=mean_sal))
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-14-2.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Sampling distribution for two means
@@ -784,7 +898,7 @@ t_salaries %>%
   geom_vline(xintercept = 0)
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 t_salaries %>%
@@ -793,7 +907,7 @@ t_salaries %>%
   geom_vline(xintercept = 0)
 ```
 
-<img src="04-InfNum_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04-InfNum_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
 
 
 ## Reflection Questions
