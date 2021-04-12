@@ -360,7 +360,7 @@ $$
 h(t) = 0 &&\Rightarrow \mbox{ no risk of death at time } t\\
 && \Rightarrow S(t) \mbox{ is flat at } t\\
 h(t) \> \>&& \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
-h(t) =k && \Rightarrow S(t) = e\^{-kt}
+h(t) =k && \Rightarrow S(t) = e^{-kt}
 \end{align*}
 $$
 
@@ -647,6 +647,16 @@ coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
 #>   term  estimate std.error statistic  p.value
 #>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 dbp     0.0316   0.00193      16.3 4.53e-60
+
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1  4699   1473          222.    4.22e-45         260.   3.44e-53           237.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 <div class="figure" style="text-align: center">
@@ -667,17 +677,27 @@ coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% tidy()
 #> # A tibble: 7 x 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 dbpf60-70      0.648     0.247      2.62 8.74e- 3
-#> 2 dbpf70-80      0.888     0.241      3.69 2.27e- 4
-#> 3 dbpf80-90      1.02      0.241      4.24 2.25e- 5
-#> 4 dbpf90-100     1.40      0.243      5.76 8.48e- 9
-#> 5 dbpf100-110    1.79      0.254      7.02 2.29e-12
-#> 6 dbpfover110    2.22      0.271      8.17 2.97e-16
+#> 1 sexmale        0.606    0.0528     11.5  1.54e-30
+#> 2 dbpf60-70      0.648    0.247       2.62 8.74e- 3
+#> 3 dbpf70-80      0.888    0.241       3.69 2.27e- 4
+#> 4 dbpf80-90      1.02     0.241       4.24 2.25e- 5
+#> 5 dbpf90-100     1.40     0.243       5.76 8.48e- 9
+#> 6 dbpf100-110    1.79     0.254       7.02 2.29e-12
 #> # … with 1 more row
+
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1  4699   1473          355.    1.10e-72         397.   1.08e-81           369.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 
@@ -700,17 +720,26 @@ coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% tidy()
 #> # A tibble: 13 x 5
-#>   term        estimate std.error statistic  p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 dbpf60-70      0.603     0.352      1.71 8.66e- 2
-#> 2 dbpf70-80      0.887     0.342      2.60 9.44e- 3
-#> 3 dbpf80-90      1.26      0.341      3.68 2.30e- 4
-#> 4 dbpf90-100     1.55      0.347      4.46 8.29e- 6
-#> 5 dbpf100-110    2.03      0.358      5.67 1.41e- 8
-#> 6 dbpfover110    2.61      0.372      7.02 2.18e-12
+#>   term        estimate std.error statistic      p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
+#> 1 sexmale        0.864     0.471      1.83 0.0668      
+#> 2 dbpf60-70      0.603     0.352      1.71 0.0866      
+#> 3 dbpf70-80      0.887     0.342      2.60 0.00944     
+#> 4 dbpf80-90      1.26      0.341      3.68 0.000230    
+#> 5 dbpf90-100     1.55      0.347      4.46 0.00000829  
+#> 6 dbpf100-110    2.03      0.358      5.67 0.0000000141
 #> # … with 7 more rows
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% glance()
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1  4699   1473          376.    2.43e-72         409.   3.29e-79           362.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 <div class="figure" style="text-align: center">
@@ -750,6 +779,15 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% t
 #> 5 dbpf100-110    1.13      0.363      3.12 0.00183  
 #> 6 dbpfover110    1.66      0.377      4.40 0.0000107
 #> # … with 10 more rows
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% glance()
+#> # A tibble: 1 x 18
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1  4658   1465          754.   5.12e-150         774.  2.21e-154           707.
+#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 
@@ -762,6 +800,8 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% t
 ### Testing Proportional Hazards {#testingph}
 
 <!-- Note: in my yellow notes from 2008 I've covered all the residual analysis stuff.  The notes aren't particularly organized or well thought-out.  The topic probably isn't relevant for this class. -->
+
+#### Proportional Hazards via survival curves:
 
 We've discussed that proportional hazards means that the hazard in one group is a constant multiple of the hazard in another group. What does that mean in terms of the survival function?
 
@@ -779,9 +819,9 @@ S_1(t) &= \bigg[ e^{- \int_0^t h_0(x) dx} \bigg]^{e^\beta}\\
 \end{align*}
 $$ 
 
-#### Test 1 for PH
+##### Test 1 for PH {-}
 
-That is to say, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta$.
+Therefore, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta$.
 
 Note that if $h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta$), then
 
@@ -797,7 +837,7 @@ $$
 
 Which is to say that if $ln(- ln S(t))$ is linear in $\ln(t)$, then $h_0(t)$ is not only PH but also constant for all $t$.
 
-#### Time dependent covariates
+#### Proportional Hazards via a test for time dependent covariates
 
 If the PH assumption is violated, then we have:
 
@@ -830,13 +870,13 @@ $$
 
 If $\beta_2 < 0$, the relative hazard decreases with time. If $\beta_2 > 0$, the relative hazard increases with time.
 
-#### Test 2 for PH
+##### Test 2 for PH {-}
 
 The PH test of interest will be: $$H_0: \beta_2 = 0$$ It isn't a Wald test, but it is the same general idea (in R: `cox.zph`). [The variable in the denominator of the likelihood (for calculating the MLE) will have different values at different times.] An alternative form of the test is to call: $x_{i2} = t \ \ \forall t$ and let $$h_i(t) = e^{\beta_1 x_{i1} + \beta_2 x_{i1} x_{i2}} h_0(t).$$
 
 If there is time dependency in the model, then the `coxph` analysis won't be accurate.
 
-#### Schoenfeld Residuals
+#### Proportional Hazards via Schoenfeld Residuals
 
 Recall: under the Cox model, the probability that any particular member $i$ fails at time $t_j$ is: 
 
@@ -860,11 +900,11 @@ w_j(\beta, t_j)$$
 
 The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time $t_j$, is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)$$ Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i$.
 
-#### Test 3 for PH
+##### Test 3 for PH {-}
 
-The idea is for the plot to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if \$t_i \< \< \$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+The idea is for the residual plot of (Schoenfeld residual wrt a paticular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i \< \<$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
 
-#### Solutions
+#### Solutions to violations of PH
 
 -   **crossing** If the hazard functions (or survivor functions!) cross over time, the PH assumption is violated.\
 -   **help** What should we do?\

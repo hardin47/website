@@ -372,7 +372,7 @@ $$
 h(t) = 0 &&\Rightarrow \mbox{ no risk of death at time } t\\
 && \Rightarrow S(t) \mbox{ is flat at } t\\
 h(t) \> \>&& \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
-h(t) =k && \Rightarrow S(t) = e\^{-kt}
+h(t) =k && \Rightarrow S(t) = e^{-kt}
 \end{align*}
 $$
 
@@ -643,6 +643,8 @@ One reason, however, to keep the variable broken into groups is because of the w
 ```{r}
 coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
 coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
+
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
 ```
 
 ```{r fig.cap = "Table 7.1 from @Collett.", out.width = "90%", fig.align='center', echo=FALSE}
@@ -661,7 +663,9 @@ knitr::include_graphics("figs/table71_CHDHR.png")
     -   The change in deviance is 133 ($H_0: \gamma =0$), so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0$, so we need gender in the model.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% tidy()
+
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
 ```
 
 
@@ -682,7 +686,8 @@ knitr::include_graphics("figs/table72_CHDHR.png")
     -   Note the marked differences between the estimates in table 7.2 and 7.3. The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises. Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% glance()
 ```
 
 ```{r fig.cap = "Table 7.3 from @Collett.", out.width = "90%", fig.align='center', echo=FALSE}
@@ -710,6 +715,7 @@ When should we transform a continuous variable into a factor variable?
 
 ```{r}
 coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% glance()
 ```
 
 
@@ -721,6 +727,8 @@ knitr::include_graphics("figs/table74_CHDHR.png")
 ### Testing Proportional Hazards {#testingph}
 
 <!-- Note: in my yellow notes from 2008 I've covered all the residual analysis stuff.  The notes aren't particularly organized or well thought-out.  The topic probably isn't relevant for this class. -->
+
+#### Proportional Hazards via survival curves:
 
 We've discussed that proportional hazards means that the hazard in one group is a constant multiple of the hazard in another group. What does that mean in terms of the survival function?
 
@@ -738,9 +746,9 @@ S_1(t) &= \bigg[ e^{- \int_0^t h_0(x) dx} \bigg]^{e^\beta}\\
 \end{align*}
 $$ 
 
-#### Test 1 for PH
+##### Test 1 for PH {-}
 
-That is to say, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta$.
+Therefore, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta$.
 
 Note that if $h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta$), then
 
@@ -756,7 +764,7 @@ $$
 
 Which is to say that if $ln(- ln S(t))$ is linear in $\ln(t)$, then $h_0(t)$ is not only PH but also constant for all $t$.
 
-#### Time dependent covariates
+#### Proportional Hazards via a test for time dependent covariates
 
 If the PH assumption is violated, then we have:
 
@@ -789,13 +797,13 @@ $$
 
 If $\beta_2 < 0$, the relative hazard decreases with time. If $\beta_2 > 0$, the relative hazard increases with time.
 
-#### Test 2 for PH
+##### Test 2 for PH {-}
 
 The PH test of interest will be: $$H_0: \beta_2 = 0$$ It isn't a Wald test, but it is the same general idea (in R: `cox.zph`). [The variable in the denominator of the likelihood (for calculating the MLE) will have different values at different times.] An alternative form of the test is to call: $x_{i2} = t \ \ \forall t$ and let $$h_i(t) = e^{\beta_1 x_{i1} + \beta_2 x_{i1} x_{i2}} h_0(t).$$
 
 If there is time dependency in the model, then the `coxph` analysis won't be accurate.
 
-#### Schoenfeld Residuals
+#### Proportional Hazards via Schoenfeld Residuals
 
 Recall: under the Cox model, the probability that any particular member $i$ fails at time $t_j$ is: 
 
@@ -819,11 +827,11 @@ w_j(\beta, t_j)$$
 
 The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time $t_j$, is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)$$ Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i$.
 
-#### Test 3 for PH
+##### Test 3 for PH {-}
 
-The idea is for the plot to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if \$t_i \< \< \$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+The idea is for the residual plot of (Schoenfeld residual wrt a paticular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i \< \<$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
 
-#### Solutions
+#### Solutions to violations of PH
 
 -   **crossing** If the hazard functions (or survivor functions!) cross over time, the PH assumption is violated.\
 -   **help** What should we do?\

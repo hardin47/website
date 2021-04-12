@@ -567,7 +567,7 @@ S(t) &amp;= \exp \{ - \int^t_0 h(x) dx  \}\\
 h(t) = 0 &amp;&amp;\Rightarrow \mbox{ no risk of death at time } t\\
 &amp;&amp; \Rightarrow S(t) \mbox{ is flat at } t\\
 h(t) \&gt; \&gt;&amp;&amp; \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
-h(t) =k &amp;&amp; \Rightarrow S(t) = e\^{-kt}
+h(t) =k &amp;&amp; \Rightarrow S(t) = e^{-kt}
 \end{align*}
 \]</span></p>
 <div id="hazard-function-as-a-constant" class="section level4" number="6.3.0.1">
@@ -903,7 +903,17 @@ h_i(t) &amp;= h0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\}
 <span class="co">#&gt; # A tibble: 1 x 5</span>
 <span class="co">#&gt;   term  estimate std.error statistic  p.value</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 dbp     0.0316   0.00193      16.3 4.53e-60</span></code></pre></div>
+<span class="co">#&gt; 1 dbp     0.0316   0.00193      16.3 4.53e-60</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 18</span>
+<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
+<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  4699   1473          222.    4.22e-45         260.   3.44e-53           237.</span>
+<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-7"></span>
 <img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Collett." width="90%"><p class="caption">
@@ -925,17 +935,27 @@ dbp_{ij} + \gamma male_i \bigg\}
 </li>
 </ul>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span> <span class="op">+</span> <span class="va">sex</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 7 x 5</span>
 <span class="co">#&gt;   term        estimate std.error statistic  p.value</span>
 <span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 dbpf60-70      0.648     0.247      2.62 8.74e- 3</span>
-<span class="co">#&gt; 2 dbpf70-80      0.888     0.241      3.69 2.27e- 4</span>
-<span class="co">#&gt; 3 dbpf80-90      1.02      0.241      4.24 2.25e- 5</span>
-<span class="co">#&gt; 4 dbpf90-100     1.40      0.243      5.76 8.48e- 9</span>
-<span class="co">#&gt; 5 dbpf100-110    1.79      0.254      7.02 2.29e-12</span>
-<span class="co">#&gt; 6 dbpfover110    2.22      0.271      8.17 2.97e-16</span>
-<span class="co">#&gt; # … with 1 more row</span></code></pre></div>
+<span class="co">#&gt; 1 sexmale        0.606    0.0528     11.5  1.54e-30</span>
+<span class="co">#&gt; 2 dbpf60-70      0.648    0.247       2.62 8.74e- 3</span>
+<span class="co">#&gt; 3 dbpf70-80      0.888    0.241       3.69 2.27e- 4</span>
+<span class="co">#&gt; 4 dbpf80-90      1.02     0.241       4.24 2.25e- 5</span>
+<span class="co">#&gt; 5 dbpf90-100     1.40     0.243       5.76 8.48e- 9</span>
+<span class="co">#&gt; 6 dbpf100-110    1.79     0.254       7.02 2.29e-12</span>
+<span class="co">#&gt; # … with 1 more row</span>
+
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 18</span>
+<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
+<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  4699   1473          355.    1.10e-72         397.   1.08e-81           369.</span>
+<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-9"></span>
 <img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Collett." width="90%"><p class="caption">
@@ -959,17 +979,26 @@ male_i \bigg\}
 </li>
 </ul>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span> <span class="op">*</span> <span class="va">sex</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 13 x 5</span>
-<span class="co">#&gt;   term        estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 dbpf60-70      0.603     0.352      1.71 8.66e- 2</span>
-<span class="co">#&gt; 2 dbpf70-80      0.887     0.342      2.60 9.44e- 3</span>
-<span class="co">#&gt; 3 dbpf80-90      1.26      0.341      3.68 2.30e- 4</span>
-<span class="co">#&gt; 4 dbpf90-100     1.55      0.347      4.46 8.29e- 6</span>
-<span class="co">#&gt; 5 dbpf100-110    2.03      0.358      5.67 1.41e- 8</span>
-<span class="co">#&gt; 6 dbpfover110    2.61      0.372      7.02 2.18e-12</span>
-<span class="co">#&gt; # … with 7 more rows</span></code></pre></div>
+<span class="co">#&gt;   term        estimate std.error statistic      p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 sexmale        0.864     0.471      1.83 0.0668      </span>
+<span class="co">#&gt; 2 dbpf60-70      0.603     0.352      1.71 0.0866      </span>
+<span class="co">#&gt; 3 dbpf70-80      0.887     0.342      2.60 0.00944     </span>
+<span class="co">#&gt; 4 dbpf80-90      1.26      0.341      3.68 0.000230    </span>
+<span class="co">#&gt; 5 dbpf90-100     1.55      0.347      4.46 0.00000829  </span>
+<span class="co">#&gt; 6 dbpf100-110    2.03      0.358      5.67 0.0000000141</span>
+<span class="co">#&gt; # … with 7 more rows</span>
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 18</span>
+<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
+<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  4699   1473          376.    2.43e-72         409.   3.29e-79           362.</span>
+<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-11"></span>
 <img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Collett." width="90%"><p class="caption">
@@ -1012,7 +1041,16 @@ h_i(t) &amp;= h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma male_i 
 <span class="co">#&gt; 4 dbpf90-100     0.661     0.351      1.88 0.0599   </span>
 <span class="co">#&gt; 5 dbpf100-110    1.13      0.363      3.12 0.00183  </span>
 <span class="co">#&gt; 6 dbpfover110    1.66      0.377      4.40 0.0000107</span>
-<span class="co">#&gt; # … with 10 more rows</span></code></pre></div>
+<span class="co">#&gt; # … with 10 more rows</span>
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span> <span class="op">*</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">scl</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 18</span>
+<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
+<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  4658   1465          754.   5.12e-150         774.  2.21e-154           707.</span>
+<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-13"></span>
 <img src="figs/table74_CHDHR.png" alt="Table 7.4 from @Collett." width="90%"><p class="caption">
@@ -1026,6 +1064,10 @@ Figure 6.4: Table 7.4 from <span class="citation"><a href="references.html#ref-C
 <span class="header-section-number">6.3.4</span> Testing Proportional Hazards<a class="anchor" aria-label="anchor" href="#testingph"><i class="fas fa-link"></i></a>
 </h3>
 <!-- Note: in my yellow notes from 2008 I've covered all the residual analysis stuff.  The notes aren't particularly organized or well thought-out.  The topic probably isn't relevant for this class. -->
+<div id="proportional-hazards-via-survival-curves" class="section level4" number="6.3.4.1">
+<h4>
+<span class="header-section-number">6.3.4.1</span> Proportional Hazards via survival curves:<a class="anchor" aria-label="anchor" href="#proportional-hazards-via-survival-curves"><i class="fas fa-link"></i></a>
+</h4>
 <p>We’ve discussed that proportional hazards means that the hazard in one group is a constant multiple of the hazard in another group. What does that mean in terms of the survival function?</p>
 <p><span class="math display">\[
 \begin{align*}
@@ -1040,11 +1082,10 @@ S_1(t) &amp;= \bigg[ e^{- \int_0^t h_0(x) dx} \bigg]^{e^\beta}\\
 \ln(-\ln(S_1(t))) &amp;= \beta + \ln [-\ln(S_0(t))]\\
 \end{align*}
 \]</span></p>
-<div id="test-1-for-ph" class="section level4" number="6.3.4.1">
-<h4>
-<span class="header-section-number">6.3.4.1</span> Test 1 for PH<a class="anchor" aria-label="anchor" href="#test-1-for-ph"><i class="fas fa-link"></i></a>
-</h4>
-<p>That is to say, the <span class="math inline">\(\ln (- \ln\)</span> survival curves) should be parallel and differ only by a y-intercept constant of <span class="math inline">\(\beta\)</span>.</p>
+<div id="test-1-for-ph" class="section level5 unnumbered">
+<h5>Test 1 for PH<a class="anchor" aria-label="anchor" href="#test-1-for-ph"><i class="fas fa-link"></i></a>
+</h5>
+<p>Therefore, the <span class="math inline">\(\ln (- \ln\)</span> survival curves) should be parallel and differ only by a y-intercept constant of <span class="math inline">\(\beta\)</span>.</p>
 <p>Note that if <span class="math inline">\(h_0(t)\)</span> is a constant (i.e., <span class="math inline">\(h_i(t) = e^\beta\)</span>), then</p>
 <p><span class="math display">\[
 \begin{align*}
@@ -1057,9 +1098,10 @@ S(t) &amp;= e^{-\int_0^t h(x) dx}\\
 \]</span></p>
 <p>Which is to say that if <span class="math inline">\(ln(- ln S(t))\)</span> is linear in <span class="math inline">\(\ln(t)\)</span>, then <span class="math inline">\(h_0(t)\)</span> is not only PH but also constant for all <span class="math inline">\(t\)</span>.</p>
 </div>
-<div id="time-dependent-covariates" class="section level4" number="6.3.4.2">
+</div>
+<div id="proportional-hazards-via-a-test-for-time-dependent-covariates" class="section level4" number="6.3.4.2">
 <h4>
-<span class="header-section-number">6.3.4.2</span> Time dependent covariates<a class="anchor" aria-label="anchor" href="#time-dependent-covariates"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.2</span> Proportional Hazards via a test for time dependent covariates<a class="anchor" aria-label="anchor" href="#proportional-hazards-via-a-test-for-time-dependent-covariates"><i class="fas fa-link"></i></a>
 </h4>
 <p>If the PH assumption is violated, then we have:</p>
 <p><span class="math display">\[\frac{h_i(t)}{h_0(t)} = g(t)\]</span> some function of <span class="math inline">\(t\)</span>. Consider the following model (the function of time is completely specified, but it is just one possibility for the dependence relationship):</p>
@@ -1087,17 +1129,16 @@ h_i(t) &amp;= e^{\beta_1 x_{i1} + \beta_2 x_{i2}} h_0(t)\\
 \end{align*}
 \]</span></p>
 <p>If <span class="math inline">\(\beta_2 &lt; 0\)</span>, the relative hazard decreases with time. If <span class="math inline">\(\beta_2 &gt; 0\)</span>, the relative hazard increases with time.</p>
-</div>
-<div id="test-2-for-ph" class="section level4" number="6.3.4.3">
-<h4>
-<span class="header-section-number">6.3.4.3</span> Test 2 for PH<a class="anchor" aria-label="anchor" href="#test-2-for-ph"><i class="fas fa-link"></i></a>
-</h4>
+<div id="test-2-for-ph" class="section level5 unnumbered">
+<h5>Test 2 for PH<a class="anchor" aria-label="anchor" href="#test-2-for-ph"><i class="fas fa-link"></i></a>
+</h5>
 <p>The PH test of interest will be: <span class="math display">\[H_0: \beta_2 = 0\]</span> It isn’t a Wald test, but it is the same general idea (in R: <code>cox.zph</code>). [The variable in the denominator of the likelihood (for calculating the MLE) will have different values at different times.] An alternative form of the test is to call: <span class="math inline">\(x_{i2} = t \ \ \forall t\)</span> and let <span class="math display">\[h_i(t) = e^{\beta_1 x_{i1} + \beta_2 x_{i1} x_{i2}} h_0(t).\]</span></p>
 <p>If there is time dependency in the model, then the <code>coxph</code> analysis won’t be accurate.</p>
 </div>
-<div id="schoenfeld-residuals" class="section level4" number="6.3.4.4">
+</div>
+<div id="proportional-hazards-via-schoenfeld-residuals" class="section level4" number="6.3.4.3">
 <h4>
-<span class="header-section-number">6.3.4.4</span> Schoenfeld Residuals<a class="anchor" aria-label="anchor" href="#schoenfeld-residuals"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.3</span> Proportional Hazards via Schoenfeld Residuals<a class="anchor" aria-label="anchor" href="#proportional-hazards-via-schoenfeld-residuals"><i class="fas fa-link"></i></a>
 </h4>
 <p>Recall: under the Cox model, the probability that any particular member <span class="math inline">\(i\)</span> fails at time <span class="math inline">\(t_j\)</span> is:</p>
 <p><span class="math display">\[
@@ -1117,16 +1158,15 @@ e^{\beta x_k}}
 <p>Using the weights above, we can calculate the average value for the <span class="math inline">\(l^{th}\)</span> covariate (i.e., explanatory variable): <span class="math display">\[\bar{x}_l (\beta,t_j) = \sum_{k: t_k \geq t_j} x_{kl}
 w_j(\beta, t_j)\]</span></p>
 <p>The Schoenfeld Residual for <span class="math inline">\(x_l\)</span> and any subject <span class="math inline">\(i\)</span> who is still alive at time <span class="math inline">\(t_j\)</span>, is the <em>difference</em> between the covariate <span class="math inline">\(x_{il}\)</span> for that subject and the weighted average of the covariates in the risk set: <span class="math display">\[\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)\]</span> Note that the calculation is for the <span class="math inline">\(i^{th}\)</span> subject which means there was a death at time <span class="math inline">\(t_i\)</span>.</p>
+<div id="test-3-for-ph" class="section level5 unnumbered">
+<h5>Test 3 for PH<a class="anchor" aria-label="anchor" href="#test-3-for-ph"><i class="fas fa-link"></i></a>
+</h5>
+<p>The idea is for the residual plot of (Schoenfeld residual wrt a paticular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If <span class="math inline">\(t_i &gt; &gt;\)</span> then <span class="math inline">\(x_i\)</span> is much bigger than expected; if <span class="math inline">\(t_i \&lt; \&lt;\)</span> then <span class="math inline">\(x_i\)</span> is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.</p>
 </div>
-<div id="test-3-for-ph" class="section level4" number="6.3.4.5">
-<h4>
-<span class="header-section-number">6.3.4.5</span> Test 3 for PH<a class="anchor" aria-label="anchor" href="#test-3-for-ph"><i class="fas fa-link"></i></a>
-</h4>
-<p>The idea is for the plot to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If <span class="math inline">\(t_i &gt; &gt;\)</span> then <span class="math inline">\(x_i\)</span> is much bigger than expected; if $t_i &lt; &lt; $ then <span class="math inline">\(x_i\)</span> is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.</p>
 </div>
-<div id="solutions" class="section level4" number="6.3.4.6">
+<div id="solutions-to-violations-of-ph" class="section level4" number="6.3.4.4">
 <h4>
-<span class="header-section-number">6.3.4.6</span> Solutions<a class="anchor" aria-label="anchor" href="#solutions"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.4</span> Solutions to violations of PH<a class="anchor" aria-label="anchor" href="#solutions-to-violations-of-ph"><i class="fas fa-link"></i></a>
 </h4>
 <ul>
 <li>
@@ -1164,9 +1204,9 @@ w_j(\beta, t_j)\]</span></p>
 </li>
 </ul>
 </div>
-<div id="log-linearity" class="section level4" number="6.3.4.7">
+<div id="log-linearity" class="section level4" number="6.3.4.5">
 <h4>
-<span class="header-section-number">6.3.4.7</span> Log linearity<a class="anchor" aria-label="anchor" href="#log-linearity"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.5</span> Log linearity<a class="anchor" aria-label="anchor" href="#log-linearity"><i class="fas fa-link"></i></a>
 </h4>
 <p>We’ve also assumed that the log of the hazard ratio is linear in the covariates. That a one unit change in any covariate has the same effect on the log of the HR (at any level of the covariate). Just like with logistic regression, this assumption is hard to check. However, we can see how the modeling performs by checking to see if quadratic (or other higher order terms) are significant in the model. Another possibility is to categorize a continuous predictor to check PH assumptions as above.</p>
 </div>
