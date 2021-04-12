@@ -155,15 +155,15 @@ nulldist <- backpain %>%
 
 # Step 3.
 visualize(nulldist) + 
-  shade_p_value(obs_stat = diff_props, direction = "less")
+  shade_p_value(obs_stat = diff_props, direction = "greater")
 
 # Step 4.
 nulldist %>%
-  get_p_value(obs_stat = diff_props, direction = "less")
+  get_p_value(obs_stat = diff_props, direction = "greater")
 #> # A tibble: 1 x 1
 #>   p_value
 #>     <dbl>
-#> 1   0.999
+#> 1   0.007
 ```
 
 <img src="04-cat_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" />
