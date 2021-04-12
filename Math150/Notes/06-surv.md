@@ -660,8 +660,8 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
 ```
 
 <div class="figure" style="text-align: center">
-<img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Collett." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-7)Table 7.1 from @Collett.</p>
+<img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Dupont." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-7)Table 7.1 from @Dupont.</p>
 </div>
 
 
@@ -702,8 +702,8 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Collett." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-9)Table 7.2 from @Collett.</p>
+<img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Dupont." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-9)Table 7.2 from @Dupont.</p>
 </div>
 
 
@@ -743,8 +743,8 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% glance()
 ```
 
 <div class="figure" style="text-align: center">
-<img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Collett." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-11)Table 7.3 from @Collett.</p>
+<img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Dupont." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-11)Table 7.3 from @Dupont.</p>
 </div>
 
 
@@ -792,8 +792,8 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% g
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/table74_CHDHR.png" alt="Table 7.4 from @Collett." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-13)Table 7.4 from @Collett.</p>
+<img src="figs/table74_CHDHR.png" alt="Table 7.4 from @Dupont." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-13)Table 7.4 from @Dupont.</p>
 </div>
 
 
