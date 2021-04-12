@@ -649,6 +649,12 @@ coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
 #> 1 dbp     0.0316   0.00193      16.3 4.53e-60
 ```
 
+<div class="figure" style="text-align: center">
+<img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Collett." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-7)Table 7.1 from @Collett.</p>
+</div>
+
+
 -   **Table 7.2**\
     As our next step, we can consider adding gender as a *multiplicative effect* to our model. $$
     \begin{align*}
@@ -673,6 +679,13 @@ coxph(Surv(followup,chdfate) ~ dbpf + sex, data = heart) %>% tidy()
 #> 6 dbpfover110    2.22      0.271      8.17 2.97e-16
 #> # … with 1 more row
 ```
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Collett." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-9)Table 7.2 from @Collett.</p>
+</div>
+
 
 -   **Table 7.3** Considering gender and dbp interacting. $$
     \begin{align*}
@@ -699,6 +712,12 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex, data = heart) %>% tidy()
 #> 6 dbpfover110    2.61      0.372      7.02 2.18e-12
 #> # … with 7 more rows
 ```
+
+<div class="figure" style="text-align: center">
+<img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Collett." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-11)Table 7.3 from @Collett.</p>
+</div>
+
 
 -   **Table 7.4**\
     Adjusting for confounding variables. Of particular interest is age at baseline exam. We know that age varied widely among study subjects, and both DBP and risk of CHD increase with age. We will also consider the effect of body mass index and serum cholesterol. $$
@@ -732,6 +751,13 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% t
 #> 6 dbpfover110    1.66      0.377      4.40 0.0000107
 #> # … with 10 more rows
 ```
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/table74_CHDHR.png" alt="Table 7.4 from @Collett." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-13)Table 7.4 from @Collett.</p>
+</div>
+
 
 ### Testing Proportional Hazards {#testingph}
 
@@ -1076,7 +1102,7 @@ legend(10,.4, c("low", "high", "medium"),lty=2:4)
 survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-12-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1085,7 +1111,7 @@ ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
 ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-13-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-17-2.png" width="80%" style="display: block; margin: auto;" />
 
 different options for CI
 
@@ -1106,7 +1132,7 @@ ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
                  data=recidKM2, facet.by = "race")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-14-5.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-5.png" width="80%" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
@@ -1141,7 +1167,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
            censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
 
 Violent recidivism
 
@@ -1202,7 +1228,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
   ggtitle("Violent Recidivism")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-3.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="80%" style="display: block; margin: auto;" />
 
 ### Cox Proportional Hazards models
 
@@ -1276,7 +1302,7 @@ options(datadist = 'ddist')
 plot(summary(recid.final), log = TRUE)
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
@@ -1286,7 +1312,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1320,7 +1346,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Coxph diagnostics ... look into all the different arguments of the function!
 
@@ -1329,4 +1355,4 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;" />
