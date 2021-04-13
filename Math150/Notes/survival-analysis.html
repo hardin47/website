@@ -889,31 +889,302 @@ h_i(t) &amp;= h0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\}
 <p>We can use the model with dbp as categorical to check whether dbp could be used as a continuous variable. Indeed, it seems that the model is linear (in ln(HR)) with respect to <code>dbp</code>. What we see (in the linearity) is that the hazard ratio for an increase in 10 dbp is constant regardless of the actual value of <code>dbp</code>. Indeed, it seems like the hazard ratio for a 10 unit increase in <code>dbp</code> is roughly <span class="math inline">\(e^{0.3}\)</span> regardless of the value of <code>dbp</code>. When the model is run on <code>dbp</code> as a continuous variable (instead of as groups) we <strong>also</strong> see that the hazard ratio associated with a 10 unit increase in <code>dbp</code> is <span class="math inline">\(e^{0.3}\)</span>.</p>
 <p>One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt;   term        estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3</span>
-<span class="co">#&gt; 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5</span>
-<span class="co">#&gt; 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6</span>
-<span class="co">#&gt; 4 dbpf90-100     1.51      0.243      6.22 4.97e-10</span>
-<span class="co">#&gt; 5 dbpf100-110    1.84      0.254      7.23 4.86e-13</span>
-<span class="co">#&gt; 6 dbpfover110    2.25      0.271      8.29 1.18e-16</span>
-<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbp</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 5</span>
-<span class="co">#&gt;   term  estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 dbp     0.0316   0.00193      16.3 4.53e-60</span>
-
-<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 18</span>
-<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
-<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  4699   1473          222.    4.22e-45         260.   3.44e-53           237.</span>
-<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"coefficients for Cox PH with dpb categorical."</span>,
+        digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 6.1: </span>coefficients for Cox PH with dpb categorical.
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+dbpf60-70
+</td>
+<td style="text-align:right;">
+0.677
+</td>
+<td style="text-align:right;">
+0.247
+</td>
+<td style="text-align:right;">
+2.74
+</td>
+<td style="text-align:right;">
+0.006
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf70-80
+</td>
+<td style="text-align:right;">
+0.939
+</td>
+<td style="text-align:right;">
+0.241
+</td>
+<td style="text-align:right;">
+3.90
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf80-90
+</td>
+<td style="text-align:right;">
+1.117
+</td>
+<td style="text-align:right;">
+0.241
+</td>
+<td style="text-align:right;">
+4.64
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf90-100
+</td>
+<td style="text-align:right;">
+1.512
+</td>
+<td style="text-align:right;">
+0.243
+</td>
+<td style="text-align:right;">
+6.22
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf100-110
+</td>
+<td style="text-align:right;">
+1.839
+</td>
+<td style="text-align:right;">
+0.254
+</td>
+<td style="text-align:right;">
+7.23
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpfover110
+</td>
+<td style="text-align:right;">
+2.247
+</td>
+<td style="text-align:right;">
+0.271
+</td>
+<td style="text-align:right;">
+8.29
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+</tbody>
+</table></div>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbp</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"coefficients for Cox PH with dpb numeric"</span>,
+        digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 6.1: </span>coefficients for Cox PH with dpb numeric
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:left;">
+dbp
+</td>
+<td style="text-align:right;">
+0.032
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+16.3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr></tbody>
+</table></div>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"glance for Cox PH with dpb categorical."</span>,
+        digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 6.1: </span>glance for Cox PH with dpb categorical.
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+nevent
+</th>
+<th style="text-align:right;">
+statistic.log
+</th>
+<th style="text-align:right;">
+p.value.log
+</th>
+<th style="text-align:right;">
+statistic.sc
+</th>
+<th style="text-align:right;">
+p.value.sc
+</th>
+<th style="text-align:right;">
+statistic.wald
+</th>
+<th style="text-align:right;">
+p.value.wald
+</th>
+<th style="text-align:right;">
+statistic.robust
+</th>
+<th style="text-align:right;">
+p.value.robust
+</th>
+<th style="text-align:right;">
+r.squared
+</th>
+<th style="text-align:right;">
+r.squared.max
+</th>
+<th style="text-align:right;">
+concordance
+</th>
+<th style="text-align:right;">
+std.error.concordance
+</th>
+<th style="text-align:right;">
+logLik
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+<th style="text-align:right;">
+nobs
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:right;">
+4699
+</td>
+<td style="text-align:right;">
+1473
+</td>
+<td style="text-align:right;">
+222
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+260
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+237
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-11724
+</td>
+<td style="text-align:right;">
+23460
+</td>
+<td style="text-align:right;">
+23492
+</td>
+<td style="text-align:right;">
+4699
+</td>
+</tr></tbody>
+</table></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-7"></span>
 <img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Dupont." width="90%"><p class="caption">
@@ -934,28 +1205,277 @@ dbp_{ij} + \gamma male_i \bigg\}
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 7 x 5</span>
-<span class="co">#&gt;   term        estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 sexmale        0.606    0.0528     11.5  1.54e-30</span>
-<span class="co">#&gt; 2 dbpf60-70      0.648    0.247       2.62 8.74e- 3</span>
-<span class="co">#&gt; 3 dbpf70-80      0.888    0.241       3.69 2.27e- 4</span>
-<span class="co">#&gt; 4 dbpf80-90      1.02     0.241       4.24 2.25e- 5</span>
-<span class="co">#&gt; 5 dbpf90-100     1.40     0.243       5.76 8.48e- 9</span>
-<span class="co">#&gt; 6 dbpf100-110    1.79     0.254       7.02 2.29e-12</span>
-<span class="co">#&gt; # … with 1 more row</span>
-
-<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 18</span>
-<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
-<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  4699   1473          355.    1.10e-72         397.   1.08e-81           369.</span>
-<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"coefficients for Cox PH with sex and dpb categorical."</span>,
+        digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 6.2: </span>coefficients for Cox PH with sex and dpb categorical.
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sexmale
+</td>
+<td style="text-align:right;">
+0.606
+</td>
+<td style="text-align:right;">
+0.053
+</td>
+<td style="text-align:right;">
+11.49
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf60-70
+</td>
+<td style="text-align:right;">
+0.648
+</td>
+<td style="text-align:right;">
+0.247
+</td>
+<td style="text-align:right;">
+2.62
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf70-80
+</td>
+<td style="text-align:right;">
+0.888
+</td>
+<td style="text-align:right;">
+0.241
+</td>
+<td style="text-align:right;">
+3.69
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf80-90
+</td>
+<td style="text-align:right;">
+1.022
+</td>
+<td style="text-align:right;">
+0.241
+</td>
+<td style="text-align:right;">
+4.24
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf90-100
+</td>
+<td style="text-align:right;">
+1.401
+</td>
+<td style="text-align:right;">
+0.243
+</td>
+<td style="text-align:right;">
+5.76
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf100-110
+</td>
+<td style="text-align:right;">
+1.785
+</td>
+<td style="text-align:right;">
+0.254
+</td>
+<td style="text-align:right;">
+7.01
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpfover110
+</td>
+<td style="text-align:right;">
+2.217
+</td>
+<td style="text-align:right;">
+0.271
+</td>
+<td style="text-align:right;">
+8.18
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+</tbody>
+</table></div>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"glance for Cox PH with sex and dpb categorical."</span>,
+        digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 6.2: </span>glance for Cox PH with sex and dpb categorical.
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+nevent
+</th>
+<th style="text-align:right;">
+statistic.log
+</th>
+<th style="text-align:right;">
+p.value.log
+</th>
+<th style="text-align:right;">
+statistic.sc
+</th>
+<th style="text-align:right;">
+p.value.sc
+</th>
+<th style="text-align:right;">
+statistic.wald
+</th>
+<th style="text-align:right;">
+p.value.wald
+</th>
+<th style="text-align:right;">
+statistic.robust
+</th>
+<th style="text-align:right;">
+p.value.robust
+</th>
+<th style="text-align:right;">
+r.squared
+</th>
+<th style="text-align:right;">
+r.squared.max
+</th>
+<th style="text-align:right;">
+concordance
+</th>
+<th style="text-align:right;">
+std.error.concordance
+</th>
+<th style="text-align:right;">
+logLik
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+<th style="text-align:right;">
+nobs
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:right;">
+4699
+</td>
+<td style="text-align:right;">
+1473
+</td>
+<td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+397
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+369
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-11657
+</td>
+<td style="text-align:right;">
+23329
+</td>
+<td style="text-align:right;">
+23366
+</td>
+<td style="text-align:right;">
+4699
+</td>
+</tr></tbody>
+</table></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-9"></span>
 <img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Dupont." width="90%"><p class="caption">
@@ -978,27 +1498,379 @@ male_i \bigg\}
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 13 x 5</span>
-<span class="co">#&gt;   term        estimate std.error statistic      p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 sexmale        0.864     0.471      1.83 0.0668      </span>
-<span class="co">#&gt; 2 dbpf60-70      0.603     0.352      1.71 0.0866      </span>
-<span class="co">#&gt; 3 dbpf70-80      0.887     0.342      2.60 0.00944     </span>
-<span class="co">#&gt; 4 dbpf80-90      1.26      0.341      3.68 0.000230    </span>
-<span class="co">#&gt; 5 dbpf90-100     1.55      0.347      4.46 0.00000829  </span>
-<span class="co">#&gt; 6 dbpf100-110    2.03      0.358      5.67 0.0000000141</span>
-<span class="co">#&gt; # … with 7 more rows</span>
-<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 18</span>
-<span class="co">#&gt;       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald</span>
-<span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  4699   1473          376.    2.43e-72         409.   3.29e-79           362.</span>
-<span class="co">#&gt; # … with 11 more variables: p.value.wald &lt;dbl&gt;, statistic.robust &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   p.value.robust &lt;dbl&gt;, r.squared &lt;dbl&gt;, r.squared.max &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"coefficients for Cox PH with sex and dpb categorical interacting."</span>,
+        digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-10">Table 6.3: </span>coefficients for Cox PH with sex and dpb categorical interacting.
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sexmale
+</td>
+<td style="text-align:right;">
+0.864
+</td>
+<td style="text-align:right;">
+0.471
+</td>
+<td style="text-align:right;">
+1.833
+</td>
+<td style="text-align:right;">
+0.067
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf60-70
+</td>
+<td style="text-align:right;">
+0.603
+</td>
+<td style="text-align:right;">
+0.352
+</td>
+<td style="text-align:right;">
+1.714
+</td>
+<td style="text-align:right;">
+0.087
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf70-80
+</td>
+<td style="text-align:right;">
+0.887
+</td>
+<td style="text-align:right;">
+0.342
+</td>
+<td style="text-align:right;">
+2.596
+</td>
+<td style="text-align:right;">
+0.009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf80-90
+</td>
+<td style="text-align:right;">
+1.258
+</td>
+<td style="text-align:right;">
+0.341
+</td>
+<td style="text-align:right;">
+3.683
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf90-100
+</td>
+<td style="text-align:right;">
+1.546
+</td>
+<td style="text-align:right;">
+0.347
+</td>
+<td style="text-align:right;">
+4.458
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpf100-110
+</td>
+<td style="text-align:right;">
+2.033
+</td>
+<td style="text-align:right;">
+0.358
+</td>
+<td style="text-align:right;">
+5.672
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dbpfover110
+</td>
+<td style="text-align:right;">
+2.612
+</td>
+<td style="text-align:right;">
+0.372
+</td>
+<td style="text-align:right;">
+7.023
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpf60-70
+</td>
+<td style="text-align:right;">
+0.057
+</td>
+<td style="text-align:right;">
+0.495
+</td>
+<td style="text-align:right;">
+0.115
+</td>
+<td style="text-align:right;">
+0.908
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpf70-80
+</td>
+<td style="text-align:right;">
+-0.038
+</td>
+<td style="text-align:right;">
+0.482
+</td>
+<td style="text-align:right;">
+-0.079
+</td>
+<td style="text-align:right;">
+0.937
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpf80-90
+</td>
+<td style="text-align:right;">
+-0.458
+</td>
+<td style="text-align:right;">
+0.482
+</td>
+<td style="text-align:right;">
+-0.951
+</td>
+<td style="text-align:right;">
+0.342
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpf90-100
+</td>
+<td style="text-align:right;">
+-0.296
+</td>
+<td style="text-align:right;">
+0.487
+</td>
+<td style="text-align:right;">
+-0.608
+</td>
+<td style="text-align:right;">
+0.543
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpf100-110
+</td>
+<td style="text-align:right;">
+-0.508
+</td>
+<td style="text-align:right;">
+0.509
+</td>
+<td style="text-align:right;">
+-0.999
+</td>
+<td style="text-align:right;">
+0.318
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sexmale:dbpfover110
+</td>
+<td style="text-align:right;">
+-0.913
+</td>
+<td style="text-align:right;">
+0.549
+</td>
+<td style="text-align:right;">
+-1.661
+</td>
+<td style="text-align:right;">
+0.097
+</td>
+</tr>
+</tbody>
+</table></div>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  
+<span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span><span class="op">*</span><span class="va">dbpf</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"glance for Cox PH with sex and dpb categorical interacting."</span>,
+        digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-10">Table 6.3: </span>glance for Cox PH with sex and dpb categorical interacting.
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+nevent
+</th>
+<th style="text-align:right;">
+statistic.log
+</th>
+<th style="text-align:right;">
+p.value.log
+</th>
+<th style="text-align:right;">
+statistic.sc
+</th>
+<th style="text-align:right;">
+p.value.sc
+</th>
+<th style="text-align:right;">
+statistic.wald
+</th>
+<th style="text-align:right;">
+p.value.wald
+</th>
+<th style="text-align:right;">
+statistic.robust
+</th>
+<th style="text-align:right;">
+p.value.robust
+</th>
+<th style="text-align:right;">
+r.squared
+</th>
+<th style="text-align:right;">
+r.squared.max
+</th>
+<th style="text-align:right;">
+concordance
+</th>
+<th style="text-align:right;">
+std.error.concordance
+</th>
+<th style="text-align:right;">
+logLik
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+<th style="text-align:right;">
+nobs
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:right;">
+4699
+</td>
+<td style="text-align:right;">
+1473
+</td>
+<td style="text-align:right;">
+376
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+409
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+362
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-11647
+</td>
+<td style="text-align:right;">
+23320
+</td>
+<td style="text-align:right;">
+23388
+</td>
+<td style="text-align:right;">
+4699
+</td>
+</tr></tbody>
+</table></div>
 <div class="figure" style="text-align: center">
 <span id="fig:unnamed-chunk-11"></span>
 <img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Dupont." width="90%"><p class="caption">
@@ -1030,7 +1902,7 @@ h_i(t) &amp;= h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} + \gamma male_i 
 <li>
 <strong>factor</strong> If the relationship is not linear. Although keep in mind that there can be lots of coefficients to estimate when we make factor variables, so we lose df.</li>
 </ul>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">followup</span>,<span class="va">chdfate</span><span class="op">)</span> <span class="op">~</span> <span class="va">dbpf</span> <span class="op">*</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">scl</span>, data <span class="op">=</span> <span class="va">heart</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 16 x 5</span>
 <span class="co">#&gt;   term        estimate std.error statistic   p.value</span>
@@ -1455,7 +2327,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <p>The original article is here: <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" class="uri">https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing</a></p>
 <p>The data analysis is here: <a href="https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm" class="uri">https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm</a></p>
 <p>The GitHub repo with data and code is here: <a href="https://github.com/propublica/compas-analysis" class="uri">https://github.com/propublica/compas-analysis</a></p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival">survival</a></span><span class="op">)</span>
 <span class="va">recid</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv"</span><span class="op">)</span>
 
@@ -1484,7 +2356,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
       <span class="fu"><a href="https://rdrr.io/r/base/with.html">within</a></span><span class="op">(</span><span class="va">gender_factor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/relevel.html">relevel</a></span><span class="op">(</span><span class="va">gender_factor</span>, ref <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
       <span class="fu">mutate</span><span class="op">(</span>score_factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">score_text</span> <span class="op">!=</span> <span class="st">"Low"</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"LowScore"</span>,<span class="st">"HighScore"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
       </code></pre></div>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">recidKM</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">read_csv</span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv"</span><span class="op">)</span>, <span class="va">score_text</span> <span class="op">!=</span> <span class="st">"N/A"</span><span class="op">)</span>, <span class="va">end</span> <span class="op">&gt;</span> <span class="va">start</span><span class="op">)</span> <span class="op">%&gt;%</span>
         <span class="fu">mutate</span><span class="op">(</span>race_factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">race</span>,
                                   labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"African-American"</span>, 
@@ -1517,20 +2389,20 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <h3>
 <span class="header-section-number">6.5.2</span> Kaplan-Meier survival curve<a class="anchor" aria-label="anchor" href="#kaplan-meier-survival-curve"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">recid.surv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/survfit.html">survfit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">recid.surv</span>, lty<span class="op">=</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span>, xlab<span class="op">=</span><span class="st">"time"</span>, ylab<span class="op">=</span><span class="st">"survival function"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">.4</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"high"</span>, <span class="st">"medium"</span><span class="op">)</span>,lty<span class="op">=</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>
 
 <span class="fu">survminer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survminer/man/ggsurvplot.html">ggsurvplot</a></span><span class="op">(</span><span class="va">recid.surv</span>, conf.int<span class="op">=</span><span class="cn">TRUE</span>, censor<span class="op">=</span><span class="cn">F</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Overall"</span><span class="op">)</span></code></pre></div>
 <p><img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggsurvplot</span><span class="op">(</span><span class="va">recid.surv</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, conf.int<span class="op">=</span><span class="cn">TRUE</span>, censor<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Low Only"</span><span class="op">)</span>
 
 <span class="fu">ggsurvplot</span><span class="op">(</span><span class="va">recid.surv</span>, conf.int<span class="op">=</span><span class="cn">TRUE</span>, censor<span class="op">=</span><span class="cn">FALSE</span>, risk.table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="06-surv_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;"><img src="06-surv_files/figure-html/unnamed-chunk-17-2.png" width="80%" style="display: block; margin: auto;"></p>
 <p>different options for CI</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
 <span class="va">recidKM2</span> <span class="op">&lt;-</span> <span class="va">recidKM</span> <span class="op">%&gt;%</span> <span class="fu">sample_n</span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>  <span class="co"># CI on a smaller random sample just to see the different CIs</span>
 <span class="fu">ggsurvplot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/survfit.html">survfit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM2</span><span class="op">)</span>, 
@@ -1551,7 +2423,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <span class="header-section-number">6.5.3</span> Log-rank test [rho=0] and the Wilcoxon test [rho=1]<a class="anchor" aria-label="anchor" href="#log-rank-test-rho0-and-the-wilcoxon-test-rho1"><i class="fas fa-link"></i></a>
 </h3>
 <p>General recidivism</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/survdiff.html">survdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM2</span>, rho<span class="op">=</span><span class="fl">0</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, </span>
@@ -1579,7 +2451,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
            censor<span class="op">=</span><span class="cn">F</span>, conf.int<span class="op">=</span><span class="cn">F</span>, pval<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"No CI"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>Violent recidivism</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
 <span class="va">recidKMV2</span> <span class="op">&lt;-</span> <span class="va">recidKMV</span> <span class="op">%&gt;%</span>
   <span class="fu">sample_n</span><span class="op">(</span><span class="fl">500</span><span class="op">)</span>
@@ -1639,7 +2511,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <h3>
 <span class="header-section-number">6.5.4</span> Cox Proportional Hazards models<a class="anchor" aria-label="anchor" href="#cox-proportional-hazards-models"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Just score_factor</span>
 <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 2 x 5</span>
@@ -1695,7 +2567,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <span class="co">#&gt; #   concordance &lt;dbl&gt;, std.error.concordance &lt;dbl&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   BIC &lt;dbl&gt;, nobs &lt;int&gt;</span></code></pre></div>
 <p>Using the <code>rms</code> package, we can plot CIs for each of the relevant HRs for the model at hand:</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">recid.data</span> <span class="op">&lt;-</span> <span class="va">recidKM</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">timefollow</span>, <span class="va">event</span>, <span class="va">score_factor</span>, <span class="va">race</span>, <span class="va">age</span>, <span class="va">sex</span><span class="op">)</span>
 <span class="va">recid.final</span> <span class="op">&lt;-</span> <span class="fu">rms</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rms/man/cph.html">cph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span>, data<span class="op">=</span><span class="va">recid.data</span><span class="op">)</span>
@@ -1708,7 +2580,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <h3>
 <span class="header-section-number">6.5.5</span> Checking proportional hazards with the plot of <span class="math inline">\(\ln(-\ln(S(t)))\)</span><a class="anchor" aria-label="anchor" href="#checking-proportional-hazards-with-the-plot-of-ln-lnst"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggsurvplot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/survfit.html">survfit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span>, 
            censor<span class="op">=</span><span class="cn">F</span>, conf.int<span class="op">=</span><span class="cn">T</span>, fun<span class="op">=</span><span class="st">"cloglog"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Complementary Log-Log"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;"></div>
@@ -1718,7 +2590,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <h3>
 <span class="header-section-number">6.5.6</span> Checking proportional hazards with cox.zph<a class="anchor" aria-label="anchor" href="#checking-proportional-hazards-with-cox.zph"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/survival/man/cox.zph.html">cox.zph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;              chisq df   p</span>
 <span class="co">#&gt; score_factor 0.457  2 0.8</span>
@@ -1736,7 +2608,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <span class="co">#&gt; GLOBAL       13.6196  5 0.0182</span></code></pre></div>
 <p>Note the big p-values. We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards. If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.</p>
 <p>The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggcoxzph</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/cox.zph.html">cox.zph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
 <div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
@@ -1744,7 +2616,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <h3>
 <span class="header-section-number">6.5.7</span> Coxph diagnostics … look into all the different arguments of the function!<a class="anchor" aria-label="anchor" href="#coxph-diagnostics-look-into-all-the-different-arguments-of-the-function"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggcoxdiagnostics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">timefollow</span>,<span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">score_factor</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span>, data<span class="op">=</span><span class="va">recidKM</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;"></div>
 

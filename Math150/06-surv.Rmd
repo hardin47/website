@@ -12,6 +12,7 @@ library(GGally)
 library(survminer)
 library(forcats)
 library(rms)
+library(kableExtra)
 ```
 
 To motivate the technical details which are vital to understanding survival analysis, consider the following example [@gerds].
@@ -641,10 +642,20 @@ We can use the model with dbp as categorical to check whether dbp could be used 
 One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
-coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy() %>%
+  kable(caption = "coefficients for Cox PH with dpb categorical.",
+        digits = 3) %>%
+  kable_styling()
 
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
+coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() %>%
+  kable(caption = "coefficients for Cox PH with dpb numeric",
+        digits = 3) %>%
+  kable_styling()
+
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() %>%
+  kable(caption = "glance for Cox PH with dpb categorical.",
+        digits = 2) %>%
+  kable_styling()
 ```
 
 ```{r fig.cap = "Table 7.1 from @Dupont.", out.width = "90%", fig.align='center', echo=FALSE}
@@ -663,9 +674,17 @@ knitr::include_graphics("figs/table71_CHDHR.png")
     -   The change in deviance is 133 ($H_0: \gamma =0$), so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0$, so we need gender in the model.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% tidy()
-
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+  tidy() %>%
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical.",
+        digits = 3) %>%
+  kable_styling()
+  
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+  glance() %>%
+  kable(caption = "glance for Cox PH with sex and dpb categorical.",
+        digits = 2) %>%
+  kable_styling()
 ```
 
 
@@ -686,8 +705,17 @@ knitr::include_graphics("figs/table72_CHDHR.png")
     -   Note the marked differences between the estimates in table 7.2 and 7.3. The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises. Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% tidy()
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% glance()
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+  tidy() %>%
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting.",
+        digits = 3) %>%
+  kable_styling()
+  
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+  glance() %>%
+  kable(caption = "glance for Cox PH with sex and dpb categorical interacting.",
+        digits = 2) %>%
+  kable_styling()
 ```
 
 ```{r fig.cap = "Table 7.3 from @Dupont.", out.width = "90%", fig.align='center', echo=FALSE}

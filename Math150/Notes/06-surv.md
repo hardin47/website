@@ -632,32 +632,154 @@ One reason, however, to keep the variable broken into groups is because of the w
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
-#> # A tibble: 6 x 5
-#>   term        estimate std.error statistic  p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 dbpf60-70      0.677     0.247      2.74 6.11e- 3
-#> 2 dbpf70-80      0.939     0.241      3.90 9.56e- 5
-#> 3 dbpf80-90      1.12      0.241      4.64 3.54e- 6
-#> 4 dbpf90-100     1.51      0.243      6.22 4.97e-10
-#> 5 dbpf100-110    1.84      0.254      7.23 4.86e-13
-#> 6 dbpfover110    2.25      0.271      8.29 1.18e-16
-coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
-#> # A tibble: 1 x 5
-#>   term  estimate std.error statistic  p.value
-#>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 dbp     0.0316   0.00193      16.3 4.53e-60
-
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1  4699   1473          222.    4.22e-45         260.   3.44e-53           237.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy() %>%
+  kable(caption = "coefficients for Cox PH with dpb categorical.",
+        digits = 3) %>%
+  kable_styling()
 ```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-6)coefficients for Cox PH with dpb categorical.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> dbpf60-70 </td>
+   <td style="text-align:right;"> 0.677 </td>
+   <td style="text-align:right;"> 0.247 </td>
+   <td style="text-align:right;"> 2.74 </td>
+   <td style="text-align:right;"> 0.006 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf70-80 </td>
+   <td style="text-align:right;"> 0.939 </td>
+   <td style="text-align:right;"> 0.241 </td>
+   <td style="text-align:right;"> 3.90 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf80-90 </td>
+   <td style="text-align:right;"> 1.117 </td>
+   <td style="text-align:right;"> 0.241 </td>
+   <td style="text-align:right;"> 4.64 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf90-100 </td>
+   <td style="text-align:right;"> 1.512 </td>
+   <td style="text-align:right;"> 0.243 </td>
+   <td style="text-align:right;"> 6.22 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf100-110 </td>
+   <td style="text-align:right;"> 1.839 </td>
+   <td style="text-align:right;"> 0.254 </td>
+   <td style="text-align:right;"> 7.23 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpfover110 </td>
+   <td style="text-align:right;"> 2.247 </td>
+   <td style="text-align:right;"> 0.271 </td>
+   <td style="text-align:right;"> 8.29 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+
+coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() %>%
+  kable(caption = "coefficients for Cox PH with dpb numeric",
+        digits = 3) %>%
+  kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-6)coefficients for Cox PH with dpb numeric</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> dbp </td>
+   <td style="text-align:right;"> 0.032 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 16.3 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() %>%
+  kable(caption = "glance for Cox PH with dpb categorical.",
+        digits = 2) %>%
+  kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-6)glance for Cox PH with dpb categorical.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> n </th>
+   <th style="text-align:right;"> nevent </th>
+   <th style="text-align:right;"> statistic.log </th>
+   <th style="text-align:right;"> p.value.log </th>
+   <th style="text-align:right;"> statistic.sc </th>
+   <th style="text-align:right;"> p.value.sc </th>
+   <th style="text-align:right;"> statistic.wald </th>
+   <th style="text-align:right;"> p.value.wald </th>
+   <th style="text-align:right;"> statistic.robust </th>
+   <th style="text-align:right;"> p.value.robust </th>
+   <th style="text-align:right;"> r.squared </th>
+   <th style="text-align:right;"> r.squared.max </th>
+   <th style="text-align:right;"> concordance </th>
+   <th style="text-align:right;"> std.error.concordance </th>
+   <th style="text-align:right;"> logLik </th>
+   <th style="text-align:right;"> AIC </th>
+   <th style="text-align:right;"> BIC </th>
+   <th style="text-align:right;"> nobs </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
+   <td style="text-align:right;"> 222 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 260 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 237 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 0.05 </td>
+   <td style="text-align:right;"> 0.99 </td>
+   <td style="text-align:right;"> 0.61 </td>
+   <td style="text-align:right;"> 0.01 </td>
+   <td style="text-align:right;"> -11724 </td>
+   <td style="text-align:right;"> 23460 </td>
+   <td style="text-align:right;"> 23492 </td>
+   <td style="text-align:right;"> 4699 </td>
+  </tr>
+</tbody>
+</table>
 
 <div class="figure" style="text-align: center">
 <img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Dupont." width="90%" />
@@ -677,28 +799,133 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% tidy()
-#> # A tibble: 7 x 5
-#>   term        estimate std.error statistic  p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 sexmale        0.606    0.0528     11.5  1.54e-30
-#> 2 dbpf60-70      0.648    0.247       2.62 8.74e- 3
-#> 3 dbpf70-80      0.888    0.241       3.69 2.27e- 4
-#> 4 dbpf80-90      1.02     0.241       4.24 2.25e- 5
-#> 5 dbpf90-100     1.40     0.243       5.76 8.48e- 9
-#> 6 dbpf100-110    1.79     0.254       7.02 2.29e-12
-#> # … with 1 more row
-
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1  4699   1473          355.    1.10e-72         397.   1.08e-81           369.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+  tidy() %>%
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical.",
+        digits = 3) %>%
+  kable_styling()
 ```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-8)coefficients for Cox PH with sex and dpb categorical.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> sexmale </td>
+   <td style="text-align:right;"> 0.606 </td>
+   <td style="text-align:right;"> 0.053 </td>
+   <td style="text-align:right;"> 11.49 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf60-70 </td>
+   <td style="text-align:right;"> 0.648 </td>
+   <td style="text-align:right;"> 0.247 </td>
+   <td style="text-align:right;"> 2.62 </td>
+   <td style="text-align:right;"> 0.009 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf70-80 </td>
+   <td style="text-align:right;"> 0.888 </td>
+   <td style="text-align:right;"> 0.241 </td>
+   <td style="text-align:right;"> 3.69 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf80-90 </td>
+   <td style="text-align:right;"> 1.022 </td>
+   <td style="text-align:right;"> 0.241 </td>
+   <td style="text-align:right;"> 4.24 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf90-100 </td>
+   <td style="text-align:right;"> 1.401 </td>
+   <td style="text-align:right;"> 0.243 </td>
+   <td style="text-align:right;"> 5.76 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf100-110 </td>
+   <td style="text-align:right;"> 1.785 </td>
+   <td style="text-align:right;"> 0.254 </td>
+   <td style="text-align:right;"> 7.01 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpfover110 </td>
+   <td style="text-align:right;"> 2.217 </td>
+   <td style="text-align:right;"> 0.271 </td>
+   <td style="text-align:right;"> 8.18 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+  
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+  glance() %>%
+  kable(caption = "glance for Cox PH with sex and dpb categorical.",
+        digits = 2) %>%
+  kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-8)glance for Cox PH with sex and dpb categorical.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> n </th>
+   <th style="text-align:right;"> nevent </th>
+   <th style="text-align:right;"> statistic.log </th>
+   <th style="text-align:right;"> p.value.log </th>
+   <th style="text-align:right;"> statistic.sc </th>
+   <th style="text-align:right;"> p.value.sc </th>
+   <th style="text-align:right;"> statistic.wald </th>
+   <th style="text-align:right;"> p.value.wald </th>
+   <th style="text-align:right;"> statistic.robust </th>
+   <th style="text-align:right;"> p.value.robust </th>
+   <th style="text-align:right;"> r.squared </th>
+   <th style="text-align:right;"> r.squared.max </th>
+   <th style="text-align:right;"> concordance </th>
+   <th style="text-align:right;"> std.error.concordance </th>
+   <th style="text-align:right;"> logLik </th>
+   <th style="text-align:right;"> AIC </th>
+   <th style="text-align:right;"> BIC </th>
+   <th style="text-align:right;"> nobs </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
+   <td style="text-align:right;"> 355 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 397 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 369 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 0.07 </td>
+   <td style="text-align:right;"> 0.99 </td>
+   <td style="text-align:right;"> 0.65 </td>
+   <td style="text-align:right;"> 0.01 </td>
+   <td style="text-align:right;"> -11657 </td>
+   <td style="text-align:right;"> 23329 </td>
+   <td style="text-align:right;"> 23366 </td>
+   <td style="text-align:right;"> 4699 </td>
+  </tr>
+</tbody>
+</table>
 
 
 <div class="figure" style="text-align: center">
@@ -720,27 +947,175 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% glance()
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% tidy()
-#> # A tibble: 13 x 5
-#>   term        estimate std.error statistic      p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
-#> 1 sexmale        0.864     0.471      1.83 0.0668      
-#> 2 dbpf60-70      0.603     0.352      1.71 0.0866      
-#> 3 dbpf70-80      0.887     0.342      2.60 0.00944     
-#> 4 dbpf80-90      1.26      0.341      3.68 0.000230    
-#> 5 dbpf90-100     1.55      0.347      4.46 0.00000829  
-#> 6 dbpf100-110    2.03      0.358      5.67 0.0000000141
-#> # … with 7 more rows
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1  4699   1473          376.    2.43e-72         409.   3.29e-79           362.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+  tidy() %>%
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting.",
+        digits = 3) %>%
+  kable_styling()
 ```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-10)coefficients for Cox PH with sex and dpb categorical interacting.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> sexmale </td>
+   <td style="text-align:right;"> 0.864 </td>
+   <td style="text-align:right;"> 0.471 </td>
+   <td style="text-align:right;"> 1.833 </td>
+   <td style="text-align:right;"> 0.067 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf60-70 </td>
+   <td style="text-align:right;"> 0.603 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 1.714 </td>
+   <td style="text-align:right;"> 0.087 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf70-80 </td>
+   <td style="text-align:right;"> 0.887 </td>
+   <td style="text-align:right;"> 0.342 </td>
+   <td style="text-align:right;"> 2.596 </td>
+   <td style="text-align:right;"> 0.009 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf80-90 </td>
+   <td style="text-align:right;"> 1.258 </td>
+   <td style="text-align:right;"> 0.341 </td>
+   <td style="text-align:right;"> 3.683 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf90-100 </td>
+   <td style="text-align:right;"> 1.546 </td>
+   <td style="text-align:right;"> 0.347 </td>
+   <td style="text-align:right;"> 4.458 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf100-110 </td>
+   <td style="text-align:right;"> 2.033 </td>
+   <td style="text-align:right;"> 0.358 </td>
+   <td style="text-align:right;"> 5.672 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpfover110 </td>
+   <td style="text-align:right;"> 2.612 </td>
+   <td style="text-align:right;"> 0.372 </td>
+   <td style="text-align:right;"> 7.023 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpf60-70 </td>
+   <td style="text-align:right;"> 0.057 </td>
+   <td style="text-align:right;"> 0.495 </td>
+   <td style="text-align:right;"> 0.115 </td>
+   <td style="text-align:right;"> 0.908 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpf70-80 </td>
+   <td style="text-align:right;"> -0.038 </td>
+   <td style="text-align:right;"> 0.482 </td>
+   <td style="text-align:right;"> -0.079 </td>
+   <td style="text-align:right;"> 0.937 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpf80-90 </td>
+   <td style="text-align:right;"> -0.458 </td>
+   <td style="text-align:right;"> 0.482 </td>
+   <td style="text-align:right;"> -0.951 </td>
+   <td style="text-align:right;"> 0.342 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpf90-100 </td>
+   <td style="text-align:right;"> -0.296 </td>
+   <td style="text-align:right;"> 0.487 </td>
+   <td style="text-align:right;"> -0.608 </td>
+   <td style="text-align:right;"> 0.543 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpf100-110 </td>
+   <td style="text-align:right;"> -0.508 </td>
+   <td style="text-align:right;"> 0.509 </td>
+   <td style="text-align:right;"> -0.999 </td>
+   <td style="text-align:right;"> 0.318 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale:dbpfover110 </td>
+   <td style="text-align:right;"> -0.913 </td>
+   <td style="text-align:right;"> 0.549 </td>
+   <td style="text-align:right;"> -1.661 </td>
+   <td style="text-align:right;"> 0.097 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+  
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+  glance() %>%
+  kable(caption = "glance for Cox PH with sex and dpb categorical interacting.",
+        digits = 2) %>%
+  kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-10)glance for Cox PH with sex and dpb categorical interacting.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> n </th>
+   <th style="text-align:right;"> nevent </th>
+   <th style="text-align:right;"> statistic.log </th>
+   <th style="text-align:right;"> p.value.log </th>
+   <th style="text-align:right;"> statistic.sc </th>
+   <th style="text-align:right;"> p.value.sc </th>
+   <th style="text-align:right;"> statistic.wald </th>
+   <th style="text-align:right;"> p.value.wald </th>
+   <th style="text-align:right;"> statistic.robust </th>
+   <th style="text-align:right;"> p.value.robust </th>
+   <th style="text-align:right;"> r.squared </th>
+   <th style="text-align:right;"> r.squared.max </th>
+   <th style="text-align:right;"> concordance </th>
+   <th style="text-align:right;"> std.error.concordance </th>
+   <th style="text-align:right;"> logLik </th>
+   <th style="text-align:right;"> AIC </th>
+   <th style="text-align:right;"> BIC </th>
+   <th style="text-align:right;"> nobs </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
+   <td style="text-align:right;"> 376 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 409 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 362 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 0.08 </td>
+   <td style="text-align:right;"> 0.99 </td>
+   <td style="text-align:right;"> 0.65 </td>
+   <td style="text-align:right;"> 0.01 </td>
+   <td style="text-align:right;"> -11647 </td>
+   <td style="text-align:right;"> 23320 </td>
+   <td style="text-align:right;"> 23388 </td>
+   <td style="text-align:right;"> 4699 </td>
+  </tr>
+</tbody>
+</table>
 
 <div class="figure" style="text-align: center">
 <img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Dupont." width="90%" />
