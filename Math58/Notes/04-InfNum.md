@@ -397,7 +397,7 @@ the F distribution.  Research into the ANOVA test has been done to identify whic
 When using this ANOVA F-test to compare several population means, we will check each condition as
 follows:
 
-* The normal probability plot (or dotplot or histogram) for each sample?s responses is reasonably
+* The normal probability plot (or dotplot or histogram) for each sample's responses is reasonably
 well-behaved.
 * The ratio of the largest standard deviation to the smallest standard deviation is at most 2.
 * The samples are independent random samples from each population.

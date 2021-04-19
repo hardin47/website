@@ -183,7 +183,7 @@ p-value &=& 2 \cdot P(t_{16} \geq 7.67) = 2 \cdot (1-pt(7.67, 16)) \approx 0
 
 
 
-#### Regression Technical Conditions {-}
+### Regression Technical Conditions {#lmtechcond}
 
 * **L:** At each value of X, there is a population of possible Y-values whose mean lies on the "true" regression line (**linearity**)
 * **I:** At each value of X, the Y-measurements represent a random sample from the population of possible Y-values (**independence**)  [Consider this example of lack of independence.  The researcher is trying to determine whether the number of pieces in a puzzle is linearly associated with the time to complete the puzzle.  At first we choose 2 people and let them do 10 puzzles each.  Then we let 20 independent people do the puzzles.  The first experiment will create a slope which is particular to the two people sampled (it may or may not be close to the parameter).  The second one will create a slope close to the 20 people sampled.  Note that the effective variability of the first model is based on n=2, but we *think* it is based on n=20 (if we don't notice the lack of independence).  The second slope is based on n=20, and so it will have the correct associated variability.]
@@ -273,9 +273,9 @@ However, the coefficient on `bedrooms` isn't significant (that is, the associate
 The least squares coefficient estimate and the SE create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating $p$ parameters, so our degrees of freedom is $n-p$).
 
 \begin{eqnarray*}
-\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\frac{b_k - \beta_k}{SE(b_k)} \sim t_{(n-p)}
 \end{eqnarray*}
-A $(1-\alpha)100\%$ CI for $\beta_k$ is given by$$b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}$$
+A $(1-\alpha)100\%$ CI for $\beta_k$ is given by$$b_k \pm t_{(1-\alpha/2, n-p)} SE(b_k)$$
 
 
 The t-test is done separately for EACH $\beta$ coefficient.   The test addresses the effect of removing only the variable at hand.  Both testing and interpretation of the regression coefficients are done **with all other variables in the model**.
