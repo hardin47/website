@@ -63,7 +63,7 @@ You should notice:
 <!--
 ## 4/2/20 Agenda {#Apr2}
 1. The t-distribution
-2. Standardized t-score 
+2. Standardized T score 
 3. Hypothesis Testing & Confidence Intervals for one mean
 
 
@@ -130,7 +130,7 @@ $H_A: \mu \ne 98.6$
 
 We use the t-distribution to investigate the claim.
 
-$$t-score = \frac{98.249 - 98.6}{0.733/\sqrt{130}} = -5.46$$
+$$T score = \frac{98.249 - 98.6}{0.733/\sqrt{130}} = -5.46$$
 
 How likely is the standardized version of our test statistic to happen if the null hypothesis is true?  Well, if $H_0$ is true, then the t-statistics should have a t-distribution.  So we can use the t-distribution to find the p-value (recall that the p-value is the probability of the data or more extreme if $H_0$ is true.)
 
@@ -277,8 +277,8 @@ t &=& \frac{(\overline{X}_1 - \overline{X}_2) - (\mu_1 - \mu_2)_0}{\sqrt{s_1^2 /
 &\sim& t_{\min \{ n_1 - 1, n_2 -1 \} }
 \end{eqnarray*}
 
-Which means that the $t_{\min \{ n_1 - 1, n_2 -1 \} }$-distribution can be used to find a p-value associated with the t-score:
-$$\mbox{t-score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}}.$$
+Which means that the $t_{\min \{ n_1 - 1, n_2 -1 \} }$-distribution can be used to find a p-value associated with the T score:
+$$\mbox{T score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}}.$$
 
 Additionally, a $(1-\alpha)100$% confidence interval for $(\mu_1 - \mu_2)$ can be found by computing:
 
@@ -287,7 +287,7 @@ $$(\overline{X}_1 - \overline{X}_2) \pm t_{\min \{ n_1 - 1, n_2 -1 \} }^* \cdot 
 <!--
 $$(\overline{X}_1 - \overline{X}_2) ~ \sim N\bigg( (\mu_1 - \mu_2), \sqrt{\sigma_1^2 / n_1 + \sigma_2^2 / n_2} \bigg)$$
 
-$$\mbox{t-score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}} \sim t_{\min \{ n_1 - 1, n_2 -1 \} }$$
+$$\mbox{T score} = \frac{(\overline{X}_1 - \overline{X}_2) - 0}{\sqrt{s_1^2 / n_1 + s_2^2 / n_2}} \sim t_{\min \{ n_1 - 1, n_2 -1 \} }$$
 
 
 Unfortunately, however Welch's t-test is not used as often as other t-tests (though there is research to show that Welch's t-test should be the default).  \\
