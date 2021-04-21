@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-04-19"
+date: "2021-04-21"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -37,7 +37,7 @@ You are responsible for reading your text.  Your text is very good & readable, s
 
 
 | Week    	| Topic                      	|  Book Chp   	|   Notes Section |
-|:---------	|:---------------------------	|:----------------:	|:----------------:	|
+|:---------	|:---------------------------	|:----------------:	|:----------------	|
 | 1/25/21 	| t-tests / SLR  | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr): t-test |
 | 1/27/21 	| SLR | 2 |  \@ref(tslr): t-test as SLR   |
 | 2/1/21 	| SLR | 2 | \@ref(SLR): SLR |

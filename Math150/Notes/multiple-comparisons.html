@@ -379,16 +379,19 @@ PPV &amp;=&amp; \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
 <span class="header-section-number">7.2</span> Multiple Comparisons<a class="anchor" aria-label="anchor" href="#multcomp"><i class="fas fa-link"></i></a>
 </h2>
 <p>As you might expect, if you have 10 groups, <strong>all of which come from the same population</strong>, you might wrongly conclude that some of the means are <em>significantly</em> different. If you try pairwise comparisons on all 10 groups, you’ll have <span class="math inline">\({10 \choose 2} = 45\)</span> comparisons. Out of the 45 CI, you’d expect 2.25 of them to not contain the true difference (of zero); equivalently, you’d expect 2.25 tests to reject the true <span class="math inline">\(H_0\)</span>. In an overall test of comparing all 10 groups simultaneously, you can’t use size as a performance measure anymore.</p>
+<div id="familywise-error-rate" class="section level3" number="7.2.1">
+<h3>
+<span class="header-section-number">7.2.1</span> Familywise Error Rate<a class="anchor" aria-label="anchor" href="#familywise-error-rate"><i class="fas fa-link"></i></a>
+</h3>
 <ul>
 <li>
 <strong>FWER</strong> = <span class="math inline">\(P(V\geq1)\)</span>
 </li>
 </ul>
 <p>The Familywise Error Rate (FWER) is the probability of making one or more type I errors in a series of multiple tests. In the example above (with 10 comparisons), you would almost always make at least one type I error if you used a size of <span class="math inline">\(\alpha = 0.05\)</span>. So, your FWER would be close to 1. Methods exist for controlling the FWER instead of the size (<span class="math inline">\(\alpha\)</span>).</p>
-<div id="bonferroni" class="section level3" number="7.2.1">
-<h3>
-<span class="header-section-number">7.2.1</span> Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni"><i class="fas fa-link"></i></a>
-</h3>
+<div id="bonferroni" class="section level4 unnumbered">
+<h4>Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni"><i class="fas fa-link"></i></a>
+</h4>
 <p>The Bonferroni method of adjusting for multiple comparisons is used to control the FWER.</p>
 <p>Assume all our tests are null
 <span class="math display">\[\begin{eqnarray*}
@@ -411,6 +414,16 @@ FWER &amp;\leq&amp; \alpha
 \tilde{p}_j = \min(m p_j, 1)
 \end{eqnarray*}\]</span>
 Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
+</div>
+<div id="holm" class="section level4 unnumbered">
+<h4>Holm<a class="anchor" aria-label="anchor" href="#holm"><i class="fas fa-link"></i></a>
+</h4>
+<p>Holm is a less conservative (than Bonferroni) method for controlling the FWER. Because each p-value is considered sequentially, the Holm adjustment is referred to as “step-up.” The intuition is that on the first step, the bound assumes up to <span class="math inline">\(m\)</span> null hypotheses. But on the second step, there are only <span class="math inline">\(m-1\)</span> null hypotheses (assuming the first p-value is rejected).</p>
+<p>To control the FWER at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span> and define the adjusted p-values to be:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\tilde{p}_j = \max_{i \leq j} [ \min((m-i+1) p_i, 1) ]
+\end{eqnarray*}\]</span>
+Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
 <ul>
 <li>Note that interpretations depend heavily on the number of tests (which is true about most multiple comparison adjustments).<br>
 </li>
@@ -419,16 +432,12 @@ Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \al
 <li>We aren’t really interested in the situation where “all true null tests don’t get rejected.”</li>
 </ul>
 </div>
-<div id="holm" class="section level3" number="7.2.2">
-<h3>
-<span class="header-section-number">7.2.2</span> Holm<a class="anchor" aria-label="anchor" href="#holm"><i class="fas fa-link"></i></a>
-</h3>
-<p>Holm is a less conservative (than Bonferroni) method for controlling the FWER. Because each p-value is considered sequentially, the Holm adjustment is referred to as “step-up.” The intuition is that on the first step, the bound assumes up to <span class="math inline">\(m\)</span> null hypotheses. But on the second step, there are only <span class="math inline">\(m-1\)</span> null hypotheses (assuming the first p-value is rejected).</p>
-<p>To control the FWER at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span> and define the adjusted p-values to be:</p>
-<p><span class="math display">\[\begin{eqnarray*}
-\tilde{p}_j = \max_{i \leq j} [ \min((m-i+1) p_i, 1) ]
-\end{eqnarray*}\]</span>
-Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
+</div>
+</div>
+<div id="false-discovery-rate" class="section level2" number="7.3">
+<h2>
+<span class="header-section-number">7.3</span> False Discovery Rate<a class="anchor" aria-label="anchor" href="#false-discovery-rate"><i class="fas fa-link"></i></a>
+</h2>
 <ul>
 <li>
 <strong>FDR</strong> = <span class="math inline">\(E[V/R]\)</span>
@@ -473,11 +482,9 @@ Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \al
 </tr>
 </tbody>
 </table></div>
-</div>
-<div id="benjamini-hochberg" class="section level3" number="7.2.3">
-<h3>
-<span class="header-section-number">7.2.3</span> Benjamini-Hochberg<a class="anchor" aria-label="anchor" href="#benjamini-hochberg"><i class="fas fa-link"></i></a>
-</h3>
+<div id="benjamini-hochberg" class="section level4 unnumbered">
+<h4>Benjamini-Hochberg<a class="anchor" aria-label="anchor" href="#benjamini-hochberg"><i class="fas fa-link"></i></a>
+</h4>
 <p>When running experiments that have many many tests of significance, it is often more desirable to worry about the <em>number</em> of false discoveries as opposed to the probability of getting <em>one</em> false discovery. That is, we are typically comfortable with a few false positives (i.e., a very HIGH FWER) as long as the rate of false positives is low.</p>
 <p>Define the estimated false discovery proportion at a cutoff t (<span class="math inline">\(\hat{FDR}(t)\)</span>) to be the number of false discoveries at a given cutoff. Again, to control the FDR at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span>.</p>
 <p><span class="math display">\[\begin{eqnarray*}
@@ -524,25 +531,22 @@ H_{0_2}: \mu = 48\\
 H_{0_3}: \mu = 50\\
 \end{eqnarray*}\]</span>
 In the null setting, the p-values are uniformly distributed from 0 to 1. When the data are not consistent with the null, there are more p-values close to zero (and even closer to zero as the data become more and more distinct from the null).</p>
-<div id="distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis." class="section level4" number="7.2.3.1">
-<h4>
-<span class="header-section-number">7.2.3.1</span> Distribution of p-values under different amounts of divergence from the null hypothesis.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis."><i class="fas fa-link"></i></a>
+</div>
+<div id="distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis." class="section level4 unnumbered">
+<h4>Distribution of p-values under different amounts of divergence from the null hypothesis.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis."><i class="fas fa-link"></i></a>
 </h4>
 <div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-1-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>The previous example considered the situation where all the p-values came from the distribution. In reality, p-values will come from many different distributions. For simplification, consider the situation where g100% of the tests come from the null distribution, and (1-g)100% of the tests come from a distribution where the p-values are much closer to one and skewed right.</p>
 </div>
-<div id="distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests." class="section level4" number="7.2.3.2">
-<h4>
-<span class="header-section-number">7.2.3.2</span> Distribution of p-values under differing proportions of null versus significant tests.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests."><i class="fas fa-link"></i></a>
+<div id="distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests." class="section level4 unnumbered">
+<h4>Distribution of p-values under differing proportions of null versus significant tests.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests."><i class="fas fa-link"></i></a>
 </h4>
 <p><img src="07-MC_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-2.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-3.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-4.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-5.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-6.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-7.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-8.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-9.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-10.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-11.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-12.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
-</div>
-</div>
-<div id="qvals" class="section level2" number="7.3">
-<h2>
-<span class="header-section-number">7.3</span> Storey &amp; q-values<a class="anchor" aria-label="anchor" href="#qvals"><i class="fas fa-link"></i></a>
-</h2>
+<div id="qvals" class="section level3" number="7.3.1">
+<h3>
+<span class="header-section-number">7.3.1</span> Storey &amp; q-values<a class="anchor" aria-label="anchor" href="#qvals"><i class="fas fa-link"></i></a>
+</h3>
 <p>The previous methods allowed the larger family of tests to control either the FWER or the FDR (global measures of accuracy). However, for a given test, there was no measure to quantify FDR for a given test.</p>
 <ul>
 <li>
@@ -577,9 +581,8 @@ If <span class="math inline">\(\hat{q}(p_{m}) = 0.7\)</span> and <span class="ma
 </li>
 </ul>
 <p>Can a q-value be less than a p-value? Sure! If the number of null hypotheses is small and the test is powerful. For example, consider testing 1000 hypotheses with 20% null tests (<span class="math inline">\(\pi_0=0.2\)</span>). Assume 500 of the p-values are less than 0.05 (very powerful!). With 200 null we would expect 10 to be less than 0.05. So, the FDR is 10/500 = 0.02 (which is smaller than the p-value of 0.05 at the cutoff for the <span class="math inline">\(500^{th}\)</span> test).</p>
-<div id="how-are-fwer-and-fdr-related" class="section level4" number="7.3.0.1">
-<h4>
-<span class="header-section-number">7.3.0.1</span> How are FWER and FDR related?<a class="anchor" aria-label="anchor" href="#how-are-fwer-and-fdr-related"><i class="fas fa-link"></i></a>
+<div id="how-are-fwer-and-fdr-related" class="section level4 unnumbered">
+<h4>How are FWER and FDR related?<a class="anchor" aria-label="anchor" href="#how-are-fwer-and-fdr-related"><i class="fas fa-link"></i></a>
 </h4>
 <p>First note that for both FDR and FWER, the procedure is to <em>control</em> the errors not to compute or estimate the errors (except in the case of the q-value).</p>
 <p>Recall that <span class="math inline">\(FDR = E[V/R]\)</span> and is defined to equal zero if R=0</p>
@@ -609,6 +612,7 @@ FDR &amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0)\\
 </li>
 </ul>
 <p>The proof above shows that FWER controls the FDR when not all significant tests are null. When all significant tests are null, FWER=FDR.</p>
+</div>
 </div>
 </div>
 <div id="interim" class="section level2" number="7.4">
@@ -830,13 +834,11 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#multcomp"><span class="header-section-number">7.2</span> Multiple Comparisons</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#bonferroni"><span class="header-section-number">7.2.1</span> Bonferroni</a></li>
-<li><a class="nav-link" href="#holm"><span class="header-section-number">7.2.2</span> Holm</a></li>
-<li><a class="nav-link" href="#benjamini-hochberg"><span class="header-section-number">7.2.3</span> Benjamini-Hochberg</a></li>
-</ul>
+<a class="nav-link" href="#multcomp"><span class="header-section-number">7.2</span> Multiple Comparisons</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#familywise-error-rate"><span class="header-section-number">7.2.1</span> Familywise Error Rate</a></li></ul>
 </li>
-<li><a class="nav-link" href="#qvals"><span class="header-section-number">7.3</span> Storey &amp; q-values</a></li>
+<li>
+<a class="nav-link" href="#false-discovery-rate"><span class="header-section-number">7.3</span> False Discovery Rate</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#qvals"><span class="header-section-number">7.3.1</span> Storey &amp; q-values</a></li></ul>
+</li>
 <li>
 <a class="nav-link" href="#interim"><span class="header-section-number">7.4</span> Interim Analyses</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#pocock"><span class="header-section-number">7.4.1</span> Pocock</a></li>
@@ -861,7 +863,7 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-04-19.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-04-21.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
