@@ -514,11 +514,11 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
 #> #   BIC <dbl>, nobs <int>
 ```
 
--   **Note 1**: There is no intercept in the model. The intercept is contained within the $h_0(t)$ parameter.\
+-   **Note 1**: There is no intercept in the linear component of the model (i.e., there is no $\beta_0$ or $b_0).$ The baseline estimate (usually the role of the "intercept") is contained within the $h_0(t)$ parameter.\
 
 -   **Note 2**: Nowhere have we made any assumptions about the form of $h_0(t)$.\
 
--   **Note 3**: To estimate $h_0(t)$, we use the pointwise values, just like Kaplan-Meier plots ($\tau_j = t_{(j+1)} - t_j):$ $$h_0(t_j) = \frac{d_j}{n_j \tau_j}$$ If there are covariates, the estimation gets much more complicated.\
+-   **Note 3**: To estimate $h_0(t)$, we use the pointwise values (here for the control group only to get $h_0),$ just like Kaplan-Meier plots $(\tau_j = t_{(j+1)} - t_j):$ $$h_0(t_j) = \frac{d_j}{n_j \tau_j}$$ If there are covariates, the estimation gets much more complicated.\
 
 -   **Note 4**: The logrank statistic can be derived as the score test for the Cox proportional hazards model comparing two groups. It is therefore approximately equivalent to the likelihood ratio test statistics from that model [@Collett (section 3.9, page 102-106)]. Additionally, the log-rank test is most powerful against the alternative that the hazard of death at any given time for an individual in one group is proportional to the hazard at that time for a similar individual in the other group (i.e., the proportional hazards assumption). [@Collett (section 2.5.4, pg 44-45)] $$
     \begin{align*}
