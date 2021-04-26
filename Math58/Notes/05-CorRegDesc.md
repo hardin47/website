@@ -39,8 +39,8 @@ Correlation measures the **linear** association between two numerical variables.
 The value of the correlation is defined as:
 
 \begin{eqnarray*}
-r &=& \frac{ \sum_i (x_i  - \overline{x})(y_i - \overline{y})}{\sqrt{\sum_i(x_i - \overline{x})^2} \sqrt{ \sum_i(y_i - \overline{y})^2}}\\
-r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{y_i - \overline{y}}{s_y} \bigg)
+r &=& \frac{ \sum_i (x_i  - \overline{x})(Y_i - \overline{y})}{\sqrt{\sum_i(x_i - \overline{x})^2} \sqrt{ \sum_i(Y_i - \overline{y})^2}}\\
+r &=& \frac{1}{n-1} \sum_{i=1}^n \bigg(\frac{x_i - \overline{x}}{s_x} \bigg) \bigg(\frac{Y_i - \overline{y}}{s_y} \bigg)
 \end{eqnarray*}
 
 
@@ -125,11 +125,11 @@ SSE is "sum of squared errors" (think about how $s^2$ is defined).  So, $SSE(\ov
 
 \begin{eqnarray*}
 R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} \\
- &=& \frac{Var(y_i) - Var(e_i)}{Var(y_i)} \\
- &=& 1 - \frac{Var(e_i)}{Var(y_i)}\\
+ &=& \frac{Var(Y_i) - Var(e_i)}{Var(Y_i)} \\
+ &=& 1 - \frac{Var(e_i)}{Var(Y_i)}\\
 \end{eqnarray*}
 
-The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  \begin{align}e_i=y_i-\hat{y}_i\end{align}
+The value $e_i$ is discussed in detail below, but it is the distance from the observed response variable to the prediction on the line:  \begin{align}e_i=Y_i-\hat{Y}_i\end{align}
 
 $R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
 
@@ -158,9 +158,9 @@ The predicted values of Y from a regression line estimate the *mean value* of $Y
 
 \begin{eqnarray*}
 \hat{y} &=& b_0 + b_1 x\\
-\hat{y}_i &=& b_0 + b_1 x_i\\
-y_i &=& b_0 + b_1 x_i + e_i\\
-e_i &=& y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
+\hat{Y}_i &=& b_0 + b_1 x_i\\
+Y_i &=& b_0 + b_1 x_i + e_i\\
+e_i &=& Y_i - \hat{Y}_i = Y_i -  (b_0 + b_1 x_i)\\
 \end{eqnarray*}
 
 Notice, that we are predicting the **mean** value of the response variable at a given value of the explanatory variable!  
@@ -173,19 +173,19 @@ To find the values of the regression statistics, the sum of squared errors is mi
 **SSE:** Sum of squared errors (or residuals) is a measure of how closely the line fits to the points.  SSE is the value of the squared deviations calculated at the "best" possible values of $\beta_0$ and $\beta_1$ for a given dataset.
 
 \begin{eqnarray*}
-SSE = \sum_i (y_i - \hat{y}_i)^2 = \sum_i (y_i - (b_0 + b_1 x_i) )^2
+SSE = \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (Y_i - (b_0 + b_1 x_i) )^2
 \end{eqnarray*}
 is minimized by the values:
 \begin{eqnarray*}
 b_0 = \overline{y} - b_1 \overline{x} & \ \ \ \ \ \ \ & b_1 = r \frac{s_y}{s_x}
 \end{eqnarray*}
 
-To find the "best" fitting line, we searched for the line that has the smallest residuals (SSE) in some sense.  In particular, the goal is to try to find the line that minimizes the following quantity: $$Q=\sum e_i^2 = \sum (y_i-(b_0+b_1x_i))^2.$$
+To find the "best" fitting line, we searched for the line that has the smallest residuals (SSE) in some sense.  In particular, the goal is to try to find the line that minimizes the following quantity: $$Q=\sum e_i^2 = \sum (Y_i-(b_0+b_1x_i))^2.$$
 
 
 Finding $b_0$ and $b_1$ that minimize Q is a calculus problem.
-$$\frac{dQ}{db_0}=-2\sum (y_i-(b_0+b_1x_i)),\qquad \frac{dQ}{db_1}=-2\sum
-x_i(y_i-(b_0+b_1x_i))$$ 
+$$\frac{dQ}{db_0}=-2\sum (Y_i-(b_0+b_1x_i)),\qquad \frac{dQ}{db_1}=-2\sum
+x_i(Y_i-(b_0+b_1x_i))$$ 
 Setting both derivatives equal to 0 and solving for $b_0$ and $b_1$ yields the optimal values, denoted as $b_0$ and $b_1$
 
 One aspect of the optimization problem that is worth pointing out has to do with the role of the two variables of interest $X$ and $Y$.   If we switch the roles of $X$ and $Y$, the best fitting line will be different.  If the relationship was invariant to which variable we choose as a response, then switching the roles of $X$ and $Y$ should give a slope of $1/b_1$, which is not the case.  [Note that the role of $X$ and $Y$ **is** invariant when calculating the correlation but not when calculating the least squares regression line.]
@@ -195,10 +195,10 @@ One aspect of the optimization problem that is worth pointing out has to do with
 Residuals measure the scatter of points above and below the least squares regression line.  We use the residuals in many of the calculations and interpretations of the model.  Indeed, the goal of the linear regression is to find a model that has small residuals.  That is, ideally, the known variable $X$ will tell us all there is to know about the unknown variable $Y$.
 
 \begin{eqnarray*}
-e_i &=& (y_i - \hat{y}_i)\\
-MSE&=& \frac{\sum_i (y_i - \hat{y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2\\
-SSE &=& \sum_i (y_i - \hat{y}_i)^2 = \sum_i (e_i)^2\\
-R^2 &=& 1 - \frac{Var(e_i)}{Var(y_i)}
+e_i &=& (Y_i - \hat{Y}_i)\\
+MSE&=& \frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2\\
+SSE &=& \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (e_i)^2\\
+R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)}
 \end{eqnarray*}
 
 

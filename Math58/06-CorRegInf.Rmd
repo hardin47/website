@@ -112,8 +112,8 @@ Notice the Greek letters representing parameters:
 
 \begin{eqnarray*}
 E[y|x] &=& \beta_0 + \beta_1 x \\
-y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
-\epsilon_i &=& y_i -  (\beta_0 + \beta_1 x_i)\\
+Y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
+\epsilon_i &=& Y_i -  (\beta_0 + \beta_1 x_i)\\
 \end{eqnarray*}
 
 #### Predicted Values {-}
@@ -122,9 +122,9 @@ The predicted values of Y from a regression line estimate the *mean value* of $Y
 
 \begin{eqnarray*}
 \hat{y} &=& b_0 + b_1 x\\
-\hat{y}_i &=& b_0 + b_1 x_i\\
-y_i &=& b_0 + b_1 x_i + e_i\\
-e_i &=& y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
+\hat{Y}_i &=& b_0 + b_1 x_i\\
+Y_i &=& b_0 + b_1 x_i + e_i\\
+e_i &=& Y_i - \hat{Y}_i = Y_i -  (b_0 + b_1 x_i)\\
 \end{eqnarray*}
 
 Notice, that we are predicting the **mean** value of the response variable at a given value of the explanatory variable!  
@@ -137,7 +137,7 @@ As in section \@ref(ls), the slope is calculated by using least squares.
 #### SE of the slope {-}
 
 \begin{eqnarray*}
-SE(b_1) &=& \sqrt{\frac{MSE}{\sum_i (x_i - \overline{x})^2}} = \sqrt{\frac{MSE}{(n-1)s_x^2}} = = \sqrt{\frac{\frac{\sum_i (y_i - \hat{y}_i)^2}{n-2}}{(n-1)s_x^2}}\\
+SE(b_1) &=& \sqrt{\frac{MSE}{\sum_i (x_i - \overline{x})^2}} = \sqrt{\frac{MSE}{(n-1)s_x^2}} = = \sqrt{\frac{\frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2}}{(n-1)s_x^2}}\\
 \end{eqnarray*}
 
 Just like any other statistic, the value of $b_1$ can be calculated for every sample.  The manner in which $b_1$ varies from sample to sample becomes the sampling distribution of the sample slope.  The SE of the slope will be the standard deviation associated with the sampling distribution of the slope.  The resulting inference theory is very similar to that which we saw with the mean.  The CLT describes $b_1$ to have a normal distribution, and estimating the $SE(b_1)$ induces extra variability which leads to a T score test statistic with a t-distribution with df = $n-2$.
@@ -148,10 +148,7 @@ Just like any other statistic, the value of $b_1$ can be calculated for every sa
 
 #### CI for the slope {-}
 
-\begin{eqnarray*}
-b_1- t^*_{\alpha/2, n-2} SE(b_1) \leq \beta_1 \leq b_1 + t^*_{\alpha/2, n-2} SE(b_1)
-\end{eqnarray*}
-
+$$b_1- t^*_{\alpha/2, n-2} SE(b_1) \leq \beta_1 \leq b_1 + t^*_{\alpha/2, n-2} SE(b_1)$$
 
 See the Housing Prices^[@iscam, Inv 5.14] example below in section \@ref(ex:houses2).
 
@@ -319,6 +316,30 @@ lm(ln_price ~  sqft, data=house)  %>% augment () %>%
   ggtitle("Residual plot for ln price as a function of sqft")
 ```
 
+
+### Adjusted $R^2$
+
+In Chapter \@ref(regdesc), $R^2$, the coefficient of determination, was presented.  Not only is $R^2$ the square of the correlation (when there is only one explanatory variable), but it has an additional interpretation that is useful when there are multiple explanatory variables.  $R^2$ measures how much of the original variability in Y is given by the regression line.  
+
+SSE is "sum of squared errors".  So, $SSE(\overline{y})$ is the amount the response variable varies on its own.  $SSE(\mbox{least-squares})$ is the amount the response variable varies around the regression line (see Section \@ref(slr)).
+
+\begin{eqnarray*}
+R^2 &=& \frac{SSE(\overline{y}) - SSE(\mbox{least-squares})}{SSE(\overline{y})} \\
+ &=& \frac{Var(Y_i) - Var(e_i)}{Var(Y_i)} \\
+ &=& 1 - \frac{Var(e_i)}{Var(Y_i)}\\
+\end{eqnarray*}
+
+Recall that $e_i$ is the distance from the observed response variable to the prediction on the line: $$e_i = Y_i - \hat{Y}_i$$ 
+
+$R^2$ can be used even in models with many explanatory variables.  As such, the way to think about $R^2$ is in terms of how much of the variability in the response variable was removed (when we learned the values of the explanatory variables).  $R^2$ **is the proportion reduction in the variability of the response variable which is explained by the explanatory variable.**
+
+
+With many variables, $R^2$ can be a biased estimate of the true percent of variability (i.e., the parameter value) explained in the response.  That's because for each new variable added to the linear model the $R^2$ value will always increase.  A solution to the problem of adding too many explanatory variables is to penalize the measure of model fit.  As seen in the equation below, the Adjusted $R^2$ will be lower than the raw $R^2$ and will be slightly penalized with many explanatory variables.
+
+$$R^2_{adj} =  1 - \frac{Var(e_i) / (n - p - 1)}{Var(Y_i) / (n - 1)}$$
+
+Where $n$ is the number of observational units and $p$ is the number of coefficients estimated in the linear model.  (Remember with one categorical variable, sometimes it is necessary to estimate multiple coefficients.)
+
 ## R code for regression 
 
 
@@ -352,28 +373,32 @@ cats %>%
 
 #### Simple Linear Regression {-}
 
-```{r}
-summary(lm(velocity ~ bodymass, data = cats))
-```
+One way to work with the linear model output is in specific pieces (instead of the entire `summary()` output).  The output is in three parts and is available from the broom package.
 
+* all `tidy()` output provides information about the coefficients (estimates, SE, p-values, etc.)
 
-An alternative way to work with the output is in specific pieces (instead of the entire summary output).
+* all `augment()` output provides information about the individual observations (original data values, fitted ($\hat{Y}_i$) values, residual values ($e_i = Y_i - \hat{Y}_i),$ etc.)
+
+* all `glance()` output provides information about the model overall ($R^2$, adjusted $R^2,$ etc.)
 
 ```{r}
 library(broom)
 
-lm(velocity ~ bodymass, data = cats) %>% tidy(conf.int = TRUE)
+lm(velocity ~ bodymass, data = cats) %>% 
+  tidy(conf.int = TRUE)  # try it without the conf.int, what happens?
 ```
 
 
 #### Residual Plot {-}
 
-And to work with the residuals, use `augment()`.
+And to work with the residuals, use `augment()` (because we need one residual per observation).
 
 ```{r}
-lm(velocity ~ bodymass, data = cats) %>% augment()
+lm(velocity ~ bodymass, data = cats) %>% 
+  augment()
 
-lm(velocity ~ bodymass, data = cats) %>% augment() %>%
+lm(velocity ~ bodymass, data = cats) %>% 
+  augment() %>%
   ggplot(aes(x = .fitted, y = .resid)) + 
   geom_point() +
   geom_hline(yintercept = 0)
@@ -382,40 +407,39 @@ lm(velocity ~ bodymass, data = cats) %>% augment() %>%
 
 #### Confidence & Prediction Intervals {-}
 
-```{r}
-m_cats <- lm(velocity ~ bodymass, data = cats)
+A single observation (or multiple observations) can be predicted using the `newdata = ` argument.
 
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="confidence")
-predict(m_cats, newdata=data.frame(bodymass=4700), interval="prediction")
+```{r}
+lm(velocity ~ bodymass, data = cats) %>%
+  augment(newdata = data.frame(bodymass = 4700), interval = "confidence")
+
+lm(velocity ~ bodymass, data = cats) %>%
+  augment(newdata = data.frame(bodymass = 4700), interval = "prediction")
 ```
 
 
 ##### Plotting!  {-}
 
+Alternatively, the entire dataset can be used to model the confidence bounds and prediction bounds.
+
 ```{r}
-catConf <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="confidence") )  # cbind binds the columns together
-
-catConf %>% head()
-
-ggplot(catConf, aes(x=bodymass)) + 
+lm(velocity ~ bodymass, data = cats) %>%
+  augment(interval = "confidence") %>%
+  ggplot(aes(x=bodymass)) + 
   geom_point(aes(y=velocity)) + 
   geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+  geom_ribbon(aes(ymin=.lower, ymax=.upper), fill="blue", alpha=0.2)
 ```
 
 
 
 ```{r}
-catPred <- m_cats %>% augment() %>%
-  cbind(predict(m_cats, interval="prediction") )  # cbind binds the columns together
-
-catPred %>% head()
-
-ggplot(catPred, aes(x=bodymass)) + 
+lm(velocity ~ bodymass, data = cats) %>%
+  augment(interval = "prediction") %>%
+  ggplot(aes(x=bodymass)) + 
   geom_point(aes(y=velocity)) + 
   geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+  geom_ribbon(aes(ymin=.lower, ymax=.upper), fill="blue", alpha=0.2)
 ```
 
 
@@ -440,31 +464,36 @@ ggpairs(house, columns = c(1,2,4,5))
 #### Simple Linear Regression {-}
 
 ```{r}
-mod.sqft <- lm(price~sqft, data = house)
-mod.sqft %>% tidy()
+lm(price ~ sqft, data = house) %>% 
+  tidy()
 
-mod.bed <- lm(price ~ bedrooms, data=house)
-mod.bed %>% tidy()
+lm(price ~ bedrooms, data=house) %>% 
+  tidy()
 ```
 
-The p-values for both explanatory variables (sqft and bedrooms) are significant.  Sqft seems more significant, and indeed, the first model has a higher $R^2$ - that is, a higher proportion of the variability in price is explained by sqft (42.07%) than by number of bedrooms (8.08%).  
+The p-values for both explanatory variables (sqft and bedrooms) are significant.  Sqft seems more significant, and indeed, the first model has a higher $R^2$ - that is, a higher proportion of the variability in price is explained by sqft (42.07%) than by number of bedrooms (8.08%).  When using multiple variables, however, we would use the adjusted $R^2$ to compare models, although the interpretation (percent variability) is not as nice.
 
 ```{r}
-mod.sqft %>% glance()
-mod.bed %>% glance()
+lm(price ~ sqft, data = house) %>% 
+  glance()
+
+lm(price ~ bedrooms, data=house) %>% 
+  glance()
 ```
 
 
 However, it is important for us to ask whether either of the relationships actually fit the technical conditions of the linear regression model.  We can see from the pairs plots that the relationships look **L**inear, we'll assume the variables were collected **I**ndependently, but the **N**ormality and the **E**quality of the error structure we can check using residual plots.
 
 ```{r}
-mod.sqft %>% augment () %>%
+lm(price ~ sqft, data = house) %>% 
+  augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for price as a function of sqft")
 
-mod.bed %>% augment () %>%
+lm(price ~ bedrooms, data=house) %>% 
+  augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
@@ -473,21 +502,18 @@ mod.bed %>% augment () %>%
 
 For both of the plots, it seems like the residuals have higher variability for positive residuals.  Additionally, it seems that the variability of the residuals increases for larger fitted observations. 
 
-A natural log transformation should fix both of these problems.
+A natural log transformation on the response variable (price) should fix both of these problems.
 
 ```{r}
-mod.lnsqft <- lm(ln_price ~ sqft, data = house)
-mod.lnbed <- lm(ln_price ~ bedrooms, data=house)
-```
-
-```{r}
-mod.lnsqft %>% augment () %>%
+lm(ln_price ~ sqft, data = house) %>% 
+  augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
   ggtitle("Residual plot for ln(price) as a function of sqft")
 
-mod.lnbed %>% augment () %>%
+lm(ln_price ~ bedrooms, data=house) %>% 
+  augment () %>%
   ggplot(aes(x = .fitted, y = .resid))+ 
   geom_point() + 
   geom_hline(yintercept=0) +
@@ -503,25 +529,25 @@ Though no residual plot will ever look perfect, these residual plots seem to fit
 
 Because the price variable had a large skew (and the `ln()` transformation helped the residuals), the following models will all use `ln(price)` as the response variable.   What happens when we try to predict `price` (actually `ln(price)`, here) using BOTH `sqft` and `bedrooms`?
 
-Note:  the natural log function in R is `log()`.
+Note:  the natural log function in R is `log()`, and the `ln` transformed variable was created earlier using `mutate()` to produce an additional variable in the `house` dataset.
 
 ```{r}
-lm(log(price) ~ sqft + bedrooms, data=house) %>% tidy()
-lm(log(price) ~ sqft + bedrooms, data=house) %>% glance()
+lm(ln_price ~ sqft + bedrooms, data=house) %>% tidy()
+lm(ln_price ~ sqft + bedrooms, data=house) %>% glance()
 ```
 
 ```{r}
-lm(log(price) ~ sqft + baths, data=house) %>% tidy()
-lm(log(price) ~ sqft + baths, data=house) %>% glance()
+lm(ln_price ~ sqft + baths, data=house) %>% tidy()
+lm(ln_price ~ sqft + baths, data=house) %>% glance()
 ```
 
 ```{r}
-lm(log(price) ~ sqft + bedrooms + baths, data=house) %>% tidy()
-lm(log(price) ~ sqft + bedrooms + baths, data=house) %>% glance()
+lm(ln_price ~ sqft + bedrooms + baths, data=house) %>% tidy()
+lm(ln_price ~ sqft + bedrooms + baths, data=house) %>% glance()
 ```
 
 
-**Sqft & bedrooms**
+**sqft & bedrooms**
 
 Although the $R^2$ value went up (44.84% of variability in log price is explained by sqft and bedrooms), the p-value on bedrooms isn't significant.  The p-value here can be interpreted as a hypothesis test on the slope coefficient given the other variables in the model.
 
@@ -529,16 +555,17 @@ Although the $R^2$ value went up (44.84% of variability in log price is explaine
 
 Our output says that once we have sqft in the model, we don't actually need to know anything about the number of bedrooms (even though bedrooms was a significant predictor on its own).
 
-**Sqft & bathrooms**
+**sqft & bathrooms**
 
 Seems like we *really* don't need bathrooms!  The information about `sqft` is sufficient for predicting the price, and information about bathrooms doesn't help much at all.
 
 **Final model**
 
-The final model will be run on log(price) using only sqft. Note that the coefficients and the $R^2$ values change slightly (from the original analysis) because the response variable is logged.
+The final model reported will be that using log(price) on only sqft. Note that the coefficients and the $R^2$ values change slightly (from the original analysis) because the response variable is logged.
 
 ```{r}
-summary(mod.lnsqft)
+lm(ln_price ~ sqft, data=house) %>% tidy()
+lm(ln_price ~ sqft, data=house) %>% glance()
 ```
 
 
@@ -549,18 +576,20 @@ As with the prediction intervals we had when we had a single sample, we can now 
 ##### Confidence interval: {-}
 
 ```{r}
-predict(mod.lnsqft, newdata=data.frame(sqft=2000), interval="confidence")
+lm(ln_price ~ sqft, data=house) %>%
+  augment(newdata=data.frame(sqft=2000), interval="confidence")
 ```
 
-I am 95% confident that the true average log price for a 2000 sqft home is between 12.79 ln\$ and 12.99 ln\$.  (The predicted value is in natural-log-dollars ... which is hard to interpret , but back-transforming can be a little tricky and beyond the scope of this semester).
+I am 95% confident that the true average log price for a 2000 sqft home is between 12.79 ln\$ and 12.99 ln\$.  (The predicted value is in natural-log-dollars ... which is hard to interpret, but back-transforming can be a little tricky and beyond the scope of this semester).
 
 ##### Prediction interval: {-}
 
 ```{r}
-predict(mod.lnsqft, newdata=data.frame(sqft=2000), interval="prediction")
+lm(ln_price ~ sqft, data=house) %>%
+  augment(newdata=data.frame(sqft=2000), interval="prediction")
 ```
 
-I am 95% of homes with 2000 sqft are between 11.99 ln\$ and 13.79 ln\$.  Now back-transforming is easy (because there are no averages), so 95% of homes with 2000 sqft are between $161,126 and $977,301 (which are just $e^{11.98994}$ and $e^{13.79255}$).
+I am 95% of homes with 2000 sqft are between 11.99 ln\$ and 13.79 ln\$.  Now back-transforming is easy (because there are no averages), so 95% of homes with 2000 sqft are between $161,126 and $977,301 (the endpoints are given by $e^{11.98994}$ and $e^{13.79255}$).
 
 ##### Plotting confidence bounds: {-}
 
@@ -568,29 +597,24 @@ I am 95% of homes with 2000 sqft are between 11.99 ln\$ and 13.79 ln\$.  Now bac
 A **confidence** interval around the line gives bounds on the parameter represented by the line.  So we are 95% confident that the true population line lies within the bounds.  Note that the interval is wider at the endpoints (because the variability is higher at the ends).
 
 ```{r}
-houseConf <- mod.lnsqft %>% augment() %>%
-  cbind(predict(mod.lnsqft, interval="confidence") )  # cbind binds the columns together
-
-houseConf %>% head()
-
-ggplot(houseConf, aes(x=sqft)) + 
-  geom_point(aes(y=`log(price)`)) + 
+lm(ln_price ~ sqft, data=house) %>%  
+  augment(interval = "confidence") %>%
+  ggplot(aes(x=sqft)) + 
+  geom_point(aes(y=ln_price)) + 
   geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+  geom_ribbon(aes(ymin=.lower, ymax=.upper), fill="blue", alpha=0.2)
 ```
 
 A **prediction** interval around the line bounds the individual points.  That is, 95% of the observations are captured inside the interval.  As with the confidence interval, the prediction interval is also wider at the ends, but it is harder to see in prediction intervals than confidence intervals
 
 ```{r}
-housePred <- mod.lnsqft %>% augment() %>%
-  cbind(predict(mod.lnsqft, interval="prediction") )  # cbind binds the columns together
-
-housePred %>% head()
-
-ggplot(housePred, aes(x=sqft)) + 
-  geom_point(aes(y=`log(price)`)) + 
+lm(ln_price ~ sqft, data=house) %>%  
+  augment(interval = "prediction") %>%
+  ggplot(aes(x=sqft)) + 
+  geom_point(aes(y=ln_price)) + 
   geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=lwr, ymax=upr), fill="blue", alpha=0.2)
+  geom_ribbon(aes(ymin=.lower, ymax=.upper), fill="blue", alpha=0.2)
+
 ```
 
 
@@ -599,29 +623,27 @@ ggplot(housePred, aes(x=sqft)) +
 The predict function still works to give estimates of the average value and the predicted individual values, but the plot is now much harder to draw because with three explanatory variables, we would need a 4-d plot to visualize the model and the predictions.
 
 ```{r}
-sqftbedbathlm = lm(log(price)~sqft + bedrooms + baths, data=house)
-
-predict(sqftbedbathlm, 
-        newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
+lm(ln_price ~ sqft + bedrooms + baths, data=house) %>%
+  augment(newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
         interval="confidence", level=.95)
 
-predict(sqftbedbathlm, 
-        newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
+lm(ln_price ~ sqft + bedrooms + baths, data=house) %>%
+  augment(newdata=data.frame(sqft=2000, bedrooms=3, baths=2), 
         interval="prediction", level=.95)
 ```
 
-Again, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
+Again, because we needed to use the `ln` transformation on `price`, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000 sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
 
 
 ### Example: 1918-19 Flu and Excess Deaths^[thanks to Laura Ring Kapitula at Grand Valley State University] {#ex:1819flu}
 
-As we are coming to know, measuring the impact of COVID-19 is difficult.  A recent NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.
+As we are coming to know, measuring the impact of COVID-19 is difficult.  A 2020 NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.
 
 ```{r fig.cap = "US Death Toll 2020, NY Times, April 28, 2020, https://www.nytimes.com/interactive/2020/04/28/us/coronavirus-death-toll-total.html", fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/covid_excess.png")
 ```
 
-While it is still too early to model COVID-19 well, we do have information from the 1918-19 Flu pandemic that was similar in many ways to the current COVID-19 pandemic.  In 2007, Markel et al. published research in the *Journal of the American Medical Association* detailing the results from different social distancing practices across the US, "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic" [JAMA, Aug 8, 2007, Vol 298, No 6].
+While it is early to model COVID-19 well, we do have information from the 1918-19 Flu pandemic that was similar in many ways to the current COVID-19 pandemic.  In 2007, Markel et al. published research in the *Journal of the American Medical Association* detailing the results from different social distancing practices across the US, "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic" [JAMA, Aug 8, 2007, Vol 298, No 6].
 
 
 ```{r fig.cap = "Nonpharmaceutical Interventions Implemented by US Cities During the 1918-1919 Influenza Pandemic, https://jamanetwork.com/journals/jama/fullarticle/208354", fig.align='center', echo=FALSE}
@@ -750,7 +772,7 @@ flu_1819 %>%
   ggtitle("St Paul & Grand Rapids NOT removed, magPeak vs days responseTime")
 ```
 
-```{r eval = FALSE}
+```{r}
 flu_1819 %>%
   mutate(ln_magPeak = log(magPeak)) %>%
   filter(place != "St Paul, MN" & place != "Grand Rapids, MI") %>%
@@ -800,7 +822,7 @@ knitr::include_graphics("figs/gilead_remdesivir.png")
 * two patient groups are 5-day and 10-day treatment courses (no placebo), randomized
 * patients on ventilators were not enrolled
 
-*The NY Times* covered the Gilead announement.  Indeed, the outcome of the trials have important political ramifications as well.
+*The NY Times* covered the Gilead announcement.  Indeed, the outcome of the trials have important political ramifications as well.
 
 ```{r fig.cap = "Gilead remdesivir trial covered in the NYT, https://www.nytimes.com/2020/04/29/health/gilead-remdesivir-coronavirus.html", fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/nyt_remdesivir.png")
