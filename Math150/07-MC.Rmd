@@ -468,7 +468,7 @@ The researcher has two options:
 
 ![Different $\alpha^*$ values for three different stopping criteria.  Note that Peto does not control the test at an overall $\alpha=0.05$, although it is close.](alphaInterim.png)
 
-Sometimes the interim criterial are referred to as "alpha spending" because the total type I error rate (that is, rejecting the original claim at any of the interim analysis steps if $H_0$ is true) should be $\alpha$, but the $\alpha$ probability of a type I error should be spread over the interim tests. 
+Sometimes the interim criteria are referred to as "alpha spending" because the total type I error rate (that is, rejecting the original claim at any of the interim analysis steps if $H_0$ is true) should be $\alpha$, but the $\alpha$ probability of a type I error should be spread over the interim tests. 
 
 ### Pocock
 
@@ -501,6 +501,248 @@ Disadvantage:
 * Symmetry:  which is more important, harm or good?
 * Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O'Brien-Flemming) to stopping early for negative reasons.
 
+
+
+```{r echo = FALSE}
+library(data.table)
+sim_week <- function(n_per_week, baseline, treatment_effect) {
+  data.table(
+    control = rbinom(n_per_week, 1, baseline),
+    treatment = rbinom(n_per_week, 1, baseline + treatment_effect)
+  )
+}
+
+sim_weeks <-
+  function(n_per_week,
+           baseline,
+           treatment_effect,
+           n_weeks) {
+    # create list where each element is the data
+    # for a week created by sim_week()
+    weeks_list = replicate(n_weeks,
+                           sim_week(n_per_week, baseline, treatment_effect),
+                           simplify = F)
+    
+    # collapse the list of weeks into a
+    # data.table with a week id column
+    weeks_dt <- rbindlist(weeks_list, idcol = 'week')
+    
+    weeks_dt %>%
+      # melt into long format with week as the id
+      melt(id.vars = 'week',
+           variable.name = 'group',
+           value.name = 'success') %>%
+      # sum success flag by week and group (treat vs control)
+      .[, .(successes_per_week = sum(success)), by = c('week', 'group')] %>%
+      # create the cumulative successes for each week by group
+      .[, successes := cumsum(successes_per_week), by = 'group'] %>%
+      # create the cumulative failures by week
+      .[, failures := week * n_per_week - successes] %>%
+      # order by week
+      .[order(week)]
+  }
+
+sim_test <-
+  function(n_per_week,
+           baseline,
+           treatment_effect,
+           n_weeks) {
+    # get the data
+    sim_result <-
+      sim_weeks(n_per_week, baseline, treatment_effect, n_weeks)
+    
+    # create an empty dt to populate below
+    dt_prop_test_result = data.table(
+      week = 1:n_weeks,
+      control_prop = vector(mode = 'numeric', length = n_weeks),
+      treatment_prop = vector(mode = 'numeric', length = n_weeks),
+      p_value = vector(mode = 'numeric', length = n_weeks)
+    )
+    
+    for (w in 1:n_weeks) {
+      # create a matrix with successes and fails in
+      # the columns control and treatment in the rows
+      mat = as.matrix(sim_result[week == w, .(successes, failures)])
+      
+      # do the prop.test
+      prop_test_result = prop.test(mat)
+      
+      # update the results data.table
+      dt_prop_test_result[week == w, `:=`(
+        control_prop = prop_test_result$estimate[1],
+        treatment_prop = prop_test_result$estimate[2],
+        p_value = prop_test_result$p.value
+      )]
+    }
+    
+    return(dt_prop_test_result)
+  }
+
+
+sim_tests <-
+  function(n_per_week,
+           baseline,
+           treatment_effect,
+           n_weeks,
+           n_tests) {
+    # replicate the test n_tests times
+    tests_list = replicate(n_tests,
+                           sim_test(n_per_week, baseline, treatment_effect, n_weeks),
+                           simplify = F)
+    
+    # return a data.table with an id col called test
+    rbindlist(tests_list, idcol = 'test')
+  }
+```
+
+
+```{r echo = FALSE}
+set.seed(4747)
+
+df_tests <-
+  sim_tests(
+    n_per_week = 500,
+    baseline = 0.5,
+    treatment_effect = 0,
+    n_weeks = 4,
+    n_tests = 1000
+  ) %>%
+  as_tibble()
+
+```
+
+```{r echo = FALSE}
+# add early stopping to tests
+df_tests_stop <- df_tests %>%
+  mutate(Pe_alpha = rep(c(0.001, 0.001, 0.001, 0.05), 1000)) %>%
+  mutate(OF_alpha = rep(c(0.0001, 0.004, 0.019, 0.043), 1000)) %>%
+  # flag for whether p-value is less than 0.05
+  mutate(raw_stop = as.numeric(p_value < 0.05)) %>%
+  mutate(Bon_stop = as.numeric(p_value < 0.05/4)) %>%
+  mutate(Po_stop = as.numeric(p_value <  0.018)) %>%
+  mutate(Pe_stop = as.numeric(p_value < Pe_alpha)) %>%
+  mutate(OF_stop = as.numeric(p_value < OF_alpha)) %>%
+  group_by(test) %>%
+  # first p-value stopped at, if stop == 0 for
+  # all weeks this will be the p-value for the first week
+  mutate(raw_stop_p_value = dplyr::first(p_value, desc(raw_stop))) %>%
+  mutate(Bon_stop_p_value = dplyr::first(p_value, desc(Bon_stop))) %>%
+  mutate(Po_stop_p_value = dplyr::first(p_value, desc(Po_stop))) %>%
+  mutate(Pe_stop_p_value = dplyr::first(p_value, desc(Pe_stop))) %>%
+  mutate(OF_stop_p_value = dplyr::first(p_value, desc(OF_stop))) %>%
+  ungroup()
+
+df_tests_stop %>%
+  summarise(type1 = mean(raw_stop_p_value < .05))
+
+
+df_tests_stop %>%
+  mutate(stop_color = ifelse(raw_stop_p_value < .05, "reject", "don't reject")) %>%
+  filter(test < 100) %>%
+  ggplot() +
+  geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
+  geom_hline(yintercept = 0.05, color = "black") +
+  scale_color_viridis_d(begin = .9, end = .1) +
+  ggtitle("Raw p-value reject: Type 1 ~ 12%")
+```
+
+####  Bonferroni {-}
+
+```{r echo = FALSE}
+# Type 1 error rate:
+df_tests_stop %>%
+  summarise(type1 = mean(Bon_stop_p_value < .05/4))
+
+
+df_tests_stop %>%
+  mutate(stop_color = ifelse(Bon_stop_p_value < .05/4, "reject", "don't reject")) %>%
+  filter(test < 100) %>%
+  ggplot() +
+  geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
+  geom_hline(yintercept = 0.05, color = "grey") +
+  geom_hline(yintercept = 0.05/4, color = "black") +
+  scale_color_viridis_d(begin = .9, end = .1) +
+  ggtitle("Bonferroni p-value reject: Type 1 ~ 3%")
+
+```
+
+####  Pocock {-}
+
+```{r echo = FALSE}
+# Type 1 error rate:
+df_tests_stop %>%
+  summarise(type1 = mean(Po_stop_p_value < .018))
+
+
+df_tests_stop %>%
+  mutate(stop_color = ifelse(Po_stop_p_value < .018, "reject", "don't reject")) %>%
+  filter(test < 100) %>%
+  ggplot() +
+  geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
+  geom_hline(yintercept = 0.05, color = "grey") +
+  geom_hline(yintercept = 0.018, color = "black") +
+  scale_color_viridis_d(begin = .9, end = .1) +
+  ggtitle("Pocock p-value reject: Type 1 ~ 5%")
+
+```
+
+
+####  Peto {-}
+
+```{r echo = FALSE}
+# Type 1 error rate:
+df_tests_stop %>%
+  group_by(test) %>%
+  mutate(any_stop = max(Pe_stop)) %>%
+  ungroup() %>%
+  summarise(type1 = mean(any_stop))
+
+
+df_tests_stop %>%
+  group_by(test) %>%
+  mutate(any_stop = max(Pe_stop)) %>%
+  ungroup()  %>%
+  mutate(stop_color = ifelse(any_stop == 1, "reject", "don't reject")) %>%
+  filter(test < 100) %>%
+  ggplot() +
+  geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
+  geom_hline(yintercept = 0.05, color = "grey") +
+  geom_segment(aes(y = 0.001, yend =0.001, x = 0.9, xend = 1.5,), color = "black") +
+  geom_segment(aes(y = 0.001, yend =0.001, x = 1.5, xend = 2.5,), color = "black") +
+  geom_segment(aes(y = 0.001, yend =0.001, x = 2.5, xend = 3.5,), color = "black") +
+  geom_segment(aes(y = 0.05, yend =0.05, x = 3.5, xend = 4.1,), color = "black") +
+  scale_color_viridis_d(begin = .9, end = .1) +
+  ggtitle("Peto p-value reject: Type 1 ~ 5%")
+```
+
+####  O'Brien-Fleming {-}
+
+```{r echo = FALSE}
+# Type 1 error rate:
+df_tests_stop %>%
+  group_by(test) %>%
+  mutate(any_stop = max(OF_stop)) %>%
+  ungroup() %>%
+  summarise(type1 = mean(any_stop))
+
+
+df_tests_stop %>%
+  group_by(test) %>%
+  mutate(any_stop = max(OF_stop)) %>%
+  ungroup()  %>%
+  mutate(stop_color = ifelse(any_stop == 1, "reject", "don't reject")) %>%
+  filter(test < 100) %>%
+  ggplot() +
+  geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
+  geom_hline(yintercept = 0.05, color = "grey") +
+  geom_segment(aes(y = 0.0001, yend =0.0001, x = 0.9, xend = 1.5,), color = "black") +
+  geom_segment(aes(y = 0.004, yend =0.004, x = 1.5, xend = 2.5,), color = "black") +
+  geom_segment(aes(y = 0.019, yend =0.019, x = 2.5, xend = 3.5,), color = "black") +
+  geom_segment(aes(y = 0.043, yend =0.043, x = 3.5, xend = 4.1,), color = "black") +
+  scale_color_viridis_d(begin = .9, end = .1) +
+  ggtitle("O'Brien-Fleming p-value reject: Type 1 ~ 5%")
+
+```
 
 ####  Advice 1
 The following quote is general advice from statistical researchers doing clinical oncology. [@crowley]

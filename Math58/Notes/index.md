@@ -38,7 +38,7 @@ You are responsible for reading the relevant chapters in the text. The text is v
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
 | 2/3/21  | Least Squares line              | IMS 3.2 & ISCAM 5.8       | \@ref(ls): Least Squares                        |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
-| 2/8/21  | Intro to Hypotheis Testing      | IMS 5.1                   | \@ref(randtest): Hypothesis Testing             |
+| 2/8/21  | Intro to Hypothesis Testing     | IMS 5.1                   | \@ref(randtest): Hypothesis Testing             |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
 | 2/10/21 | Randomization Test              | IMS 5.1                   | \@ref(randtest): Randomization Test             |
 +---------+---------------------------------+---------------------------+-------------------------------------------------+
