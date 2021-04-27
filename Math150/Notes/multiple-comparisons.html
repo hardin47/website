@@ -640,14 +640,17 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <li>Change <span class="math inline">\(\alpha\)</span> at each step along the way so that the total probability of a type I error is <span class="math inline">\(\alpha\)</span>
 </li>
 </ol>
+<div id="different-p-value-cutoff-choices" class="section level3" number="7.4.1">
+<h3>
+<span class="header-section-number">7.4.1</span> Different p-value cutoff choices<a class="anchor" aria-label="anchor" href="#different-p-value-cutoff-choices"><i class="fas fa-link"></i></a>
+</h3>
 <div class="figure">
 <img src="alphaInterim.png" alt=""><p class="caption">Different <span class="math inline">\(\alpha^*\)</span> values for three different stopping criteria. Note that Peto does not control the test at an overall <span class="math inline">\(\alpha=0.05\)</span>, although it is close.</p>
 </div>
 <p>Sometimes the interim criteria are referred to as “alpha spending” because the total type I error rate (that is, rejecting the original claim at any of the interim analysis steps if <span class="math inline">\(H_0\)</span> is true) should be <span class="math inline">\(\alpha\)</span>, but the <span class="math inline">\(\alpha\)</span> probability of a type I error should be spread over the interim tests.</p>
-<div id="pocock" class="section level3" number="7.4.1">
-<h3>
-<span class="header-section-number">7.4.1</span> Pocock<a class="anchor" aria-label="anchor" href="#pocock"><i class="fas fa-link"></i></a>
-</h3>
+<div id="pocock" class="section level4 unnumbered">
+<h4>Pocock<a class="anchor" aria-label="anchor" href="#pocock"><i class="fas fa-link"></i></a>
+</h4>
 <p>The Pocock boundary</p>
 <p>Advantages:</p>
 <ul>
@@ -659,10 +662,9 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <li>low power and therefore large maximum sample size (when the effect size is small)</li>
 </ul>
 </div>
-<div id="obrien-flemming" class="section level3" number="7.4.2">
-<h3>
-<span class="header-section-number">7.4.2</span> O’Brien-Flemming<a class="anchor" aria-label="anchor" href="#obrien-flemming"><i class="fas fa-link"></i></a>
-</h3>
+<div id="obrien-fleming" class="section level4 unnumbered">
+<h4>O’Brien-Fleming<a class="anchor" aria-label="anchor" href="#obrien-fleming"><i class="fas fa-link"></i></a>
+</h4>
 <p>Advantages:</p>
 <ul>
 <li>final <span class="math inline">\(\alpha\)</span> is close to desired <span class="math inline">\(\alpha\)</span>
@@ -674,24 +676,34 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <li>less likely to stop early, so larger expected sample size</li>
 </ul>
 </div>
-<div id="some-parting-thoughts" class="section level3" number="7.4.3">
+</div>
+<div id="simulation-1" class="section level3" number="7.4.2">
 <h3>
-<span class="header-section-number">7.4.3</span> Some parting thoughts<a class="anchor" aria-label="anchor" href="#some-parting-thoughts"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.4.2</span> Simulation<a class="anchor" aria-label="anchor" href="#simulation-1"><i class="fas fa-link"></i></a>
 </h3>
+<p>The simulation below is based on a pair of blogs by Ed Berry (<a href="https://www.eddjberry.com/post/simulating-a-b-tests-with-data-table/">here</a> and <a href="https://www.eddjberry.com/post/intro-group-sequential-designs/">here</a>).</p>
+<p>Every simulation is done under the null hypothesis. That is, there are no effects to find. We are worried about the situation when the null hypothesis is rejected (at any of the time points).</p>
 <ul>
-<li>If <span class="math inline">\(H_a\)</span> is true, the effect size is likely overestimated (true in general, not just for interim analyses).</li>
-<li>Symmetry: which is more important, harm or good?</li>
-<li>Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O’Brien-Flemming) to stopping early for negative reasons.</li>
+<li><p>Each of the following is done 1000 times (there are 1000 lines created, each of the plots only has 100 lines so that we can see the lines more clearly).</p></li>
+<li><p>For week 1, generate 500 people (250 in each group) and measure whether or not to reject <span class="math inline">\(H_0\)</span>. Note that we shouldn’t be rejecting because there is no treatment effect!</p></li>
+<li><p>For week 2, 500 more people are generated. Also for weeks 3 and 4.</p></li>
+<li><p>The line is colored purple if the study is rejected at any point. Note that in actual studies, if the study is rejected it would not (typically) be continued. I did continue for weeks past where the rejection would have happened (only because of simulation and graphing simplicity).</p></li>
 </ul>
+<p>The simulated type 1 error rate is the number of studies that rejected at any of the weeks (out of 1000).</p>
+<div id="raw-p-values" class="section level4 unnumbered">
+<h4>Raw p-values<a class="anchor" aria-label="anchor" href="#raw-p-values"><i class="fas fa-link"></i></a>
+</h4>
+<p>Note that the horizontal black line is at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.131</code></pre>
 <div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
 <div id="bonferroni-1" class="section level4 unnumbered">
 <h4>Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni-1"><i class="fas fa-link"></i></a>
 </h4>
-<p>Type 1 error rate:</p>
+<p>Note that the horizontal black line is at 0.05/4 = 0.0125; there is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
@@ -701,7 +713,7 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <div id="pocock-1" class="section level4 unnumbered">
 <h4>Pocock<a class="anchor" aria-label="anchor" href="#pocock-1"><i class="fas fa-link"></i></a>
 </h4>
-<p>Type 1 error rate:</p>
+<p>Note that the horizontal black line is at 0.018; there is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
@@ -711,23 +723,33 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <div id="peto" class="section level4 unnumbered">
 <h4>Peto<a class="anchor" aria-label="anchor" href="#peto"><i class="fas fa-link"></i></a>
 </h4>
-<p>Type 1 error rate:</p>
+<p>Note that the horizontal black line is at 0.001 for the first three weeks and 0.05 for the fourth week. There is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is (note that we expect the type 1 error rate to be above 5%):</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.054</code></pre>
 <div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
-<div id="obrien-fleming" class="section level4 unnumbered">
-<h4>O’Brien-Fleming<a class="anchor" aria-label="anchor" href="#obrien-fleming"><i class="fas fa-link"></i></a>
+<div id="obrien-fleming-1" class="section level4 unnumbered">
+<h4>O’Brien-Fleming<a class="anchor" aria-label="anchor" href="#obrien-fleming-1"><i class="fas fa-link"></i></a>
 </h4>
-<p>Type 1 error rate:</p>
+<p>Note that the horizontal black lines are at 0.0001, 0.004, 0.019, and 0.043. There is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.049</code></pre>
 <div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
+</div>
+<div id="some-parting-thoughts" class="section level3" number="7.4.3">
+<h3>
+<span class="header-section-number">7.4.3</span> Some parting thoughts<a class="anchor" aria-label="anchor" href="#some-parting-thoughts"><i class="fas fa-link"></i></a>
+</h3>
+<ul>
+<li>If <span class="math inline">\(H_A\)</span> is true, the effect size is likely overestimated (true in general, not just for interim analyses).</li>
+<li>Symmetry: which is more important, harm or good?</li>
+<li>Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O’Brien-Fleming) to stopping early for negative reasons.</li>
+</ul>
 <div id="advice-1" class="section level4" number="7.4.3.1">
 <h4>
 <span class="header-section-number">7.4.3.1</span> Advice 1<a class="anchor" aria-label="anchor" href="#advice-1"><i class="fas fa-link"></i></a>
@@ -888,8 +910,8 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 </li>
 <li>
 <a class="nav-link" href="#interim"><span class="header-section-number">7.4</span> Interim Analyses</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#pocock"><span class="header-section-number">7.4.1</span> Pocock</a></li>
-<li><a class="nav-link" href="#obrien-flemming"><span class="header-section-number">7.4.2</span> O’Brien-Flemming</a></li>
+<li><a class="nav-link" href="#different-p-value-cutoff-choices"><span class="header-section-number">7.4.1</span> Different p-value cutoff choices</a></li>
+<li><a class="nav-link" href="#simulation-1"><span class="header-section-number">7.4.2</span> Simulation</a></li>
 <li><a class="nav-link" href="#some-parting-thoughts"><span class="header-section-number">7.4.3</span> Some parting thoughts</a></li>
 </ul>
 </li>

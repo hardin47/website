@@ -329,7 +329,7 @@ The previous example considered the situation where all the p-values came from t
 #### Distribution of p-values under differing proportions of null versus significant tests. {-}
 
 ```{r echo=FALSE, fig.height=10}
-# let g = proporiton of null genes
+# let g = proportion of null genes
 
 #par(mfrow=c(6,2))
 g=0.95
@@ -466,11 +466,13 @@ The researcher has two options:
 1. Let $\alpha^* < < < \alpha$
 2. Change $\alpha$ at each step along the way so that the total probability of a type I error is $\alpha$
 
+### Different p-value cutoff choices
+
 ![Different $\alpha^*$ values for three different stopping criteria.  Note that Peto does not control the test at an overall $\alpha=0.05$, although it is close.](alphaInterim.png)
 
 Sometimes the interim criteria are referred to as "alpha spending" because the total type I error rate (that is, rejecting the original claim at any of the interim analysis steps if $H_0$ is true) should be $\alpha$, but the $\alpha$ probability of a type I error should be spread over the interim tests. 
 
-### Pocock
+#### Pocock {-}
 
 The Pocock boundary 
 
@@ -484,7 +486,7 @@ Disadvantage:
 
 * low power and therefore large maximum sample size (when the effect size is small)
 
-### O'Brien-Flemming
+#### O'Brien-Fleming {-}
 
 Advantages:
 
@@ -496,10 +498,22 @@ Disadvantage:
 * less likely to stop early, so larger expected sample size
 
 
-### Some parting thoughts
-* If $H_a$ is true, the effect size is likely overestimated (true in general, not just for interim analyses).
-* Symmetry:  which is more important, harm or good?
-* Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O'Brien-Flemming) to stopping early for negative reasons.
+
+### Simulation
+
+The simulation below is based on a pair of blogs by Ed Berry ([here](https://www.eddjberry.com/post/simulating-a-b-tests-with-data-table/) and [here](https://www.eddjberry.com/post/intro-group-sequential-designs/)).
+
+Every simulation is done under the null hypothesis.  That is, there are no effects to find.  We are worried about the situation when the null hypothesis is rejected (at any of the time points).  
+
+* Each of the following is done 1000 times (there are 1000 lines created, each of the plots only has 100 lines so that we can see the lines more clearly).
+
+* For week 1, generate 500 people (250 in each group) and measure whether or not to reject $H_0$.  Note that we shouldn't be rejecting because there is no treatment effect!
+
+* For week 2, 500 more people are generated.  Also for weeks 3 and 4.
+
+* The line is colored purple if the study is rejected at any point. Note that in actual studies, if the study is rejected it would not (typically) be continued.  I did continue for weeks past where the rejection would have happened (only because of simulation and graphing simplicity).
+
+The simulated type 1 error rate is the number of studies that rejected at any of the weeks (out of 1000).
 
 
 
@@ -611,6 +625,10 @@ df_tests <-
 
 ```
 
+####  Raw p-values {-}
+
+Note that the horizontal black line is at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:
+
 ```{r echo = FALSE}
 # add early stopping to tests
 df_tests_stop <- df_tests %>%
@@ -643,12 +661,13 @@ df_tests_stop %>%
   geom_line(aes(x = week, y = p_value, group = test, color = stop_color), alpha = .7) +
   geom_hline(yintercept = 0.05, color = "black") +
   scale_color_viridis_d(begin = .9, end = .1) +
-  ggtitle("Raw p-value reject: Type 1 ~ 13%")
+  ggtitle("Raw p-value reject: Type 1 ~ 13.1%")
 ```
+
 
 ####  Bonferroni {-}
 
-Type 1 error rate:
+Note that the horizontal black line is at 0.05/4 = 0.0125; there is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:
 
 ```{r echo = FALSE}
 df_tests_stop %>%
@@ -663,13 +682,13 @@ df_tests_stop %>%
   geom_hline(yintercept = 0.05, color = "grey") +
   geom_hline(yintercept = 0.05/4, color = "black") +
   scale_color_viridis_d(begin = .9, end = .1) +
-  ggtitle("Bonferroni p-value reject: Type 1 ~ 3%")
+  ggtitle("Bonferroni p-value reject: Type 1 ~ 2.7%")
 
 ```
 
 ####  Pocock {-}
 
-Type 1 error rate:
+Note that the horizontal black line is at 0.018; there is a gray horizontal line at 0.05.  The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:
 
 ```{r echo = FALSE}
 df_tests_stop %>%
@@ -684,14 +703,14 @@ df_tests_stop %>%
   geom_hline(yintercept = 0.05, color = "grey") +
   geom_hline(yintercept = 0.018, color = "black") +
   scale_color_viridis_d(begin = .9, end = .1) +
-  ggtitle("Pocock p-value reject: Type 1 ~ 5%")
+  ggtitle("Pocock p-value reject: Type 1 ~ 4.8%")
 
 ```
 
 
 ####  Peto {-}
 
-Type 1 error rate:
+Note that the horizontal black line is at 0.001 for the first three weeks and 0.05 for the fourth week.  There is a gray horizontal line at 0.05.  The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is (note that we expect the type 1 error rate to be above 5%):
 
 ```{r echo = FALSE}
 
@@ -716,12 +735,13 @@ df_tests_stop %>%
   geom_segment(aes(y = 0.001, yend =0.001, x = 2.5, xend = 3.5,), color = "black") +
   geom_segment(aes(y = 0.05, yend =0.05, x = 3.5, xend = 4.1,), color = "black") +
   scale_color_viridis_d(begin = .9, end = .1) +
-  ggtitle("Peto p-value reject: Type 1 ~ 5%")
+  ggtitle("Peto p-value reject: Type 1 ~ 5.4%")
 ```
 
 ####  O'Brien-Fleming {-}
 
-Type 1 error rate:
+Note that the horizontal black lines are at 0.0001, 0.004, 0.019, and 0.043.  There is a gray horizontal line at 0.05.  The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:
+
 
 ```{r echo = FALSE}
 df_tests_stop %>%
@@ -745,9 +765,15 @@ df_tests_stop %>%
   geom_segment(aes(y = 0.019, yend =0.019, x = 2.5, xend = 3.5,), color = "black") +
   geom_segment(aes(y = 0.043, yend =0.043, x = 3.5, xend = 4.1,), color = "black") +
   scale_color_viridis_d(begin = .9, end = .1) +
-  ggtitle("O'Brien-Fleming p-value reject: Type 1 ~ 5%")
+  ggtitle("O'Brien-Fleming p-value reject: Type 1 ~ 4.9%")
 
 ```
+
+
+### Some parting thoughts
+* If $H_A$ is true, the effect size is likely overestimated (true in general, not just for interim analyses).
+* Symmetry:  which is more important, harm or good?
+* Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O'Brien-Fleming) to stopping early for negative reasons.
 
 ####  Advice 1
 The following quote is general advice from statistical researchers doing clinical oncology. [@crowley]
