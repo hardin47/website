@@ -1286,7 +1286,7 @@ The idea is for the residual plot of (Schoenfeld residual wrt a paticular covari
 -   **crossing** If the hazard functions (or survivor functions!) cross over time, the PH assumption is violated.\
 -   **help** What should we do?\
 
-1.  Don't do coxph, just fit K-M curves separately and perform a log-rank test.\
+1.  Don't do Cox PH, just fit K-M curves separately and perform a Wilcoxon test (as long as the curves don't cross).\
 2.  Start at $t^*$, the crossing point.\
 3.  Fit different models for before $t^*$ and after $t^*$.\
 4.  Fit a model with a time dependent covariate.\
@@ -1765,7 +1765,7 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 
 <img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" />
 
-### Coxph diagnostics ... look into all the different arguments of the function!
+### Cox PH diagnostics ... look into all the different arguments of the function!
 
 
 ```r
