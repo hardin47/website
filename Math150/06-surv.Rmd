@@ -702,6 +702,7 @@ knitr::include_graphics("figs/table72_CHDHR.png")
     $$
 
     -   The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002. The evidence of interaction is statistically significant.\
+    -   The individual p-values associated with each of the interaction coefficients are all big!  Are the two sets of p-values inconsistent?  No, they test different things!  The likelihood ratio test is assessing whether **all** of the interaction terms can be dropped (answer: no).  The individual coefficient p-values assess whether that single variable can be dropped when everything else is in the model (answer: yes).  One way to figure out which interaction term is driving the model is to look at each level separately.  That is, create a binary variable for only one of the levels and model that variable with interaction.  As such, note that "80-90" is quite significant as a variable interacting with gender (model not shown).
     -   Note the marked differences between the estimates in table 7.2 and 7.3. The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises. Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.
 
 ```{r}
@@ -742,8 +743,17 @@ When should we transform a continuous variable into a factor variable?
 -   **factor** If the relationship is not linear. Although keep in mind that there can be lots of coefficients to estimate when we make factor variables, so we lose df.
 
 ```{r}
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% glance()
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+  tidy() %>% 
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
+        digits = 3) %>%
+  kable_styling()
+
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+  glance() %>% 
+  kable(caption = "glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
+        digits = 3) %>%
+  kable_styling()
 ```
 
 
@@ -859,7 +869,7 @@ The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time
 
 ##### Test 3 for PH {-}
 
-The idea is for the residual plot of (Schoenfeld residual wrt a paticular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < <$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+The idea is for the residual plot of (Schoenfeld residual wrt a particular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < <$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
 
 #### Solutions to violations of PH
 

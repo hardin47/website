@@ -100,6 +100,23 @@ PPV &<& 0.5  \mbox{ more likely false}\\
 \mbox{iff   } (1-\beta) R &<& \alpha \\
 \end{eqnarray*}
 
+#### How do PPV and FDR relate to type 1 and type 2 errors? {-}
+
+First, remember that conditional probabilities cannot be inverted.  Here is an illustrative example:
+
+$$P(\mbox{play in the NBA} \ | \ \mbox{taller than 6'}) \ne P(\mbox{taller than 6'} \ | \ \mbox{play in the NBA})$$
+
+If you are taller than 6', it is still **extremely unlikely** that you play basketball in the NBA.  If you are in the NBA however, is is **extremely likely** that you are taller than 6'.  As mentioned above, conditional probabilities cannot be reversed because they have fundamentally different meanings.
+
+Notice that FDR (defined in more detail below) can be thought of as reaching into the sea of all significant studies and pulling out a null study.  PPV can be though of as reaching into the sea of all significant studies and pulling out a true study.  
+
+$$
+\begin{align*}
+PPV &= P(\mbox{true} \ | \ \mbox{sig}) \ &  \ \mbox{power} &= P(\mbox{sig} \ | \ \mbox{true})\\
+FDR &= P(\mbox{null} \ | \ \mbox{sig}) \ & \ P(\mbox{type 1 error}) &= P(\mbox{sig} \ | \ \mbox{null})
+\end{align*}
+$$
+
 ### Bias
 
 * **bias**
@@ -124,7 +141,6 @@ PPV &=& \frac{[c(1-\beta)R +uc \beta R] / (R+1)}{c[R+\alpha - \beta R + u(1-\alp
 \end{eqnarray*}
 
 Note that $PPV \uparrow$ as $u \uparrow$ as long as $(1-\beta) \leq \alpha$.  Or really, it is probably easier to think about if $(1-\beta) > \alpha$, then $PPV \uparrow$ as $u \downarrow$.  The second sentence is more realistic, e.g., $\beta < .95$ means that we have more true results in our list of significant findings as the bias goes down.  [To understand the direction of the relationships, find $\partial PPV / \partial u < 0$ if $(1-\beta) > \alpha$  (decreasing with u).]
-
 
 
 ### Multiple Studies
@@ -154,8 +170,38 @@ PPV &=& \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
 \end{eqnarray*}
 
 
-$PPV \downarrow$ as $n \uparrow$ unless $(1-\beta) < \alpha$  that is, $\beta > 0.95$ !!
+$PPV \downarrow$ as $n \uparrow$ unless $(1-\beta) < \alpha$  that is, $\beta > 0.95$ !!  Again, the result showing how PPV changes as a function of $n$ is given by $\partial PPV / \partial n < 0$ if $(1-\beta) > \alpha$.  
 
+```{r eval = FALSE, echo = FALSE}
+# the function is the numerator of the derivative of PPV wrt n
+multn <- function(a,b,n){
+(-((1 - a)^n *(-1 + b^n) *log(1 - a)) + (-1 + (1 - a)^n)* b^n  *log(b))
+}
+
+num <- c()
+alpha <- c()
+beta <- c()
+a <- seq(0.01,.2, by = 0.01)
+b <- seq(0.2, 0.99, by = 0.01)
+n <- 200
+
+for(i in 1: length(a)){
+  for(j in 1:length(b)){
+    num <- c(num, multn(a[i], b[j], n))
+    alpha <- c(alpha, a[i])
+    beta <- c(beta, b[j])
+  }
+}
+
+data <- data.frame(num, alpha, beta) %>%
+  mutate(der0 = ifelse(num < 0 , "yes", "no"))
+
+data %>%
+  ggplot(aes(x = alpha, y = beta, fill = der0)) +
+  geom_tile() +
+  scale_fill_viridis_d(direction = -1)
+
+```
 
 ### Corollaries
 
@@ -180,7 +226,7 @@ The Familywise Error Rate (FWER) is the probability of making one or more type I
 
 
 
-#### Bonferroni {-}
+#### Bonferroni {#bonf}
 
 The Bonferroni method of adjusting for multiple comparisons is used to control the FWER.
 
@@ -210,7 +256,7 @@ That is, with $m$ tests, rejecting any test whose p-value is less than or equal 
 Reject any hypothesis such that $\tilde{p}_j \leq \alpha$.
 
 
-#### Holm {-}
+#### Holm {#holm}
 
 Holm is a less conservative (than Bonferroni) method for controlling the FWER.  Because each p-value is considered sequentially, the Holm adjustment is referred to as "step-up".  The intuition is that on the first step, the bound assumes up to $m$ null hypotheses.  But on the second step, there are only $m-1$ null hypotheses (assuming the first p-value is rejected).  
 
@@ -221,12 +267,14 @@ To control the FWER at $\alpha$, first order the p-values as $p_1 \leq p_2 \leq 
 \end{eqnarray*}
 Reject any hypothesis such that $\tilde{p}_j \leq \alpha$.
 
+Why do we need the $\max$ in the p-value adjustment?  Let's say we have 7 p-values and the top 3 are 0.001, 0.0011, and 0.0012 (in order).  To adjust them with only the multiplicative factor, we'd get: 0.007, 0.0066, and 0.006.  The p-values were close enough to each other (to start with) that the descending multiplicative factor **reversed** the order of significance!  And we're trying to control how often we make Type 1 errors in the entire report, we aren't trying to re-consider which test is more or less significant.  The original information (about order of significance) is the order we should stick to.  With the three values above, after applying the $\max$ function, the three adjusted p-values will all be 0.007.
+
 
 * Note that interpretations depend heavily on the number of tests (which is true about most multiple comparison adjustments).  
 * Bonferroni is extremely conservative, and therefore it has very high type II error rates (low power).  
 * We aren't really interested in the situation where "all true null tests don't get rejected."  
 
-## False Discovery Rate
+### False Discovery Rate {#FDR}
 
 * **FDR**  = $E[V/R]$
 
@@ -243,7 +291,7 @@ Consider $m$ hypotheses:
 |  	|  	| $m_0$ 	| $m-m_0$ 	| $m$ 	|
 
 
-#### Benjamini-Hochberg {-}
+#### Benjamini-Hochberg {#BH}
 
 When running experiments that have many many tests of significance, it is often more desirable to worry about the *number* of false discoveries as opposed to the probability of getting *one* false discovery.  That is, we are typically comfortable with a few false positives (i.e., a very HIGH FWER) as long as the rate of false positives is low.
 
@@ -308,17 +356,17 @@ In the null setting, the p-values are uniformly distributed from 0 to 1.  When t
 #### Distribution of p-values under different amounts of divergence from the null hypothesis. {-}
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap = "All simulations come from the same population.  In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true).  In the other three histograms, the null varies (i.e., the null hypothesis is not true).  Each simulation is run with the same true alternative, HA: mu = 47.", fig.show = 'hold', out.width='47%', fig.ncol = 2}
 t0.pvals = replicate(500,t.test(rnorm(20,47,3), mu=47)$p.value)
 t1.pvals = replicate(500,t.test(rnorm(20,47,3), mu=40)$p.value)
 t2.pvals = replicate(500,t.test(rnorm(20,47,3), mu=48)$p.value)
 t3.pvals = replicate(500,t.test(rnorm(20,47,3), mu=50)$p.value)
 
-par(mfrow=c(2,2))
-hist(t0.pvals, main="H0: 47, Ha: 47", xlim=c(0,1))
-hist(t1.pvals, main="H0: 40, Ha: 47", xlim=c(0,1))
-hist(t2.pvals, main="H0: 48, Ha: 47", xlim=c(0,1))
-hist(t3.pvals, main="H0: 50, Ha: 47", xlim=c(0,1))
+#par(mfrow=c(2,2))
+hist(t0.pvals, main="H0: mu = 47, HA: mu = 47", xlim=c(0,1))
+hist(t1.pvals, main="H0: mu = 40, HA: mu = 47", xlim=c(0,1))
+hist(t2.pvals, main="H0: mu = 48, HA: mu = 47", xlim=c(0,1))
+hist(t3.pvals, main="H0: mu = 50, HA: mu = 47", xlim=c(0,1))
 mtext("p-values under H0 and Ha conditions for 500 indep tests", side=3, line=-1, outer=T)
 ```
 
@@ -328,7 +376,7 @@ The previous example considered the situation where all the p-values came from t
 
 #### Distribution of p-values under differing proportions of null versus significant tests. {-}
 
-```{r echo=FALSE, fig.height=10}
+```{r echo=FALSE, fig.cap = "Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47.", fig.show = 'hold', out.width='47%', fig.ncol = 2}
 # let g = proportion of null genes
 
 #par(mfrow=c(6,2))
@@ -378,7 +426,7 @@ hist(c(t0.pvals[sample(1:500,500*g)],
 ```
 
 
-### Storey & q-values {#qvals}
+#### Storey & q-values {#qvals}
 
 The previous methods allowed the larger family of tests to control either the FWER or the FDR (global measures of accuracy).  However, for a given test, there was no measure to quantify FDR for a given test.
 
@@ -443,7 +491,6 @@ FDR &=& E\bigg[\frac{V}{R} | R > 0 \bigg] P(R >0)\\
 
 
 The proof above shows that FWER controls the FDR when not all significant tests are null.  When all significant tests are null, FWER=FDR.
-
 
 
 ## Interim Analyses {#interim}

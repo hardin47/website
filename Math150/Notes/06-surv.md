@@ -943,6 +943,7 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
     $$
 
     -   The change in deviance is 21.23 ($H_0: \delta_j =0$), so with six degrees of freedom, the p-value is 0.002. The evidence of interaction is statistically significant.\
+    -   The individual p-values associated with each of the interaction coefficients are all big!  Are the two sets of p-values inconsistent?  No, they test different things!  The likelihood ratio test is assessing whether **all** of the interaction terms can be dropped (answer: no).  The individual coefficient p-values assess whether that single variable can be dropped when everything else is in the model (answer: yes).  One way to figure out which interaction term is driving the model is to look at each level separately.  That is, create a binary variable for only one of the levels and model that variable with interaction.  As such, note that "80-90" is quite significant as a variable interacting with gender (model not shown).
     -   Note the marked differences between the estimates in table 7.2 and 7.3. The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises. Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.
 
 
@@ -1143,27 +1144,196 @@ When should we transform a continuous variable into a factor variable?
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% tidy()
-#> # A tibble: 16 x 5
-#>   term        estimate std.error statistic   p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 dbpf60-70      0.415     0.352      1.18 0.238    
-#> 2 dbpf70-80      0.503     0.343      1.47 0.142    
-#> 3 dbpf80-90      0.648     0.344      1.89 0.0592   
-#> 4 dbpf90-100     0.661     0.351      1.88 0.0599   
-#> 5 dbpf100-110    1.13      0.363      3.12 0.00183  
-#> 6 dbpfover110    1.66      0.377      4.40 0.0000107
-#> # … with 10 more rows
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1  4658   1465          754.   5.12e-150         774.  2.21e-154           707.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+  tidy() %>% 
+  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
+        digits = 3) %>%
+  kable_styling()
 ```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-12)coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> estimate </th>
+   <th style="text-align:right;"> std.error </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> p.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> dbpf60-70 </td>
+   <td style="text-align:right;"> 0.415 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 1.180 </td>
+   <td style="text-align:right;"> 0.238 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf70-80 </td>
+   <td style="text-align:right;"> 0.503 </td>
+   <td style="text-align:right;"> 0.343 </td>
+   <td style="text-align:right;"> 1.469 </td>
+   <td style="text-align:right;"> 0.142 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf80-90 </td>
+   <td style="text-align:right;"> 0.648 </td>
+   <td style="text-align:right;"> 0.344 </td>
+   <td style="text-align:right;"> 1.887 </td>
+   <td style="text-align:right;"> 0.059 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf90-100 </td>
+   <td style="text-align:right;"> 0.661 </td>
+   <td style="text-align:right;"> 0.351 </td>
+   <td style="text-align:right;"> 1.882 </td>
+   <td style="text-align:right;"> 0.060 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf100-110 </td>
+   <td style="text-align:right;"> 1.131 </td>
+   <td style="text-align:right;"> 0.363 </td>
+   <td style="text-align:right;"> 3.117 </td>
+   <td style="text-align:right;"> 0.002 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpfover110 </td>
+   <td style="text-align:right;"> 1.662 </td>
+   <td style="text-align:right;"> 0.377 </td>
+   <td style="text-align:right;"> 4.403 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sexmale </td>
+   <td style="text-align:right;"> 0.685 </td>
+   <td style="text-align:right;"> 0.472 </td>
+   <td style="text-align:right;"> 1.453 </td>
+   <td style="text-align:right;"> 0.146 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> age </td>
+   <td style="text-align:right;"> 0.047 </td>
+   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:right;"> 13.991 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> bmi </td>
+   <td style="text-align:right;"> 0.038 </td>
+   <td style="text-align:right;"> 0.007 </td>
+   <td style="text-align:right;"> 5.617 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> scl </td>
+   <td style="text-align:right;"> 0.006 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:right;"> 9.867 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf60-70:sexmale </td>
+   <td style="text-align:right;"> 0.160 </td>
+   <td style="text-align:right;"> 0.495 </td>
+   <td style="text-align:right;"> 0.323 </td>
+   <td style="text-align:right;"> 0.747 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf70-80:sexmale </td>
+   <td style="text-align:right;"> 0.167 </td>
+   <td style="text-align:right;"> 0.482 </td>
+   <td style="text-align:right;"> 0.346 </td>
+   <td style="text-align:right;"> 0.729 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf80-90:sexmale </td>
+   <td style="text-align:right;"> -0.131 </td>
+   <td style="text-align:right;"> 0.482 </td>
+   <td style="text-align:right;"> -0.272 </td>
+   <td style="text-align:right;"> 0.785 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf90-100:sexmale </td>
+   <td style="text-align:right;"> 0.236 </td>
+   <td style="text-align:right;"> 0.488 </td>
+   <td style="text-align:right;"> 0.483 </td>
+   <td style="text-align:right;"> 0.629 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpf100-110:sexmale </td>
+   <td style="text-align:right;"> 0.023 </td>
+   <td style="text-align:right;"> 0.510 </td>
+   <td style="text-align:right;"> 0.045 </td>
+   <td style="text-align:right;"> 0.964 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> dbpfover110:sexmale </td>
+   <td style="text-align:right;"> -0.490 </td>
+   <td style="text-align:right;"> 0.550 </td>
+   <td style="text-align:right;"> -0.891 </td>
+   <td style="text-align:right;"> 0.373 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+  glance() %>% 
+  kable(caption = "glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
+        digits = 3) %>%
+  kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-12)glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> n </th>
+   <th style="text-align:right;"> nevent </th>
+   <th style="text-align:right;"> statistic.log </th>
+   <th style="text-align:right;"> p.value.log </th>
+   <th style="text-align:right;"> statistic.sc </th>
+   <th style="text-align:right;"> p.value.sc </th>
+   <th style="text-align:right;"> statistic.wald </th>
+   <th style="text-align:right;"> p.value.wald </th>
+   <th style="text-align:right;"> statistic.robust </th>
+   <th style="text-align:right;"> p.value.robust </th>
+   <th style="text-align:right;"> r.squared </th>
+   <th style="text-align:right;"> r.squared.max </th>
+   <th style="text-align:right;"> concordance </th>
+   <th style="text-align:right;"> std.error.concordance </th>
+   <th style="text-align:right;"> logLik </th>
+   <th style="text-align:right;"> AIC </th>
+   <th style="text-align:right;"> BIC </th>
+   <th style="text-align:right;"> nobs </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 4658 </td>
+   <td style="text-align:right;"> 1465 </td>
+   <td style="text-align:right;"> 754 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 774 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 707 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 0.149 </td>
+   <td style="text-align:right;"> 0.994 </td>
+   <td style="text-align:right;"> 0.712 </td>
+   <td style="text-align:right;"> 0.006 </td>
+   <td style="text-align:right;"> -11382 </td>
+   <td style="text-align:right;"> 22796 </td>
+   <td style="text-align:right;"> 22881 </td>
+   <td style="text-align:right;"> 4658 </td>
+  </tr>
+</tbody>
+</table>
 
 
 <div class="figure" style="text-align: center">
@@ -1279,7 +1449,7 @@ The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time
 
 ##### Test 3 for PH {-}
 
-The idea is for the residual plot of (Schoenfeld residual wrt a paticular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < <$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+The idea is for the residual plot of (Schoenfeld residual wrt a particular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < <$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
 
 #### Solutions to violations of PH
 

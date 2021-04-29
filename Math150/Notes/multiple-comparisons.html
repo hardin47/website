@@ -223,6 +223,20 @@ PPV &amp;&gt;&amp; 0.5 \mbox{ more likely true}\\
 PPV &amp;&lt;&amp; 0.5  \mbox{ more likely false}\\
 \mbox{iff   } (1-\beta) R &amp;&lt;&amp; \alpha \\
 \end{eqnarray*}\]</span></p>
+<div id="how-do-ppv-and-fdr-relate-to-type-1-and-type-2-errors" class="section level4 unnumbered">
+<h4>How do PPV and FDR relate to type 1 and type 2 errors?<a class="anchor" aria-label="anchor" href="#how-do-ppv-and-fdr-relate-to-type-1-and-type-2-errors"><i class="fas fa-link"></i></a>
+</h4>
+<p>First, remember that conditional probabilities cannot be inverted. Here is an illustrative example:</p>
+<p><span class="math display">\[P(\mbox{play in the NBA} \ | \ \mbox{taller than 6'}) \ne P(\mbox{taller than 6'} \ | \ \mbox{play in the NBA})\]</span></p>
+<p>If you are taller than 6’, it is still <strong>extremely unlikely</strong> that you play basketball in the NBA. If you are in the NBA however, is is <strong>extremely likely</strong> that you are taller than 6’. As mentioned above, conditional probabilities cannot be reversed because they have fundamentally different meanings.</p>
+<p>Notice that FDR (defined in more detail below) can be thought of as reaching into the sea of all significant studies and pulling out a null study. PPV can be though of as reaching into the sea of all significant studies and pulling out a true study.</p>
+<p><span class="math display">\[
+\begin{align*}
+PPV &amp;= P(\mbox{true} \ | \ \mbox{sig}) \ &amp;  \ \mbox{power} &amp;= P(\mbox{sig} \ | \ \mbox{true})\\
+FDR &amp;= P(\mbox{null} \ | \ \mbox{sig}) \ &amp; \ P(\mbox{type 1 error}) &amp;= P(\mbox{sig} \ | \ \mbox{null})
+\end{align*}
+\]</span></p>
+</div>
 </div>
 <div id="bias" class="section level3" number="7.1.2">
 <h3>
@@ -348,7 +362,7 @@ PPV &amp;=&amp; \frac{[c(1-\beta)R +uc \beta R] / (R+1)}{c[R+\alpha - \beta R + 
 <p><span class="math display">\[\begin{eqnarray*}
 PPV &amp;=&amp; \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
 \end{eqnarray*}\]</span></p>
-<p><span class="math inline">\(PPV \downarrow\)</span> as <span class="math inline">\(n \uparrow\)</span> unless <span class="math inline">\((1-\beta) &lt; \alpha\)</span> that is, <span class="math inline">\(\beta &gt; 0.95\)</span> !!</p>
+<p><span class="math inline">\(PPV \downarrow\)</span> as <span class="math inline">\(n \uparrow\)</span> unless <span class="math inline">\((1-\beta) &lt; \alpha\)</span> that is, <span class="math inline">\(\beta &gt; 0.95\)</span> !! Again, the result showing how PPV changes as a function of <span class="math inline">\(n\)</span> is given by <span class="math inline">\(\partial PPV / \partial n &lt; 0\)</span> if <span class="math inline">\((1-\beta) &gt; \alpha\)</span>.</p>
 </div>
 <div id="corollaries" class="section level3" number="7.1.4">
 <h3>
@@ -389,8 +403,9 @@ PPV &amp;=&amp; \frac{(1-\beta^n)R}{(R+1-[1-\alpha]^n - \beta^n R)}
 </li>
 </ul>
 <p>The Familywise Error Rate (FWER) is the probability of making one or more type I errors in a series of multiple tests. In the example above (with 10 comparisons), you would almost always make at least one type I error if you used a size of <span class="math inline">\(\alpha = 0.05\)</span>. So, your FWER would be close to 1. Methods exist for controlling the FWER instead of the size (<span class="math inline">\(\alpha\)</span>).</p>
-<div id="bonferroni" class="section level4 unnumbered">
-<h4>Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni"><i class="fas fa-link"></i></a>
+<div id="bonf" class="section level4" number="7.2.1.1">
+<h4>
+<span class="header-section-number">7.2.1.1</span> Bonferroni<a class="anchor" aria-label="anchor" href="#bonf"><i class="fas fa-link"></i></a>
 </h4>
 <p>The Bonferroni method of adjusting for multiple comparisons is used to control the FWER.</p>
 <p>Assume all our tests are null
@@ -415,8 +430,9 @@ FWER &amp;\leq&amp; \alpha
 \end{eqnarray*}\]</span>
 Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
 </div>
-<div id="holm" class="section level4 unnumbered">
-<h4>Holm<a class="anchor" aria-label="anchor" href="#holm"><i class="fas fa-link"></i></a>
+<div id="holm" class="section level4" number="7.2.1.2">
+<h4>
+<span class="header-section-number">7.2.1.2</span> Holm<a class="anchor" aria-label="anchor" href="#holm"><i class="fas fa-link"></i></a>
 </h4>
 <p>Holm is a less conservative (than Bonferroni) method for controlling the FWER. Because each p-value is considered sequentially, the Holm adjustment is referred to as “step-up.” The intuition is that on the first step, the bound assumes up to <span class="math inline">\(m\)</span> null hypotheses. But on the second step, there are only <span class="math inline">\(m-1\)</span> null hypotheses (assuming the first p-value is rejected).</p>
 <p>To control the FWER at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span> and define the adjusted p-values to be:</p>
@@ -424,6 +440,7 @@ Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \al
 \tilde{p}_j = \max_{i \leq j} [ \min((m-i+1) p_i, 1) ]
 \end{eqnarray*}\]</span>
 Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \alpha\)</span>.</p>
+<p>Why do we need the <span class="math inline">\(\max\)</span> in the p-value adjustment? Let’s say we have 7 p-values and the top 3 are 0.001, 0.0011, and 0.0012 (in order). To adjust them with only the multiplicative factor, we’d get: 0.007, 0.0066, and 0.006. The p-values were close enough to each other (to start with) that the descending multiplicative factor <strong>reversed</strong> the order of significance! And we’re trying to control how often we make Type 1 errors in the entire report, we aren’t trying to re-consider which test is more or less significant. The original information (about order of significance) is the order we should stick to. With the three values above, after applying the <span class="math inline">\(\max\)</span> function, the three adjusted p-values will all be 0.007.</p>
 <ul>
 <li>Note that interpretations depend heavily on the number of tests (which is true about most multiple comparison adjustments).<br>
 </li>
@@ -433,11 +450,10 @@ Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \al
 </ul>
 </div>
 </div>
-</div>
-<div id="false-discovery-rate" class="section level2" number="7.3">
-<h2>
-<span class="header-section-number">7.3</span> False Discovery Rate<a class="anchor" aria-label="anchor" href="#false-discovery-rate"><i class="fas fa-link"></i></a>
-</h2>
+<div id="FDR" class="section level3" number="7.2.2">
+<h3>
+<span class="header-section-number">7.2.2</span> False Discovery Rate<a class="anchor" aria-label="anchor" href="#FDR"><i class="fas fa-link"></i></a>
+</h3>
 <ul>
 <li>
 <strong>FDR</strong> = <span class="math inline">\(E[V/R]\)</span>
@@ -482,8 +498,9 @@ Reject any hypothesis such that <span class="math inline">\(\tilde{p}_j \leq \al
 </tr>
 </tbody>
 </table></div>
-<div id="benjamini-hochberg" class="section level4 unnumbered">
-<h4>Benjamini-Hochberg<a class="anchor" aria-label="anchor" href="#benjamini-hochberg"><i class="fas fa-link"></i></a>
+<div id="BH" class="section level4" number="7.2.2.1">
+<h4>
+<span class="header-section-number">7.2.2.1</span> Benjamini-Hochberg<a class="anchor" aria-label="anchor" href="#BH"><i class="fas fa-link"></i></a>
 </h4>
 <p>When running experiments that have many many tests of significance, it is often more desirable to worry about the <em>number</em> of false discoveries as opposed to the probability of getting <em>one</em> false discovery. That is, we are typically comfortable with a few false positives (i.e., a very HIGH FWER) as long as the rate of false positives is low.</p>
 <p>Define the estimated false discovery proportion at a cutoff t (<span class="math inline">\(\hat{FDR}(t)\)</span>) to be the number of false discoveries at a given cutoff. Again, to control the FDR at <span class="math inline">\(\alpha\)</span>, first order the p-values as <span class="math inline">\(p_1 \leq p_2 \leq \cdots \leq p_m\)</span>.</p>
@@ -535,18 +552,28 @@ In the null setting, the p-values are uniformly distributed from 0 to 1. When th
 <div id="distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis." class="section level4 unnumbered">
 <h4>Distribution of p-values under different amounts of divergence from the null hypothesis.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-different-amounts-of-divergence-from-the-null-hypothesis."><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-1-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="figure" style="text-align: center">
+<span id="fig:unnamed-chunk-2"></span>
+<img src="07-MC_files/figure-html/unnamed-chunk-2-1.png" alt="All simulations come from the same population.  In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true).  In the other three histograms, the null varies (i.e., the null hypothesis is not true).  Each simulation is run with the same true alternative, HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-2-2.png" alt="All simulations come from the same population.  In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true).  In the other three histograms, the null varies (i.e., the null hypothesis is not true).  Each simulation is run with the same true alternative, HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-2-3.png" alt="All simulations come from the same population.  In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true).  In the other three histograms, the null varies (i.e., the null hypothesis is not true).  Each simulation is run with the same true alternative, HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-2-4.png" alt="All simulations come from the same population.  In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true).  In the other three histograms, the null varies (i.e., the null hypothesis is not true).  Each simulation is run with the same true alternative, HA: mu = 47." width="47%"><p class="caption">
+Figure 1.2: All simulations come from the same population. In the first histogram, the null and alternative hypotheses are the same (i.e., the null hypothesis is true). In the other three histograms, the null varies (i.e., the null hypothesis is not true). Each simulation is run with the same true alternative, HA: mu = 47.
+</p>
+</div>
 <p>The previous example considered the situation where all the p-values came from the distribution. In reality, p-values will come from many different distributions. For simplification, consider the situation where g100% of the tests come from the null distribution, and (1-g)100% of the tests come from a distribution where the p-values are much closer to one and skewed right.</p>
 </div>
 <div id="distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests." class="section level4 unnumbered">
 <h4>Distribution of p-values under differing proportions of null versus significant tests.<a class="anchor" aria-label="anchor" href="#distribution-of-p-values-under-differing-proportions-of-null-versus-significant-tests."><i class="fas fa-link"></i></a>
 </h4>
-<p><img src="07-MC_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-2.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-3.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-4.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-5.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-6.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-7.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-8.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-9.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-10.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-11.png" width="80%" style="display: block; margin: auto;"><img src="07-MC_files/figure-html/unnamed-chunk-2-12.png" width="80%" style="display: block; margin: auto;"></p>
+<div class="figure" style="text-align: center">
+<span id="fig:unnamed-chunk-3"></span>
+<img src="07-MC_files/figure-html/unnamed-chunk-3-1.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-2.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-3.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-4.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-5.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-6.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-7.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-8.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-9.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-10.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-11.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><img src="07-MC_files/figure-html/unnamed-chunk-3-12.png" alt="Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47." width="47%"><p class="caption">
+Figure 1.3: Varying the proportion of null genes and the value of the parameter being tested in the null hypothesis. The null hypothesis varies, with the alternative set at HA: mu = 47.
+</p>
 </div>
-<div id="qvals" class="section level3" number="7.3.1">
-<h3>
-<span class="header-section-number">7.3.1</span> Storey &amp; q-values<a class="anchor" aria-label="anchor" href="#qvals"><i class="fas fa-link"></i></a>
-</h3>
+</div>
+<div id="qvals" class="section level4" number="7.2.2.2">
+<h4>
+<span class="header-section-number">7.2.2.2</span> Storey &amp; q-values<a class="anchor" aria-label="anchor" href="#qvals"><i class="fas fa-link"></i></a>
+</h4>
 <p>The previous methods allowed the larger family of tests to control either the FWER or the FDR (global measures of accuracy). However, for a given test, there was no measure to quantify FDR for a given test.</p>
 <ul>
 <li>
@@ -581,6 +608,7 @@ If <span class="math inline">\(\hat{q}(p_{m}) = 0.7\)</span> and <span class="ma
 </li>
 </ul>
 <p>Can a q-value be less than a p-value? Sure! If the number of null hypotheses is small and the test is powerful. For example, consider testing 1000 hypotheses with 20% null tests (<span class="math inline">\(\pi_0=0.2\)</span>). Assume 500 of the p-values are less than 0.05 (very powerful!). With 200 null we would expect 10 to be less than 0.05. So, the FDR is 10/500 = 0.02 (which is smaller than the p-value of 0.05 at the cutoff for the <span class="math inline">\(500^{th}\)</span> test).</p>
+</div>
 <div id="how-are-fwer-and-fdr-related" class="section level4 unnumbered">
 <h4>How are FWER and FDR related?<a class="anchor" aria-label="anchor" href="#how-are-fwer-and-fdr-related"><i class="fas fa-link"></i></a>
 </h4>
@@ -615,9 +643,9 @@ FDR &amp;=&amp; E\bigg[\frac{V}{R} | R &gt; 0 \bigg] P(R &gt;0)\\
 </div>
 </div>
 </div>
-<div id="interim" class="section level2" number="7.4">
+<div id="interim" class="section level2" number="7.3">
 <h2>
-<span class="header-section-number">7.4</span> Interim Analyses<a class="anchor" aria-label="anchor" href="#interim"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3</span> Interim Analyses<a class="anchor" aria-label="anchor" href="#interim"><i class="fas fa-link"></i></a>
 </h2>
 <p>An important application of multiple comparisons issues comes when deciding whether or not to stop a clinical trial early due to either positive or negative results. Looking at the data too often will create false positives which can be quite problematic. <span class="citation">(<a href="references.html#ref-subgroup" role="doc-biblioref">Schulz and Grimes 2005</a>)</span></p>
 <p>Consider the following case studies:</p>
@@ -640,9 +668,9 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <li>Change <span class="math inline">\(\alpha\)</span> at each step along the way so that the total probability of a type I error is <span class="math inline">\(\alpha\)</span>
 </li>
 </ol>
-<div id="different-p-value-cutoff-choices" class="section level3" number="7.4.1">
+<div id="different-p-value-cutoff-choices" class="section level3" number="7.3.1">
 <h3>
-<span class="header-section-number">7.4.1</span> Different p-value cutoff choices<a class="anchor" aria-label="anchor" href="#different-p-value-cutoff-choices"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.1</span> Different p-value cutoff choices<a class="anchor" aria-label="anchor" href="#different-p-value-cutoff-choices"><i class="fas fa-link"></i></a>
 </h3>
 <div class="figure">
 <img src="alphaInterim.png" alt=""><p class="caption">Different <span class="math inline">\(\alpha^*\)</span> values for three different stopping criteria. Note that Peto does not control the test at an overall <span class="math inline">\(\alpha=0.05\)</span>, although it is close.</p>
@@ -677,9 +705,9 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 </ul>
 </div>
 </div>
-<div id="simulation-1" class="section level3" number="7.4.2">
+<div id="simulation-1" class="section level3" number="7.3.2">
 <h3>
-<span class="header-section-number">7.4.2</span> Simulation<a class="anchor" aria-label="anchor" href="#simulation-1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.2</span> Simulation<a class="anchor" aria-label="anchor" href="#simulation-1"><i class="fas fa-link"></i></a>
 </h3>
 <p>The simulation below is based on a pair of blogs by Ed Berry (<a href="https://www.eddjberry.com/post/simulating-a-b-tests-with-data-table/">here</a> and <a href="https://www.eddjberry.com/post/intro-group-sequential-designs/">here</a>).</p>
 <p>Every simulation is done under the null hypothesis. That is, there are no effects to find. We are worried about the situation when the null hypothesis is rejected (at any of the time points).</p>
@@ -698,17 +726,17 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.131</code></pre>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
-<div id="bonferroni-1" class="section level4 unnumbered">
-<h4>Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni-1"><i class="fas fa-link"></i></a>
+<div id="bonferroni" class="section level4 unnumbered">
+<h4>Bonferroni<a class="anchor" aria-label="anchor" href="#bonferroni"><i class="fas fa-link"></i></a>
 </h4>
 <p>Note that the horizontal black line is at 0.05/4 = 0.0125; there is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is:</p>
 <pre><code>#&gt; # A tibble: 1 x 1
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.027</code></pre>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 <div id="pocock-1" class="section level4 unnumbered">
 <h4>Pocock<a class="anchor" aria-label="anchor" href="#pocock-1"><i class="fas fa-link"></i></a>
@@ -718,7 +746,7 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.048</code></pre>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 <div id="peto" class="section level4 unnumbered">
 <h4>Peto<a class="anchor" aria-label="anchor" href="#peto"><i class="fas fa-link"></i></a>
@@ -728,7 +756,7 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.054</code></pre>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 <div id="obrien-fleming-1" class="section level4 unnumbered">
 <h4>O’Brien-Fleming<a class="anchor" aria-label="anchor" href="#obrien-fleming-1"><i class="fas fa-link"></i></a>
@@ -738,21 +766,21 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 #&gt;   type1
 #&gt;   &lt;dbl&gt;
 #&gt; 1 0.049</code></pre>
-<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 </div>
-<div id="some-parting-thoughts" class="section level3" number="7.4.3">
+<div id="some-parting-thoughts" class="section level3" number="7.3.3">
 <h3>
-<span class="header-section-number">7.4.3</span> Some parting thoughts<a class="anchor" aria-label="anchor" href="#some-parting-thoughts"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3</span> Some parting thoughts<a class="anchor" aria-label="anchor" href="#some-parting-thoughts"><i class="fas fa-link"></i></a>
 </h3>
 <ul>
 <li>If <span class="math inline">\(H_A\)</span> is true, the effect size is likely overestimated (true in general, not just for interim analyses).</li>
 <li>Symmetry: which is more important, harm or good?</li>
 <li>Can split alpha into two halves and apply one method (e.g., Pocock) to stopping early for positive reasons and apply another method (e.g., O’Brien-Fleming) to stopping early for negative reasons.</li>
 </ul>
-<div id="advice-1" class="section level4" number="7.4.3.1">
+<div id="advice-1" class="section level4" number="7.3.3.1">
 <h4>
-<span class="header-section-number">7.4.3.1</span> Advice 1<a class="anchor" aria-label="anchor" href="#advice-1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.1</span> Advice 1<a class="anchor" aria-label="anchor" href="#advice-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>The following quote is general advice from statistical researchers doing clinical oncology. <span class="citation">(<a href="references.html#ref-crowley" role="doc-biblioref">Green, Benedetti, and Crowley 1997</a>)</span></p>
 <blockquote>
@@ -822,9 +850,9 @@ P( test1 &lt; \alpha \mbox{ or } test2 &lt; \alpha \mbox{ or } \ldots \mbox{ or 
 <p>Every monitoring committee functions differently because no two people have the same ethical, scientific, or practical perspectives. This means different committees might well come up with different answers to the same monitoring issues. To ensure some balance of opinions, it is best to have a variety of knowledgeable people as members of the committee.</p>
 </blockquote>
 </div>
-<div id="advice-2" class="section level4" number="7.4.3.2">
+<div id="advice-2" class="section level4" number="7.3.3.2">
 <h4>
-<span class="header-section-number">7.4.3.2</span> Advice 2<a class="anchor" aria-label="anchor" href="#advice-2"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3.3.2</span> Advice 2<a class="anchor" aria-label="anchor" href="#advice-2"><i class="fas fa-link"></i></a>
 </h4>
 <p>Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally. Recently, he was invited to participate in a workshop, <em>Training Students to Extract Value from Big Data</em>. The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge. <a href="http://www.nap.edu/catalog.php?record_id=18981" class="uri">http://www.nap.edu/catalog.php?record_id=18981</a></p>
 <p><strong>Principles for the Data Science Process</strong>, Duncan Temple Lang, University of California, Davis <span class="citation">(<a href="references.html#ref-duncanTL" role="doc-biblioref"><em>National Research Council: Training Students to Extract Value from Big Data</em> 2014</a>)</span></p>
@@ -903,16 +931,16 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#multcomp"><span class="header-section-number">7.2</span> Multiple Comparisons</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#familywise-error-rate"><span class="header-section-number">7.2.1</span> Familywise Error Rate</a></li></ul>
+<a class="nav-link" href="#multcomp"><span class="header-section-number">7.2</span> Multiple Comparisons</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#familywise-error-rate"><span class="header-section-number">7.2.1</span> Familywise Error Rate</a></li>
+<li><a class="nav-link" href="#FDR"><span class="header-section-number">7.2.2</span> False Discovery Rate</a></li>
+</ul>
 </li>
 <li>
-<a class="nav-link" href="#false-discovery-rate"><span class="header-section-number">7.3</span> False Discovery Rate</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#qvals"><span class="header-section-number">7.3.1</span> Storey &amp; q-values</a></li></ul>
-</li>
-<li>
-<a class="nav-link" href="#interim"><span class="header-section-number">7.4</span> Interim Analyses</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#different-p-value-cutoff-choices"><span class="header-section-number">7.4.1</span> Different p-value cutoff choices</a></li>
-<li><a class="nav-link" href="#simulation-1"><span class="header-section-number">7.4.2</span> Simulation</a></li>
-<li><a class="nav-link" href="#some-parting-thoughts"><span class="header-section-number">7.4.3</span> Some parting thoughts</a></li>
+<a class="nav-link" href="#interim"><span class="header-section-number">7.3</span> Interim Analyses</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#different-p-value-cutoff-choices"><span class="header-section-number">7.3.1</span> Different p-value cutoff choices</a></li>
+<li><a class="nav-link" href="#simulation-1"><span class="header-section-number">7.3.2</span> Simulation</a></li>
+<li><a class="nav-link" href="#some-parting-thoughts"><span class="header-section-number">7.3.3</span> Some parting thoughts</a></li>
 </ul>
 </li>
 </ul>
@@ -932,7 +960,7 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-04-28.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-04-29.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
