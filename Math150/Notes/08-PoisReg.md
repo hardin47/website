@@ -56,11 +56,6 @@ Like every model, there are technical conditions associated with Poisson Regress
 4. Error: The mean of the response variables is equal to the variance of the response variable for each combination of explanatory variables in the model.
 
 
-
-```r
-include_graphics("NormPoisReg1.jpg")
-```
-
 <div class="figure" style="text-align: center">
 <img src="NormPoisReg1.jpg" alt="Visualizing Normal vs Poisson Error Regression from @bysh." width="90%" />
 <p class="caption">(\#fig:unnamed-chunk-3)Visualizing Normal vs Poisson Error Regression from @bysh.</p>
@@ -94,11 +89,6 @@ mean(log(example))
 ```
 
 2.  The second difference to note across the two regression set-ups is that the variability is modeled differently.  Indeed, the likelihood functions are quite different and will produce different maximum likelihood estimates of the parameter values.
-
-
-```r
-include_graphics("NormPoisReg2.jpg")
-```
 
 <div class="figure" style="text-align: center">
 <img src="NormPoisReg2.jpg" alt="Differences in Normal vs Poisson Error Regression from @bysh." width="90%" />
