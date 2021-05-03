@@ -56,7 +56,15 @@ Like every model, there are technical conditions associated with Poisson Regress
 4. Error: The mean of the response variables is equal to the variance of the response variable for each combination of explanatory variables in the model.
 
 
-![Visualizing Normal vs Poisson Error Regression from @bysh](NormPoisReg1.jpg)
+
+```r
+include_graphics("NormPoisReg1.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="NormPoisReg1.jpg" alt="Visualizing Normal vs Poisson Error Regression from @bysh." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-3)Visualizing Normal vs Poisson Error Regression from @bysh.</p>
+</div>
 
 
 ### Comparison to Linear Regression
@@ -87,7 +95,16 @@ mean(log(example))
 
 2.  The second difference to note across the two regression set-ups is that the variability is modeled differently.  Indeed, the likelihood functions are quite different and will produce different maximum likelihood estimates of the parameter values.
 
-![Differences in Normal vs Poisson Error Regression from @bysh](NormPoisReg2.jpg)
+
+```r
+include_graphics("NormPoisReg2.jpg")
+```
+
+<div class="figure" style="text-align: center">
+<img src="NormPoisReg2.jpg" alt="Differences in Normal vs Poisson Error Regression from @bysh." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-5)Differences in Normal vs Poisson Error Regression from @bysh.</p>
+</div>
+
 
 ###  Interpreting Poisson Regression Coefficients
 
@@ -105,11 +122,11 @@ Just as with linear regression we used scatterplots to give a sense of whether o
 
 
 **Technical Condition 3, Poisson:** Let's first look at the response variable.  A histogram of the number of successful matings shows a right skew which is typically not acceptable for normal errors regression (although, remember, the value of the response variable is dependent on the value of the explanatory variable!)
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" />
 
 Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables.  Because the sample size is limited, we group the age variable into 5 year increments.  Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean.  It might also be good to find the sample mean per group and plot the Poisson probabilities onto each bar.
 
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" />
 
 **Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in the following section \@ref(overdis).
 
@@ -152,7 +169,7 @@ elephantsGRP
 elephantsGRP %>% ggplot(aes(x=age, y=logmate)) + geom_point()
 ```
 
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 
@@ -278,7 +295,7 @@ head(galap)
 ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
 ```
 
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;" />
 
 ###  glm
 
@@ -353,7 +370,7 @@ glm(species ~ log(area) + scruz + adjacent,
   ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
 ```
 
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /><img src="08-PoisReg_files/figure-html/unnamed-chunk-12-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /><img src="08-PoisReg_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;" />
 
 
 ###  quasiPoisson
@@ -410,5 +427,5 @@ glm(species ~ log(area) + scruz + adjacent,
   ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
 ```
 
-<img src="08-PoisReg_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /><img src="08-PoisReg_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="08-PoisReg_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="08-PoisReg_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" />
 
