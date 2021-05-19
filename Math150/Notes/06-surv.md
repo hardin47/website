@@ -1824,13 +1824,15 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
 
 ```r
 # Just score_factor
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+  tidy()
 #> # A tibble: 2 x 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 score_factorHigh      1.08     0.0446      24.1 7.67e-129
 #> 2 score_factorMedium    0.704    0.0439      16.0 9.78e- 58
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+  glance()
 #> # A tibble: 1 x 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
 #>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
@@ -1841,14 +1843,16 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
 #> #   BIC <dbl>, nobs <int>
 
 # score_factor and race
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+  tidy()
 #> # A tibble: 3 x 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 score_factorHigh      1.03     0.0460     22.3  3.96e-110
 #> 2 score_factorMedium    0.674    0.0445     15.2  7.45e- 52
 #> 3 raceCaucasian        -0.170    0.0396     -4.29 1.78e-  5
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+  glance()
 #> # A tibble: 1 x 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
 #>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
@@ -1859,7 +1863,8 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
 #> #   BIC <dbl>, nobs <int>
 
 # score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+  tidy()
 #> # A tibble: 5 x 5
 #>   term               estimate std.error statistic  p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>    <dbl>
@@ -1868,7 +1873,8 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> 3 raceCaucasian       -0.120    0.0398      -3.01 2.63e- 3
 #> 4 age                 -0.0137   0.00175     -7.82 5.38e-15
 #> 5 sexMale              0.411    0.0502       8.19 2.53e-16
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+  glance()
 #> # A tibble: 1 x 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
 #>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
@@ -1879,7 +1885,7 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> #   BIC <dbl>, nobs <int>
 ```
 
-Using the `rms` package, we can plot CIs for each of the relevant HRs for the model at hand:
+Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:
 
 
 ```r
@@ -1893,6 +1899,15 @@ plot(summary(recid.final), log = TRUE)
 
 <img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
 
+The survminer packages also has the `ggforest()` function which makes a fantastic data viz.
+
+
+```r
+ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
+```
+
+<img src="06-surv_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;" />
+
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
 
@@ -1901,7 +1916,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1935,7 +1950,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Cox PH diagnostics ... look into all the different arguments of the function!
 
@@ -1944,4 +1959,4 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="80%" style="display: block; margin: auto;" />

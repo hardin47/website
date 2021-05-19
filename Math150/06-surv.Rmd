@@ -1178,19 +1178,25 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
 
 ```{r}
 # Just score_factor
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% tidy()
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+  tidy()
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+  glance()
 
 # score_factor and race
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% tidy()
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+  tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+  glance()
 
 # score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% tidy()
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% glance()
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+  tidy()
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+  glance()
 ```
 
-Using the `rms` package, we can plot CIs for each of the relevant HRs for the model at hand:
+Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:
 
 ```{r}
 recid.data <- recidKM %>%
@@ -1199,6 +1205,12 @@ recid.final <- rms::cph(Surv(timefollow,event) ~ score_factor + race + age + sex
 ddist <- rms::datadist(recid.data)
 options(datadist = 'ddist')
 plot(summary(recid.final), log = TRUE)
+```
+
+The survminer packages also has the `ggforest()` function which makes a fantastic data viz.
+
+```{r}
+ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
 ```
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
