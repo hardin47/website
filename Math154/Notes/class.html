@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Classification | Computational Statistics</title>
   <meta name="description" content="Class notes for Math 154 at Pomona College: Computational Statistics. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Modern Data Science with R by Baumer, Kaplan, and Horton." />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Classification | Computational Statistics" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Jo Hardin" />
 
 
-<meta name="date" content="2021-01-04" />
+<meta name="date" content="2021-08-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="ethics.html"/>
 <link rel="next" href="unsup.html"/>
-<script src="libs/header-attrs-2.6/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10.3/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -51,12 +51,15 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -115,6 +118,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -421,16 +447,16 @@ One of the most satisfying aspects of this unit is that you can now turn student
 </ol>
 <p><strong>Important Note</strong>: For the majority of the classification and clustering methods, we will use the <code>caret</code> package in R. For more information see: <a href="http://topepo.github.io/caret/index.html" class="uri">http://topepo.github.io/caret/index.html</a></p>
 <p>Also, check out the <code>caret</code> cheat sheet: <a href="https://github.com/rstudio/cheatsheets/raw/master/caret.pdf" class="uri">https://github.com/rstudio/cheatsheets/raw/master/caret.pdf</a></p>
-<p><span class="citation"><a href="references.html#ref-Baumer15" role="doc-biblioref">B. Baumer</a> (<a href="references.html#ref-Baumer15" role="doc-biblioref">2015</a>)</span> provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:</p>
+<p><span class="citation"><a href="#ref-Baumer15" role="doc-biblioref">B. Baumer</a> (<a href="#ref-Baumer15" role="doc-biblioref">2015</a>)</span> provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:</p>
 <blockquote>
-<p>In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by <span class="citation"><a href="references.html#ref-brei01" role="doc-biblioref">Breiman</a> (<a href="references.html#ref-brei01" role="doc-biblioref">2001</a>)</span>, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a <em>data model</em> f such that y <span class="math inline">\(\sim\)</span> f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is</p>
+<p>In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by <span class="citation"><a href="#ref-brei01" role="doc-biblioref">Breiman</a> (<a href="#ref-brei01" role="doc-biblioref">2001</a>)</span>, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a <em>data model</em> f such that y <span class="math inline">\(\sim\)</span> f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is</p>
 </blockquote>
 <blockquote>
 <p>Alternatively, one might construct an <em>algorithmic model</em> f, such that <span class="math inline">\(y \sim f(x)\)</span>, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).</p>
 </blockquote>
 <p>Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set. That is, the model should <em>classify</em> new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value. For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.</p>
 <p>Some examples of classification techniques include: linear regression, logistic regression, neural networks, <strong>classification trees</strong>, <strong>Random Forests</strong>, <strong>k-nearest neighbors</strong>, <strong>support vector machines</strong>, näive Bayes, and linear discriminant analysis. We will cover the methods in <strong>bold</strong>.</p>
-<p><strong>Simple is Better</strong> (From <span class="citation"><a href="references.html#ref-field07" role="doc-biblioref">Fielding</a> (<a href="references.html#ref-field07" role="doc-biblioref">2007</a>)</span>, p. 87)</p>
+<p><strong>Simple is Better</strong> (From <span class="citation"><a href="#ref-field07" role="doc-biblioref">Fielding</a> (<a href="#ref-field07" role="doc-biblioref">2007</a>)</span>, p. 87)</p>
 <ol style="list-style-type: decimal">
 <li>We want to avoid over-fitting the model (certainly, it is a bad idea to model the noise!)</li>
 <li>Future prediction performance goes down with too many predictors.</li>
@@ -460,10 +486,10 @@ One of the most satisfying aspects of this unit is that you can now turn student
 <li><strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
 </ul>
 <p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-2"></span>
 <img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
 <p class="caption">
-Figure 1.2: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(<a href="references.html#ref-ESL" role="doc-biblioref">Hastie, Tibshirani, and Friedman 2001</a>)</span>
+Figure 1.2: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(<a href="#ref-ESL" role="doc-biblioref">Hastie, Tibshirani, and Friedman 2001</a>)</span>
 </p>
 </div>
 <p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
@@ -471,10 +497,10 @@ Figure 1.2: Test and training error as a function of model complexity. Note that
 </div>
 <div id="implementing-cross-validation" class="section level3" number="8.2.2">
 <h3><span class="header-section-number">8.2.2</span> Implementing Cross Validation</h3>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-3"></span>
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
 <p class="caption">
-Figure 1.3: <span class="citation">(<a href="references.html#ref-flach12" role="doc-biblioref">Flach 2012</a>)</span>
+Figure 1.3: <span class="citation">(<a href="#ref-flach12" role="doc-biblioref">Flach 2012</a>)</span>
 </p>
 </div>
 <p>Cross validation is typically used in two ways.</p>
@@ -549,10 +575,10 @@ Figure 1.3: <span class="citation">(<a href="references.html#ref-flach12" role="
 <li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
 <li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
 </ol>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-4"></span>
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
 <p class="caption">
-Figure 1.4: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(<a href="references.html#ref-CVpaper" role="doc-biblioref">Varoquaux et al. 2017</a>)</span>
+Figure 1.4: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(<a href="#ref-CVpaper" role="doc-biblioref">Varoquaux et al. 2017</a>)</span>
 </p>
 </div>
 </div>
@@ -782,14 +808,14 @@ Figure 1.4: Nested cross-validation: two cross-validation loops are run one insi
 <div id="cart" class="section level2" number="8.5">
 <h2><span class="header-section-number">8.5</span> CART</h2>
 <p>Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition. Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-12"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-12"></span>
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
 <p class="caption">
 Figure 1.8: <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-1/</a> A visual introduction to machine learning.
 </p>
 </div>
 <p>Decision trees are used for all sorts of predictive and descriptive models. The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-13"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-13"></span>
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
 <p class="caption">
 Figure 1.9: <a href="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html" class="uri">https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html</a> Quiz: Let Us Predict Whether You’re a Democrat or a Republican NYT, Aug 8, 2019. Note that race is the first and dominant node, followed by religion.
@@ -860,7 +886,7 @@ and we seek the value of <span class="math inline">\(j\)</span> and <span class=
 <p>The goal of the algorithm in a <em>regression tree</em> is to split the set of possible value for the data into <span class="math inline">\(|T|\)</span> distinct and non-overlapping regions, <span class="math inline">\(R_1, R_2, \ldots, R_{|T|}\)</span>. For every observation that falls into the region <span class="math inline">\(R_m\)</span>, we make the same prediction - the mean of the response values for the training observations in <span class="math inline">\(R_m\)</span>. So how do we find the regions <span class="math inline">\(R_1, \ldots, R_{|T|}\)</span>?</p>
 <p><span class="math inline">\(\Rightarrow\)</span> Minimize RSS, <span class="math display">\[RSS = \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\]</span>
 where <span class="math inline">\(\overline{y}_{R_m}\)</span> is the mean response for the training observations within the <span class="math inline">\(m\)</span>th region.</p>
-<p>(Note: in the chapter <span class="citation">(<a href="references.html#ref-ISL" role="doc-biblioref">James et al. 2013</a>)</span> they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)</p>
+<p>(Note: in the chapter <span class="citation">(<a href="#ref-ISL" role="doc-biblioref">James et al. 2013</a>)</span> they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)</p>
 <!--
 $$ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}$$
 -->
@@ -1413,7 +1439,7 @@ Typically <span class="math inline">\(m = \sqrt{p}\)</span> or <span class="math
 <li>All trees together represent the <em>model</em> that is used for new predictions (either majority vote or average).</li>
 </ol>
 <hr />
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-23"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-23"></span>
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
 <p class="caption">
 Figure 8.1: Building multiple trees and then combining the outputs (predictions). Note that this image makes the choice to average the tree probabilities instead of using majority vote. Both are valid methods for creating a Random Forest prediction model. <a href="http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" class="uri">http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</a>
@@ -1718,7 +1744,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <p>Recall ideas of kNN and trees:</p>
 <p><img src="figs/separate.jpg" width="100%" style="display: block; margin: auto;" /></p>
 <p>But today’s decision boundary is going to be based on a hyperplane which separates the values in the “best” way. Certainly, if the data are linearly separable, then there are infinitely many hyperplanes which will partition the data perfectly. For SVM, the idea is to find the “street” which separates the positive and negative samples to give the widest margin.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-31"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-31"></span>
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
 <p class="caption">
 Figure 8.2: The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier. <a href="http://www.rmki.kfki.hu/~banmi/elte/Bishop" class="uri">http://www.rmki.kfki.hu/~banmi/elte/Bishop</a> - Pattern Recognition and Machine Learning.pdf
@@ -1731,7 +1757,7 @@ Figure 8.2: The correct project of the observations can often produce a perfect 
 <span class="math display">\[\begin{align}
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
 \end{align}\]</span></p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-32"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-32"></span>
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
 <p class="caption">
 Figure 8.3: If <strong>w</strong> is known, then the projection of any new observation onto <strong>w</strong> will lead to a linear partition of the space.
@@ -1914,7 +1940,7 @@ where cross validation is used to find the tuning value <span class="math inline
 <div id="what-if-the-boundary-is-wiggly" class="section level5 unnumbered">
 <h5>What if the boundary is wiggly?</h5>
 <p>The take home message here is that a wiggly boundary is really best, and the value of <span class="math inline">\(\gamma\)</span> should be high to represent the high model complexity.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-34"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-34"></span>
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
 <p class="caption">
 Figure 8.4: Extremely complicated decision boundary
@@ -1924,19 +1950,19 @@ Figure 8.4: Extremely complicated decision boundary
 <div id="what-if-the-boundary-isnt-wiggly" class="section level5 unnumbered">
 <h5>What if the boundary isn’t wiggly?</h5>
 <p>But if the boundary has low complexity, then the best value of <span class="math inline">\(\gamma\)</span> is probably much lower.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-35"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-35"></span>
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
 <p class="caption">
 Figure 8.5: Simple decision boundary
 </p>
 </div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-36"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-36"></span>
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
 <p class="caption">
 Figure 8.6: Simple decision boundary – reasonable gamma
 </p>
 </div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-37"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-37"></span>
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
 <p class="caption">
 Figure 8.7: Simple decision boundary – gamma too big
@@ -1974,7 +2000,7 @@ Note, here <span class="math inline">\(\gamma, r\)</span> must be tuned using cr
 <h4><span class="header-section-number">8.12.3.2</span> Soft Margins</h4>
 <p>But what if the data aren’t linearly separable? The optimization problem can be changed to allow for points to be on the other side of the margin. The optimization problem is slightly more complicated, but basically the same idea:
 <span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-38"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-38"></span>
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
 <p class="caption">
 Figure 8.8: Note that now the problem is set up such that points are allowed to cross the boundary. Slack variables (the xi_i) allow for every point to be classified correctly up to the slack. Note that xi_i=0 for any point that is actually calculated correctly.
@@ -2003,7 +2029,7 @@ That is, the objective function now allows for a trade-off between a large margi
 <p><span class="math display">\[C=0 \rightarrow \mbox{ can lead to large training error}\]</span></p>
 <p>If <span class="math inline">\(C\)</span> is quite large, then the algorithm will try very hard to classify exactly perfectly. That is, it will want <span class="math inline">\(\xi_i\)</span> to be as close to zero as possible. When projecting into high dimensions, we can always perfectly classify, so a large <span class="math inline">\(C\)</span> will tend to overfit the training data and give a very small margin.
 <span class="math display">\[C&gt;&gt;&gt; \rightarrow \mbox{ can lead to classification rule which does not generalize to test data}\]</span></p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-39"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-39"></span>
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
 <p class="caption">
 Figure 4.1: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
@@ -2201,6 +2227,30 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Baumer15" class="csl-entry">
+Baumer, Ben. 2015. <span>“A Data Science Course for Undergraduates: Thinking with Data.”</span> <em>The American Statistician</em>.
+</div>
+<div id="ref-brei01" class="csl-entry">
+Breiman, L. 2001. <span>“Statistical Modeling: The Two Cultures.”</span> <em>Statistical Science</em> 16 (3): 199–215.
+</div>
+<div id="ref-field07" class="csl-entry">
+Fielding, Alan. 2007. <em>Cluster and Classification Techniques for the Biosciences</em>. Cambridge.
+</div>
+<div id="ref-flach12" class="csl-entry">
+Flach, P. 2012. <em>Machine Learning</em>. Cambridge University Press.
+</div>
+<div id="ref-ESL" class="csl-entry">
+Hastie, T., R. Tibshirani, and J. Friedman. 2001. <em>The Elements of Statistical Learning</em>. Springer.
+</div>
+<div id="ref-ISL" class="csl-entry">
+James, Witten, Hastie, and Tibshirani. 2013. <em>An Introduction to Statistical Learning</em>. Springer. <a href="http://faculty.marshall.usc.edu/gareth-james/ISL/">http://faculty.marshall.usc.edu/gareth-james/ISL/</a>.
+</div>
+<div id="ref-CVpaper" class="csl-entry">
+Varoquaux, G., P. Reddy Raamana, D. Engemann, A. Hoyos-Idrobo, Y. Schwartz, and B. Thirion. 2017. <span>“Assessing and Tuning Brain Decoders: Cross-Validation, Caveats, and Guidelines.”</span> <em>Neuro<span>I</span>mage</em> 145: 166–79.
+</div>
+</div>
             </section>
 
           </div>
@@ -2230,6 +2280,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -2250,6 +2301,10 @@ gitbook.start({
 "text": null
 },
 "download": ["Math-154-Notes.pdf", "Math-154-Notes.epub"],
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }

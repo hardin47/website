@@ -67,8 +67,19 @@ The Georgia Department of Health came out with a grouped barplot showing the num
 A few weeks later, the Georgia Department of Health came out with the following two plots where, despite cases skyrocketing, they display images where the visual doesn't really change.
 
 <div class="figure" style="text-align: center">
-<img src="img3_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" /><img src="img4_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" />
+<img src="figs/img3_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" /><img src="figs/img4_with_border.png" alt="July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report" width="42%" />
 <p class="caption">(\#fig:unnamed-chunk-7)July 2, 2020 (left) and July 17, 2020 (right), Georgia Department of Health, COVID-19 cases per 100K https://dph.georgia.gov/covid-19-daily-status-report</p>
+</div>
+
+Seems odd that a linear model was fit to these data.
+In particular, the trend is absolutely non-linear!
+Note that the screen shot has a slider to indicate the number of days modeled and displayed.
+There is some information in 14, 28, and 42 days related to policy decisions based on whether cases are trending positive or negative.
+However, even if you do need to know about positive or negative trends, even over a short time frame, the linear model fit to the data seems to be inappropriate.
+
+<div class="figure" style="text-align: center">
+<img src="figs/COVIDkentMI.png" alt="Screen shot of the Kent, MI COVID dashboard.  There are clearly three peaks over the last year and a half (Dec 2021, April 2021, and August 2021).  The peaked data should not be modeled with a linear trend." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-8)From the  Kent County COVID dashboard, screen shot 8/25/2021.  https://www.accesskent.com/Health/covid-19-data.htm</p>
 </div>
 
 
@@ -175,7 +186,7 @@ Consider a study done on a dataset of nearly 70,000 users of the online dating s
 
 <div class="figure" style="text-align: center">
 <img src="figs/okcupid.jpg" alt="Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-8)Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking.</p>
+<p class="caption">(\#fig:unnamed-chunk-9)Not only is it worth discussing the ethics of how the data were collected, but it also seems like maybe the study did some p-hacking.</p>
 </div>
 
 ## Authorship
@@ -196,7 +207,7 @@ From the International Committee of Medical Journal Editors, http://www.icmje.or
 
 <div class="figure" style="text-align: center">
 <img src="figs/retraction.jpg" alt="The paper was retracted because the authors could not agree on the order of authorship." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-9)The paper was retracted because the authors could not agree on the order of authorship.</p>
+<p class="caption">(\#fig:unnamed-chunk-10)The paper was retracted because the authors could not agree on the order of authorship.</p>
 </div>
 
 ## Algorithms
@@ -230,7 +241,7 @@ Also keep in mind the various laws which are designed to protect privacy and civ
 
 <div class="figure" style="text-align: center">
 <img src="figs/recid1.jpg" alt="Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-10)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
+<p class="caption">(\#fig:unnamed-chunk-11)Dylan Fugett had three subsequent arrests for drug possession.  Bernard Parker had no subsequent offenses.</p>
 </div>
 
 | DYLAN FUGETT 	| BERNARD PARKER 	|
@@ -245,7 +256,7 @@ Also keep in mind the various laws which are designed to protect privacy and civ
 
 <div class="figure" style="text-align: center">
 <img src="figs/recid2.jpg" alt="False positive and false negative rates broken down by race." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-11)False positive and false negative rates broken down by race.</p>
+<p class="caption">(\#fig:unnamed-chunk-12)False positive and false negative rates broken down by race.</p>
 </div>
 
 ### Algorithmic Justice League {-}
