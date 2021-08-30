@@ -1,9 +1,13 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2021-08-29"
+date: "2021-08-30"
+knit: bookdown::render_book
 site: bookdown::bookdown_site
-header-includes:  \usepackage{blkarray}
+output:
+  bookdown::pdf_book:
+    includes:
+      in_header: preamble.tex
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
