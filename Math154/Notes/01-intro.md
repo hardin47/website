@@ -1,11 +1,4 @@
 # Introduction {#intro}
-
-## 9/3/19 Agenda {#Sep3}
-1. Questionnaire
-2. Syllabus & Course Outline
-3. Stitch Fix Algorithm
-4. College Rankings
-5. Can Twitter predict election results?
   
 ## Course Logistics
 
@@ -42,13 +35,12 @@ While the prerequisite for Computational Statistics is Introduction to Statistic
 There is one homework assignment per week, two in-class midterm exams, two take-home midterm exams, and a final end of the semester project.  Many students report working about 8-10 hours per week on this class.   
 
 **What software will we use? Will there be any real world applications?  Will there be any mathematics?  Will there be any CS?**
-All of the work will be done in R using RStudio as a front end.  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  All assignments will be posted to private repositories on GitHub.  The class is a mix of many real world applications and case studies, some higher level math, programming, and communication skills.  The final project requires your own analysis of a dataset of your choosing.
+All of the work will be done in R (using RStudio as a front end, called an integrated development environment, IDE).  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  All assignments will be posted to private repositories on GitHub.  The class is a mix of many real world applications and case studies, some higher level math, programming, and communication skills.  The final project requires your own analysis of a dataset of your choosing.
 
 
 * You may use R on the Pomona server:  https://rstudio.campus.pomona.edu/  (All Pomona students will be able to log in immediately.  Non-Pomona students need to go to ITS at Pomona to get Pomona login information.)
 * If you want to use R on your own machine, you may.  Please make sure all components are updated:
 R is freely available at http://www.r-project.org/ and is already installed on college computers. Additionally, installing R Studio is required http://rstudio.org/.
-* http://swirlstats.com/ is one way to walk through learning the basics of R.
 * All assignments should be turned in using R Markdown compiled to pdf.
 
 
@@ -68,7 +60,7 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 
 Computational Statistics can be a very large umbrella for many ideas.  Indeed, sometimes the topics can seem somewhat disjointed.  Below, I've categorized the topics we will cover into four groups.  The four different broad topics all play different roles and can be more or less important depending on the problem at hand.  None of the topics should exist on their own, because only with the bigger focus on all topics will any sort of data analysis / interpretation be accurate and compelling.
 
-**Letting the computer help:**  R, RStudio, GitHub, Reproducibility, Data Viz, Data Wrangling
+**Letting the computer help:**  R, RStudio, Git, GitHub, Reproducibility, Data Viz, Data Wrangling
 
 **Statistics:**  Simulating, Randomization / Permutation Tests, Bootstrapping, Ethics
 
@@ -161,10 +153,6 @@ During the discussion, Temple Lang proposed computing statistics on visualizatio
 
 A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship's changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.
 
-
-## 9/5/19 Agenda {#Sep5}
-1. Design Challenge [Not So Standard Deviations](https://overcast.fm/+FMBuKdMEI/00:30)
-2. Reproducibility & GitHub
 
  
 ## Reproducibility {#repro}
@@ -280,11 +268,11 @@ See this great video (less than 2 min) on a reproducible workflow: https://www.y
 <p class="caption">(\#fig:unnamed-chunk-12)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
 </div>
 
-#### Tools: GitHub {-}
+#### Tools: Git & GitHub {-}
 
 * You must submit your assignments via GitHub
 * Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
-* Follow Jacob Fiksel's advice on how to connect to our classroom: https://github.com/jfiksel/github-classroom-for-students
+* Class specific instructions at https://m154-comp-stats.netlify.app/github.html
 
 
 Admittedly, there is a steep learning curve with Git.  However, it is among the tools which you are most likely to use in your future endeavors, so spending a little time focusing on the concepts now may pay off big time in the future.  Beyond practicing and working through http://happygitwithr.com/, you may want to read a little bit about waht Git is doing behind the scences.  This reference: [Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) is very good and accessible.
@@ -307,7 +295,7 @@ Admittedly, there is a steep learning curve with Git.  However, it is among the 
 #### Steps for weekly homework {-}
 
 1. You will get a link to the new assignment (clicking on the link will create a new private repo)  
-2. Use R Studio  
+2. Use R (within R Studio)  
     * New Project, version control, Git  
     * Clone the repo using SSH  
 3. If it exists, rename the Rmd file to ma154-hw#-lname-fname.Rmd  
