@@ -5,13 +5,6 @@ Data visualization is integral to understanding both data and models.  Computati
 
 
 
-## 9/10/19 Agenda {#Sep10}
-1. Cholera: what went (didn't go) well with the graphics?
-2. Challenger: what didn't go (went) well with the graphics?
-3. Thoughts on plotting (with example(s))
-4. Should have read: @VST
-5. One more great reference is the following text: **Fundamentals of Data Visualization** by Wilke at http://serialmentor.com/dataviz/
-
 
 Depending on the introductory (or other) statistics classes you've had, your instructor may have focused more or less on visualizations in class.  They (I) may have even said something like *making visualizations are incredibly important to the entire data analysis process.*  But even if you buy the perspective, why is it that we don't see more good graphics in our analyses?   Andrew Gelman [@Gelman11] responds by stating, "Good statistical graphics are hard to do, much harder than running regressions and making tables."   **Our goal will be to create graphics and visualizations that convey statistical information.**
 
@@ -23,7 +16,7 @@ The important idea here is to find anything unusual in the data.  Are there patt
 
 2. *Facilitate comparison*
 
-The second item allows us to consider the research questions at hand. What are the important variables?  How do we emphasize them?  Which variables should be plotted together?  Can they be super-imposed?  Does color, plotting character, size of plot character help to bring out the important relationships?  Be aware of over plotting and issues of color blindness! http://colorbrewer2.org/
+The second item allows us to consider the research questions at hand. What are the important variables?  How do we emphasize them?  Which variables should be plotted together?  Can they be super-imposed?  Does color, plotting character, size of plot character help to bring out the important relationships?  Be aware of over plotting and issues of color blindness. http://colorbrewer2.org/
 
 3. *Add information*
 
@@ -35,6 +28,7 @@ Randy Pruim asks the following question to decide whether or not a plot is good:
 * easily? and
 * accurately?
 
+Consider adding alt text to allow screen readers to parse the image.  The DataViz Society/Nightingale by way of Amy Cesal has an article on writing good alt text for plots/graphs, <a href = "https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81" target = "_blank">Writing Alt Text for Data Visualization</a>.
 
 ## Examples
 
@@ -207,11 +201,6 @@ At RStudio::conf 2020, [The Glamour of Graphics](https://rstudio.com/resources/r
 
 A rubric for assessing analysis and corresponding visualization.  Note that there can be a large amount of information gained in moving from basic competency to surpassed competency.  Table taken from @Nolan16.
 
-
-
-## 9/12/19 Agenda {#Sep12}
-1. Grammar of graphics
-2. ggplot
 
 <!---
 % look at Di's plenary talk from rstudio::conf 2018
