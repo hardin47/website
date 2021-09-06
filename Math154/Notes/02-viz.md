@@ -187,7 +187,7 @@ https://docs.google.com/spreadsheets/d/1KYMUjrCulPtpUHwep9bVvsBvmVsDEbucdyRZ5uHC
 At RStudio::conf 2020, [The Glamour of Graphics](https://rstudio.com/resources/rstudioconf-2020/the-glamour-of-graphics/), Will Chase makes some very important points about how and why making good graphics matters. The talk might be summarized by the plot below: fonts matter.
 
 
-<img src="figs/fontsmatter.png" width="800px" style="display: block; margin: auto;" />
+<img src="figs/fontsmatter.png" width="500px" style="display: block; margin: auto;" />
 
 ### Assessing Graphics (and Other Analyses)
 
