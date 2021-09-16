@@ -6,11 +6,6 @@ As with data visualization, data wrangling is a fundamental part of being able t
 
 
 
-## 9/17/19 Agenda {#Sep17}
-1. Tidy Data (structure of data)
-2. Piping / chaining
-3. Basic data Verbs
-4. babynames / NHANES examples
 
 >Information is what we want, but data are what we've got. [@Kaplan15]
 
@@ -116,9 +111,9 @@ The `babynames` data table in the `babynames` package comes from the Social Secu
 
 ### Data Verbs (on single data frames)
 
-> Super important resource:  The RStudio `dplyr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf
+> Super important resource:  The RStudio **dplyr** cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf
 
-**Data verbs take data tables as input and give data tables as output (that's how we can use the chaining syntax!).**  We will use the R package `dplyr` to do much of our data wrangling.  Below is a list of verbs which will be helpful in wrangling many different types of data.  See the Data Wrangling cheat sheet from RStudio for additional help.   https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+**Data verbs take data tables as input and give data tables as output (that's how we can use the chaining syntax!).**  We will use the R package **dplyr** to do much of our data wrangling.  Below is a list of verbs which will be helpful in wrangling many different types of data.  See the Data Wrangling cheat sheet from RStudio for additional help.   https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
 
  * `sample_n()` take a random row(s)
  * `head()`  grab the first few rows
@@ -148,11 +143,11 @@ The following Shiny app ("Visualizing data manipulation operations") is for demo
 ### Datasets
 
 
-**starwars** is from `dplyr` , although originally from SWAPI, the Star Wars API, http://swapi.co/.
+`starwars` is from **dplyr** , although originally from SWAPI, the Star Wars API, http://swapi.co/.
 
-**NHANES** From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination center (MEC).
+`NHANES` From `?NHANES`:  NHANES is survey data collected by the US National Center for Health Statistics (NCHS) which has conducted a series of health and nutrition surveys since the early 1960's. Since 1999 approximately 5,000 individuals of all ages are interviewed in their homes every year and complete the health examination component of the survey. The health examination is conducted in a mobile examination center (MEC).
 
-**babynames**  Each year, the US Social Security Administration publishes a list of the most popular names given to babies.  In 2018, http://www.ssa.gov/oact/babynames/#ht=2 shows Emma and Olivia leading for girls, Noah and Liam for boys. (Only names with 5 or more babies are published by the SSA.)
+`babynames`  Each year, the US Social Security Administration publishes a list of the most popular names given to babies.  In 2018, http://www.ssa.gov/oact/babynames/#ht=2 shows Emma and Olivia leading for girls, Noah and Liam for boys. (Only names with 5 or more babies are published by the SSA.)
 
   
 ### Examples of Chaining
@@ -823,14 +818,9 @@ Frances %>% ggplot(aes(x=year, y=yrTot)) +
 
 
 
-
-## 9/19/19 Agenda {#Sep19}
-1. Higher level data verbs: `pivot_longer`, `pivot_wider`, `join`
-2. `lubridate`
-
 ## Higher Level Data Verbs {#highverb}
 
-There are more complicated verbs which may be important for more sophisticated analyses.  See the RStudio `dplyr` cheat sheet,  https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf}.
+There are more complicated verbs which may be important for more sophisticated analyses.  See the RStudio **dplyr** cheat sheet,  https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf}.
 
 
 * `pivot_longer` makes many columns into 2 columns: `pivot_longer(data, cols,  names_to = , value_to = )`
@@ -851,7 +841,7 @@ Good practice:  always specify the `by` argument when joining data frames.
 In class example on babynames via Nick  http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane.Rmd   http://dtkaplan.github.io/CVC/Summer2015/Learn/BabyNames/WhatHappenedToJane-answers.pdf
 -->
 
-`tidyr 1.0.0` has just been released!  The new release means that you need to update `tidyr`.  You will know if you have the latest version if the following command works in the console (window below):
+**tidyr** 1.0.0 has just been released!  The new release means that you need to update **tidyr**.  You will know if you have the latest version if the following command works in the console (window below):
 
 ```
 ?tidyr::pivot_longer
@@ -859,7 +849,7 @@ In class example on babynames via Nick  http://dtkaplan.github.io/CVC/Summer2015
 
 If you are familiar with `spread` and `gather`, you should acquaint yourself with `pivot_longer()` and `pivot_wider()`.  The idea is to go from very wide dataframes to very long dataframes and vice versa.
 
-### `pivot_longer`
+### `pivot_longer()`
 
 `pivot` the military pay grade to become longer? 
 
@@ -871,7 +861,7 @@ If you are familiar with `spread` and `gather`, you should acquaint yourself wit
 
 ```r
 library(googlesheets4)
-sheets_deauth()
+gs4_deauth()
 
 navy_gs = read_sheet("https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408", 
                      col_types = "ccnnnnnnnnnnnnnnn")
@@ -879,29 +869,29 @@ navy_gs = read_sheet("https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i35
 
 
 ```r
-dplyr::glimpse(navy_gs)
+glimpse(navy_gs)
 ```
 
 ```
-## Observations: 38
-## Variables: 17
-## $ ...1                 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
-## $ `Active Duty Family` <chr> NA, "Marital Status Report", NA, "Data Refl…
-## $ ...3                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 31229, 5309…
-## $ ...4                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5717, 8388,…
-## $ ...5                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 36946, 6148…
-## $ ...6                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 563, 1457, …
-## $ ...7                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 122, 275, 1…
-## $ ...8                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 685, 1732, …
-## $ ...9                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 139, 438, 3…
-## $ ...10                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 141, 579, 4…
-## $ ...11                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 280, 1017, …
-## $ ...12                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5060, 12483…
-## $ ...13                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 719, 1682, …
-## $ ...14                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5779, 14165…
-## $ ...15                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 36991, 6747…
-## $ ...16                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 6699, 10924…
-## $ ...17                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 43690, 7839…
+## Rows: 38
+## Columns: 17
+## $ ...1                 <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ `Active Duty Family` <chr> NA, "Marital Status Report", NA, "Data Reflect Se…
+## $ ...3                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 31229, 53094, 131…
+## $ ...4                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5717, 8388, 21019…
+## $ ...5                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 36946, 61482, 152…
+## $ ...6                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 563, 1457, 4264, …
+## $ ...7                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 122, 275, 1920, 4…
+## $ ...8                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 685, 1732, 6184, …
+## $ ...9                 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 139, 438, 3579, 8…
+## $ ...10                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 141, 579, 4902, 9…
+## $ ...11                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 280, 1017, 8481, …
+## $ ...12                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5060, 12483, 5479…
+## $ ...13                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 719, 1682, 6641, …
+## $ ...14                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 5779, 14165, 6143…
+## $ ...15                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 36991, 67472, 193…
+## $ ...16                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 6699, 10924, 3448…
+## $ ...17                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, 43690, 78396, 228…
 ```
 
 ```r
@@ -916,42 +906,42 @@ dplyr::glimpse(navy)
 ```
 
 ```
-## Observations: 30
-## Variables: 16
-## $ pay.grade       <chr> "E-1", "E-2", "E-3", "E-4", "E-5", "E-6", "E-7",…
-## $ male.sing.wo    <dbl> 31229, 53094, 131091, 112710, 57989, 19125, 5446…
-## $ female.sing.wo  <dbl> 5717, 8388, 21019, 16381, 11021, 4654, 1913, 438…
-## $ tot.sing.wo     <dbl> 36946, 61482, 152110, 129091, 69010, 23779, 7359…
-## $ male.sing.w     <dbl> 563, 1457, 4264, 9491, 10937, 10369, 6530, 1786,…
-## $ female.sing.w   <dbl> 122, 275, 1920, 4662, 6576, 4962, 2585, 513, 144…
-## $ tot.sing.w      <dbl> 685, 1732, 6184, 14153, 17513, 15331, 9115, 2299…
-## $ male.joint.NA   <dbl> 139, 438, 3579, 8661, 12459, 8474, 5065, 1423, 4…
-## $ female.joint.NA <dbl> 141, 579, 4902, 9778, 11117, 6961, 3291, 651, 15…
-## $ tot.joint.NA    <dbl> 280, 1017, 8481, 18439, 23576, 15435, 8356, 2074…
-## $ male.civ.NA     <dbl> 5060, 12483, 54795, 105556, 130944, 110322, 7000…
-## $ female.civ.NA   <dbl> 719, 1682, 6641, 9961, 8592, 5827, 3206, 820, 29…
-## $ tot.civ.NA      <dbl> 5779, 14165, 61436, 115517, 139536, 116149, 7320…
-## $ male.tot.NA     <dbl> 36991, 67472, 193729, 236418, 212329, 148290, 87…
-## $ female.tot.NA   <dbl> 6699, 10924, 34482, 40782, 37306, 22404, 10995, …
-## $ tot.tot.NA      <dbl> 43690, 78396, 228211, 277200, 249635, 170694, 98…
+## Rows: 30
+## Columns: 16
+## $ pay.grade       <chr> "E-1", "E-2", "E-3", "E-4", "E-5", "E-6", "E-7", "E-8"…
+## $ male.sing.wo    <dbl> 31229, 53094, 131091, 112710, 57989, 19125, 5446, 1009…
+## $ female.sing.wo  <dbl> 5717, 8388, 21019, 16381, 11021, 4654, 1913, 438, 202,…
+## $ tot.sing.wo     <dbl> 36946, 61482, 152110, 129091, 69010, 23779, 7359, 1447…
+## $ male.sing.w     <dbl> 563, 1457, 4264, 9491, 10937, 10369, 6530, 1786, 579, …
+## $ female.sing.w   <dbl> 122, 275, 1920, 4662, 6576, 4962, 2585, 513, 144, 2175…
+## $ tot.sing.w      <dbl> 685, 1732, 6184, 14153, 17513, 15331, 9115, 2299, 723,…
+## $ male.joint.NA   <dbl> 139, 438, 3579, 8661, 12459, 8474, 5065, 1423, 458, 40…
+## $ female.joint.NA <dbl> 141, 579, 4902, 9778, 11117, 6961, 3291, 651, 150, 375…
+## $ tot.joint.NA    <dbl> 280, 1017, 8481, 18439, 23576, 15435, 8356, 2074, 608,…
+## $ male.civ.NA     <dbl> 5060, 12483, 54795, 105556, 130944, 110322, 70001, 210…
+## $ female.civ.NA   <dbl> 719, 1682, 6641, 9961, 8592, 5827, 3206, 820, 291, 377…
+## $ tot.civ.NA      <dbl> 5779, 14165, 61436, 115517, 139536, 116149, 73207, 218…
+## $ male.tot.NA     <dbl> 36991, 67472, 193729, 236418, 212329, 148290, 87042, 2…
+## $ female.tot.NA   <dbl> 6699, 10924, 34482, 40782, 37306, 22404, 10995, 2422, …
+## $ tot.tot.NA      <dbl> 43690, 78396, 228211, 277200, 249635, 170694, 98037, 2…
 ```
 
 ```r
 # get rid of total columns & rows:
 
-navyWR = navy %>% dplyr::select(-contains("tot")) %>%
-   dplyr::filter(substr(pay.grade, 1, 5) != "TOTAL" & 
+navyWR = navy %>% select(-contains("tot")) %>%
+   filter(substr(pay.grade, 1, 5) != "TOTAL" & 
                    substr(pay.grade, 1, 5) != "GRAND" ) %>%
-   tidyr::pivot_longer(-pay.grade, 
+   pivot_longer(-pay.grade, 
                        values_to = "numPeople", 
                        names_to = "status") %>%
-   tidyr::separate(status, into = c("sex", "marital", "kids"))
+   separate(status, into = c("sex", "marital", "kids"))
 
 navyWR %>% head()
 ```
 
 ```
-## # A tibble: 6 x 5
+## # A tibble: 6 × 5
 ##   pay.grade sex    marital kids  numPeople
 ##   <chr>     <chr>  <chr>   <chr>     <dbl>
 ## 1 E-1       male   sing    wo        31229
@@ -966,7 +956,12 @@ Does a graph tell us if we did it right?  what if we had done it wrong...?
 
 ```r
 navyWR %>% ggplot(aes(x=pay.grade, y=numPeople, color=sex)) + 
-  geom_point()  + facet_grid(kids~marital)
+  geom_point()  + 
+  facet_grid(kids ~ marital) +
+  theme_minimal() +
+  scale_color_viridis_d() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   hjust = 1, size = rel(.5)))
 ```
 
 <img src="03-wrangling_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
@@ -977,34 +972,38 @@ navyWR %>% ggplot(aes(x=pay.grade, y=numPeople, color=sex)) +
 ```r
 library(babynames)
 babynames %>% dplyr::select(-prop) %>%
-   tidyr::pivot_wider(names_from = sex, values_from = n) %>% 
-   head()
+   tidyr::pivot_wider(names_from = sex, values_from = n) 
 ```
 
 ```
-## # A tibble: 6 x 4
-##    year name          F     M
-##   <dbl> <chr>     <int> <int>
-## 1  1880 Mary       7065    27
-## 2  1880 Anna       2604    12
-## 3  1880 Emma       2003    10
-## 4  1880 Elizabeth  1939     9
-## 5  1880 Minnie     1746     9
-## 6  1880 Margaret   1578    NA
+## # A tibble: 1,756,284 × 4
+##     year name          F     M
+##    <dbl> <chr>     <int> <int>
+##  1  1880 Mary       7065    27
+##  2  1880 Anna       2604    12
+##  3  1880 Emma       2003    10
+##  4  1880 Elizabeth  1939     9
+##  5  1880 Minnie     1746     9
+##  6  1880 Margaret   1578    NA
+##  7  1880 Ida        1472     8
+##  8  1880 Alice      1414    NA
+##  9  1880 Bertha     1320    NA
+## 10  1880 Sarah      1288    NA
+## # … with 1,756,274 more rows
 ```
 
 
 
 ```r
 babynames %>% 
-  dplyr::select(-prop) %>% 
-  tidyr::pivot_wider(names_from = sex, values_from = n) %>%
-  dplyr::filter(!is.na(F) & !is.na(M)) %>%
+  select(-prop) %>% 
+  pivot_wider(names_from = sex, values_from = n) %>%
+  filter(!is.na(F) & !is.na(M)) %>%
   arrange(desc(year), desc(M))
 ```
 
 ```
-## # A tibble: 168,381 x 4
+## # A tibble: 168,381 × 4
 ##     year name         F     M
 ##    <dbl> <chr>    <int> <int>
 ##  1  2017 Liam        36 18728
@@ -1023,13 +1022,13 @@ babynames %>%
 
 ```r
 babynames %>% 
-  tidyr::pivot_wider(names_from = sex, values_from = n) %>%
-  dplyr::filter(!is.na(F) & !is.na(M)) %>%
+  pivot_wider(names_from = sex, values_from = n) %>%
+  filter(!is.na(F) & !is.na(M)) %>%
   arrange(desc(prop))
 ```
 
 ```
-## # A tibble: 12 x 5
+## # A tibble: 12 × 5
 ##     year name            prop     F     M
 ##    <dbl> <chr>          <dbl> <int> <int>
 ##  1  1986 Marquette 0.0000130     24    25
@@ -1054,29 +1053,29 @@ Both of the following datasets come from GapMinder.  The first represents countr
 
 
 ```r
-sheets_deauth()
+gs4_deauth()
 litF = read_sheet("https://docs.google.com/spreadsheets/d/1hDinTIRHQIaZg1RUn6Z_6mo12PtKwEPFIz_mJVF6P5I/pub?gid=0")
 
-litF = litF %>% dplyr::select(country=starts_with("Adult"), 
+litF = litF %>% select(country=starts_with("Adult"), 
                               starts_with("1"), starts_with("2")) %>%
-  tidyr::pivot_longer(-country, 
+  pivot_longer(-country, 
                       names_to = "year", 
                       values_to = "litRateF") %>%
-  dplyr::filter(!is.na(litRateF))
+  filter(!is.na(litRateF))
 ```
 
 
 
 ```r
-sheets_deauth()
+gs4_deauth()
 GDP = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
 
-GDP = GDP %>% dplyr::select(country = starts_with("Income"), 
+GDP = GDP %>% select(country = starts_with("Income"), 
                             starts_with("1"), starts_with("2")) %>%
-  tidyr::pivot_longer(-country, 
+  pivot_longer(-country, 
                       names_to = "year", 
                       values_to = "gdp") %>%
-  dplyr::filter(!is.na(gdp))
+  filter(!is.na(gdp))
 ```
   
 
@@ -1085,7 +1084,7 @@ head(litF)
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ##   country     year  litRateF
 ##   <chr>       <chr>    <dbl>
 ## 1 Afghanistan 1979      4.99
@@ -1101,7 +1100,7 @@ head(GDP)
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ##   country year    gdp
 ##   <chr>   <chr> <dbl>
 ## 1 Albania 1980  1061.
@@ -1114,7 +1113,7 @@ head(GDP)
 
 ```r
 # left
-litGDPleft = dplyr::left_join(litF, GDP, by=c("country", "year"))
+litGDPleft = left_join(litF, GDP, by=c("country", "year"))
 dim(litGDPleft)
 ```
 
@@ -1135,7 +1134,7 @@ head(litGDPleft)
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##   country     year  litRateF   gdp
 ##   <chr>       <chr>    <dbl> <dbl>
 ## 1 Afghanistan 1979      4.99   NA 
@@ -1148,7 +1147,7 @@ head(litGDPleft)
 
 ```r
 # right
-litGDPright = dplyr::right_join(litF, GDP, by=c("country", "year"))
+litGDPright = right_join(litF, GDP, by=c("country", "year"))
 dim(litGDPright)
 ```
 
@@ -1169,20 +1168,20 @@ head(litGDPright)
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##   country year  litRateF   gdp
 ##   <chr>   <chr>    <dbl> <dbl>
-## 1 Albania 1980        NA 1061.
-## 2 Albania 1981        NA 1100.
-## 3 Albania 1982        NA 1111.
-## 4 Albania 1983        NA 1101.
-## 5 Albania 1984        NA 1065.
-## 6 Albania 1985        NA 1060.
+## 1 Albania 2001      98.3 1282.
+## 2 Albania 2008      94.7 1804.
+## 3 Albania 2011      95.7 1966.
+## 4 Algeria 1987      35.8 1902.
+## 5 Algeria 2002      60.1 1872.
+## 6 Algeria 2006      63.9 2125.
 ```
 
 ```r
 # inner
-litGDPinner = dplyr::inner_join(litF, GDP, by=c("country", "year"))
+litGDPinner = inner_join(litF, GDP, by=c("country", "year"))
 dim(litGDPinner)
 ```
 
@@ -1203,7 +1202,7 @@ head(litGDPinner)
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##   country year  litRateF   gdp
 ##   <chr>   <chr>    <dbl> <dbl>
 ## 1 Albania 2001      98.3 1282.
@@ -1216,7 +1215,7 @@ head(litGDPinner)
 
 ```r
 # full
-litGDPfull = dplyr::full_join(litF, GDP, by=c("country", "year"))
+litGDPfull = full_join(litF, GDP, by=c("country", "year"))
 dim(litGDPfull)
 ```
 
@@ -1237,7 +1236,7 @@ head(litGDPfull)
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##   country     year  litRateF   gdp
 ##   <chr>       <chr>    <dbl> <dbl>
 ## 1 Afghanistan 1979      4.99   NA 
@@ -1249,9 +1248,9 @@ head(litGDPfull)
 ```
 
 
-### `lubridate`
+### **lubridate**
 
-`lubridate` is a another R package meant for data wrangling [@lubridate].  In particular, `lubridate` makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.  The linked table is from the original paper and provides many of the basic `lubridate` commands:  http://blog.yhathq.com/static/pdf/R_date_cheat_sheet.pdf}.
+**lubridate** is a another R package meant for data wrangling [@lubridate].  In particular, **lubridate** makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.  The linked table is from the original paper and provides many of the basic **lubridate** commands:  http://blog.yhathq.com/static/pdf/R_date_cheat_sheet.pdf}.
 
 Example from  https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html
 
@@ -1268,7 +1267,7 @@ A basic property of arithmetic is that a + b - b = a. Only solution 1 obeys the 
 
 If you thought solution 2 or 3 was more useful, no problem. You can still get those results with clever arithmetic, or by using the special `%m+%` and `%m-%` operators. `%m+%` and `%m-%` automatically roll dates back to the last day of the month, should that be necessary.
 
-#### R examples, `lubridate`
+#### R examples, `lubridate()`
 
 ##### Some basics in lubridate {-}
 
@@ -1371,14 +1370,14 @@ wday(rightnow, label=TRUE)
 
 
 ```r
-jan31 <- ymd("2013-01-31")
+jan31 <- ymd("2021-01-31")
 jan31 + months(0:11)
 ```
 
 ```
-##  [1] "2013-01-31" NA           "2013-03-31" NA           "2013-05-31"
-##  [6] NA           "2013-07-31" "2013-08-31" NA           "2013-10-31"
-## [11] NA           "2013-12-31"
+##  [1] "2021-01-31" NA           "2021-03-31" NA           "2021-05-31"
+##  [6] NA           "2021-07-31" "2021-08-31" NA           "2021-10-31"
+## [11] NA           "2021-12-31"
 ```
 
 ```r
@@ -1386,9 +1385,9 @@ floor_date(jan31, "month") + months(0:11) + days(31)
 ```
 
 ```
-##  [1] "2013-02-01" "2013-03-04" "2013-04-01" "2013-05-02" "2013-06-01"
-##  [6] "2013-07-02" "2013-08-01" "2013-09-01" "2013-10-02" "2013-11-01"
-## [11] "2013-12-02" "2014-01-01"
+##  [1] "2021-02-01" "2021-03-04" "2021-04-01" "2021-05-02" "2021-06-01"
+##  [6] "2021-07-02" "2021-08-01" "2021-09-01" "2021-10-02" "2021-11-01"
+## [11] "2021-12-02" "2022-01-01"
 ```
 
 ```r
@@ -1396,9 +1395,9 @@ jan31 + months(0:11) + days(31)
 ```
 
 ```
-##  [1] "2013-03-03" NA           "2013-05-01" NA           "2013-07-01"
-##  [6] NA           "2013-08-31" "2013-10-01" NA           "2013-12-01"
-## [11] NA           "2014-01-31"
+##  [1] "2021-03-03" NA           "2021-05-01" NA           "2021-07-01"
+##  [6] NA           "2021-08-31" "2021-10-01" NA           "2021-12-01"
+## [11] NA           "2022-01-31"
 ```
 
 ```r
@@ -1406,9 +1405,9 @@ jan31 %m+% months(0:11)
 ```
 
 ```
-##  [1] "2013-01-31" "2013-02-28" "2013-03-31" "2013-04-30" "2013-05-31"
-##  [6] "2013-06-30" "2013-07-31" "2013-08-31" "2013-09-30" "2013-10-31"
-## [11] "2013-11-30" "2013-12-31"
+##  [1] "2021-01-31" "2021-02-28" "2021-03-31" "2021-04-30" "2021-05-31"
+##  [6] "2021-06-30" "2021-07-31" "2021-08-31" "2021-09-30" "2021-10-31"
+## [11] "2021-11-30" "2021-12-31"
 ```
 
 
@@ -1486,7 +1485,195 @@ by Saurav Kaushik   https://www.analyticsvidhya.com/blog/2017/03/beginners-guide
 * La Quinta vs. Dennys (Colin Rundel & Mine Cetinkaya-Rundel )  https://github.com/rundel/Dennys_LaQuinta_Chance Webinar about the study:  https://www.rstudio.com/resources/webinars/data-science-case-study/  OR what if you look at Holiday Inn???)
 -->
 
-## `reprex`
+
+## **purrr** for functional programming
+
+We will see the R package **purrr** in greater detail as we go, but for now, let's get a hint for how it works.  
+
+We are going to focus on the `map` family of functions which will just get us started.  Lots of other good **purrr** functions like `pluck()` and `accumulate()`.
+
+Much of below is taken from a [tutorial](https://www.rebeccabarter.com/blog/2019-08-19_purrr/) by Rebecca Barter.
+
+
+The `map` functions are *named* by the **output** the produce.  For example: 
+
+* `map(.x, .f)` is the main mapping function and returns a list
+
+* `map_df(.x, .f)` returns a data frame
+
+* `map_dbl(.x, .f)` returns a numeric (double) vector
+
+* `map_chr(.x, .f)` returns a character vector
+
+* `map_lgl(.x, .f)` returns a logical vector
+
+Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.
+
+The **input** to a `map` function is always either a *vector* (like a column), a *list* (which can be non-rectangular), or a *dataframe* (like a rectangle).
+
+A list is a way to hold things which might be very different in shape:
+
+
+```r
+a_list <- list(a_number = 5,
+                      a_vector = c("a", "b", "c"),
+                      a_dataframe = data.frame(a = 1:3, 
+                                               b = c("q", "b", "z"), 
+                                               c = c("bananas", "are", "so very great")))
+
+print(a_list)
+```
+
+```
+## $a_number
+## [1] 5
+## 
+## $a_vector
+## [1] "a" "b" "c"
+## 
+## $a_dataframe
+##   a b             c
+## 1 1 q       bananas
+## 2 2 b           are
+## 3 3 z so very great
+```
+
+
+Consider the following function:
+
+
+```r
+add_ten <- function(x) {
+  return(x + 10)
+  }
+```
+
+We can `map()` the `add_ten()` function across a vector.  Note that the output is a list (the default).
+
+
+```r
+library(tidyverse)
+map(.x = c(2, 5, 10),
+    .f = add_ten)
+```
+
+```
+## [[1]]
+## [1] 12
+## 
+## [[2]]
+## [1] 15
+## 
+## [[3]]
+## [1] 20
+```
+
+What if we use a different type of input?  The default behavior is to still return a list!
+
+
+```r
+data.frame(a = 2, b = 5, c = 10) %>%
+  map(add_ten)
+```
+
+```
+## $a
+## [1] 12
+## 
+## $b
+## [1] 15
+## 
+## $c
+## [1] 20
+```
+
+What if we want a different type of output?  We use a different `map()` function, `map_df()`, for example.
+
+
+```r
+data.frame(a = 2, b = 5, c = 10) %>%
+  map_df(add_ten)
+```
+
+```
+## # A tibble: 1 × 3
+##       a     b     c
+##   <dbl> <dbl> <dbl>
+## 1    12    15    20
+```
+
+
+Shorthand lets us get away from pre-defining the function (which will be useful).  Use the tilde `~` to indicate that you have a function: 
+
+
+```r
+data.frame(a = 2, b = 5, c = 10) %>%
+  map_df(~{.x + 10})
+```
+
+```
+## # A tibble: 1 × 3
+##       a     b     c
+##   <dbl> <dbl> <dbl>
+## 1    12    15    20
+```
+
+Mostly, the tilde will be used for functions we already know:
+
+
+```r
+library(palmerpenguins)
+library(broom)
+
+penguins %>%
+  split(.$species) %>%
+  map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) %>%
+  map_df(tidy)  # map(tidy)
+```
+
+```
+## # A tibble: 6 × 5
+##   term              estimate std.error statistic  p.value
+##   <chr>                <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)        -2536.     965.       -2.63 9.48e- 3
+## 2 flipper_length_mm     32.8      5.08      6.47 1.34e- 9
+## 3 (Intercept)        -3037.     997.       -3.05 3.33e- 3
+## 4 flipper_length_mm     34.6      5.09      6.79 3.75e- 9
+## 5 (Intercept)        -6787.    1093.       -6.21 7.65e- 9
+## 6 flipper_length_mm     54.6      5.03     10.9  1.33e-19
+```
+
+```r
+penguins %>%
+  group_by(species) %>%
+  group_map(~lm(body_mass_g ~ flipper_length_mm, data = .x)) %>%
+  map(tidy)  # map_df(tidy)
+```
+
+```
+## [[1]]
+## # A tibble: 2 × 5
+##   term              estimate std.error statistic       p.value
+##   <chr>                <dbl>     <dbl>     <dbl>         <dbl>
+## 1 (Intercept)        -2536.     965.       -2.63 0.00948      
+## 2 flipper_length_mm     32.8      5.08      6.47 0.00000000134
+## 
+## [[2]]
+## # A tibble: 2 × 5
+##   term              estimate std.error statistic       p.value
+##   <chr>                <dbl>     <dbl>     <dbl>         <dbl>
+## 1 (Intercept)        -3037.     997.       -3.05 0.00333      
+## 2 flipper_length_mm     34.6      5.09      6.79 0.00000000375
+## 
+## [[3]]
+## # A tibble: 2 × 5
+##   term              estimate std.error statistic  p.value
+##   <chr>                <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)        -6787.    1093.       -6.21 7.65e- 9
+## 2 flipper_length_mm     54.6      5.03     10.9  1.33e-19
+```
+
+## `reprex()`
 
 > Help me help you
 
@@ -1505,6 +1692,7 @@ Some places to learn more about `reprex` include
 * The `reprex` vignette: https://reprex.tidyverse.org/index.html
 * `reprex` dos and donts: https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html
 * Jenny Bryan webinar on `reprex`: "Help me help you. Creating reproducible examples" https://resources.rstudio.com/webinars/help-me-help-you-creating-reproducible-examples-jenny-bryan
+* Some advice: https://stackoverflow.com/help/minimal-reproducible-example 
 
 
 
@@ -1519,7 +1707,7 @@ multiple lines of code:
 
 ```
 reprex({
-  jan31 <- ymd("2013-01-31")
+  jan31 <- ymd("2021-01-31")
   jan31 + months(0:11) + days(31)
 })
 ```
@@ -1527,7 +1715,7 @@ reprex({
 ```
 reprex({
   library(lubridate)
-  jan31 <- ymd("2013-01-31")
+  jan31 <- ymd("2021-01-31")
   jan31 + months(0:11) + days(31)
 })
 ```

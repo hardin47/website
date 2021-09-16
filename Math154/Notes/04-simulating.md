@@ -159,8 +159,7 @@ The goal of simulating a complicated model is not only to create a program which
 
 #### Blackjack
 
-* Example and code come from **Data Science in R: a case studies approach to computational reasoning and problem solving*, by Nolan and Temple Lang.
-* Chapter 9 *Simulating Blackjack*, by Hadley Wickham
+* Example and code come from **Data Science in R: a case studies approach to computational reasoning and problem solving**, by Nolan and Temple Lang, Chapter 9 *Simulating Blackjack*, by Hadley Wickham
 * All R code is online at [http://rdatasciencecases.org/](http://rdatasciencecases.org/)
 * More about the game of blackjack, there are many online resources that you can use to learn about the came.  Two resources that Nolan and Temple Lang recommend are http://wizardofodds.com/games/blackjack/ and http://hitorstand.net/.
 
@@ -1053,13 +1052,52 @@ b <- 23462146143
 m <- 423514351351
 
 xval <- 47 
-reps <- 10000
+reps <- 10
 unif.val <- c()
 
 for(i in 1:reps){
   xval <- (a*xval + b) %% m
   unif.val <- c(unif.val, xval/m)   }
 
+update_rv <- function(x){(a*x + b) %% m }
+
+rep(xval, reps) %>%
+  map(~ accumulate(., ~ ((a*.x + b) %% m))/m )
+```
+
+```
+## [[1]]
+## [1] 0.28
+## 
+## [[2]]
+## [1] 0.28
+## 
+## [[3]]
+## [1] 0.28
+## 
+## [[4]]
+## [1] 0.28
+## 
+## [[5]]
+## [1] 0.28
+## 
+## [[6]]
+## [1] 0.28
+## 
+## [[7]]
+## [1] 0.28
+## 
+## [[8]]
+## [1] 0.28
+## 
+## [[9]]
+## [1] 0.28
+## 
+## [[10]]
+## [1] 0.28
+```
+
+```r
 data.frame(uniformRVs = unif.val) %>%
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```

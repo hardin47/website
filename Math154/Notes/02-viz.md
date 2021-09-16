@@ -32,7 +32,7 @@ Consider adding alt text to allow screen readers to parse the image.  The DataVi
 
 ## Examples
 
-The first two examples are taken from a book by Edward Tufte who is arguably the master at visualizations.  The book is *Visual and Statistical Thinking: Displays of Evidence for Making decisions*.  The book can be purchased for $7 at http://www.edwardtufte.com/tufte/books_textb, though there may be online versions of it that you can download. 
+The first two examples are taken from a book by Edward Tufte who is arguably the master at visualizations.  The book is *Visual and Statistical Thinking: Displays of Evidence for Making decisions*.  The book can be purchased at http://www.edwardtufte.com/tufte/books_textb, though there may be online versions of it that you can download. 
 
 
 ##### An aside {-}
@@ -66,8 +66,6 @@ In September 1854, the worst outbreak of cholera in London occurred in a few blo
 
 
 
-
-
 ### Challenger via Tufte
 
 John Snow's story of the successful graphical intervention in the cholera outbreak is contrasted with the fateful poor-graphical non-intervention of the Challenger disaster.  On January 28, 1986, the space shuttle Challenger took off from Cape Canaveral, FL and immediately exploded, killing all seven astronauts aboard.  We now know that the reason for the explosion was due to the failure of two rubber O-rings which malfunctioned due to the cold temperature of the day ($\sim 29^\circ$ F).   
@@ -85,7 +83,7 @@ The biggest problem (existing in many of the bullet points below) is that the en
 
 3. Missing data created an illusion of *lack of evidence*, when in fact, the true story was quite strong given the full set of information.  (92% of the temperature data was missing from some of the most vital tables.)
 
-4. Anecdotal evidence was misconstrued:  SRM-15 at 57F at the most damage, but SRM-22 at 75F had the second most damage.
+4. Anecdotal evidence was misconstrued:  SRM-15 at 57F had the most damage, but SRM-22 at 75F had the second most damage.
 
 5. In the end, the shuttle launched on a day which was an extrapolation from the model suggested by the data.  They had never launched a shuttle at temperatures of $26^\circ-29^\circ$F.
 
