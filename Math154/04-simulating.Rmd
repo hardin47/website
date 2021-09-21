@@ -111,6 +111,7 @@ sum(replicate(100000, sticks_beta())) / 100000
 5. Repeat the entire process many times so as to account for variability in the simulation.
 6. Use the law of large numbers to conclude that the average of the simulation approximates the expected value.
 
+#####  Using a for-loop
 
 ```{r}
 allk <- c()
@@ -121,6 +122,64 @@ for(i in 1:1000){
     k <- k+1 }
   allk <- c(allk, k-1) }
 mean(allk)
+```
+
+#### Using functional programming and the `map()` function
+
+Functional programming is typically much faster than for loops are, and they also fit more cleanly into a tidy pipeline.  The `map` functions (in the **purrr** package) are *named* by the **output** the produce.  Some of the `map()` functions include: 
+
+* `map(.x, .f)` is the main mapping function and returns a list
+
+* `map_df(.x, .f)` returns a data frame
+
+* `map_dbl(.x, .f)` returns a numeric (double) vector
+
+* `map_chr(.x, .f)` returns a character vector
+
+* `map_lgl(.x, .f)` returns a logical vector
+
+
+```{r out.width = '90%', fig.align='center', echo=FALSE, fig.cap = "From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html"}
+knitr::include_graphics("figs/purrr_map.png")
+```
+
+Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.
+
+To use functional programming on expected value problem, the first step is to write a function (here called `sum_unif()`) which will select uniform random variables until they add up to more than one.  Note that the function itself doesn't have any arguments.
+
+```{r}
+sum_unif <- function(.x){
+  sumU <- 0
+  k <- 0
+  while(sumU < 1) {
+    sumU <- sumU + runif(1)
+    k <- k+1
+}
+  return(c(k-1, sumU))
+}
+```
+
+Using `map()`, the `sum_unif()` function is run `reps` number of times.  Note that `sum_unif()` doesn't have any arguments, so it doesn't really matter what the form of the input is for `sum_unif()`. 
+
+```{r}
+set.seed(4747)
+reps <- 1000
+ 
+sim_k_max <- data.frame(row_id = seq(1, reps, 1)) %>%
+  mutate(max_for_EX = map(row_id, sum_unif)) %>%
+  unnest(max_for_EX) %>%
+  mutate(output = rep(c("k", "sum"), reps)) %>%
+  pivot_wider(id_cols = row_id, names_from = output, 
+              values_from = max_for_EX) 
+
+sim_k_max
+```
+
+Last, approximate the expected value of $X$ using the law of large numbers... the sample average converges in probability to the expected value.
+
+```{r}
+sim_k_max %>%
+  summarize(EX = mean(k))
 ```
 
 
@@ -137,9 +196,9 @@ sample(alph, 5, replace = FALSE) # sample (from a population)
 
 sample(alph, 15, replace = TRUE) # sample (from a population)
 
-sample(alph, replace = FALSE)  # shuffle
+sample(alph, 10, replace = FALSE)  # shuffle
 
-sample(alph, replace = TRUE)  # resample
+sample(alph, 10, replace = TRUE)  # resample
 ```
 
 

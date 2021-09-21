@@ -113,6 +113,7 @@ sum(replicate(100000, sticks_beta())) / 100000
 5. Repeat the entire process many times so as to account for variability in the simulation.
 6. Use the law of large numbers to conclude that the average of the simulation approximates the expected value.
 
+#####  Using a for-loop
 
 
 ```r
@@ -128,6 +129,92 @@ mean(allk)
 
 ```
 ## [1] 1.71
+```
+
+#### Using functional programming and the `map()` function
+
+Functional programming is typically much faster than for loops are, and they also fit more cleanly into a tidy pipeline.  The `map` functions (in the **purrr** package) are *named* by the **output** the produce.  Some of the `map()` functions include: 
+
+* `map(.x, .f)` is the main mapping function and returns a list
+
+* `map_df(.x, .f)` returns a data frame
+
+* `map_dbl(.x, .f)` returns a numeric (double) vector
+
+* `map_chr(.x, .f)` returns a character vector
+
+* `map_lgl(.x, .f)` returns a logical vector
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/purrr_map.png" alt="From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html" width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-6)From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html</p>
+</div>
+
+Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.
+
+To use functional programming on expected value problem, the first step is to write a function (here called `sum_unif()`) which will select uniform random variables until they add up to more than one.  Note that the function itself doesn't have any arguments.
+
+
+```r
+sum_unif <- function(.x){
+  sumU <- 0
+  k <- 0
+  while(sumU < 1) {
+    sumU <- sumU + runif(1)
+    k <- k+1
+}
+  return(c(k-1, sumU))
+}
+```
+
+Using `map()`, the `sum_unif()` function is run `reps` number of times.  Note that `sum_unif()` doesn't have any arguments, so it doesn't really matter what the form of the input is for `sum_unif()`. 
+
+
+```r
+set.seed(4747)
+reps <- 1000
+ 
+sim_k_max <- data.frame(row_id = seq(1, reps, 1)) %>%
+  mutate(max_for_EX = map(row_id, sum_unif)) %>%
+  unnest(max_for_EX) %>%
+  mutate(output = rep(c("k", "sum"), reps)) %>%
+  pivot_wider(id_cols = row_id, names_from = output, 
+              values_from = max_for_EX) 
+
+sim_k_max
+```
+
+```
+## # A tibble: 1,000 × 3
+##    row_id     k   sum
+##     <dbl> <dbl> <dbl>
+##  1      1     2  1.05
+##  2      2     2  1.68
+##  3      3     1  1.39
+##  4      4     1  1.47
+##  5      5     2  1.03
+##  6      6     1  1.45
+##  7      7     1  1.41
+##  8      8     1  1.83
+##  9      9     1  1.17
+## 10     10     2  1.42
+## # … with 990 more rows
+```
+
+Last, approximate the expected value of $X$ using the law of large numbers... the sample average converges in probability to the expected value.
+
+
+```r
+sim_k_max %>%
+  summarize(EX = mean(k))
+```
+
+```
+## # A tibble: 1 × 1
+##      EX
+##   <dbl>
+## 1  1.74
 ```
 
 
@@ -151,7 +238,7 @@ sample(alph, 5, replace = FALSE) # sample (from a population)
 ```
 
 ```
-## [1] "j" "c" "h" "g" "f"
+## [1] "g" "i" "h" "b" "a"
 ```
 
 ```r
@@ -159,23 +246,23 @@ sample(alph, 15, replace = TRUE) # sample (from a population)
 ```
 
 ```
-##  [1] "f" "a" "a" "h" "f" "f" "i" "e" "h" "d" "b" "g" "f" "e" "i"
+##  [1] "i" "e" "d" "i" "d" "a" "c" "h" "a" "a" "b" "f" "i" "e" "h"
 ```
 
 ```r
-sample(alph, replace = FALSE)  # shuffle
+sample(alph, 10, replace = FALSE)  # shuffle
 ```
 
 ```
-##  [1] "g" "e" "f" "i" "j" "c" "d" "a" "b" "h"
+##  [1] "h" "a" "e" "g" "i" "c" "j" "d" "f" "b"
 ```
 
 ```r
-sample(alph, replace = TRUE)  # resample
+sample(alph, 10, replace = TRUE)  # resample
 ```
 
 ```
-##  [1] "a" "i" "d" "e" "e" "f" "g" "c" "c" "c"
+##  [1] "c" "h" "i" "j" "i" "b" "e" "j" "g" "c"
 ```
 
 
@@ -228,7 +315,7 @@ The goal of simulating a complicated model is not only to create a program which
 * Start with 2 cards, build up one card at a time
 * Lots of different strategies (also based on dealer's cards)
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -258,15 +345,15 @@ shuffle_decks(4)
 ```
 
 ```
-##   [1]  6  4 10  2  1  5  5  8 10  8 10 10 10  3  6 10  2  5  3 10  1  4  1  2  3
-##  [26]  5  5  5  4  4 10 10 10 10  9  1  2  4  6  9  6  6  9 10  3  6  3  8 10  3
-##  [51]  9  4  8  8  6  8  7  2 10  6  1  3 10 10  3 10  2  1  8 10  5 10 10  4  7
-##  [76]  2 10  1  9  3 10  9  6  9  8 10  5 10  1  7  4  7 10  6  1 10  8  4  8  7
-## [101] 10  8  1  2  3  2  3 10  8  3  8  9 10  5  8  7  1  2  4  3  5 10  7  5  4
-## [126]  2 10 10 10  6  3  5  9 10  1  1  6 10 10  7  8 10  4  6  4  9 10 10 10 10
-## [151] 10  2  7 10  7  1 10 10  1 10  4  2  9 10 10  2 10  9 10 10  3  5  7 10 10
-## [176] 10 10 10  9  5  2  4 10 10  7 10  8  9  5 10 10  7  3  1  6 10  7  5  4  7
-## [201] 10  9  6  6  2  9 10  7
+##   [1]  6  5 10  4  2  1  2 10  1 10 10  7  9  5 10  4 10  2  6  8  8 10  7  9  3
+##  [26]  1 10 10 10  5  3 10  2 10 10 10  8  3  3 10 10 10  5 10  7  8 10 10  5 10
+##  [51]  9  6 10  8 10  9 10  2  1  4 10  7  3 10 10  8  3  6  6  3  5  5  6  9 10
+##  [76]  9  4 10  6  3  9 10  1 10  8  1  5 10  7  8 10  4 10  1  2  2  8  4  5  8
+## [101]  4  6  8  7  7 10 10  5  3  4 10 10  3 10  1 10 10  4  6  7  8  9 10  4  2
+## [126]  5  6  1 10  4 10  5 10  1  3  7  3  4 10  9 10  6  2 10  2  5  2  2  9 10
+## [151]  1 10  3  8  9  3 10  1 10  5  4  2  5  4  8 10  2  9 10  8  7  7  9  2 10
+## [176]  6  3  4  1 10  1  6  7  9  5 10  1  8  2  7  3  7  1 10  6  4  6  6 10 10
+## [201] 10 10  7  9  9  7 10 10
 ```
 
 ##### Outcome of cards in hand {-}
@@ -444,7 +531,7 @@ myCards
 ## function(m = 1) sample(deck, m, replace = TRUE)
 ## 
 ## $cards
-## [1] 10  8
+## [1] 10  3
 ```
 
 ##### First action: hit {-}
@@ -460,7 +547,7 @@ hit(myCards)$cards
 ```
 
 ```
-## [1] 10  8  1
+## [1] 10  3 10
 ```
 
 ##### Second action: stand  {-}
@@ -473,7 +560,7 @@ stand(myCards)$cards
 ```
 
 ```
-## [1] 10  8
+## [1] 10  3
 ```
 
 
@@ -492,7 +579,7 @@ dd(myCards)$cards
 ```
 
 ```
-## [1] 10  8 10
+## [1] 10  3 10
 ```
 
 ##### Fourth action: split a pair {-}
@@ -519,7 +606,7 @@ splitHand[[1]]$cards
 ```
 
 ```
-## [1] 10 10
+## [1] 10  1
 ```
 
 ```r
@@ -527,7 +614,7 @@ splitHand[[2]]$cards
 ```
 
 ```
-## [1] 8 9
+## [1] 3 3
 ```
 
 
@@ -782,7 +869,7 @@ ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
   geom_abline(intercept = 0, slope = 1)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Two separate models {-}
 
@@ -879,7 +966,7 @@ ggplot(new.college.data, aes(x = talent, y = predicted, color = color)) +
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -933,7 +1020,7 @@ ggplot(new.college.data, aes(x = talent,
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -1025,7 +1112,7 @@ Consider the following linear model with the points normally distributed with *e
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1062,7 +1149,7 @@ Consider the following linear model with the points normally distributed with *u
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1168,7 +1255,7 @@ data.frame(uniformRVs = unif.val) %>%
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Generating other RVs:  **The Inverse Transform Method**
@@ -1211,7 +1298,7 @@ P(X \leq x) &= P(F^{-1}(U) \leq x)\\
 
 <div class="figure" style="text-align: center">
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
-<p class="caption">(\#fig:unnamed-chunk-40)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+<p class="caption">(\#fig:unnamed-chunk-44)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
 </div>
 
 
@@ -1247,7 +1334,7 @@ ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) +
   facet_grid(~sim.method)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Discrete RVs {-}

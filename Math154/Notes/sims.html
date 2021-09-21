@@ -160,6 +160,10 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <li>Repeat the entire process many times so as to account for variability in the simulation.</li>
 <li>Use the law of large numbers to conclude that the average of the simulation approximates the expected value.</li>
 </ol>
+<div id="using-a-for-loop" class="section level5" number="4.1.0.0.1">
+<h5>
+<span class="header-section-number">4.1.0.0.1</span> Using a for-loop<a class="anchor" aria-label="anchor" href="#using-a-for-loop"><i class="fas fa-link"></i></a>
+</h5>
 <div class="sourceCode" id="cb241"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">allk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span><span class="op">{</span>
@@ -170,28 +174,95 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
   <span class="va">allk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">allk</span>, <span class="va">k</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">}</span>
 <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">allk</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1.71</code></pre>
+</div>
+<div id="using-functional-programming-and-the-map-function" class="section level4" number="4.1.0.1">
+<h4>
+<span class="header-section-number">4.1.0.1</span> Using functional programming and the <code>map()</code> function<a class="anchor" aria-label="anchor" href="#using-functional-programming-and-the-map-function"><i class="fas fa-link"></i></a>
+</h4>
+<p>Functional programming is typically much faster than for loops are, and they also fit more cleanly into a tidy pipeline. The <code>map</code> functions (in the <strong>purrr</strong> package) are <em>named</em> by the <strong>output</strong> the produce. Some of the <code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code> functions include:</p>
+<ul>
+<li><p><code><a href="https://purrr.tidyverse.org/reference/map.html">map(.x, .f)</a></code> is the main mapping function and returns a list</p></li>
+<li><p><code><a href="https://purrr.tidyverse.org/reference/map.html">map_df(.x, .f)</a></code> returns a data frame</p></li>
+<li><p><code><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl(.x, .f)</a></code> returns a numeric (double) vector</p></li>
+<li><p><code><a href="https://purrr.tidyverse.org/reference/map.html">map_chr(.x, .f)</a></code> returns a character vector</p></li>
+<li><p><code><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl(.x, .f)</a></code> returns a logical vector</p></li>
+</ul>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-6"></span>
+<img src="figs/purrr_map.png" alt="From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html" width="90%"><p class="caption">
+Figure 1.6: From Advanced R by Wickham. <a href="https://adv-r.hadley.nz/functionals.html" class="uri">https://adv-r.hadley.nz/functionals.html</a>
+</p>
+</div>
+<p>Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.</p>
+<p>To use functional programming on expected value problem, the first step is to write a function (here called <code>sum_unif()</code>) which will select uniform random variables until they add up to more than one. Note that the function itself doesn’t have any arguments.</p>
+<div class="sourceCode" id="cb243"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sum_unif</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">sumU</span> <span class="op">&lt;-</span> <span class="fl">0</span>
+  <span class="va">k</span> <span class="op">&lt;-</span> <span class="fl">0</span>
+  <span class="kw">while</span><span class="op">(</span><span class="va">sumU</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">sumU</span> <span class="op">&lt;-</span> <span class="va">sumU</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">k</span> <span class="op">&lt;-</span> <span class="va">k</span><span class="op">+</span><span class="fl">1</span>
+<span class="op">}</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">k</span><span class="op">-</span><span class="fl">1</span>, <span class="va">sumU</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p>Using <code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>, the <code>sum_unif()</code> function is run <code>reps</code> number of times. Note that <code>sum_unif()</code> doesn’t have any arguments, so it doesn’t really matter what the form of the input is for <code>sum_unif()</code>.</p>
+<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">1000</span>
+ 
+<span class="va">sim_k_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>row_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">reps</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>max_for_EX <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">row_id</span>, <span class="va">sum_unif</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">unnest</span><span class="op">(</span><span class="va">max_for_EX</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"k"</span>, <span class="st">"sum"</span><span class="op">)</span>, <span class="va">reps</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">pivot_wider</span><span class="op">(</span>id_cols <span class="op">=</span> <span class="va">row_id</span>, names_from <span class="op">=</span> <span class="va">output</span>, 
+              values_from <span class="op">=</span> <span class="va">max_for_EX</span><span class="op">)</span> 
+
+<span class="va">sim_k_max</span></code></pre></div>
+<pre><code>## # A tibble: 1,000 × 3
+##    row_id     k   sum
+##     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1      1     2  1.05
+##  2      2     2  1.68
+##  3      3     1  1.39
+##  4      4     1  1.47
+##  5      5     2  1.03
+##  6      6     1  1.45
+##  7      7     1  1.41
+##  8      8     1  1.83
+##  9      9     1  1.17
+## 10     10     2  1.42
+## # … with 990 more rows</code></pre>
+<p>Last, approximate the expected value of <span class="math inline">\(X\)</span> using the law of large numbers… the sample average converges in probability to the expected value.</p>
+<div class="sourceCode" id="cb246"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sim_k_max</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>EX <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 1
+##      EX
+##   &lt;dbl&gt;
+## 1  1.74</code></pre>
+</div>
 <div id="aside-the-r-function-sample" class="section level3" number="4.1.1">
 <h3>
 <span class="header-section-number">4.1.1</span> Aside: the R function <code>sample()</code><a class="anchor" aria-label="anchor" href="#aside-the-r-function-sample"><i class="fas fa-link"></i></a>
 </h3>
 <p>The word “simulate” can mean a variety of things. In this course, we will simulate under various settings: <em>sampling</em>, <em>shuffling</em>, and <em>resampling</em>. All of the simultion methods can be done using the same R function <code><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample()</a></code></p>
-<div class="sourceCode" id="cb243"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb248"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">alph</span> <span class="op">&lt;-</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>
 
 <span class="va">alph</span></code></pre></div>
 <pre><code>##  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"</code></pre>
-<div class="sourceCode" id="cb245"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb250"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, <span class="fl">5</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># sample (from a population)</span></code></pre></div>
-<pre><code>## [1] "j" "c" "h" "g" "f"</code></pre>
-<div class="sourceCode" id="cb247"><pre class="downlit sourceCode r">
+<pre><code>## [1] "g" "i" "h" "b" "a"</code></pre>
+<div class="sourceCode" id="cb252"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, <span class="fl">15</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># sample (from a population)</span></code></pre></div>
-<pre><code>##  [1] "f" "a" "a" "h" "f" "f" "i" "e" "h" "d" "b" "g" "f" "e" "i"</code></pre>
-<div class="sourceCode" id="cb249"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># shuffle</span></code></pre></div>
-<pre><code>##  [1] "g" "e" "f" "i" "j" "c" "d" "a" "b" "h"</code></pre>
-<div class="sourceCode" id="cb251"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># resample</span></code></pre></div>
-<pre><code>##  [1] "a" "i" "d" "e" "e" "f" "g" "c" "c" "c"</code></pre>
+<pre><code>##  [1] "i" "e" "d" "i" "d" "a" "c" "h" "a" "a" "b" "f" "i" "e" "h"</code></pre>
+<div class="sourceCode" id="cb254"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, <span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># shuffle</span></code></pre></div>
+<pre><code>##  [1] "h" "a" "e" "g" "i" "c" "j" "d" "f" "b"</code></pre>
+<div class="sourceCode" id="cb256"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">alph</span>, <span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># resample</span></code></pre></div>
+<pre><code>##  [1] "c" "h" "i" "j" "i" "b" "e" "j" "g" "c"</code></pre>
 </div>
 <div id="why-do-we-simulate-differently" class="section level3" number="4.1.2">
 <h3>
@@ -250,7 +321,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <li>Start with 2 cards, build up one card at a time</li>
 <li>Lots of different strategies (also based on dealer’s cards)</li>
 </ul>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;"></div>
 <hr>
 </div>
 <div id="what-do-we-need-to-simulate-poker" class="section level5 unnumbered">
@@ -279,26 +350,26 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="setting-up-the-game-in-r" class="section level5 unnumbered">
 <h5>Setting up the Game in R<a class="anchor" aria-label="anchor" href="#setting-up-the-game-in-r"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb253"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb258"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">deck</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span>
 
 <span class="va">shuffle_decks</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ndecks</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">deck</span>, <span class="va">ndecks</span><span class="op">)</span><span class="op">)</span><span class="op">}</span>
 
 <span class="fu">shuffle_decks</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></code></pre></div>
-<pre><code>##   [1]  6  4 10  2  1  5  5  8 10  8 10 10 10  3  6 10  2  5  3 10  1  4  1  2  3
-##  [26]  5  5  5  4  4 10 10 10 10  9  1  2  4  6  9  6  6  9 10  3  6  3  8 10  3
-##  [51]  9  4  8  8  6  8  7  2 10  6  1  3 10 10  3 10  2  1  8 10  5 10 10  4  7
-##  [76]  2 10  1  9  3 10  9  6  9  8 10  5 10  1  7  4  7 10  6  1 10  8  4  8  7
-## [101] 10  8  1  2  3  2  3 10  8  3  8  9 10  5  8  7  1  2  4  3  5 10  7  5  4
-## [126]  2 10 10 10  6  3  5  9 10  1  1  6 10 10  7  8 10  4  6  4  9 10 10 10 10
-## [151] 10  2  7 10  7  1 10 10  1 10  4  2  9 10 10  2 10  9 10 10  3  5  7 10 10
-## [176] 10 10 10  9  5  2  4 10 10  7 10  8  9  5 10 10  7  3  1  6 10  7  5  4  7
-## [201] 10  9  6  6  2  9 10  7</code></pre>
+<pre><code>##   [1]  6  5 10  4  2  1  2 10  1 10 10  7  9  5 10  4 10  2  6  8  8 10  7  9  3
+##  [26]  1 10 10 10  5  3 10  2 10 10 10  8  3  3 10 10 10  5 10  7  8 10 10  5 10
+##  [51]  9  6 10  8 10  9 10  2  1  4 10  7  3 10 10  8  3  6  6  3  5  5  6  9 10
+##  [76]  9  4 10  6  3  9 10  1 10  8  1  5 10  7  8 10  4 10  1  2  2  8  4  5  8
+## [101]  4  6  8  7  7 10 10  5  3  4 10 10  3 10  1 10 10  4  6  7  8  9 10  4  2
+## [126]  5  6  1 10  4 10  5 10  1  3  7  3  4 10  9 10  6  2 10  2  5  2  2  9 10
+## [151]  1 10  3  8  9  3 10  1 10  5  4  2  5  4  8 10  2  9 10  8  7  7  9  2 10
+## [176]  6  3  4  1 10  1  6  7  9  5 10  1  8  2  7  3  7  1 10  6  4  6  6 10 10
+## [201] 10 10  7  9  9  7 10 10</code></pre>
 </div>
 <div id="outcome-of-cards-in-hand" class="section level5 unnumbered">
 <h5>Outcome of cards in hand<a class="anchor" aria-label="anchor" href="#outcome-of-cards-in-hand"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb255"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb260"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">handValue</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">cards</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">value</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="va">cards</span><span class="op">)</span>
   
@@ -317,14 +388,14 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <span class="op">}</span>
 <span class="fu">handValue</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 14</code></pre>
-<div class="sourceCode" id="cb257"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb262"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">handValue</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0</code></pre>
 </div>
 <div id="of-cards-in-hand" class="section level5 unnumbered">
 <h5>$ of cards in hand<a class="anchor" aria-label="anchor" href="#of-cards-in-hand"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb259"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb264"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">winnings</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dealer</span>, <span class="va">players</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">if</span> <span class="op">(</span><span class="va">dealer</span> <span class="op">&gt;</span> <span class="fl">21</span><span class="op">)</span> <span class="op">{</span>  <span class="co"># Dealer=Blackjack, ties players with Blackjack</span>
     <span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="op">(</span><span class="va">players</span> <span class="op">&lt;=</span> <span class="fl">21</span><span class="op">)</span>
@@ -344,7 +415,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="better-of-cards-in-hand" class="section level5 unnumbered">
 <h5>Better $ of cards in hand<a class="anchor" aria-label="anchor" href="#better-of-cards-in-hand"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb261"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb266"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">winnings</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dealer</span>, <span class="va">players</span><span class="op">)</span><span class="op">{</span>
   <span class="op">(</span><span class="va">players</span> <span class="op">&gt;</span> <span class="va">dealer</span> <span class="op">&amp;</span> <span class="va">players</span> <span class="op">&gt;</span> <span class="fl">21</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1.5</span> <span class="op">+</span> <span class="co"># Blackjack</span>
   <span class="op">(</span><span class="va">players</span> <span class="op">&gt;</span> <span class="va">dealer</span> <span class="op">&amp;</span> <span class="va">players</span> <span class="op">&lt;=</span> <span class="fl">21</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1</span> <span class="op">+</span>  <span class="co"># win</span>
@@ -353,30 +424,30 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 
 <span class="fu">winnings</span><span class="op">(</span><span class="fl">17</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">21.5</span>, <span class="fl">14</span>, <span class="fl">0</span>, <span class="fl">21</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1]  1.0  1.5 -1.0 -1.0  1.0</code></pre>
-<div class="sourceCode" id="cb263"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb268"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">winnings</span><span class="op">(</span><span class="fl">21.5</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">21.5</span>, <span class="fl">14</span>, <span class="fl">0</span>, <span class="fl">21</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] -1  0 -1 -1 -1</code></pre>
 </div>
 <div id="how-well-does-handvalue-work" class="section level5 unnumbered">
 <h5>How well does <code>handValue</code> work?<a class="anchor" aria-label="anchor" href="#how-well-does-handvalue-work"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb270"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">test_cards</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, 
                    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">6</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, 
                    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">1</span>, <span class="fl">9</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,
                    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">7</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">9</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> 
 
 <span class="va">test_cards_val</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21.5</span>, <span class="fl">21</span>, <span class="fl">12</span>, <span class="fl">19</span>, <span class="fl">21</span>, <span class="fl">19</span>, <span class="fl">17</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>
-<span class="fu">map_dbl</span><span class="op">(</span><span class="va">test_cards</span>, <span class="va">handValue</span><span class="op">)</span>  <span class="co"># apply the function handValue to test_cards</span></code></pre></div>
+<span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="va">test_cards</span>, <span class="va">handValue</span><span class="op">)</span>  <span class="co"># apply the function handValue to test_cards</span></code></pre></div>
 <pre><code>## [1] 21.5 21.0 12.0 19.0 21.0 19.0 17.0  0.0  0.0</code></pre>
-<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">test_cards_val</span>, <span class="fu">map_dbl</span><span class="op">(</span><span class="va">test_cards</span>, <span class="va">handValue</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">test_cards_val</span>, <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="va">test_cards</span>, <span class="va">handValue</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="testing-winnings-create-known" class="section level5 unnumbered">
 <h5>Testing winnings (create known)<a class="anchor" aria-label="anchor" href="#testing-winnings-create-known"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">test_vals</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">16</span>, <span class="fl">19</span>, <span class="fl">20</span>, <span class="fl">21</span>, <span class="fl">21.5</span><span class="op">)</span>
 
 <span class="va">testWinnings</span> <span class="op">=</span>
@@ -403,7 +474,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="does-winnings-work" class="section level5 unnumbered">
 <h5>Does <code>winnings</code> work?<a class="anchor" aria-label="anchor" href="#does-winnings-work"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb271"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">check</span> <span class="op">=</span> <span class="va">testWinnings</span>  <span class="co"># make the matrix the right size</span>
 <span class="va">check</span><span class="op">[</span><span class="op">]</span> <span class="op">=</span> <span class="cn">NA</span>  <span class="co"># make all entries NA</span>
  
@@ -419,7 +490,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="function-for-getting-more-cards" class="section level5 unnumbered">
 <h5>Function for getting more cards<a class="anchor" aria-label="anchor" href="#function-for-getting-more-cards"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb273"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb278"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">shoe</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">m</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="va">deck</span>, <span class="va">m</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="va">new_hand</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">cards</span> <span class="op">=</span> <span class="fu">shoe</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, <span class="va">bet</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span>
@@ -434,36 +505,36 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 ## function(m = 1) sample(deck, m, replace = TRUE)
 ## 
 ## $cards
-## [1] 10  8</code></pre>
+## [1] 10  3</code></pre>
 </div>
 <div id="first-action-hit" class="section level5 unnumbered">
 <h5>First action: hit<a class="anchor" aria-label="anchor" href="#first-action-hit"><i class="fas fa-link"></i></a>
 </h5>
 <p>receive another card</p>
-<div class="sourceCode" id="cb275"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb280"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">hit</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">hand</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">hand</span><span class="op">$</span><span class="va">cards</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">hand</span><span class="op">$</span><span class="va">cards</span>, <span class="va">hand</span><span class="op">$</span><span class="fu">shoe</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
   <span class="va">hand</span>
 <span class="op">}</span>
 
 <span class="fu">hit</span><span class="op">(</span><span class="va">myCards</span><span class="op">)</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
-<pre><code>## [1] 10  8  1</code></pre>
+<pre><code>## [1] 10  3 10</code></pre>
 </div>
 <div id="second-action-stand" class="section level5 unnumbered">
 <h5>Second action: stand<a class="anchor" aria-label="anchor" href="#second-action-stand"><i class="fas fa-link"></i></a>
 </h5>
 <p>stay with current cards</p>
-<div class="sourceCode" id="cb277"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb282"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">stand</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">hand</span><span class="op">)</span> <span class="va">hand</span>
 
 <span class="fu">stand</span><span class="op">(</span><span class="va">myCards</span><span class="op">)</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
-<pre><code>## [1] 10  8</code></pre>
+<pre><code>## [1] 10  3</code></pre>
 </div>
 <div id="third-action-double-down" class="section level5 unnumbered">
 <h5>Third action: double down<a class="anchor" aria-label="anchor" href="#third-action-double-down"><i class="fas fa-link"></i></a>
 </h5>
 <p>double the bet after receiving exactly one more card</p>
-<div class="sourceCode" id="cb279"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dd</span> <span class="op">=</span>  <span class="kw">function</span><span class="op">(</span><span class="va">hand</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">hand</span><span class="op">$</span><span class="va">bet</span> <span class="op">=</span> <span class="va">hand</span><span class="op">$</span><span class="va">bet</span> <span class="op">*</span> <span class="fl">2</span>
   <span class="va">hand</span> <span class="op">=</span> <span class="fu">hit</span><span class="op">(</span><span class="va">hand</span><span class="op">)</span>
@@ -471,13 +542,13 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <span class="op">}</span>
 
 <span class="fu">dd</span><span class="op">(</span><span class="va">myCards</span><span class="op">)</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
-<pre><code>## [1] 10  8 10</code></pre>
+<pre><code>## [1] 10  3 10</code></pre>
 </div>
 <div id="fourth-action-split-a-pair" class="section level5 unnumbered">
 <h5>Fourth action: split a pair<a class="anchor" aria-label="anchor" href="#fourth-action-split-a-pair"><i class="fas fa-link"></i></a>
 </h5>
 <p>create two different hands from initial hand with two cards of the same value</p>
-<div class="sourceCode" id="cb281"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">splitPair</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">hand</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span> <span class="fu">new_hand</span><span class="op">(</span><span class="va">hand</span><span class="op">$</span><span class="va">shoe</span>, 
              cards <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">hand</span><span class="op">$</span><span class="va">cards</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">hand</span><span class="op">$</span><span class="fu">shoe</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,
@@ -491,25 +562,25 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <h5>Results of splitting<a class="anchor" aria-label="anchor" href="#results-of-splitting"><i class="fas fa-link"></i></a>
 </h5>
 <p>(can we always split?)</p>
-<div class="sourceCode" id="cb282"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">splitHand</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
-<pre><code>## [1] 10 10</code></pre>
-<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
+<pre><code>## [1] 10  1</code></pre>
+<div class="sourceCode" id="cb289"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">splitHand</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
-<pre><code>## [1] 8 9</code></pre>
+<pre><code>## [1] 3 3</code></pre>
 </div>
 <div id="lets-play-not-yet-automated" class="section level5 unnumbered">
 <h5>Let’s play! Not yet automated…<a class="anchor" aria-label="anchor" href="#lets-play-not-yet-automated"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb291"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">470</span><span class="op">)</span>; <span class="va">dealer</span> <span class="op">=</span> <span class="fu">new_hand</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span>; <span class="va">player</span> <span class="op">=</span> <span class="fu">new_hand</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span>; 
 <span class="va">dealer</span><span class="op">$</span><span class="va">cards</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
 <pre><code>## [1] 2</code></pre>
-<div class="sourceCode" id="cb288"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb293"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">player</span><span class="op">$</span><span class="va">cards</span>; <span class="va">player</span> <span class="op">=</span> <span class="fu">hit</span><span class="op">(</span><span class="va">player</span><span class="op">)</span>; <span class="va">player</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
 <pre><code>## [1]  5 10</code></pre>
 <pre><code>## [1]  5 10  9</code></pre>
-<div class="sourceCode" id="cb291"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dealer</span><span class="op">$</span><span class="va">cards</span>; <span class="va">dealer</span> <span class="op">=</span> <span class="fu">hit</span><span class="op">(</span><span class="va">dealer</span><span class="op">)</span>; <span class="va">dealer</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
 <pre><code>## [1] 2 3</code></pre>
 <pre><code>## [1] 2 3 3</code></pre>
@@ -517,15 +588,15 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="who-won" class="section level5 unnumbered">
 <h5>Who won?<a class="anchor" aria-label="anchor" href="#who-won"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb294"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb299"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dealer</span><span class="op">$</span><span class="va">cards</span>; <span class="va">player</span><span class="op">$</span><span class="va">cards</span></code></pre></div>
 <pre><code>## [1] 2 3 3</code></pre>
 <pre><code>## [1]  5 10  9</code></pre>
-<div class="sourceCode" id="cb297"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb302"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">handValue</span><span class="op">(</span><span class="va">dealer</span><span class="op">$</span><span class="va">cards</span><span class="op">)</span>; <span class="fu">handValue</span><span class="op">(</span><span class="va">player</span><span class="op">$</span><span class="va">cards</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 8</code></pre>
 <pre><code>## [1] 0</code></pre>
-<div class="sourceCode" id="cb300"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb305"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">winnings</span><span class="op">(</span><span class="fu">handValue</span><span class="op">(</span><span class="va">dealer</span><span class="op">$</span><span class="va">cards</span><span class="op">)</span>, <span class="fu">handValue</span><span class="op">(</span><span class="va">player</span><span class="op">$</span><span class="va">cards</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] -1</code></pre>
 </div>
@@ -533,7 +604,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <h5>Simply strategy<a class="anchor" aria-label="anchor" href="#simply-strategy"><i class="fas fa-link"></i></a>
 </h5>
 <p>recall the handValue function – what if player busts?</p>
-<div class="sourceCode" id="cb302"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb307"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">strategy_simple</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">mine</span>, <span class="va">dealerFaceUp</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">if</span> <span class="op">(</span><span class="fu">handValue</span><span class="op">(</span><span class="va">dealerFaceUp</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">6</span> <span class="op">&amp;&amp;</span> <span class="fu">handValue</span><span class="op">(</span><span class="va">mine</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">17</span><span class="op">)</span> 
      <span class="st">"H"</span> 
@@ -544,7 +615,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="better-simple-strategy" class="section level5 unnumbered">
 <h5>Better simple strategy<a class="anchor" aria-label="anchor" href="#better-simple-strategy"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb303"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb308"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">strategy_simple</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">mine</span>, <span class="va">dealerFaceUp</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">if</span> <span class="op">(</span><span class="fu">handValue</span><span class="op">(</span><span class="va">mine</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="st">"S"</span><span class="op">)</span>
   <span class="kw">if</span> <span class="op">(</span><span class="fu">handValue</span><span class="op">(</span><span class="va">dealerFaceUp</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">6</span> <span class="op">&amp;&amp;</span> <span class="fu">handValue</span><span class="op">(</span><span class="va">mine</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">17</span><span class="op">)</span> 
@@ -557,7 +628,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <h5>Dealer<a class="anchor" aria-label="anchor" href="#dealer"><i class="fas fa-link"></i></a>
 </h5>
 <p>The dealer gets cards regardless of what the player does</p>
-<div class="sourceCode" id="cb304"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb309"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dealer_cards</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">cards</span> <span class="op">=</span> <span class="fu">shoe</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>
   <span class="kw">while</span><span class="op">(</span><span class="fu">handValue</span><span class="op">(</span><span class="va">cards</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">17</span> <span class="op">&amp;&amp;</span> <span class="fu">handValue</span><span class="op">(</span><span class="va">cards</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
@@ -568,14 +639,14 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 
 <span class="fu">dealer_cards</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 5 9 1 8</code></pre>
-<div class="sourceCode" id="cb306"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb311"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">dealer_cards</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1]  4  4  7 10</code></pre>
 </div>
 <div id="playing-a-hand" class="section level5 unnumbered">
 <h5>Playing a hand<a class="anchor" aria-label="anchor" href="#playing-a-hand"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb308"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb313"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">play_hand</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">strategy</span>, 
                       <span class="va">hand</span> <span class="op">=</span> <span class="fu">new_hand</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span>, 
                       <span class="va">dealer</span> <span class="op">=</span> <span class="fu">dealer_cards</span><span class="op">(</span><span class="va">shoe</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
@@ -598,16 +669,16 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <div id="play-a-few-hands" class="section level5 unnumbered">
 <h5>Play a few hands<a class="anchor" aria-label="anchor" href="#play-a-few-hands"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb309"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb314"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">play_hand</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">strategy_simple</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0</code></pre>
-<div class="sourceCode" id="cb311"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb316"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">play_hand</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">strategy_simple</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] -1</code></pre>
-<div class="sourceCode" id="cb313"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb318"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">play_hand</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">strategy_simple</span>, <span class="fu">new_hand</span><span class="op">(</span><span class="va">shoe</span>, bet<span class="op">=</span><span class="fl">7</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0</code></pre>
-<div class="sourceCode" id="cb315"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb320"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">play_hand</span><span class="op">(</span><span class="va">shoe</span>, <span class="va">strategy_simple</span>, <span class="fu">new_hand</span><span class="op">(</span><span class="va">shoe</span>, bet<span class="op">=</span><span class="fl">7</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
 </div>
@@ -615,7 +686,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <h5>Repeated games<a class="anchor" aria-label="anchor" href="#repeated-games"><i class="fas fa-link"></i></a>
 </h5>
 <p>To repeat the game, we simply repeat the <code>play_hand</code> function and keep track of the dollars gained or lost.</p>
-<div class="sourceCode" id="cb317"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb322"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">reps</span><span class="op">=</span><span class="fl">10</span>
 <span class="va">money</span><span class="op">=</span><span class="fl">20</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps</span><span class="op">)</span><span class="op">{</span>
@@ -660,7 +731,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <blockquote>
 <p>But there is one difference: the Blues have a bit more money than the Reds, so they each take the SAT twice, and report only the highest of the two scores to the college. This results in a small but noticeable bump in their average SAT scores, compared to the Reds.</p>
 </blockquote>
-<div class="sourceCode" id="cb319"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb324"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">n</span> <span class="op">=</span> <span class="fl">100000</span>
 <span class="va">n.red</span> <span class="op">=</span> <span class="va">n</span><span class="op">*</span><span class="fl">0.99</span>
 <span class="va">n.blue</span> <span class="op">=</span> <span class="va">n</span><span class="op">*</span><span class="fl">0.01</span>
@@ -680,12 +751,12 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
                            grades <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">red.grade</span>, <span class="va">blue.grade</span><span class="op">)</span>,
                            color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="va">n.red</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="va">n.blue</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">college.data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">grades</span>, y <span class="op">=</span> <span class="va">SAT</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_color_identity</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">college.data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">grades</span>, y <span class="op">=</span> <span class="va">SAT</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html">scale_color_identity</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
                        guide <span class="op">=</span> <span class="st">"legend"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">geom_abline</span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;"></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="two-separate-models" class="section level4 unnumbered">
 <h4>Two separate models<a class="anchor" aria-label="anchor" href="#two-separate-models"><i class="fas fa-link"></i></a>
@@ -693,7 +764,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <blockquote>
 <p>So what is the effect of this when we use our reasonable inference procedure? First, lets consider what happens when we learn two different regression models: one for the Blues, and a different one for the Reds. We don’t see much difference:</p>
 </blockquote>
-<div class="sourceCode" id="cb320"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb325"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">red.lm</span> <span class="op">=</span> <span class="va">college.data</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">color</span> <span class="op">==</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">talent</span> <span class="op">~</span> <span class="va">SAT</span> <span class="op">+</span> <span class="va">grades</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
@@ -712,7 +783,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 ## 1 (Intercept)   33.2     0.153        216.       0
 ## 2 SAT            0.333   0.00151      220.       0
 ## 3 grades         0.335   0.00151      222.       0</code></pre>
-<div class="sourceCode" id="cb322"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb327"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">blue.lm</span> <span class="op">%&gt;%</span> <span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 × 5
 ##   term        estimate std.error statistic   p.value
@@ -720,7 +791,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 ## 1 (Intercept)   25.6      1.64        15.6 1.85e- 49
 ## 2 SAT            0.429    0.0169      25.3 1.12e-109
 ## 3 grades         0.280    0.0157      17.9 3.50e- 62</code></pre>
-<div class="sourceCode" id="cb324"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb329"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">global.lm</span> <span class="op">%&gt;%</span> <span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 × 5
 ##   term        estimate std.error statistic p.value
@@ -728,7 +799,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 ## 1 (Intercept)   33.2     0.153        217.       0
 ## 2 SAT            0.333   0.00151      221.       0
 ## 3 grades         0.335   0.00150      223.       0</code></pre>
-<div class="sourceCode" id="cb326"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb331"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new.reds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n.red</span>, mean <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>
 <span class="va">new.blues</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n.blue</span>, mean <span class="op">=</span> <span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>
 
@@ -757,14 +828,14 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <span class="va">new.college.data</span> <span class="op">&lt;-</span> <span class="va">new.college.data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span>predicted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">new.red.pred</span>, <span class="va">new.blue.pred</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">new.college.data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">talent</span>, y <span class="op">=</span> <span class="va">predicted</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_color_identity</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">new.college.data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">talent</span>, y <span class="op">=</span> <span class="va">predicted</span>, color <span class="op">=</span> <span class="va">color</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html">scale_color_identity</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
                        guide <span class="op">=</span> <span class="st">"legend"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb327"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb332"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new.college.data</span> <span class="op">&lt;-</span> <span class="va">new.college.data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">talent</span> <span class="op">&lt;</span> <span class="fl">115</span> <span class="op">&amp;</span> <span class="va">predicted</span> <span class="op">&gt;</span> <span class="fl">115</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,
          tp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">talent</span> <span class="op">&gt;</span> <span class="fl">115</span> <span class="op">&amp;</span> <span class="va">predicted</span> <span class="op">&gt;</span> <span class="fl">115</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,
@@ -800,23 +871,23 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <blockquote>
 <p>But you might reasonably object: because we have learned separate models for the Blues and the Reds, we are explicitly making admissions decisions as a function of a student’s color! This might sound like a form of discrimination, baked in by the algorithm designer — and if the two populations represent e.g. racial groups, then its explicitly illegal in a number of settings, including lending.</p>
 </blockquote>
-<div class="sourceCode" id="cb329"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb334"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new.pred</span> <span class="op">&lt;-</span> <span class="va">new.college.data</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/predict.lm.html">predict.lm</a></span><span class="op">(</span><span class="va">global.lm</span>, newdata <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
 
 <span class="va">new.college.data</span> <span class="op">&lt;-</span> <span class="va">new.college.data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span>global.predicted <span class="op">=</span> <span class="va">new.pred</span><span class="op">)</span>
 
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">new.college.data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">talent</span>, 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">new.college.data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">talent</span>, 
                              y <span class="op">=</span> <span class="va">global.predicted</span>, 
                              color <span class="op">=</span> <span class="va">color</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">scale_color_identity</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">115</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html">scale_color_identity</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Color Group"</span>,
                        guide <span class="op">=</span> <span class="st">"legend"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb330"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb335"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">new.college.data</span> <span class="op">&lt;-</span> <span class="va">new.college.data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">talent</span> <span class="op">&lt;</span> <span class="fl">115</span> <span class="op">&amp;</span> <span class="va">global.predicted</span> <span class="op">&gt;</span> <span class="fl">115</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,
          tp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">talent</span> <span class="op">&gt;</span> <span class="fl">115</span> <span class="op">&amp;</span> <span class="va">global.predicted</span> <span class="op">&gt;</span> <span class="fl">115</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,
@@ -865,7 +936,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <h4>Examples<a class="anchor" aria-label="anchor" href="#examples-1"><i class="fas fa-link"></i></a>
 </h4>
 <p><strong>Equal variance in the t-test</strong> Recall that one of the technical conditions for the t-test is that the two samples come from populations where the variance is equal (at least when <code>var.equal=TRUE</code> is specified). What happens if the null hypothesis is true (i.e., the <em>means</em> are equal!) but the technical conditions are violated (i.e., the variances are unequal)?</p>
-<div class="sourceCode" id="cb332"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb337"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pvals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">10000</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps</span><span class="op">)</span><span class="op">{</span>
@@ -876,7 +947,7 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="va">pvals</span> <span class="op">&lt;</span> <span class="fl">.05</span><span class="op">)</span><span class="op">/</span><span class="va">reps</span></code></pre></div>
 <pre><code>## [1] 0.0502</code></pre>
 <p><strong>Unequal variance in the t-test</strong></p>
-<div class="sourceCode" id="cb334"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb339"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pvals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">10000</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps</span><span class="op">)</span><span class="op">{</span>
@@ -890,8 +961,8 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <p>The <a href="http://www.rossmanchance.com/applets/RegShuffle.htm">ISCAM applet</a> by Beth Chance and Allan Rossman <span class="citation">(<a href="references.html#ref-iscam" role="doc-biblioref">Chance and Rossman 2018b</a>)</span> demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.</p>
 <p>Consider the following linear model with the points normally distributed with <em>equal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory works out well. It turns out that the confidence interval will capture the true parameter in 95% of samples!]</p>
 <p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)\]</span></p>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb336"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb341"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">beta2.in</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">beta0</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span>
 <span class="va">beta1</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
@@ -916,8 +987,8 @@ Y + (L - Y) &amp;&gt; X \Rightarrow L &gt; X
 <p><strong>Unequal variance in the linear model</strong></p>
 <p>Consider the following linear model with the points normally distributed with <em>unequal</em> variance around the line. [Spoiler: when the technical conditions are met, the theory does not work out as well. It turns out that the confidence interval will not capture the true parameter in 95% of samples!]</p>
 <p><span class="math display">\[ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)\]</span></p>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb338"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb343"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">beta2.in</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">beta0</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span>
 <span class="va">beta1</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
@@ -963,7 +1034,7 @@ You are not responsible for the material on generating random numbers, but it’
 <li>
 <span class="math inline">\(a - 1\)</span> is divisible by 4 if <span class="math inline">\(m\)</span> is divisible by 4.</li>
 </ul>
-<div class="sourceCode" id="cb340"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb345"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fl">31541435235</span>
 <span class="va">b</span> <span class="op">&lt;-</span> <span class="fl">23462146143</span> 
 <span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">423514351351</span>
@@ -979,7 +1050,7 @@ You are not responsible for the material on generating random numbers, but it’
 <span class="va">update_rv</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">a</span><span class="op">*</span><span class="va">x</span> <span class="op">+</span> <span class="va">b</span><span class="op">)</span> <span class="op">%%</span> <span class="va">m</span> <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">xval</span>, <span class="va">reps</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">map</span><span class="op">(</span><span class="op">~</span> <span class="fu">accumulate</span><span class="op">(</span><span class="va">.</span>, <span class="op">~</span> <span class="op">(</span><span class="op">(</span><span class="va">a</span><span class="op">*</span><span class="va">.x</span> <span class="op">+</span> <span class="va">b</span><span class="op">)</span> <span class="op">%%</span> <span class="va">m</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="va">m</span> <span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/accumulate.html">accumulate</a></span><span class="op">(</span><span class="va">.</span>, <span class="op">~</span> <span class="op">(</span><span class="op">(</span><span class="va">a</span><span class="op">*</span><span class="va">.x</span> <span class="op">+</span> <span class="va">b</span><span class="op">)</span> <span class="op">%%</span> <span class="va">m</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="va">m</span> <span class="op">)</span></code></pre></div>
 <pre><code>## [[1]]
 ## [1] 0.28
 ## 
@@ -1009,10 +1080,10 @@ You are not responsible for the material on generating random numbers, but it’
 ## 
 ## [[10]]
 ## [1] 0.28</code></pre>
-<div class="sourceCode" id="cb342"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb347"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>uniformRVs <span class="op">=</span> <span class="va">unif.val</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">uniformRVs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;"></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">uniformRVs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 </div>
 <div id="generating-other-rvs-the-inverse-transform-method" class="section level3" number="4.2.4">
@@ -1052,7 +1123,7 @@ P(X \leq x) &amp;= P(F^{-1}(U) \leq x)\\
  2x e^{-x^2} &amp; 0 &lt; x \\ 0 &amp; x &lt; 0 \end{cases}\]</span></p>
 <p><em>Note:</em> This is known as a Weibull(<span class="math inline">\(\lambda=1\)</span>, <span class="math inline">\(k=2\)</span>) distribution.</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-40"></span>
+<span style="display:block;" id="fig:unnamed-chunk-44"></span>
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162"><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162"><p class="caption">
 Figure 4.1: Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons
 </p>
@@ -1077,7 +1148,7 @@ could you use these to simulate RV’s with the Weibull density, <span class="ma
 <span class="math display">\[ \mbox{Let: } X_i = \sqrt{-\ln(1-U_i)}\]</span>
 </li>
 </ul>
-<div class="sourceCode" id="cb343"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb348"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">unifdata</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10000</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>
 <span class="va">weib1data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">unifdata</span><span class="op">)</span><span class="op">)</span>
 <span class="va">weib2data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Weibull.html">rweibull</a></span><span class="op">(</span><span class="fl">10000</span>,<span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>
@@ -1086,9 +1157,9 @@ could you use these to simulate RV’s with the Weibull density, <span class="ma
                        sim.method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"InvTrans"</span>, <span class="fl">10000</span><span class="op">)</span>, 
                                       <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"rweibull"</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">weibdata</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">weibull</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">facet_grid</span><span class="op">(</span><span class="op">~</span><span class="va">sim.method</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;"></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">weibdata</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">weibull</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="op">~</span><span class="va">sim.method</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-simulating_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="discrete-rvs" class="section level4 unnumbered">
 <h4>Discrete RVs<a class="anchor" aria-label="anchor" href="#discrete-rvs"><i class="fas fa-link"></i></a>
