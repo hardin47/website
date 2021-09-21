@@ -4,11 +4,6 @@
 
 
 
-## 9/24/19 Agenda {#Sep24}
-1. Why simulate?
-2. What makes a good simulation?
-3. pigs / blackjack examples
-
 
 Below, computer simulations will be used for two main objectives:
 
@@ -136,6 +131,67 @@ mean(allk)
 ```
 
 
+### Aside: the R function `sample()`
+
+The word "simulate" can mean a variety of things.  In this course, we will simulate under various settings: *sampling*, *shuffling*,  and *resampling*.  All of the simultion methods can be done using the same R function `sample()`  
+
+
+```r
+alph <- letters[1:10]
+
+alph
+```
+
+```
+##  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
+```
+
+```r
+sample(alph, 5, replace = FALSE) # sample (from a population)
+```
+
+```
+## [1] "j" "c" "h" "g" "f"
+```
+
+```r
+sample(alph, 15, replace = TRUE) # sample (from a population)
+```
+
+```
+##  [1] "f" "a" "a" "h" "f" "f" "i" "e" "h" "d" "b" "g" "f" "e" "i"
+```
+
+```r
+sample(alph, replace = FALSE)  # shuffle
+```
+
+```
+##  [1] "g" "e" "f" "i" "j" "c" "d" "a" "b" "h"
+```
+
+```r
+sample(alph, replace = TRUE)  # resample
+```
+
+```
+##  [1] "a" "i" "d" "e" "e" "f" "g" "c" "c" "c"
+```
+
+
+### Why do we simulate differently?
+
+Three simulating methods are used for different purposes:
+
+1. Monte Carlo methods - use *sampling* repeated sampling from populations with known (either via data or via populations) characteristics.  [Note, another **very** common tool for sampling from a population is to use a probability model.  Some of the distribution functions we will use include `rnorm()`, `runif()`, `rbinom()`, etc.]
+
+
+2. Randomization / Permutation methods - use *shuffling* (sampling without replacement) to test hypotheses of "no effect".
+
+
+3. Bootstrap methods - use *resampling* (sampling with replacement) to establish confidence intervals.
+
+
 
 ### Goals of Simulating Complicated Models
 
@@ -172,7 +228,7 @@ The goal of simulating a complicated model is not only to create a program which
 * Start with 2 cards, build up one card at a time
 * Lots of different strategies (also based on dealer's cards)
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -198,11 +254,19 @@ deck = rep(c(1:10, 10, 10, 10), 4)
 
 shuffle_decks = function(ndecks){sample(rep(deck, ndecks))}
 
-head(shuffle_decks(4), 10)
+shuffle_decks(4)
 ```
 
 ```
-##  [1]  2  6  6  1  6 10 10 10  2 10
+##   [1]  6  4 10  2  1  5  5  8 10  8 10 10 10  3  6 10  2  5  3 10  1  4  1  2  3
+##  [26]  5  5  5  4  4 10 10 10 10  9  1  2  4  6  9  6  6  9 10  3  6  3  8 10  3
+##  [51]  9  4  8  8  6  8  7  2 10  6  1  3 10 10  3 10  2  1  8 10  5 10 10  4  7
+##  [76]  2 10  1  9  3 10  9  6  9  8 10  5 10  1  7  4  7 10  6  1 10  8  4  8  7
+## [101] 10  8  1  2  3  2  3 10  8  3  8  9 10  5  8  7  1  2  4  3  5 10  7  5  4
+## [126]  2 10 10 10  6  3  5  9 10  1  1  6 10 10  7  8 10  4  6  4  9 10 10 10 10
+## [151] 10  2  7 10  7  1 10 10  1 10  4  2  9 10 10  2 10  9 10 10  3  5  7 10 10
+## [176] 10 10 10  9  5  2  4 10 10  7 10  8  9  5 10 10  7  3  1  6 10  7  5  4  7
+## [201] 10  9  6  6  2  9 10  7
 ```
 
 ##### Outcome of cards in hand {-}
@@ -229,6 +293,14 @@ handValue(c(10,4))
 
 ```
 ## [1] 14
+```
+
+```r
+handValue(c(10, 4, 9))
+```
+
+```
+## [1] 0
 ```
 
 ##### $ of cards in hand {-}
@@ -288,7 +360,7 @@ test_cards = list( c(10, 1), c(10, 5, 6), c(10, 1, 1),
                    c(5, 10, 7), c(10, 9, 1, 1, 1)) 
 
 test_cards_val = c(21.5, 21, 12, 19, 21, 19, 17, 0, 0)
-sapply(test_cards, handValue)  # apply the function handValue to test_cards
+map_dbl(test_cards, handValue)  # apply the function handValue to test_cards
 ```
 
 ```
@@ -296,7 +368,7 @@ sapply(test_cards, handValue)  # apply the function handValue to test_cards
 ```
 
 ```r
-identical(test_cards_val, sapply(test_cards, handValue))
+identical(test_cards_val, map_dbl(test_cards, handValue))
 ```
 
 ```
@@ -372,7 +444,7 @@ myCards
 ## function(m = 1) sample(deck, m, replace = TRUE)
 ## 
 ## $cards
-## [1] 4 9
+## [1] 10  8
 ```
 
 ##### First action: hit {-}
@@ -388,7 +460,7 @@ hit(myCards)$cards
 ```
 
 ```
-## [1]  4  9 10
+## [1] 10  8  1
 ```
 
 ##### Second action: stand  {-}
@@ -401,12 +473,13 @@ stand(myCards)$cards
 ```
 
 ```
-## [1] 4 9
+## [1] 10  8
 ```
 
 
 ##### Third action: double down {-}
 double the bet after receiving exactly one more card
+
 
 ```r
 dd =  function(hand) {
@@ -419,7 +492,7 @@ dd(myCards)$cards
 ```
 
 ```
-## [1] 4 9 3
+## [1] 10  8 10
 ```
 
 ##### Fourth action: split a pair {-}
@@ -436,7 +509,8 @@ splitPair = function(hand) {
              bet = hand$bet))   }
 splitHand = splitPair(myCards)
 ```
-  
+
+
 ##### Results of splitting {-}
 (can we always split?)
 
@@ -445,7 +519,7 @@ splitHand[[1]]$cards
 ```
 
 ```
-## [1] 4 1
+## [1] 10 10
 ```
 
 ```r
@@ -453,7 +527,7 @@ splitHand[[2]]$cards
 ```
 
 ```
-## [1] 9 5
+## [1] 8 9
 ```
 
 
@@ -661,14 +735,6 @@ for(i in 1:reps){
 ```
 
 
-
-## 9/26/19 Agenda {#Sep26}
-1. Understanding bias in modeling
-2. Sensitivity of statistical inferential procedures to technical conditions
-3. <p style = "color:red">(Not responsible for: Generating random numbers) </p>
-
-
-
 ## Simulating to Assess Sensitivity {#simsens}
 
 
@@ -716,7 +782,7 @@ ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
   geom_abline(intercept = 0, slope = 1)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Two separate models {-}
 
@@ -739,7 +805,7 @@ red.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 ## 1 (Intercept)   33.2     0.153        216.       0
@@ -752,7 +818,7 @@ blue.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic   p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 ## 1 (Intercept)   25.6      1.64        15.6 1.85e- 49
@@ -765,7 +831,7 @@ global.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 ## 1 (Intercept)   33.2     0.153        217.       0
@@ -813,7 +879,7 @@ ggplot(new.college.data, aes(x = talent, y = predicted, color = color)) +
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -833,9 +899,9 @@ error.rates
 ```
 
 ```
-## # A tibble: 2 x 6
+## # A tibble: 2 × 6
 ##   color   tpr    fpr   fnr   fdr error
-##   <fct> <dbl>  <dbl> <dbl> <dbl> <dbl>
+##   <chr> <dbl>  <dbl> <dbl> <dbl> <dbl>
 ## 1 blue  0.548 0.0367 0.452 0.267 0.101
 ## 2 red   0.506 0.0379 0.494 0.284 0.111
 ```
@@ -867,7 +933,7 @@ ggplot(new.college.data, aes(x = talent,
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -887,9 +953,9 @@ error.rates
 ```
 
 ```
-## # A tibble: 2 x 6
+## # A tibble: 2 × 6
 ##   color   tpr    fpr   fnr   fdr error
-##   <fct> <dbl>  <dbl> <dbl> <dbl> <dbl>
+##   <chr> <dbl>  <dbl> <dbl> <dbl> <dbl>
 ## 1 blue  0.632 0.0627 0.368 0.351 0.11 
 ## 2 red   0.504 0.0377 0.496 0.283 0.111
 ```
@@ -959,7 +1025,7 @@ Consider the following linear model with the points normally distributed with *e
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -996,7 +1062,7 @@ Consider the following linear model with the points normally distributed with *u
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1102,7 +1168,7 @@ data.frame(uniformRVs = unif.val) %>%
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Generating other RVs:  **The Inverse Transform Method**
@@ -1145,7 +1211,7 @@ P(X \leq x) &= P(F^{-1}(U) \leq x)\\
 
 <div class="figure" style="text-align: center">
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
-<p class="caption">(\#fig:unnamed-chunk-39)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+<p class="caption">(\#fig:unnamed-chunk-40)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
 </div>
 
 
@@ -1181,7 +1247,7 @@ ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) +
   facet_grid(~sim.method)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Discrete RVs {-}

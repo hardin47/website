@@ -9,13 +9,9 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE,
 
 library(tidyverse)
 library(broom)
+library(magrittr)
 options(digits=3)
 ```
-
-## 9/24/19 Agenda {#Sep24}
-1. Why simulate?
-2. What makes a good simulation?
-3. pigs / blackjack examples
 
 
 Below, computer simulations will be used for two main objectives:
@@ -128,6 +124,38 @@ mean(allk)
 ```
 
 
+### Aside: the R function `sample()`
+
+The word "simulate" can mean a variety of things.  In this course, we will simulate under various settings: *sampling*, *shuffling*,  and *resampling*.  All of the simultion methods can be done using the same R function `sample()`  
+
+```{r}
+alph <- letters[1:10]
+
+alph
+
+sample(alph, 5, replace = FALSE) # sample (from a population)
+
+sample(alph, 15, replace = TRUE) # sample (from a population)
+
+sample(alph, replace = FALSE)  # shuffle
+
+sample(alph, replace = TRUE)  # resample
+```
+
+
+### Why do we simulate differently?
+
+Three simulating methods are used for different purposes:
+
+1. Monte Carlo methods - use *sampling* repeated sampling from populations with known (either via data or via populations) characteristics.  [Note, another **very** common tool for sampling from a population is to use a probability model.  Some of the distribution functions we will use include `rnorm()`, `runif()`, `rbinom()`, etc.]
+
+
+2. Randomization / Permutation methods - use *shuffling* (sampling without replacement) to test hypotheses of "no effect".
+
+
+3. Bootstrap methods - use *resampling* (sampling with replacement) to establish confidence intervals.
+
+
 
 ### Goals of Simulating Complicated Models
 
@@ -194,7 +222,7 @@ deck = rep(c(1:10, 10, 10, 10), 4)
 
 shuffle_decks = function(ndecks){sample(rep(deck, ndecks))}
 
-head(shuffle_decks(4), 10)
+shuffle_decks(4)
 ```
 
 ##### Outcome of cards in hand {-}
@@ -216,6 +244,7 @@ handValue = function(cards) {
     value
 }
 handValue(c(10,4))
+handValue(c(10, 4, 9))
 ```
 
 ##### $ of cards in hand {-}
@@ -257,9 +286,9 @@ test_cards = list( c(10, 1), c(10, 5, 6), c(10, 1, 1),
                    c(5, 10, 7), c(10, 9, 1, 1, 1)) 
 
 test_cards_val = c(21.5, 21, 12, 19, 21, 19, 17, 0, 0)
-sapply(test_cards, handValue)  # apply the function handValue to test_cards
+map_dbl(test_cards, handValue)  # apply the function handValue to test_cards
 
-identical(test_cards_val, sapply(test_cards, handValue))
+identical(test_cards_val, map_dbl(test_cards, handValue))
 ```
 
 ##### Testing winnings (create known) {-}
@@ -327,6 +356,7 @@ stand(myCards)$cards
 
 ##### Third action: double down {-}
 double the bet after receiving exactly one more card
+
 ```{r}
 dd =  function(hand) {
   hand$bet = hand$bet * 2
@@ -350,7 +380,8 @@ splitPair = function(hand) {
              bet = hand$bet))   }
 splitHand = splitPair(myCards)
 ```
-  
+
+
 ##### Results of splitting {-}
 (can we always split?)
 ```{r}
@@ -455,14 +486,6 @@ for(i in 1:reps){
   money <- money + play_hand(shoe, strategy_simple)
   print(money)}
 ```
-
-
-
-## 9/26/19 Agenda {#Sep26}
-1. Understanding bias in modeling
-2. Sensitivity of statistical inferential procedures to technical conditions
-3. <p style = "color:red">(Not responsible for: Generating random numbers) </p>
-
 
 
 ## Simulating to Assess Sensitivity {#simsens}
