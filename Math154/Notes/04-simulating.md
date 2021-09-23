@@ -843,9 +843,9 @@ The example below is taken directly (and mostly verbatim) from a blog by Aaron R
 
 
 ```r
-n = 100000
-n.red = n*0.99
-n.blue = n*0.01
+n_obs <- 100000
+n.red <- n_obs*0.99
+n.blue <- n_obs*0.01
 reds <- rnorm(n.red, mean = 100, sd = 15)
 blues <- rnorm(n.blue, mean = 100, sd = 15)
 
@@ -992,6 +992,7 @@ error.rates
 ## 1 blue  0.548 0.0367 0.452 0.267 0.101
 ## 2 red   0.506 0.0379 0.494 0.284 0.111
 ```
+
 >The Red classifier makes errors approximately 11.053% of the time. The Blue classifier does about the same --- it makes errors about 10.1% of the time. This makes sense: the Blues artificially inflated their SAT score distribution without increasing their talent, and the classifier picked up on this and corrected for it. In fact, it is even a little more accurate!
 
 >And since we are interested in fairness, lets think about the false negative rate of our classifiers. **"False Negatives" in this setting are the people who are qualified to attend the college ($I > 115$), but whom the college mistakenly rejects.** These are really the people who have come to harm as a result of the classifier's mistakes. And the False Negative Rate is the probability that a randomly selected qualified person is mistakenly rejected from college --- i.e. the probability that a randomly selected student is harmed by the classifier. We should want that the false negative rates are approximately equal across the two populations: this would mean that the burden of harm caused by the classifier's mistakes is not disproportionately borne by one population over the other. This is one reason why the difference between false negative rates across different populations has become a standard fairness metric in algorithmic fairness --- sometimes referred to as "equal opportunity."
@@ -1065,83 +1066,226 @@ error.rates
 
 **p-value** is the probability of obtaining the observed data or *more extreme* given the null hypothesis is true.
 
-**confidence interval** is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in $(1-\alpha)100$% of the intervals.
+**$(1-\alpha)100$% confidence interval** is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in $(1-\alpha)100$% of the intervals.
 
 #### Examples {-}
 
 **Equal variance in the t-test**  Recall that one of the technical conditions for the t-test is that the two samples come from populations where the variance is equal (at least when `var.equal=TRUE` is specified).  What happens if the null hypothesis is true (i.e., the *means* are equal!) but the technical conditions are violated (i.e., the variances are unequal)?
 
 
+##### t-test function (for use in `map()`)
+
+
 ```r
-pvals <- c()
-reps <- 10000
-for(i in 1:reps){
-  x1 <- rnorm(10, mean=47, sd=1)
-  x2 <- rnorm(10, mean=47, sd=1)
-  pvals <- c(pvals, t.test(x1,x2, var.equal=TRUE)$p.value) }
-
-sum(pvals < .05)/reps
+t_test_pval <- function(df){
+  t.test(y ~ x1, data = df, var.equal = TRUE) %>%
+    tidy() %>%
+    select(estimate, p.value) 
+}
 ```
 
+
+##### generating data (equal variance)
+
+
+```r
+set.seed(470)
+reps <- 1000
+n_obs <- 20
+null_data_equal <- 
+  data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c("group1", "group2"), each = n()/2),
+    y = rnorm(n(), mean = 10, 
+               sd = rep(c(1,1), each = n()/2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
 ```
-## [1] 0.0502
+
+
+##### summarize p-values
+
+(Note: we rejected 4.5% of the null tests, close to 5%.)
+
+
+```r
+null_data_equal %>% 
+  mutate(t_vals = map(data,t_test_pval)) %>%
+  select(t_vals) %>% 
+  unnest(t_vals) %>%
+  ungroup(sim_id) %>%
+  summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
+
+```
+## # A tibble: 1 × 1
+##   type1error_rate
+##             <dbl>
+## 1           0.045
+```
+
+
+
 
 **Unequal variance in the t-test** 
 
+
+##### generating data (unequal variance)
+
+
 ```r
-pvals <- c()
-reps <- 10000
-for(i in 1:reps){
-  x1 <- rnorm(10, mean=47, sd=1)
-  x2 <- rnorm(10, mean=47, sd=100)
-  pvals <- c(pvals, t.test(x1,x2, var.equal=TRUE)$p.value) }
-
-sum(pvals < .05)/reps
+set.seed(470)
+reps <- 1000
+n_obs <- 20
+null_data_unequal <- 
+  data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c("group1", "group2"), each = n()/2),
+    y = rnorm(n(), mean = 10, 
+               sd = rep(c(1,100), each = n()/2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
 ```
 
+
+##### summarize p-values
+
+(Note, we rejected 5.7% of the null tests, not too bad!)
+
+
+```r
+null_data_unequal %>% 
+  mutate(t_vals = map(data,t_test_pval)) %>%
+  select(t_vals) %>% 
+  unnest(t_vals) %>%
+  ungroup(sim_id) %>%
+  summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
-## [1] 0.0637
+
 ```
+## # A tibble: 1 × 1
+##   type1error_rate
+##             <dbl>
+## 1           0.057
+```
+
+
 
 **Equal variance in the linear model**
 
-The [ISCAM applet](http://www.rossmanchance.com/applets/RegShuffle.htm) by Beth Chance and Allan Rossman [@iscam] demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.
+The [ISCAM applet](https://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm) by Beth Chance and Allan Rossman [@iscam] demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.
 
 Consider the following linear model with the points normally distributed with *equal* variance around the line. [Spoiler:  when the technical conditions are met, the theory works out well.  It turns out that the confidence interval will capture the true parameter in 95% of samples!]
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-39-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
+
+
+Did we capture the true parameter in the CI?  YES!
 
 
 ```r
-beta2.in <- c()
-beta0 <- -1
-beta1 <- 0.5
-beta2 <- 1.5
-n <- 100
-reps <- 10000
+CI <- lm(y~x1+x2) %>% tidy(conf.int=TRUE) %>% data.frame()
+CI
+```
 
-set.seed(4747)
-for(i in 1:reps){
-  x1 <- rep(c(0,1), each=n/2)
-  x2 <- runif(n, min=-1, max=1)
-  y <- beta0 + beta1*x1 + beta2*x2 + rnorm(n, mean=0, sd = 1)
+```
+##          term estimate std.error statistic  p.value conf.low conf.high
+## 1 (Intercept)   -0.950     0.148     -6.41 5.39e-09   -1.244    -0.656
+## 2          x1    0.259     0.210      1.23 2.20e-01   -0.158     0.677
+## 3          x2    1.401     0.194      7.21 1.24e-10    1.015     1.787
+```
 
-  CI <- lm(y~x1+x2) %>% tidy(conf.int=TRUE) %>% data.frame()
-  
-  beta2.in <- c(beta2.in, between(beta2, CI[3,6], CI[3,7]))
+```r
+CI %>%
+  filter(term == "x2") %>%
+  select(term, estimate, conf.low, conf.high) %>%
+  mutate(inside = between(beta2, conf.low, conf.high))
+```
+
+```
+##   term estimate conf.low conf.high inside
+## 1   x2      1.4     1.02      1.79   TRUE
+```
+
+What if we want to repeat lots of times...
+
+**FUNCTION**
+
+```r
+beta_coef <- function(df){
+  lm(y ~ x1 + x2, data = df) %>%
+    tidy(conf.int = TRUE) %>%
+    filter(term == "x2") %>%
+    select(estimate, conf.low, conf.high, p.value) 
 }
+```
 
-# coverage rate of the CI is given by:
-sum(beta2.in)/reps
+**DATA**
+
+```r
+eqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c(0,1), each = n()/2),
+    x2 = runif(n(), min = -1, max = 1),
+    y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, sd = 1)
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
+
+eqvar_data
 ```
 
 ```
-## [1] 0.952
+## # A tibble: 1,000 × 2
+## # Groups:   sim_id [1,000]
+##    sim_id data              
+##     <int> <list>            
+##  1      1 <tibble [100 × 4]>
+##  2      2 <tibble [100 × 4]>
+##  3      3 <tibble [100 × 4]>
+##  4      4 <tibble [100 × 4]>
+##  5      5 <tibble [100 × 4]>
+##  6      6 <tibble [100 × 4]>
+##  7      7 <tibble [100 × 4]>
+##  8      8 <tibble [100 × 4]>
+##  9      9 <tibble [100 × 4]>
+## 10     10 <tibble [100 × 4]>
+## # … with 990 more rows
 ```
 
+**MAPPING**
+
+We captured the true slope parameter in 95.5% of the confidence intervals (i.e., 95.5% of the datasets created confidence intervals that captured the true parameter).
+
+
+```r
+eqvar_data %>% 
+  mutate(b2_vals = map(data, beta_coef)) %>%
+  select(b2_vals) %>% 
+  unnest(b2_vals) %>%
+  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+  summarize(capture_rate = sum(capture)/reps)
+```
+
+```
+## # A tibble: 1 × 1
+##   capture_rate
+##          <dbl>
+## 1        0.955
+```
 
 **Unequal variance in the linear model**
 
@@ -1149,34 +1293,78 @@ Consider the following linear model with the points normally distributed with *u
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-41-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-49-1.png" width="480" style="display: block; margin: auto;" />
+
+
+What if we want to repeat lots of times...
+
+**FUNCTION**
+
+```r
+beta_coef <- function(df){
+  lm(y ~ x1 + x2, data = df) %>%
+    tidy(conf.int = TRUE) %>%
+    filter(term == "x2") %>%
+    select(estimate, conf.low, conf.high, p.value) 
+}
+```
+
+**DATA**
+
+```r
+uneqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c(0,1), each = n()/2),
+    x2 = runif(n(), min = -1, max = 1),
+    y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, 
+                                            sd = 1 + x1 + 10*abs(x2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
+
+uneqvar_data
+```
+
+```
+## # A tibble: 1,000 × 2
+## # Groups:   sim_id [1,000]
+##    sim_id data              
+##     <int> <list>            
+##  1      1 <tibble [100 × 4]>
+##  2      2 <tibble [100 × 4]>
+##  3      3 <tibble [100 × 4]>
+##  4      4 <tibble [100 × 4]>
+##  5      5 <tibble [100 × 4]>
+##  6      6 <tibble [100 × 4]>
+##  7      7 <tibble [100 × 4]>
+##  8      8 <tibble [100 × 4]>
+##  9      9 <tibble [100 × 4]>
+## 10     10 <tibble [100 × 4]>
+## # … with 990 more rows
+```
+
+**MAPPING**
+
+Using the data with unequal variability, we only captured the slope parameter about 88% of the time.
 
 
 ```r
-beta2.in <- c()
-beta0 <- -1
-beta1 <- 0.5
-beta2 <- 1.5
-n <- 100
-reps <- 10000
-
-set.seed(4747)
-for(i in 1:reps){
-  x1 <- rep(c(0,1), each=n/2)
-  x2 <- runif(n, min=-1, max=1)
-  y <- beta0 + beta1*x1 + beta2*x2 + rnorm(n, mean=0, sd = 1 + x1 + 10*abs(x2))
-
-  CI <- lm(y~x1+x2) %>% broom::tidy(conf.int=TRUE) %>% data.frame()
-  
-  beta2.in <- c(beta2.in, between(beta2, CI[3,6], CI[3,7]))
-}
-
-# coverage rate of the CI is given by:
-sum(beta2.in)/reps
+uneqvar_data %>% 
+  mutate(b2_vals = map(data, beta_coef)) %>%
+  select(b2_vals) %>% 
+  unnest(b2_vals) %>%
+  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+  summarize(capture_rate = sum(capture)/reps)
 ```
 
 ```
-## [1] 0.872
+## # A tibble: 1 × 1
+##   capture_rate
+##          <dbl>
+## 1        0.861
 ```
 
 
@@ -1255,7 +1443,7 @@ data.frame(uniformRVs = unif.val) %>%
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Generating other RVs:  **The Inverse Transform Method**
@@ -1298,7 +1486,7 @@ P(X \leq x) &= P(F^{-1}(U) \leq x)\\
 
 <div class="figure" style="text-align: center">
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
-<p class="caption">(\#fig:unnamed-chunk-44)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+<p class="caption">(\#fig:unnamed-chunk-54)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
 </div>
 
 
@@ -1334,7 +1522,7 @@ ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) +
   facet_grid(~sim.method)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-45-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Discrete RVs {-}
