@@ -3,10 +3,6 @@
 
 
 
-## 10/1/19 Agenda {#Oct1}
-1. Review: logic of hypothesis testing
-2. Logic of permutation tests
-3. Examples - 2 samples and beyond
 
 
 <!--
@@ -44,7 +40,8 @@ F &= \frac{\text{between-group variability}}{\text{within-group variability}}\\
 
 3. Locate the observed statistic in this distribution.  A value in the main body of the distribution could easily occur just by chance.  A value in the tail would rarely occur by chance and so is evidence that something other than chance is operating.  [This piece is going to happen in permutation tests as well as in analytic tests -- the point is to see if the observed data is consistent with the null distribution.]
 
-##### p-value {-} is the probability of the observed data or more extreme if the null hypothesis is true.  [Also true for both types of tests!]
+##### p-value {-} 
+is the probability of the observed data or more extreme if the null hypothesis is true.  [Also true for both types of tests!]
 
 To estimate the p-value for a test of significance, estimate the sampling distribution of the test statistic when the null hypothesis is true by resampling in a manner that is consistent with the null hypothesis.
 
@@ -64,7 +61,7 @@ To evaluate the p-value for a permutation test, estimate the sampling distributi
 4. Find the observed test statistic on the null sampling distribution and compute the p-value (observed data or more extreme).  The p-value can be one or two-sided.
 
 #### Technical Conditions {-}
-Permutation tests fall into a broad class of tests called "non-parametric" tests.  The label indicates that there are no distributional assumptions made on the data (i.e., no assumption that the data come from a normal or binomial distribution).  However, a test which is ``non-parametric" does not meant that there are no assumptions on the data, simply that there are no *distributional or parametric* assumptions on the data.  **The parameters are at the heart of almost all parametric tests.**
+Permutation tests fall into a broad class of tests called "non-parametric" tests.  The label indicates that there are no distributional assumptions made on the data (i.e., no assumption that the data come from a normal or binomial distribution).  However, a test which is "non-parametric" does not meant that there are no assumptions on the data, simply that there are no *distributional or parametric* assumptions on the data.  **The parameters are at the heart of almost all parametric tests.**
 
 For permutation tests, we are not basing the test on population parameters, so we don't need to make any assumptions about them (i.e., that they are the mean of a particular distribution).
 
@@ -75,14 +72,6 @@ For permutation tests, we are not basing the test on population parameters, so w
 **IMPORTANT KEY IDEA**  the point of technical conditions for parametric or permutation tests is to create a sampling distribution that accurately reflects the null sampling distribution for the statistic of interest (the statistic which captures the relevant research question information).
 
 
-## 10/3/19 Agenda {#Oct3}
-1. R code, examples
-2. Assumptions, exchangeability, random structure
-3. Different statistics within the permutation test
-4. Permutation vs. Randomization tests (Binomial)
-
-
-
 ## Permutation tests in practice {#perms}
 
 How is the test interpreted given the different types of sampling which are possibly used to collect the data?
@@ -91,7 +80,7 @@ How is the test interpreted given the different types of sampling which are poss
 
 * **Random Experiment** In the context of a **randomized experiment**, the p-value represents the observed data compared to "happening by chance."
 
-    * The interpretation is easy: if there is only a very small chance that the observed statistic would take such an extreme value, as a result only of the randomization of cases:  we reject the null treatment effect hypothesis. CAUSAL!
+    * The interpretation is direct: if there is only a very small chance that the observed statistic would take such an extreme value, as a result only of the randomization of cases:  we reject the null treatment effect hypothesis. CAUSAL!
     
 * **Observational Study** In the context of **observational studies** the results are less strong, but it is reasonable to conclude that the effect observed in the sample reflects an effect present in the population.
 
