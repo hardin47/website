@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 8 Classification | Computational Statistics</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="8.1 10/29/19 Agenda classification \(k\)-Nearest Neighbors bias-variance trade-off cross validation Important Note: For the majority of the classification and clustering methods, we will use the...">
+<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta property="og:title" content="Chapter 8 Classification | Computational Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="8.1 10/29/19 Agenda classification \(k\)-Nearest Neighbors bias-variance trade-off cross validation Important Note: For the majority of the classification and clustering methods, we will use the...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 8 Classification | Computational Statistics">
+<meta name="twitter:description" content="8.1 10/29/19 Agenda classification \(k\)-Nearest Neighbors bias-variance trade-off cross validation Important Note: For the majority of the classification and clustering methods, we will use the...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11.1/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.0/transition.js"></script><script src="libs/bs3compat-0.3.0/tabs.js"></script><script src="libs/bs3compat-0.3.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Computational Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="visualization.html"><span class="header-section-number">2</span> Visualization</a></li>
+<li><a class="" href="wrang.html"><span class="header-section-number">3</span> Data Wrangling</a></li>
+<li><a class="" href="sims.html"><span class="header-section-number">4</span> Simulating</a></li>
+<li><a class="" href="permschp.html"><span class="header-section-number">5</span> Permutation Tests</a></li>
+<li><a class="" href="boot.html"><span class="header-section-number">6</span> Bootstrapping</a></li>
+<li><a class="" href="ethics.html"><span class="header-section-number">7</span> Ethics</a></li>
+<li><a class="active" href="class.html"><span class="header-section-number">8</span> Classification</a></li>
+<li><a class="" href="unsup.html"><span class="header-section-number">9</span> Unsupervised Methods</a></li>
+<li><a class="" href="misc.html"><span class="header-section-number">10</span> Misc</a></li>
+<li><a class="" href="compstat.html"><span class="header-section-number">11</span> Computational Statistics</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="class" class="section level1" number="8">
+<h1>
+<span class="header-section-number">8</span> Classification<a class="anchor" aria-label="anchor" href="#class"><i class="fas fa-link"></i></a>
+</h1>
+<!--
+Daniela Witten talking about inference in prediction: https://www.youtube.com/watch?v=Y4UJjzuYjfM 
+R Unconference 2013
+
+that f is a meaningful reflection of the true unknown process.
+
+
+One of the most satisfying aspects of this unit is that you can now turn students loose on a massive data set. Past instances of the KDD Cup \url{http://www.sigkdd.org/kddcup/index.php} are an excellent source for such data sets. We explored data from the 2008 KDD Cup on breast cancer. Each of the n observations contained digitized data from an X-Ray image of a breast. Each observation corresponded to a small area of a particular breast, which may or may not depict a malignant tumor ï¿œï¿œthis provided the binary response variable.  In addition to a handful of well-defined variables ((x, y)-location, etc.), each observation has 117 nameless attributes, about which no information was provided. Knowing nothing about what these variables mean, students recognized the need to employ machine learning techniques to sift through them and find relationships. The size of the data and number of variables made manual exploration of the data impractical.
+
+\textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
+\url{http://www.dabi.temple.edu/~hbling/8590.002/Montillo_RandomForests_4-2-2009.pdf}
+-->
+<div id="Oct29" class="section level2" number="8.1">
+<h2>
+<span class="header-section-number">8.1</span> 10/29/19 Agenda<a class="anchor" aria-label="anchor" href="#Oct29"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>classification</li>
+<li>
+<span class="math inline">\(k\)</span>-Nearest Neighbors</li>
+<li>bias-variance trade-off</li>
+<li>cross validation</li>
+</ol>
+<p><strong>Important Note</strong>: For the majority of the classification and clustering methods, we will use the <code>caret</code> package in R. For more information see: <a href="http://topepo.github.io/caret/index.html" class="uri">http://topepo.github.io/caret/index.html</a></p>
+<p>Also, check out the <code>caret</code> cheat sheet: <a href="https://github.com/rstudio/cheatsheets/raw/master/caret.pdf" class="uri">https://github.com/rstudio/cheatsheets/raw/master/caret.pdf</a></p>
+<p><span class="citation"><a href="references.html#ref-Baumer15" role="doc-biblioref">Baumer</a> (<a href="references.html#ref-Baumer15" role="doc-biblioref">2015</a>)</span> provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:</p>
+<blockquote>
+<p>In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by <span class="citation"><a href="references.html#ref-brei01" role="doc-biblioref">Breiman</a> (<a href="references.html#ref-brei01" role="doc-biblioref">2001</a>)</span>, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a <em>data model</em> f such that y <span class="math inline">\(\sim\)</span> f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is</p>
+</blockquote>
+<blockquote>
+<p>Alternatively, one might construct an <em>algorithmic model</em> f, such that <span class="math inline">\(y \sim f(x)\)</span>, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).</p>
+</blockquote>
+<p>Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set. That is, the model should <em>classify</em> new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value. For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.</p>
+<p>Some examples of classification techniques include: linear regression, logistic regression, neural networks, <strong>classification trees</strong>, <strong>Random Forests</strong>, <strong>k-nearest neighbors</strong>, <strong>support vector machines</strong>, näive Bayes, and linear discriminant analysis. We will cover the methods in <strong>bold</strong>.</p>
+<p><strong>Simple is Better</strong> (From <span class="citation"><a href="references.html#ref-field07" role="doc-biblioref">Fielding</a> (<a href="references.html#ref-field07" role="doc-biblioref">2007</a>)</span>, p. 87)</p>
+<ol style="list-style-type: decimal">
+<li>We want to avoid over-fitting the model (certainly, it is a bad idea to model the noise!)</li>
+<li>Future prediction performance goes down with too many predictors.</li>
+<li>Simple models provide better insight into causality and specific associations.</li>
+<li>Fewer predictors implies fewer variables to collect in later studies.</li>
+</ol>
+<p>That said, the model should still represent the complexity of the data! We describe the trade-off above as the “bias-variance” trade-off. In order to fully understand that trade-off, let’s first cover the classification method known as <span class="math inline">\(k\)</span>-Nearest Neighbors.</p>
+</div>
+<div id="cv" class="section level2" number="8.2">
+<h2>
+<span class="header-section-number">8.2</span> Cross Validation<a class="anchor" aria-label="anchor" href="#cv"><i class="fas fa-link"></i></a>
+</h2>
+<div id="bias-variance-trade-off" class="section level3" number="8.2.1">
+<h3>
+<span class="header-section-number">8.2.1</span> Bias-variance trade-off<a class="anchor" aria-label="anchor" href="#bias-variance-trade-off"><i class="fas fa-link"></i></a>
+</h3>
+<div id="excellent-resource" class="section level4 unnumbered">
+<h4>Excellent resource<a class="anchor" aria-label="anchor" href="#excellent-resource"><i class="fas fa-link"></i></a>
+</h4>
+<p>for explaining the bias-variance trade-off: <a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" class="uri">http://scott.fortmann-roe.com/docs/BiasVariance.html</a></p>
+<ul>
+<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
+<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
+</ul>
+<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit. [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]</p>
+<p><span class="math display">\[\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}\]</span></p>
+<ul>
+<li>
+<strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
+<li>
+<strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, the more complicated the model (e.g., smaller <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN), the closer the points are to the prediction. As the model gets more complicated (e.g., as <span class="math inline">\(k\)</span> decreases), the bias goes down.</li>
+<li>
+<strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (big <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>NN) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., as <span class="math inline">\(k\)</span> increases).</li>
+</ul>
+<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-2"></span>
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%"><p class="caption">
+Figure 1.2: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(<a href="references.html#ref-ESL" role="doc-biblioref">Hastie, Tibshirani, and Friedman 2001</a>)</span>
+</p>
+</div>
+<p>The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree. <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
+</div>
+</div>
+<div id="implementing-cross-validation" class="section level3" number="8.2.2">
+<h3>
+<span class="header-section-number">8.2.2</span> Implementing Cross Validation<a class="anchor" aria-label="anchor" href="#implementing-cross-validation"><i class="fas fa-link"></i></a>
+</h3>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-3"></span>
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%"><p class="caption">
+Figure 1.3: <span class="citation">(<a href="references.html#ref-flach12" role="doc-biblioref">Flach 2012</a>)</span>
+</p>
+</div>
+<p>Cross validation is typically used in two ways.</p>
+<ol style="list-style-type: decimal">
+<li>To assess a model’s accuracy (<em>model assessment</em>).<br>
+</li>
+<li>To build a model (<em>model selection</em>).</li>
+</ol>
+<div id="different-ways-to-cv" class="section level4 unnumbered">
+<h4>Different ways to CV<a class="anchor" aria-label="anchor" href="#different-ways-to-cv"><i class="fas fa-link"></i></a>
+</h4>
+<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</li>
+<li>leave one out cross validation (LOOCV)</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation</li>
+<li>build the model using the remaining n-1 points</li>
+<li>predict class membership for the observation which was removed</li>
+<li>repeat by removing each observation one at a time</li>
+</ol>
+<ul>
+<li>
+<span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span>
+</li>
+<li>advantage of <span class="math inline">\(k\)</span>-fold is computational</li>
+<li>
+<span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model assessment</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>assume <span class="math inline">\(k\)</span> is given for <span class="math inline">\(k\)</span>-NN</li>
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
+</ol>
+</div>
+<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model selection</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-selection-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>-NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict class membership / continuous response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+</ol>
+</li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
+<li>repeat steps 1-3 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest</li>
+</ol>
+</div>
+<div id="cv-for-model-assessment-and-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model assessment and selection</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment-and-selection-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<p>To do both, one approach is to use test/training data <em>and</em> CV in order to both model assessment and selection. Note that CV could be used in both steps, but the algorithm is slightly more complicated.</p>
+<ol style="list-style-type: decimal">
+<li>split the data into training and test observations</li>
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>-NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above on <em>only the training data</em>:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the training data</li>
+<li>build the model using the remaining 90% of the training data</li>
+<li>predict class membership / continuous response for the 10% of the training observations which were removed</li>
+<li>repeat by removing each decile one at a time from the training data</li>
+</ol>
+</li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand on the training data</li>
+<li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
+<li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
+</ol>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-4"></span>
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%"><p class="caption">
+Figure 1.4: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(<a href="references.html#ref-CVpaper" role="doc-biblioref">Varoquaux et al. 2017</a>)</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="knn" class="section level2" number="8.3">
+<h2>
+<span class="header-section-number">8.3</span> <span class="math inline">\(k\)</span>-Nearest Neighbors<a class="anchor" aria-label="anchor" href="#knn"><i class="fas fa-link"></i></a>
+</h2>
+<p>The <span class="math inline">\(k\)</span>-Nearest Neighbor algorithm does exactly what it sounds like it does. The user decides on the integer value for <span class="math inline">\(k\)</span>, and a point is classified to be in the group for which the majority of the <span class="math inline">\(k\)</span> closest points in the training data.</p>
+<div id="k-nn-algorithm" class="section level3" number="8.3.1">
+<h3>
+<span class="header-section-number">8.3.1</span> <span class="math inline">\(k\)</span>-NN algorithm<a class="anchor" aria-label="anchor" href="#k-nn-algorithm"><i class="fas fa-link"></i></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>Decide on a distance metric (e.g., Euclidean distance, 1 - correlation, etc.) and find the distances from each point in the test set to each point in the training set. The distance is measured in the feature space, that is, with respect to the explanatory variables (not the response variable).</li>
+</ol>
+<p>n.b. In most machine learning algorithms that use “distance” as a measure, the “distance” is not required to be a mathematical distance metric. Indeed, 1-correlation is a very common distance measure, and it fails the triangle inequality.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Consider a point in the test set. Find the <span class="math inline">\(k\)</span> closest points in the training set to the one test observation.</p></li>
+<li><p>Using majority vote, find the dominate class of the <span class="math inline">\(k\)</span> closest points. Predict that class label to the test observation.</p></li>
+</ol>
+<p>Note: if the response variable is continuous (instead of categorical), find the average response variable of the <span class="math inline">\(k\)</span> training point to be the predicted response for the one test observation.</p>
+<p><strong>Shortcomings of <span class="math inline">\(k\)</span>-NN</strong>:</p>
+<ul>
+<li>one class can dominate if it has a large majority</li>
+<li>Euclidean distance is dominated by scale</li>
+<li>it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)</li>
+<li>the output doesn’t provide any information about which explanatory variables are informative.</li>
+</ul>
+<p><strong>Strengths of <span class="math inline">\(k\)</span>-NN</strong>:</p>
+<ul>
+<li>it can easily work for any number of categories</li>
+<li>it can predict a quantitative response variable</li>
+<li>the bias of 1-NN is often low (but the variance is high)</li>
+<li>any distance metric can be used (so the algorithm models the data appropriately)</li>
+<li>the method is simple to implement / understand</li>
+<li>model is nonparametric (no distributional assumptions on the data)</li>
+<li>great model for imputing missing data</li>
+</ul>
+<p><img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;"><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;"></p>
+</div>
+<div id="r-knn-example" class="section level3" number="8.3.2">
+<h3>
+<span class="header-section-number">8.3.2</span> R knn Example<a class="anchor" aria-label="anchor" href="#r-knn-example"><i class="fas fa-link"></i></a>
+</h3>
+<p>R code for using the <code>caret</code> package to cluster the <code>iris</code> data. The <code>caret</code> package vignette for <code>knn</code> is here: <a href="http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function" class="uri">http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function</a></p>
+<div class="sourceCode" id="cb502"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggobi.github.io/ggally/">GGally</a></span><span class="op">)</span> <span class="co"># for plotting</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>  <span class="co"># for partitioning &amp; classification</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span></code></pre></div>
+<div id="iris-data" class="section level4 unnumbered">
+<h4>iris Data<a class="anchor" aria-label="anchor" href="#iris-data"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb503"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggobi.github.io/ggally/reference/ggpairs.html">ggpairs</a></span><span class="op">(</span><span class="va">iris</span>, color<span class="op">=</span><span class="st">"Species"</span>, alpha<span class="op">=</span><span class="fl">.4</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="knn-1" class="section level4 unnumbered">
+<h4>kNN<a class="anchor" aria-label="anchor" href="#knn-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>Without thinking about test / training data, a naive model is:</p>
+<div class="sourceCode" id="cb504"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fitControl</span> <span class="op">&lt;-</span><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span>, classProbs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">tr.iris</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                        data<span class="op">=</span><span class="va">iris</span>,
+                        method<span class="op">=</span><span class="st">"knn"</span>,
+                        trControl <span class="op">=</span> <span class="va">fitControl</span>,
+                        tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>k<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tr.iris</span>, newdata <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>, 
+                reference <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         50          0         0
+##   versicolor      0         47         3
+##   virginica       0          3        47
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.96           
+##                  95% CI : (0.915, 0.9852)
+##     No Information Rate : 0.3333         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.94           
+##                                          
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9400           0.9400
+## Specificity                 1.0000            0.9700           0.9700
+## Pos Pred Value              1.0000            0.9400           0.9400
+## Neg Pred Value              1.0000            0.9700           0.9700
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3133           0.3133
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9550           0.9550</code></pre>
+</div>
+<div id="why-naive" class="section level4 unnumbered">
+<h4>Why naive?<a class="anchor" aria-label="anchor" href="#why-naive"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>Not good to train and test on the same data set!</li>
+<li>Assumed the knowledge of <span class="math inline">\(k\)</span> groups.</li>
+<li>Was Euclidean distance the right thing to use? [The <code>knn</code> package in R only uses Euclidean distance.]</li>
+</ol>
+</div>
+<div id="using-testtraining-data-sets." class="section level4 unnumbered">
+<h4>Using test/training data sets.<a class="anchor" aria-label="anchor" href="#using-testtraining-data-sets."><i class="fas fa-link"></i></a>
+</h4>
+<p>One of the common pieces to use in the <code>caret</code> package is creating test and training datasets for cross validation.</p>
+<div class="sourceCode" id="cb506"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">inTrain</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, p<span class="op">=</span><span class="fl">0.7</span>, list<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">iris.train</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">inTrain</span>,<span class="op">]</span>
+<span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">inTrain</span><span class="op">)</span>,<span class="op">]</span>
+
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
+<span class="va">tr.iris</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                        data<span class="op">=</span><span class="va">iris.train</span>, 
+                        method<span class="op">=</span><span class="st">"knn"</span>, 
+                        trControl <span class="op">=</span> <span class="va">fitControl</span>, 
+                        tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>k<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tr.iris</span>, newdata <span class="op">=</span> <span class="va">iris.test</span><span class="op">)</span>, 
+                reference <span class="op">=</span> <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500</code></pre>
+</div>
+<div id="k-neighbors-cv-on-training-to-find-k" class="section level4 unnumbered">
+<h4>
+<span class="math inline">\(k\)</span> neighbors? CV on TRAINING to find <span class="math inline">\(k\)</span><a class="anchor" aria-label="anchor" href="#k-neighbors-cv-on-training-to-find-k"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb508"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span>, number<span class="op">=</span><span class="fl">10</span><span class="op">)</span>
+<span class="va">tr.iris</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                        data<span class="op">=</span><span class="va">iris.train</span>, 
+                        method<span class="op">=</span><span class="st">"knn"</span>, 
+                        trControl <span class="op">=</span> <span class="va">fitControl</span>, 
+                        tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">7</span>,<span class="fl">9</span>,<span class="fl">11</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">tr.iris</span></code></pre></div>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 95, 93, 95, 95, 94, 95, ... 
+## Resampling results across tuning parameters:
+## 
+##   k   Accuracy   Kappa    
+##    1  0.9516667  0.9275521
+##    3  0.9316667  0.8974822
+##    5  0.9205556  0.8805824
+##    7  0.9500000  0.9249006
+##    9  0.9616667  0.9427036
+##   11  0.9716667  0.9580882
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was k = 11.</code></pre>
+</div>
+<div id="then-measure-accuracy-by-testing-on-test-data" class="section level4 unnumbered">
+<h4>Then measure accuracy by testing on test data!<a class="anchor" aria-label="anchor" href="#then-measure-accuracy-by-testing-on-test-data"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb510"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tr.iris</span>, newdata <span class="op">=</span> <span class="va">iris.test</span><span class="op">)</span>, 
+                       reference <span class="op">=</span> <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         1
+##   virginica       0          1        14
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9556          
+##                  95% CI : (0.8485, 0.9946)
+##     No Information Rate : 0.3333          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9333          
+##                                           
+##  Mcnemar's Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.9333
+## Specificity                 1.0000            0.9667           0.9667
+## Pos Pred Value              1.0000            0.9333           0.9333
+## Neg Pred Value              1.0000            0.9667           0.9667
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.3111
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9500           0.9500</code></pre>
+</div>
+</div>
+</div>
+<div id="Oct31" class="section level2" number="8.4">
+<h2>
+<span class="header-section-number">8.4</span> 10/31/19 Agenda<a class="anchor" aria-label="anchor" href="#Oct31"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>trees (CART)</li>
+<li>building trees (binary recursive splitting)</li>
+<li>homogeneity measures</li>
+<li>pruning trees</li>
+</ol>
+</div>
+<div id="cart" class="section level2" number="8.5">
+<h2>
+<span class="header-section-number">8.5</span> CART<a class="anchor" aria-label="anchor" href="#cart"><i class="fas fa-link"></i></a>
+</h2>
+<p>Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition. Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-12"></span>
+<img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%"><p class="caption">
+Figure 1.8: <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-1/</a> A visual introduction to machine learning.
+</p>
+</div>
+<p>Decision trees are used for all sorts of predictive and descriptive models. The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-13"></span>
+<img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%"><p class="caption">
+Figure 1.9: <a href="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html" class="uri">https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html</a> Quiz: Let Us Predict Whether You’re a Democrat or a Republican NYT, Aug 8, 2019. Note that race is the first and dominant node, followed by religion.
+</p>
+</div>
+<div id="cart-algorithm" class="section level3" number="8.5.1">
+<h3>
+<span class="header-section-number">8.5.1</span> CART algorithm<a class="anchor" aria-label="anchor" href="#cart-algorithm"><i class="fas fa-link"></i></a>
+</h3>
+<p><strong>Basic Classification and Regression Trees (CART) Algorithm:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Start with all observations in one group.</li>
+<li>Find the variable/split that best separates the response variable (successive binary partitions based on the different predictors / explanatory variables).
+<ul>
+<li>Evaluation “homogeneity” within each group</li>
+<li>Divide the data into two groups (“leaves”) on that split (“node”).</li>
+<li>Within each split, find the best variable/split that separates the outcomes.</li>
+</ul>
+</li>
+<li>Continue until the groups are too small or sufficiently “pure.”</li>
+<li>Prune tree.</li>
+</ol>
+<p><strong>Shortcomings of CART:</strong></p>
+<ul>
+<li>Straight CART do not generally have the same predictive accuracy as other classification approaches. (we will improve the model - see Random Forests, boosting, bagging)</li>
+<li>Difficult to write down / consider the CART “model”</li>
+<li>Without proper pruning, the model can easily lead to overfitting</li>
+<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy</li>
+<li>Often, prediction performance is poor</li>
+</ul>
+<p><strong>Strengths of CART:</strong></p>
+<ul>
+<li>They are easy to explain; trees are easy to display graphically (which make them easy to interpret). (They mirror the typical human decision-making process.)</li>
+<li>Can handle categorical or numerical predictors or response variables (indeed, they can handle mixed predictors at the same time!).</li>
+<li>Can handle more than 2 groups for categorical predictions</li>
+<li>Easily ignore redundant variables.</li>
+<li>Perform better than linear models in non-linear settings. Classification trees are non-linear models, so they immediately use interactions between variables.</li>
+<li>Data transformations may be less important (monotone transformations on the explanatory variables won’t change anything).</li>
+</ul>
+<div id="classification-trees" class="section level4" number="8.5.1.1">
+<h4>
+<span class="header-section-number">8.5.1.1</span> Classification Trees<a class="anchor" aria-label="anchor" href="#classification-trees"><i class="fas fa-link"></i></a>
+</h4>
+<p>A <em>classification tree</em> is used to predict a categorical response variable (rather than a quantitative one). The end predicted value will be the one of the <em>most commonly occurring class</em> of training observations in the region to which it belongs. The goal is to create regions which are as homogeneous as possible with respect to the response variable - categories.</p>
+<p><strong>measures of impurity</strong></p>
+<ol style="list-style-type: decimal">
+<li>Calculate the <em>classification error rate</em> as the fraction of the training observations in that region that do not belong to the most common class: <span class="math display">\[E_m = 1 - \max_k(\hat{p}_{mk})\]</span>
+where <span class="math inline">\(\hat{p}_{mk}\)</span> represents the proportion of training observations in the <span class="math inline">\(m\)</span>th region that are from the <span class="math inline">\(k\)</span>th class. However, the classification error rate is not particularly sensitive to node purity, and so two additional measures are typically used to partition the regions.</li>
+<li>Further, the <em>Gini index</em> is defined by <span class="math display">\[G_m= \sum_{k=1}^K \hat{p}_{mk}(1-\hat{p}_{mk})\]</span>
+a measure of total variance across the <span class="math inline">\(K\)</span> classes. [Recall, the variance of a Bernoulli random variable with <span class="math inline">\(\pi\)</span> = P(success) is <span class="math inline">\(\pi(1-\pi)\)</span>.] Note that the Gini index takes on a small value if all of the <span class="math inline">\(\hat{p}_{mk}\)</span> values are close to zero or one. For this reason, the Gini index is referred to as a measure of node <em>purity</em> - a small value indicates that a node contains predominantly observations from a single class.</li>
+<li>Last, the <em>cross-entropy</em> is defined as <span class="math display">\[D_m = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}\]</span>
+Since <span class="math inline">\(0 \leq \hat{p}_{mk} \leq 1\)</span> it follows that <span class="math inline">\(0 \leq -\hat{p}_{mk} \log\hat{p}_{mk}\)</span>. One can show that the cross-entropy will take on a value near zero if the <span class="math inline">\(\hat{p}_{mk}\)</span> values are all near zero or all near one. Therefore, like the Gini index, the cross-entropy will take on a small value if the <span class="math inline">\(m\)</span>th node is pure.</li>
+<li>To <em>build</em> the tree, typically the Gini index or the cross-entropy are used to evaluate a particular split.</li>
+<li>To <em>prune</em> the tree, often classification error is used (if accuracy of the final pruned tree is the goal)</li>
+</ol>
+<p>Computationally, it is usually infeasible to consider every possible partition of the observations. Instead of looking at all partitions, we perform a <em>top down</em> approach to the problem which is known as <em>recursive binary splitting</em> (<em>greedy</em> because we look only at the current split and not at the outcomes of the splits to come).</p>
+<p><strong>Recursive Binary Splitting on Categories</strong> (for a given node)</p>
+<ol style="list-style-type: decimal">
+<li>Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in Gini index or cross-entropy.</li>
+<li>For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
+<span class="math display">\[R_1(j,s) = \{X | X_j &lt; s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}\]</span>
+and we seek the value of <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> that minimize the equation:
+<span class="math display">\[\begin{align}
+&amp; \sum_{i:x_i \in R_1(j,s)} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + \sum_{i:x_i \in R_2(j,s)} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
+\mbox{equivalently: } &amp; n_{R_1} \sum_{k=1}^K \hat{p}_{{R_1}k}(1-\hat{p}_{{R_1}k}) + n_{R_2} \sum_{k=1}^K \hat{p}_{{R_2}k}(1-\hat{p}_{{R_2}k})\\
+\end{align}\]</span>
+</li>
+<li>Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).</li>
+<li>Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</li>
+</ol>
+</div>
+<div id="regression-trees" class="section level4" number="8.5.1.2">
+<h4>
+<span class="header-section-number">8.5.1.2</span> Regression Trees<a class="anchor" aria-label="anchor" href="#regression-trees"><i class="fas fa-link"></i></a>
+</h4>
+<p>The goal of the algorithm in a <em>regression tree</em> is to split the set of possible value for the data into <span class="math inline">\(|T|\)</span> distinct and non-overlapping regions, <span class="math inline">\(R_1, R_2, \ldots, R_{|T|}\)</span>. For every observation that falls into the region <span class="math inline">\(R_m\)</span>, we make the same prediction - the mean of the response values for the training observations in <span class="math inline">\(R_m\)</span>. So how do we find the regions <span class="math inline">\(R_1, \ldots, R_{|T|}\)</span>?</p>
+<p><span class="math inline">\(\Rightarrow\)</span> Minimize RSS, <span class="math display">\[RSS = \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\]</span>
+where <span class="math inline">\(\overline{y}_{R_m}\)</span> is the mean response for the training observations within the <span class="math inline">\(m\)</span>th region.</p>
+<p>(Note: in the chapter <span class="citation">(<a href="references.html#ref-ISL" role="doc-biblioref">James et al. 2021</a>)</span> they refer to MSE - mean squared error - in addition to RSS where MSE is simply RSS / n, see equation (2.5).)</p>
+<!--
+$$ MSE = \frac{\sum_{i=1}^N (y_i - \overline{y}_i)^2}{N}$$
+-->
+<p>Again, it is usually infeasible to consider every possible partition of the observations. Instead of looking at all partitions, we perform a <em>top down</em> approach to the problem which is known as <em>recursive binary splitting</em> (<em>greedy</em> because we look only at the current split and not at the outcomes of the splits to come).</p>
+<p><strong>Recursive Binary Splitting on Numerical Response</strong> (for a given node)</p>
+<ol style="list-style-type: decimal">
+<li>Select the predictor <span class="math inline">\(X_j\)</span> and the cutpoint <span class="math inline">\(s\)</span> such that splitting the predictor space into the regions <span class="math inline">\(\{X | X_j&lt; s\}\)</span> and <span class="math inline">\(\{X | X_j \geq s\}\)</span> lead to the greatest reduction in RSS.</li>
+<li>For any <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span>, define the pair of half-planes to be
+<span class="math display">\[R_1(j,s) = \{X | X_j &lt; s\} \mbox{ and } R_2(j,s) = \{X | X_j \geq s\}\]</span>
+and we see the value of <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> that minimize the equation:
+<span class="math display">\[\sum_{i:x_i \in R_1(j,s)} (y_i - \overline{y}_{R_1})^2 + \sum_{i:x_i \in R_2(j,s)} (y_i - \overline{y}_{R_2})^2\]</span>
+where <span class="math inline">\(\overline{y}_{R_1}\)</span> is the mean response for the training observations in <span class="math inline">\(R_1(j,s)\)</span> and <span class="math inline">\(\overline{y}_{R_2}\)</span> is the mean response for training observations in <span class="math inline">\(R_2(j,s)\)</span>.</li>
+<li>Repeat the process, looking for the best predictor and best cutpoint <em>within</em> one of the previously identified regions (producing three regions, now).</li>
+<li>Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.</li>
+</ol>
+</div>
+<div id="avoiding-overfitting" class="section level4" number="8.5.1.3">
+<h4>
+<span class="header-section-number">8.5.1.3</span> (Avoiding) Overfitting<a class="anchor" aria-label="anchor" href="#avoiding-overfitting"><i class="fas fa-link"></i></a>
+</h4>
+<p>Ideally, the tree would not overfit the training data. One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don’t represent the test data).</p>
+<p>See the following (amazing!) demonstration for intuition on model validation / overfitting: <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
+<p>One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold. However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information. A better strategy is to grow a very large tree <span class="math inline">\(T_0\)</span> and then prune it back in order to obtain a subtree. We use cross validation to build the subtree so as to not overfit the data.</p>
+<hr>
+<p><strong>Algorithm</strong>: Building a Regression Tree</p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Use recursive binary splitting to grow a large tree on the training data, stopping only when each terminal node has fewer than some minimum number of observations.</li>
+<li>Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of <span class="math inline">\(\alpha\)</span>.</li>
+<li>Use <span class="math inline">\(K\)</span>-fold cross-validation to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(K\)</span> folds. For each <span class="math inline">\(k=1, 2, \ldots, K\)</span>:
+<ol style="list-style-type: lower-alpha">
+<li>Repeat Steps 1 and 2 on all but the <span class="math inline">\(k\)</span>th fold of the training data.</li>
+<li>Evaluate the mean squared prediction error on the data in the left-out <span class="math inline">\(k\)</span>th fold, as a function of <span class="math inline">\(\alpha\)</span>.
+For each value of <span class="math inline">\(\alpha\)</span>, average the prediction error (either misclassification or RSS), and pick <span class="math inline">\(\alpha\)</span> to minimize the average error.</li>
+</ol>
+</li>
+<li>Return the subtree from Step 2 that corresponds to the chosen value of <span class="math inline">\(\alpha\)</span>.</li>
+</ol>
+<hr>
+</div>
+<div id="cost-complexity-pruning" class="section level4" number="8.5.1.4">
+<h4>
+<span class="header-section-number">8.5.1.4</span> Cost Complexity Pruning<a class="anchor" aria-label="anchor" href="#cost-complexity-pruning"><i class="fas fa-link"></i></a>
+</h4>
+<p>Also known as <em>weakest link pruning</em>, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter <span class="math inline">\(\alpha\)</span> (instead of considering every single subtree). Generally, the idea is that there is a cost to having a larger (more complex!) tree. We define the cost complexity criterion (<span class="math inline">\(\alpha &gt; 0\)</span>):
+<span class="math display">\[\begin{align}
+\mbox{numerical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha|T|\\
+\mbox{categorical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha|T|
+\end{align}\]</span>
+where <span class="math inline">\(k(m)\)</span> is the class with the majority of observations in node <span class="math inline">\(m\)</span> and <span class="math inline">\(|T|\)</span> is the number of terminal nodes in the tree.</p>
+<ul>
+<li>
+<span class="math inline">\(\alpha\)</span> small: If <span class="math inline">\(\alpha\)</span> is set to be small, we are saying that the risk is more worrisome than the complexity and larger trees are favored because they reduce the risk.</li>
+<li>
+<span class="math inline">\(\alpha\)</span> large: If <span class="math inline">\(\alpha\)</span> is set to be large, then the complexity of the tree is more worrisome and smaller trees are favored.</li>
+</ul>
+<p>The way to think about cost complexity is to consider <span class="math inline">\(\alpha\)</span> increasing. As <span class="math inline">\(\alpha\)</span> gets bigger, the “best” tree will be smaller. But the test error will not be monotonically related to the size of the training tree.</p>
+<div class="inline-figure"><img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;"></div>
+<div id="variations-on-a-theme" class="section level5 unnumbered">
+<h5>Variations on a theme<a class="anchor" aria-label="anchor" href="#variations-on-a-theme"><i class="fas fa-link"></i></a>
+</h5>
+<p>The main ideas above are consistent throughout all CART algorithms. However, the exact details of implementation can change from function to function, and often times it is very difficult to decipher exactly which equation is being used. In the <code>tree</code> function in R, much of the decision making is done on <code>deviance</code> which is defined as:
+<span class="math display">\[\begin{align}
+\mbox{numerical: } \mbox{deviance} &amp;= \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\\
+\mbox{categorical: }  \mbox{deviance} &amp;= -2\sum_{m=1}^{|T|} \sum_{k=1}^K n_{mk} \log \hat{p}_{mk}\\
+\end{align}\]</span></p>
+<p>For the CART algorithm, minimize the deviance (for both types of variables). The categorical deviance will be small if most of the observations are in the majority group (with high proportion). Also, <span class="math inline">\(\lim_{\epsilon \rightarrow 0} \epsilon \log(\epsilon) = 0\)</span>. Additionally, methods of cross validation can also vary. In particular, if the number of variables is large, the tree algorithm can be slow and so the cross validation process - choice of <span class="math inline">\(\alpha\)</span> - needs to be efficient.</p>
+</div>
+<div id="cv-for-model-building-and-model-assessment" class="section level5 unnumbered">
+<h5>CV for model building and model assessment<a class="anchor" aria-label="anchor" href="#cv-for-model-building-and-model-assessment"><i class="fas fa-link"></i></a>
+</h5>
+<p>Notice that CV is used for both model building and model assessment. It is possible (and practical, though quite computational!) to use both practices on the same classification model. The algorithm could be as follows.</p>
+<hr>
+<p><strong>Algorithm</strong>: CV for both <span class="math inline">\(k_1\)</span>-fold CV building and <span class="math inline">\(k_2\)</span>-fold CV assessment</p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Partition the data in <span class="math inline">\(k_1\)</span> groups.</li>
+<li>Remove the first group, and train the data on the remaining <span class="math inline">\(k_1-1\)</span> groups.</li>
+<li>Use <span class="math inline">\(k_2\)</span>-fold cross-validation (on the <span class="math inline">\(k_1-1\)</span> groups) to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(k_2\)</span> folds and find <span class="math inline">\(\alpha\)</span> that minimizes the error.</li>
+<li>Using the subtree that corresponds to the chosen value of <span class="math inline">\(\alpha\)</span>, predict the first of the <span class="math inline">\(k_1\)</span> hold out samples.</li>
+<li>Repeat steps 2-4 using the remaining <span class="math inline">\(k_1 - 1\)</span> groups.</li>
+</ol>
+<hr>
+</div>
+</div>
+</div>
+<div id="r-cart-example" class="section level3" number="8.5.2">
+<h3>
+<span class="header-section-number">8.5.2</span> R CART Example<a class="anchor" aria-label="anchor" href="#r-cart-example"><i class="fas fa-link"></i></a>
+</h3>
+<p>There are multiple tree building options in R both in the <code>caret</code> package and <code>party</code>, <code>rpart</code>, and <code>tree</code> packages.</p>
+<p>The Census Bureau divides the country up into “tracts” of approximately
+equal population. For the 1990 Census, California was divided into 20640 tracts. One data sets (houses on <a href="http://lib.stat.cmu.edu/datasets/" class="uri">http://lib.stat.cmu.edu/datasets/</a>; <a href="http://lib.stat.cmu.edu/datasets/houses.zip" class="uri">http://lib.stat.cmu.edu/datasets/houses.zip</a>) records the following for each tract in California: Median house price, median house age, total number of rooms, total number of bedrooms, total number of occupants, total number of houses, median income (in thousands of dollars), latitude and longitude. It appeared in Pace and Barry (1997), “Sparse Spatial Autoregressions,” <strong>Statistics and Probability Letters</strong>.</p>
+<div id="classification-and-regression-trees" class="section level4 unnumbered">
+<h4>Classification and Regression Trees<a class="anchor" aria-label="anchor" href="#classification-and-regression-trees"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Classification Trees</strong> are used to predict a response or class <span class="math inline">\(Y\)</span> from input <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>. If it is a continuous response it’s called a regression tree, if it is categorical, it’s called a classification tree. At each node of the tree, we check the value of one the input <span class="math inline">\(X_i\)</span> and depending of the (binary) answer we continue to the left or to the right subbranch. When we reach a leaf we will find the prediction (usually it is a simple statistic of the dataset the leaf represents, like the most common value from the available classes).</p>
+<p>Note on <code>maxdepth</code>: as you might expect, <code>maxdepth</code> indicates the longest length from the root of the tree to a terminal node. However, for <code>rpart</code> (in particular, using <code>rpart</code> or <code>rpart2</code> in <code>caret</code>), there are other default settings that keep the tree from growing all the way to singular nodes, even with a high <code>maxdepth</code>.</p>
+</div>
+<div id="regression-trees-1" class="section level4 unnumbered">
+<h4>Regression Trees<a class="anchor" aria-label="anchor" href="#regression-trees-1"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb512"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">real.estate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt"</span>, 
+                          header<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
+<span class="va">tr.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
+                         data<span class="op">=</span><span class="va">real.estate</span>, 
+                         method<span class="op">=</span><span class="st">"rpart2"</span>, 
+                         trControl <span class="op">=</span> <span class="va">fitControl</span>, 
+                         tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tr.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;"></div>
+</div>
+<div id="scatterplot" class="section level4 unnumbered">
+<h4>Scatterplot<a class="anchor" aria-label="anchor" href="#scatterplot"><i class="fas fa-link"></i></a>
+</h4>
+<p>Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend. Note that this plot uses the <code>tree</code> model (instead of the <code>rpart2</code> model) because the optimization is different.</p>
+<div class="sourceCode" id="cb513"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tree.model</span> <span class="op">&lt;-</span> <span class="fu">tree</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tree/man/tree.html">tree</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
+                         data<span class="op">=</span><span class="va">real.estate</span><span class="op">)</span>
+
+<span class="va">price.deciles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">10</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span>
+<span class="va">cut.prices</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, 
+                     <span class="va">price.deciles</span>, 
+                     include.lowest<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">Longitude</span>, 
+     <span class="va">real.estate</span><span class="op">$</span><span class="va">Latitude</span>, 
+     col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.html">grey</a></span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">2</span><span class="op">/</span><span class="fl">11</span><span class="op">)</span><span class="op">[</span><span class="va">cut.prices</span><span class="op">]</span>, 
+     pch<span class="op">=</span><span class="fl">20</span>, 
+     xlab<span class="op">=</span><span class="st">"Longitude"</span>,ylab<span class="op">=</span><span class="st">"Latitude"</span><span class="op">)</span>
+
+<span class="fu">tree</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tree/man/partition.tree.html">partition.tree</a></span><span class="op">(</span><span class="va">tree.model</span>, 
+                     ordvars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Longitude"</span>,<span class="st">"Latitude"</span><span class="op">)</span>, 
+                     add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> </code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;"></div>
+</div>
+<div id="finer-partition" class="section level4 unnumbered">
+<h4>Finer partition<a class="anchor" aria-label="anchor" href="#finer-partition"><i class="fas fa-link"></i></a>
+</h4>
+<pre><code>12) Latitude&gt;=34.7 2844  645.0 11.5 </code></pre>
+<p>the node that splits at latitude greater than 34.7 has 2844 houses. 645 is the “deviance” which is the sum of squares value for that node. the predicted value is the average of the points in that node: 11.5. it is not a terminal node (no asterisk).</p>
+<div class="sourceCode" id="cb515"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
+<span class="va">tr.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
+                         data<span class="op">=</span><span class="va">real.estate</span>, 
+                         method<span class="op">=</span><span class="st">"rpart2"</span>,
+                         trControl <span class="op">=</span> <span class="va">fitControl</span>, 
+                         tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">tr.house</span><span class="op">$</span><span class="va">finalModel</span></code></pre></div>
+<pre><code>## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) Latitude&gt;=38.485 2061  383.26410 11.59422  
+##      4) Latitude&gt;=39.355 674   65.51082 11.31630 *
+##      5) Latitude&lt; 39.355 1387  240.39580 11.72928 *
+##    3) Latitude&lt; 38.485 18579 5750.77400 12.13931  
+##      6) Longitude&gt;=-121.655 13941 4395.52000 12.05527  
+##       12) Latitude&gt;=34.675 2844  645.27310 11.51018  
+##         24) Longitude&gt;=-120.275 1460  212.47730 11.28145 *
+##         25) Longitude&lt; -120.275 1384  275.83120 11.75148 *
+##       13) Latitude&lt; 34.675 11097 2688.68000 12.19497  
+##         26) Longitude&gt;=-118.315 8384 1823.33000 12.08687  
+##           52) Longitude&gt;=-117.545 2839  691.79800 11.87672 *
+##           53) Longitude&lt; -117.545 5545  941.96340 12.19446 *
+##         27) Longitude&lt; -118.315 2713  464.62720 12.52902 *
+##      7) Longitude&lt; -121.655 4638  960.79250 12.39194  
+##       14) Latitude&gt;=37.925 1063  177.59430 12.09533 *
+##       15) Latitude&lt; 37.925 3575  661.87260 12.48013 *</code></pre>
+</div>
+<div id="more-variables" class="section level4 unnumbered">
+<h4>More variables<a class="anchor" aria-label="anchor" href="#more-variables"><i class="fas fa-link"></i></a>
+</h4>
+<p>Including all the variables, not only the latitude and longitude:</p>
+<div class="sourceCode" id="cb517"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
+<span class="va">tr.full.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
+                              data<span class="op">=</span><span class="va">real.estate</span>, 
+                              method<span class="op">=</span><span class="st">"rpart2"</span>, 
+                              trControl <span class="op">=</span> <span class="va">fitControl</span>, 
+                              tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">tr.full.house</span><span class="op">$</span><span class="va">finalModel</span></code></pre></div>
+<pre><code>## n= 20640 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 20640 6685.26300 12.08488  
+##    2) MedianIncome&lt; 3.5471 10381 2662.31300 11.77174  
+##      4) MedianIncome&lt; 2.51025 4842 1193.71700 11.57572  
+##        8) Latitude&gt;=34.465 2520  557.77450 11.38771  
+##         16) Longitude&gt;=-120.275 728   77.14396 11.08365 *
+##         17) Longitude&lt; -120.275 1792  385.97890 11.51124  
+##           34) Latitude&gt;=37.905 1103  150.31490 11.35795 *
+##           35) Latitude&lt; 37.905 689  168.25420 11.75664 *
+##        9) Latitude&lt; 34.465 2322  450.19880 11.77976  
+##         18) Longitude&gt;=-117.775 878  144.15330 11.52580 *
+##         19) Longitude&lt; -117.775 1444  214.98520 11.93418 *
+##      5) MedianIncome&gt;=2.51025 5539 1119.89800 11.94310  
+##       10) Latitude&gt;=37.925 1104  123.65980 11.68124 *
+##       11) Latitude&lt; 37.925 4435  901.69050 12.00829  
+##         22) Longitude&gt;=-122.235 4084  770.65270 11.96811  
+##           44) Latitude&gt;=34.455 1270  284.66500 11.76617 *
+##           45) Latitude&lt; 34.455 2814  410.82510 12.05924 *
+##         23) Longitude&lt; -122.235 351   47.73002 12.47579 *
+##    3) MedianIncome&gt;=3.5471 10259 1974.99300 12.40175  
+##      6) MedianIncome&lt; 5.5892 7265 1156.09500 12.25720  
+##       12) MedianHouseAge&lt; 38.5 5907  858.59850 12.20694 *
+##       13) MedianHouseAge&gt;=38.5 1358  217.69860 12.47578 *
+##      7) MedianIncome&gt;=5.5892 2994  298.73550 12.75251  
+##       14) MedianIncome&lt; 7.393 2008  176.41530 12.64297 *
+##       15) MedianIncome&gt;=7.393 986   49.16749 12.97557 *</code></pre>
+<div class="sourceCode" id="cb519"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tr.full.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;"></div>
+</div>
+<div id="cross-validation-model-building" class="section level4 unnumbered">
+<h4>Cross Validation (model building!)<a class="anchor" aria-label="anchor" href="#cross-validation-model-building"><i class="fas fa-link"></i></a>
+</h4>
+<p>Turns out that the tree does “better” by being more complex – why is that? The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.</p>
+<div class="sourceCode" id="cb520"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># here, let's use all the variables and all the samples</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>
+<span class="va">tree.cv.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
+                              data<span class="op">=</span><span class="va">real.estate</span>, 
+                              method<span class="op">=</span><span class="st">"rpart2"</span>,
+                              trControl<span class="op">=</span><span class="va">fitControl</span>,
+                              tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,
+                              parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span>
+  
+<span class="va">tree.cv.house</span>  </code></pre></div>
+<pre><code>## CART 
+## 
+## 20640 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4748682  0.3041572  0.3848606
+##    2        0.4478756  0.3809354  0.3563586
+##    3        0.4282733  0.4340116  0.3393296
+##    4        0.4178448  0.4611563  0.3296215
+##    5        0.4054431  0.4924175  0.3184901
+##    6        0.3962472  0.5155365  0.3103266
+##    7        0.3948428  0.5189584  0.3092563
+##    8        0.3935306  0.5221099  0.3080369
+##    9        0.3891254  0.5326804  0.3044392
+##   10        0.3836652  0.5456808  0.3000226
+##   11        0.3786873  0.5574177  0.2956848
+##   12        0.3739131  0.5685161  0.2907504
+##   13        0.3712711  0.5746216  0.2868830
+##   14        0.3703641  0.5767271  0.2858720
+##   15        0.3703641  0.5767271  0.2858720
+##   16        0.3703641  0.5767271  0.2858720
+##   17        0.3703641  0.5767271  0.2858720
+##   18        0.3703641  0.5767271  0.2858720
+##   19        0.3703641  0.5767271  0.2858720
+##   20        0.3703641  0.5767271  0.2858720
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 14.</code></pre>
+<div class="sourceCode" id="cb522"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tree.cv.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb523"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">tree.cv.house</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-20-2.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="training-test-data-for-model-building-and-model-accuracy" class="section level4 unnumbered">
+<h4>Training / test data for model building AND model accuracy<a class="anchor" aria-label="anchor" href="#training-test-data-for-model-building-and-model-accuracy"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb524"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># first create two datasets: one training, one test</span>
+<span class="va">inTrain</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, 
+                                      p<span class="op">=</span><span class="fl">.8</span>, list<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">house.train</span> <span class="op">&lt;-</span> <span class="va">real.estate</span><span class="op">[</span><span class="va">inTrain</span>,<span class="op">]</span>
+<span class="va">house.test</span> <span class="op">&lt;-</span> <span class="va">real.estate</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">inTrain</span><span class="op">)</span>,<span class="op">]</span>
+
+
+<span class="co"># then use CV on the training data to find the best maxdepth</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>
+<span class="va">tree.cvtrain.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
+                                   data<span class="op">=</span><span class="va">house.train</span>, 
+                                   method<span class="op">=</span><span class="st">"rpart2"</span>,
+                                   trControl<span class="op">=</span><span class="va">fitControl</span>, 
+                                   tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,
+                                   parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span>
+
+
+<span class="va">tree.cvtrain.house</span></code></pre></div>
+<pre><code>## CART 
+## 
+## 16513 samples
+##     8 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
+## Resampling results across tuning parameters:
+## 
+##   maxdepth  RMSE       Rsquared   MAE      
+##    1        0.4756049  0.2994314  0.3851775
+##    2        0.4497958  0.3734197  0.3581148
+##    3        0.4289837  0.4302083  0.3396992
+##    4        0.4192079  0.4558965  0.3304520
+##    5        0.4026435  0.4979229  0.3153937
+##    6        0.3960649  0.5141665  0.3102682
+##    7        0.3960649  0.5141665  0.3102682
+##    8        0.3924388  0.5229961  0.3072433
+##    9        0.3875832  0.5347306  0.3027262
+##   10        0.3830783  0.5454004  0.2981715
+##   11        0.3783297  0.5566766  0.2941443
+##   12        0.3724797  0.5702362  0.2883089
+##   13        0.3694837  0.5770987  0.2850918
+##   14        0.3694837  0.5770987  0.2850918
+##   15        0.3694837  0.5770987  0.2850918
+##   16        0.3694837  0.5770987  0.2850918
+##   17        0.3694837  0.5770987  0.2850918
+##   18        0.3694837  0.5770987  0.2850918
+##   19        0.3694837  0.5770987  0.2850918
+##   20        0.3694837  0.5770987  0.2850918
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was maxdepth = 13.</code></pre>
+<div class="sourceCode" id="cb526"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tree.train.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
+                                 data<span class="op">=</span><span class="va">house.train</span>, 
+                                 method<span class="op">=</span><span class="st">"rpart2"</span>,
+                                 trControl<span class="op">=</span><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>,
+                                 tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">14</span><span class="op">)</span>,
+                                 parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><strong>for classification results</strong> use <code>confusionMatrix</code> instead of <code>postResample</code></p>
+<div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">test.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tree.train.house</span>, <span class="va">house.test</span><span class="op">)</span>
+<span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">postResample</a></span><span class="op">(</span>pred <span class="op">=</span> <span class="va">test.pred</span>, obs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">house.test</span><span class="op">$</span><span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>##      RMSE  Rsquared       MAE 
+## 0.3696649 0.5840583 0.2846395</code></pre>
+</div>
+<div id="other-tree-r-packages" class="section level4 unnumbered">
+<h4>Other tree R packages<a class="anchor" aria-label="anchor" href="#other-tree-r-packages"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li><p><code>rpart</code> is faster than <code>tree</code></p></li>
+<li><p><code>party</code> gives great plotting options</p></li>
+<li><p><code>maptree</code> also gives trees from hierarchical clustering</p></li>
+<li><p><code>randomForest</code> up next!</p></li>
+</ul>
+<p>Reference: slides built from <a href="http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf" class="uri">http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf</a></p>
+</div>
+</div>
+</div>
+<div id="Nov5" class="section level2" number="8.6">
+<h2>
+<span class="header-section-number">8.6</span> 11/5/19 Agenda<a class="anchor" aria-label="anchor" href="#Nov5"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>pruning</li>
+<li>variable selection</li>
+<li>bagging (no boosting)</li>
+<li>OOB error rate</li>
+</ol>
+</div>
+<div id="bagging" class="section level2" number="8.7">
+<h2>
+<span class="header-section-number">8.7</span> Bagging<a class="anchor" aria-label="anchor" href="#bagging"><i class="fas fa-link"></i></a>
+</h2>
+<p>The tree based models given by CART are easy to understand and implement, but they suffer from <em>high variance</em>. That is, if we split the training data into two parts at random and fit a decision tree to both halves, the results that we get could be quite different (you might have seen this in your homework assignment!). We’d like a model that produces low variance - one for which if we ran it on different datasets, we’d get (close to) the same model every time.</p>
+<p><strong>Bagging = Bootstrap Aggregating</strong>. The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit. Bagging can be applied to any classifier to reduce variability.</p>
+<p style="color:red">
+Recall that the variance of the sample mean is variance / n. So we’ve seen the idea that averaging an outcome gives reduced variability.
+</p>
+<div id="bagging-algorithm" class="section level3" number="8.7.1">
+<h3>
+<span class="header-section-number">8.7.1</span> Bagging algorithm<a class="anchor" aria-label="anchor" href="#bagging-algorithm"><i class="fas fa-link"></i></a>
+</h3>
+<hr>
+<p><strong>Algorithm</strong>: Bagging Forest</p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Resample <em>cases</em> (observational units, not variables) and recalculate predictions. Choose <span class="math inline">\(N' \leq N\)</span> for the number of observations in the new training set through random sampling with replacement. Almost always we use <span class="math inline">\(N' = N\)</span> for a full bootstrap.</li>
+<li>Build a tree on each new set of <span class="math inline">\(N'\)</span> training observations.</li>
+<li>Average (regression) or majority vote (classification).</li>
+<li>Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.</li>
+</ol>
+<hr>
+<p><span class="math display">\[\begin{align}
+P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
+\lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
+\end{align}\]</span></p>
+<p><strong>Shortcomings of Bagging:</strong></p>
+<ul>
+<li>Model is even harder to “write-down” (than CART)</li>
+<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy - now computational task is even harder! (because of the number of trees grown for each bootstrap sample)</li>
+</ul>
+<p><strong>Strengths of Bagging:</strong></p>
+<ul>
+<li>Can handle categorical or numerical predictors or response variables (indeed, they can handle mixed predictors at the same time!).</li>
+<li>Can handle more than 2 groups for categorical predictions</li>
+<li>Easily ignore redundant variables.</li>
+<li>Perform better than linear models in non-linear settings. Classification trees are non-linear models, so they immediately use interactions between variables.</li>
+<li>Data transformations may be less important (monotone transformations on the explanatory variables won’t change anything).
+<p style="color:red">
+<em>Similar bias</em> to CART, but <em>reduced variance</em>
+</p>
+(can be proved).</li>
+</ul>
+<p><strong>Notes on bagging:</strong></p>
+<ul>
+<li>Bagging alone uses the full set of predictors to determine every tree (it is the observations that are bootstrapped).</li>
+<li>Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction. We average (or majority vote) the predictions to get one prediction for the observation at hand.</li>
+<li>Bagging gives a smoother decision boundary</li>
+<li>Bagging can be done on <em>any</em> decision method (not just trees).</li>
+<li>No need to prune or CV trees. The reason is that averaging keeps us from overfitting a particular few observations (think of averages in other contexts: law of large numbers). Pruning wouldn’t be a bad thing to do in terms of fit, but it is unnecessary for good predictions (and would add a lot to the complexity of the algorithm).</li>
+</ul>
+</div>
+<div id="out-of-bag-oob-error-rate" class="section level3" number="8.7.2">
+<h3>
+<span class="header-section-number">8.7.2</span> Out Of Bag (OOB) error rate<a class="anchor" aria-label="anchor" href="#out-of-bag-oob-error-rate"><i class="fas fa-link"></i></a>
+</h3>
+<p>Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:</p>
+<ul>
+<li>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.</li>
+<li>Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.</li>
+</ul>
+<p>How does it work? Consider the following predictions for a silly toy data set of 9 observations. Recall that <span class="math inline">\(\sim 1/3\)</span> of the observations will be left out at each bootstrap sample. Those are the observations for which predictions will be made. In the table below, an X is given if there is a prediction made for that value.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="center">obs</th>
+<th align="center">tree1</th>
+<th align="center">tree2</th>
+<th align="center">tree3</th>
+<th align="center">tree4</th>
+<th align="center"><span class="math inline">\(\cdots\)</span></th>
+<th align="center">tree100</th>
+<th align="center">average</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/38\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/30\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/33\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/32\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/39\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/29\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/29\)</span></td>
+</tr>
+<tr class="even">
+<td align="center">8</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"><span class="math inline">\(\sum(pred)/31\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center">9</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="math inline">\(\sum(pred)/36\)</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>Let the OOB prediction for the <span class="math inline">\(i^{th}\)</span> observation to be <span class="math inline">\(\hat{y}_{(-i)}\)</span></p>
+<p><span class="math display">\[\begin{align}
+\mbox{OOB}_{\mbox{error}} &amp;= \frac{1}{n} \sum_{i=1}^n \textrm{I} (y_i \ne \hat{y}_{(-i)}) \ \ \ \ \ \ \ \  \mbox{classification}\\
+\mbox{OOB}_{\mbox{error}} &amp;= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
+\end{align}\]</span></p>
+</div>
+</div>
+<div id="Nov7" class="section level2" number="8.8">
+<h2>
+<span class="header-section-number">8.8</span> 11/7/19 Agenda<a class="anchor" aria-label="anchor" href="#Nov7"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>OOB again</li>
+<li>Random Forests</li>
+<li>variable importance</li>
+<li>R code / examples</li>
+</ol>
+</div>
+<div id="rf" class="section level2" number="8.9">
+<h2>
+<span class="header-section-number">8.9</span> Random Forests<a class="anchor" aria-label="anchor" href="#rf"><i class="fas fa-link"></i></a>
+</h2>
+<p>Random Forests are an extension to bagging for regression trees (note: bagging can be done on any prediction method). Again, with the idea of infusing extra variability and then averaging over that variability, RFs use a <em>subset</em> of predictor variables at every node in the tree.</p>
+<blockquote>
+<p>“Random forests does not overfit. You can run as many trees as you want.” Brieman, <a href="http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm" class="uri">http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm</a></p>
+</blockquote>
+<div id="random-forest-algorithm" class="section level3" number="8.9.1">
+<h3>
+<span class="header-section-number">8.9.1</span> Random Forest algorithm<a class="anchor" aria-label="anchor" href="#random-forest-algorithm"><i class="fas fa-link"></i></a>
+</h3>
+<hr>
+<p><strong>Algorithm</strong>: Random Forest</p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Bootstrap sample from the training set.</li>
+<li>Grow an un-pruned tree on this bootstrap sample.</li>
+</ol>
+<ul>
+<li>
+<em>At each split</em>, select <span class="math inline">\(m\)</span> variables and determine the best split using only these predictors.
+Typically <span class="math inline">\(m = \sqrt{p}\)</span> or <span class="math inline">\(\log_2 p\)</span>, where <span class="math inline">\(p\)</span> is the number of features. Random Forests are not overly sensitive to the value of <span class="math inline">\(m\)</span>. [splits are chosen as with trees: according to either squared error or gini index / cross entropy / classification error.]</li>
+<li>Do <em>not</em> prune the tree. Save the tree as is!</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Repeat steps 1-2 for many many trees.</li>
+<li>For each tree grown on a bootstrap sample, predict the OOB samples. For each tree grown, <span class="math inline">\(~1/3\)</span> of the training samples won’t be in the bootstrap sample – those are called out of bootstrap (OOB) samples. OOB samples can be used as <em>test</em> data to estimate the error rate of the tree.</li>
+<li>Combine the OOB predictions to create the “out-of-bag” error rate (either majority vote or average of predictions / class probabilities).</li>
+<li>All trees together represent the <em>model</em> that is used for new predictions (either majority vote or average).</li>
+</ol>
+<hr>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-23"></span>
+<img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%"><p class="caption">
+Figure 8.1: Building multiple trees and then combining the outputs (predictions). Note that this image makes the choice to average the tree probabilities instead of using majority vote. Both are valid methods for creating a Random Forest prediction model. <a href="http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" class="uri">http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</a>
+</p>
+</div>
+<p><strong>Shortcomings of Random Forests:</strong></p>
+<ul>
+<li>Model is even harder to “write-down” (than CART)</li>
+<li>With lots of predictors, (even greedy) partitioning can become computationally unwieldy - now computational task is even harder! … bagging the observations and</li>
+</ul>
+<p><strong>Strengths of Random Forests:</strong></p>
+<ul>
+<li>refinement of bagged trees; quite popular (Random Forests tries to improve on bagging by “de-correlating” the trees. Each tree has the same expectation, but the average will again reduce the variability.)</li>
+<li>subset of predictors makes Random Forests <em>much faster</em> to search through than all predictors</li>
+<li>creates a diverse set of trees that can be built. Note that by bootstrapping the samples and the predictor variables, we add another level of randomness over which we can average to again decrease the variability.</li>
+<li>Random Forests are quite accurate</li>
+<li>generally, models do not overfit the data and CV is not needed. However, CV can be used to fit the tuning parameters (<span class="math inline">\(m\)</span>, node size, max number of nodes, etc.).</li>
+</ul>
+<p><strong>Notes on Random Forests:</strong></p>
+<ul>
+<li>Bagging alone uses the full set of predictors to determine every tree (it is the observations that are bootstrapped). Random Forests use a subset of predictors.</li>
+<li>Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction. We average (or majority vote) the predictions to get one prediction for the observation at hand.</li>
+<li>Bagging is a special case of Random Forest where <span class="math inline">\(m=k\)</span>.</li>
+<li>generally, models do not overfit the data and CV is not needed. However, CV can be used to fit the tuning parameters (<span class="math inline">\(m\)</span>, node size, max number of nodes, etc.).</li>
+</ul>
+<blockquote>
+<p>“Random forests does not overfit. You can run as many trees as you want.” Brieman, <a href="http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm" class="uri">http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm</a></p>
+</blockquote>
+<div id="how-to-choose-parameters" class="section level4 unnumbered">
+<h4>How to choose parameters?<a class="anchor" aria-label="anchor" href="#how-to-choose-parameters"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>
+<strong><span class="math inline">\(\#\)</span> trees</strong>
+Build trees until the error no longer decreases</li>
+<li>
+<strong><span class="math inline">\(m\)</span></strong>
+Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).</li>
+<li>
+<strong><span class="math inline">\(N'\)</span> samples</strong>
+<span class="math inline">\(N'\)</span> should be the same size as the training data.</li>
+</ul>
+</div>
+<div id="variable-importance" class="section level4 unnumbered">
+<h4>Variable Importance<a class="anchor" aria-label="anchor" href="#variable-importance"><i class="fas fa-link"></i></a>
+</h4>
+<p>All learners are bad when there are too many noisy variables because the response is bound to correlate with some of them. We can measure the contribution of each additional variable in the model by how much the model accuracy decreased when the given variable was <em>excluded</em> from the model.</p>
+<blockquote>
+<p>importance = decrease in node impurity resulting from splits over that variable, averaged over all trees</p>
+</blockquote>
+<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees).</p>
+<p><strong>Variable importance</strong> is measured by two different metrics (from R help on <code>importance</code>):</p>
+<ul>
+<li>(permutation) <strong>accuracy:</strong> For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression). Within the oob values, permute the <span class="math inline">\(j^{th}\)</span> variable and recalculate the prediction error. The difference between the two are then averaged over all trees (with the <span class="math inline">\(j^{th}\)</span> variable) to give the importance for the <span class="math inline">\(j^{th}\)</span> variable.</li>
+<li>
+<strong>purity:</strong> The decrease (or increase, depending on the plot) in node purity: root sum of squares (RSS) [deviance/gini for classification trees]. That is, the amount of total decrease in RSS from splitting on <em>that</em> variable, averaged over all trees.</li>
+</ul>
+<p>If the number of variables is very large, forests can be run once with all the variables, then run again using only the most important variables from the first run.</p>
+</div>
+</div>
+<div id="r-rf-example" class="section level3" number="8.9.2">
+<h3>
+<span class="header-section-number">8.9.2</span> R RF Example<a class="anchor" aria-label="anchor" href="#r-rf-example"><i class="fas fa-link"></i></a>
+</h3>
+<p>(“impurity” is defined as RSS for regression trees and deviance for classification trees).</p>
+<p><code>method= 'ranger'</code> is about a zillion times faster than <code>method = 'randomForest'</code> or <code>method = 'rf'</code>, but they all do the work.</p>
+<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger">ranger</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">e1071</span><span class="op">)</span>
+
+<span class="va">inTrain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, p<span class="op">=</span><span class="fl">0.7</span>, list<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">iris.train</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">inTrain</span>,<span class="op">]</span>
+<span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="va">inTrain</span>,<span class="op">]</span></code></pre></div>
+<div class="sourceCode" id="cb530"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">modFit</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                data<span class="op">=</span><span class="va">iris.train</span>, 
+                method<span class="op">=</span><span class="st">"ranger"</span><span class="op">)</span>
+<span class="va">modFit</span></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling: Bootstrapped (25 reps) 
+## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  splitrule   Accuracy   Kappa    
+##   2     gini        0.9519882  0.9268222
+##   2     extratrees  0.9501667  0.9239468
+##   3     gini        0.9509638  0.9252363
+##   3     extratrees  0.9511923  0.9254990
+##   4     gini        0.9489015  0.9221052
+##   4     extratrees  0.9501289  0.9238519
+## 
+## Tuning parameter 'min.node.size' was held constant at a value of 1
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were mtry = 2, splitrule = gini
+##  and min.node.size = 1.</code></pre>
+<div class="sourceCode" id="cb532"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">modFit</span>, newdata <span class="op">=</span> <span class="va">iris.test</span><span class="op">)</span>, 
+                reference <span class="op">=</span> <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##             Reference
+## Prediction   setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         14         2
+##   virginica       0          1        13
+## 
+## Overall Statistics
+##                                          
+##                Accuracy : 0.9333         
+##                  95% CI : (0.8173, 0.986)
+##     No Information Rate : 0.3333         
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+##                                          
+##                   Kappa : 0.9            
+##                                          
+##  Mcnemar's Test P-Value : NA             
+## 
+## Statistics by Class:
+## 
+##                      Class: setosa Class: versicolor Class: virginica
+## Sensitivity                 1.0000            0.9333           0.8667
+## Specificity                 1.0000            0.9333           0.9667
+## Pos Pred Value              1.0000            0.8750           0.9286
+## Neg Pred Value              1.0000            0.9655           0.9355
+## Prevalence                  0.3333            0.3333           0.3333
+## Detection Rate              0.3333            0.3111           0.2889
+## Detection Prevalence        0.3333            0.3556           0.3111
+## Balanced Accuracy           1.0000            0.9333           0.9167</code></pre>
+<div id="parameters-mtry-and-num.trees" class="section level4" number="8.9.2.1">
+<h4>
+<span class="header-section-number">8.9.2.1</span> Parameters… <code>mtry</code> and <code>num.trees</code><a class="anchor" aria-label="anchor" href="#parameters-mtry-and-num.trees"><i class="fas fa-link"></i></a>
+</h4>
+<p>Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests). Hopefully the code below will help for other problems where Random Forests are more appropriate.</p>
+<div class="sourceCode" id="cb534"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">modFit.m</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                data<span class="op">=</span><span class="va">iris.train</span>, 
+                method<span class="op">=</span><span class="st">"ranger"</span>, 
+                trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"oob"</span><span class="op">)</span>,
+                num.trees <span class="op">=</span> <span class="fl">500</span>,
+                tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>mtry<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, splitrule <span class="op">=</span> <span class="st">"gini"</span>,
+                                     min.node.size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">modFit.m</span></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 105 samples
+##   4 predictor
+##   3 classes: 'setosa', 'versicolor', 'virginica' 
+## 
+## No pre-processing
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##   1     0.9428571  0.9142857
+##   2     0.9523810  0.9285714
+##   3     0.9523810  0.9285714
+##   4     0.9523810  0.9285714
+## 
+## Tuning parameter 'splitrule' was held constant at a value of gini
+## 
+## Tuning parameter 'min.node.size' was held constant at a value of 5
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were mtry = 2, splitrule = gini
+##  and min.node.size = 5.</code></pre>
+<div class="sourceCode" id="cb536"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">modFit.m</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+
+<span class="va">acc.ntree</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">260</span>, by <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+<span class="va">modFit.ntree</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                data<span class="op">=</span><span class="va">iris.train</span>, 
+                method<span class="op">=</span><span class="st">"ranger"</span>, 
+                trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"oob"</span><span class="op">)</span>,
+                num.trees <span class="op">=</span> <span class="va">i</span>,
+                tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>mtry<span class="op">=</span><span class="fl">3</span>, splitrule <span class="op">=</span> <span class="st">"gini"</span>,
+                                     min.node.size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">acc.ntree</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">acc.ntree</span>, <span class="va">modFit.ntree</span><span class="op">$</span><span class="va">finalModel</span><span class="op">$</span><span class="va">prediction.error</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span> ntree <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">260</span>, by <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>, <span class="va">acc.ntree</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu">ggplot</span><span class="op">(</span> <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">ntree</span>, y <span class="op">=</span> <span class="va">acc.ntree</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"number of trees in the RF"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">ylab</span><span class="op">(</span><span class="st">"OOB Accuracy"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.06</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="variable-importance-1" class="section level4 unnumbered">
+<h4>Variable Importance<a class="anchor" aria-label="anchor" href="#variable-importance-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>In order to get the variable importance, you need to specify importance within the building of the forest.</p>
+<p>See if you can figure out every single line of the <code>ggplot</code> code.</p>
+<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">modFit.VI</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
+                data<span class="op">=</span><span class="va">iris.train</span>, 
+                importance <span class="op">=</span> <span class="st">"permutation"</span>,
+                method<span class="op">=</span><span class="st">"ranger"</span><span class="op">)</span>
+
+<span class="fu">ranger</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/importance.ranger.html">importance</a></span><span class="op">(</span><span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
+<pre><code>## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##  0.026859630  0.006130369  0.297439677  0.323197349</code></pre>
+<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>importance <span class="op">=</span> <span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">$</span><span class="va">variable.importance</span>,
+           variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">$</span><span class="va">variable.importance</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+    <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">variables</span>, <span class="va">importance</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">importance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu">geom_bar</span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">xlab</span><span class="op">(</span><span class="st">"Variable"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">coord_flip</span><span class="op">(</span><span class="op">)</span> </code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;"></div>
+<p>plot both the given labels as well as the predicted labels</p>
+<div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris.test</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>testSpecies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">modFit</span>, <span class="va">iris.test</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">ggplot</span><span class="op">(</span><span class="va">iris.test</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">Petal.Width</span>, y<span class="op">=</span><span class="va">Petal.Length</span>, 
+                      shape <span class="op">=</span> <span class="va">Species</span>, col <span class="op">=</span> <span class="va">testSpecies</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu">geom_point</span><span class="op">(</span>size<span class="op">=</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+</div>
+</div>
+<div id="model-choices" class="section level2" number="8.10">
+<h2>
+<span class="header-section-number">8.10</span> Model Choices<a class="anchor" aria-label="anchor" href="#model-choices"><i class="fas fa-link"></i></a>
+</h2>
+<p>There are <em>soooooo</em> many choices we’ve made along the way. The following list should make you realize that there is no <strong>truth</strong> with respect to any given model. Every choice will (could) lead to a different model.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th><span class="math inline">\(\mbox{ }\)</span></th>
+<th><span class="math inline">\(\mbox{ }\)</span></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>* explanatory variable choice</td>
+<td>* k (kNN)</td>
+</tr>
+<tr class="even">
+<td>* number of explanatory variables</td>
+<td>* distance measure</td>
+</tr>
+<tr class="odd">
+<td>* functions/transformation of explanatory</td>
+<td>* k (CV)</td>
+</tr>
+<tr class="even">
+<td>* transformation of response</td>
+<td>* CV set.seed</td>
+</tr>
+<tr class="odd">
+<td>* response:continuous vs. categorical</td>
+<td>* alpha prune</td>
+</tr>
+<tr class="even">
+<td>* how missing data is dealt with</td>
+<td>* maxdepth prune</td>
+</tr>
+<tr class="odd">
+<td>* train/test split (<code>set.seed</code>)</td>
+<td>* prune or not</td>
+</tr>
+<tr class="even">
+<td>* train/test proportion</td>
+<td>* gini / entropy (split)</td>
+</tr>
+<tr class="odd">
+<td>* type of classification model</td>
+<td>* # trees / # BS samples</td>
+</tr>
+<tr class="even">
+<td>* use of cost complexity / parameter</td>
+<td>* grid search etc. for tuning</td>
+</tr>
+<tr class="odd">
+<td>* majority / average prob (tree error rate)</td>
+<td>* value(s) of <code>mtry</code>
+</td>
+</tr>
+<tr class="even">
+<td>* accuracy vs sensitivity vs specificity</td>
+<td>* OOB vs CV for tuning</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div id="Nov12" class="section level2" number="8.11">
+<h2>
+<span class="header-section-number">8.11</span> 11/12/19 Agenda<a class="anchor" aria-label="anchor" href="#Nov12"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>linearly separable</li>
+<li>dot products</li>
+<li>support vector formulation</li>
+</ol>
+</div>
+<div id="support-vector-machines" class="section level2" number="8.12">
+<h2>
+<span class="header-section-number">8.12</span> Support Vector Machines<a class="anchor" aria-label="anchor" href="#support-vector-machines"><i class="fas fa-link"></i></a>
+</h2>
+<!--
+% Great video, MIT online!!!  \url{https://www.youtube.com/watch?v=_PwhiWxHK8o}
+
+% \url{http://www.r-bloggers.com/learning-kernels-svm/}
+
+% \url{http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf}
+
+% \textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
+
+% \textcolor{red}{Read Pattern Recognition \& Machine Learning by Bishop and also Chapter 9 in ISL}
+-->
+<p>Support Vector Machines are one more algorithm for classification. As you’ll see, they have some excellent properties, but one important aspect to note is that they use only numeric predictor variables and only binary response variables (classify two groups).</p>
+<p>Vladimir Vapnik (b. 1936) created SVMs in the late 1990s. History: he actually did the work as his PhD in the early 60s in the Soviet Union. Someone from Bell Labs asked him to visit, and he ended up immigrating to the US. No one actually thought that SVMs would work, but he eventually (1995 - took 30 years between the idea and the implementation) bet a dinner on classifying handwriting via SVM (using a very simple kernel) versus neural networks and the rest is history.</p>
+<p>The basic idea of SVMs is to figure out a way to create really complicated decision boundaries. We want to put in a straight line with the widest possible street (draw street with gutters and 4 points, two positive and two negative). The decision rule has to do with a dot product of the new sample with a vector <span class="math inline">\({\bf w}\)</span> which is perpendicular to the median of the “street.”</p>
+<p>Note: the standard formulation of SVM requires the computer to find dot products between each of the observations. In order to do so, the explanatory variables must be numeric. In order for the dot products to be meaningful, the data must be on the same scale.</p>
+<div id="linsvm" class="section level4" number="8.12.0.1">
+<h4>
+<span class="header-section-number">8.12.0.1</span> Linear Separator<a class="anchor" aria-label="anchor" href="#linsvm"><i class="fas fa-link"></i></a>
+</h4>
+<p>Recall ideas of kNN and trees:</p>
+<div class="inline-figure"><img src="figs/separate.jpg" width="100%" style="display: block; margin: auto;"></div>
+<p>But today’s decision boundary is going to be based on a hyperplane which separates the values in the “best” way. Certainly, if the data are linearly separable, then there are infinitely many hyperplanes which will partition the data perfectly. For SVM, the idea is to find the “street” which separates the positive and negative samples to give the widest margin.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-31"></span>
+<img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%"><p class="caption">
+Figure 8.2: The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier. <a href="http://www.rmki.kfki.hu/~banmi/elte/Bishop" class="uri">http://www.rmki.kfki.hu/~banmi/elte/Bishop</a> - Pattern Recognition and Machine Learning.pdf
+</p>
+</div>
+</div>
+<div id="aside-what-is-a-dot-product" class="section level4 unnumbered">
+<h4>Aside: what is a dot product?<a class="anchor" aria-label="anchor" href="#aside-what-is-a-dot-product"><i class="fas fa-link"></i></a>
+</h4>
+<p>Let <span class="math inline">\({\bf x} = (x_1, x_2, \ldots, x_p)^t\)</span> and <span class="math inline">\({\bf y} = (y_1, y_2, \ldots, y_p)^t\)</span> be two vectors which live in <span class="math inline">\(R^p\)</span>. Then their dot product is defined as:
+<span class="math display">\[\begin{align}
+{\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
+\end{align}\]</span></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-32"></span>
+<img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%"><p class="caption">
+Figure 8.3: If <strong>w</strong> is known, then the projection of any new observation onto <strong>w</strong> will lead to a linear partition of the space.
+</p>
+</div>
+<p>How can the street be used to get a decision rule? All that is known is that <span class="math inline">\({\bf w}\)</span> is perpendicular to the street. We don’t yet know <span class="math inline">\({\bf w}\)</span> or <span class="math inline">\(b\)</span>.</p>
+<p>The “width” of the street will be a vector which is perpendicular to the street (median). We don’t know the width yet, but we know know that we can use that perpendicular vector (<span class="math inline">\({\bf w}\)</span>) to figure out how to classify the points. Project an unknown point (<span class="math inline">\({\bf u}\)</span>) onto <span class="math inline">\({\bf w}\)</span> to see which side of the street the unknown value lands. That is, if the projection is large enough, we would classify the point as positive: <span class="math display">\[{\bf w} \cdot {\bf u} \geq c?\]</span></p>
+<p>[Keep in mind that <span class="math inline">\({\bf u} \cdot {\bf w} = ||{\bf w}|| \times\)</span>(the length of the shadow). That is, the projection will only be the length of the shadow if <span class="math inline">\({\bf w}\)</span> is a unit vector. And we aren’t going to constrain <span class="math inline">\({\bf w}\)</span> to be unit vector (though we could!). But regardless, <span class="math inline">\({\bf u} \cdot {\bf w}\)</span> still gives the ability to classify because it is proportional to the length of the shadow.]</p>
+<blockquote>
+<p>Decision rule:
+if <span class="math inline">\({\bf w} \cdot {\bf u} + b \geq 0\)</span> then label the new sample “positive”</p>
+</blockquote>
+<p>where <span class="math inline">\({\bf w}\)</span> is created in such a way that it is perpendicular to the median of the street. Then the unknown (<span class="math inline">\({\bf u}\)</span>) vector is projected onto <span class="math inline">\({\bf w}\)</span> to see if it is on the left or the right side of the street.</p>
+<p>But we don’t know the values in the decision rule! We need more constraints. Assuming that the data are linearly separable, as an initial step to find <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, for all positive samples (<span class="math inline">\(x_+\)</span>) and all negative samples (<span class="math inline">\(x_-\)</span>) force:
+<span class="math display" id="eq:negconstr">\[\begin{align}
+{\bf w} \cdot {\bf x}_+ + b &amp;\geq 1 \tag{8.1}\\
+{\bf w} \cdot {\bf x}_- + b &amp;\leq -1 \tag{8.2}
+\end{align}\]</span></p>
+<p>For mathematical convenience (so that we don’t have 2 equations hanging around), introduce <span class="math inline">\(y_i\)</span> such that
+<span class="math display">\[\begin{align}
+y_i &amp;= 1 \mbox{ for positive samples}\\
+y_i &amp;= -1 \mbox{ for negative samples}
+\end{align}\]</span></p>
+<p>Which simplifies the criteria for finding <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span> to be:
+<span class="math display">\[ y_i({\bf w} \cdot {\bf x}_i + b) \geq 1\]</span>
+(Multiplying through by -1 on equation (<a href="class.html#eq:negconstr">(8.2)</a> switches the signs, and both equation (<a href="class.html#eq:posconstr">(8.1)</a>) and (<a href="class.html#eq:negconstr">(8.2)</a> end up as the same for both types of points.)</p>
+<p>Again, working toward solving for <span class="math inline">\({\bf w}\)</span> and <span class="math inline">\(b\)</span>, add the additional constraint that for the points in the gutter (on the margin lines):</p>
+<blockquote>
+<p>For <span class="math inline">\(x_i\)</span> in the gutter (by definition):
+<span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) - 1 = 0\]</span></p>
+</blockquote>
+<p>Now consider two particular positive and negative values that live on the margin (gutter). The difference is almost the width of the street (we want to find the street that is as <em>wide as possible</em>), but it is at the wrong angle (see street picture again). Remember, our goal here is to <strong>find the street separating the pluses and the minuses that is as wide as possible.</strong> If we had a unit vector, we could dot it with <span class="math inline">\((x_+ - x_-)\)</span> to get the width of the street!</p>
+<p><span class="math display">\[\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||}
+\end{align}\]</span>
+which doesn’t do us much good yet.</p>
+<div class="inline-figure"><img src="figs/width.jpg" width="100%" style="display: block; margin: auto;"></div>
+<p style="color:red">
+Goal: Try to find as wide a street as possible.
+</p>
+<p>But remember, the gutter points are constrained: it turns out that <span class="math inline">\(x_+ \cdot {\bf w} = 1 - b\)</span> and <span class="math inline">\(x_- \cdot {\bf w} = -1 - b\)</span>. Therefore:</p>
+<p><span class="math display">\[\begin{align}
+width = \frac{(x_+ - x_-) \cdot {\bf w}}{|| {\bf w} ||} = \frac{(1-b) - (-1-b)}{|| {\bf w} ||} = \frac{2}{||w||}
+\end{align}\]</span></p>
+In order to maximize <span class="math inline">\(\frac{2}{||w||}\)</span>, minimize <span class="math inline">\(||w||\)</span>, or
+<center>
+<p style="color:red">
+minimize <span class="math inline">\((1/2)*||w||^2\)</span>
+</p>
+</center>
+<p>(to make it mathematically easier). We have all the pieces of making the decision rules as an optimization problem. That is, minimize some quantity subject to the constraints given by the problem.</p>
+</div>
+<div id="lagrange-multipliers" class="section level4 unnumbered">
+<h4>Lagrange multipliers<a class="anchor" aria-label="anchor" href="#lagrange-multipliers"><i class="fas fa-link"></i></a>
+</h4>
+<p>Recall, with Lagrange multipliers, the first part is the optimization, the second part is the constraint. The point of Lagrange multipliers is to put together the constraint and the optimization into one equation where you don’t worry about the constraints any longer.</p>
+<p><span class="math inline">\(L\)</span> consists of two parts. The first is the thing to minimize. The second is the set of constraints (here, the summation over all the constraints). Each constraint has a multiplier <span class="math inline">\(\alpha_i\)</span>, the non-zero <span class="math inline">\(\alpha_i\)</span> will be the ones connected to the values on the gutter.</p>
+<p><span class="math display">\[\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1]
+\end{align}\]</span></p>
+<p>Find derivatives, set them equal to zero. Note that we can differentiate with respect to the vector component wise, but we’ll skip that notation, but you could do it one element at a time.</p>
+<p><span class="math display">\[\begin{align}
+\frac{\partial L}{\partial {\bf w}} &amp;= {\bf w} - \sum \alpha_i  y_i  {\bf x}_i = 0 \rightarrow {\bf w} = \sum \alpha_i  y_i  {\bf x}_i \\
+\frac{\partial L}{\partial b} &amp;= -\sum \alpha_i y_i = 0\\
+\end{align}\]</span></p>
+<blockquote>
+<p>It turns out that <span class="math inline">\({\bf w}\)</span> is a linear sum of data vectors, either all of them or some of them (it turns out that for some <span class="math inline">\(i\)</span>, <span class="math inline">\(\alpha_i=0\)</span>):
+<span class="math display">\[{\bf w} = \sum \alpha_i  y_i  {\bf x}_i\]</span></p>
+</blockquote>
+<p>Use the value of <span class="math inline">\({\bf w}\)</span> to plug back into <span class="math inline">\(L\)</span> to maximize.</p>
+<p><span class="math display">\[\begin{align}
+L &amp;= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
+&amp;= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
+&amp;= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
+&amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
+\end{align}\]</span></p>
+<blockquote>
+<p>Find the minimum of this expression:
+<span class="math display">\[L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j\]</span></p>
+</blockquote>
+The computer / numerical analyst is going to solve <span class="math inline">\(L\)</span> for the <span class="math inline">\(\alpha_i\)</span>, so why did we go to all the work? We need to understand the dependencies of sample vectors. That is,
+<center>
+<p style="color:red">
+the optimization depends only on the dot product of pairs of samples
+</p>
+</center>
+<p>. And the decision rule <em>also</em> depends only on the dot product of the new observation with the original samples. [Note, the points on the margin / gutter can be used to solve for <span class="math inline">\(b\)</span>: <span class="math inline">\(b =y_i - {\bf w} \cdot {\bf x}_i\)</span>, because <span class="math inline">\(y_i = 1/y_i\)</span>.]</p>
+<blockquote>
+<p>Decision Rule, call positive if:
+<span class="math display">\[\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0\]</span></p>
+</blockquote>
+<p>Note that we have a convex space (can be proved), and so we can’t get stuck in a local maximum.</p>
+</div>
+<div id="Nov14" class="section level3" number="8.12.1">
+<h3>
+<span class="header-section-number">8.12.1</span> 11/14/19 Agenda<a class="anchor" aria-label="anchor" href="#Nov14"><i class="fas fa-link"></i></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>not linearly separable (SVM)</li>
+<li>kernels (SVM)</li>
+<li>support vector formulation</li>
+</ol>
+</div>
+<div id="notlinsvm" class="section level3" number="8.12.2">
+<h3>
+<span class="header-section-number">8.12.2</span> Not Linearly Separable<a class="anchor" aria-label="anchor" href="#notlinsvm"><i class="fas fa-link"></i></a>
+</h3>
+<div id="transformations" class="section level4" number="8.12.2.1">
+<h4>
+<span class="header-section-number">8.12.2.1</span> Transformations<a class="anchor" aria-label="anchor" href="#transformations"><i class="fas fa-link"></i></a>
+</h4>
+Simultaneously,
+<center>
+<p style="color:red">
+the data can be transformed into a new space where the data <strong>are</strong> linearly separable.
+</p>
+</center>
+<p>If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing! That is, consider the function <span class="math inline">\(\phi\)</span> such that our new space consists of vectors <span class="math inline">\(\phi({\bf x})\)</span>.</p>
+<p>Consider the case with a circle on the plane. The class boundary should segment the space by considering the points within that circle to belong to one class, and the points outside that circle to another one. The space is not linearly separable, but mapping it into a third dimension will make it separable. Two great videos: <a href="https://www.youtube.com/watch?v=3liCbRZPrZA" class="uri">https://www.youtube.com/watch?v=3liCbRZPrZA</a> and <a href="https://www.youtube.com/watch?v=9NrALgHFwTo" class="uri">https://www.youtube.com/watch?v=9NrALgHFwTo</a> .</p>
+<p>Within the transformed space, the minimization procedure will amount to minimizing the following:</p>
+<blockquote>
+<p>We want the minimum of this expression:
+<span class="math display">\[\begin{align}
+L &amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\bf x}_i) \cdot  \phi({\bf x}_j)\\
+&amp;= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j K({\bf x}_i, {\bf x}_j)
+\end{align}\]</span></p>
+</blockquote>
+<blockquote>
+<p>Decision Rule, call positive if:
+<span class="math display">\[\begin{align}
+\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b &amp;\geq&amp; 0\\
+\sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &amp;\geq&amp; 0
+\end{align}\]</span></p>
+</blockquote>
+</div>
+</div>
+<div id="Nov19" class="section level3" number="8.12.3">
+<h3>
+<span class="header-section-number">8.12.3</span> 11/19/19 Agenda<a class="anchor" aria-label="anchor" href="#Nov19"><i class="fas fa-link"></i></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>kernels</li>
+<li>not separable: soft margins / cost</li>
+<li>one vs. one / one vs. all</li>
+</ol>
+<div id="kernel-examples" class="section level5 unnumbered">
+<h5>Kernel Examples:<a class="anchor" aria-label="anchor" href="#kernel-examples"><i class="fas fa-link"></i></a>
+</h5>
+<ul>
+<li><strong>Kernel 1</strong></li>
+</ul>
+<p>Consider the following transformation, <span class="math inline">\(\phi: R^2 \rightarrow R^3\)</span>:
+<span class="math display">\[\begin{align}
+\phi({\bf x}) &amp;= (x_1^2, x_2^2, \sqrt{2} x_1 x_2)\\
+K({\bf x}, {\bf y}) &amp;= \phi({\bf x}) \cdot \phi({\bf y}) = x_1^2y_1^2 + x_2^2y_2^2 + 2x_1x_2y_1y_2\\
+&amp;= (x_1y_1 + x_2y_2)^2\\
+K({\bf x}, {\bf y}) &amp;= ({\bf x} \cdot {\bf y})^2
+\end{align}\]</span>
+Which is to say, as long as we know the dot product of the original data, then we can recover the dot product in the transformed space using the quadratic kernel.</p>
+<ul>
+<li>
+<strong>Kernel 2</strong>
+Writing the polynomial kernel out (for <span class="math inline">\(d=2\)</span>), we can find the exact <span class="math inline">\(\phi\)</span> function. Consider the following polynomial kernel for <span class="math inline">\(d=2\)</span>.
+<span class="math display">\[K({\bf x}, {\bf y}) = ({\bf x} \cdot {\bf y} + c)^2\]</span>
+By writing down the dot product and then considering the square of each of the components separately, we get
+<span class="math display">\[\begin{align}
+({\bf x} \cdot {\bf y} + c)^2 &amp;= (c + \sum_{i=1}^p x_i y_i)^2\\
+&amp;= c^2 + \sum_{i=1}^p x_i^2 y_i^2 + \sum_{i=1}^{p-1} \sum_{j={i+1}}^{p} 2x_i y_i x_j y_j + \sum_{i=1}^p 2 cx_i y_i
+\end{align}\]</span>
+By pulling the sum apart into all the components of the <span class="math inline">\({\bf x}\)</span> and <span class="math inline">\({\bf y}\)</span> vectors separately, we find that
+<span class="math display">\[\begin{align}
+\phi({\bf x}) = (c, x_1^2, \ldots, x_p^2, \sqrt{2}x_1x_2, \ldots, \sqrt{2}x_1x_p, \sqrt{2}x_2x_3, \ldots, \sqrt{2}x_{p-1}x_p, \sqrt{2c}x_1, \ldots, \sqrt{2c}x_p)
+\end{align}\]</span>
+</li>
+</ul>
+<!--
+%The polar transformation corresponds to $(x,y) \rightarrow (\sqrt(x^2+y^2),\arctan(x,y))$. The closest related polynomial kernel might be $(x,y) \rightarrow (x^2,y^2,\sqrt(2)xy)$. In any case, this will work for that toy case.
+
+%If two concentric circles, just map to $(x, y, x^2 + y^2)$  (note: we went from R2 to R3, and the data were then linearly separable in R3).
+--><ul>
+<li>
+<strong>Kernel 3</strong>
+Using the radial kernel (see below) it is possible to map the observations into an infinite dimensional space yet still only consider the kernel associated with the dot product of the original data. Consider the following example for <span class="math inline">\(x\)</span> in one dimension mapped to infinite dimensions.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+\phi_{RBF}(x) &amp;= e^{-\gamma x} \bigg(1, \sqrt{\frac{2\gamma}{1!}} x, \sqrt{\frac{(2\gamma)^2}{2!}} x^2, \sqrt{\frac{(2\gamma)^3}{3!}} x^3, \ldots \bigg)^t\\
+K_{RBF} (x,y) &amp;= \exp( -\gamma ||x-y||^2)
+\end{align}\]</span>
+where cross validation is used to find the tuning value <span class="math inline">\(\gamma\)</span> as well as the penalty parameter <span class="math inline">\(C\)</span>.</p>
+<p>Consider the following example from <a href="http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&amp;doc=exercises/ex8/ex8.html" class="uri">http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&amp;doc=exercises/ex8/ex8.html</a>.</p>
+</div>
+<div id="what-if-the-boundary-is-wiggly" class="section level5 unnumbered">
+<h5>What if the boundary is wiggly?<a class="anchor" aria-label="anchor" href="#what-if-the-boundary-is-wiggly"><i class="fas fa-link"></i></a>
+</h5>
+<p>The take home message here is that a wiggly boundary is really best, and the value of <span class="math inline">\(\gamma\)</span> should be high to represent the high model complexity.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-34"></span>
+<img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%"><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%"><p class="caption">
+Figure 8.4: Extremely complicated decision boundary
+</p>
+</div>
+</div>
+<div id="what-if-the-boundary-isnt-wiggly" class="section level5 unnumbered">
+<h5>What if the boundary isn’t wiggly?<a class="anchor" aria-label="anchor" href="#what-if-the-boundary-isnt-wiggly"><i class="fas fa-link"></i></a>
+</h5>
+<p>But if the boundary has low complexity, then the best value of <span class="math inline">\(\gamma\)</span> is probably much lower.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-35"></span>
+<img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%"><p class="caption">
+Figure 8.5: Simple decision boundary
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-36"></span>
+<img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%"><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%"><p class="caption">
+Figure 8.6: Simple decision boundary – reasonable gamma
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-37"></span>
+<img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%"><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%"><p class="caption">
+Figure 8.7: Simple decision boundary – gamma too big
+</p>
+</div>
+</div>
+<div id="kernels" class="section level4" number="8.12.3.1">
+<h4>
+<span class="header-section-number">8.12.3.1</span> What is a Kernel?<a class="anchor" aria-label="anchor" href="#kernels"><i class="fas fa-link"></i></a>
+</h4>
+<p>What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won’t go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors, (e.g. a measure of “similarity” between the two vectors). If <span class="math inline">\(K\)</span> is a function of two vectors <span class="math inline">\({\bf x}\)</span> and <span class="math inline">\({\bf y}\)</span>, then it is a kernel function if <span class="math inline">\(K\)</span> is the dot product of <span class="math inline">\(\phi()\)</span> applied to those vectors. We know that <span class="math inline">\(\phi()\)</span> exists if <span class="math inline">\(K\)</span> is symmetric and if when <span class="math inline">\(K_{ij} = K({\bf x}_i, {\bf x}_j)\)</span>, the matrix <span class="math inline">\({\bf K} = [K_{ij}]\)</span> is positive definite.</p>
+<p>A helpful website about kernels: <a href="http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html" class="uri">http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html</a></p>
+<p><span class="math display">\[\begin{align}
+K({\bf x},{\bf y}) = \phi({\bf x}) \cdot \phi({\bf y})
+\end{align}\]</span></p>
+</div>
+<div id="examples-of-kernels" class="section level4 unnumbered">
+<h4>Examples of kernels:<a class="anchor" aria-label="anchor" href="#examples-of-kernels"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li><p><strong>linear</strong>
+<span class="math display">\[K({\bf x}, {\bf y}) = {\bf x} \cdot{\bf y}\]</span>
+Note, the only tuning parameter is the penalty/cost parameter <span class="math inline">\(C\)</span>).</p></li>
+<li><p><strong>polynomial</strong>
+<span class="math display">\[K_P({\bf x}, {\bf y}) =(\gamma {\bf x}\cdot {\bf y} + r)^d = \phi_P({\bf x}) \cdot \phi_P({\bf y}) \ \ \ \ \gamma &gt; 0\]</span>
+Note, here <span class="math inline">\(\gamma, r, d\)</span> must be tuned using cross validation (along with the penalty/cost parameter <span class="math inline">\(C\)</span>).</p></li>
+<li><p><strong>RBF</strong>
+The radial basis function is also called the Gaussian kernel because of its similarity to the Gaussian distribution (aka the normal distribution). Because the RBF maps to infinite dimensional space, it can easily over fit the training data. Care must be taken to estimate <span class="math inline">\(\gamma\)</span>.
+<span class="math display">\[K_{RBF}({\bf x}, {\bf y}) = \exp( - \gamma ||{\bf x} -  {\bf y}||^2) = \phi_{RBF}({\bf x}) \cdot \phi_{RBF}({\bf y})\]</span>
+Note, here <span class="math inline">\(\gamma\)</span> must be tuned using cross validation (along with the penalty/cost parameter <span class="math inline">\(C\)</span>).</p></li>
+<li><p><strong>sigmoid</strong>
+The sigmoid kernel is not a valid kernel method for all values of <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(r\)</span> [which means that for certain parameter values, the <span class="math inline">\(\phi()\)</span> function may not exist].
+<span class="math display">\[K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x}) \cdot \phi_S({\bf y})\]</span>
+Note, here <span class="math inline">\(\gamma, r\)</span> must be tuned using cross validation (along with the penalty/cost parameter <span class="math inline">\(C\)</span>). One benefit of the sigmoid kernel is that it has equivalence to a two-layer perceptron neural network.</p></li>
+</ul>
+</div>
+<div id="soft-margins" class="section level4" number="8.12.3.2">
+<h4>
+<span class="header-section-number">8.12.3.2</span> Soft Margins<a class="anchor" aria-label="anchor" href="#soft-margins"><i class="fas fa-link"></i></a>
+</h4>
+<p>But what if the data aren’t linearly separable? The optimization problem can be changed to allow for points to be on the other side of the margin. The optimization problem is slightly more complicated, but basically the same idea:
+<span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-38"></span>
+<img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%"><p class="caption">
+Figure 8.8: Note that now the problem is set up such that points are allowed to cross the boundary. Slack variables (the xi_i) allow for every point to be classified correctly up to the slack. Note that xi_i=0 for any point that is actually calculated correctly.
+</p>
+</div>
+<p>The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, <span class="math inline">\(C\)</span> (how much misclassification is allowed - the value of <span class="math inline">\(C\)</span> is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.</p>
+<blockquote>
+<p>Minimize (for <span class="math inline">\({\bf w}\)</span>, <span class="math inline">\(\xi_i\)</span>, <span class="math inline">\(b\)</span>):
+<span class="math display">\[\frac{1}{2} ||{\bf w}||^2 + C \sum_{i=1}^n \xi_i\]</span>
+Subject to:
+<span class="math display">\[y_i ({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i \ \ \ \ \xi_i \geq 0\]</span></p>
+</blockquote>
+<p>Which leads to the following Lagrangian equation:
+<span class="math display">\[\begin{align}
+L = \frac{1}{2}||{\bf w}||^2 + C \sum_{i=1}^n \xi_i - \sum \alpha_i [ y_i ({\bf w} \cdot {\bf x}_i + b) - 1 + \xi_i] - \sum_{i=1}^n \beta_i \xi_i \ \ \ \ \alpha_i, \beta_i \geq 0
+\end{align}\]</span></p>
+That is, the objective function now allows for a trade-off between a large margin and a small error penalty. Again, Lagrange multipliers can be shown to give classification rule that is based only on the dot product of the observations. The key here is that although quadratic programming can be used to solve for most of the parameters,
+<center>
+<p style="color:red">
+<span class="math inline">\(C\)</span> is now a tuning parameter that needs to be set by the user or by cross validation.
+</p>
+</center>
+<div id="how-does-c-relate-to-margins" class="section level5 unnumbered">
+<h5>How does <span class="math inline">\(C\)</span> relate to margins?<a class="anchor" aria-label="anchor" href="#how-does-c-relate-to-margins"><i class="fas fa-link"></i></a>
+</h5>
+<p>Notice that the minimization is now over many more variables (with <span class="math inline">\(C\)</span> set/tuned - not optimized). If we are allowing for misclassification and <span class="math inline">\(C=0\)</span>, that implies that <span class="math inline">\(\xi_i\)</span> can be as large as possible. Which means the algorithm will choose the widest possible street. The widest possible street will be the one that hits at the two most extreme data points (the “support vectors” will now be the ones on the edge, not the ones near the separating hyperplane). <span class="math inline">\(C\)</span> small allows the constraints (on points crossing the line) to be ignored.</p>
+<p><span class="math display">\[C=0 \rightarrow \mbox{ can lead to large training error}\]</span></p>
+<p>If <span class="math inline">\(C\)</span> is quite large, then the algorithm will try very hard to classify exactly perfectly. That is, it will want <span class="math inline">\(\xi_i\)</span> to be as close to zero as possible. When projecting into high dimensions, we can always perfectly classify, so a large <span class="math inline">\(C\)</span> will tend to overfit the training data and give a very small margin.
+<span class="math display">\[C&gt;&gt;&gt; \rightarrow \mbox{ can lead to classification rule which does not generalize to test data}\]</span></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-39"></span>
+<img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><p class="caption">
+Figure 8.9: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="support-vector-machine-algorithm" class="section level3" number="8.12.4">
+<h3>
+<span class="header-section-number">8.12.4</span> Support Vector Machine algorithm<a class="anchor" aria-label="anchor" href="#support-vector-machine-algorithm"><i class="fas fa-link"></i></a>
+</h3>
+<hr>
+<p><strong>Algorithm</strong>: Support Vector Machine</p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Using cross validation, find values of <span class="math inline">\(C, \gamma, d, r\)</span>, etc. (and the kernel function!)</li>
+<li>Using Lagrange multipliers (read: the computer), solve for <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(b\)</span>.</li>
+<li>Classify an unknown observation (<span class="math inline">\({\bf u}\)</span>) as “positive” if:
+<span class="math display">\[\sum \alpha_i y_i \phi({\bf x}_i) \cdot \phi({\bf u}) + b  = \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b \geq 0\]</span>
+</li>
+</ol>
+<hr>
+<ul>
+<li><p><strong>Shortcomings of Support Vector Machines:</strong></p></li>
+<li><p>Can only classify binary categories (response variable).</p></li>
+<li>
+<p>All predictor variables must be numeric.</p>
+<ul>
+<li>A great differential in range will allow variables with large range to dominate the predictions. Either linearly scale each attribute to some range [ e.g., (-1, +1) or (0,1)] or divide by the standard deviation.</li>
+<li>Categorical variables can be used if formatted as binary factor variables.</li>
+<li>Whatever is done to the training data <em>must</em> also be done to the test data!</li>
+</ul>
+</li>
+<li>
+<p>Another problem is the kernel function itself.</p>
+<ul>
+<li>With primitive data (e.g., 2d data points), good kernels are easy to come by.</li>
+<li>With harder data (e.g., MRI scans), finding a sensible kernel function may be much harder.</li>
+</ul>
+</li>
+<li><p>With really large data, it doesn’t perform well because of the large amount of required training time</p></li>
+<li><p>It also doesn’t perform very well when the data set has a lot of noise i.e., target classes are overlapping</p></li>
+<li><p>SVM doesn’t directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.</p></li>
+<li><p><strong>Strengths of Support Vector Machines:</strong></p></li>
+<li><p>Can always fit a linear separating hyper plane in a high enough dimensional space.</p></li>
+<li><p>The kernel trick makes it possible to not know the transformation functions, <span class="math inline">\(\phi\)</span>.</p></li>
+<li><p>Because the optimization is on a convex function, the numerical process for finding solutions are extremely efficient.</p></li>
+<li><p>It works really well with clear margin of separation</p></li>
+<li><p>It is effective in high dimensional spaces.</p></li>
+<li><p>It is effective in cases where number of dimensions is greater than the number of samples.</p></li>
+<li><p>It uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.</p></li>
+</ul>
+</div>
+<div id="classifying-more-than-one-group" class="section level3" number="8.12.5">
+<h3>
+<span class="header-section-number">8.12.5</span> Classifying more than one group<a class="anchor" aria-label="anchor" href="#classifying-more-than-one-group"><i class="fas fa-link"></i></a>
+</h3>
+<p>When there are more than two classes, the problem needs to be reduced into a binary classification problem. Consider the groups associated with Red, Green, and Blue. In order to figure out which points get classified as Red, two different methods can be applied.</p>
+<ul>
+<li>
+<strong>One vs All</strong>
+Each category can be compared to the <em>rest of the groups</em>. This will create <span class="math inline">\(K\)</span> different classifiers (here <span class="math inline">\(K=\)</span> the number of classes the response variable can take on). Each test value would then be classified according to each classifier, and the group assignment would be given by the group giving the highest value of <span class="math inline">\({\bf w}_K \cdot {\bf u} + b\)</span>, as the projection would represent the classification <em>farthest</em> into the group center. In the end, there will be <span class="math inline">\(K\)</span> classifiers.</li>
+<li>
+<strong>One vs One</strong>
+Alternatively, each group can be compared with each other group (e.g., Red vs. Green, Red vs. Blue, Green vs. Blue). Class membership will be determine by the group to which the unknown point is most often classified. In the end, there will be <span class="math inline">\(K(K-1)/2\)</span> classifiers.</li>
+</ul>
+</div>
+<div id="r-svm-example" class="section level3" number="8.12.6">
+<h3>
+<span class="header-section-number">8.12.6</span> R SVM Example<a class="anchor" aria-label="anchor" href="#r-svm-example"><i class="fas fa-link"></i></a>
+</h3>
+<p>We’ll go back to the iris data. As a first pass, let’s use SVM to distinguish between Setosa and Versicolor/Virginica.</p>
+<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">kernlab</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">e1071</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>
+
+<span class="va">iris2</span> <span class="op">&lt;-</span> <span class="va">iris</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Species2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">==</span> <span class="st">"setosa"</span>, <span class="st">"S"</span>, <span class="st">"V"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<div id="building-an-svm-on-training-data-with-radial-kernel" class="section level4" number="8.12.6.1">
+<h4>
+<span class="header-section-number">8.12.6.1</span> Building an SVM on training data with radial kernel<a class="anchor" aria-label="anchor" href="#building-an-svm-on-training-data-with-radial-kernel"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">iris.svm.rad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species2</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">iris2</span>, method<span class="op">=</span><span class="st">"svmRadial"</span>, 
+                 trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>,
+                 tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span>C<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.1</span>,<span class="fl">1</span>,<span class="fl">10</span>,<span class="fl">100</span><span class="op">)</span>, sigma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span>,
+                 preProcess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"scale"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">iris.svm.rad</span></code></pre></div>
+<pre><code>## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 150 samples
+##   4 predictor
+##   2 classes: 'S', 'V' 
+## 
+## Pre-processing: centered (4), scaled (4) 
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 135, 135, 135, 135, 135, 135, ... 
+## Resampling results across tuning parameters:
+## 
+##   C      sigma  Accuracy   Kappa    
+##   1e-02  0.5    0.6666667  0.0000000
+##   1e-02  1.0    0.6666667  0.0000000
+##   1e-02  2.0    0.6666667  0.0000000
+##   1e-02  3.0    0.6666667  0.0000000
+##   1e-02  4.0    0.6666667  0.0000000
+##   1e-01  0.5    0.9866667  0.9684211
+##   1e-01  1.0    0.9800000  0.9508772
+##   1e-01  2.0    0.9466667  0.8684211
+##   1e-01  3.0    0.8800000  0.6892931
+##   1e-01  4.0    0.7933333  0.4411765
+##   1e+00  0.5    0.9933333  0.9842105
+##   1e+00  1.0    0.9933333  0.9842105
+##   1e+00  2.0    0.9866667  0.9684211
+##   1e+00  3.0    0.9866667  0.9684211
+##   1e+00  4.0    0.9866667  0.9684211
+##   1e+01  0.5    0.9933333  0.9842105
+##   1e+01  1.0    0.9933333  0.9842105
+##   1e+01  2.0    0.9866667  0.9684211
+##   1e+01  3.0    0.9866667  0.9684211
+##   1e+01  4.0    0.9866667  0.9684211
+##   1e+02  0.5    0.9933333  0.9842105
+##   1e+02  1.0    0.9933333  0.9842105
+##   1e+02  2.0    0.9866667  0.9684211
+##   1e+02  3.0    0.9866667  0.9684211
+##   1e+02  4.0    0.9866667  0.9684211
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final values used for the model were sigma = 1 and C = 1.</code></pre>
+</div>
+<div id="training-error" class="section level4" number="8.12.6.2">
+<h4>
+<span class="header-section-number">8.12.6.2</span> Training Error<a class="anchor" aria-label="anchor" href="#training-error"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iris.train.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm.rad</span>, <span class="va">iris2</span><span class="op">)</span>
+<span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span><span class="va">iris.train.pred</span>, <span class="va">iris2</span><span class="op">$</span><span class="va">Species2</span><span class="op">)</span><span class="op">$</span><span class="va">overall</span></code></pre></div>
+<pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+##   1.000000e+00   1.000000e+00   9.757074e-01   1.000000e+00   6.666667e-01 
+## AccuracyPValue  McnemarPValue 
+##   3.857546e-27            NaN</code></pre>
+<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span><span class="va">iris.train.pred</span>, <span class="va">iris2</span><span class="op">$</span><span class="va">Species2</span><span class="op">)</span></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   S   V
+##          S  50   0
+##          V   0 100
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9757, 1)
+##     No Information Rate : 0.6667     
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##                                      
+##  Mcnemar's Test P-Value : NA         
+##                                      
+##             Sensitivity : 1.0000     
+##             Specificity : 1.0000     
+##          Pos Pred Value : 1.0000     
+##          Neg Pred Value : 1.0000     
+##              Prevalence : 0.3333     
+##          Detection Rate : 0.3333     
+##    Detection Prevalence : 0.3333     
+##       Balanced Accuracy : 1.0000     
+##                                      
+##        'Positive' Class : S          
+## </code></pre>
+</div>
+<div id="visualizing-the-boundary" class="section level4" number="8.12.6.3">
+<h4>
+<span class="header-section-number">8.12.6.3</span> Visualizing the Boundary<a class="anchor" aria-label="anchor" href="#visualizing-the-boundary"><i class="fas fa-link"></i></a>
+</h4>
+<p><code>caret</code> doesn’t allow for visualization, so I’ve applied the <code>svm</code> function directly here. I had to try various combinations of variables before finding a boundary that was visually interesting. Note that just being in the yellow or red part doesn’t necessarily indicate missclassification. Remember that the boundary is in 4 dimensions and is not linear.</p>
+<div class="sourceCode" id="cb549"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iris.svm</span> <span class="op">&lt;-</span> <span class="fu">e1071</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/e1071/man/svm.html">svm</a></span><span class="op">(</span><span class="va">Species2</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris2</span>, kernel <span class="op">=</span> <span class="st">"radial"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">iris.svm</span>, data <span class="op">=</span> <span class="va">iris2</span>, <span class="va">Sepal.Width</span> <span class="op">~</span> <span class="va">Petal.Width</span>, 
+     slice<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Sepal.Length <span class="op">=</span> <span class="fl">3</span>, Petal.Length <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="groups" class="section level4" number="8.12.6.4">
+<h4>
+<span class="header-section-number">8.12.6.4</span> 3 groups<a class="anchor" aria-label="anchor" href="#groups"><i class="fas fa-link"></i></a>
+</h4>
+<blockquote>
+<p>For multiclass-classification with k classes, k &gt; 2, <code>ksvm</code> uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme</p>
+</blockquote>
+<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">474747</span><span class="op">)</span>
+<span class="va">train.obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">150</span>, <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">iris.train</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">train.obs</span>, <span class="op">]</span>
+<span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="va">train.obs</span>, <span class="op">]</span></code></pre></div>
+<div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iris.svm3</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">iris.train</span>, method<span class="op">=</span><span class="st">"svmRadial"</span>, 
+                 trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>,
+                 tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span>C<span class="op">=</span><span class="fl">1</span>, sigma<span class="op">=</span><span class="fl">2</span><span class="op">)</span>,
+                 preProcess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"scale"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm3</span>, <span class="va">iris.test</span><span class="op">)</span></code></pre></div>
+<pre><code>##  [1] setosa     setosa     setosa     setosa     setosa     setosa    
+##  [7] setosa     setosa     setosa     setosa     setosa     setosa    
+## [13] virginica  setosa     setosa     setosa     versicolor versicolor
+## [19] versicolor versicolor versicolor versicolor versicolor virginica 
+## [25] versicolor versicolor versicolor versicolor versicolor versicolor
+## [31] versicolor versicolor versicolor virginica  virginica  virginica 
+## [37] virginica  virginica  virginica  versicolor virginica  virginica 
+## [43] virginica  versicolor virginica  virginica  virginica  virginica 
+## [49] virginica  virginica 
+## Levels: setosa versicolor virginica</code></pre>
+<div class="sourceCode" id="cb554"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm3</span>, <span class="va">iris.test</span><span class="op">)</span>, <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
+<pre><code>##             
+##              setosa versicolor virginica
+##   setosa         15          0         0
+##   versicolor      0         16         2
+##   virginica       1          1        15</code></pre>
+
+</div>
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="ethics.html"><span class="header-section-number">7</span> Ethics</a></div>
+<div class="next"><a href="unsup.html"><span class="header-section-number">9</span> Unsupervised Methods</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#class"><span class="header-section-number">8</span> Classification</a></li>
+<li><a class="nav-link" href="#Oct29"><span class="header-section-number">8.1</span> 10/29/19 Agenda</a></li>
+<li>
+<a class="nav-link" href="#cv"><span class="header-section-number">8.2</span> Cross Validation</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#bias-variance-trade-off"><span class="header-section-number">8.2.1</span> Bias-variance trade-off</a></li>
+<li><a class="nav-link" href="#implementing-cross-validation"><span class="header-section-number">8.2.2</span> Implementing Cross Validation</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#knn"><span class="header-section-number">8.3</span> \(k\)-Nearest Neighbors</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#k-nn-algorithm"><span class="header-section-number">8.3.1</span> \(k\)-NN algorithm</a></li>
+<li><a class="nav-link" href="#r-knn-example"><span class="header-section-number">8.3.2</span> R knn Example</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#Oct31"><span class="header-section-number">8.4</span> 10/31/19 Agenda</a></li>
+<li>
+<a class="nav-link" href="#cart"><span class="header-section-number">8.5</span> CART</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#cart-algorithm"><span class="header-section-number">8.5.1</span> CART algorithm</a></li>
+<li><a class="nav-link" href="#r-cart-example"><span class="header-section-number">8.5.2</span> R CART Example</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#Nov5"><span class="header-section-number">8.6</span> 11/5/19 Agenda</a></li>
+<li>
+<a class="nav-link" href="#bagging"><span class="header-section-number">8.7</span> Bagging</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#bagging-algorithm"><span class="header-section-number">8.7.1</span> Bagging algorithm</a></li>
+<li><a class="nav-link" href="#out-of-bag-oob-error-rate"><span class="header-section-number">8.7.2</span> Out Of Bag (OOB) error rate</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#Nov7"><span class="header-section-number">8.8</span> 11/7/19 Agenda</a></li>
+<li>
+<a class="nav-link" href="#rf"><span class="header-section-number">8.9</span> Random Forests</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#random-forest-algorithm"><span class="header-section-number">8.9.1</span> Random Forest algorithm</a></li>
+<li><a class="nav-link" href="#r-rf-example"><span class="header-section-number">8.9.2</span> R RF Example</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#model-choices"><span class="header-section-number">8.10</span> Model Choices</a></li>
+<li><a class="nav-link" href="#Nov12"><span class="header-section-number">8.11</span> 11/12/19 Agenda</a></li>
+<li>
+<a class="nav-link" href="#support-vector-machines"><span class="header-section-number">8.12</span> Support Vector Machines</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#Nov14"><span class="header-section-number">8.12.1</span> 11/14/19 Agenda</a></li>
+<li><a class="nav-link" href="#notlinsvm"><span class="header-section-number">8.12.2</span> Not Linearly Separable</a></li>
+<li><a class="nav-link" href="#Nov19"><span class="header-section-number">8.12.3</span> 11/19/19 Agenda</a></li>
+<li><a class="nav-link" href="#support-vector-machine-algorithm"><span class="header-section-number">8.12.4</span> Support Vector Machine algorithm</a></li>
+<li><a class="nav-link" href="#classifying-more-than-one-group"><span class="header-section-number">8.12.5</span> Classifying more than one group</a></li>
+<li><a class="nav-link" href="#r-svm-example"><span class="header-section-number">8.12.6</span> R SVM Example</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/08-classification.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/08-classification.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-09-27.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

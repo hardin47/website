@@ -4,11 +4,6 @@
 
 
 
-## 9/24/19 Agenda {#Sep24}
-1. Why simulate?
-2. What makes a good simulation?
-3. pigs / blackjack examples
-
 
 Below, computer simulations will be used for two main objectives:
 
@@ -118,6 +113,7 @@ sum(replicate(100000, sticks_beta())) / 100000
 5. Repeat the entire process many times so as to account for variability in the simulation.
 6. Use the law of large numbers to conclude that the average of the simulation approximates the expected value.
 
+#####  Using a for-loop
 
 
 ```r
@@ -134,6 +130,153 @@ mean(allk)
 ```
 ## [1] 1.71
 ```
+
+#### Using functional programming and the `map()` function
+
+Functional programming is typically much faster than for loops are, and they also fit more cleanly into a tidy pipeline.  The `map` functions (in the **purrr** package) are *named* by the **output** the produce.  Some of the `map()` functions include: 
+
+* `map(.x, .f)` is the main mapping function and returns a list
+
+* `map_df(.x, .f)` returns a data frame
+
+* `map_dbl(.x, .f)` returns a numeric (double) vector
+
+* `map_chr(.x, .f)` returns a character vector
+
+* `map_lgl(.x, .f)` returns a logical vector
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/purrr_map.png" alt="From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html" width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-6)From Advanced R by Wickham. https://adv-r.hadley.nz/functionals.html</p>
+</div>
+
+Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.
+
+To use functional programming on expected value problem, the first step is to write a function (here called `sum_unif()`) which will select uniform random variables until they add up to more than one.  Note that the function itself doesn't have any arguments.
+
+
+```r
+sum_unif <- function(.x){
+  sumU <- 0
+  k <- 0
+  while(sumU < 1) {
+    sumU <- sumU + runif(1)
+    k <- k+1
+}
+  return(c(k-1, sumU))
+}
+```
+
+Using `map()`, the `sum_unif()` function is run `reps` number of times.  Note that `sum_unif()` doesn't have any arguments, so it doesn't really matter what the form of the input is for `sum_unif()`. 
+
+
+```r
+set.seed(4747)
+reps <- 1000
+ 
+sim_k_max <- data.frame(row_id = seq(1, reps, 1)) %>%
+  mutate(max_for_EX = map(row_id, sum_unif)) %>%
+  unnest(max_for_EX) %>%
+  mutate(output = rep(c("k", "sum"), reps)) %>%
+  pivot_wider(id_cols = row_id, names_from = output, 
+              values_from = max_for_EX) 
+
+sim_k_max
+```
+
+```
+## # A tibble: 1,000 × 3
+##    row_id     k   sum
+##     <dbl> <dbl> <dbl>
+##  1      1     2  1.05
+##  2      2     2  1.68
+##  3      3     1  1.39
+##  4      4     1  1.47
+##  5      5     2  1.03
+##  6      6     1  1.45
+##  7      7     1  1.41
+##  8      8     1  1.83
+##  9      9     1  1.17
+## 10     10     2  1.42
+## # … with 990 more rows
+```
+
+Last, approximate the expected value of $X$ using the law of large numbers... the sample average converges in probability to the expected value.
+
+
+```r
+sim_k_max %>%
+  summarize(EX = mean(k))
+```
+
+```
+## # A tibble: 1 × 1
+##      EX
+##   <dbl>
+## 1  1.74
+```
+
+
+### Aside: the R function `sample()`
+
+The word "simulate" can mean a variety of things.  In this course, we will simulate under various settings: *sampling*, *shuffling*,  and *resampling*.  All of the simultion methods can be done using the same R function `sample()`  
+
+
+```r
+alph <- letters[1:10]
+
+alph
+```
+
+```
+##  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
+```
+
+```r
+sample(alph, 5, replace = FALSE) # sample (from a population)
+```
+
+```
+## [1] "g" "i" "h" "b" "a"
+```
+
+```r
+sample(alph, 15, replace = TRUE) # sample (from a population)
+```
+
+```
+##  [1] "i" "e" "d" "i" "d" "a" "c" "h" "a" "a" "b" "f" "i" "e" "h"
+```
+
+```r
+sample(alph, 10, replace = FALSE)  # shuffle
+```
+
+```
+##  [1] "h" "a" "e" "g" "i" "c" "j" "d" "f" "b"
+```
+
+```r
+sample(alph, 10, replace = TRUE)  # resample
+```
+
+```
+##  [1] "c" "h" "i" "j" "i" "b" "e" "j" "g" "c"
+```
+
+
+### Why do we simulate differently?
+
+Three simulating methods are used for different purposes:
+
+1. Monte Carlo methods - use *sampling* repeated sampling from populations with known (either via data or via populations) characteristics.  [Note, another **very** common tool for sampling from a population is to use a probability model.  Some of the distribution functions we will use include `rnorm()`, `runif()`, `rbinom()`, etc.]
+
+
+2. Randomization / Permutation methods - use *shuffling* (sampling without replacement) to test hypotheses of "no effect".
+
+
+3. Bootstrap methods - use *resampling* (sampling with replacement) to establish confidence intervals.
 
 
 
@@ -159,8 +302,7 @@ The goal of simulating a complicated model is not only to create a program which
 
 #### Blackjack
 
-* Example and code come from **Data Science in R: a case studies approach to computational reasoning and problem solving*, by Nolan and Temple Lang.
-* Chapter 9 *Simulating Blackjack*, by Hadley Wickham
+* Example and code come from **Data Science in R: a case studies approach to computational reasoning and problem solving**, by Nolan and Temple Lang, Chapter 9 *Simulating Blackjack*, by Hadley Wickham
 * All R code is online at [http://rdatasciencecases.org/](http://rdatasciencecases.org/)
 * More about the game of blackjack, there are many online resources that you can use to learn about the came.  Two resources that Nolan and Temple Lang recommend are http://wizardofodds.com/games/blackjack/ and http://hitorstand.net/.
 
@@ -173,7 +315,7 @@ The goal of simulating a complicated model is not only to create a program which
 * Start with 2 cards, build up one card at a time
 * Lots of different strategies (also based on dealer's cards)
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;" />
 
 ---
 
@@ -199,11 +341,19 @@ deck = rep(c(1:10, 10, 10, 10), 4)
 
 shuffle_decks = function(ndecks){sample(rep(deck, ndecks))}
 
-head(shuffle_decks(4), 10)
+shuffle_decks(4)
 ```
 
 ```
-##  [1]  2  6  6  1  6 10 10 10  2 10
+##   [1]  6  5 10  4  2  1  2 10  1 10 10  7  9  5 10  4 10  2  6  8  8 10  7  9  3
+##  [26]  1 10 10 10  5  3 10  2 10 10 10  8  3  3 10 10 10  5 10  7  8 10 10  5 10
+##  [51]  9  6 10  8 10  9 10  2  1  4 10  7  3 10 10  8  3  6  6  3  5  5  6  9 10
+##  [76]  9  4 10  6  3  9 10  1 10  8  1  5 10  7  8 10  4 10  1  2  2  8  4  5  8
+## [101]  4  6  8  7  7 10 10  5  3  4 10 10  3 10  1 10 10  4  6  7  8  9 10  4  2
+## [126]  5  6  1 10  4 10  5 10  1  3  7  3  4 10  9 10  6  2 10  2  5  2  2  9 10
+## [151]  1 10  3  8  9  3 10  1 10  5  4  2  5  4  8 10  2  9 10  8  7  7  9  2 10
+## [176]  6  3  4  1 10  1  6  7  9  5 10  1  8  2  7  3  7  1 10  6  4  6  6 10 10
+## [201] 10 10  7  9  9  7 10 10
 ```
 
 ##### Outcome of cards in hand {-}
@@ -230,6 +380,14 @@ handValue(c(10,4))
 
 ```
 ## [1] 14
+```
+
+```r
+handValue(c(10, 4, 9))
+```
+
+```
+## [1] 0
 ```
 
 ##### $ of cards in hand {-}
@@ -289,7 +447,7 @@ test_cards = list( c(10, 1), c(10, 5, 6), c(10, 1, 1),
                    c(5, 10, 7), c(10, 9, 1, 1, 1)) 
 
 test_cards_val = c(21.5, 21, 12, 19, 21, 19, 17, 0, 0)
-sapply(test_cards, handValue)  # apply the function handValue to test_cards
+map_dbl(test_cards, handValue)  # apply the function handValue to test_cards
 ```
 
 ```
@@ -297,7 +455,7 @@ sapply(test_cards, handValue)  # apply the function handValue to test_cards
 ```
 
 ```r
-identical(test_cards_val, sapply(test_cards, handValue))
+identical(test_cards_val, map_dbl(test_cards, handValue))
 ```
 
 ```
@@ -373,7 +531,7 @@ myCards
 ## function(m = 1) sample(deck, m, replace = TRUE)
 ## 
 ## $cards
-## [1] 4 9
+## [1] 10  3
 ```
 
 ##### First action: hit {-}
@@ -389,7 +547,7 @@ hit(myCards)$cards
 ```
 
 ```
-## [1]  4  9 10
+## [1] 10  3 10
 ```
 
 ##### Second action: stand  {-}
@@ -402,12 +560,13 @@ stand(myCards)$cards
 ```
 
 ```
-## [1] 4 9
+## [1] 10  3
 ```
 
 
 ##### Third action: double down {-}
 double the bet after receiving exactly one more card
+
 
 ```r
 dd =  function(hand) {
@@ -420,7 +579,7 @@ dd(myCards)$cards
 ```
 
 ```
-## [1] 4 9 3
+## [1] 10  3 10
 ```
 
 ##### Fourth action: split a pair {-}
@@ -437,7 +596,8 @@ splitPair = function(hand) {
              bet = hand$bet))   }
 splitHand = splitPair(myCards)
 ```
-  
+
+
 ##### Results of splitting {-}
 (can we always split?)
 
@@ -446,7 +606,7 @@ splitHand[[1]]$cards
 ```
 
 ```
-## [1] 4 1
+## [1] 10  1
 ```
 
 ```r
@@ -454,7 +614,7 @@ splitHand[[2]]$cards
 ```
 
 ```
-## [1] 9 5
+## [1] 3 3
 ```
 
 
@@ -662,20 +822,12 @@ for(i in 1:reps){
 ```
 
 
-
-## 9/26/19 Agenda {#Sep26}
-1. Understanding bias in modeling
-2. Sensitivity of statistical inferential procedures to technical conditions
-3. (Not responsible for: Generating random numbers)
-
-
-
 ## Simulating to Assess Sensitivity {#simsens}
 
 
 As a second use of simulations, we can assess the sensitivity of parameters, model assumptions, sample size, etc.  Ideally, the results will be summarized graphically, instead of as a table.   A graphical representation can often provide insight into how parameters are related, whereas a table can be very hard to read.
 
-### Bias in Models
+### Bias in Models {#biasmodels}
 
 The example below is taken directly (and mostly verbatim) from a blog by Aaron Roth [Algorithmic Unfairness Without Any Bias Baked In](http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html).  
 
@@ -691,9 +843,9 @@ The example below is taken directly (and mostly verbatim) from a blog by Aaron R
 
 
 ```r
-n = 100000
-n.red = n*0.99
-n.blue = n*0.01
+n_obs <- 100000
+n.red <- n_obs*0.99
+n.blue <- n_obs*0.01
 reds <- rnorm(n.red, mean = 100, sd = 15)
 blues <- rnorm(n.blue, mean = 100, sd = 15)
 
@@ -717,7 +869,7 @@ ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
   geom_abline(intercept = 0, slope = 1)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Two separate models {-}
 
@@ -740,7 +892,7 @@ red.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 ## 1 (Intercept)   33.2     0.153        216.       0
@@ -753,7 +905,7 @@ blue.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic   p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 ## 1 (Intercept)   25.6      1.64        15.6 1.85e- 49
@@ -766,7 +918,7 @@ global.lm %>% broom::tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term        estimate std.error statistic p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 ## 1 (Intercept)   33.2     0.153        217.       0
@@ -814,7 +966,7 @@ ggplot(new.college.data, aes(x = talent, y = predicted, color = color)) +
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -834,12 +986,13 @@ error.rates
 ```
 
 ```
-## # A tibble: 2 x 6
+## # A tibble: 2 × 6
 ##   color   tpr    fpr   fnr   fdr error
-##   <fct> <dbl>  <dbl> <dbl> <dbl> <dbl>
+##   <chr> <dbl>  <dbl> <dbl> <dbl> <dbl>
 ## 1 blue  0.548 0.0367 0.452 0.267 0.101
 ## 2 red   0.506 0.0379 0.494 0.284 0.111
 ```
+
 >The Red classifier makes errors approximately 11.053% of the time. The Blue classifier does about the same --- it makes errors about 10.1% of the time. This makes sense: the Blues artificially inflated their SAT score distribution without increasing their talent, and the classifier picked up on this and corrected for it. In fact, it is even a little more accurate!
 
 >And since we are interested in fairness, lets think about the false negative rate of our classifiers. **"False Negatives" in this setting are the people who are qualified to attend the college ($I > 115$), but whom the college mistakenly rejects.** These are really the people who have come to harm as a result of the classifier's mistakes. And the False Negative Rate is the probability that a randomly selected qualified person is mistakenly rejected from college --- i.e. the probability that a randomly selected student is harmed by the classifier. We should want that the false negative rates are approximately equal across the two populations: this would mean that the burden of harm caused by the classifier's mistakes is not disproportionately borne by one population over the other. This is one reason why the difference between false negative rates across different populations has become a standard fairness metric in algorithmic fairness --- sometimes referred to as "equal opportunity."
@@ -868,7 +1021,7 @@ ggplot(new.college.data, aes(x = talent,
                        guide = "legend")
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 new.college.data <- new.college.data %>% 
@@ -888,9 +1041,9 @@ error.rates
 ```
 
 ```
-## # A tibble: 2 x 6
+## # A tibble: 2 × 6
 ##   color   tpr    fpr   fnr   fdr error
-##   <fct> <dbl>  <dbl> <dbl> <dbl> <dbl>
+##   <chr> <dbl>  <dbl> <dbl> <dbl> <dbl>
 ## 1 blue  0.632 0.0627 0.368 0.351 0.11 
 ## 2 red   0.504 0.0377 0.496 0.283 0.111
 ```
@@ -913,83 +1066,226 @@ error.rates
 
 **p-value** is the probability of obtaining the observed data or *more extreme* given the null hypothesis is true.
 
-**confidence interval** is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in $(1-\alpha)100$% of the intervals.
+**$(1-\alpha)100$% confidence interval** is a range of values collected in such a way that repeated samples of data (using the same mechanism) would capture the parameter of interest in $(1-\alpha)100$% of the intervals.
 
 #### Examples {-}
 
 **Equal variance in the t-test**  Recall that one of the technical conditions for the t-test is that the two samples come from populations where the variance is equal (at least when `var.equal=TRUE` is specified).  What happens if the null hypothesis is true (i.e., the *means* are equal!) but the technical conditions are violated (i.e., the variances are unequal)?
 
 
+##### t-test function (for use in `map()`)
+
+
 ```r
-pvals <- c()
-reps <- 10000
-for(i in 1:reps){
-  x1 <- rnorm(10, mean=47, sd=1)
-  x2 <- rnorm(10, mean=47, sd=1)
-  pvals <- c(pvals, t.test(x1,x2, var.equal=TRUE)$p.value) }
-
-sum(pvals < .05)/reps
+t_test_pval <- function(df){
+  t.test(y ~ x1, data = df, var.equal = TRUE) %>%
+    tidy() %>%
+    select(estimate, p.value) 
+}
 ```
 
+
+##### generating data (equal variance)
+
+
+```r
+set.seed(470)
+reps <- 1000
+n_obs <- 20
+null_data_equal <- 
+  data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c("group1", "group2"), each = n()/2),
+    y = rnorm(n(), mean = 10, 
+               sd = rep(c(1,1), each = n()/2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
 ```
-## [1] 0.0502
+
+
+##### summarize p-values
+
+(Note: we rejected 4.5% of the null tests, close to 5%.)
+
+
+```r
+null_data_equal %>% 
+  mutate(t_vals = map(data,t_test_pval)) %>%
+  select(t_vals) %>% 
+  unnest(t_vals) %>%
+  ungroup(sim_id) %>%
+  summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
+
+```
+## # A tibble: 1 × 1
+##   type1error_rate
+##             <dbl>
+## 1           0.045
+```
+
+
+
 
 **Unequal variance in the t-test** 
 
+
+##### generating data (unequal variance)
+
+
 ```r
-pvals <- c()
-reps <- 10000
-for(i in 1:reps){
-  x1 <- rnorm(10, mean=47, sd=1)
-  x2 <- rnorm(10, mean=47, sd=100)
-  pvals <- c(pvals, t.test(x1,x2, var.equal=TRUE)$p.value) }
-
-sum(pvals < .05)/reps
+set.seed(470)
+reps <- 1000
+n_obs <- 20
+null_data_unequal <- 
+  data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c("group1", "group2"), each = n()/2),
+    y = rnorm(n(), mean = 10, 
+               sd = rep(c(1,100), each = n()/2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
 ```
 
+
+##### summarize p-values
+
+(Note, we rejected 5.7% of the null tests, not too bad!)
+
+
+```r
+null_data_unequal %>% 
+  mutate(t_vals = map(data,t_test_pval)) %>%
+  select(t_vals) %>% 
+  unnest(t_vals) %>%
+  ungroup(sim_id) %>%
+  summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
-## [1] 0.0637
+
 ```
+## # A tibble: 1 × 1
+##   type1error_rate
+##             <dbl>
+## 1           0.057
+```
+
+
 
 **Equal variance in the linear model**
 
-The [ISCAM applet](http://www.rossmanchance.com/applets/RegShuffle.htm) by Beth Chance and Allan Rossman [@iscam] demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.
+The [ISCAM applet](https://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm) by Beth Chance and Allan Rossman [@iscam] demonstrates ideas of confidence intervals and what the analyst should expect with inferential assessment.
 
 Consider the following linear model with the points normally distributed with *equal* variance around the line. [Spoiler:  when the technical conditions are met, the theory works out well.  It turns out that the confidence interval will capture the true parameter in 95% of samples!]
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-44-1.png" width="480" style="display: block; margin: auto;" />
+
+
+Did we capture the true parameter in the CI?  YES!
 
 
 ```r
-beta2.in <- c()
-beta0 <- -1
-beta1 <- 0.5
-beta2 <- 1.5
-n <- 100
-reps <- 10000
+CI <- lm(y~x1+x2) %>% tidy(conf.int=TRUE) %>% data.frame()
+CI
+```
 
-set.seed(4747)
-for(i in 1:reps){
-  x1 <- rep(c(0,1), each=n/2)
-  x2 <- runif(n, min=-1, max=1)
-  y <- beta0 + beta1*x1 + beta2*x2 + rnorm(n, mean=0, sd = 1)
+```
+##          term estimate std.error statistic  p.value conf.low conf.high
+## 1 (Intercept)   -0.950     0.148     -6.41 5.39e-09   -1.244    -0.656
+## 2          x1    0.259     0.210      1.23 2.20e-01   -0.158     0.677
+## 3          x2    1.401     0.194      7.21 1.24e-10    1.015     1.787
+```
 
-  CI <- lm(y~x1+x2) %>% tidy(conf.int=TRUE) %>% data.frame()
-  
-  beta2.in <- c(beta2.in, between(beta2, CI[3,6], CI[3,7]))
+```r
+CI %>%
+  filter(term == "x2") %>%
+  select(term, estimate, conf.low, conf.high) %>%
+  mutate(inside = between(beta2, conf.low, conf.high))
+```
+
+```
+##   term estimate conf.low conf.high inside
+## 1   x2      1.4     1.02      1.79   TRUE
+```
+
+What if we want to repeat lots of times...
+
+**FUNCTION**
+
+```r
+beta_coef <- function(df){
+  lm(y ~ x1 + x2, data = df) %>%
+    tidy(conf.int = TRUE) %>%
+    filter(term == "x2") %>%
+    select(estimate, conf.low, conf.high, p.value) 
 }
+```
 
-# coverage rate of the CI is given by:
-sum(beta2.in)/reps
+**DATA**
+
+```r
+eqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c(0,1), each = n()/2),
+    x2 = runif(n(), min = -1, max = 1),
+    y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, sd = 1)
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
+
+eqvar_data
 ```
 
 ```
-## [1] 0.952
+## # A tibble: 1,000 × 2
+## # Groups:   sim_id [1,000]
+##    sim_id data              
+##     <int> <list>            
+##  1      1 <tibble [100 × 4]>
+##  2      2 <tibble [100 × 4]>
+##  3      3 <tibble [100 × 4]>
+##  4      4 <tibble [100 × 4]>
+##  5      5 <tibble [100 × 4]>
+##  6      6 <tibble [100 × 4]>
+##  7      7 <tibble [100 × 4]>
+##  8      8 <tibble [100 × 4]>
+##  9      9 <tibble [100 × 4]>
+## 10     10 <tibble [100 × 4]>
+## # … with 990 more rows
 ```
 
+**MAPPING**
+
+We captured the true slope parameter in 95.5% of the confidence intervals (i.e., 95.5% of the datasets created confidence intervals that captured the true parameter).
+
+
+```r
+eqvar_data %>% 
+  mutate(b2_vals = map(data, beta_coef)) %>%
+  select(b2_vals) %>% 
+  unnest(b2_vals) %>%
+  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+  summarize(capture_rate = sum(capture)/reps)
+```
+
+```
+## # A tibble: 1 × 1
+##   capture_rate
+##          <dbl>
+## 1        0.955
+```
 
 **Unequal variance in the linear model**
 
@@ -997,34 +1293,78 @@ Consider the following linear model with the points normally distributed with *u
 
 $$ Y = -1 + 0.5 X_1 + 1.5 X_2 + \epsilon, \ \ \ \epsilon \sim N(0,1+ X_1 + 10 \cdot |X_2|)$$
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-49-1.png" width="480" style="display: block; margin: auto;" />
+
+
+What if we want to repeat lots of times...
+
+**FUNCTION**
+
+```r
+beta_coef <- function(df){
+  lm(y ~ x1 + x2, data = df) %>%
+    tidy(conf.int = TRUE) %>%
+    filter(term == "x2") %>%
+    select(estimate, conf.low, conf.high, p.value) 
+}
+```
+
+**DATA**
+
+```r
+uneqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
+  slice(rep(row_id, each = reps)) %>%
+  mutate(
+    sim_id = rep(1:reps, n_obs),
+    x1 = rep(c(0,1), each = n()/2),
+    x2 = runif(n(), min = -1, max = 1),
+    y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, 
+                                            sd = 1 + x1 + 10*abs(x2))
+  ) %>%
+  arrange(sim_id, row_id) %>%
+  group_by(sim_id) %>%
+  nest()
+
+uneqvar_data
+```
+
+```
+## # A tibble: 1,000 × 2
+## # Groups:   sim_id [1,000]
+##    sim_id data              
+##     <int> <list>            
+##  1      1 <tibble [100 × 4]>
+##  2      2 <tibble [100 × 4]>
+##  3      3 <tibble [100 × 4]>
+##  4      4 <tibble [100 × 4]>
+##  5      5 <tibble [100 × 4]>
+##  6      6 <tibble [100 × 4]>
+##  7      7 <tibble [100 × 4]>
+##  8      8 <tibble [100 × 4]>
+##  9      9 <tibble [100 × 4]>
+## 10     10 <tibble [100 × 4]>
+## # … with 990 more rows
+```
+
+**MAPPING**
+
+Using the data with unequal variability, we only captured the slope parameter about 88% of the time.
 
 
 ```r
-beta2.in <- c()
-beta0 <- -1
-beta1 <- 0.5
-beta2 <- 1.5
-n <- 100
-reps <- 10000
-
-set.seed(4747)
-for(i in 1:reps){
-  x1 <- rep(c(0,1), each=n/2)
-  x2 <- runif(n, min=-1, max=1)
-  y <- beta0 + beta1*x1 + beta2*x2 + rnorm(n, mean=0, sd = 1 + x1 + 10*abs(x2))
-
-  CI <- lm(y~x1+x2) %>% broom::tidy(conf.int=TRUE) %>% data.frame()
-  
-  beta2.in <- c(beta2.in, between(beta2, CI[3,6], CI[3,7]))
-}
-
-# coverage rate of the CI is given by:
-sum(beta2.in)/reps
+uneqvar_data %>% 
+  mutate(b2_vals = map(data, beta_coef)) %>%
+  select(b2_vals) %>% 
+  unnest(b2_vals) %>%
+  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+  summarize(capture_rate = sum(capture)/reps)
 ```
 
 ```
-## [1] 0.872
+## # A tibble: 1 × 1
+##   capture_rate
+##          <dbl>
+## 1        0.861
 ```
 
 
@@ -1033,7 +1373,7 @@ sum(beta2.in)/reps
 
 ### Generating random numbers
 
-(You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.)
+<p style = "color:red">You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.</p>
 
 #### How do we generate uniform[0,1] numbers?
 
@@ -1053,18 +1393,57 @@ b <- 23462146143
 m <- 423514351351
 
 xval <- 47 
-reps <- 10000
+reps <- 10
 unif.val <- c()
 
 for(i in 1:reps){
   xval <- (a*xval + b) %% m
   unif.val <- c(unif.val, xval/m)   }
 
+update_rv <- function(x){(a*x + b) %% m }
+
+rep(xval, reps) %>%
+  map(~ accumulate(., ~ ((a*.x + b) %% m))/m )
+```
+
+```
+## [[1]]
+## [1] 0.28
+## 
+## [[2]]
+## [1] 0.28
+## 
+## [[3]]
+## [1] 0.28
+## 
+## [[4]]
+## [1] 0.28
+## 
+## [[5]]
+## [1] 0.28
+## 
+## [[6]]
+## [1] 0.28
+## 
+## [[7]]
+## [1] 0.28
+## 
+## [[8]]
+## [1] 0.28
+## 
+## [[9]]
+## [1] 0.28
+## 
+## [[10]]
+## [1] 0.28
+```
+
+```r
 data.frame(uniformRVs = unif.val) %>%
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### Generating other RVs:  **The Inverse Transform Method**
@@ -1072,6 +1451,8 @@ data.frame(uniformRVs = unif.val) %>%
 <!--
 %\textcolor{red}{See Bill De Roses's simulation!!}
 -->
+
+<p style = "color:red">You are not responsible for the material on generating random numbers, but it's pretty cool stuff that relies heavily on simulation.</p>
 
 #### Continuous RVs {-}
 
@@ -1105,7 +1486,7 @@ P(X \leq x) &= P(F^{-1}(U) \leq x)\\
 
 <div class="figure" style="text-align: center">
 <img src="figs/Weibull_PDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" /><img src="figs/Weibull_CDF.png" alt="Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons" width="162" />
-<p class="caption">(\#fig:unnamed-chunk-39)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
+<p class="caption">(\#fig:unnamed-chunk-54)Weibull PDF by Calimo - Own work, after Philip Leitch.. Licensed under CC BY-SA 3.0 via Commons</p>
 </div>
 
 
@@ -1141,7 +1522,7 @@ ggplot(weibdata, aes(x = weibull)) + geom_histogram(bins = 25) +
   facet_grid(~sim.method)
 ```
 
-<img src="04-simulating_files/figure-html/unnamed-chunk-40-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04-simulating_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Discrete RVs {-}

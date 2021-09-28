@@ -92,28 +92,24 @@ How is the test interpreted given the different types of sampling which are poss
 The example in class used a modification of the ANOVA F-statistic to compare the observed data with the permuted data test statistics.  Depending on the data and question, the permuted test statistic can take on any of a variety of forms.
 
 
-| Data 	| Hypothesis Question 	| Statistic 	|
-|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
-| 2 categorical 	| diff in prop 	| $\hat{p}_1 - \hat{p}_2$ or $\chi^2$ 	|
-| variables 	| ratio of prop 	| $\hat{p}_1 /  \hat{p}_2$ 	|
----------------------------------
-| 1 numeric 	| diff in means 	| $\overline{X}_1 - \overline{X}_2$ 	|
-| 1 binary 	| ratio of means 	| $\overline{X}_1 / \overline{X}_2$ 	|
-|  	| diff in medians 	| $\mbox{median}_1 - \mbox{median}_2$ 	|
-|  	| ratio of medians 	| $\mbox{median}_1 / \mbox{median}_2$ 	|
-|  	| diff in SD 	| $s_1 - s_2$ 	|
-|  	| diff in var 	| $s^2_1 - s^2_2$ 	|
-|  	| ratio of SD or VAR 	| $s_1 / s_2$ 	|
-| 1 numeric 	| diff in means 	| $\sum n_i (\overline{X}_i - \overline{X})^2$ or 	|
-| k groups 	|  	| F stat 	|
----------------------------------
-| paired or 	| (permute *within* row) 	| $\overline{X}_1 - \overline{X}_2$ 	|
-| repeated measures 	|  	|  	|
----------------------------------
-| regression 	| correlation 	| least sq slope 	|
----------------------------------
-| time series 	| no serial corr 	| lag 1 autocross 	|
----------------------------------
+| Data | Hypothesis Question | Statistic |
+|:--------------|:----------:|:-------------:|
+| 2 categorical | diff in prop | $\hat{p}_1 - \hat{p}_2$ or $\chi^2$ |
+| variables | ratio of prop | $\hat{p}_1 /  \hat{p}_2$ |
+| 1 numeric | diff in means | $\overline{X}_1 - \overline{X}_2$ |
+| 1 binary | ratio of means | $\overline{X}_1 / \overline{X}_2$ |
+|  | diff in medians | $\mbox{median}_1 - \mbox{median}_2$ |
+|  | ratio of medians | $\mbox{median}_1 / \mbox{median}_2$ |
+|  | diff in SD | $s_1 - s_2$ |
+|  | diff in var | $s^2_1 - s^2_2$ |
+|  | ratio of SD or VAR | $s_1 / s_2$ |
+| 1 numeric | diff in means | $\sum n_i (\overline{X}_i - \overline{X})^2$ or |
+| k groups |  | F stat |
+| paired or | (permute *within* row) | $\overline{X}_1 - \overline{X}_2$ |
+| repeated measures |  |  |
+| regression | correlation | least sq slope |
+| time series | no serial corr | lag 1 autocross |
+
 
 Depending on the data, hypotheses, and original data collection structure (e.g., random sampling vs random allocation), the choice of statistic for the permutation test will vary.
 
