@@ -40,10 +40,8 @@ F &= \frac{\text{between-group variability}}{\text{within-group variability}}\\
 
 3. Locate the observed statistic in this distribution.  A value in the main body of the distribution could easily occur just by chance.  A value in the tail would rarely occur by chance and so is evidence that something other than chance is operating.  [This piece is going to happen in permutation tests as well as in analytic tests -- the point is to see if the observed data is consistent with the null distribution.]
 
-##### p-value {-} 
-is the probability of the observed data or more extreme if the null hypothesis is true.  [Also true for both types of tests!]
-
-To estimate the p-value for a test of significance, estimate the sampling distribution of the test statistic when the null hypothesis is true by resampling in a manner that is consistent with the null hypothesis.
+4. **p-value**  is the probability of the observed data or more extreme if the null hypothesis is true.  [Same definition for analytic, permutation, and randomization tests!]   
+To estimate the p-value for a test of significance, estimate the sampling distribution of the test statistic when the null hypothesis is true by simulating in a manner that is consistent with the null hypothesis.  Alternatively, there are analytic / mathematical formulas for many of the common statistical hypothesis tests.
 
 
 
@@ -98,6 +96,7 @@ The example in class used a modification of the ANOVA F-statistic to compare the
 |-------------------	|:-----------------------:	|:-----------------------------------------------:	|
 | 2 categorical 	| diff in prop 	| $\hat{p}_1 - \hat{p}_2$ or $\chi^2$ 	|
 | variables 	| ratio of prop 	| $\hat{p}_1 /  \hat{p}_2$ 	|
+|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
 | 1 numeric 	| diff in means 	| $\overline{X}_1 - \overline{X}_2$ 	|
 | 1 binary 	| ratio of means 	| $\overline{X}_1 / \overline{X}_2$ 	|
 |  	| diff in medians 	| $\mbox{median}_1 - \mbox{median}_2$ 	|
@@ -107,17 +106,21 @@ The example in class used a modification of the ANOVA F-statistic to compare the
 |  	| ratio of SD or VAR 	| $s_1 / s_2$ 	|
 | 1 numeric 	| diff in means 	| $\sum n_i (\overline{X}_i - \overline{X})^2$ or 	|
 | k groups 	|  	| F stat 	|
+|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
 | paired or 	| (permute *within* row) 	| $\overline{X}_1 - \overline{X}_2$ 	|
 | repeated measures 	|  	|  	|
+|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
 | regression 	| correlation 	| least sq slope 	|
-| time series 	| no serial core 	| lag 1 autocross 	|
+|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
+| time series 	| no serial corr 	| lag 1 autocross 	|
+|-------------------	|:-----------------------:	|:-----------------------------------------------:	|
 
 Depending on the data, hypotheses, and original data collection structure (e.g., random sampling vs random allocation), the choice of statistic for the permutation test will vary.
 
 
 ### Permutation vs. Randomization Tests
 
-We will call **randomization tests** those that enumerate *all* possible data permutations.  **permutation tests**, on the other hand, will permute the data $B$ ($< < $ all) times. Some authors call a permutation test applied to a randomized experiment a randomization test.
+We will call **randomization tests** those that enumerate *all* possible data permutations.  **permutation tests**, on the other hand, will permute the data $B$ ($< <$ all) times. [Some authors call a permutation test applied to a randomized experiment a randomization test, but we will use the term randomization to indicate that all possible permutations have been considered.]
 
 * Main difference:  randomization tests consider every possible permutation of the labels, permutation tests take a random sample of permutations of the labels.
 * Both can only be applied to a comparison situation (e.g., no one sample t-tests).
