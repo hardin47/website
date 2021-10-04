@@ -2,10 +2,6 @@
 
 
 
-## 10/8/19 Agenda {#Oct8}
-1. Review: logic of confidence intervals
-2. Logic of bootstrapping (resample from the sample *with* replacement)
-3. BS SE of a statistic
 
 ## Introduction
 
@@ -220,11 +216,6 @@ We think of this as the non-linear transformation that normalizes the sampling d
 \end{enumerate}
 -->
 
-## 10/10/19 Agenda {#Oct10}
-1. Normal CI using BS SE
-2. Bootstrap-t (studentized) CIs 
-3. Percentile CIs
-4. properties / advantages / disadvantages
 
 The StatKey applets which demonstrate bootstrapping are here:  http://www.lock5stat.com/StatKey/
 
