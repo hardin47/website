@@ -19,7 +19,7 @@ options(digits=3)
 
 As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample).
 
-Main idea:  we will be able to estimate the **variability** of our estimator (difference in medians, ordinary least square with non-normal errors, etc.).
+Main idea:  we will be able to estimate the **variability** of the estimator (difference in medians, ordinary least square with non-normal errors, etc.).
 
 * It's not so strange to get $\hat{\theta}$ and SE($\hat{\theta}$) from the data (consider $\hat{p}$ & $\sqrt{\hat{p}(1-\hat{p})/n}$ and $\overline{X}$ & $s/\sqrt{n}$).
 * We'll only consider confidence intervals for now.
@@ -37,11 +37,11 @@ Let $\theta$ be the parameter of interest, and let $\hat{\theta}$ be the estimat
 \begin{align}
 \hat{\theta}(\cdot) = \frac{1}{B} \sum_{i=1}^B \hat{\theta}_i
 \end{align}
-is our best guess for $\theta$.  If $\hat{\theta}$ is very different from $\theta$, we would call it **biased**.
+is the best guess for $\theta$.  If $\hat{\theta}$ is very different from $\theta$, we would call it **biased**.
 \begin{align}
 SE(\hat{\theta}) &= \bigg[ \frac{1}{B-1} \sum_{i=1}^B(\hat{\theta}_i - \hat{\theta}(\cdot))^2 \bigg]^{1/2}\\
-q_1 &= [0.25 n] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
-q_3 &= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
+q_1 &= [0.25 B] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
+q_3 &= [0.75 B] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
 \end{align}
 
 If we could, we would completely characterize the sampling distribution (as a function of $\theta$) which would allow us to make inference on $\theta$ when we only had $\hat{\theta}$.
@@ -102,13 +102,13 @@ We can *resample* from the *sample* to represent samples from the actual populat
 
 ### Bootstrap Procedure
 
-1. Resample data **with replacement**.
+1. Resample data **with replacement** from the original sample.
 2. Calculate the statistic of interest for each resample.
 3. Repeat 1. and 2. $B$ times.
 4. Use the bootstrap distribution for inference.
 
+```{r eval = FALSE, include = FALSE}
 In R:
-```
 install.packages('bootstrap')
 library(bootstrap)
 install.packages('boot')
@@ -121,13 +121,13 @@ library(boot)
 ### Bootstrap Notation
 
 
-Take lots ($B$) of sample of size n from the sample, $\hat{F}(x)$ (instead of from the population, $F(x)$ ) to create a bootstrap distribution for $\hat{\theta}^*$ (instead of the sampling distribution for $\hat{\theta}$).
+Take many ($B$) resamples of size $n$ from the sample, $\hat{F}(x)$ (instead of from the population, $F(x)$ ) to create a bootstrap distribution for $\hat{\theta}^*$ (instead of the sampling distribution for $\hat{\theta}$).
 
-Let $\hat{\theta}^*(b)$ be the calculated statistic of interest for the $b^{th}$ bootstrap sample.  Our best guess for $\theta$ is:
+Let $\hat{\theta}^*(b)$ be the calculated statistic of interest for the $b^{th}$ bootstrap sample.  The best guess for $\theta$ is:
 \begin{align}
 \hat{\theta}^* = \frac{1}{B} \sum_{b=1}^B \hat{\theta}^*(b)
 \end{align}
-(if $\hat{\theta}^*$ is very different from $\hat{\theta}$, we call it biased.)  And the estimated value for the standard error of our estimate is
+(if $\hat{\theta}^*$ is very different from $\hat{\theta}$, we call it biased.)  And the estimated value for the standard error of the estimate is
 \begin{align}
 \hat{SE}^* = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
 \end{align}
@@ -335,10 +335,10 @@ The interval between the $\alpha/2$ and $1-\alpha/2$ quantiles of the bootstrap 
 
 <p style="color:red">You do not need to know *why* the percentile interval works...  but isn't it so cool to see how it works???</p>
 
-Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron's "backwards" intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
+Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If the observed $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of the CI will get up to the true parameter value at the correct rate?  (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron's "backwards" intervals.) Or, if the sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
 
 
-To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where g is a monotonic function (assume wlog that g is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
+To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of the statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where g is a monotonic function (assume wlog that g is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
 
 \begin{equation}
  \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2) (\#eq:phidist).
@@ -413,7 +413,7 @@ In order for a percentile interval to be appropriate, we simply need to know tha
 
 See Charlotte's example on bootstrapping a loess smooth for her thesis data (carryingcap.r).  The idea was this:  Charlotte had some data that she wanted to model (using differential equations).  She asked me how to tell whether or not her new model was reflective of the data / population.  So, we fit a loess spline to see the shape of the data.  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit.
 
-Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
+Keeping in mind that the theory we've covered here doesn't exactly work for this situation (the work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
 -->
 
 
@@ -447,7 +447,7 @@ P(\theta < \hat{\theta}_{(lo)})&=\alpha/2\\
 P(\theta > \hat{\theta}_{(hi)})&=\alpha/2\\
 \end{align}
 
-* Note:  all of our intervals are approximate.  We judge them based on how accurately they cover $\theta$.
+* Note:  all of the intervals are approximate.  We judge them based on how accurately they cover $\theta$.
 
     * A CI is first order accurate if:
 \begin{align}
@@ -610,7 +610,7 @@ bias&= E(\hat{\theta} - \theta)\\
 var &= E(\hat{\theta} - \theta)^2 = \sigma^2\\
 skew &= E(\hat{\theta} - \theta)^3 / \sigma^3\\
 \end{align}
-We can think of the skew as the rate of chance of the standard error on a normalized scale.  If there is no skew, we will estimate $a=0$.  Our estimate of $a$ comes from a procedure known as the jackknife.
+We can think of the skew as the rate of chance of the standard error on a normalized scale.  If there is no skew, we will estimate $a=0$.  The estimate of $a$ comes from a procedure known as the jackknife.
 
 \begin{align}
 \hat{a} = \frac{\sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^3}{6 [ \sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^2 ] ^{3/2}}
@@ -619,7 +619,7 @@ We can think of the skew as the rate of chance of the standard error on a normal
 
 ## R example: Heroin
 
-Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
+Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) spent a clinic for methadone maintenance treatment for people addicted to heroin.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
 
 
 
