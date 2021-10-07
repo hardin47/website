@@ -156,16 +156,16 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
 <h4>Some parallel examples<a class="anchor" aria-label="anchor" href="#some-parallel-examples"><i class="fas fa-link"></i></a>
 </h4>
 <p>Before running code in parallel, it is valuable to know how many cores your computer has to work with. Note that the <code>detectCores</code> function will provide information about the specific device you are using (<code>logical = FALSE</code> tells you only the physical cores which is likely what you want). Note that after <code>makeCluster</code> the separate threads have information. [The argument <code>setup_strategy = "sequential"</code> is a fix for working with R 4.0+.] After <code>stopCluster</code>, the code is no longer connecting to the cluster structure.</p>
-<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb526"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span>
 <span class="va">P</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span><span class="op">(</span>logical<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">P</span></code></pre></div>
 <pre><code>## [1] 8</code></pre>
-<div class="sourceCode" id="cb558"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb528"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span><span class="op">(</span><span class="va">P</span>, setup_strategy <span class="op">=</span> <span class="st">"sequential"</span><span class="op">)</span>
 <span class="va">cl</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
 <pre><code>## node of a socket cluster on host 'localhost' with pid 75490</code></pre>
-<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb530"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
 <span class="va">cl</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
 <pre><code>## Error in summary.connection(connection): invalid connection</code></pre>
@@ -174,7 +174,7 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
 <h4>Embarrassingly embarrassing example<a class="anchor" aria-label="anchor" href="#embarrassingly-embarrassing-example"><i class="fas fa-link"></i></a>
 </h4>
 <p>In the example below, we generate some Cauchy data and find the max of each sample. Note that for the current device there are 8 cores, so the process will happen 100/P = 12.5 times on each core. The second argument of <code>clusterApply</code> is a sequence of numbers that gets passed to each worker as the (first) argument of <code>func1</code>. Below, I’ve specified that the value 50 (number of reps) should be passed separately to 100 different workers.</p>
-<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb532"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">W</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 <span class="va">P</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span><span class="op">(</span>logical<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span><span class="op">(</span><span class="va">P</span>, setup_strategy <span class="op">=</span> <span class="st">"sequential"</span><span class="op">)</span>
@@ -193,10 +193,10 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
 ## 
 ## [[3]]
 ## [1] 74.68404</code></pre>
-<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb534"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 <p>There are many R functions which implement parallel processing. For example, the same code from above can be processed using <code>foreach</code>.</p>
-<div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">doParallel</span><span class="op">)</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span><span class="op">(</span><span class="va">P</span>, setup_strategy <span class="op">=</span> <span class="st">"sequential"</span><span class="op">)</span>
 
@@ -205,20 +205,20 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
   <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="va">reps</span><span class="op">)</span><span class="op">)</span>
        <span class="op">}</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1]  43.14389 274.16503  19.45930</code></pre>
-<div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="example-bootstrapping" class="section level4 unnumbered">
 <h4>Example bootstrapping<a class="anchor" aria-label="anchor" href="#example-bootstrapping"><i class="fas fa-link"></i></a>
 </h4>
 <p>A slightly less embarrassingly parallel example comes with bootstrapping. Below we have used parallel implementation to bootstrap the mean of the iris data petal length (Virginica only).</p>
-<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>
 
 <span class="va">iris_bs</span> <span class="op">&lt;-</span> <span class="va">iris</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">==</span> <span class="st">"virginica"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">Petal.Length</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb569"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb539"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span><span class="op">(</span><span class="va">P</span>, setup_strategy <span class="op">=</span> <span class="st">"sequential"</span><span class="op">)</span>
 
 <span class="fu">doParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
@@ -238,7 +238,7 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
 <p>Some of you may be familiar with <a href="http://spark.apache.org/">Apache Spark</a> which is an open-source product for distributed cluster-computing. You may want to learn more about its capabilities, including scheduling workflow, dispatching tasks, and consolidating end results. While incredibly powerful, there has historically been a steep learning curve to getting R to work smoothly with a Spark connection. Recently, RStudio has come out with a new package <a href="https://spark.rstudio.com/"><code>sparklyr</code></a> which integrates R and Spark seamlessly. Note that in the example below, we’ve set up a local connection just for the purposes of the example. For your work, you may want to connect to a cluster or cloud space with many cores.</p>
 <p>The <a href="https://spark.rstudio.com/">RStudio <code>sparklyr</code> webpage</a> provides a plethora of good examples demonstrating the sophistication and power of the technology. <code>sparklyr</code> has particularly strong connections to the suite of <code>tidyverse</code> functions. Indeed, the power of <code>sparklyr</code> is more about distributing the computing than about parallelizing it. For example, with <code>sparklyr</code> the computations are delayed until you need the results. Additionally, Spark is doing the heavy lifting and only at the very end (when your results are called) do you need to worry about the size of the table, results, or computational space. The example below repeats the bootstrapping work that was done previously.</p>
 <p>Note, it is important to look at your data structures and variables names. For example, when copying the local dataframe <code>iris_samps</code> to the remote data source called <code>iris_samps_tbl</code>, the variable <code>Petal.Length</code> was changed to <code>Petal_Length</code>.</p>
-<div class="sourceCode" id="cb570"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">sparklyr</span><span class="op">)</span>
 <span class="fu">spark_install</span><span class="op">(</span><span class="op">)</span>
 
@@ -258,10 +258,10 @@ Figure 1.4: Image taken from <a href="https://blog.restcase.com/restful-api-auth
     group_by <span class="op">=</span> <span class="st">"replicate"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Histogram of 100 Bootstrapped Means using sparklyr"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="10-misc_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb571"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">spark_disconnect</span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></code></pre></div>
 <p>For our particular application, the adept reader has probably noticed that the average of a variable using <code>group_by</code> is a very quick and easy task for <code>dplyr</code>. Indeed, the use of <code>sparklyr</code> above is overkill and is presented only as a way to demonstrate using <code>sparklyr</code>. If you are working with big datasets that require large computing infrastructure, the RStudio help pages on <code>sparklyr</code> are fantastic. Additionally, there are many instances of working with <code>Spark</code> in the wild, and you might consider working through someone else’s <code>Spark</code> analysis like this <a href="https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/">fantastic example</a> on splitting up large amounts of raw DNA sequencing to get data for a given genetic location.</p>
-<div class="sourceCode" id="cb572"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb542"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iris_samps</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/group_by.html">group_by</a></span><span class="op">(</span><span class="va">replicate</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>result <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">Petal.Length</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Histogram of 100 Bootstrapped Means using dplyr"</span><span class="op">)</span></code></pre></div>
@@ -330,43 +330,43 @@ Figure 1.9: Image from Sevcikova UseR! 2017 <a href="https://rawgit.com/PPgp/use
 <p>Consider an example using GCP (kudos to <a href="https://www.shukryzablah.com">Shukry Zablah</a> for his assistance).</p>
 <p><a href="https://cloud.google.com/bigquery/">BigQuery</a> is Google’s serverless, highly-scalable, cloud data warehouse. A <a href="https://cloud.google.com/bigquery/docs/quickstarts">quickstart</a> document is available which discusses use of the web user interface and the GCP console as well as access through an API interface. The <a href="https://github.com/r-dbi/bigrquery">bigrquery</a> package in R makes it easy to work with data stored in Google BigQuery through queries to BigQuery tables.</p>
 <p>The first step is to request GCP credits (see above) and use the online interface to create a project (below called “Test Project for Blog”).</p>
-<div class="sourceCode" id="cb573"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bigrquery</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org">forcats</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org">purrr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org">readr</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">projectId</span> <span class="op">&lt;-</span> <span class="st">"bigquery-public-data"</span>  <span class="co"># replace with your own project</span>
 <span class="va">billingId</span> <span class="op">&lt;-</span> <span class="st">"test-project-for-blog"</span> <span class="co"># replace with your own billing ID</span>
 <span class="va">datasetName</span> <span class="op">&lt;-</span> <span class="st">"samples"</span>
 <span class="va">tableName</span> <span class="op">&lt;-</span> <span class="st">"wikipedia"</span></code></pre></div>
 <p>BigQuery includes a number of <a href="https://cloud.google.com/bigquery/public-data/">public datasets</a>.
 Below is an analysis of the public dataset of the revisions of Wikipedia articles up to April 2010, hosted in GCP BigQuery. The size of the table is 35.69GB. The queries take only seconds to run.</p>
-<div class="sourceCode" id="cb575"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">query</span> <span class="op">&lt;-</span> <span class="st">"SELECT  title, COUNT(title) as n
           FROM `bigquery-public-data.samples.wikipedia` 
           GROUP BY title
           ORDER BY n DESC
           LIMIT 500"</span></code></pre></div>
 <p>For safety, always try to make sure that your queries have the <code>LIMIT</code> set on your queries.</p>
-<div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mostRevisions_tb</span> <span class="op">&lt;-</span> 
   <span class="fu">bigrquery</span><span class="fu">::</span><span class="fu">bq_project_query</span><span class="op">(</span>x <span class="op">=</span> <span class="va">billingId</span>, 
     query <span class="op">=</span> <span class="va">query</span><span class="op">)</span> <span class="co">#creates temporary table</span></code></pre></div>
 <p>When the previous <code>bq_project_query()</code> function is run within RStudio, a connection is made to Google (GCP) and an authentication window will open up in a local browser.</p>
 <p>All the heavy lifting we perform is done on the database end (note that we are billed for it, though the first 1TB of accesses are free). The local machine only receives the data once we try to display it. Right now <code>mostRevisions_tb</code> is just a reference to a temporary table online. The query accessed 7GB of data.</p>
 <p>We can get a copy of the data on our local machine once we are confident that it is what we want.</p>
-<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mostRevisions</span> <span class="op">&lt;-</span> <span class="fu">bq_table_download</span><span class="op">(</span><span class="va">mostRevisions_tb</span><span class="op">)</span> </code></pre></div>
-<div class="sourceCode" id="cb578"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb548"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/pillar/man/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">mostRevisions</span><span class="op">)</span></code></pre></div>
 <pre><code>## Observations: 500
 ## Variables: 2
 ## $ title &lt;chr&gt; "Wikipedia:Administrator intervention against vandalism", …
 ## $ n     &lt;int&gt; 643271, 419695, 326337, 257893, 226802, 204469, 191679, 18…</code></pre>
-<div class="sourceCode" id="cb580"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">clean</span> <span class="op">&lt;-</span> <span class="va">mostRevisions</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Wikipedia|User|Template|Talk"</span>, <span class="va">title</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/forcats/man/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">title</span>, <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co">#to sort levels</span>
@@ -376,7 +376,7 @@ Below is an analysis of the public dataset of the revisions of Wikipedia article
 ## $ title &lt;fct&gt; George W. Bush, List of World Wrestling Entertainment empl…
 ## $ n     &lt;int&gt; 43652, 30572, 27433, 23245, 21768, 20814, 20546, 20529, 20…</code></pre>
 <p>Let’s plot the top 10 entries.</p>
-<div class="sourceCode" id="cb582"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">clean</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">title</span>, y <span class="op">=</span> <span class="va">n</span>, fill <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_bar.html">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Article Title"</span>,
@@ -398,7 +398,7 @@ Below is an analysis of the public dataset of the revisions of Wikipedia article
 <h3>Connect to Python within RStudio<a class="anchor" aria-label="anchor" href="#connect-to-python-within-rstudio"><i class="fas fa-link"></i></a>
 </h3>
 <p>For many statisticians, the go-to software language is R. However, there is no doubt that Python is a very important language in data science. Why not do both??</p>
-<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/reticulate">reticulate</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/use_python.html">use_virtualenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span><span class="op">)</span>
@@ -422,11 +422,11 @@ flights = flights[['carrier', 'dep_delay', 'arr_delay']]
 flights = flights.dropna()
 ```</code></pre>
 <p>A view of the Python chunk which is actually run:</p>
-<div class="sourceCode" id="cb586"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb586-1"><a href="misc.html#cb586-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas</span>
-<span id="cb586-2"><a href="misc.html#cb586-2" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> pandas.read_csv(<span class="st">"flights.csv"</span>)</span>
-<span id="cb586-3"><a href="misc.html#cb586-3" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[flights[<span class="st">"dest"</span>] <span class="op">==</span> <span class="st">"ORD"</span>]</span>
-<span id="cb586-4"><a href="misc.html#cb586-4" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[[<span class="st">'carrier'</span>, <span class="st">'dep_delay'</span>, <span class="st">'arr_delay'</span>]]</span>
-<span id="cb586-5"><a href="misc.html#cb586-5" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights.dropna()</span></code></pre></div>
+<div class="sourceCode" id="cb556"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb556-1"><a href="misc.html#cb556-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas</span>
+<span id="cb556-2"><a href="misc.html#cb556-2" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> pandas.read_csv(<span class="st">"flights.csv"</span>)</span>
+<span id="cb556-3"><a href="misc.html#cb556-3" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[flights[<span class="st">"dest"</span>] <span class="op">==</span> <span class="st">"ORD"</span>]</span>
+<span id="cb556-4"><a href="misc.html#cb556-4" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[[<span class="st">'carrier'</span>, <span class="st">'dep_delay'</span>, <span class="st">'arr_delay'</span>]]</span>
+<span id="cb556-5"><a href="misc.html#cb556-5" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights.dropna()</span></code></pre></div>
 </div>
 <div id="learn-about-the-dataset" class="section level4 unnumbered">
 <h4>Learn about the dataset<a class="anchor" aria-label="anchor" href="#learn-about-the-dataset"><i class="fas fa-link"></i></a>
@@ -436,14 +436,14 @@ flights.shape
 flights.head(3)
 flights.describe()
 ```</code></pre>
-<div class="sourceCode" id="cb588"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb588-1"><a href="misc.html#cb588-1" aria-hidden="true" tabindex="-1"></a>flights.shape</span></code></pre></div>
+<div class="sourceCode" id="cb558"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb558-1"><a href="misc.html#cb558-1" aria-hidden="true" tabindex="-1"></a>flights.shape</span></code></pre></div>
 <pre><code>## (12590, 3)</code></pre>
-<div class="sourceCode" id="cb590"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb590-1"><a href="misc.html#cb590-1" aria-hidden="true" tabindex="-1"></a>flights.head(<span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb560"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb560-1"><a href="misc.html#cb560-1" aria-hidden="true" tabindex="-1"></a>flights.head(<span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##    carrier  dep_delay  arr_delay
 ## 4       UA       -4.0       12.0
 ## 5       AA       -2.0        8.0
 ## 22      AA       -1.0       14.0</code></pre>
-<div class="sourceCode" id="cb592"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb592-1"><a href="misc.html#cb592-1" aria-hidden="true" tabindex="-1"></a>flights.describe()</span></code></pre></div>
+<div class="sourceCode" id="cb562"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb562-1"><a href="misc.html#cb562-1" aria-hidden="true" tabindex="-1"></a>flights.describe()</span></code></pre></div>
 <pre><code>##           dep_delay     arr_delay
 ## count  12590.000000  12590.000000
 ## mean      11.709770      2.917951
@@ -462,9 +462,9 @@ flights = pandas.read_csv("flights.csv")
 flights = flights[['carrier', 'dep_delay', 'arr_delay']]
 flights.groupby("carrier").mean()
 ```</code></pre>
-<div class="sourceCode" id="cb595"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb595-1"><a href="misc.html#cb595-1" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> pandas.read_csv(<span class="st">"flights.csv"</span>)</span>
-<span id="cb595-2"><a href="misc.html#cb595-2" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[[<span class="st">'carrier'</span>, <span class="st">'dep_delay'</span>, <span class="st">'arr_delay'</span>]]</span>
-<span id="cb595-3"><a href="misc.html#cb595-3" aria-hidden="true" tabindex="-1"></a>flights.groupby(<span class="st">"carrier"</span>).mean()</span></code></pre></div>
+<div class="sourceCode" id="cb565"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb565-1"><a href="misc.html#cb565-1" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> pandas.read_csv(<span class="st">"flights.csv"</span>)</span>
+<span id="cb565-2"><a href="misc.html#cb565-2" aria-hidden="true" tabindex="-1"></a>flights <span class="op">=</span> flights[[<span class="st">'carrier'</span>, <span class="st">'dep_delay'</span>, <span class="st">'arr_delay'</span>]]</span>
+<span id="cb565-3"><a href="misc.html#cb565-3" aria-hidden="true" tabindex="-1"></a>flights.groupby(<span class="st">"carrier"</span>).mean()</span></code></pre></div>
 <pre><code>##          dep_delay  arr_delay
 ## carrier                      
 ## AA        8.586016   0.364291
@@ -482,7 +482,7 @@ flights.groupby("carrier").mean()
 <li>
 <code>r.x</code> accesses an <code>x</code> variable created within R from Python</li>
 </ul>
-<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">py</span><span class="op">$</span><span class="va">flights</span>, 
        <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">carrier</span>, 
@@ -494,7 +494,7 @@ flights.groupby("carrier").mean()
 <div id="from-r-chunk-to-python-chunk" class="section level4 unnumbered">
 <h4>From R chunk to Python chunk<a class="anchor" aria-label="anchor" href="#from-r-chunk-to-python-chunk"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb598"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">diamonds</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">diamonds</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 6 x 10
@@ -511,7 +511,7 @@ flights.groupby("carrier").mean()
 <h4>Python chunks<a class="anchor" aria-label="anchor" href="#python-chunks"><i class="fas fa-link"></i></a>
 </h4>
 <p>Note that we’re calling Python code on an R object.</p>
-<div class="sourceCode" id="cb600"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb600-1"><a href="misc.html#cb600-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.diamonds.describe())</span></code></pre></div>
+<div class="sourceCode" id="cb570"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb570-1"><a href="misc.html#cb570-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.diamonds.describe())</span></code></pre></div>
 <pre><code>##               carat         depth  ...             y             z
 ## count  53940.000000  53940.000000  ...  53940.000000  53940.000000
 ## mean       0.797940     61.749405  ...      5.734526      3.538734
@@ -523,9 +523,9 @@ flights.groupby("carrier").mean()
 ## max        5.010000     79.000000  ...     58.900000     31.800000
 ## 
 ## [8 rows x 7 columns]</code></pre>
-<div class="sourceCode" id="cb602"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb602-1"><a href="misc.html#cb602-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb602-2"><a href="misc.html#cb602-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> smf.ols(<span class="st">'price ~ carat'</span>, data <span class="op">=</span> r.diamonds).fit()</span>
-<span id="cb602-3"><a href="misc.html#cb602-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model.summary())</span></code></pre></div>
+<div class="sourceCode" id="cb572"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb572-1"><a href="misc.html#cb572-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb572-2"><a href="misc.html#cb572-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> smf.ols(<span class="st">'price ~ carat'</span>, data <span class="op">=</span> r.diamonds).fit()</span>
+<span id="cb572-3"><a href="misc.html#cb572-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model.summary())</span></code></pre></div>
 <pre><code>##                             OLS Regression Results                            
 ## ==============================================================================
 ## Dep. Variable:                  price   R-squared:                       0.849
@@ -585,18 +585,18 @@ flights.groupby("carrier").mean()
 <p>SQL (pronounced <em>sequel</em>) stands for <a href="https://en.wikipedia.org/wiki/SQL">Structured Query Language</a>; it is a language designed to manage data in a relational database system.</p>
 <p>We will use a public facing MySQL <a href="http://www.science.smith.edu/wai-database/home/about">database</a> containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, <a href="https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&amp;icde=44962011&amp;ddparam=&amp;ddvalue=&amp;ddsub=&amp;cr=46&amp;csb=default&amp;cs=ASC&amp;pball=">PI Susan Voss, R15 DC014129-01</a>.) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.</p>
 <p>We begin by demonstrating how SQL queries can be sent to a database. It is necessary to set up a connection using the <code>dbConnect()</code> function.</p>
-<div class="sourceCode" id="cb604"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ProjectMOSAIC/mosaic">mosaic</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://downloads.mariadb.org/connector-c/">RMySQL</a></span><span class="op">)</span>  
 <span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span>
   <span class="fu">RMySQL</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RMySQL/man/MySQLDriver-class.html">MySQL</a></span><span class="op">(</span><span class="op">)</span>, host <span class="op">=</span> <span class="st">"scidb.smith.edu"</span>, user <span class="op">=</span> <span class="st">"waiuser"</span>, 
   password <span class="op">=</span> <span class="st">"smith_waiDB"</span>, dbname <span class="op">=</span> <span class="st">"wai"</span><span class="op">)</span></code></pre></div>
 <p>Next a series of SQL queries can be sent to the database using the <code><a href="https://rdrr.io/pkg/DBI/man/dbGetQuery.html">DBI::dbGetQuery()</a></code> function: each query returns an R dataframe.</p>
-<div class="sourceCode" id="cb605"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb575"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SHOW TABLES"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "data.frame"</code></pre>
 <p>There are multiple tables within the <code>wai</code> database.</p>
-<div class="sourceCode" id="cb607"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SHOW TABLES"</span><span class="op">)</span></code></pre></div>
 <pre><code>##       Tables_in_wai
 ## 1          Codebook
@@ -607,7 +607,7 @@ flights.groupby("carrier").mean()
 ## 6           Subject
 ## 7     Subjects_2020</code></pre>
 <p>The <code>EXPLAIN</code> command describes the ten field names (variables) in the <code>PI_Info</code> table.</p>
-<div class="sourceCode" id="cb609"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb579"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"EXPLAIN PI_Info"</span><span class="op">)</span></code></pre></div>
 <pre><code>##                 Field        Type Null Key Default Extra
 ## 1          Identifier varchar(50)   NO PRI    &lt;NA&gt;      
@@ -623,7 +623,7 @@ flights.groupby("carrier").mean()
 ## 11      DateSubmitted        text   NO        &lt;NA&gt;      
 ## 12           PI_Notes        text   NO        &lt;NA&gt;</code></pre>
 <p>The <code>SELECT</code> statement can be used to select all fields for eight observations in the <code>Measurements</code> table.</p>
-<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb581"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">eightobs</span> <span class="op">&lt;-</span> <span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM Measurements LIMIT 8"</span><span class="op">)</span>
 <span class="va">eightobs</span></code></pre></div>
 <pre><code>##   Identifier Sub_Number Session Left_Ear MEP Instrument    Freq Absorbance
@@ -645,7 +645,7 @@ flights.groupby("carrier").mean()
 ## 7  66615500 -0.229576         NA
 ## 8  61996200 -0.229327         NA</code></pre>
 <p>More interesting and complicated <code>SELECT</code> calls can be used to undertake grouping and aggregation. Here we calculate the sample size for each study</p>
-<div class="sourceCode" id="cb613"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, 
   <span class="st">"SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM"</span><span class="op">)</span></code></pre></div>
 <pre><code>##       Identifier    NUM
@@ -667,23 +667,23 @@ flights.groupby("carrier").mean()
 <p>Alternatively, a connection can be made to the server by creating a series of <code>dplyr</code> tbl
 objects. Connecting with familiar <code>dplyr</code> syntax is attractive because, as <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html">Hadley Wickham</a> has noted, SQL and R have similar syntax (but sufficiently different to be confusing).</p>
 <p>The setup process looks similar.</p>
-<div class="sourceCode" id="cb615"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb585"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Measurements</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"Measurements"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">Measurements</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "tbl_MySQLConnection" "tbl_dbi"             "tbl_sql"            
 ## [4] "tbl_lazy"            "tbl"</code></pre>
-<div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb587"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">PI_Info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"PI_Info"</span><span class="op">)</span>
 <span class="va">Subject</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"Subject"</span><span class="op">)</span></code></pre></div>
 <p>We explore the <code>PI_Info</code> table using the <code><a href="https://rdrr.io/pkg/dplyr/man/compute.html">collect()</a></code> function used to force computation on the database (and return the results). One attractive aspect of database systems is that they feature <a href="https://en.wikipedia.org/wiki/Lazy_evaluation"><em>lazy evaluation</em></a>, where computation is optimized and postponed as long as possible.</p>
-<div class="sourceCode" id="cb618"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb588"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">PI_Info</span>  <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarise</a></span><span class="op">(</span>total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log [waiuser@scidb.smith.edu:/wai]
 ##   total
 ##   &lt;dbl&gt;
 ## 1    12</code></pre>
-<div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb590"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">PI_Info</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="op">)</span>   </code></pre></div>
 <pre><code>##       Identifier Year
 ## 1      Abur_2014 2014
@@ -815,18 +815,18 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 ## 11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 ## 12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Used an ER-1 earphone and ER-7C microphone.  Data provided by Doug Keefe and formatted by Susan Voss with help.  Lynne Werner is retired.</code></pre>
-<div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb592"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># be careful with collect() when dealing with large tables!</span></code></pre></div>
 <p>Note how the number of rows is unknown (<code>??</code> at the top of the output above) for the lazy query.</p>
 <p>Similarly, we can explore the <code>Subjects</code> table.</p>
-<div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb593"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Subject</span>  <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarise</a></span><span class="op">(</span>total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log [waiuser@scidb.smith.edu:/wai]
 ##   total
 ##   &lt;dbl&gt;
 ## 1   640</code></pre>
-<div class="sourceCode" id="cb625"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb595"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Subject</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># be careful with collect() with large tables!</span></code></pre></div>
 <pre><code>## # A tibble: 640 x 10
 ##    Identifier Sub_Number Session_Total   Age Female  Race Ethnicity
@@ -844,7 +844,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## # … with 630 more rows, and 3 more variables: Left_Ear_Status &lt;int&gt;,
 ## #   Right_Ear_Status &lt;int&gt;, Sub_Notes &lt;chr&gt;</code></pre>
 <p>Let’s explore the <code>Measurements</code> table.</p>
-<div class="sourceCode" id="cb627"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb597"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Measurements</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarise</a></span><span class="op">(</span>total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: mysql 5.5.58-0ubuntu0.14.04.1-log [waiuser@scidb.smith.edu:/wai]
@@ -854,7 +854,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <p>There are more than a quarter million observations.</p>
 <p>In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al. (2012) entitled <a href="https://www.ncbi.nlm.nih.gov/pubmed/21857517">“Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults”</a>.</p>
 <p>Arbitrarily we choose to collect data from subject number three.</p>
-<div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb599"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">onesubj</span> <span class="op">&lt;-</span> 
   <span class="va">Measurements</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="va">Identifier</span> <span class="op">==</span> <span class="st">"Rosowski_2012"</span>, <span class="va">Sub_Number</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -873,13 +873,13 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## # … with 4 more variables: Zmag &lt;dbl&gt;, Zang &lt;dbl&gt;, Canal_Area &lt;dbl&gt;,
 ## #   SessionNum &lt;fct&gt;</code></pre>
 <p>Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.</p>
-<div class="sourceCode" id="cb631"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb601"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">onesubj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span><span class="va">onesubj</span>, Ear <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">Left_Ear</span> <span class="op">==</span> <span class="fl">1</span>, <span class="st">"Left"</span>, <span class="st">"Right"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">onesubj</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Freq</span>, y <span class="op">=</span> <span class="va">Absorbance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">Ear</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Absorbance by ear Rosowski subject 3"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="10-misc_files/figure-html/unnamed-chunk-46-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>Always a good idea to terminate the SQL connection.</p>
-<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb602"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <p>We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite. More information about databases within R can be found in the CRAN <a href="https://cran.r-project.org/web/views/Databases.html">Databases with R</a> Task View.</p>
@@ -995,10 +995,10 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <blockquote>
 <p>Note: <code><a href="https://rdrr.io/r/base/cat.html">cat()</a></code> and <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> handle escape sequences differently, if you want to print a string out with these sequences interpreted, use <code><a href="https://rdrr.io/r/base/cat.html">cat()</a></code>.</p>
 </blockquote>
-<div class="sourceCode" id="cb634"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb604"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="st">"a\nb"</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "a\nb"</code></pre>
-<div class="sourceCode" id="cb636"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"a\nb"</span><span class="op">)</span></code></pre></div>
 <pre><code>## a
 ## b</code></pre>
@@ -1026,31 +1026,31 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <li>
 <code>{n,m}</code>: matches between n and m times.</li>
 </ul>
-<div class="sourceCode" id="cb638"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">strings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"ab"</span>, <span class="st">"acb"</span>, <span class="st">"accb"</span>, <span class="st">"acccb"</span>, <span class="st">"accccb"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "a"      "ab"     "acb"    "accb"   "acccb"  "accccb"</code></pre>
-<div class="sourceCode" id="cb640"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb610"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac*b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "ab"     "acb"    "accb"   "acccb"  "accccb"</code></pre>
-<div class="sourceCode" id="cb642"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb612"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac*b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 2 3 4 5 6</code></pre>
-<div class="sourceCode" id="cb644"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb614"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac+b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "acb"    "accb"   "acccb"  "accccb"</code></pre>
-<div class="sourceCode" id="cb646"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb616"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac?b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "ab"  "acb"</code></pre>
-<div class="sourceCode" id="cb648"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb618"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac{2}b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "accb"</code></pre>
-<div class="sourceCode" id="cb650"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac{2}b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 4</code></pre>
-<div class="sourceCode" id="cb652"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb622"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac{2,}b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "accb"   "acccb"  "accccb"</code></pre>
-<div class="sourceCode" id="cb654"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ac{2,3}b"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "accb"  "acccb"</code></pre>
 </div>
@@ -1070,19 +1070,19 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <li>
 <code>\B</code>: matches the empty string provided it is not at an edge of a word.</li>
 </ul>
-<div class="sourceCode" id="cb656"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb626"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">strings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"abcd"</span>, <span class="st">"cdab"</span>, <span class="st">"cabd"</span>, <span class="st">"c abd"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abcd"  "cdab"  "cabd"  "c abd"</code></pre>
-<div class="sourceCode" id="cb658"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ab"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abcd"  "cdab"  "cabd"  "c abd"</code></pre>
-<div class="sourceCode" id="cb660"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb630"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"^ab"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abcd"</code></pre>
-<div class="sourceCode" id="cb662"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ab$"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "cdab"</code></pre>
-<div class="sourceCode" id="cb664"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb634"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"\\bab"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abcd"  "c abd"</code></pre>
 </div>
@@ -1107,28 +1107,28 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <li>
 <code>(...)</code>: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using <code>\\N</code>, with N being the No. of <code>(...)</code> used. This is called <strong>backreference</strong>.</li>
 </ul>
-<div class="sourceCode" id="cb666"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb636"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">strings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"^ab"</span>, <span class="st">"ab"</span>, <span class="st">"abc"</span>, <span class="st">"abd"</span>, <span class="st">"abe"</span>, <span class="st">"ab 12"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "^ab"   "ab"    "abc"   "abd"   "abe"   "ab 12"</code></pre>
-<div class="sourceCode" id="cb668"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb638"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ab."</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abc"   "abd"   "abe"   "ab 12"</code></pre>
-<div class="sourceCode" id="cb670"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb640"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ab[c-e]"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abc" "abd" "abe"</code></pre>
-<div class="sourceCode" id="cb672"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb642"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"ab[^c]"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abd"   "abe"   "ab 12"</code></pre>
-<div class="sourceCode" id="cb674"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb644"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"^ab"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "ab"    "abc"   "abd"   "abe"   "ab 12"</code></pre>
-<div class="sourceCode" id="cb676"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb646"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"\\^ab"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "^ab"</code></pre>
-<div class="sourceCode" id="cb678"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb648"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">"abc|abd"</span>, <span class="va">strings</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "abc" "abd"</code></pre>
-<div class="sourceCode" id="cb680"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb650"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">"(ab) 12"</span>, <span class="st">"\\1 34"</span>, <span class="va">strings</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "^ab"   "ab"    "abc"   "abd"   "abe"   "ab 34"</code></pre>
 </div>
@@ -1197,7 +1197,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <code>stringr</code> cheat sheet: <a href="https://github.com/rstudio/cheatsheets/raw/master/strings.pdf" class="uri">https://github.com/rstudio/cheatsheets/raw/master/strings.pdf</a>
 </li>
 </ul>
-<div class="sourceCode" id="cb682"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb652"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Stat2Data</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">RailsTrails</span><span class="op">)</span>
 <span class="va">RailsTrails</span> <span class="op">&lt;-</span> <span class="va">RailsTrails</span> <span class="op">%&gt;%</span> 
@@ -1210,7 +1210,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 4        4        3   276.250     Bridge Road
 ## 5        5        4   169.173     Bridge Road
 ## 6        6        3   211.487 Brierwood Drive</code></pre>
-<div class="sourceCode" id="cb684"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb654"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">RailsTrails</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>first_piece <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringr/man/word.html">word</a></span><span class="op">(</span><span class="va">StreetName</span>, start <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>##   HouseNum Bedrooms Price2014      StreetName first_piece
@@ -1220,7 +1220,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 4        4        3   276.250     Bridge Road      Bridge
 ## 5        5        4   169.173     Bridge Road      Bridge
 ## 6        6        3   211.487 Brierwood Drive   Brierwood</code></pre>
-<div class="sourceCode" id="cb686"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb656"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">RailsTrails</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>last_piece <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringr/man/word.html">word</a></span><span class="op">(</span><span class="va">StreetName</span>, start <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>##   HouseNum Bedrooms Price2014      StreetName last_piece
@@ -1238,7 +1238,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <div id="the-names-of-the-genomic-pieces" class="section level5 unnumbered">
 <h5>The names of the genomic pieces<a class="anchor" aria-label="anchor" href="#the-names-of-the-genomic-pieces"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb688"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb658"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">allCounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>Geneid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CDS:b2743:pcm:L-isoaspartate_protein_carboxylmethyltransferase_type_II:cds2705:-:626:NC_000913.3"</span>,
             <span class="st">"CDS:b2764:cysJ:sulfite_reductase2C_alpha_subunit2C_flavoprotein:cds2726:-:1799:NC_000913.3"</span>,
             <span class="st">"IGR:(CDS,b1594,mlc,glucosamine_anaerobic_growth_regulon_transcriptional_repressor3B_autorepressor,cds1581,-,1220/CDS,b1595,ynfL,LysR_family_putative_transcriptional_regulator,cds1582,-,893):+:945:NC_000913.3"</span>,
@@ -1247,7 +1247,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 
 <span class="va">allCounts</span><span class="op">$</span><span class="va">GeneidBackup</span> <span class="op">=</span> <span class="va">allCounts</span><span class="op">$</span><span class="va">Geneid</span></code></pre></div>
 <p>First, it is important to identify which are IGR, CDS, and anti-sense.</p>
-<div class="sourceCode" id="cb689"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb659"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">allCounts</span> <span class="op">&lt;-</span> <span class="va">allCounts</span> <span class="op">%&gt;%</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/separate.html">separate</a></span><span class="op">(</span><span class="va">Geneid</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"feature"</span>, <span class="st">"rest"</span><span class="op">)</span>, sep<span class="op">=</span><span class="st">"[:]"</span><span class="op">)</span>
 <span class="va">allCounts</span></code></pre></div>
 <pre><code>##   feature
@@ -1269,12 +1269,12 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 4                                                      AS_IGR:(CDS,b0008,talB,transaldolase_B,cds7,+,953/CDS,b0009,mog,molybdochelatase_incorporating_molybdenum_into_molybdopterin,cds8,+,587):+:639:NC_000913.3
 ## 5                                       IGR:(CDS,b1808,yoaA,putative_ATP-dependent_helicase2C_DinG_family,cds1798,-,1910/CDS,b1809,yoaB,putative_reactive_intermediate_deaminase,cds1799,+,344):+:396:NC_000913.3</code></pre>
 <p>We keep only the IGR and AS_IGR strings, and we separate the two bookends. Note, the separation comes at the backslash.</p>
-<div class="sourceCode" id="cb691"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb661"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span> <span class="op">&lt;-</span> <span class="va">allCounts</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="va">feature</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"IGR"</span>, <span class="st">"AS_IGR"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">igr</span> <span class="op">&lt;-</span> <span class="va">igr</span> <span class="op">%&gt;%</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/separate.html">separate</a></span><span class="op">(</span><span class="va">GeneidBackup</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Geneid1"</span>, <span class="st">"Geneid2"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"[/]"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">igr</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "feature" "rest"    "Geneid1" "Geneid2"</code></pre>
-<div class="sourceCode" id="cb693"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb663"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span></code></pre></div>
 <pre><code>##   feature
 ## 1     IGR
@@ -1293,13 +1293,13 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 2 CDS,b0009,mog,molybdochelatase_incorporating_molybdenum_into_molybdopterin,cds8,+,587):+:639:NC_000913.3
 ## 3                 CDS,b1809,yoaB,putative_reactive_intermediate_deaminase,cds1799,+,344):+:396:NC_000913.3</code></pre>
 <p>For each of the two bookend Genes, we need to separate out the feature from the rest. Note that we write over feature1 in the second line of code below. Both of the bookends for all sequences are CDS elements.</p>
-<div class="sourceCode" id="cb695"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb665"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span><span class="op">$</span><span class="va">feature1</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/separate.html">separate</a></span><span class="op">(</span><span class="va">igr</span>, <span class="va">Geneid1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"feature1"</span>, <span class="st">"rest"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"[,]"</span><span class="op">)</span><span class="op">$</span><span class="va">feature1</span>
 <span class="va">igr</span><span class="op">$</span><span class="va">feature1</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/separate.html">separate</a></span><span class="op">(</span><span class="va">igr</span>, <span class="va">feature1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"rest"</span>, <span class="st">"feature1"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"[()]"</span><span class="op">)</span><span class="op">$</span><span class="va">feature1</span>
 <span class="va">igr</span><span class="op">$</span><span class="va">feature2</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/separate.html">separate</a></span><span class="op">(</span><span class="va">igr</span>, <span class="va">Geneid2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"feature2"</span>, <span class="st">"rest"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"[,]"</span><span class="op">)</span><span class="op">$</span><span class="va">feature2</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">igr</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "feature"  "rest"     "Geneid1"  "Geneid2"  "feature1" "feature2"</code></pre>
-<div class="sourceCode" id="cb697"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb667"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span></code></pre></div>
 <pre><code>##   feature
 ## 1     IGR
@@ -1323,14 +1323,14 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 ## 3      CDS      CDS</code></pre>
 <p>As CDS, it is now important to find the actual genenames for each of the IGR sequences. We also keep each element’s <code>bnum</code> which represents a unique gene identifier in <em>E. coli</em>.</p>
 <p><code>bnum</code>, <code>genename</code>, <code>rna.name</code> act as place holders for the types of elements that we will need to identify the bookends of the IGRs.</p>
-<div class="sourceCode" id="cb699"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb669"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">bnum</span> <span class="op">=</span> <span class="st">"b[0-9]{4}"</span>
 <span class="va">bnum</span></code></pre></div>
 <pre><code>## [1] "b[0-9]{4}"</code></pre>
-<div class="sourceCode" id="cb701"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb671"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">genename</span> <span class="op">=</span> <span class="st">",[a-z]{3}[A-Z,]."</span>
 <span class="va">rna.name</span> <span class="op">=</span> <span class="st">",rna[0-9].."</span></code></pre></div>
-<div class="sourceCode" id="cb702"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb672"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span><span class="op">$</span><span class="va">start.gene</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/case_when.html">case_when</a></span><span class="op">(</span>
   <span class="va">igr</span><span class="op">$</span><span class="va">feature1</span> <span class="op">==</span> <span class="st">"CDS"</span> <span class="op">~</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringr/man/str_extract.html">str_extract</a></span><span class="op">(</span><span class="va">igr</span><span class="op">$</span><span class="va">Geneid1</span>, <span class="va">genename</span><span class="op">)</span>,
   <span class="cn">TRUE</span> <span class="op">~</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringr/man/str_extract.html">str_extract</a></span><span class="op">(</span><span class="va">igr</span><span class="op">$</span><span class="va">Geneid1</span>, <span class="va">rna.name</span><span class="op">)</span><span class="op">)</span>
@@ -1350,7 +1350,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">igr</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] "feature"    "rest"       "Geneid1"    "Geneid2"    "feature1"  
 ##  [6] "feature2"   "start.gene" "end.gene"   "start.bnum" "end.bnum"</code></pre>
-<div class="sourceCode" id="cb704"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb674"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">igr</span></code></pre></div>
 <pre><code>##   feature
 ## 1     IGR
@@ -1449,7 +1449,7 @@ objects. Connecting with familiar <code>dplyr</code> syntax is attractive becaus
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-10-03.</p>
+    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-10-07.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
