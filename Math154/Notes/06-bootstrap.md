@@ -405,8 +405,9 @@ Keeping in mind that the theory we've covered here doesn't exactly work for this
 no transformation $\phi = m(\theta)$ can fix things up.  Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has only fixed the specific situation of the sampling distribution being is non-normal.
 
 
-### What makes a CI good?
+### What makes a CI procedure good?
 
+The following qualities that may or may not result from a confidence interval procedure are what determines the choice of method for the researcher.
 
 * Symmetry (??): the interval is symmetric, pivotal around some value.  Not necessarily a good thing.  Maybe a bad thing to force?
 * Resistant: BS-t is particularly not resistant to outliers or crazy sampling distributions of the statistic (can make it more robust with a variance stabilizing transformation)
@@ -681,17 +682,21 @@ set.seed(4747)
 **boot stat function**
 
 ```r
-boot_stat_func <- function(df = heroin){ 
+boot_stat_func <- function(df){ 
 	df %>% 
+    mutate(obs_med = median(times),
+           obs_tr_mean = mean(times, trim = 0.24)) %>%
     sample_frac(size=1, replace=TRUE) %>%
     summarize(boot_med = median(times), 
-              boot_tr_mean = mean(times, trim = 0.25))}
+              boot_tr_mean = mean(times, trim = 0.25),
+              obs_med = mean(obs_med),
+              obs_tr_mean = mean(obs_tr_mean))}
 ```
 
 **resample function**
 
 ```r
-boot_1_func <- function(df = heroin){
+boot_1_func <- function(df){
   df %>% 
     sample_frac(size=1, replace=TRUE)
 }
@@ -700,23 +705,23 @@ boot_1_func <- function(df = heroin){
 **bootstrapping**
 
 ```r
-map_df(1:n_rep1, ~boot_stat_func(), df = heroin)
+map_df(1:n_rep1, ~boot_stat_func(df = heroin))
 ```
 
 ```
-## # A tibble: 100 × 2
-##    boot_med boot_tr_mean
-##       <dbl>        <dbl>
-##  1     368          372.
-##  2     358          363.
-##  3     431          421.
-##  4     332.         350.
-##  5     310.         331.
-##  6     376          382.
-##  7     366          365.
-##  8     378.         382.
-##  9     394          386.
-## 10     392.         402.
+## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       <dbl>        <dbl>   <dbl>       <dbl>
+##  1     368          372.    368.        378.
+##  2     358          363.    368.        378.
+##  3     431          421.    368.        378.
+##  4     332.         350.    368.        378.
+##  5     310.         331.    368.        378.
+##  6     376          382.    368.        378.
+##  7     366          365.    368.        378.
+##  8     378.         382.    368.        378.
+##  9     394          386.    368.        378.
+## 10     392.         402.    368.        378.
 ## # … with 90 more rows
 ```
 
@@ -735,25 +740,25 @@ The distributions of both the median and the trimmed mean are symmetric and bell
 #### What does the boot output look like? {-}
 
 ```r
-boot_stats <- map_df(1:n_rep1, ~boot_stat_func(), df = heroin)
+boot_stats <- map_df(1:n_rep1, ~boot_stat_func(df = heroin))
 
 boot_stats
 ```
 
 ```
-## # A tibble: 100 × 2
-##    boot_med boot_tr_mean
-##       <dbl>        <dbl>
-##  1     362          373.
-##  2     342.         345.
-##  3     388.         393.
-##  4     452          428.
-##  5     400.         400.
-##  6     348          363.
-##  7     399          405.
-##  8     394          398.
-##  9     358          359.
-## 10     299          332.
+## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       <dbl>        <dbl>   <dbl>       <dbl>
+##  1     362          373.    368.        378.
+##  2     342.         345.    368.        378.
+##  3     388.         393.    368.        378.
+##  4     452          428.    368.        378.
+##  5     400.         400.    368.        378.
+##  6     348          363.    368.        378.
+##  7     399          405.    368.        378.
+##  8     394          398.    368.        378.
+##  9     358          359.    368.        378.
+## 10     299          332.    368.        378.
 ## # … with 90 more rows
 ```
 
@@ -764,19 +769,17 @@ boot_stats
 
 ```r
 boot_stats %>%
-  summarize(theta1 = mean(boot_med), theta2 = mean(boot_tr_mean), 
-            SE1 = sd(boot_med), SE2 = sd(boot_tr_mean)) %>%
-  mutate(low_med = theta1 + qnorm(0.025)*SE1, 
-         up_med = theta1 + qnorm(0.975) *SE1,
-         low_tr_mean = theta2 + qnorm(0.025)*SE2, 
-         up_tr_mean = theta2 + qnorm(0.975) *SE2)
+  summarize(low_med = mean(obs_med) + qnorm(0.025) * sd(boot_med), 
+         up_med = mean(obs_med) + qnorm(0.975) * sd(boot_med),
+         low_tr_mean = mean(obs_tr_mean) + qnorm(0.025) * sd(boot_tr_mean), 
+         up_tr_mean = mean(obs_tr_mean) + qnorm(0.975) * sd(boot_tr_mean))
 ```
 
 ```
-## # A tibble: 1 × 8
-##   theta1 theta2   SE1   SE2 low_med up_med low_tr_mean up_tr_mean
-##    <dbl>  <dbl> <dbl> <dbl>   <dbl>  <dbl>       <dbl>      <dbl>
-## 1   378.   382.  33.8  23.7    312.   445.        336.       429.
+## # A tibble: 1 × 4
+##   low_med up_med low_tr_mean up_tr_mean
+##     <dbl>  <dbl>       <dbl>      <dbl>
+## 1    301.   434.        332.       425.
 ```
 
 
@@ -1325,9 +1328,9 @@ The first three columns  correspond to the CIs for the true median of the surviv
 
 CI | lower | obs Med | upper | lower | obs Tr Mean | upper
 --- | ----- | ----- | ----- | ----- | ------ | -------- | 
-Percentile | 321 | 367.50| 453 | 335 | 378.30 | 420
-w BS SE | 315| 367.50| 431 | 336 | 378.30 | 419
-BS-t | 309 | 367.50| 425 | 331 | 378.30 | 421
+Percentile | 321 | 367.50| 434.58 | 334.86 | 378.30 | 429.77
+w BS SE | 309.98 | 367.50| 425.01 | 336.90 | 378.30 | 419.77
+BS-t | 309.30 | 367.50| 425.31 | 331.02 | 378.30 | 421.17
 
 
 
