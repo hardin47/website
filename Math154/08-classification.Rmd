@@ -23,6 +23,7 @@ One of the most satisfying aspects of this unit is that you can now turn student
 -->
 
 
+```{r eval = FALSE, include = FALSE}
 ## 10/29/19 Agenda {#Oct29}
 1. classification
 2. $k$-Nearest Neighbors
@@ -33,6 +34,8 @@ One of the most satisfying aspects of this unit is that you can now turn student
 **Important Note**:  For the majority of the classification and clustering methods, we will use the `caret` package in R.  For more information see: http://topepo.github.io/caret/index.html
 
 Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets/raw/master/caret.pdf
+```
+
 
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
@@ -55,6 +58,250 @@ Some examples of classification techniques include: linear regression, logistic 
 
 That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
 
+
+## Model Building Process
+
+```{r echo = FALSE}
+knitr::include_graphics("../images/process.png")
+```
+
+### Motivation {-}
+
+```{r echo = FALSE}
+knitr::include_graphics("../images/garbage.png")
+```
+
+### `tidymodels` {-}
+
+1. partition the data
+2. build a recipe
+3. select a model
+4. create a workflow
+5. fit the model  
+6. validate the model
+
+
+#### 1. Partition the data {-}
+
+Put the testing data in your pocket (keep it secret from R!!)
+
+```{r echo = FALSE, fig.cap = "Image credit: Julia Silge"}
+knitr::include_graphics("../images/testtrain.png")
+```
+
+#### 2. build a recipe {-}
+
+1. Start the `recipe()`
+2. Define the **variables** involved
+3. Describe preprocessing **step-by-step**
+
+**feature engineering** or preprocessing:
+
+> feature engineering is the process of transforming raw data into features (variables) that are better predictors (for the model at hand).
+
+Examples include:
+
+* create new variables (e.g., combine levels -> from state to region)
+* transform variable (e.g., log, polar coordinates)
+* continuous variables -> discrete (e.g., binning)
+* numerical categorical data -> factors / character strings (one hot encoding)
+* time -> discretized time
+* missing values -> imputed
+* NA -> level
+* continuous variables -> center & scale ("normalize")
+
+
+**`step_` functions**
+
+For more information: https://recipes.tidymodels.org/reference/index.html
+
+```{r}
+apropos("^step_")
+```
+
+#### 3. select a model {-}
+
+To specify a model:
+
+1. pick a **model**
+2. set the **mode** (regression vs classification, if needed)
+3. set the **engine**
+
+Examples of engines for some of the classification algorithms we will cover in class:
+
+
+```{r}
+show_engines("nearest_neighbor")
+show_engines("decision_tree")
+show_engines("rand_forest")
+show_engines("svm_poly")
+show_engines("svm_rbf")
+show_engines("linear_reg")
+```
+
+#### 4. Create a workflow {-}
+
+A workflow combines the model / engine with the recipe.
+
+
+#### 5. Fit the model {-}
+
+Putting it all together, the `fit()` will give the model specifications.
+
+#### 6. Validate the model {-}
+
+**model parameters**
+
+* Some model parameters are tuned from the data (some aren't).
+  - linear model coefficients are optimized (not tuned)
+  - k-nn value of "k" is tuned
+
+* If the model is tuned using the data, the same data **cannot** be used to assess the model.
+
+* With Cross Validation, you iteratively put data in your pocket.
+
+* For example, keep 1/5 of the data in your pocket, build the model on the remaining 4/5 of the data.
+
+**Cross validation** for tuning parameters.  Note that all of the cross validation is done on the **training** data.
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide2.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide3.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide4.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide5.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide6.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide7.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide8.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide9.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide10.png")
+```
+
+$$\Bigg\Downarrow$$
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+knitr::include_graphics("../images/CV/Slide11.png")
+```
+
+
+
+## Penguins example
+
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", fig.align='right', out.width="30%"}
+knitr::include_graphics("../images/penguins.png")
+```
+
+```{r}
+penguins
+```
+
+#### 1. Partition the data {-}
+
+```{r}
+library(tidymodels)
+library(palmerpenguins)
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+```
+
+#### 2. build a recipe {-}
+
+```{r}
+penguin_recipe <-
+  recipe(body_mass_g ~ species + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm + sex + year,
+         data = penguin_train) %>%
+  step_mutate(year = as.factor(year)) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_relevel(sex, ref_level = "female") %>%
+  update_role(island, new_role = "id variable")
+```
+
+
+```{r}
+summary(penguin_recipe)
+```
+
+#### 3. select a model {-}
+
+```{r}
+penguin_lm <- linear_reg() %>%
+  set_engine("lm")
+```
+
+```{r}
+penguin_lm
+```
+
+#### 4. Create a workflow {-}
+
+```{r}
+penguin_wflow <- workflow() %>%
+  add_model(penguin_lm) %>%
+  add_recipe(penguin_recipe)
+```
+
+```{r}
+penguin_wflow
+```
+
+#### 5. Fit the model {-}
+
+```{r}
+penguin_fit <- penguin_wflow %>%
+  fit(data = penguin_train)
+```
+
+
+```{r}
+penguin_fit %>% tidy()
+```
+
+#### 6. Cross validation {-}
+
+(See Section @cv for a full description of cross validation.)
 
 ## Cross Validation {#cv}
 
@@ -291,13 +538,13 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 ```
 
 
-
+```{r eval = FALSE, include = FALSE}
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)
 2. building trees (binary recursive splitting)
 3. homogeneity measures
 4. pruning trees
-
+```
 
 ## CART {#cart}
 
@@ -668,11 +915,13 @@ caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 
 Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
+```{r eval = FALSE, include = FALSE}
 ## 11/5/19 Agenda {#Nov5}
 1. pruning
 2. variable selection
 3. bagging (no boosting)
 4. OOB error rate
+```
 
 ## Bagging {#bagging}
 
@@ -757,12 +1006,13 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 \mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
 \end{align}
 
+```{r eval = FALSE, include = FALSE}
 ## 11/7/19 Agenda {#Nov7}
 1. OOB again
 2. Random Forests
 3. variable importance
 4. R code / examples
-
+```
 
 ## Random Forests {#rf}
 
@@ -979,11 +1229,13 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * majority / average prob (tree error rate) 	| * value(s) of `mtry` 	|
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
 
-
+```{r eval = FALSE, include = FALSE}
 ## 11/12/19 Agenda {#Nov12}
 1. linearly separable
 2. dot products
 3. support vector formulation
+```
+
 
 ## Support Vector Machines
 
@@ -1136,12 +1388,12 @@ The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so wh
 
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
-
+```{r eval = FALSE, include = FALSE}
 ### 11/14/19 Agenda {#Nov14}
 1. not linearly separable (SVM)
 2. kernels (SVM)
 3. support vector formulation
-
+```
 
 
 ### Not Linearly Separable {#notlinsvm}
@@ -1168,10 +1420,12 @@ L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\
 \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
 \end{align}
 
+```{r eval = FALSE, include = FALSE}
 ### 11/19/19 Agenda {#Nov19}
 1. kernels
 2. not separable: soft margins / cost
 3. one vs. one / one vs. all
+```
 
 ##### Kernel Examples: {-}
 
