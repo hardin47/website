@@ -2,7 +2,7 @@
 
 
 
-<!--
+<!---
 Daniela Witten talking about inference in prediction: https://www.youtube.com/watch?v=Y4UJjzuYjfM 
 R Unconference 2013
 
@@ -13,9 +13,10 @@ One of the most satisfying aspects of this unit is that you can now turn student
 
 \textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
 \url{http://www.dabi.temple.edu/~hbling/8590.002/Montillo_RandomForests_4-2-2009.pdf}
--->
+--->
 
 
+<!---
 ## 10/29/19 Agenda {#Oct29}
 1. classification
 2. $k$-Nearest Neighbors
@@ -26,6 +27,7 @@ One of the most satisfying aspects of this unit is that you can now turn student
 **Important Note**:  For the majority of the classification and clustering methods, we will use the `caret` package in R.  For more information see: http://topepo.github.io/caret/index.html
 
 Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets/raw/master/caret.pdf
+--->
 
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
@@ -48,6 +50,420 @@ Some examples of classification techniques include: linear regression, logistic 
 
 That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
 
+
+## Model Building Process
+
+<img src="figs/process.png" width="1105" style="display: block; margin: auto;" />
+
+### Motivation {-}
+
+<img src="figs/garbage.png" width="889" style="display: block; margin: auto;" />
+
+### `tidymodels` {-}
+
+1. partition the data
+2. build a recipe
+3. select a model
+4. create a workflow
+5. fit the model  
+6. validate the model
+
+
+#### 1. Partition the data {-}
+
+Put the testing data in your pocket (keep it secret from R!!)
+
+<div class="figure" style="text-align: center">
+<img src="figs/testtrain.png" alt="Image credit: Julia Silge" width="1066" />
+<p class="caption">(\#fig:unnamed-chunk-4)Image credit: Julia Silge</p>
+</div>
+
+#### 2. build a recipe {-}
+
+1. Start the `recipe()`
+2. Define the **variables** involved
+3. Describe preprocessing **step-by-step**
+
+**feature engineering** or preprocessing:
+
+> feature engineering is the process of transforming raw data into features (variables) that are better predictors (for the model at hand).
+
+Examples include:
+
+* create new variables (e.g., combine levels -> from state to region)
+* transform variable (e.g., log, polar coordinates)
+* continuous variables -> discrete (e.g., binning)
+* numerical categorical data -> factors / character strings (one hot encoding)
+* time -> discretized time
+* missing values -> imputed
+* NA -> level
+* continuous variables -> center & scale ("normalize")
+
+
+**`step_` functions**
+
+For more information: https://recipes.tidymodels.org/reference/index.html
+
+
+```r
+apropos("^step_")
+```
+
+```
+## character(0)
+```
+
+#### 3. select a model {-}
+
+To specify a model:
+
+1. pick a **model**
+2. set the **mode** (regression vs classification, if needed)
+3. set the **engine**
+
+Examples of engines for some of the classification algorithms we will cover in class:
+
+
+
+```r
+show_engines("nearest_neighbor")
+```
+
+```
+## # A tibble: 2 × 2
+##   engine mode          
+##   <chr>  <chr>         
+## 1 kknn   classification
+## 2 kknn   regression
+```
+
+```r
+show_engines("decision_tree")
+```
+
+```
+## # A tibble: 5 × 2
+##   engine mode          
+##   <chr>  <chr>         
+## 1 rpart  classification
+## 2 rpart  regression    
+## 3 C5.0   classification
+## 4 spark  classification
+## 5 spark  regression
+```
+
+```r
+show_engines("rand_forest")
+```
+
+```
+## # A tibble: 6 × 2
+##   engine       mode          
+##   <chr>        <chr>         
+## 1 ranger       classification
+## 2 ranger       regression    
+## 3 randomForest classification
+## 4 randomForest regression    
+## 5 spark        classification
+## 6 spark        regression
+```
+
+```r
+show_engines("svm_poly")
+```
+
+```
+## # A tibble: 2 × 2
+##   engine  mode          
+##   <chr>   <chr>         
+## 1 kernlab classification
+## 2 kernlab regression
+```
+
+```r
+show_engines("svm_rbf")
+```
+
+```
+## # A tibble: 4 × 2
+##   engine    mode          
+##   <chr>     <chr>         
+## 1 kernlab   classification
+## 2 kernlab   regression    
+## 3 liquidSVM classification
+## 4 liquidSVM regression
+```
+
+```r
+show_engines("linear_reg")
+```
+
+```
+## # A tibble: 5 × 2
+##   engine mode      
+##   <chr>  <chr>     
+## 1 lm     regression
+## 2 glmnet regression
+## 3 stan   regression
+## 4 spark  regression
+## 5 keras  regression
+```
+
+#### 4. Create a workflow {-}
+
+A workflow combines the model / engine with the recipe.
+
+
+#### 5. Fit the model {-}
+
+Putting it all together, the `fit()` will give the model specifications.
+
+#### 6. Validate the model {-}
+
+**model parameters**
+
+* Some model parameters are tuned from the data (some aren't).
+  - linear model coefficients are optimized (not tuned)
+  - k-nn value of "k" is tuned
+
+* If the model is tuned using the data, the same data **cannot** be used to assess the model.
+
+* With Cross Validation, you iteratively put data in your pocket.
+
+* For example, keep 1/5 of the data in your pocket, build the model on the remaining 4/5 of the data.
+
+**Cross validation** for tuning parameters.  Note that all of the cross validation is done on the **training** data.
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-7)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-8)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-9)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-10)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
+</div>
+
+$$\Bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="1500" />
+<p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
+</div>
+
+
+
+## Penguins example
+
+<div class="figure" style="text-align: right">
+<img src="figs/penguins.png" alt="Image credit: Alison Hill" width="30%" />
+<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
+</div>
+
+
+```r
+penguins
+```
+
+```
+## # A tibble: 344 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    <fct>   <fct>              <dbl>         <dbl>             <int>       <int>
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 334 more rows, and 2 more variables: sex <fct>, year <int>
+```
+
+#### 1. Partition the data {-}
+
+
+```r
+library(tidymodels)
+library(palmerpenguins)
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+```
+
+#### 2. build a recipe {-}
+
+
+```r
+penguin_recipe <-
+  recipe(body_mass_g ~ species + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm + sex + year,
+         data = penguin_train) %>%
+  step_mutate(year = as.factor(year)) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_relevel(sex, ref_level = "female") %>%
+  update_role(island, new_role = "id variable")
+```
+
+
+
+```r
+summary(penguin_recipe)
+```
+
+```
+## # A tibble: 8 × 4
+##   variable          type    role        source  
+##   <chr>             <chr>   <chr>       <chr>   
+## 1 species           nominal predictor   original
+## 2 island            nominal id variable original
+## 3 bill_length_mm    numeric predictor   original
+## 4 bill_depth_mm     numeric predictor   original
+## 5 flipper_length_mm numeric predictor   original
+## 6 sex               nominal predictor   original
+## 7 year              numeric predictor   original
+## 8 body_mass_g       numeric outcome     original
+```
+
+#### 3. select a model {-}
+
+
+```r
+penguin_lm <- linear_reg() %>%
+  set_engine("lm")
+```
+
+
+```r
+penguin_lm
+```
+
+```
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+
+#### 4. Create a workflow {-}
+
+
+```r
+penguin_wflow <- workflow() %>%
+  add_model(penguin_lm) %>%
+  add_recipe(penguin_recipe)
+```
+
+
+```r
+penguin_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: linear_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 3 Recipe Steps
+## 
+## • step_mutate()
+## • step_unknown()
+## • step_relevel()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+
+#### 5. Fit the model {-}
+
+
+```r
+penguin_fit <- penguin_wflow %>%
+  fit(data = penguin_train)
+```
+
+
+
+```r
+penguin_fit %>% tidy()
+```
+
+```
+## # A tibble: 10 × 5
+##    term              estimate std.error statistic  p.value
+##    <chr>                <dbl>     <dbl>     <dbl>    <dbl>
+##  1 (Intercept)        -2417.     665.      -3.64  3.36e- 4
+##  2 speciesChinstrap    -208.      92.9     -2.24  2.58e- 2
+##  3 speciesGentoo        985.     152.       6.48  5.02e-10
+##  4 bill_length_mm        13.5      8.29     1.63  1.04e- 1
+##  5 bill_depth_mm         80.9     22.1      3.66  3.10e- 4
+##  6 flipper_length_mm     20.8      3.62     5.74  2.81e- 8
+##  7 sexmale              351.      52.6      6.67  1.72e-10
+##  8 sexunknown            47.6    103.       0.460 6.46e- 1
+##  9 year2008             -24.8     47.5     -0.521 6.03e- 1
+## 10 year2009             -61.9     46.0     -1.35  1.80e- 1
+```
+
+#### 6. Cross validation {-}
+
+(See Section \@ref(cv) for a full description of cross validation.)
 
 ## Cross Validation {#cv}
 
@@ -77,7 +493,7 @@ Note the bias-variance trade-off.  We want our prediction error to be small, so 
 
 <div class="figure" style="text-align: center">
 <img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-2)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+<p class="caption">(\#fig:unnamed-chunk-28)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
 </div>
 
 
@@ -88,7 +504,7 @@ The following visualization does an excellent job of communicating the trade-off
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-3)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-29)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -155,7 +571,7 @@ To do both, one approach is to use test/training data *and* CV in order to both 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-4)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-30)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
 
 
@@ -218,7 +634,7 @@ data(iris)
 ggpairs(iris, color="Species", alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
 
 #### kNN {-}
 
@@ -415,12 +831,13 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 ```
 
 
-
+<!---
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)
 2. building trees (binary recursive splitting)
 3. homogeneity measures
 4. pruning trees
+--->
 
 
 ## CART {#cart}
@@ -429,14 +846,14 @@ Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tr
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-12)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
+<p class="caption">(\#fig:unnamed-chunk-38)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
 Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-13)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+<p class="caption">(\#fig:unnamed-chunk-39)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
 </div>
 
 
@@ -647,7 +1064,7 @@ tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude,
 rpart.plot::rpart.plot(tr.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -675,7 +1092,7 @@ tree::partition.tree(tree.model,
                      add=TRUE) 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="768" style="display: block; margin: auto;" />
 
 
 
@@ -780,7 +1197,7 @@ tr.full.house$finalModel
 rpart.plot::rpart.plot(tr.full.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" />
 
 
 #### Cross Validation (model building!)  {-}
@@ -844,13 +1261,13 @@ tree.cv.house
 rpart.plot::rpart.plot(tree.cv.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-46-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 plot(tree.cv.house)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-20-2.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-46-2.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Training / test data for model building AND model accuracy {-}
@@ -950,11 +1367,14 @@ caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
 
 Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
+<!---
 ## 11/5/19 Agenda {#Nov5}
 1. pruning
 2. variable selection
 3. bagging (no boosting)
 4. OOB error rate
+--->
+
 
 ## Bagging {#bagging}
 
@@ -1039,12 +1459,13 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 \mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
 \end{align}
 
+<!---
 ## 11/7/19 Agenda {#Nov7}
 1. OOB again
 2. Random Forests
 3. variable importance
 4. R code / examples
-
+--->
 
 ## Random Forests {#rf}
 
@@ -1076,7 +1497,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-23)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-49)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1273,7 +1694,7 @@ modFit.m
 plot(modFit.m)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-52-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1301,7 +1722,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
     ylim(c(0.04, 0.06))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
 
 ####  Variable Importance {-}
 
@@ -1332,7 +1753,7 @@ data.frame(importance = modFit.VI$finalModel$variable.importance,
     coord_flip() 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-54-1.png" width="480" style="display: block; margin: auto;" />
 
 plot both the given labels as well as the predicted labels
 
@@ -1345,7 +1766,7 @@ ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length,
     geom_point(size=3)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1371,10 +1792,13 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
 
 
+<!---
 ## 11/12/19 Agenda {#Nov12}
 1. linearly separable
 2. dot products
 3. support vector formulation
+--->
+
 
 ## Support Vector Machines
 
@@ -1412,7 +1836,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-31)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-57)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -1426,7 +1850,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-32)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-58)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -1525,13 +1949,12 @@ The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so wh
 
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
-
+<!---
 ### 11/14/19 Agenda {#Nov14}
 1. not linearly separable (SVM)
 2. kernels (SVM)
 3. support vector formulation
-
-
+--->
 
 ### Not Linearly Separable {#notlinsvm}
 
@@ -1557,10 +1980,13 @@ L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\
 \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
 \end{align}
 
+<!---
 ### 11/19/19 Agenda {#Nov19}
 1. kernels
 2. not separable: soft margins / cost
 3. one vs. one / one vs. all
+--->
+
 
 ##### Kernel Examples: {-}
 
@@ -1613,7 +2039,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-34)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-60)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -1622,17 +2048,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-61)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-36)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-62)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-37)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-63)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -1677,7 +2103,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-38)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-64)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -1708,7 +2134,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-39)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-65)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -1894,7 +2320,7 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
