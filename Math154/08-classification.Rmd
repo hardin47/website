@@ -68,7 +68,6 @@ All classification and prediction models have the same basic steps.  The data is
 knitr::include_graphics("figs/process.png")
 ```
 
-### Motivation {-}
 
 If the variables and information used to train the model has not been fully tuned, processed, and considered for the model, it won't matter how sophisticated or special the model is.  Garbage in, garbage out.
 
@@ -76,7 +75,114 @@ If the variables and information used to train the model has not been fully tune
 knitr::include_graphics("figs/garbage.png")
 ```
 
-### **tidymodels** {-}
+### Cross Validation {#cv}
+
+#### Bias-variance trade-off {-}
+
+**Excellent resource**
+
+for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
+
+* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
+
+* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
+
+Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
+
+
+\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}
+
+* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
+* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., smaller $k$ in $k$NN), the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
+* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
+
+
+Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
+
+```{r fig.cap = "Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]", out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/varbias.png")
+```
+
+
+The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
+
+#### Implementing Cross Validation {-}
+
+
+```{r fig.cap = "[@flach12]", out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/overfitting.jpg")
+```
+
+Cross validation is typically used in two ways.  
+
+1. To assess a model's accuracy (*model assessment*).  
+2. To build a model (*model selection*).
+
+#### Different ways to CV {-}
+
+Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
+
+* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
+* leave one out cross validation (LOOCV)
+1. remove one observation
+2. build the model using the remaining n-1 points
+3. predict class membership for the observation which was removed
+4. repeat by removing each observation one at a time
+
+* $k$-fold cross validation ($k$-fold CV)
+    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $k$-fold CV with $k=n$
+    * advantage of $k$-fold is computational
+    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+
+
+#### CV for **Model assessment** 10-fold {-}
+
+1. assume $k$ is given for $k$-NN
+2. remove 10% of the data
+3. build the model using the remaining 90%
+4. predict class membership / continuous response for the 10% of the observations which were removed
+5. repeat by removing each decile one at a time
+6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
+
+
+#### CV for **Model selection** 10-fold {-}
+
+1. set $k$ in $k$-NN
+2. build the model using the $k$ value set above:
+    a. remove 10% of the data
+    b. build the model using the remaining 90%
+    c. predict class membership / continuous response for the 10% of the observations which were removed
+    d. repeat by removing each decile one at a time
+
+3. measure the CV prediction error for the $k$ value at hand
+4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
+
+
+#### CV for **Model assessment and selection** 10-fold {-}
+
+To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
+
+1. split the data into training and test observations
+2. set $k$ in $k$-NN
+3. build the model using the $k$ value set above on *only the training data*:
+    a. remove 10% of the training data
+    b. build the model using the remaining 90% of the training data
+    c. predict class membership / continuous response for the 10% of the training observations which were removed
+    d. repeat by removing each decile one at a time from the training data
+4. measure the CV prediction error for the $k$ value at hand on the training data
+5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
+6. using the $k$ value given in step 5, assess the prediction error on the test data
+
+
+```{r fig.cap = "Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]", out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/CV.jpg")
+```
+
+
+### **tidymodels** 
 
 The **tidymodels** framework provides a series of steps that allow for systematic model building.  The steps are:
 
@@ -176,63 +282,80 @@ Putting it all together, the `fit()` will give the model specifications.
 knitr::include_graphics("figs/CV/Slide2.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide3.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide4.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide5.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide6.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide7.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide8.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide9.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide10.png")
 ```
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide11.png")
 ```
 
+#### Reflecting on Model Building
+
+In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>, Kuhn and Silge walk through an example of an entire model building process.  Note that each of the stages is visited often before coming up with an appropriate model. 
+
+```{r echo = FALSE, fig.cap = "Image credit: https://www.tmwr.org/"}
+knitr::include_graphics("figs/modelbuild1.png")
+```
+
+```{r echo = FALSE, fig.cap = "Image credit: https://www.tmwr.org/"}
+knitr::include_graphics("figs/modelbuild2.png")
+```
 
 
-## Penguins example
+```{r echo = FALSE, fig.cap = "Image credit: https://www.tmwr.org/", fig.align='center'}
+knitr::include_graphics("figs/modelbuild3.png")
+```
+
+
+
+### R model: penguins
 
 ```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", fig.align='right', out.width="30%"}
 knitr::include_graphics("figs/penguins.png")
@@ -309,113 +432,8 @@ penguin_fit %>% tidy()
 
 #### 6. Cross validation {-}
 
-(See Section \@ref(cv) for a full description of cross validation.)
+(See Section \@ref(cv) and future R examples for a full description of cross validation.)
 
-## Cross Validation {#cv}
-
-### Bias-variance trade-off
-
-####  Excellent resource {-} 
-
-for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
-
-* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
-
-* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
-
-Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
-
-
-\begin{align}
-\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
-\end{align}
-
-* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
-* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., smaller $k$ in $k$NN), the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
-* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
-
-
-Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
-
-```{r fig.cap = "Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]", out.width='100%', fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/varbias.png")
-```
-
-
-The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
-
-### Implementing Cross Validation 
-
-
-```{r fig.cap = "[@flach12]", out.width='100%', fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/overfitting.jpg")
-```
-
-Cross validation is typically used in two ways.  
-
-1. To assess a model's accuracy (*model assessment*).  
-2. To build a model (*model selection*).
-
-#### Different ways to CV {-}
-
-Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
-
-* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
-* leave one out cross validation (LOOCV)
-1. remove one observation
-2. build the model using the remaining n-1 points
-3. predict class membership for the observation which was removed
-4. repeat by removing each observation one at a time
-
-* $k$-fold cross validation ($k$-fold CV)
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
-    * LOOCV is a special case of $k$-fold CV with $k=n$
-    * advantage of $k$-fold is computational
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
-
-
-#### CV for **Model assessment** 10-fold {-}
-
-1. assume $k$ is given for $k$-NN
-2. remove 10% of the data
-3. build the model using the remaining 90%
-4. predict class membership / continuous response for the 10% of the observations which were removed
-5. repeat by removing each decile one at a time
-6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
-
-
-#### CV for **Model selection** 10-fold {-}
-
-1. set $k$ in $k$-NN
-2. build the model using the $k$ value set above:
-    a. remove 10% of the data
-    b. build the model using the remaining 90%
-    c. predict class membership / continuous response for the 10% of the observations which were removed
-    d. repeat by removing each decile one at a time
-
-3. measure the CV prediction error for the $k$ value at hand
-4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
-
-
-#### CV for **Model assessment and selection** 10-fold {-}
-
-To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
-
-1. split the data into training and test observations
-2. set $k$ in $k$-NN
-3. build the model using the $k$ value set above on *only the training data*:
-    a. remove 10% of the training data
-    b. build the model using the remaining 90% of the training data
-    c. predict class membership / continuous response for the 10% of the training observations which were removed
-    d. repeat by removing each decile one at a time from the training data
-4. measure the CV prediction error for the $k$ value at hand on the training data
-5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
-6. using the $k$ value given in step 5, assess the prediction error on the test data
-
-
-```{r fig.cap = "Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]", out.width='100%', fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/CV.jpg")
-```
 
 
 ## $k$-Nearest Neighbors {#knn}
@@ -443,15 +461,19 @@ Note: if the response variable is continuous (instead of categorical), find the 
 * Euclidean distance is dominated by scale
 * it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
 * the output doesn't provide any information about which explanatory variables are informative.
-
+* doesn't work well with large datasets (the cost of prediction is high, and the model doesn't always find the structure)
+* doesn't work well in high dimensions (curse of dimensionality -- distance becomes meaningless in high dimensions)
+* we need a lot of feature scaling
+* sensitive to noise and outliers
 
 **Strengths of $k$-NN**:
 
-* it can easily work for any number of categories
+* it can easily work for any number of categories (of the outcome variable)
 * it can predict a quantitative response variable
 * the bias of 1-NN is often low (but the variance is high)
 * any distance metric can be used (so the algorithm models the data appropriately)
-* the method is simple to implement / understand
+* the method is straightforward to implement / understand
+* there is no training period (i.e., no discrimination function is created)
 * model is nonparametric (no distributional assumptions on the data)
 * great model for imputing missing data
 
@@ -461,90 +483,193 @@ knitr::include_graphics("figs/knnK.jpg")
 ```
 
 
-###  R knn Example  
+###  R k-NN: penguins
 
-R code for using the `caret` package to cluster the `iris` data.  The `caret` package vignette for `knn` is here: http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function
+We will fit a $k$-Nearest Neighbor algorithm to the `penguins` dataset.  As previously (and as to come), we'll use the entire **tidymodels** workflow including partitioning the data, build a recipe, select a model, create a workflow, fit a model, and validate the model
 
 
 ```{r message=FALSE, warning=FALSE}
 library(GGally) # for plotting
-library(caret)  # for partitioning & classification
-data(iris)
+library(tidymodels)
+data(penguins)
 ```
 
-#### iris Data {-}
+#### penguin data {-}
 
 ```{r message=FALSE, warning=FALSE}
-ggpairs(iris, color="Species", alpha=.4)
+ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-#### kNN {-}
+## $k$-NN to predict penguin species
 
-Without thinking about test / training data, a naive model is:
+#### 1. Partition the data
 
-```{r}
-fitControl <-caret::trainControl(method="none", classProbs = TRUE)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris,
-                        method="knn",
-                        trControl = fitControl,
-                        tuneGrid= data.frame(k=3))
+```{r echo = FALSE}
+library(tidymodels)
+library(palmerpenguins)
 
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris), 
-                reference = iris$Species)
-```
-
-
-#### Why naive? {-}
-
-1. Not good to train and test on the same data set!
-2. Assumed the knowledge of $k$ groups.
-3. Was Euclidean distance the right thing to use?  [The `knn` package in R only uses Euclidean distance.]
-
-
-#### Using test/training data sets. {-}
-
-One of the common pieces to use in the `caret` package is creating test and training datasets for cross validation.
-
-```{r}
-set.seed(4747)
-inTrain <- caret::createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-c(inTrain),]
-
-fitControl <- caret::trainControl(method="none")
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=5))
-
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                reference = iris.test$Species)
-```
-
-#### $k$ neighbors?  CV on TRAINING to find $k$ {-}
-
-```{r}
 set.seed(47)
-fitControl <- caret::trainControl(method="cv", number=10)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=c(1,3,5,7,9,11)))
-tr.iris
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+```
+
+#### 2. Build a recipe
+```{r}
+penguin_knn_recipe <-
+  recipe(species ~ body_mass_g + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm,
+         data = penguin_train) %>%
+  update_role(island, new_role = "id variable") %>%
+  step_normalize(all_predictors())
+
+summary(penguin_knn_recipe)
+```
+
+#### 3. Select a model
+
+(note that we've used the default number of neighbors (here $k=7$).)
+```{r}
+penguin_knn <- nearest_neighbor() %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn
 ```
 
 
+#### 4. Create a workflow
+```{r}
+penguin_knn_wflow <- workflow() %>%
+  add_model(penguin_knn) %>%
+  add_recipe(penguin_knn_recipe)
 
-#### Then measure accuracy by testing on test data! {-}
+penguin_knn_wflow
+```
+
+
+#### 5. Fit (/ predict) 
 
 ```{r}
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                       reference = iris.test$Species)
+penguin_knn_fit <- penguin_knn_wflow %>%
+  fit(data = penguin_train)
 ```
 
+For the next R code chunk break it down into pieces -- that is, run each line one at a time.
+```{r}
+penguin_knn_fit %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
+```
+
+### What is $k$?
+
+It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
+
+
+**Cross Validation!!!**
+
+The red observations are used to fit the model, the black observations are used to assess the model.
+
+```{r echo = FALSE, fig.align = 'center', fig.cap = "Image credit: Alison Hill", out.width="60%"}
+knitr::include_graphics("figs/CV/Slide11.png")
+```
+
+
+As we saw above, cross validation randomly splits the training data into V distinct blocks of roughly equal size.
+
+* leave out the first block of analysis data and fit a model.
+* the model is used to predict the held-out block of assessment data.
+* continue the process until all V assessment blocks have been predicted
+
+The final performance is based on the hold-out predictions by averaging the statistics from the V blocks.
+
+#### 1b.  A new partition of the training data
+
+```{r}
+set.seed(470)
+penguin_vfold <- vfold_cv(penguin_train,
+                          v = 3, strata = species)
+```
+
+#### 3. Select a model
+
+Now the knn model uses `tune()` to indicate that we actually don't know how many neighbors to use.
+```{r}
+penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+```
+
+#### 4. Re-create a workflow
+
+This time, use the model that has not set the number of neighbors.
+
+```{r}
+penguin_knn_wflow_tune <- workflow() %>%
+  add_model(penguin_knn_tune) %>%
+  add_recipe(penguin_knn_recipe)
+```
+
+
+#### 5. Fit the model
+
+The model is fit to all three of the folds created above for each value of $k$ in `k_grid`.
+
+```{r}
+k_grid <- data.frame(neighbors = seq(1, 15, by = 4))
+k_grid
+
+penguin_knn_wflow_tune %>%
+  tune_grid(resamples = penguin_vfold, 
+           grid = k_grid) %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy")
+```
+
+
+#### 6. Validate the model
+
+Using $k$ = 9, the model is re-trained on the training data and tested on the test data (to estimate overall model accuracy).
+
+
+##### 3. select a model
+
+```{r}
+penguin_knn_final <- nearest_neighbor(neighbors = 9) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn_final
+```
+
+##### 4. create a workflow
+
+```{r}
+penguin_knn_wflow_final <- workflow() %>%
+  add_model(penguin_knn_final) %>%
+  add_recipe(penguin_knn_recipe)
+
+penguin_knn_wflow_final
+```
+
+##### 5. fit the model
+```{r}
+penguin_knn_fit_final <- penguin_knn_wflow_final %>%
+  fit(data = penguin_train)
+```
+
+
+##### 6. validate the model
+```{r}
+penguin_knn_fit_final %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
+```
 
 <!---
 ## 10/31/19 Agenda {#Oct31}
@@ -555,7 +680,7 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 --->
 
 
-## CART {#cart}
+## Decision Trees {#cart}
 
 Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.
 

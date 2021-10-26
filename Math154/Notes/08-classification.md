@@ -57,13 +57,122 @@ All classification and prediction models have the same basic steps.  The data is
 
 <img src="figs/process.png" width="60%" style="display: block; margin: auto;" />
 
-### Motivation {-}
 
 If the variables and information used to train the model has not been fully tuned, processed, and considered for the model, it won't matter how sophisticated or special the model is.  Garbage in, garbage out.
 
 <img src="figs/garbage.png" width="60%" style="display: block; margin: auto;" />
 
-### **tidymodels** {-}
+### Cross Validation {#cv}
+
+#### Bias-variance trade-off {-}
+
+**Excellent resource**
+
+for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
+
+* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
+
+* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
+
+Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
+
+
+\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}
+
+* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
+* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., smaller $k$ in $k$NN), the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
+* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
+
+
+Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
+
+<div class="figure" style="text-align: center">
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-4)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+</div>
+
+
+The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
+
+#### Implementing Cross Validation {-}
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-5)[@flach12]</p>
+</div>
+
+Cross validation is typically used in two ways.  
+
+1. To assess a model's accuracy (*model assessment*).  
+2. To build a model (*model selection*).
+
+#### Different ways to CV {-}
+
+Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
+
+* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
+* leave one out cross validation (LOOCV)
+1. remove one observation
+2. build the model using the remaining n-1 points
+3. predict class membership for the observation which was removed
+4. repeat by removing each observation one at a time
+
+* $k$-fold cross validation ($k$-fold CV)
+    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $k$-fold CV with $k=n$
+    * advantage of $k$-fold is computational
+    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+
+
+#### CV for **Model assessment** 10-fold {-}
+
+1. assume $k$ is given for $k$-NN
+2. remove 10% of the data
+3. build the model using the remaining 90%
+4. predict class membership / continuous response for the 10% of the observations which were removed
+5. repeat by removing each decile one at a time
+6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
+
+
+#### CV for **Model selection** 10-fold {-}
+
+1. set $k$ in $k$-NN
+2. build the model using the $k$ value set above:
+    a. remove 10% of the data
+    b. build the model using the remaining 90%
+    c. predict class membership / continuous response for the 10% of the observations which were removed
+    d. repeat by removing each decile one at a time
+
+3. measure the CV prediction error for the $k$ value at hand
+4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
+
+
+#### CV for **Model assessment and selection** 10-fold {-}
+
+To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
+
+1. split the data into training and test observations
+2. set $k$ in $k$-NN
+3. build the model using the $k$ value set above on *only the training data*:
+    a. remove 10% of the training data
+    b. build the model using the remaining 90% of the training data
+    c. predict class membership / continuous response for the 10% of the training observations which were removed
+    d. repeat by removing each decile one at a time from the training data
+4. measure the CV prediction error for the $k$ value at hand on the training data
+5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
+6. using the $k$ value given in step 5, assess the prediction error on the test data
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-6)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+</div>
+
+
+### **tidymodels** 
 
 The **tidymodels** framework provides a series of steps that allow for systematic model building.  The steps are:
 
@@ -82,7 +191,7 @@ Put the testing data in your pocket (keep it secret from R!!)
 
 <div class="figure" style="text-align: center">
 <img src="figs/testtrain.png" alt="Image credit: Julia Silge" width="1066" />
-<p class="caption">(\#fig:unnamed-chunk-4)Image credit: Julia Silge</p>
+<p class="caption">(\#fig:unnamed-chunk-7)Image credit: Julia Silge</p>
 </div>
 
 #### 2. build a recipe {-}
@@ -271,79 +380,99 @@ Putting it all together, the `fit()` will give the model specifications.
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-7)Image credit: Alison Hill</p>
-</div>
-
-$$\Bigg\Downarrow$$
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-8)Image credit: Alison Hill</p>
-</div>
-
-$$\Bigg\Downarrow$$
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-9)Image credit: Alison Hill</p>
-</div>
-
-$$\Bigg\Downarrow$$
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-10)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
 </div>
 
-$$\Bigg\Downarrow$$
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-18)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-19)Image credit: Alison Hill</p>
+</div>
+
+#### Reflecting on Model Building
+
+In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>, Kuhn and Silge walk through an example of an entire model building process.  Note that each of the stages is visited often before coming up with an appropriate model. 
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild1.png" alt="Image credit: https://www.tmwr.org/" width="816" />
+<p class="caption">(\#fig:unnamed-chunk-20)Image credit: https://www.tmwr.org/</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild2.png" alt="Image credit: https://www.tmwr.org/" width="775" />
+<p class="caption">(\#fig:unnamed-chunk-21)Image credit: https://www.tmwr.org/</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild3.png" alt="Image credit: https://www.tmwr.org/" width="796" />
+<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
 </div>
 
 
 
-## Penguins example
+### R model: penguins
 
 <div class="figure" style="text-align: right">
 <img src="figs/penguins.png" alt="Image credit: Alison Hill" width="30%" />
-<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-23)Image credit: Alison Hill</p>
 </div>
 
 
@@ -498,116 +627,8 @@ penguin_fit %>% tidy()
 
 #### 6. Cross validation {-}
 
-(See Section \@ref(cv) for a full description of cross validation.)
+(See Section \@ref(cv) and future R examples for a full description of cross validation.)
 
-## Cross Validation {#cv}
-
-### Bias-variance trade-off
-
-####  Excellent resource {-} 
-
-for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
-
-* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
-
-* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
-
-Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
-
-
-\begin{align}
-\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
-\end{align}
-
-* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
-* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., smaller $k$ in $k$NN), the closer the points are to the prediction.  As the model gets more complicated (e.g., as $k$ decreases), the bias goes down.
-* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (big $k$ in $k$NN) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., as $k$ increases).
-
-
-Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
-
-<div class="figure" style="text-align: center">
-<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-28)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
-</div>
-
-
-The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
-
-### Implementing Cross Validation 
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-29)[@flach12]</p>
-</div>
-
-Cross validation is typically used in two ways.  
-
-1. To assess a model's accuracy (*model assessment*).  
-2. To build a model (*model selection*).
-
-#### Different ways to CV {-}
-
-Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
-
-* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
-* leave one out cross validation (LOOCV)
-1. remove one observation
-2. build the model using the remaining n-1 points
-3. predict class membership for the observation which was removed
-4. repeat by removing each observation one at a time
-
-* $k$-fold cross validation ($k$-fold CV)
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
-    * LOOCV is a special case of $k$-fold CV with $k=n$
-    * advantage of $k$-fold is computational
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
-
-
-#### CV for **Model assessment** 10-fold {-}
-
-1. assume $k$ is given for $k$-NN
-2. remove 10% of the data
-3. build the model using the remaining 90%
-4. predict class membership / continuous response for the 10% of the observations which were removed
-5. repeat by removing each decile one at a time
-6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
-
-
-#### CV for **Model selection** 10-fold {-}
-
-1. set $k$ in $k$-NN
-2. build the model using the $k$ value set above:
-    a. remove 10% of the data
-    b. build the model using the remaining 90%
-    c. predict class membership / continuous response for the 10% of the observations which were removed
-    d. repeat by removing each decile one at a time
-
-3. measure the CV prediction error for the $k$ value at hand
-4. repeat steps 1-3 and choose the $k$ for which the prediction error is lowest
-
-
-#### CV for **Model assessment and selection** 10-fold {-}
-
-To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
-
-1. split the data into training and test observations
-2. set $k$ in $k$-NN
-3. build the model using the $k$ value set above on *only the training data*:
-    a. remove 10% of the training data
-    b. build the model using the remaining 90% of the training data
-    c. predict class membership / continuous response for the 10% of the training observations which were removed
-    d. repeat by removing each decile one at a time from the training data
-4. measure the CV prediction error for the $k$ value at hand on the training data
-5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
-6. using the $k$ value given in step 5, assess the prediction error on the test data
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-30)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
-</div>
 
 
 ## $k$-Nearest Neighbors {#knn}
@@ -635,236 +656,318 @@ Note: if the response variable is continuous (instead of categorical), find the 
 * Euclidean distance is dominated by scale
 * it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
 * the output doesn't provide any information about which explanatory variables are informative.
-
+* doesn't work well with large datasets (the cost of prediction is high, and the model doesn't always find the structure)
+* doesn't work well in high dimensions (curse of dimensionality -- distance becomes meaningless in high dimensions)
+* we need a lot of feature scaling
+* sensitive to noise and outliers
 
 **Strengths of $k$-NN**:
 
-* it can easily work for any number of categories
+* it can easily work for any number of categories (of the outcome variable)
 * it can predict a quantitative response variable
 * the bias of 1-NN is often low (but the variance is high)
 * any distance metric can be used (so the algorithm models the data appropriately)
-* the method is simple to implement / understand
+* the method is straightforward to implement / understand
+* there is no training period (i.e., no discrimination function is created)
 * model is nonparametric (no distributional assumptions on the data)
 * great model for imputing missing data
 
 <img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;" /><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;" />
 
 
-###  R knn Example  
+###  R k-NN: penguins
 
-R code for using the `caret` package to cluster the `iris` data.  The `caret` package vignette for `knn` is here: http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function
+We will fit a $k$-Nearest Neighbor algorithm to the `penguins` dataset.  As previously (and as to come), we'll use the entire **tidymodels** workflow including partitioning the data, build a recipe, select a model, create a workflow, fit a model, and validate the model
 
 
 
 ```r
 library(GGally) # for plotting
-library(caret)  # for partitioning & classification
-data(iris)
+library(tidymodels)
+data(penguins)
 ```
 
-#### iris Data {-}
+#### penguin data {-}
 
 
 ```r
-ggpairs(iris, color="Species", alpha=.4)
+ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
-#### kNN {-}
+## $k$-NN to predict penguin species
 
-Without thinking about test / training data, a naive model is:
+#### 1. Partition the data
+
+
+
+#### 2. Build a recipe
+
+```r
+penguin_knn_recipe <-
+  recipe(species ~ body_mass_g + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm,
+         data = penguin_train) %>%
+  update_role(island, new_role = "id variable") %>%
+  step_normalize(all_predictors())
+
+summary(penguin_knn_recipe)
+```
+
+```
+## # A tibble: 6 × 4
+##   variable          type    role        source  
+##   <chr>             <chr>   <chr>       <chr>   
+## 1 body_mass_g       numeric predictor   original
+## 2 island            nominal id variable original
+## 3 bill_length_mm    numeric predictor   original
+## 4 bill_depth_mm     numeric predictor   original
+## 5 flipper_length_mm numeric predictor   original
+## 6 species           nominal outcome     original
+```
+
+#### 3. Select a model
+
+(note that we've used the default number of neighbors (here $k=7$).)
+
+```r
+penguin_knn <- nearest_neighbor() %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn
+```
+
+```
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Computational engine: kknn
+```
+
+
+#### 4. Create a workflow
+
+```r
+penguin_knn_wflow <- workflow() %>%
+  add_model(penguin_knn) %>%
+  add_recipe(penguin_knn_recipe)
+
+penguin_knn_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: nearest_neighbor()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Computational engine: kknn
+```
+
+
+#### 5. Fit (/ predict) 
 
 
 ```r
-fitControl <-caret::trainControl(method="none", classProbs = TRUE)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris,
-                        method="knn",
-                        trControl = fitControl,
-                        tuneGrid= data.frame(k=3))
+penguin_knn_fit <- penguin_knn_wflow %>%
+  fit(data = penguin_train)
+```
 
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris), 
-                reference = iris$Species)
+For the next R code chunk break it down into pieces -- that is, run each line one at a time.
+
+```r
+penguin_knn_fit %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
 ```
 
 ```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         50          0         0
-##   versicolor      0         47         3
-##   virginica       0          3        47
-## 
-## Overall Statistics
-##                                          
-##                Accuracy : 0.96           
-##                  95% CI : (0.915, 0.9852)
-##     No Information Rate : 0.3333         
-##     P-Value [Acc > NIR] : < 2.2e-16      
-##                                          
-##                   Kappa : 0.94           
-##                                          
-##  Mcnemar's Test P-Value : NA             
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9400           0.9400
-## Specificity                 1.0000            0.9700           0.9700
-## Pos Pred Value              1.0000            0.9400           0.9400
-## Neg Pred Value              1.0000            0.9700           0.9700
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3133           0.3133
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9550           0.9550
+## # A tibble: 1 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy multiclass     0.988
 ```
 
+### What is $k$?
 
-#### Why naive? {-}
-
-1. Not good to train and test on the same data set!
-2. Assumed the knowledge of $k$ groups.
-3. Was Euclidean distance the right thing to use?  [The `knn` package in R only uses Euclidean distance.]
+It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
 
 
-#### Using test/training data sets. {-}
+**Cross Validation!!!**
 
-One of the common pieces to use in the `caret` package is creating test and training datasets for cross validation.
+The red observations are used to fit the model, the black observations are used to assess the model.
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="60%" />
+<p class="caption">(\#fig:unnamed-chunk-43)Image credit: Alison Hill</p>
+</div>
+
+
+As we saw above, cross validation randomly splits the training data into V distinct blocks of roughly equal size.
+
+* leave out the first block of analysis data and fit a model.
+* the model is used to predict the held-out block of assessment data.
+* continue the process until all V assessment blocks have been predicted
+
+The final performance is based on the hold-out predictions by averaging the statistics from the V blocks.
+
+#### 1b.  A new partition of the training data
 
 
 ```r
-set.seed(4747)
-inTrain <- caret::createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-c(inTrain),]
-
-fitControl <- caret::trainControl(method="none")
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=5))
-
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                reference = iris.test$Species)
+set.seed(470)
+penguin_vfold <- vfold_cv(penguin_train,
+                          v = 3, strata = species)
 ```
 
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         1
-##   virginica       0          1        14
-## 
-## Overall Statistics
-##                                           
-##                Accuracy : 0.9556          
-##                  95% CI : (0.8485, 0.9946)
-##     No Information Rate : 0.3333          
-##     P-Value [Acc > NIR] : < 2.2e-16       
-##                                           
-##                   Kappa : 0.9333          
-##                                           
-##  Mcnemar's Test P-Value : NA              
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.9333
-## Specificity                 1.0000            0.9667           0.9667
-## Pos Pred Value              1.0000            0.9333           0.9333
-## Neg Pred Value              1.0000            0.9667           0.9667
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.3111
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9500           0.9500
+#### 3. Select a model
+
+Now the knn model uses `tune()` to indicate that we actually don't know how many neighbors to use.
+
+```r
+penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
 ```
 
-#### $k$ neighbors?  CV on TRAINING to find $k$ {-}
+#### 4. Re-create a workflow
+
+This time, use the model that has not set the number of neighbors.
 
 
 ```r
-set.seed(47)
-fitControl <- caret::trainControl(method="cv", number=10)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=c(1,3,5,7,9,11)))
-tr.iris
-```
-
-```
-## k-Nearest Neighbors 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 95, 93, 95, 95, 94, 95, ... 
-## Resampling results across tuning parameters:
-## 
-##   k   Accuracy   Kappa    
-##    1  0.9516667  0.9275521
-##    3  0.9316667  0.8974822
-##    5  0.9205556  0.8805824
-##    7  0.9500000  0.9249006
-##    9  0.9616667  0.9427036
-##   11  0.9716667  0.9580882
-## 
-## Accuracy was used to select the optimal model using the largest value.
-## The final value used for the model was k = 11.
+penguin_knn_wflow_tune <- workflow() %>%
+  add_model(penguin_knn_tune) %>%
+  add_recipe(penguin_knn_recipe)
 ```
 
 
+#### 5. Fit the model
 
-#### Then measure accuracy by testing on test data! {-}
+The model is fit to all three of the folds created above for each value of $k$ in `k_grid`.
 
 
 ```r
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                       reference = iris.test$Species)
+k_grid <- data.frame(neighbors = seq(1, 15, by = 4))
+k_grid
 ```
 
 ```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         1
-##   virginica       0          1        14
-## 
-## Overall Statistics
-##                                           
-##                Accuracy : 0.9556          
-##                  95% CI : (0.8485, 0.9946)
-##     No Information Rate : 0.3333          
-##     P-Value [Acc > NIR] : < 2.2e-16       
-##                                           
-##                   Kappa : 0.9333          
-##                                           
-##  Mcnemar's Test P-Value : NA              
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.9333
-## Specificity                 1.0000            0.9667           0.9667
-## Pos Pred Value              1.0000            0.9333           0.9333
-## Neg Pred Value              1.0000            0.9667           0.9667
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.3111
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9500           0.9500
+##   neighbors
+## 1         1
+## 2         5
+## 3         9
+## 4        13
 ```
 
+```r
+penguin_knn_wflow_tune %>%
+  tune_grid(resamples = penguin_vfold, 
+           grid = k_grid) %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy")
+```
+
+```
+## # A tibble: 4 × 7
+##   neighbors .metric  .estimator  mean     n   std_err .config             
+##       <dbl> <chr>    <chr>      <dbl> <int>     <dbl> <chr>               
+## 1         1 accuracy multiclass 0.971     2 0.00595   Preprocessor1_Model1
+## 2         5 accuracy multiclass 0.977     2 0.000134  Preprocessor1_Model2
+## 3         9 accuracy multiclass 0.988     2 0.0000668 Preprocessor1_Model3
+## 4        13 accuracy multiclass 0.983     2 0.00568   Preprocessor1_Model4
+```
+
+
+#### 6. Validate the model
+
+Using $k$ = 9, the model is re-trained on the training data and tested on the test data (to estimate overall model accuracy).
+
+
+##### 3. select a model
+
+
+```r
+penguin_knn_final <- nearest_neighbor(neighbors = 9) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn_final
+```
+
+```
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Main Arguments:
+##   neighbors = 9
+## 
+## Computational engine: kknn
+```
+
+##### 4. create a workflow
+
+
+```r
+penguin_knn_wflow_final <- workflow() %>%
+  add_model(penguin_knn_final) %>%
+  add_recipe(penguin_knn_recipe)
+
+penguin_knn_wflow_final
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: nearest_neighbor()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Main Arguments:
+##   neighbors = 9
+## 
+## Computational engine: kknn
+```
+
+##### 5. fit the model
+
+```r
+penguin_knn_fit_final <- penguin_knn_wflow_final %>%
+  fit(data = penguin_train)
+```
+
+
+##### 6. validate the model
+
+```r
+penguin_knn_fit_final %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy multiclass     0.977
+```
 
 <!---
 ## 10/31/19 Agenda {#Oct31}
@@ -875,20 +978,20 @@ caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test),
 --->
 
 
-## CART {#cart}
+## Decision Trees {#cart}
 
 Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-38)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
+<p class="caption">(\#fig:unnamed-chunk-52)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
 Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-39)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+<p class="caption">(\#fig:unnamed-chunk-53)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
 </div>
 
 
@@ -1099,7 +1202,7 @@ tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude,
 rpart.plot::rpart.plot(tr.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1127,7 +1230,7 @@ tree::partition.tree(tree.model,
                      add=TRUE) 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="768" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-57-1.png" width="768" style="display: block; margin: auto;" />
 
 
 
@@ -1232,7 +1335,7 @@ tr.full.house$finalModel
 rpart.plot::rpart.plot(tr.full.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="672" style="display: block; margin: auto;" />
 
 
 #### Cross Validation (model building!)  {-}
@@ -1296,13 +1399,13 @@ tree.cv.house
 rpart.plot::rpart.plot(tree.cv.house$finalModel)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-46-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 plot(tree.cv.house)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-46-2.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-60-2.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Training / test data for model building AND model accuracy {-}
@@ -1532,7 +1635,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-49)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-63)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1729,7 +1832,7 @@ modFit.m
 plot(modFit.m)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-52-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1757,7 +1860,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
     ylim(c(0.04, 0.06))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-53-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-67-1.png" width="480" style="display: block; margin: auto;" />
 
 ####  Variable Importance {-}
 
@@ -1788,7 +1891,7 @@ data.frame(importance = modFit.VI$finalModel$variable.importance,
     coord_flip() 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-54-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-68-1.png" width="480" style="display: block; margin: auto;" />
 
 plot both the given labels as well as the predicted labels
 
@@ -1801,7 +1904,7 @@ ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length,
     geom_point(size=3)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-55-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1871,7 +1974,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-57)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-71)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -1885,7 +1988,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-58)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-72)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -2074,7 +2177,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-60)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-74)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -2083,17 +2186,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-61)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-75)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-62)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-76)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-63)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-77)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -2138,7 +2241,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-64)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-78)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -2169,7 +2272,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-65)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-79)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -2355,7 +2458,7 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-83-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
