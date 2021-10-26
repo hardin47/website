@@ -32,12 +32,12 @@ Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
 
-> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is
+> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x.
 
 > Alternatively, one might construct an *algorithmic model* f, such that $y \sim f(x)$, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).
 
 
-Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.
+Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  We will consider classifying into categories (often only one of two categories) as well as predicting a numeric variable  (e.g., support vector machines and linear regression).
 
 Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **Random Forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
 
@@ -48,18 +48,25 @@ Some examples of classification techniques include: linear regression, logistic 
 3. Simple models provide better insight into causality and specific associations.
 4. Fewer predictors implies fewer variables to collect in later studies.
 
-That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
+That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the structure of model building and also the classification method known as $k$-Nearest Neighbors.
 
 
 ## Model Building Process
 
-<img src="figs/process.png" width="1105" style="display: block; margin: auto;" />
+All classification and prediction models have the same basic steps.  The data is preprocessed, the model is trained, and then the model is validated.
+
+<img src="figs/process.png" width="60%" style="display: block; margin: auto;" />
 
 ### Motivation {-}
 
-<img src="figs/garbage.png" width="889" style="display: block; margin: auto;" />
+If the variables and information used to train the model has not been fully tuned, processed, and considered for the model, it won't matter how sophisticated or special the model is.  Garbage in, garbage out.
 
-### `tidymodels` {-}
+<img src="figs/garbage.png" width="60%" style="display: block; margin: auto;" />
+
+### **tidymodels** {-}
+
+The **tidymodels** framework provides a series of steps that allow for systematic model building.  The steps are:
+
 
 1. partition the data
 2. build a recipe
@@ -106,11 +113,39 @@ For more information: https://recipes.tidymodels.org/reference/index.html
 
 
 ```r
-apropos("^step_")
+ls(pattern = '^step_', env = as.environment('package:recipes'))
 ```
 
 ```
-## character(0)
+##  [1] "step_arrange"       "step_bagimpute"     "step_bin2factor"   
+##  [4] "step_BoxCox"        "step_bs"            "step_center"       
+##  [7] "step_classdist"     "step_corr"          "step_count"        
+## [10] "step_cut"           "step_date"          "step_depth"        
+## [13] "step_discretize"    "step_downsample"    "step_dummy"        
+## [16] "step_factor2string" "step_filter"        "step_geodist"      
+## [19] "step_holiday"       "step_hyperbolic"    "step_ica"          
+## [22] "step_impute_bag"    "step_impute_knn"    "step_impute_linear"
+## [25] "step_impute_lower"  "step_impute_mean"   "step_impute_median"
+## [28] "step_impute_mode"   "step_impute_roll"   "step_indicate_na"  
+## [31] "step_integer"       "step_interact"      "step_intercept"    
+## [34] "step_inverse"       "step_invlogit"      "step_isomap"       
+## [37] "step_knnimpute"     "step_kpca"          "step_kpca_poly"    
+## [40] "step_kpca_rbf"      "step_lag"           "step_lincomb"      
+## [43] "step_log"           "step_logit"         "step_lowerimpute"  
+## [46] "step_meanimpute"    "step_medianimpute"  "step_modeimpute"   
+## [49] "step_mutate"        "step_mutate_at"     "step_naomit"       
+## [52] "step_nnmf"          "step_normalize"     "step_novel"        
+## [55] "step_ns"            "step_num2factor"    "step_nzv"          
+## [58] "step_ordinalscore"  "step_other"         "step_pca"          
+## [61] "step_pls"           "step_poly"          "step_profile"      
+## [64] "step_range"         "step_ratio"         "step_regex"        
+## [67] "step_relevel"       "step_relu"          "step_rename"       
+## [70] "step_rename_at"     "step_rm"            "step_rollimpute"   
+## [73] "step_sample"        "step_scale"         "step_select"       
+## [76] "step_shuffle"       "step_slice"         "step_spatialsign"  
+## [79] "step_sqrt"          "step_string2factor" "step_unknown"      
+## [82] "step_unorder"       "step_upsample"      "step_window"       
+## [85] "step_YeoJohnson"    "step_zv"
 ```
 
 #### 3. select a model {-}
@@ -235,70 +270,70 @@ Putting it all together, the `fit()` will give the model specifications.
 **Cross validation** for tuning parameters.  Note that all of the cross validation is done on the **training** data.
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-7)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-8)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-9)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-10)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
 </div>
 
 $$\Bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="1500" />
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
 </div>
 

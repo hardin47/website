@@ -41,12 +41,12 @@ Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
 
-> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is
+> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x.
 
 > Alternatively, one might construct an *algorithmic model* f, such that $y \sim f(x)$, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).
 
 
-Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.
+Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  We will consider classifying into categories (often only one of two categories) as well as predicting a numeric variable  (e.g., support vector machines and linear regression).
 
 Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **Random Forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
 
@@ -57,22 +57,29 @@ Some examples of classification techniques include: linear regression, logistic 
 3. Simple models provide better insight into causality and specific associations.
 4. Fewer predictors implies fewer variables to collect in later studies.
 
-That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
+That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the structure of model building and also the classification method known as $k$-Nearest Neighbors.
 
 
 ## Model Building Process
 
-```{r echo = FALSE}
+All classification and prediction models have the same basic steps.  The data is preprocessed, the model is trained, and then the model is validated.
+
+```{r echo = FALSE, out.width = "60%"}
 knitr::include_graphics("figs/process.png")
 ```
 
 ### Motivation {-}
 
-```{r echo = FALSE}
+If the variables and information used to train the model has not been fully tuned, processed, and considered for the model, it won't matter how sophisticated or special the model is.  Garbage in, garbage out.
+
+```{r echo = FALSE, out.width = "60%"}
 knitr::include_graphics("figs/garbage.png")
 ```
 
-### `tidymodels` {-}
+### **tidymodels** {-}
+
+The **tidymodels** framework provides a series of steps that allow for systematic model building.  The steps are:
+
 
 1. partition the data
 2. build a recipe
@@ -117,7 +124,7 @@ Examples include:
 For more information: https://recipes.tidymodels.org/reference/index.html
 
 ```{r}
-apropos("^step_")
+ls(pattern = '^step_', env = as.environment('package:recipes'))
 ```
 
 #### 3. select a model {-}
@@ -165,61 +172,61 @@ Putting it all together, the `fit()` will give the model specifications.
 
 **Cross validation** for tuning parameters.  Note that all of the cross validation is done on the **training** data.
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide2.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide3.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide4.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide5.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide6.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide7.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide8.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide9.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide10.png")
 ```
 
 $$\Bigg\Downarrow$$
 
-```{r echo = FALSE, fig.cap = "Image credit: Alison Hill"}
+```{r echo = FALSE, fig.cap = "Image credit: Alison Hill", out.width = "20%"}
 knitr::include_graphics("figs/CV/Slide11.png")
 ```
 
