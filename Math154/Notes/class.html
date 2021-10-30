@@ -195,14 +195,14 @@ Figure 1.5: <span class="citation">(<a href="references.html#ref-flach12" role="
 </ol>
 <ul>
 <li>
-<span class="math inline">\(k\)</span>-fold cross validation (<span class="math inline">\(k\)</span>-fold CV)
+<span class="math inline">\(V\)</span>-fold cross validation (<span class="math inline">\(V\)</span>-fold CV)
 <ul>
-<li>like LOOCV except that the algorithm is run <span class="math inline">\(k\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
-<li>LOOCV is a special case of <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k=n\)</span>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(V\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(V\)</span>-fold CV with <span class="math inline">\(V=n\)</span>
 </li>
-<li>advantage of <span class="math inline">\(k\)</span>-fold is computational</li>
+<li>advantage of <span class="math inline">\(V\)</span>-fold is computational</li>
 <li>
-<span class="math inline">\(k\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(k\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(k\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+<span class="math inline">\(V\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(V\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(V\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
 </ul>
 </li>
 </ul>
@@ -670,7 +670,12 @@ Figure 8.10: Image credit: Alison Hill
 <h2>
 <span class="header-section-number">8.2</span> <span class="math inline">\(k\)</span>-Nearest Neighbors<a class="anchor" aria-label="anchor" href="#knn"><i class="fas fa-link"></i></a>
 </h2>
-<p>The <span class="math inline">\(k\)</span>-Nearest Neighbor algorithm does exactly what it sounds like it does. The user decides on the integer value for <span class="math inline">\(k\)</span>, and a point is classified to be in the group for which the majority of the <span class="math inline">\(k\)</span> closest points in the training data.</p>
+<p>The <span class="math inline">\(k\)</span>-Nearest Neighbor algorithm does exactly what it sounds like it does.</p>
+<ul>
+<li><p>user decides on the integer value for <span class="math inline">\(k\)</span></p></li>
+<li><p>user decides on a distance metric (most <span class="math inline">\(k\)</span>-NN algorithms default to Euclidean distance)</p></li>
+<li><p>a point is classified to be in the same group as the majority of the <span class="math inline">\(k\)</span> <strong>closest</strong> points in the training data.</p></li>
+</ul>
 <div id="k-nn-algorithm" class="section level3" number="8.2.1">
 <h3>
 <span class="header-section-number">8.2.1</span> <span class="math inline">\(k\)</span>-NN algorithm<a class="anchor" aria-label="anchor" href="#k-nn-algorithm"><i class="fas fa-link"></i></a>
@@ -963,6 +968,9 @@ Figure 8.11: Image credit: Alison Hill
 ##   .metric  .estimator .estimate
 ##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 ## 1 accuracy multiclass     0.977</code></pre>
+<p>Huh. Seems like <span class="math inline">\(k=9\)</span> didn’t do as well as <span class="math inline">\(k=7\)</span> (the value we tried at the very beginning before cross validating).</p>
+<p>Well, it turns out, that’s the nature of variability, randomness, and model building.</p>
+<p>We don’t know truth, and we won’t every find a perfect model.</p>
 <!---
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)
@@ -1088,16 +1096,16 @@ where <span class="math inline">\(\overline{y}_{R_1}\)</span> is the mean respon
 </h4>
 <p>Ideally, the tree would not overfit the training data. One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don’t represent the test data).</p>
 <p>See the following (amazing!) demonstration for intuition on model validation / overfitting: <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" class="uri">http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</a></p>
-<p>One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold. However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information. A better strategy is to grow a very large tree <span class="math inline">\(T_0\)</span> and then prune it back in order to obtain a subtree. We use cross validation to build the subtree so as to not overfit the data.</p>
+<p>One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold. However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information. A better strategy is to grow a very large tree <span class="math inline">\(T_0\)</span> and then prune it back in order to obtain a subtree. Use cross validation to build the subtree so as to not overfit the data.</p>
 <hr>
 <p><strong>Algorithm</strong>: Building a Regression Tree</p>
 <hr>
 <ol style="list-style-type: decimal">
 <li>Use recursive binary splitting to grow a large tree on the training data, stopping only when each terminal node has fewer than some minimum number of observations.</li>
 <li>Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of <span class="math inline">\(\alpha\)</span>.</li>
-<li>Use <span class="math inline">\(K\)</span>-fold cross-validation to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(K\)</span> folds. For each <span class="math inline">\(k=1, 2, \ldots, K\)</span>:
+<li>Use <span class="math inline">\(V\)</span>-fold cross-validation to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(V\)</span> folds. For each <span class="math inline">\(v=1, 2, \ldots, V\)</span>:
 <ol style="list-style-type: lower-alpha">
-<li>Repeat Steps 1 and 2 on all but the <span class="math inline">\(k\)</span>th fold of the training data.</li>
+<li>Repeat Steps 1 and 2 on all but the <span class="math inline">\(V\)</span>th fold of the training data.</li>
 <li>Evaluate the mean squared prediction error on the data in the left-out <span class="math inline">\(k\)</span>th fold, as a function of <span class="math inline">\(\alpha\)</span>.
 For each value of <span class="math inline">\(\alpha\)</span>, average the prediction error (either misclassification or RSS), and pick <span class="math inline">\(\alpha\)</span> to minimize the average error.</li>
 </ol>
@@ -1112,8 +1120,8 @@ For each value of <span class="math inline">\(\alpha\)</span>, average the predi
 </h4>
 <p>Also known as <em>weakest link pruning</em>, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter <span class="math inline">\(\alpha\)</span> (instead of considering every single subtree). Generally, the idea is that there is a cost to having a larger (more complex!) tree. We define the cost complexity criterion (<span class="math inline">\(\alpha &gt; 0\)</span>):
 <span class="math display">\[\begin{align}
-\mbox{numerical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha|T|\\
-\mbox{categorical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha|T|
+\mbox{numerical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &amp;= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
 \end{align}\]</span>
 where <span class="math inline">\(k(m)\)</span> is the class with the majority of observations in node <span class="math inline">\(m\)</span> and <span class="math inline">\(|T|\)</span> is the number of terminal nodes in the tree.</p>
 <ul>
@@ -1139,14 +1147,14 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 </h5>
 <p>Notice that CV is used for both model building and model assessment. It is possible (and practical, though quite computational!) to use both practices on the same classification model. The algorithm could be as follows.</p>
 <hr>
-<p><strong>Algorithm</strong>: CV for both <span class="math inline">\(k_1\)</span>-fold CV building and <span class="math inline">\(k_2\)</span>-fold CV assessment</p>
+<p><strong>Algorithm</strong>: CV for both <span class="math inline">\(V_1\)</span>-fold CV building and <span class="math inline">\(V_2\)</span>-fold CV assessment</p>
 <hr>
 <ol style="list-style-type: decimal">
-<li>Partition the data in <span class="math inline">\(k_1\)</span> groups.</li>
-<li>Remove the first group, and train the data on the remaining <span class="math inline">\(k_1-1\)</span> groups.</li>
-<li>Use <span class="math inline">\(k_2\)</span>-fold cross-validation (on the <span class="math inline">\(k_1-1\)</span> groups) to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(k_2\)</span> folds and find <span class="math inline">\(\alpha\)</span> that minimizes the error.</li>
-<li>Using the subtree that corresponds to the chosen value of <span class="math inline">\(\alpha\)</span>, predict the first of the <span class="math inline">\(k_1\)</span> hold out samples.</li>
-<li>Repeat steps 2-4 using the remaining <span class="math inline">\(k_1 - 1\)</span> groups.</li>
+<li>Partition the data in <span class="math inline">\(V_1\)</span> groups.</li>
+<li>Remove the first group, and train the data on the remaining <span class="math inline">\(V_1-1\)</span> groups.</li>
+<li>Use <span class="math inline">\(V_2\)</span>-fold cross-validation (on the <span class="math inline">\(V_1-1\)</span> groups) to choose <span class="math inline">\(\alpha\)</span>. That is, divide the training observations into <span class="math inline">\(V_2\)</span> folds and find <span class="math inline">\(\alpha\)</span> that minimizes the error.</li>
+<li>Using the subtree that corresponds to the chosen value of <span class="math inline">\(\alpha\)</span>, predict the first of the <span class="math inline">\(V_1\)</span> hold out samples.</li>
+<li>Repeat steps 2-4 using the remaining <span class="math inline">\(V_1 - 1\)</span> groups.</li>
 </ol>
 <hr>
 </div>
@@ -1156,7 +1164,6 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 <h3>
 <span class="header-section-number">8.4.2</span> R CART Example<a class="anchor" aria-label="anchor" href="#r-cart-example"><i class="fas fa-link"></i></a>
 </h3>
-<p>There are multiple tree building options in R both in the <code>caret</code> package and <code>party</code>, <code>rpart</code>, and <code>tree</code> packages.</p>
 <p>The Census Bureau divides the country up into “tracts” of approximately
 equal population. For the 1990 Census, California was divided into 20640 tracts. One data sets (houses on <a href="http://lib.stat.cmu.edu/datasets/" class="uri">http://lib.stat.cmu.edu/datasets/</a>; <a href="http://lib.stat.cmu.edu/datasets/houses.zip" class="uri">http://lib.stat.cmu.edu/datasets/houses.zip</a>) records the following for each tract in California: Median house price, median house age, total number of rooms, total number of bedrooms, total number of occupants, total number of houses, median income (in thousands of dollars), latitude and longitude. It appeared in Pace and Barry (1997), “Sparse Spatial Autoregressions,” <strong>Statistics and Probability Letters</strong>.</p>
 <div id="classification-and-regression-trees" class="section level4 unnumbered">
@@ -1168,268 +1175,311 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <div id="regression-trees-1" class="section level4 unnumbered">
 <h4>Regression Trees<a class="anchor" aria-label="anchor" href="#regression-trees-1"><i class="fas fa-link"></i></a>
 </h4>
+<p>For technical reasons (e.g., see <a href="https://github.com/tidymodels/TMwR/issues/33">here</a>), the <code>step_log()</code> on the outcome variable step gives problems with predictions at the end. Therefore, we mutate the outcome variable within the dataset before starting the model building process.</p>
 <div class="sourceCode" id="cb526"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">real.estate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt"</span>, 
-                          header<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+                          header<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>logValue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
-<span class="va">tr.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
-                         data<span class="op">=</span><span class="va">real.estate</span>, 
-                         method<span class="op">=</span><span class="st">"rpart2"</span>, 
-                         trControl <span class="op">=</span> <span class="va">fitControl</span>, 
-                         tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="co"># partition</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+<span class="va">house_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">real.estate</span><span class="op">)</span>
+<span class="va">house_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
+<span class="va">house_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
 
-<span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tr.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;"></div>
+<span class="co"># recipe</span>
+<span class="va">house_cart_recipe</span> <span class="op">&lt;-</span>
+  <span class="fu">recipe</span><span class="op">(</span><span class="va">logValue</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span> ,
+         data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span>
+<span class="co"># model</span>
+<span class="va">house_cart</span> <span class="op">&lt;-</span> <span class="fu">decision_tree</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"rpart"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span>
+
+<span class="co"># workflow</span>
+<span class="va">house_cart_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">house_cart</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">house_cart_recipe</span><span class="op">)</span>
+
+<span class="co"># fit</span>
+<span class="va">house_cart_fit</span> <span class="op">&lt;-</span> <span class="va">house_cart_wflow</span> <span class="op">%&gt;%</span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="scatterplot" class="section level4 unnumbered">
-<h4>Scatterplot<a class="anchor" aria-label="anchor" href="#scatterplot"><i class="fas fa-link"></i></a>
+<div id="model-output" class="section level4 unnumbered">
+<h4>Model Output<a class="anchor" aria-label="anchor" href="#model-output"><i class="fas fa-link"></i></a>
 </h4>
-<p>Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend. Note that this plot uses the <code>tree</code> model (instead of the <code>rpart2</code> model) because the optimization is different.</p>
 <div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">tree.model</span> <span class="op">&lt;-</span> <span class="fu">tree</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tree/man/tree.html">tree</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
-                         data<span class="op">=</span><span class="va">real.estate</span><span class="op">)</span>
-
-<span class="va">price.deciles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">10</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span>
-<span class="va">cut.prices</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, 
-                     <span class="va">price.deciles</span>, 
-                     include.lowest<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">real.estate</span><span class="op">$</span><span class="va">Longitude</span>, 
-     <span class="va">real.estate</span><span class="op">$</span><span class="va">Latitude</span>, 
-     col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grDevices/gray.html">grey</a></span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">2</span><span class="op">/</span><span class="fl">11</span><span class="op">)</span><span class="op">[</span><span class="va">cut.prices</span><span class="op">]</span>, 
-     pch<span class="op">=</span><span class="fl">20</span>, 
-     xlab<span class="op">=</span><span class="st">"Longitude"</span>,ylab<span class="op">=</span><span class="st">"Latitude"</span><span class="op">)</span>
-
-<span class="fu">tree</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tree/man/partition.tree.html">partition.tree</a></span><span class="op">(</span><span class="va">tree.model</span>, 
-                     ordvars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Longitude"</span>,<span class="st">"Latitude"</span><span class="op">)</span>, 
-                     add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-57-1.png" width="768" style="display: block; margin: auto;"></div>
+<code class="sourceCode R"><span class="va">house_cart_fit</span></code></pre></div>
+<pre><code>## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##   1) root 15480 5024.405000 12.08947  
+##     2) Latitude&gt;=38.485 1541  283.738200 11.59436  
+##       4) Latitude&gt;=39.355 506   48.267930 11.31530 *
+##       5) Latitude&lt; 39.355 1035  176.803400 11.73079 *
+##     3) Latitude&lt; 38.485 13939 4321.152000 12.14421  
+##       6) Longitude&gt;=-121.645 10454 3320.946000 12.06198  
+##        12) Latitude&gt;=34.635 2166  491.986400 11.52110  
+##          24) Longitude&gt;=-120.265 1083  166.051200 11.28432 *
+##          25) Longitude&lt; -120.265 1083  204.505800 11.75787 *
+##        13) Latitude&lt; 34.635 8288 2029.685000 12.20333  
+##          26) Longitude&gt;=-118.315 6240 1373.830000 12.09295  
+##            52) Longitude&gt;=-117.575 2130  516.313400 11.87918  
+##             104) Latitude&gt;=33.605 821  123.684300 11.64002 *
+##             105) Latitude&lt; 33.605 1309  316.218800 12.02918  
+##               210) Longitude&gt;=-116.33 97    8.931327 11.17127 *
+##               211) Longitude&lt; -116.33 1212  230.181300 12.09784  
+##                 422) Longitude&gt;=-117.165 796  101.805300 11.94935 *
+##                 423) Longitude&lt; -117.165 416   77.245280 12.38196 *
+##            53) Longitude&lt; -117.575 4110  709.740000 12.20373  
+##             106) Latitude&gt;=33.735 3529  542.838300 12.14908  
+##               212) Latitude&lt; 34.105 2931  379.526800 12.09154  
+##                 424) Longitude&lt; -118.165 1114  147.375800 11.91911 *
+##                 425) Longitude&gt;=-118.165 1817  178.722200 12.19726 *
+##               213) Latitude&gt;=34.105 598  106.051400 12.43109 *
+##             107) Latitude&lt; 33.735 581   92.340630 12.53568 *
+##          27) Longitude&lt; -118.315 2048  348.149000 12.53967  
+##            54) Latitude&gt;=34.165 949  106.791800 12.38022 *
+##            55) Latitude&lt; 34.165 1099  196.395200 12.67735  
+##             110) Longitude&gt;=-118.365 431   85.796770 12.38191 *
+##             111) Longitude&lt; -118.365 668   48.703000 12.86798 *
+##       7) Longitude&lt; -121.645 3485  717.479900 12.39087  
+##        14) Latitude&gt;=37.925 796  133.300900 12.10055 *
+##        15) Latitude&lt; 37.925 2689  497.226200 12.47681 *</code></pre>
+<p>The following scatter plot can only be made when the CART is built using two numerical predictor variables.</p>
+<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">#remotes::install_github("grantmcdermott/parttree")</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/grantmcdermott/parttree">parttree</a></span><span class="op">)</span>
+<span class="va">house_train</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">Longitude</span>, x <span class="op">=</span> <span class="va">Latitude</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/parttree/man/geom_parttree.html">geom_parttree</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">house_cart_fit</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-58-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="predicting" class="section level4 unnumbered">
+<h4>Predicting<a class="anchor" aria-label="anchor" href="#predicting"><i class="fas fa-link"></i></a>
+</h4>
+<p>As seen in the image above, there are only 12 region so there are only 12 predicted values. The plot below seems a little odd at first glance, but it should make sense after careful consideration of what is the outcome measurement and what is the predicted value.</p>
+<div class="sourceCode" id="cb530"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">house_cart_fit</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">logValue</span>, y <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="finer-partition" class="section level4 unnumbered">
 <h4>Finer partition<a class="anchor" aria-label="anchor" href="#finer-partition"><i class="fas fa-link"></i></a>
 </h4>
-<pre><code>12) Latitude&gt;=34.7 2844  645.0 11.5 </code></pre>
-<p>the node that splits at latitude greater than 34.7 has 2844 houses. 645 is the “deviance” which is the sum of squares value for that node. the predicted value is the average of the points in that node: 11.5. it is not a terminal node (no asterisk).</p>
-<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
-<span class="va">tr.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">Longitude</span> <span class="op">+</span> <span class="va">Latitude</span>, 
-                         data<span class="op">=</span><span class="va">real.estate</span>, 
-                         method<span class="op">=</span><span class="st">"rpart2"</span>,
-                         trControl <span class="op">=</span> <span class="va">fitControl</span>, 
-                         tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">tr.house</span><span class="op">$</span><span class="va">finalModel</span></code></pre></div>
-<pre><code>## n= 20640 
-## 
-## node), split, n, deviance, yval
-##       * denotes terminal node
-## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) Latitude&gt;=38.485 2061  383.26410 11.59422  
-##      4) Latitude&gt;=39.355 674   65.51082 11.31630 *
-##      5) Latitude&lt; 39.355 1387  240.39580 11.72928 *
-##    3) Latitude&lt; 38.485 18579 5750.77400 12.13931  
-##      6) Longitude&gt;=-121.655 13941 4395.52000 12.05527  
-##       12) Latitude&gt;=34.675 2844  645.27310 11.51018  
-##         24) Longitude&gt;=-120.275 1460  212.47730 11.28145 *
-##         25) Longitude&lt; -120.275 1384  275.83120 11.75148 *
-##       13) Latitude&lt; 34.675 11097 2688.68000 12.19497  
-##         26) Longitude&gt;=-118.315 8384 1823.33000 12.08687  
-##           52) Longitude&gt;=-117.545 2839  691.79800 11.87672 *
-##           53) Longitude&lt; -117.545 5545  941.96340 12.19446 *
-##         27) Longitude&lt; -118.315 2713  464.62720 12.52902 *
-##      7) Longitude&lt; -121.655 4638  960.79250 12.39194  
-##       14) Latitude&gt;=37.925 1063  177.59430 12.09533 *
-##       15) Latitude&lt; 37.925 3575  661.87260 12.48013 *</code></pre>
+<p>From above:</p>
+<pre><code>       12) Latitude&gt;=34.675 2182  513.95640 11.52385  </code></pre>
+<p>The node that splits at latitude greater than 34.675 has 2182 houses. 513.9564 is the “deviance” which is the sum of squares value for that node. The predicted value is the average of the points in that node: 11.5. It is not a terminal node (no asterisk).</p>
 </div>
 <div id="more-variables" class="section level4 unnumbered">
 <h4>More variables<a class="anchor" aria-label="anchor" href="#more-variables"><i class="fas fa-link"></i></a>
 </h4>
-<p>Including all the variables, not only the latitude and longitude:</p>
-<div class="sourceCode" id="cb531"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
-<span class="va">tr.full.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
-                              data<span class="op">=</span><span class="va">real.estate</span>, 
-                              method<span class="op">=</span><span class="st">"rpart2"</span>, 
-                              trControl <span class="op">=</span> <span class="va">fitControl</span>, 
-                              tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<p>Including all the variables, not only the latitude and longitude. Note the predictions are much better!</p>
+<div class="sourceCode" id="cb532"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">real.estate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt"</span>, 
+                          header<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>logValue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">tr.full.house</span><span class="op">$</span><span class="va">finalModel</span></code></pre></div>
-<pre><code>## n= 20640 
-## 
-## node), split, n, deviance, yval
-##       * denotes terminal node
-## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) MedianIncome&lt; 3.5471 10381 2662.31300 11.77174  
-##      4) MedianIncome&lt; 2.51025 4842 1193.71700 11.57572  
-##        8) Latitude&gt;=34.465 2520  557.77450 11.38771  
-##         16) Longitude&gt;=-120.275 728   77.14396 11.08365 *
-##         17) Longitude&lt; -120.275 1792  385.97890 11.51124  
-##           34) Latitude&gt;=37.905 1103  150.31490 11.35795 *
-##           35) Latitude&lt; 37.905 689  168.25420 11.75664 *
-##        9) Latitude&lt; 34.465 2322  450.19880 11.77976  
-##         18) Longitude&gt;=-117.775 878  144.15330 11.52580 *
-##         19) Longitude&lt; -117.775 1444  214.98520 11.93418 *
-##      5) MedianIncome&gt;=2.51025 5539 1119.89800 11.94310  
-##       10) Latitude&gt;=37.925 1104  123.65980 11.68124 *
-##       11) Latitude&lt; 37.925 4435  901.69050 12.00829  
-##         22) Longitude&gt;=-122.235 4084  770.65270 11.96811  
-##           44) Latitude&gt;=34.455 1270  284.66500 11.76617 *
-##           45) Latitude&lt; 34.455 2814  410.82510 12.05924 *
-##         23) Longitude&lt; -122.235 351   47.73002 12.47579 *
-##    3) MedianIncome&gt;=3.5471 10259 1974.99300 12.40175  
-##      6) MedianIncome&lt; 5.5892 7265 1156.09500 12.25720  
-##       12) MedianHouseAge&lt; 38.5 5907  858.59850 12.20694 *
-##       13) MedianHouseAge&gt;=38.5 1358  217.69860 12.47578 *
-##      7) MedianIncome&gt;=5.5892 2994  298.73550 12.75251  
-##       14) MedianIncome&lt; 7.393 2008  176.41530 12.64297 *
-##       15) MedianIncome&gt;=7.393 986   49.16749 12.97557 *</code></pre>
+<span class="co"># partition</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+<span class="va">house_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">real.estate</span><span class="op">)</span>
+<span class="va">house_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
+<span class="va">house_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
+
+<span class="co"># recipe</span>
+<span class="va">house_cart_full_recipe</span> <span class="op">&lt;-</span>
+  <span class="fu">recipe</span><span class="op">(</span><span class="va">logValue</span> <span class="op">~</span> <span class="va">.</span> ,
+         data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">update_role</span><span class="op">(</span><span class="va">MedianHouseValue</span>, new_role <span class="op">=</span> <span class="st">"id variable"</span><span class="op">)</span>
+
+<span class="co"># model</span>
+<span class="va">house_cart</span> <span class="op">&lt;-</span> <span class="fu">decision_tree</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"rpart"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span>
+
+<span class="co"># workflow</span>
+<span class="va">house_cart_full_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">house_cart</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">house_cart_full_recipe</span><span class="op">)</span>
+
+<span class="co"># fit</span>
+<span class="va">house_cart_full_fit</span> <span class="op">&lt;-</span> <span class="va">house_cart_full_wflow</span> <span class="op">%&gt;%</span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb533"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tr.full.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="672" style="display: block; margin: auto;"></div>
+<code class="sourceCode R"><span class="va">house_cart_full_fit</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">logValue</span>, y <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-61-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="cross-validation-model-building" class="section level4 unnumbered">
 <h4>Cross Validation (model building!)<a class="anchor" aria-label="anchor" href="#cross-validation-model-building"><i class="fas fa-link"></i></a>
 </h4>
-<p>Turns out that the tree does “better” by being more complex – why is that? The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.</p>
 <div class="sourceCode" id="cb534"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># here, let's use all the variables and all the samples</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>
-<span class="va">tree.cv.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
-                              data<span class="op">=</span><span class="va">real.estate</span>, 
-                              method<span class="op">=</span><span class="st">"rpart2"</span>,
-                              trControl<span class="op">=</span><span class="va">fitControl</span>,
-                              tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,
-                              parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span>
-  
-<span class="va">tree.cv.house</span>  </code></pre></div>
-<pre><code>## CART 
-## 
-## 20640 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4748682  0.3041572  0.3848606
-##    2        0.4478756  0.3809354  0.3563586
-##    3        0.4282733  0.4340116  0.3393296
-##    4        0.4178448  0.4611563  0.3296215
-##    5        0.4054431  0.4924175  0.3184901
-##    6        0.3962472  0.5155365  0.3103266
-##    7        0.3948428  0.5189584  0.3092563
-##    8        0.3935306  0.5221099  0.3080369
-##    9        0.3891254  0.5326804  0.3044392
-##   10        0.3836652  0.5456808  0.3000226
-##   11        0.3786873  0.5574177  0.2956848
-##   12        0.3739131  0.5685161  0.2907504
-##   13        0.3712711  0.5746216  0.2868830
-##   14        0.3703641  0.5767271  0.2858720
-##   15        0.3703641  0.5767271  0.2858720
-##   16        0.3703641  0.5767271  0.2858720
-##   17        0.3703641  0.5767271  0.2858720
-##   18        0.3703641  0.5767271  0.2858720
-##   19        0.3703641  0.5767271  0.2858720
-##   20        0.3703641  0.5767271  0.2858720
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 14.</code></pre>
-<div class="sourceCode" id="cb536"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rpart.plot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpart.plot/man/rpart.plot.html">rpart.plot</a></span><span class="op">(</span><span class="va">tree.cv.house</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;"></div>
+<code class="sourceCode R"><span class="va">real.estate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt"</span>, 
+                          header<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>logValue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># partition</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+<span class="va">house_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">real.estate</span><span class="op">)</span>
+<span class="va">house_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
+<span class="va">house_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">house_split</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span>
+<span class="va">house_vfold</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">house_train</span>, v <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+
+<span class="va">cart_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span>tree_depth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">20</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># recipe</span>
+<span class="va">house_cart_tune_recipe</span> <span class="op">&lt;-</span>
+  <span class="fu">recipe</span><span class="op">(</span><span class="va">logValue</span> <span class="op">~</span> <span class="va">.</span>,
+         data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">update_role</span><span class="op">(</span><span class="va">MedianHouseValue</span>, new_role <span class="op">=</span> <span class="st">"id variable"</span><span class="op">)</span>
+
+<span class="co"># model</span>
+<span class="va">house_cart_tune</span> <span class="op">&lt;-</span> <span class="fu">decision_tree</span><span class="op">(</span>tree_depth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/e1071/man/tune.html">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"rpart"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span>
+
+<span class="co"># workflow</span>
+<span class="va">house_cart_tune_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">house_cart_tune</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">house_cart_tune_recipe</span><span class="op">)</span>
+
+<span class="co"># tuning / fit</span>
+<span class="va">house_tuned</span> <span class="op">&lt;-</span> <span class="va">house_cart_tune_wflow</span> <span class="op">%&gt;%</span>
+  <span class="fu">tune_grid</span><span class="op">(</span>resamples <span class="op">=</span> <span class="va">house_vfold</span>, 
+           grid <span class="op">=</span> <span class="va">cart_grid</span><span class="op">)</span> </code></pre></div>
+<p><strong>CV accuracy</strong></p>
+<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">house_tuned</span> <span class="op">%&gt;%</span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 20 × 7
+##    tree_depth .metric .estimator  mean     n std_err .config              
+##         &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+##  1          2 rmse    standard   0.428    10 0.00224 Preprocessor1_Model01
+##  2          2 rsq     standard   0.436    10 0.00665 Preprocessor1_Model01
+##  3          4 rmse    standard   0.383    10 0.00242 Preprocessor1_Model02
+##  4          4 rsq     standard   0.547    10 0.00629 Preprocessor1_Model02
+##  5          6 rmse    standard   0.366    10 0.00239 Preprocessor1_Model03
+##  6          6 rsq     standard   0.588    10 0.00586 Preprocessor1_Model03
+##  7          8 rmse    standard   0.366    10 0.00239 Preprocessor1_Model04
+##  8          8 rsq     standard   0.588    10 0.00586 Preprocessor1_Model04
+##  9         10 rmse    standard   0.366    10 0.00239 Preprocessor1_Model05
+## 10         10 rsq     standard   0.588    10 0.00586 Preprocessor1_Model05
+## 11         12 rmse    standard   0.366    10 0.00239 Preprocessor1_Model06
+## 12         12 rsq     standard   0.588    10 0.00586 Preprocessor1_Model06
+## 13         14 rmse    standard   0.366    10 0.00239 Preprocessor1_Model07
+## 14         14 rsq     standard   0.588    10 0.00586 Preprocessor1_Model07
+## 15         16 rmse    standard   0.366    10 0.00239 Preprocessor1_Model08
+## 16         16 rsq     standard   0.588    10 0.00586 Preprocessor1_Model08
+## 17         18 rmse    standard   0.366    10 0.00239 Preprocessor1_Model09
+## 18         18 rsq     standard   0.588    10 0.00586 Preprocessor1_Model09
+## 19         20 rmse    standard   0.366    10 0.00239 Preprocessor1_Model10
+## 20         20 rsq     standard   0.588    10 0.00586 Preprocessor1_Model10</code></pre>
 <div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">tree.cv.house</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-60-2.png" width="480" style="display: block; margin: auto;"></div>
-</div>
-<div id="training-test-data-for-model-building-and-model-accuracy" class="section level4 unnumbered">
-<h4>Training / test data for model building AND model accuracy<a class="anchor" aria-label="anchor" href="#training-test-data-for-model-building-and-model-accuracy"><i class="fas fa-link"></i></a>
-</h4>
+<code class="sourceCode R"><span class="va">house_tuned</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/autoplot.html">autoplot</a></span><span class="op">(</span>metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-63-1.png" width="480" style="display: block; margin: auto;"></div>
 <div class="sourceCode" id="cb538"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># first create two datasets: one training, one test</span>
-<span class="va">inTrain</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">real.estate</span><span class="op">$</span><span class="va">MedianHouseValue</span>, 
-                                      p<span class="op">=</span><span class="fl">.8</span>, list<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">house.train</span> <span class="op">&lt;-</span> <span class="va">real.estate</span><span class="op">[</span><span class="va">inTrain</span>,<span class="op">]</span>
-<span class="va">house.test</span> <span class="op">&lt;-</span> <span class="va">real.estate</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">inTrain</span><span class="op">)</span>,<span class="op">]</span>
-
-
-<span class="co"># then use CV on the training data to find the best maxdepth</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">fitControl</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>
-<span class="va">tree.cvtrain.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
-                                   data<span class="op">=</span><span class="va">house.train</span>, 
-                                   method<span class="op">=</span><span class="st">"rpart2"</span>,
-                                   trControl<span class="op">=</span><span class="va">fitControl</span>, 
-                                   tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,
-                                   parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span>
-
-
-<span class="va">tree.cvtrain.house</span></code></pre></div>
-<pre><code>## CART 
-## 
-## 16513 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4756049  0.2994314  0.3851775
-##    2        0.4497958  0.3734197  0.3581148
-##    3        0.4289837  0.4302083  0.3396992
-##    4        0.4192079  0.4558965  0.3304520
-##    5        0.4026435  0.4979229  0.3153937
-##    6        0.3960649  0.5141665  0.3102682
-##    7        0.3960649  0.5141665  0.3102682
-##    8        0.3924388  0.5229961  0.3072433
-##    9        0.3875832  0.5347306  0.3027262
-##   10        0.3830783  0.5454004  0.2981715
-##   11        0.3783297  0.5566766  0.2941443
-##   12        0.3724797  0.5702362  0.2883089
-##   13        0.3694837  0.5770987  0.2850918
-##   14        0.3694837  0.5770987  0.2850918
-##   15        0.3694837  0.5770987  0.2850918
-##   16        0.3694837  0.5770987  0.2850918
-##   17        0.3694837  0.5770987  0.2850918
-##   18        0.3694837  0.5770987  0.2850918
-##   19        0.3694837  0.5770987  0.2850918
-##   20        0.3694837  0.5770987  0.2850918
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 13.</code></pre>
+<code class="sourceCode R"><span class="va">house_tuned</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select_best</span><span class="op">(</span><span class="st">"rmse"</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##   tree_depth .config              
+##        &lt;dbl&gt; &lt;chr&gt;                
+## 1          6 Preprocessor1_Model03</code></pre>
+<p><strong>Final model + prediction on test data</strong></p>
+<p>Turns out that the tree does “better” by being more complex – why is that? The tree with 14 nodes (depth of 6) corresponds to the tree with the lowest deviance.</p>
 <div class="sourceCode" id="cb540"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">tree.train.house</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">MedianHouseValue</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span>, 
-                                 data<span class="op">=</span><span class="va">house.train</span>, 
-                                 method<span class="op">=</span><span class="st">"rpart2"</span>,
-                                 trControl<span class="op">=</span><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>,
-                                 tuneGrid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>maxdepth<span class="op">=</span><span class="fl">14</span><span class="op">)</span>,
-                                 parms<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>split<span class="op">=</span><span class="st">"gini"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><strong>for classification results</strong> use <code>confusionMatrix</code> instead of <code>postResample</code></p>
+<code class="sourceCode R"><span class="co"># recipe</span>
+<span class="va">house_cart_final_recipe</span> <span class="op">&lt;-</span>
+  <span class="fu">recipe</span><span class="op">(</span><span class="va">logValue</span> <span class="op">~</span> <span class="va">.</span>,
+         data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">update_role</span><span class="op">(</span><span class="va">MedianHouseValue</span>, new_role <span class="op">=</span> <span class="st">"id variable"</span><span class="op">)</span>
+
+<span class="co"># model</span>
+<span class="va">house_cart_final</span> <span class="op">&lt;-</span> <span class="fu">decision_tree</span><span class="op">(</span>tree_depth <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"rpart"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span>
+
+<span class="co"># workflow</span>
+<span class="va">house_cart_final_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">house_cart_final</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">house_cart_final_recipe</span><span class="op">)</span>
+
+<span class="co"># tuning / fit</span>
+<span class="va">house_final</span> <span class="op">&lt;-</span> <span class="va">house_cart_final_wflow</span> <span class="op">%&gt;%</span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></code></pre></div>
+<p><strong>Predicting the final model on test data</strong></p>
 <div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">test.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tree.train.house</span>, <span class="va">house.test</span><span class="op">)</span>
-<span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/postResample.html">postResample</a></span><span class="op">(</span>pred <span class="op">=</span> <span class="va">test.pred</span>, obs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">house.test</span><span class="op">$</span><span class="va">MedianHouseValue</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##      RMSE  Rsquared       MAE 
-## 0.3696649 0.5840583 0.2846395</code></pre>
-</div>
-<div id="other-tree-r-packages" class="section level4 unnumbered">
-<h4>Other tree R packages<a class="anchor" aria-label="anchor" href="#other-tree-r-packages"><i class="fas fa-link"></i></a>
-</h4>
-<ul>
-<li><p><code>rpart</code> is faster than <code>tree</code></p></li>
-<li><p><code>party</code> gives great plotting options</p></li>
-<li><p><code>maptree</code> also gives trees from hierarchical clustering</p></li>
-<li><p><code>randomForest</code> up next!</p></li>
-</ul>
-<p>Reference: slides built from <a href="http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf" class="uri">http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf</a></p>
+<code class="sourceCode R"><span class="va">house_final</span></code></pre></div>
+<pre><code>## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 15480 5024.40500 12.08947  
+##    2) MedianIncome&lt; 3.54635 7696 1992.69800 11.77343  
+##      4) MedianIncome&lt; 2.5165 3632  904.76740 11.57590  
+##        8) Latitude&gt;=34.445 1897  412.81950 11.38488  
+##         16) Longitude&gt;=-120.265 549   63.97662 11.08633 *
+##         17) Longitude&lt; -120.265 1348  279.98120 11.50647 *
+##        9) Latitude&lt; 34.445 1735  347.04430 11.78476  
+##         18) Longitude&gt;=-117.775 645  111.86670 11.52607 *
+##         19) Longitude&lt; -117.775 1090  166.47070 11.93784 *
+##      5) MedianIncome&gt;=2.5165 4064  819.58450 11.94995  
+##       10) Latitude&gt;=37.925 809   91.49688 11.68589 *
+##       11) Latitude&lt; 37.925 3255  657.65510 12.01558  
+##         22) Longitude&gt;=-122.235 2992  563.13610 11.97426  
+##           44) Latitude&gt;=34.455 940  203.99070 11.77685  
+##             88) Longitude&gt;=-120.155 338   31.54079 11.36422 *
+##             89) Longitude&lt; -120.155 602   82.59029 12.00852 *
+##           45) Latitude&lt; 34.455 2052  305.72870 12.06470  
+##             90) Longitude&gt;=-118.285 1476  171.16160 11.95681 *
+##             91) Longitude&lt; -118.285 576   73.36843 12.34115 *
+##         23) Longitude&lt; -122.235 263   31.29310 12.48567 *
+##    3) MedianIncome&gt;=3.54635 7784 1502.97400 12.40194  
+##      6) MedianIncome&lt; 5.59185 5526  876.96730 12.25670  
+##       12) MedianHouseAge&lt; 38.5 4497  651.27750 12.20567  
+##         24) MedianIncome&lt; 4.53095 2616  388.38650 12.11491 *
+##         25) MedianIncome&gt;=4.53095 1881  211.37640 12.33189 *
+##       13) MedianHouseAge&gt;=38.5 1029  162.80030 12.47972 *
+##      7) MedianIncome&gt;=5.59185 2258  224.13060 12.75740  
+##       14) MedianIncome&lt; 7.393 1527  134.00030 12.64684 *
+##       15) MedianIncome&gt;=7.393 731   32.47344 12.98835 *</code></pre>
+<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">house_final</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">house_test</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">logValue</span>, y <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"log of the Median House Value"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"predicted value of log Median House"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;"></div>
 <!---
 ## 11/5/19 Agenda {#Nov5}
 1. pruning
@@ -1654,7 +1704,7 @@ Typically <span class="math inline">\(m = \sqrt{p}\)</span> or <span class="math
 </ol>
 <hr>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-63"></span>
+<span style="display:block;" id="fig:unnamed-chunk-67"></span>
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%"><p class="caption">
 Figure 8.14: Building multiple trees and then combining the outputs (predictions). Note that this image makes the choice to average the tree probabilities instead of using majority vote. Both are valid methods for creating a Random Forest prediction model. <a href="http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" class="uri">http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</a>
 </p>
@@ -1720,7 +1770,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 </h3>
 <p>(“impurity” is defined as RSS for regression trees and deviance for classification trees).</p>
 <p><code>method= 'ranger'</code> is about a zillion times faster than <code>method = 'randomForest'</code> or <code>method = 'rf'</code>, but they all do the work.</p>
-<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>
@@ -1730,7 +1780,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <span class="va">inTrain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html">createDataPartition</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, p<span class="op">=</span><span class="fl">0.7</span>, list<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">iris.train</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">inTrain</span>,<span class="op">]</span>
 <span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="va">inTrain</span>,<span class="op">]</span></code></pre></div>
-<div class="sourceCode" id="cb544"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">modFit</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
                 data<span class="op">=</span><span class="va">iris.train</span>, 
                 method<span class="op">=</span><span class="st">"ranger"</span><span class="op">)</span>
@@ -1747,18 +1797,18 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  splitrule   Accuracy   Kappa    
-##   2     gini        0.9519882  0.9268222
-##   2     extratrees  0.9501667  0.9239468
-##   3     gini        0.9509638  0.9252363
-##   3     extratrees  0.9511923  0.9254990
-##   4     gini        0.9489015  0.9221052
-##   4     extratrees  0.9501289  0.9238519
+##   2     gini        0.9510313  0.9254883
+##   2     extratrees  0.9458269  0.9175811
+##   3     gini        0.9510313  0.9254883
+##   3     extratrees  0.9458269  0.9175811
+##   4     gini        0.9480755  0.9210098
+##   4     extratrees  0.9491620  0.9227209
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 1
 ## Accuracy was used to select the optimal model using the largest value.
 ## The final values used for the model were mtry = 2, splitrule = gini
 ##  and min.node.size = 1.</code></pre>
-<div class="sourceCode" id="cb546"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">modFit</span>, newdata <span class="op">=</span> <span class="va">iris.test</span><span class="op">)</span>, 
                 reference <span class="op">=</span> <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
 <pre><code>## Confusion Matrix and Statistics
@@ -1796,7 +1846,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <span class="header-section-number">8.6.2.1</span> Parameters… <code>mtry</code> and <code>num.trees</code><a class="anchor" aria-label="anchor" href="#parameters-mtry-and-num.trees"><i class="fas fa-link"></i></a>
 </h4>
 <p>Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests). Hopefully the code below will help for other problems where Random Forests are more appropriate.</p>
-<div class="sourceCode" id="cb548"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb549"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">modFit.m</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
                 data<span class="op">=</span><span class="va">iris.train</span>, 
                 method<span class="op">=</span><span class="st">"ranger"</span>, 
@@ -1814,22 +1864,22 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 ## No pre-processing
 ## Resampling results across tuning parameters:
 ## 
-##   mtry  Accuracy   Kappa    
-##   1     0.9428571  0.9142857
-##   2     0.9523810  0.9285714
-##   3     0.9523810  0.9285714
-##   4     0.9523810  0.9285714
+##   mtry  Accuracy  Kappa    
+##   1     0.952381  0.9285714
+##   2     0.952381  0.9285714
+##   3     0.952381  0.9285714
+##   4     0.952381  0.9285714
 ## 
 ## Tuning parameter 'splitrule' was held constant at a value of gini
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 5
 ## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 2, splitrule = gini
+## The final values used for the model were mtry = 1, splitrule = gini
 ##  and min.node.size = 5.</code></pre>
-<div class="sourceCode" id="cb550"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">modFit.m</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;"></div>
 <div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">modFit.m</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-70-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
 
 <span class="va">acc.ntree</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
@@ -1850,14 +1900,14 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"number of trees in the RF"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"OOB Accuracy"</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">ylim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.06</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-67-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="variable-importance-1" class="section level4 unnumbered">
 <h4>Variable Importance<a class="anchor" aria-label="anchor" href="#variable-importance-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>In order to get the variable importance, you need to specify importance within the building of the forest.</p>
 <p>See if you can figure out every single line of the <code>ggplot</code> code.</p>
-<div class="sourceCode" id="cb552"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">modFit.VI</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, 
                 data<span class="op">=</span><span class="va">iris.train</span>, 
                 importance <span class="op">=</span> <span class="st">"permutation"</span>,
@@ -1865,24 +1915,24 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 
 <span class="fu">ranger</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/importance.ranger.html">importance</a></span><span class="op">(</span><span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">)</span></code></pre></div>
 <pre><code>## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.026859630  0.006130369  0.297439677  0.323197349</code></pre>
-<div class="sourceCode" id="cb554"><pre class="downlit sourceCode r">
+##  0.014669229  0.005659636  0.321919861  0.311967973</code></pre>
+<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>importance <span class="op">=</span> <span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">$</span><span class="va">variable.importance</span>,
            variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">modFit.VI</span><span class="op">$</span><span class="va">finalModel</span><span class="op">$</span><span class="va">variable.importance</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">variables</span>, <span class="va">importance</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">importance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_bar.html">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Variable"</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_flip.html">coord_flip</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-68-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>plot both the given labels as well as the predicted labels</p>
-<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris.test</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>testSpecies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">modFit</span>, <span class="va">iris.test</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">iris.test</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Petal.Width</span>, y<span class="op">=</span><span class="va">Petal.Length</span>, 
                       shape <span class="op">=</span> <span class="va">Species</span>, col <span class="op">=</span> <span class="va">testSpecies</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
     <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 </div>
 </div>
@@ -1982,7 +2032,7 @@ Try the recommended defaults, half of them, and twice of them - pick the best (u
 <div class="inline-figure"><img src="figs/separate.jpg" width="100%" style="display: block; margin: auto;"></div>
 <p>But today’s decision boundary is going to be based on a hyperplane which separates the values in the “best” way. Certainly, if the data are linearly separable, then there are infinitely many hyperplanes which will partition the data perfectly. For SVM, the idea is to find the “street” which separates the positive and negative samples to give the widest margin.</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-71"></span>
+<span style="display:block;" id="fig:unnamed-chunk-75"></span>
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%"><p class="caption">
 Figure 8.15: The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier. <a href="http://www.rmki.kfki.hu/~banmi/elte/Bishop" class="uri">http://www.rmki.kfki.hu/~banmi/elte/Bishop</a> - Pattern Recognition and Machine Learning.pdf
 </p>
@@ -1996,7 +2046,7 @@ Figure 8.15: The correct project of the observations can often produce a perfect
 {\bf x} \cdot {\bf y} = {\bf x}^t {\bf y} = \sum_{i=1}^p x_i y_i
 \end{align}\]</span></p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-72"></span>
+<span style="display:block;" id="fig:unnamed-chunk-76"></span>
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%"><p class="caption">
 Figure 8.16: If <strong>w</strong> is known, then the projection of any new observation onto <strong>w</strong> will lead to a linear partition of the space.
 </p>
@@ -2183,7 +2233,7 @@ where cross validation is used to find the tuning value <span class="math inline
 </h5>
 <p>The take home message here is that a wiggly boundary is really best, and the value of <span class="math inline">\(\gamma\)</span> should be high to represent the high model complexity.</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-74"></span>
+<span style="display:block;" id="fig:unnamed-chunk-78"></span>
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%"><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%"><p class="caption">
 Figure 8.17: Extremely complicated decision boundary
 </p>
@@ -2194,19 +2244,19 @@ Figure 8.17: Extremely complicated decision boundary
 </h5>
 <p>But if the boundary has low complexity, then the best value of <span class="math inline">\(\gamma\)</span> is probably much lower.</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-75"></span>
+<span style="display:block;" id="fig:unnamed-chunk-79"></span>
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%"><p class="caption">
 Figure 8.18: Simple decision boundary
 </p>
 </div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-76"></span>
+<span style="display:block;" id="fig:unnamed-chunk-80"></span>
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%"><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%"><p class="caption">
 Figure 8.19: Simple decision boundary – reasonable gamma
 </p>
 </div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-77"></span>
+<span style="display:block;" id="fig:unnamed-chunk-81"></span>
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%"><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%"><p class="caption">
 Figure 8.20: Simple decision boundary – gamma too big
 </p>
@@ -2250,7 +2300,7 @@ Note, here <span class="math inline">\(\gamma, r\)</span> must be tuned using cr
 <p>But what if the data aren’t linearly separable? The optimization problem can be changed to allow for points to be on the other side of the margin. The optimization problem is slightly more complicated, but basically the same idea:
 <span class="math display">\[y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0\]</span></p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-78"></span>
+<span style="display:block;" id="fig:unnamed-chunk-82"></span>
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%"><p class="caption">
 Figure 8.21: Note that now the problem is set up such that points are allowed to cross the boundary. Slack variables (the xi_i) allow for every point to be classified correctly up to the slack. Note that xi_i=0 for any point that is actually calculated correctly.
 </p>
@@ -2280,7 +2330,7 @@ That is, the objective function now allows for a trade-off between a large margi
 <p>If <span class="math inline">\(C\)</span> is quite large, then the algorithm will try very hard to classify exactly perfectly. That is, it will want <span class="math inline">\(\xi_i\)</span> to be as close to zero as possible. When projecting into high dimensions, we can always perfectly classify, so a large <span class="math inline">\(C\)</span> will tend to overfit the training data and give a very small margin.
 <span class="math display">\[C&gt;&gt;&gt; \rightarrow \mbox{ can lead to classification rule which does not generalize to test data}\]</span></p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-79"></span>
+<span style="display:block;" id="fig:unnamed-chunk-83"></span>
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%"><p class="caption">
 Figure 8.22: In the first figure, the low C value gives a large margin. On the right, the high C value gives a small margin. Which classifier is better? Well, it depends on what the actual data (test, population, etc.) look like! In the second row the large C classifier is better; in the third row, the small C classifier is better. photo credit: <a href="http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" class="uri">http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</a>
 </p>
@@ -2353,7 +2403,7 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <span class="header-section-number">8.8.4</span> R SVM Example<a class="anchor" aria-label="anchor" href="#r-svm-example"><i class="fas fa-link"></i></a>
 </h3>
 <p>We’ll go back to the iris data. As a first pass, let’s use SVM to distinguish between Setosa and Versicolor/Virginica.</p>
-<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb557"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">kernlab</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">e1071</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>
@@ -2365,7 +2415,7 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <h4>
 <span class="header-section-number">8.8.4.1</span> Building an SVM on training data with radial kernel<a class="anchor" aria-label="anchor" href="#building-an-svm-on-training-data-with-radial-kernel"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb557"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb558"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
 <span class="va">iris.svm.rad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species2</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">iris2</span>, method<span class="op">=</span><span class="st">"svmRadial"</span>, 
                  trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"cv"</span><span class="op">)</span>,
@@ -2418,14 +2468,14 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <h4>
 <span class="header-section-number">8.8.4.2</span> Training Error<a class="anchor" aria-label="anchor" href="#training-error"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb559"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iris.train.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm.rad</span>, <span class="va">iris2</span><span class="op">)</span>
 <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span><span class="va">iris.train.pred</span>, <span class="va">iris2</span><span class="op">$</span><span class="va">Species2</span><span class="op">)</span><span class="op">$</span><span class="va">overall</span></code></pre></div>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
 ##   1.000000e+00   1.000000e+00   9.757074e-01   1.000000e+00   6.666667e-01 
 ## AccuracyPValue  McnemarPValue 
 ##   3.857546e-27            NaN</code></pre>
-<div class="sourceCode" id="cb561"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/confusionMatrix.html">confusionMatrix</a></span><span class="op">(</span><span class="va">iris.train.pred</span>, <span class="va">iris2</span><span class="op">$</span><span class="va">Species2</span><span class="op">)</span></code></pre></div>
 <pre><code>## Confusion Matrix and Statistics
 ## 
@@ -2460,11 +2510,11 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <span class="header-section-number">8.8.4.3</span> Visualizing the Boundary<a class="anchor" aria-label="anchor" href="#visualizing-the-boundary"><i class="fas fa-link"></i></a>
 </h4>
 <p><code>caret</code> doesn’t allow for visualization, so I’ve applied the <code>svm</code> function directly here. I had to try various combinations of variables before finding a boundary that was visually interesting. Note that just being in the yellow or red part doesn’t necessarily indicate missclassification. Remember that the boundary is in 4 dimensions and is not linear.</p>
-<div class="sourceCode" id="cb563"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iris.svm</span> <span class="op">&lt;-</span> <span class="fu">e1071</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/e1071/man/svm.html">svm</a></span><span class="op">(</span><span class="va">Species2</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris2</span>, kernel <span class="op">=</span> <span class="st">"radial"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">iris.svm</span>, data <span class="op">=</span> <span class="va">iris2</span>, <span class="va">Sepal.Width</span> <span class="op">~</span> <span class="va">Petal.Width</span>, 
      slice<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Sepal.Length <span class="op">=</span> <span class="fl">3</span>, Petal.Length <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-83-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="groups" class="section level4" number="8.8.4.4">
 <h4>
@@ -2473,17 +2523,17 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <blockquote>
 <p>For multiclass-classification with k classes, k &gt; 2, <code>ksvm</code> uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme</p>
 </blockquote>
-<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">474747</span><span class="op">)</span>
 <span class="va">train.obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/resample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">150</span>, <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">iris.train</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">train.obs</span>, <span class="op">]</span>
 <span class="va">iris.test</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="va">train.obs</span>, <span class="op">]</span></code></pre></div>
-<div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iris.svm3</span> <span class="op">&lt;-</span> <span class="fu">caret</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">iris.train</span>, method<span class="op">=</span><span class="st">"svmRadial"</span>, 
                  trControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/trainControl.html">trainControl</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"none"</span><span class="op">)</span>,
                  tuneGrid<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span>C<span class="op">=</span><span class="fl">1</span>, sigma<span class="op">=</span><span class="fl">2</span><span class="op">)</span>,
                  preProcess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"scale"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm3</span>, <span class="va">iris.test</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] setosa     setosa     setosa     setosa     setosa     setosa    
 ##  [7] setosa     setosa     setosa     setosa     setosa     setosa    
@@ -2495,7 +2545,7 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 ## [43] virginica  versicolor virginica  virginica  virginica  virginica 
 ## [49] virginica  virginica 
 ## Levels: setosa versicolor virginica</code></pre>
-<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb569"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">iris.svm3</span>, <span class="va">iris.test</span><span class="op">)</span>, <span class="va">iris.test</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></code></pre></div>
 <pre><code>##             
 ##              setosa versicolor virginica
@@ -2574,7 +2624,7 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-10-26.</p>
+    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-10-30.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

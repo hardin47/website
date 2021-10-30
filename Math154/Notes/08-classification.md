@@ -120,11 +120,11 @@ Suppose that we build a classifier on a given data set.  We'd like to know how w
 3. predict class membership for the observation which was removed
 4. repeat by removing each observation one at a time
 
-* $k$-fold cross validation ($k$-fold CV)
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
-    * LOOCV is a special case of $k$-fold CV with $k=n$
-    * advantage of $k$-fold is computational
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+* $V$-fold cross validation ($V$-fold CV)
+    * like LOOCV except that the algorithm is run $V$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $V$-fold CV with $V=n$
+    * advantage of $V$-fold is computational
+    * $V$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $V$-fold, prediction is on $n$ values from $V$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
 
 
 #### CV for **Model assessment** 10-fold {-}
@@ -634,7 +634,14 @@ penguin_fit %>% tidy()
 ## $k$-Nearest Neighbors {#knn}
 
 
-The $k$-Nearest Neighbor algorithm does exactly what it sounds like it does.  The user decides on the integer value for $k$, and a point is classified to be in the group for which the majority of the $k$ closest points in the training data.
+The $k$-Nearest Neighbor algorithm does exactly what it sounds like it does.  
+
+* user decides on the integer value for $k$
+
+* user decides on a distance metric (most $k$-NN algorithms default to Euclidean distance)
+
+* a point is classified to be in the same group as the majority of the $k$ **closest** points in the training data.
+
 
 ### $k$-NN algorithm
 
@@ -969,6 +976,14 @@ penguin_knn_fit_final %>%
 ## 1 accuracy multiclass     0.977
 ```
 
+
+Huh.  Seems like $k=9$ didn't do as well as $k=7$ (the value we tried at the very beginning before cross validating).
+
+Well, it turns out, that's the nature of variability, randomness, and model building.
+
+We don't know truth, and we won't every find a perfect model.
+
+
 <!---
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)
@@ -1102,7 +1117,7 @@ Ideally, the tree would not overfit the training data.  One could imagine how ea
 
 See the following (amazing!) demonstration for intuition on model validation / overfitting:  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
 
-One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  We use cross validation to build the subtree so as to not overfit the data.
+One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  Use cross validation to build the subtree so as to not overfit the data.
 
 
 ******
@@ -1111,8 +1126,8 @@ One possible algorithm for building a tree is to split based on the reduction in
 ******
 1.  Use recursive binary splitting to grow a large tree on the training data, stopping only when each terminal node has fewer than some minimum number of observations.
 2.  Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of $\alpha$.
-3. Use $K$-fold cross-validation to choose $\alpha$.  That is, divide the training observations into $K$ folds.  For each $k=1, 2, \ldots, K$:
-    a. Repeat Steps 1 and 2 on all but the $k$th fold of the training data.
+3. Use $V$-fold cross-validation to choose $\alpha$.  That is, divide the training observations into $V$ folds.  For each $v=1, 2, \ldots, V$:
+    a. Repeat Steps 1 and 2 on all but the $V$th fold of the training data.
     b. Evaluate the mean squared prediction error on the data in the left-out $k$th fold, as a function of $\alpha$.
     For each value of $\alpha$, average the prediction error (either misclassification or RSS), and pick $\alpha$ to minimize the average error.
 4. Return the subtree from Step 2 that corresponds to the chosen value of $\alpha$.
@@ -1124,8 +1139,8 @@ One possible algorithm for building a tree is to split based on the reduction in
 
 Also known as *weakest link pruning*, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$ (instead of considering every single subtree).  Generally, the idea is that there is a cost to having a larger (more complex!) tree.  We define the cost complexity criterion ($\alpha > 0$):
 \begin{align}
-\mbox{numerical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha|T|\\
-\mbox{categorical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha|T|
+\mbox{numerical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
 \end{align}
 where $k(m)$ is the class with the majority of observations in node $m$ and $|T|$ is the number of terminal nodes in the tree.
 
@@ -1156,21 +1171,19 @@ Notice that CV is used for both model building and model assessment.  It is poss
 
 
 ******
-**Algorithm**:  CV for both $k_1$-fold CV building and $k_2$-fold CV assessment
+**Algorithm**:  CV for both $V_1$-fold CV building and $V_2$-fold CV assessment
 
 ******
-1. Partition the data in $k_1$ groups.
-2. Remove the first group, and train the data on the remaining $k_1-1$ groups.
-3. Use $k_2$-fold cross-validation (on the $k_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $k_2$ folds and find $\alpha$ that minimizes the error.
-4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $k_1$ hold out samples.
-5. Repeat steps 2-4 using the remaining $k_1 - 1$ groups.
+1. Partition the data in $V_1$ groups.
+2. Remove the first group, and train the data on the remaining $V_1-1$ groups.
+3. Use $V_2$-fold cross-validation (on the $V_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $V_2$ folds and find $\alpha$ that minimizes the error.
+4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $V_1$ hold out samples.
+5. Repeat steps 2-4 using the remaining $V_1 - 1$ groups.
 
 ******
 
 
 ### R CART Example
-
-There are multiple tree building options in R both in the `caret` package and `party`, `rpart`, and `tree` packages.
 
 The Census Bureau divides the country up into "tracts" of approximately
 equal population. For the 1990 Census, California was divided into 20640 tracts.  One data sets (houses on http://lib.stat.cmu.edu/datasets/; http://lib.stat.cmu.edu/datasets/houses.zip) records the following for each tract in California: Median house price, median house age, total number of rooms, total number of bedrooms, total number of occupants, total number of houses, median income (in thousands of dollars), latitude and longitude.  It appeared in Pace and Barry (1997), "Sparse Spatial Autoregressions", **Statistics and Probability Letters**. 
@@ -1186,324 +1199,377 @@ Note on `maxdepth`:  as you might expect, `maxdepth` indicates the longest lengt
 
 #### Regression Trees  {-}
 
+For technical reasons (e.g., see [here](https://github.com/tidymodels/TMwR/issues/33)), the `step_log()` on the outcome variable step gives problems with predictions at the end.  Therefore, we mutate the outcome variable within the dataset before starting the model building process. 
+
 
 ```r
 real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
-                          header=TRUE)
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
 
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate, 
-                         method="rpart2", 
-                         trControl = fitControl, 
-                         tuneGrid= data.frame(maxdepth=5))
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
 
-rpart.plot::rpart.plot(tr.house$finalModel)
+# recipe
+house_cart_recipe <-
+  recipe(logValue ~ Longitude + Latitude ,
+         data = house_train)
+# model
+house_cart <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_wflow <- workflow() %>%
+  add_model(house_cart) %>%
+  add_recipe(house_cart_recipe)
+
+# fit
+house_cart_fit <- house_cart_wflow %>%
+  fit(data = house_train)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" />
 
-
-
-#### Scatterplot  {-}
-
-Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend.  Note that this plot uses the `tree` model (instead of the `rpart2` model) because the optimization is different.
+#### Model Output {-}
 
 
 ```r
-tree.model <- tree::tree(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate)
-
-price.deciles <- quantile(real.estate$MedianHouseValue, 0:10/10)
-cut.prices    <- cut(real.estate$MedianHouseValue, 
-                     price.deciles, 
-                     include.lowest=TRUE)
-plot(real.estate$Longitude, 
-     real.estate$Latitude, 
-     col=grey(10:2/11)[cut.prices], 
-     pch=20, 
-     xlab="Longitude",ylab="Latitude")
-
-tree::partition.tree(tree.model, 
-                     ordvars=c("Longitude","Latitude"), 
-                     add=TRUE) 
+house_cart_fit
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-57-1.png" width="768" style="display: block; margin: auto;" />
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##   1) root 15480 5024.405000 12.08947  
+##     2) Latitude>=38.485 1541  283.738200 11.59436  
+##       4) Latitude>=39.355 506   48.267930 11.31530 *
+##       5) Latitude< 39.355 1035  176.803400 11.73079 *
+##     3) Latitude< 38.485 13939 4321.152000 12.14421  
+##       6) Longitude>=-121.645 10454 3320.946000 12.06198  
+##        12) Latitude>=34.635 2166  491.986400 11.52110  
+##          24) Longitude>=-120.265 1083  166.051200 11.28432 *
+##          25) Longitude< -120.265 1083  204.505800 11.75787 *
+##        13) Latitude< 34.635 8288 2029.685000 12.20333  
+##          26) Longitude>=-118.315 6240 1373.830000 12.09295  
+##            52) Longitude>=-117.575 2130  516.313400 11.87918  
+##             104) Latitude>=33.605 821  123.684300 11.64002 *
+##             105) Latitude< 33.605 1309  316.218800 12.02918  
+##               210) Longitude>=-116.33 97    8.931327 11.17127 *
+##               211) Longitude< -116.33 1212  230.181300 12.09784  
+##                 422) Longitude>=-117.165 796  101.805300 11.94935 *
+##                 423) Longitude< -117.165 416   77.245280 12.38196 *
+##            53) Longitude< -117.575 4110  709.740000 12.20373  
+##             106) Latitude>=33.735 3529  542.838300 12.14908  
+##               212) Latitude< 34.105 2931  379.526800 12.09154  
+##                 424) Longitude< -118.165 1114  147.375800 11.91911 *
+##                 425) Longitude>=-118.165 1817  178.722200 12.19726 *
+##               213) Latitude>=34.105 598  106.051400 12.43109 *
+##             107) Latitude< 33.735 581   92.340630 12.53568 *
+##          27) Longitude< -118.315 2048  348.149000 12.53967  
+##            54) Latitude>=34.165 949  106.791800 12.38022 *
+##            55) Latitude< 34.165 1099  196.395200 12.67735  
+##             110) Longitude>=-118.365 431   85.796770 12.38191 *
+##             111) Longitude< -118.365 668   48.703000 12.86798 *
+##       7) Longitude< -121.645 3485  717.479900 12.39087  
+##        14) Latitude>=37.925 796  133.300900 12.10055 *
+##        15) Latitude< 37.925 2689  497.226200 12.47681 *
+```
+
+The following scatter plot can only be made when the CART is built using two numerical predictor variables.
+
+
+```r
+#remotes::install_github("grantmcdermott/parttree")
+library(parttree)
+house_train %>%
+  ggplot(aes(y = Longitude, x = Latitude)) + 
+  geom_parttree(data = house_cart_fit, alpha = 0.2) +
+  geom_point(aes(color = MedianHouseValue)) 
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-58-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+#### Predicting  {-}
+
+As seen in the image above, there are only 12 region so there are only 12 predicted values.  The plot below seems a little odd at first glance, but it should make sense after careful consideration of what is the outcome measurement and what is the predicted value.
+
+
+```r
+house_cart_fit %>%
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.1)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
 #### Finer partition  {-}
 
-```
-12) Latitude>=34.7 2844  645.0 11.5 
-```
-
-the node that splits at latitude greater than 34.7 has 2844 houses.  645 is the "deviance" which is the sum of squares value for that node.  the predicted value is the average of the points in that node: 11.5.  it is not a terminal node (no asterisk).
-
-
-```r
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate, 
-                         method="rpart2",
-                         trControl = fitControl, 
-                         tuneGrid= data.frame(maxdepth=5))
-
-tr.house$finalModel
-```
+From above: 
 
 ```
-## n= 20640 
-## 
-## node), split, n, deviance, yval
-##       * denotes terminal node
-## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) Latitude>=38.485 2061  383.26410 11.59422  
-##      4) Latitude>=39.355 674   65.51082 11.31630 *
-##      5) Latitude< 39.355 1387  240.39580 11.72928 *
-##    3) Latitude< 38.485 18579 5750.77400 12.13931  
-##      6) Longitude>=-121.655 13941 4395.52000 12.05527  
-##       12) Latitude>=34.675 2844  645.27310 11.51018  
-##         24) Longitude>=-120.275 1460  212.47730 11.28145 *
-##         25) Longitude< -120.275 1384  275.83120 11.75148 *
-##       13) Latitude< 34.675 11097 2688.68000 12.19497  
-##         26) Longitude>=-118.315 8384 1823.33000 12.08687  
-##           52) Longitude>=-117.545 2839  691.79800 11.87672 *
-##           53) Longitude< -117.545 5545  941.96340 12.19446 *
-##         27) Longitude< -118.315 2713  464.62720 12.52902 *
-##      7) Longitude< -121.655 4638  960.79250 12.39194  
-##       14) Latitude>=37.925 1063  177.59430 12.09533 *
-##       15) Latitude< 37.925 3575  661.87260 12.48013 *
+       12) Latitude>=34.675 2182  513.95640 11.52385  
 ```
+
+The node that splits at latitude greater than 34.675 has 2182 houses.  513.9564 is the "deviance" which is the sum of squares value for that node.  The predicted value is the average of the points in that node: 11.5.  It is not a terminal node (no asterisk).
 
 
 #### More variables {-}
 
-Including all the variables, not only the latitude and longitude:
+Including all the variables, not only the latitude and longitude.  Note the predictions are much better!
 
 
 ```r
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.full.house <- caret::train(log(MedianHouseValue) ~ ., 
-                              data=real.estate, 
-                              method="rpart2", 
-                              trControl = fitControl, 
-                              tuneGrid= data.frame(maxdepth=5))
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
 
-tr.full.house$finalModel
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
+
+# recipe
+house_cart_full_recipe <-
+  recipe(logValue ~ . ,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_full_wflow <- workflow() %>%
+  add_model(house_cart) %>%
+  add_recipe(house_cart_full_recipe)
+
+# fit
+house_cart_full_fit <- house_cart_full_wflow %>%
+  fit(data = house_train)
+```
+
+
+```r
+house_cart_full_fit %>%
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.01)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-61-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Cross Validation (model building!)  {-}
+
+
+
+```r
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
+
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
+
+set.seed(4321)
+house_vfold <- vfold_cv(house_train, v = 10)
+
+cart_grid <- expand.grid(tree_depth = seq(2, 20, by = 2))
+
+# recipe
+house_cart_tune_recipe <-
+  recipe(logValue ~ .,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart_tune <- decision_tree(tree_depth = tune()) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_tune_wflow <- workflow() %>%
+  add_model(house_cart_tune) %>%
+  add_recipe(house_cart_tune_recipe)
+
+# tuning / fit
+house_tuned <- house_cart_tune_wflow %>%
+  tune_grid(resamples = house_vfold, 
+           grid = cart_grid) 
+```
+
+**CV accuracy**
+
+
+
+```r
+house_tuned %>% collect_metrics() %>%
+  filter()
 ```
 
 ```
-## n= 20640 
+## # A tibble: 20 × 7
+##    tree_depth .metric .estimator  mean     n std_err .config              
+##         <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+##  1          2 rmse    standard   0.428    10 0.00224 Preprocessor1_Model01
+##  2          2 rsq     standard   0.436    10 0.00665 Preprocessor1_Model01
+##  3          4 rmse    standard   0.383    10 0.00242 Preprocessor1_Model02
+##  4          4 rsq     standard   0.547    10 0.00629 Preprocessor1_Model02
+##  5          6 rmse    standard   0.366    10 0.00239 Preprocessor1_Model03
+##  6          6 rsq     standard   0.588    10 0.00586 Preprocessor1_Model03
+##  7          8 rmse    standard   0.366    10 0.00239 Preprocessor1_Model04
+##  8          8 rsq     standard   0.588    10 0.00586 Preprocessor1_Model04
+##  9         10 rmse    standard   0.366    10 0.00239 Preprocessor1_Model05
+## 10         10 rsq     standard   0.588    10 0.00586 Preprocessor1_Model05
+## 11         12 rmse    standard   0.366    10 0.00239 Preprocessor1_Model06
+## 12         12 rsq     standard   0.588    10 0.00586 Preprocessor1_Model06
+## 13         14 rmse    standard   0.366    10 0.00239 Preprocessor1_Model07
+## 14         14 rsq     standard   0.588    10 0.00586 Preprocessor1_Model07
+## 15         16 rmse    standard   0.366    10 0.00239 Preprocessor1_Model08
+## 16         16 rsq     standard   0.588    10 0.00586 Preprocessor1_Model08
+## 17         18 rmse    standard   0.366    10 0.00239 Preprocessor1_Model09
+## 18         18 rsq     standard   0.588    10 0.00586 Preprocessor1_Model09
+## 19         20 rmse    standard   0.366    10 0.00239 Preprocessor1_Model10
+## 20         20 rsq     standard   0.588    10 0.00586 Preprocessor1_Model10
+```
+
+```r
+house_tuned %>%
+  autoplot(metric = "rmse")
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-63-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+house_tuned %>% 
+  select_best("rmse")
+```
+
+```
+## # A tibble: 1 × 2
+##   tree_depth .config              
+##        <dbl> <chr>                
+## 1          6 Preprocessor1_Model03
+```
+**Final model + prediction on test data**
+
+
+Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes (depth of 6) corresponds to the tree with the lowest deviance.
+
+
+```r
+# recipe
+house_cart_final_recipe <-
+  recipe(logValue ~ .,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart_final <- decision_tree(tree_depth = 6) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_final_wflow <- workflow() %>%
+  add_model(house_cart_final) %>%
+  add_recipe(house_cart_final_recipe)
+
+# tuning / fit
+house_final <- house_cart_final_wflow %>%
+  fit(data = house_train)
+```
+
+
+**Predicting the final model on test data**
+
+
+```r
+house_final
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
 ## 
 ## node), split, n, deviance, yval
 ##       * denotes terminal node
 ## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) MedianIncome< 3.5471 10381 2662.31300 11.77174  
-##      4) MedianIncome< 2.51025 4842 1193.71700 11.57572  
-##        8) Latitude>=34.465 2520  557.77450 11.38771  
-##         16) Longitude>=-120.275 728   77.14396 11.08365 *
-##         17) Longitude< -120.275 1792  385.97890 11.51124  
-##           34) Latitude>=37.905 1103  150.31490 11.35795 *
-##           35) Latitude< 37.905 689  168.25420 11.75664 *
-##        9) Latitude< 34.465 2322  450.19880 11.77976  
-##         18) Longitude>=-117.775 878  144.15330 11.52580 *
-##         19) Longitude< -117.775 1444  214.98520 11.93418 *
-##      5) MedianIncome>=2.51025 5539 1119.89800 11.94310  
-##       10) Latitude>=37.925 1104  123.65980 11.68124 *
-##       11) Latitude< 37.925 4435  901.69050 12.00829  
-##         22) Longitude>=-122.235 4084  770.65270 11.96811  
-##           44) Latitude>=34.455 1270  284.66500 11.76617 *
-##           45) Latitude< 34.455 2814  410.82510 12.05924 *
-##         23) Longitude< -122.235 351   47.73002 12.47579 *
-##    3) MedianIncome>=3.5471 10259 1974.99300 12.40175  
-##      6) MedianIncome< 5.5892 7265 1156.09500 12.25720  
-##       12) MedianHouseAge< 38.5 5907  858.59850 12.20694 *
-##       13) MedianHouseAge>=38.5 1358  217.69860 12.47578 *
-##      7) MedianIncome>=5.5892 2994  298.73550 12.75251  
-##       14) MedianIncome< 7.393 2008  176.41530 12.64297 *
-##       15) MedianIncome>=7.393 986   49.16749 12.97557 *
+##  1) root 15480 5024.40500 12.08947  
+##    2) MedianIncome< 3.54635 7696 1992.69800 11.77343  
+##      4) MedianIncome< 2.5165 3632  904.76740 11.57590  
+##        8) Latitude>=34.445 1897  412.81950 11.38488  
+##         16) Longitude>=-120.265 549   63.97662 11.08633 *
+##         17) Longitude< -120.265 1348  279.98120 11.50647 *
+##        9) Latitude< 34.445 1735  347.04430 11.78476  
+##         18) Longitude>=-117.775 645  111.86670 11.52607 *
+##         19) Longitude< -117.775 1090  166.47070 11.93784 *
+##      5) MedianIncome>=2.5165 4064  819.58450 11.94995  
+##       10) Latitude>=37.925 809   91.49688 11.68589 *
+##       11) Latitude< 37.925 3255  657.65510 12.01558  
+##         22) Longitude>=-122.235 2992  563.13610 11.97426  
+##           44) Latitude>=34.455 940  203.99070 11.77685  
+##             88) Longitude>=-120.155 338   31.54079 11.36422 *
+##             89) Longitude< -120.155 602   82.59029 12.00852 *
+##           45) Latitude< 34.455 2052  305.72870 12.06470  
+##             90) Longitude>=-118.285 1476  171.16160 11.95681 *
+##             91) Longitude< -118.285 576   73.36843 12.34115 *
+##         23) Longitude< -122.235 263   31.29310 12.48567 *
+##    3) MedianIncome>=3.54635 7784 1502.97400 12.40194  
+##      6) MedianIncome< 5.59185 5526  876.96730 12.25670  
+##       12) MedianHouseAge< 38.5 4497  651.27750 12.20567  
+##         24) MedianIncome< 4.53095 2616  388.38650 12.11491 *
+##         25) MedianIncome>=4.53095 1881  211.37640 12.33189 *
+##       13) MedianHouseAge>=38.5 1029  162.80030 12.47972 *
+##      7) MedianIncome>=5.59185 2258  224.13060 12.75740  
+##       14) MedianIncome< 7.393 1527  134.00030 12.64684 *
+##       15) MedianIncome>=7.393 731   32.47344 12.98835 *
 ```
-
-```r
-rpart.plot::rpart.plot(tr.full.house$finalModel)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="672" style="display: block; margin: auto;" />
-
-
-#### Cross Validation (model building!)  {-}
-
-Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.
-
 
 
 ```r
-# here, let's use all the variables and all the samples
-set.seed(4747)
-fitControl <- caret::trainControl(method="cv")
-tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., 
-                              data=real.estate, 
-                              method="rpart2",
-                              trControl=fitControl,
-                              tuneGrid=data.frame(maxdepth=1:20),
-                              parms=list(split="gini"))
-  
-tree.cv.house  
+house_final %>% 
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.1) + 
+  xlab("log of the Median House Value") +
+  ylab("predicted value of log Median House")
 ```
 
-```
-## CART 
-## 
-## 20640 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4748682  0.3041572  0.3848606
-##    2        0.4478756  0.3809354  0.3563586
-##    3        0.4282733  0.4340116  0.3393296
-##    4        0.4178448  0.4611563  0.3296215
-##    5        0.4054431  0.4924175  0.3184901
-##    6        0.3962472  0.5155365  0.3103266
-##    7        0.3948428  0.5189584  0.3092563
-##    8        0.3935306  0.5221099  0.3080369
-##    9        0.3891254  0.5326804  0.3044392
-##   10        0.3836652  0.5456808  0.3000226
-##   11        0.3786873  0.5574177  0.2956848
-##   12        0.3739131  0.5685161  0.2907504
-##   13        0.3712711  0.5746216  0.2868830
-##   14        0.3703641  0.5767271  0.2858720
-##   15        0.3703641  0.5767271  0.2858720
-##   16        0.3703641  0.5767271  0.2858720
-##   17        0.3703641  0.5767271  0.2858720
-##   18        0.3703641  0.5767271  0.2858720
-##   19        0.3703641  0.5767271  0.2858720
-##   20        0.3703641  0.5767271  0.2858720
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 14.
-```
+<img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;" />
 
-```r
-rpart.plot::rpart.plot(tree.cv.house$finalModel)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;" />
-
-```r
-plot(tree.cv.house)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-60-2.png" width="480" style="display: block; margin: auto;" />
-
-
-#### Training / test data for model building AND model accuracy {-}
-
-
-```r
-# first create two datasets: one training, one test
-inTrain <- caret::createDataPartition(y = real.estate$MedianHouseValue, 
-                                      p=.8, list=FALSE)
-house.train <- real.estate[inTrain,]
-house.test <- real.estate[-c(inTrain),]
-
-
-# then use CV on the training data to find the best maxdepth
-set.seed(4747)
-fitControl <- caret::trainControl(method="cv")
-tree.cvtrain.house <- caret::train(log(MedianHouseValue) ~ ., 
-                                   data=house.train, 
-                                   method="rpart2",
-                                   trControl=fitControl, 
-                                   tuneGrid=data.frame(maxdepth=1:20),
-                                   parms=list(split="gini"))
-
-
-tree.cvtrain.house
-```
-
-```
-## CART 
-## 
-## 16513 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4756049  0.2994314  0.3851775
-##    2        0.4497958  0.3734197  0.3581148
-##    3        0.4289837  0.4302083  0.3396992
-##    4        0.4192079  0.4558965  0.3304520
-##    5        0.4026435  0.4979229  0.3153937
-##    6        0.3960649  0.5141665  0.3102682
-##    7        0.3960649  0.5141665  0.3102682
-##    8        0.3924388  0.5229961  0.3072433
-##    9        0.3875832  0.5347306  0.3027262
-##   10        0.3830783  0.5454004  0.2981715
-##   11        0.3783297  0.5566766  0.2941443
-##   12        0.3724797  0.5702362  0.2883089
-##   13        0.3694837  0.5770987  0.2850918
-##   14        0.3694837  0.5770987  0.2850918
-##   15        0.3694837  0.5770987  0.2850918
-##   16        0.3694837  0.5770987  0.2850918
-##   17        0.3694837  0.5770987  0.2850918
-##   18        0.3694837  0.5770987  0.2850918
-##   19        0.3694837  0.5770987  0.2850918
-##   20        0.3694837  0.5770987  0.2850918
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 13.
-```
-
-```r
-tree.train.house <- caret::train(log(MedianHouseValue) ~ ., 
-                                 data=house.train, 
-                                 method="rpart2",
-                                 trControl=caret::trainControl(method="none"),
-                                 tuneGrid=data.frame(maxdepth=14),
-                                 parms=list(split="gini"))
-```
-
-**for classification results** use `confusionMatrix` instead of `postResample`
-
-
-```r
-test.pred <- predict(tree.train.house, house.test)
-caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
-```
-
-```
-##      RMSE  Rsquared       MAE 
-## 0.3696649 0.5840583 0.2846395
-```
-
-
-#### Other tree R packages  {-}
-
-* `rpart` is faster than `tree`
-
-* `party`  gives great plotting options
-
-* `maptree` also gives trees from hierarchical clustering
-
-* `randomForest`  up next!
-
-Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
 
 <!---
 ## 11/5/19 Agenda {#Nov5}
@@ -1635,7 +1701,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-63)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-67)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1736,12 +1802,12 @@ modFit
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  splitrule   Accuracy   Kappa    
-##   2     gini        0.9519882  0.9268222
-##   2     extratrees  0.9501667  0.9239468
-##   3     gini        0.9509638  0.9252363
-##   3     extratrees  0.9511923  0.9254990
-##   4     gini        0.9489015  0.9221052
-##   4     extratrees  0.9501289  0.9238519
+##   2     gini        0.9510313  0.9254883
+##   2     extratrees  0.9458269  0.9175811
+##   3     gini        0.9510313  0.9254883
+##   3     extratrees  0.9458269  0.9175811
+##   4     gini        0.9480755  0.9210098
+##   4     extratrees  0.9491620  0.9227209
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 1
 ## Accuracy was used to select the optimal model using the largest value.
@@ -1814,17 +1880,17 @@ modFit.m
 ## No pre-processing
 ## Resampling results across tuning parameters:
 ## 
-##   mtry  Accuracy   Kappa    
-##   1     0.9428571  0.9142857
-##   2     0.9523810  0.9285714
-##   3     0.9523810  0.9285714
-##   4     0.9523810  0.9285714
+##   mtry  Accuracy  Kappa    
+##   1     0.952381  0.9285714
+##   2     0.952381  0.9285714
+##   3     0.952381  0.9285714
+##   4     0.952381  0.9285714
 ## 
 ## Tuning parameter 'splitrule' was held constant at a value of gini
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 5
 ## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 2, splitrule = gini
+## The final values used for the model were mtry = 1, splitrule = gini
 ##  and min.node.size = 5.
 ```
 
@@ -1832,7 +1898,7 @@ modFit.m
 plot(modFit.m)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-70-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1860,7 +1926,7 @@ data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
     ylim(c(0.04, 0.06))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-67-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;" />
 
 ####  Variable Importance {-}
 
@@ -1879,7 +1945,7 @@ ranger::importance(modFit.VI$finalModel)
 
 ```
 ## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.026859630  0.006130369  0.297439677  0.323197349
+##  0.014669229  0.005659636  0.321919861  0.311967973
 ```
 
 ```r
@@ -1891,7 +1957,7 @@ data.frame(importance = modFit.VI$finalModel$variable.importance,
     coord_flip() 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-68-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
 
 plot both the given labels as well as the predicted labels
 
@@ -1904,7 +1970,7 @@ ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length,
     geom_point(size=3)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1974,7 +2040,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-71)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-75)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -1988,7 +2054,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-72)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-76)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -2177,7 +2243,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-74)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-78)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -2186,17 +2252,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-75)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-76)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-77)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-81)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -2241,7 +2307,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-78)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-82)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -2272,7 +2338,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-79)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-83)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -2458,7 +2524,7 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-83-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
