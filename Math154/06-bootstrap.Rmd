@@ -750,8 +750,6 @@ boot_stats %>%
 
 #### 95% Bootstrap-t CI {-}
 
-##### Without built in functions {-}
-
 Note that the t-value is needed (which requires a different SE for each bootstrap sample).  It is necessary to bootstrap twice.
 
 
@@ -773,12 +771,9 @@ boot_2_func <- function(df, reps){
 **double bootstrap!**
 ```{r}
 boot_2_stats <- data.frame(resample1 = 1:n_rep1) %>%
-  mutate(first_boot = map(1:n_rep1, ~boot_1_func())) %>%
+  mutate(first_boot = map(1:n_rep1, ~boot_1_func(df = heroin))) %>%
   mutate(second_boot = map(first_boot, boot_2_func, reps = n_rep2)) 
-
-boot_2_stats
 ```
-
 
 #### Summarizing the double bootstrap
 
@@ -807,18 +802,54 @@ boot_t_stats <- boot_2_stats %>%
   unnest(second_boot) %>%
   unnest(first_boot) %>%
   group_by(resample1) %>%
-  summarize(boot_sd_med = sd(boot_2_med),
-            boot_sd_tr_mean = sd(boot_2_tr_mean),
+  summarize(boot_se_med = sd(boot_2_med),
+            boot_se_tr_mean = sd(boot_2_tr_mean),
             boot_med = mean(boot_med),  # doesn't do anything, just copies over
             boot_tr_mean = mean(boot_tr_mean))  %>% # the variables into the output
-  mutate(boot_t_med = (boot_med - mean(boot_med)) / boot_sd_med,
-            boot_t_tr_mean = (boot_tr_mean - mean(boot_tr_mean)) / boot_sd_tr_mean)
+  mutate(boot_t_med = (boot_med - mean(boot_med)) / boot_se_med,
+            boot_t_tr_mean = (boot_tr_mean - mean(boot_tr_mean)) / boot_se_tr_mean)
 
   
 boot_t_stats
 
 ```
 
+```{r echo = FALSE}
+library(patchwork)
+p1 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_tr_mean)) + 
+  xlab("boostrapped \ntrimmed means")
+p2 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_se_tr_mean)) + 
+  xlab("boostrapped \nSEs (trim mean)")
+p3 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_t_tr_mean)) + 
+  xlab("boostrapped \nt-like-stats (trim mean)")
+
+p1 + p2 + p3
+
+```
+
+```{r echo = FALSE}
+p4 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_med)) + 
+  xlab("boostrapped \nmedians")
+p5 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_se_med)) + 
+  xlab("boostrapped \nSEs (median)")
+p6 <- boot_t_stats %>%
+  ggplot() + 
+  geom_histogram(aes(x =boot_t_med)) + 
+  xlab("boostrapped \nt-like-stats (median)")
+
+p4 + p5 + p6
+
+```
 #### 95% Bootstrap-t CI
 
 
