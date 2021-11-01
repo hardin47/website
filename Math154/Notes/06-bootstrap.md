@@ -919,8 +919,9 @@ boot_t_stats
 <img src="06-bootstrap_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
 <img src="06-bootstrap_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
-#### 95% Bootstrap-t CI
 
+
+#### 95% Bootstrap-t CI
 
 Note that the t-value is needed (which requires a different SE for each bootstrap sample).
 
