@@ -507,7 +507,7 @@ data(penguins)
 ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-## $k$-NN to predict penguin species
+#### $k$-NN to predict penguin species {-}
 
 #### 1. Partition the data
 
@@ -571,7 +571,7 @@ penguin_knn_fit %>%
   filter(.metric == "accuracy")
 ```
 
-### What is $k$?
+#### What is $k$?
 
 It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
 
@@ -856,6 +856,19 @@ The way to think about cost complexity is to consider $\alpha$ increasing.  As $
 ```{r  out.width='100%', fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/treealpha.jpg")
 ```
+
+
+**A note on $\alpha$**
+
+In the text (*Introduction to Statistical Learning*) and almost everywhere else you might look, the cost complexity is defined as in previous slides.
+
+However, you might notice that in R the `cost_complexity` value is typically less than 1.  From what I can tell, the value of the function that is being minimized in R is the **average** of the squared errors and the missclassification **rate**.
+
+\begin{align}
+\mbox{numerical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
+\end{align}
+
 
 ##### Variations on a theme {-}
 
@@ -1142,7 +1155,7 @@ The tree based models given by CART are easy to understand and implement, but th
 
 **Bagging = Bootstrap Aggregating**.  The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit.  Bagging can be applied to any classifier to reduce variability.
 
-<p style = "color:red">Recall that the variance of the sample mean is variance / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
+<p style = "color:red">Recall that the variance of the sample mean is variance of data / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
 
 ### Bagging algorithm
 
@@ -1150,8 +1163,8 @@ The tree based models given by CART are easy to understand and implement, but th
 **Algorithm**:  Bagging Forest
 
 ******
-1. Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
-2. Build a tree on each new set of $N'$ training observations.
+1. Resample (bootstrap) *cases* (observational units, not variables).  
+2. Build a tree on each new set of (bootstrapped) training observations.
 3. Average (regression) or majority vote (classification).
 4. Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
 
@@ -1159,7 +1172,7 @@ The tree based models given by CART are easy to understand and implement, but th
 ******
 
 \begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
+P(\mbox{observation $i$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
 \lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
 \end{align} 
 
@@ -1193,8 +1206,9 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n
 
 Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:
 
-* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.
-* Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
+* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the $b^{th}$ tree.
+* Put each case left out in the construction of the $b^{th}$ tree down the $b^{th}$ tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees.  
+* At the end of the run, take $j$ to be the class that got most of the votes every time case $i$ was oob. The proportion of times that $j$ is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
 
 
 How does it work?  Consider the following predictions for a silly toy data set of 9 observations.  Recall that $\sim 1/3$ of the observations will be left out at each bootstrap sample.  Those are the observations for which predictions will be made.  In the table below, an X is given if there is a prediction made for that value.
@@ -1240,8 +1254,8 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 
 ******
 1. Bootstrap sample from the training set.
-2. Grow an un-pruned tree on this bootstrap sample.
-* *At each split*, select $m$ variables and determine the best split using only these predictors.
+2. Grow an un-pruned tree on the bootstrap sample.
+* *At each split*, select $m$ variables and determine the best split using only the $m$ predictors.
 Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random Forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
 * Do *not* prune the tree.  Save the tree as is!
 
@@ -1290,10 +1304,6 @@ knitr::include_graphics("figs/zissermanRF.jpg")
 Build trees until the error no longer decreases
 * **$m$**
 Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).
-* **$N'$ samples**
-$N'$ should be the same size as the training data.
-
-
 
 
 
@@ -1307,7 +1317,7 @@ All learners are bad when there are too many noisy variables because the respons
 
 **Variable importance** is measured by two different metrics (from R help on `importance`):
 
-* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).  Within the oob values, permute the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (with the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
+* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).**Permute** the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (for the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
 * **purity:** The decrease (or increase, depending on the plot) in node purity: root sum of squares (RSS) [deviance/gini for classification trees].  That is, the amount of total decrease in RSS from splitting on *that* variable, averaged over all trees.
 
 
@@ -1323,104 +1333,110 @@ If the number of variables is very large, forests can be run once with all the v
 `method= 'ranger' ` is about a zillion times faster than `method = 'randomForest'` or  `method = 'rf'`, but they all do the work.
 
 ```{r}
-data(iris)
-library(tidyverse)
-library(caret)
-library(ranger)
-library(e1071)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
 
-inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-inTrain,]
-```
+penguins <- penguins %>%
+  drop_na()
 
-```{r}
-modFit <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger")
-modFit
-
-caret::confusionMatrix(data=predict(modFit, newdata = iris.test), 
-                reference = iris.test$Species)
-```
-
-
-#### Parameters...  `mtry` and `num.trees`
-
-Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
-
-```{r}
-modFit.m <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = 500,
-                tuneGrid= data.frame(mtry=1:4, splitrule = "gini",
-                                     min.node.size = 5))
-modFit.m
-plot(modFit.m)
-```
-
-
-
-```{r}
+# partition
 set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
 
-acc.ntree = c()
-for(i in seq(10, 260, by = 50)){
-modFit.ntree <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = i,
-                tuneGrid= data.frame(mtry=3, splitrule = "gini",
-                                     min.node.size = 5))
+# recipe
+penguin_rf_recipe <-
+  recipe(body_mass_g ~ . ,
+         data = penguin_train) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_mutate(year = as.factor(year)) 
 
-acc.ntree <- c(acc.ntree, modFit.ntree$finalModel$prediction.error)
-}
+#model
+penguin_rf <- rand_forest(mtry = tune(),
+                           trees = tune()) %>%
+  set_engine("ranger", importance = "permutation") %>%
+  set_mode("regression")
 
-data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
-    ggplot( aes(x=ntree, y = acc.ntree)) + geom_line() +
-    xlab("number of trees in the RF") +
-    ylab("OOB Accuracy") +
-    ylim(c(0.04, 0.06))
+# workflow
+penguin_rf_wflow <- workflow() %>%
+  add_model(penguin_rf) %>%
+  add_recipe(penguin_rf_recipe)
 
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+penguin_grid <- grid_regular(mtry(range = c(2,7)),
+                             trees(range = c(1,500)),
+                             levels = 5)
+
+# tune
+penguin_rf_tune <- 
+  penguin_rf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+select_best(penguin_rf_tune, "rmse")
 ```
+
+Which `mtry` and number of trees?
+
+```{r}
+penguin_rf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "rmse") %>%
+  ggplot() + 
+  geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
+```
+
+
+Get the final model:
+
+```{r}
+penguin_rf_best <- finalize_model(
+  penguin_rf,
+  select_best(penguin_rf_tune, "rmse"))
+
+penguin_rf_best
+
+
+penguin_rf_final <-
+  workflow() %>%
+  add_model(penguin_rf_best) %>%
+  add_recipe(penguin_rf_recipe) %>%
+  fit(data = penguin_train)
+
+penguin_rf_final
+```
+
+Predict the test data:
+
+
+```{r}
+penguin_rf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  ggplot() +
+  geom_point(aes(x = body_mass_g, y = .pred)) + 
+  geom_abline(intercept = 0, slope = 1)
+```
+
 
 ####  Variable Importance {-}
 
-In order to get the variable importance, you need to specify importance within the building of the forest.
+In order to get the variable importance, you need to specify importance within the model of the forest.
 
-See if you can figure out every single line of the `ggplot` code.
-```{r}
-modFit.VI <- caret::train(Species ~ ., 
-                data=iris.train, 
-                importance = "permutation",
-                method="ranger")
+```{r fig.height = 5}
+library(vip)
 
-ranger::importance(modFit.VI$finalModel)
-
-data.frame(importance = modFit.VI$finalModel$variable.importance,
-           variables = names(modFit.VI$finalModel$variable.importance)) %>% 
-    ggplot(aes(x = reorder(variables, importance), y = importance)) +
-    geom_bar(stat = "identity") + 
-    xlab("Variable") + 
-    coord_flip() 
+penguin_rf_final %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "point")
 ```
-
-plot both the given labels as well as the predicted labels
-```{r}
-iris.test <- iris.test %>%
-    mutate(testSpecies = predict(modFit, iris.test))
-
-ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length, 
-                      shape = Species, col = testSpecies)) + 
-    geom_point(size=3)
-```
-
-
-
-
 
 ## Model Choices
 
@@ -1428,11 +1444,11 @@ There are *soooooo* many choices we've made along the way.  The following list s
 
 |  $\mbox{  }$ 	| $\mbox{  }$	|
 |---------------------------------------------	|-------------------------------	|
-| * explanatory variable choice 	| * k (kNN) 	|
+| * explanatory variable choice 	| * $k$ ($k$-NN) 	|
 | * number of explanatory variables 	| * distance measure 	|
-| * functions/transformation of explanatory 	| * k (CV) 	|
-| * transformation of response 	| * CV set.seed 	|
-| * response:continuous vs. categorical 	| * alpha prune 	|
+| * functions/transformation of explanatory 	| * V (CV) 	|
+| * transformation of response 	| * CV `set.seed` 	|
+| * response:continuous vs. categorical 	| * $\alpha$ prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
 | * train/test split (`set.seed`) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|

@@ -1153,6 +1153,19 @@ The way to think about cost complexity is to consider $\alpha$ increasing.  As $
 
 <img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;" />
 
+
+**A note on $\alpha$**
+
+In the text (*Introduction to Statistical Learning*) and almost everywhere else you might look, the cost complexity is defined as in previous slides.
+
+However, you might notice that in R the `cost_complexity` value is typically less than 1.  From what I can tell, the value of the function that is being minimized in R is the **average** of the squared errors and the missclassification **rate**.
+
+\begin{align}
+\mbox{numerical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
+\end{align}
+
+
 ##### Variations on a theme {-}
 
 The main ideas above are consistent throughout all CART algorithms.  However, the exact details of implementation can change from function to function, and often times it is very difficult to decipher exactly which equation is being used.  In the `tree` function in R, much of the decision making is done on `deviance` which is defined as:
@@ -1587,7 +1600,7 @@ The tree based models given by CART are easy to understand and implement, but th
 
 **Bagging = Bootstrap Aggregating**.  The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit.  Bagging can be applied to any classifier to reduce variability.
 
-<p style = "color:red">Recall that the variance of the sample mean is variance / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
+<p style = "color:red">Recall that the variance of the sample mean is variance of data / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
 
 ### Bagging algorithm
 
@@ -1595,8 +1608,8 @@ The tree based models given by CART are easy to understand and implement, but th
 **Algorithm**:  Bagging Forest
 
 ******
-1. Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
-2. Build a tree on each new set of $N'$ training observations.
+1. Resample (bootstrap) *cases* (observational units, not variables).  
+2. Build a tree on each new set of (bootstrapped) training observations.
 3. Average (regression) or majority vote (classification).
 4. Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
 
@@ -1604,7 +1617,7 @@ The tree based models given by CART are easy to understand and implement, but th
 ******
 
 \begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
+P(\mbox{observation $i$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
 \lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
 \end{align} 
 
@@ -1638,8 +1651,9 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n
 
 Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:
 
-* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.
-* Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
+* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the $b^{th}$ tree.
+* Put each case left out in the construction of the $b^{th}$ tree down the $b^{th}$ tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees.  
+* At the end of the run, take $j$ to be the class that got most of the votes every time case $i$ was oob. The proportion of times that $j$ is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
 
 
 How does it work?  Consider the following predictions for a silly toy data set of 9 observations.  Recall that $\sim 1/3$ of the observations will be left out at each bootstrap sample.  Those are the observations for which predictions will be made.  In the table below, an X is given if there is a prediction made for that value.
@@ -1736,10 +1750,6 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 Build trees until the error no longer decreases
 * **$m$**
 Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).
-* **$N'$ samples**
-$N'$ should be the same size as the training data.
-
-
 
 
 

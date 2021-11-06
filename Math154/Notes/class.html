@@ -1132,6 +1132,13 @@ where <span class="math inline">\(k(m)\)</span> is the class with the majority o
 </ul>
 <p>The way to think about cost complexity is to consider <span class="math inline">\(\alpha\)</span> increasing. As <span class="math inline">\(\alpha\)</span> gets bigger, the “best” tree will be smaller. But the test error will not be monotonically related to the size of the training tree.</p>
 <div class="inline-figure"><img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;"></div>
+<p><strong>A note on <span class="math inline">\(\alpha\)</span></strong></p>
+<p>In the text (<em>Introduction to Statistical Learning</em>) and almost everywhere else you might look, the cost complexity is defined as in previous slides.</p>
+<p>However, you might notice that in R the <code>cost_complexity</code> value is typically less than 1. From what I can tell, the value of the function that is being minimized in R is the <strong>average</strong> of the squared errors and the missclassification <strong>rate</strong>.</p>
+<p><span class="math display">\[\begin{align}
+\mbox{numerical: } C_\alpha(T) &amp;= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &amp;= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
+\end{align}\]</span></p>
 <div id="variations-on-a-theme" class="section level5 unnumbered">
 <h5>Variations on a theme<a class="anchor" aria-label="anchor" href="#variations-on-a-theme"><i class="fas fa-link"></i></a>
 </h5>
@@ -1497,7 +1504,7 @@ equal population. For the 1990 Census, California was divided into 20640 tracts.
 <p>The tree based models given by CART are easy to understand and implement, but they suffer from <em>high variance</em>. That is, if we split the training data into two parts at random and fit a decision tree to both halves, the results that we get could be quite different (you might have seen this in your homework assignment!). We’d like a model that produces low variance - one for which if we ran it on different datasets, we’d get (close to) the same model every time.</p>
 <p><strong>Bagging = Bootstrap Aggregating</strong>. The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit. Bagging can be applied to any classifier to reduce variability.</p>
 <p style="color:red">
-Recall that the variance of the sample mean is variance / n. So we’ve seen the idea that averaging an outcome gives reduced variability.
+Recall that the variance of the sample mean is variance of data / n. So we’ve seen the idea that averaging an outcome gives reduced variability.
 </p>
 <div id="bagging-algorithm" class="section level3" number="8.5.1">
 <h3>
@@ -1507,14 +1514,15 @@ Recall that the variance of the sample mean is variance / n. So we’ve seen th
 <p><strong>Algorithm</strong>: Bagging Forest</p>
 <hr>
 <ol style="list-style-type: decimal">
-<li>Resample <em>cases</em> (observational units, not variables) and recalculate predictions. Choose <span class="math inline">\(N' \leq N\)</span> for the number of observations in the new training set through random sampling with replacement. Almost always we use <span class="math inline">\(N' = N\)</span> for a full bootstrap.</li>
-<li>Build a tree on each new set of <span class="math inline">\(N'\)</span> training observations.</li>
+<li>Resample (bootstrap) <em>cases</em> (observational units, not variables).<br>
+</li>
+<li>Build a tree on each new set of (bootstrapped) training observations.</li>
 <li>Average (regression) or majority vote (classification).</li>
 <li>Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.</li>
 </ol>
 <hr>
 <p><span class="math display">\[\begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
+P(\mbox{observation $i$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{1}{n} \bigg)^n\\
 \lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
 \end{align}\]</span></p>
 <p><strong>Shortcomings of Bagging:</strong></p>
@@ -1549,8 +1557,10 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &amp;= \bigg(1 - \frac{
 </h3>
 <p>Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:</p>
 <ul>
-<li>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.</li>
-<li>Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.</li>
+<li>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the <span class="math inline">\(b^{th}\)</span> tree.</li>
+<li>Put each case left out in the construction of the <span class="math inline">\(b^{th}\)</span> tree down the <span class="math inline">\(b^{th}\)</span> tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees.<br>
+</li>
+<li>At the end of the run, take <span class="math inline">\(j\)</span> to be the class that got most of the votes every time case <span class="math inline">\(i\)</span> was oob. The proportion of times that <span class="math inline">\(j\)</span> is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.</li>
 </ul>
 <p>How does it work? Consider the following predictions for a silly toy data set of 9 observations. Recall that <span class="math inline">\(\sim 1/3\)</span> of the observations will be left out at each bootstrap sample. Those are the observations for which predictions will be made. In the table below, an X is given if there is a prediction made for that value.</p>
 <div class="inline-table"><table class="table table-sm">
@@ -1742,9 +1752,6 @@ Build trees until the error no longer decreases</li>
 <li>
 <strong><span class="math inline">\(m\)</span></strong>
 Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).</li>
-<li>
-<strong><span class="math inline">\(N'\)</span> samples</strong>
-<span class="math inline">\(N'\)</span> should be the same size as the training data.</li>
 </ul>
 </div>
 <div id="variable-importance" class="section level4 unnumbered">
@@ -2624,7 +2631,7 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-11-01.</p>
+    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-11-02.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
