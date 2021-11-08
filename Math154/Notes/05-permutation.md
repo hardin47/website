@@ -271,8 +271,9 @@ After running tests to compare means and variances we obtain the following p-val
 Before doing anything, let's look at the data.  Here, we visualize with both boxplots and histograms.  Also, we visualize on the raw scale as well as the log scale.  Certainly, the log10 scale indicates that a transformation makes the data more symmetric.
 
 
+
 ```r
-clouds <- read_delim("https://dasl.datadescription.com/download/data/3117/cloud-seeding.txt", 
+clouds <- read_delim("figs/cloud-seeding.txt", 
      "\t", escape_double = FALSE, trim_ws = TRUE) 
 
 names(clouds) <- c("unseeded", "seeded")
@@ -294,6 +295,7 @@ clouds %>%
 
 
 
+
 ```r
 clouds %>%
   ggplot(aes(x=seeding, y=rainfall)) + geom_boxplot() + scale_y_log10()
@@ -312,6 +314,7 @@ clouds %>%
 **unlogged data:**
 
 
+
 ```r
 clouds %>%
   mutate(lnrain = log(rainfall)) %>%
@@ -319,13 +322,17 @@ clouds %>%
   summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain))
 ```
 
+
+
 ```
-## # A tibble: 2 x 3
+## # A tibble: 2 × 3
 ##   seeding  meanrain meanlnrain
 ##   <fct>       <dbl>      <dbl>
 ## 1 seeded       442.       5.13
 ## 2 unseeded     165.       3.99
 ```
+
+
 
 ```r
 clouds %>%
@@ -335,12 +342,16 @@ clouds %>%
   summarize(diff(meanrain), diff(meanlnrain))
 ```
 
+
+
 ```
-## # A tibble: 1 x 2
+## # A tibble: 1 × 2
 ##   `diff(meanrain)` `diff(meanlnrain)`
 ##              <dbl>              <dbl>
 ## 1            -277.              -1.14
 ```
+
+
 
 ```r
 raindiffs <- clouds %>%
@@ -352,18 +363,23 @@ raindiffs <- clouds %>%
 raindiffs
 ```
 
+
+
 ```
-## # A tibble: 1 x 2
+## # A tibble: 1 × 2
 ##   diffrain difflnrain
 ##      <dbl>      <dbl>
 ## 1    -277.      -1.14
 ```
 
 
+
+
 Below, we've formally gone through a permutation.  here, the resampling is not coded in a particularly tidy way, but there is a tidy way to code loops!  Generally, loops are not the fasted way to code in R, so if you need to quickly run code that seems like it should go in a loop, it is very likely that `purrr` is the direction you want to go, https://purrr.tidyverse.org/.
 
 
 #####  Difference in means after permuting
+
 
 
 ```r
@@ -388,6 +404,7 @@ permdiffs %>% data.frame() %>%
 
 
 #####  Ratio of variances after permuting
+
 
 
 ```r
@@ -428,21 +445,30 @@ As evidenced in the histograms above,
 * the permutation test (one-sided) for the ratio of variances will count the number of permuted ratios that are greater than or equal to the observed ratio of variances, about 7%.
 
 
+
 ```r
 (sum(raindiffs$diffrain >= permdiffs) + 1) /1000
 ```
 
+
+
 ```
-## [1] 0.027
+## [1] 0.02
 ```
+
+
 
 ```r
 (sum(rainvarratio$rainratio <= permvars)+1)/1000
 ```
 
+
+
 ```
-## [1] 0.081
+## [1] 0.075
 ```
+
+
 
 <!--
 
@@ -459,6 +485,7 @@ To find a CI for the difference in locations of the distributions of the seeded 
 
 
 where p is the proportion of simulated test statistics greater than or equal to our observed value (after shifting by an amount "b").
+
 
 
 ```r
@@ -502,6 +529,8 @@ print((sum(obs.um.ci.stat>=perm.um.ci.stat)+1)/4000)
 }
 ```
 
+
+
 -->
 
 ### MacNell Teaching Evaluations (Stratified two-sample t-test)
@@ -510,10 +539,10 @@ Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were r
 
 <div class="figure" style="text-align: center">
 <img src="figs/genderbias2a.png" alt="@genderbias3" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-91)@genderbias3</p>
+<p class="caption">(\#fig:unnamed-chunk-9-1)@genderbias3</p>
 </div><div class="figure" style="text-align: center">
 <img src="figs/genderbias2b.png" alt="@genderbias3" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-92)@genderbias3</p>
+<p class="caption">(\#fig:unnamed-chunk-9-2)@genderbias3</p>
 </div>
 
 
@@ -524,10 +553,10 @@ Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were r
 
 <div class="figure" style="text-align: center">
 <img src="figs/genderbias3a.png" alt="@genderbias2" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-111)@genderbias2</p>
+<p class="caption">(\#fig:unnamed-chunk-11-1)@genderbias2</p>
 </div><div class="figure" style="text-align: center">
 <img src="figs/genderbias3b.png" alt="@genderbias2" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-112)@genderbias2</p>
+<p class="caption">(\#fig:unnamed-chunk-11-2)@genderbias2</p>
 </div>
 
 
@@ -537,7 +566,9 @@ Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were r
 
 
 ```r
-macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+#macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+library(permuter)
+data(macnell)
 ```
 
 
@@ -546,15 +577,21 @@ macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/m
 
 
 ```r
+library(ggridges)
 macnell %>% 
   mutate(TAID = ifelse(taidgender==1, "male", "female")) %>%
   mutate(TAGend = ifelse(tagender==1, "male", "female")) %>%
-  mutate(gendjitter = ifelse(tagender==1, -0.2, 0.2)) %>%
-ggplot(aes(x=TAGend, y=overall, color=TAID, fill=TAID)) + 
-  geom_boxplot() + scale_fill_manual(values=rep('white', 2))  +
-  geom_point(position=position_jitterdodge(jitter.width=0.2), alpha=0.5) +
-  stat_summary(fun.y="mean", geom="point", size=3,
-    position=position_dodge(width=0.75))
+ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID), 
+           fill=TAID)) +
+  geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), aes(color = TAID)) +
+  stat_summary(fun="mean", geom="crossbar", size=.3, width = 1,
+               aes(color = TAID),
+               position=position_dodge(width=0.4)) +
+  stat_summary(fun="mean", geom="point", shape = "X",
+               size=5, aes(color = TAID),
+               position=position_dodge(width=0.4)) +
+  coord_flip() +
+  xlab("") + ggtitle("Overall teaching effectiveness score")
 ```
 
 <img src="05-permutation_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
@@ -566,7 +603,7 @@ Want to know if the score for the **perceived** gender is different.
 
 
 $$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
-
+> Although for the permutation test, under the null hypothesis not only are the means of the population distributions the same, but the variance and all other aspects of the distributions across perceived gender.
 
 #### MacNell Data without permutation
 
@@ -580,18 +617,16 @@ macnell %>%
 
 
 ```
-## # A tibble: 15 x 3
 ##    overall tagender taidgender
-##      <dbl>    <dbl>      <dbl>
-##  1       4        0          1
-##  2       4        0          1
-##  3       5        0          1
-##  4       5        0          1
-##  5       5        0          1
-##  6       4        0          1
-##  7       4        0          1
-##  8       5        0          1
-##  9       4        0          1
+## 1        4        0          1
+## 2        4        0          1
+## 3        5        0          1
+## 4        5        0          1
+## 5        5        0          1
+## 6        4        0          1
+## 7        4        0          1
+## 8        5        0          1
+## 9        4        0          1
 ## 10       3        0          1
 ## 11       5        0          1
 ## 12       4        0          1
@@ -607,73 +642,150 @@ macnell %>%
 
 Conceptually, there are two levels of randomization:
 
-1. $N_m$ students are randomly assigned to the male instructor and the remaining $N_f$ get the female instructor.
+1. $N_m$ students are randomly assigned to the male instructor and $N_f$ are assigned to the female instructor.
 
-2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, for $j=1,2$.
+2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, and $N_{jf}$ are told that the instructor is female for $j=m,f$.
+
+
+
+```r
+macnell %>%
+  group_by(tagender, taidgender) %>%
+  summarize(n())
+```
+
+
+
+```
+## # A tibble: 4 × 3
+## # Groups:   tagender [2]
+##   tagender taidgender `n()`
+##      <int>      <int> <int>
+## 1        0          0    11
+## 2        0          1    12
+## 3        1          0    13
+## 4        1          1    11
+```
+
 
 
 **Stratified two-sample test:**
 
-* For each instructor, permute *perceived* gender assignments.
+* **For each instructor**, permute *perceived* gender assignments.
 * Use difference in mean ratings for female-identified vs male-identified instructors.
 
 
-<pre><code class='language-r'><code>macnell %>% <span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  select(overall, tagender, taidgender, permTAID) %>% head(15)</code></code></pre> 
+
+
+
+
+
+
+<pre><code class='language-r'><code>macnell %>% <br>&nbsp;&nbsp;<span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>&nbsp;&nbsp;mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>&nbsp;&nbsp;select(overall, tagender, taidgender, permTAID)</code></code></pre>
+
+
+
+
 
 ```
-## # A tibble: 15 x 4
+
+## # A tibble: 47 × 4
 ## # Groups:   tagender [2]
 ##    overall tagender taidgender permTAID
-##      <dbl>    <dbl>      <dbl>    <dbl>
+##      <dbl>    <int>      <int>    <int>
 ##  1       4        0          1        1
 ##  2       4        0          1        1
-##  3       5        0          1        0
-##  4       5        0          1        0
+##  3       5        0          1        1
+##  4       5        0          1        1
 ##  5       5        0          1        1
 ##  6       4        0          1        1
 ##  7       4        0          1        0
 ##  8       5        0          1        0
-##  9       4        0          1        1
-## 10       3        0          1        1
-## 11       5        0          1        0
-## 12       4        0          1        0
-## 13       5        1          1        1
-## 14       5        1          1        1
-## 15       4        1          1        1
-```
-
-
-
-
-<pre><code class='language-r'><code>macnell %>% <span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  ungroup(tagender) %>%<br>  <span style='background-color:#ffff7f'>group_by(permTAID)</span> %>%<br>  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%<br>  summarize(diff(pmeans))</code></code></pre> 
+##  9       4        0          1        0
+## 10       3        0          1        0
+## # … with 37 more rows
 
 ```
-## # A tibble: 1 x 1
+
+
+
+
+
+
+
+
+
+
+
+<pre><code class='language-r'><code>macnell %>% <br>&nbsp;&nbsp;<span style='background-color:#ffff7f'>group_by(tagender)</span> %>%<br>&nbsp;&nbsp;mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>&nbsp;&nbsp;ungroup(tagender) %>%<br>&nbsp;&nbsp;<span style='background-color:#ffff7f'>group_by(permTAID)</span> %>%<br>&nbsp;&nbsp;summarize(pmeans = mean(overall, na.rm=TRUE)) %>%<br>&nbsp;&nbsp;summarize(diff(pmeans))</code></code></pre>
+
+
+
+
+
+```
+
+## # A tibble: 1 × 1
 ##   `diff(pmeans)`
 ##            <dbl>
-## 1         -0.380
+## 1        -0.0870
+
+```
+
+
+
+
+
+
+
+```r
+diff_means_func <- function(.x){
+  macnell %>% group_by(tagender) %>%
+  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
+  ungroup(tagender) %>%
+  group_by(permTAID) %>%
+  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+  summarize(diff_mean = diff(pmeans))
+  }
+
+map_df(1:5, diff_means_func)
+```
+
+
+
+```
+## # A tibble: 5 × 1
+##   diff_mean
+##       <dbl>
+## 1   -0.188 
+## 2   -0.0909
+## 3   -0.474 
+## 4   -0.0909
+## 5    0.277
 ```
 
 
 
 
-<pre><code class='language-r'><code><span style='background-color:#ffff7f'>replicate(5</span>,<br>  macnell %>% group_by(tagender) %>%<br>  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%<br>  ungroup(tagender) %>%<br>  group_by(permTAID) %>%<br>  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%<br>  summarize(diff(pmeans)))</code></code></pre> 
+#### Observed vs. Permuted statistic
+
+
+
+```r
+# observed
+macnell %>% 
+  group_by(taidgender) %>%
+  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+  summarize(diff_mean = diff(pmeans))
+```
+
+
 
 ```
-## $`diff(pmeans)`
-## [1] -0.671
-## 
-## $`diff(pmeans)`
-## [1] -0.1
-## 
-## $`diff(pmeans)`
-## [1] 0.18
-## 
-## $`diff(pmeans)`
-## [1] -0.00652
-## 
-## $`diff(pmeans)`
-## [1] 0.0952
+## # A tibble: 1 × 1
+##   diff_mean
+##       <dbl>
+## 1     0.474
 ```
 
 
@@ -682,18 +794,10 @@ Conceptually, there are two levels of randomization:
 
 
 ```r
+# permuted
 set.seed(47)
-reps = 10000
-ov.stats <- replicate(reps,
-  macnell %>% group_by(tagender) %>%
-  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
-  ungroup(tagender) %>%
-  group_by(permTAID) %>%
-  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
-  summarize(diff(pmeans))
-  )
-
-ov.stats <- unlist(ov.stats)
+reps = 1000
+perm_diff_means <- map_df(1:reps, diff_means_func)
 ```
 
 
@@ -703,127 +807,38 @@ ov.stats <- unlist(ov.stats)
 #### permutation sampling distribution:
 
 
+.pull-left[
+<img src="05-permutation_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+]
 
-```r
-hist(ov.stats)
-abline(v=0.47, col="red")
-```
-
-<img src="05-permutation_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
-
+.pull-right[
 
 
 ```r
-# brute force permuation
-2*sum(ov.stats > 0.47) / reps
+# permutation p-value
+perm_diff_means %>%
+  summarize(p_val = 
+      sum(diff_mean > 0.474) / 
+      reps)
 ```
 
 
 
 ```
-## [1] 0.113
+## # A tibble: 1 × 1
+##   p_val
+##   <dbl>
+## 1 0.048
 ```
 
 
-
-
-#### MacNell Data with different permutation tests
-
-The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
-
-
-
-```r
-distr1 <- stratified_two_sample(response = macnell$overall,
-                               group =  macnell$taidgender,
-                               stratum = macnell$tagender,
-                               stat = "mean", reps=reps)
-
-distr2 <- stratified_two_sample(response = macnell$overall,
-                               group =  macnell$taidgender,
-                               stratum = macnell$tagender,
-                               stat = "t", reps=reps)
-```
+]
 
 
 
 
 
-```r
-macnell %>% group_by(taidgender) %>%
-  summarize(means = mean(overall, na.rm = TRUE)) %>%
-  summarize(diff(means))
-```
 
-
-
-```
-## # A tibble: 1 x 1
-##   `diff(means)`
-##           <dbl>
-## 1         0.474
-```
-
-
-
-```r
-macnell %>% group_by(taidgender) %>%
-  summarize(means = mean(overall, na.rm=TRUE), 
-            vars = var(overall, na.rm=TRUE), ns = n() ) %>%
-  summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
-```
-
-
-
-```
-## # A tibble: 1 x 1
-##   `(means[1] - means[2])/sqrt(vars[1]/ns[1] + vars[2]/ns[2])`
-##                                                         <dbl>
-## 1                                                       -1.59
-```
-
-
-
-
-
-```r
-# brute force permuation
-2*sum(ov.stats > 0.47) / reps
-```
-
-
-
-```
-## [1] 0.113
-```
-
-
-
-```r
-# mean(x) - mean(y)
-t2p(0.47, distr1, alternative="two-sided")
-```
-
-
-
-```
-## Two-sided 
-##      0.13
-```
-
-
-
-```r
-# t permutation
-t2p(-1.56, distr2, alternative="two-sided")
-```
-
-
-
-```
-## Two-sided 
-##    0.0978
-```
 
 
 
@@ -897,7 +912,7 @@ NH.means
 
 
 ```
-## # A tibble: 5 x 3
+## # A tibble: 5 × 3
 ##   HealthGen IncMean count
 ##   <fct>       <dbl> <int>
 ## 1 Excellent  69354.   817
@@ -921,23 +936,9 @@ ggplot(aes(x=HealthGen, y=HHIncomeMid)) +
   geom_jitter(width=0.1, alpha=.2)
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
 
 The differences in health, can be calculated directly, but we still don't know if the differences are due to randome chance or some other larger structure.
-
-
-
-```r
-diff.mat = data.frame(matrix(ncol=5, nrow=5))
-names(diff.mat) = NH.means$HealthGen
-rownames(diff.mat) = NH.means$HealthGen
-
-for(i in 1:5){
-  for(j in 1:5){
-    diff.mat[i,j] = NH.means$IncMean[i] - NH.means$IncMean[j]   }}
-
-diff.mat
-```
 
 
 
@@ -968,21 +969,26 @@ $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 
 ```r
 NHANES %>% select(HHIncomeMid, HealthGen) %>% 
-  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% head()
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid))
 ```
 
 
 
 ```
-## # A tibble: 6 x 2
-##   HHIncomeMid HealthGen
-##         <int> <fct>    
-## 1       30000 Good     
-## 2       30000 Good     
-## 3       30000 Good     
-## 4       40000 Good     
-## 5       87500 Vgood    
-## 6       87500 Vgood
+## # A tibble: 6,966 × 2
+##    HHIncomeMid HealthGen
+##          <int> <fct>    
+##  1       30000 Good     
+##  2       30000 Good     
+##  3       30000 Good     
+##  4       40000 Good     
+##  5       87500 Vgood    
+##  6       87500 Vgood    
+##  7       87500 Vgood    
+##  8       30000 Vgood    
+##  9      100000 Vgood    
+## 10       70000 Fair     
+## # … with 6,956 more rows
 ```
 
 
@@ -990,7 +996,9 @@ NHANES %>% select(HHIncomeMid, HealthGen) %>%
 
 
 ```r
-GM = mean(NHANES$HHIncomeMid, na.rm=TRUE); GM
+GM <- mean(NHANES$HHIncomeMid, na.rm=TRUE)
+
+GM
 ```
 
 
@@ -1008,7 +1016,7 @@ NH.means
 
 
 ```
-## # A tibble: 5 x 3
+## # A tibble: 5 × 3
 ##   HealthGen IncMean count
 ##   <fct>       <dbl> <int>
 ## 1 Excellent  69354.   817
@@ -1076,7 +1084,8 @@ $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 
 
 ```r
-sum(NH.means$count * (NH.means$IncMean - GM)^2)
+sum(NH.means %>% select(count) %>% pull() * 
+      (NH.means %>% select(IncMean) %>% pull() - GM)^2)
 ```
 
 
@@ -1096,22 +1105,26 @@ sum(NH.means$count * (NH.means$IncMean - GM)^2)
 NHANES %>% 
   filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
   mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
-  select(HealthGen, HHIncomeMid, IncomePerm) %>%
-  head()
+  select(HealthGen, HHIncomeMid, IncomePerm) 
 ```
 
 
 
 ```
-## # A tibble: 6 x 3
-##   HealthGen HHIncomeMid IncomePerm
-##   <fct>           <int>      <int>
-## 1 Good            30000     100000
-## 2 Good            30000      87500
-## 3 Good            30000      17500
-## 4 Good            40000      60000
-## 5 Vgood           87500      50000
-## 6 Vgood           87500     100000
+## # A tibble: 6,966 × 3
+##    HealthGen HHIncomeMid IncomePerm
+##    <fct>           <int>      <int>
+##  1 Good            30000      87500
+##  2 Good            30000      70000
+##  3 Good            30000     100000
+##  4 Good            40000      40000
+##  5 Vgood           87500      87500
+##  6 Vgood           87500     100000
+##  7 Vgood           87500      50000
+##  8 Vgood           30000      50000
+##  9 Vgood          100000      70000
+## 10 Fair            70000      22500
+## # … with 6,956 more rows
 ```
 
 
@@ -1133,10 +1146,10 @@ NHANES %>%
 
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##       teststat
 ##          <dbl>
-## 1 12553059728.
+## 1 14268151317.
 ```
 
 
@@ -1147,25 +1160,39 @@ NHANES %>%
 
 
 ```r
-reps = 1000
-SSB <- 
-  unlist(replicate(reps, 
-     NHANES %>% 
+reps <- 1000
+
+SSB_perm_func <- function(.x){
+  NHANES %>% 
         filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
         mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
         group_by(HealthGen) %>% 
         summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
-        summarize(teststat = sum(count*(IncMeanP - GM)^2))
-      ))
+        summarize(teststat = sum(count*(IncMeanP - GM)^2)) 
+}
 
-head(SSB)
+SSB_perm_val <- map_dfr(1:reps, SSB_perm_func)
+
+SSB_perm_val
 ```
 
 
 
 ```
-## teststat teststat teststat teststat teststat teststat 
-## 1.45e+10 1.60e+10 1.38e+10 1.32e+10 1.37e+10 1.44e+10
+## # A tibble: 1,000 × 1
+##        teststat
+##           <dbl>
+##  1 11839838857.
+##  2 14805138617.
+##  3 12238328218.
+##  4 14493898296.
+##  5 19052560418.
+##  6 14099580957.
+##  7 19808304723.
+##  8 14972708855.
+##  9 15543404291.
+## 10 18334398022.
+## # … with 990 more rows
 ```
 
 
@@ -1177,20 +1204,20 @@ head(SSB)
 
 
 ```r
-obsSSB <- NHANES %>%
+SSB_obs <- NHANES %>%
   filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
   group_by(HealthGen) %>% 
   summarize(IncMean = mean(HHIncomeMid), count=n()) %>%
-  summarize(obs.teststat = sum(count*(IncMean - GM)^2))
+  summarize(obs_teststat = sum(count*(IncMean - GM)^2)) 
 
-obsSSB
+SSB_obs 
 ```
 
 
 
 ```
-## # A tibble: 1 x 1
-##    obs.teststat
+## # A tibble: 1 × 1
+##    obs_teststat
 ##           <dbl>
 ## 1 488767088754.
 ```
@@ -1198,7 +1225,7 @@ obsSSB
 
 
 ```r
-sum(SSB>obsSSB) / reps
+sum(SSB_perm_val %>% pull() > SSB_obs %>% pull() ) / reps
 ```
 
 
@@ -1212,10 +1239,14 @@ sum(SSB>obsSSB) / reps
 
 
 ```r
-hist(SSB, xlim=c(0, 6e+11)); abline(v=obsSSB)
+SSB_perm_val %>%
+  ggplot(aes(x = teststat)) +
+  geom_histogram() + 
+  geom_vline(data = SSB_obs, aes(xintercept = obs_teststat), color = "red") +
+  ylab("") + xlab("Permuted SSB Test Statistics")
 ```
 
-<img src="05-permutation_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-permutation_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
 
 
 

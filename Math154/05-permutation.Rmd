@@ -13,6 +13,8 @@ library(permuter)
 library(knitr)
 library(NHANES)
 options(digits=3)
+#devtools::install_github("kbodwin/demoR")
+#I can't figure out why we need demoR (replaced by flair)
 ```
 
 
@@ -283,7 +285,7 @@ After running tests to compare means and variances we obtain the following p-val
 Before doing anything, let's look at the data.  Here, we visualize with both boxplots and histograms.  Also, we visualize on the raw scale as well as the log scale.  Certainly, the log10 scale indicates that a transformation makes the data more symmetric.
 
 ```{r}
-clouds <- read_delim("https://dasl.datadescription.com/download/data/3117/cloud-seeding.txt", 
+clouds <- read_delim("figs/cloud-seeding.txt", 
      "\t", escape_double = FALSE, trim_ws = TRUE) 
 
 names(clouds) <- c("unseeded", "seeded")
@@ -482,20 +484,28 @@ knitr::include_graphics(c("figs/genderbias3a.png", "figs/genderbias3b.png"))
 #####  R code
 
 ```{r}
-macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+#macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+library(permuter)
+data(macnell)
 ```
 
 
 ```{r warning=FALSE, message=FALSE, fig.align="center"}
+library(ggridges)
 macnell %>% 
   mutate(TAID = ifelse(taidgender==1, "male", "female")) %>%
   mutate(TAGend = ifelse(tagender==1, "male", "female")) %>%
-  mutate(gendjitter = ifelse(tagender==1, -0.2, 0.2)) %>%
-ggplot(aes(x=TAGend, y=overall, color=TAID, fill=TAID)) + 
-  geom_boxplot() + scale_fill_manual(values=rep('white', 2))  +
-  geom_point(position=position_jitterdodge(jitter.width=0.2), alpha=0.5) +
-  stat_summary(fun.y="mean", geom="point", size=3,
-    position=position_dodge(width=0.75))
+ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID), 
+           fill=TAID)) +
+  geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), aes(color = TAID)) +
+  stat_summary(fun="mean", geom="crossbar", size=.3, width = 1,
+               aes(color = TAID),
+               position=position_dodge(width=0.4)) +
+  stat_summary(fun="mean", geom="point", shape = "X",
+               size=5, aes(color = TAID),
+               position=position_dodge(width=0.4)) +
+  coord_flip() +
+  xlab("") + ggtitle("Overall teaching effectiveness score")
 
 ```
 
@@ -506,7 +516,7 @@ Want to know if the score for the **perceived** gender is different.
 
 
 $$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
-
+> Although for the permutation test, under the null hypothesis not only are the means of the population distributions the same, but the variance and all other aspects of the distributions across perceived gender.
 
 #### MacNell Data without permutation
 
@@ -520,90 +530,118 @@ macnell %>%
 
 Conceptually, there are two levels of randomization:
 
-1. $N_m$ students are randomly assigned to the male instructor and the remaining $N_f$ get the female instructor.
+1. $N_m$ students are randomly assigned to the male instructor and $N_f$ are assigned to the female instructor.
 
-2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, for $j=1,2$.
+2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, and $N_{jf}$ are told that the instructor is female for $j=m,f$.
 
+```{r}
+macnell %>%
+  group_by(tagender, taidgender) %>%
+  summarize(n())
+```
 
 **Stratified two-sample test:**
 
-* For each instructor, permute *perceived* gender assignments.
+* **For each instructor**, permute *perceived* gender assignments.
 * Use difference in mean ratings for female-identified vs male-identified instructors.
 
 
-```{r echo=FALSE}
-demo_code('
-macnell %>% group_by(tagender) %>%
+```{r mac1, eval=FALSE, include = FALSE}
+macnell %>% 
+  group_by(tagender) %>%
   mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
-  select(overall, tagender, taidgender, permTAID) %>% head(15)
-') %>%
-  hlt_fixed("group_by(tagender)")
+  select(overall, tagender, taidgender, permTAID) 
+```
+
+```{r echo = FALSE}
+decorate("mac1") %>%
+  flair("group_by(tagender)") %>%
+  knit_print.with_flair()
 ```
 
 
-```{r echo=FALSE}
-demo_code('
-macnell %>% group_by(tagender) %>%
+```{r mac2, eval=FALSE, include = FALSE}
+macnell %>% 
+  group_by(tagender) %>%
   mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
   ungroup(tagender) %>%
   group_by(permTAID) %>%
   summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
   summarize(diff(pmeans))
-') %>%
-  hlt_fixed("group_by(tagender)") %>%
-  hlt_fixed("group_by(permTAID)")
+```
+
+```{r echo = FALSE}
+decorate("mac2") %>%  
+  flair("group_by(tagender)") %>%
+  flair("group_by(permTAID)") %>%
+  knit_print.with_flair()
 ```
 
 
-```{r echo=FALSE}
-demo_code('
-replicate(5,
+```{r mac3}
+diff_means_func <- function(.x){
   macnell %>% group_by(tagender) %>%
   mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
   ungroup(tagender) %>%
   group_by(permTAID) %>%
   summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
-  summarize(diff(pmeans)))
-') %>%
-  hlt_fixed("replicate(5")   
+  summarize(diff_mean = diff(pmeans))
+  }
+
+map_df(1:5, diff_means_func)
+```
+
+
+#### Observed vs. Permuted statistic
+
+```{r}
+# observed
+macnell %>% 
+  group_by(taidgender) %>%
+  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+  summarize(diff_mean = diff(pmeans))
 ```
 
 
 ```{r}
+# permuted
 set.seed(47)
-reps = 10000
-ov.stats <- replicate(reps,
-  macnell %>% group_by(tagender) %>%
-  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
-  ungroup(tagender) %>%
-  group_by(permTAID) %>%
-  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
-  summarize(diff(pmeans))
-  )
-
-ov.stats <- unlist(ov.stats)
+reps = 1000
+perm_diff_means <- map_df(1:reps, diff_means_func)
 ```
 
 
 
 #### permutation sampling distribution:
 
-```{r }
-hist(ov.stats)
-abline(v=0.47, col="red")
-```
 
+.pull-left[
+```{r echo=FALSE}
+perm_diff_means %>%
+  ggplot(aes(x = diff_mean)) +
+  geom_histogram() +
+  geom_vline(xintercept = 0.474, color = "red")
+```
+]
+
+.pull-right[
 ```{r}
-# brute force permuation
-2*sum(ov.stats > 0.47) / reps
+# permutation p-value
+perm_diff_means %>%
+  summarize(p_val = 
+      sum(diff_mean > 0.474) / 
+      reps)
 ```
+]
 
+
+
+```{r echo = FALSE, eval = FALSE, include = FALSE}
 
 #### MacNell Data with different permutation tests
 
-The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
+#The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
 
-```{r}
 distr1 <- stratified_two_sample(response = macnell$overall,
                                group =  macnell$taidgender,
                                stratum = macnell$tagender,
@@ -615,7 +653,8 @@ distr2 <- stratified_two_sample(response = macnell$overall,
                                stat = "t", reps=reps)
 ```
 
-```{r}
+```{r echo = FALSE, eval = FALSE, include = FALSE}
+
 macnell %>% group_by(taidgender) %>%
   summarize(means = mean(overall, na.rm = TRUE)) %>%
   summarize(diff(means))
@@ -627,7 +666,7 @@ macnell %>% group_by(taidgender) %>%
 
 ```
 
-```{r}
+```{r echo = FALSE, eval = FALSE, include = FALSE}
 # brute force permuation
 2*sum(ov.stats > 0.47) / reps
 
@@ -688,7 +727,7 @@ ggplot(aes(x=HealthGen, y=HHIncomeMid)) +
 
 The differences in health, can be calculated directly, but we still don't know if the differences are due to randome chance or some other larger structure.
 
-```{r}
+```{r echo = FALSE}
 diff.mat = data.frame(matrix(ncol=5, nrow=5))
 names(diff.mat) = NH.means$HealthGen
 rownames(diff.mat) = NH.means$HealthGen
@@ -714,12 +753,14 @@ $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 
 ```{r}
 NHANES %>% select(HHIncomeMid, HealthGen) %>% 
-  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% head()
-
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid))
 ```
 
 ```{r}
-GM = mean(NHANES$HHIncomeMid, na.rm=TRUE); GM
+GM <- mean(NHANES$HHIncomeMid, na.rm=TRUE)
+
+GM
+
 NH.means
 ```
 
@@ -734,7 +775,8 @@ NH.means$count * (NH.means$IncMean - GM)^2
 
 $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 ```{r}
-sum(NH.means$count * (NH.means$IncMean - GM)^2)
+sum(NH.means %>% select(count) %>% pull() * 
+      (NH.means %>% select(IncMean) %>% pull() - GM)^2)
 ```
 
 
@@ -744,8 +786,7 @@ sum(NH.means$count * (NH.means$IncMean - GM)^2)
 NHANES %>% 
   filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
   mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
-  select(HealthGen, HHIncomeMid, IncomePerm) %>%
-  head()
+  select(HealthGen, HHIncomeMid, IncomePerm) 
 ```
 
 
@@ -765,18 +806,20 @@ NHANES %>%
 #### Lots of times...
 
 ```{r}
-reps = 1000
-SSB <- 
-  unlist(replicate(reps, 
-     NHANES %>% 
+reps <- 1000
+
+SSB_perm_func <- function(.x){
+  NHANES %>% 
         filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
         mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
         group_by(HealthGen) %>% 
         summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
-        summarize(teststat = sum(count*(IncMeanP - GM)^2))
-      ))
+        summarize(teststat = sum(count*(IncMeanP - GM)^2)) 
+}
 
-head(SSB)
+SSB_perm_val <- map_dfr(1:reps, SSB_perm_func)
+
+SSB_perm_val
 ```
 
 
@@ -784,18 +827,22 @@ head(SSB)
 
 
 ```{r}
-obsSSB <- NHANES %>%
+SSB_obs <- NHANES %>%
   filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
   group_by(HealthGen) %>% 
   summarize(IncMean = mean(HHIncomeMid), count=n()) %>%
-  summarize(obs.teststat = sum(count*(IncMean - GM)^2))
+  summarize(obs_teststat = sum(count*(IncMean - GM)^2)) 
 
-obsSSB
-sum(SSB>obsSSB) / reps
+SSB_obs 
+sum(SSB_perm_val %>% pull() > SSB_obs %>% pull() ) / reps
 ```
 
 ```{r}
-hist(SSB, xlim=c(0, 6e+11)); abline(v=obsSSB)
+SSB_perm_val %>%
+  ggplot(aes(x = teststat)) +
+  geom_histogram() + 
+  geom_vline(data = SSB_obs, aes(xintercept = obs_teststat), color = "red") +
+  ylab("") + xlab("Permuted SSB Test Statistics")
 ```
 
 

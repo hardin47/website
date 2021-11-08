@@ -507,7 +507,7 @@ We will use a public facing MySQL [database](http://www.science.smith.edu/wai-da
 
 We begin by demonstrating how SQL queries can be sent to a database.  It is necessary to set up a connection using the `dbConnect()` function.
 
-```{r message = FALSE}
+```{r eval = FALSE}
 library(mosaic)
 library(RMySQL)  
 con <- dbConnect(
@@ -517,25 +517,25 @@ con <- dbConnect(
 
 Next a series of SQL queries can be sent to the database using the `DBI::dbGetQuery()` function: each query returns an R dataframe.
 
-```{r}
+```{r eval = FALSE}
 class(dbGetQuery(con, "SHOW TABLES"))
 ```
 
 There are multiple tables within the `wai` database.
 
-```{r}
+```{r eval = FALSE}
 dbGetQuery(con, "SHOW TABLES")
 ```
 
 The `EXPLAIN` command describes the ten field names (variables) in the `PI_Info` table.
 
-```{r}
+```{r eval = FALSE}
 dbGetQuery(con, "EXPLAIN PI_Info")
 ```
 
 The `SELECT` statement can be used to select all fields for eight observations in the `Measurements` table.
 
-```{r}
+```{r eval = FALSE}
 eightobs <- dbGetQuery(con, "SELECT * FROM Measurements LIMIT 8")
 eightobs
 ```
@@ -543,7 +543,7 @@ eightobs
 
 More interesting and complicated `SELECT` calls can be used to undertake grouping and aggregation.  Here we calculate the sample size for each study
 
-```{r}
+```{r eval = FALSE}
 dbGetQuery(con, 
   "SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM")
 ```
@@ -556,17 +556,16 @@ objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadl
 
 The setup process looks similar.
 
-```{r}
+```{r eval = FALSE}
 Measurements <- tbl(con, "Measurements")
 class(Measurements)
 PI_Info <- tbl(con, "PI_Info")
-Subject <- tbl(con, "Subject")
+Subject <- tbl(con, "Subjects")
 ```
 
 We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
 
-```{r}
-PI_Info  %>% summarise(total = n())
+```{r eval = FALSE}
 PI_Info %>% collect() %>% data.frame()   
 # be careful with collect() when dealing with large tables!
 ```
@@ -574,14 +573,15 @@ PI_Info %>% collect() %>% data.frame()
 Note how the number of rows is unknown (`??` at the top of the output above) for the lazy query.
 
 Similarly, we can explore the `Subjects` table.
-```{r}
-Subject  %>% summarise(total = n())
+```{r eval = FALSE}
+#Subject  %>% summarise(total = n())
 Subject %>% collect()  # be careful with collect() with large tables!
 ```
 
 Let's explore the `Measurements` table.
-```{r}
-Measurements %>% summarise(total = n())
+```{r eval = FALSE}
+#Measurements %>% summarise(total = n())
+Measurements %>% collect()
 ```
 
 There are more than a quarter million observations.  
@@ -590,7 +590,7 @@ In the next step, we will download the data from a given subject for a specific 
 
 Arbitrarily we choose to collect data from subject number three.
 
-```{r}
+```{r eval = FALSE}
 onesubj <- 
   Measurements %>% 
   filter(Identifier == "Rosowski_2012", Sub_Number == 3) %>%
@@ -601,7 +601,7 @@ head(onesubj)
 
 Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.
 
-```{r eval=TRUE, fig.height=6}
+```{r eval=FALSE, fig.height=6}
 onesubj <- mutate(onesubj, Ear = ifelse(Left_Ear == 1, "Left", "Right"))
 ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
   aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
@@ -610,7 +610,7 @@ ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
 
 Always a good idea to terminate the SQL connection.
 
-```{r}
+```{r eval = FALSE}
 dbDisconnect(con)
 ```
 

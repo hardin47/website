@@ -703,7 +703,7 @@ ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 
 <img src="08-classification_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
-## $k$-NN to predict penguin species
+#### $k$-NN to predict penguin species {-}
 
 #### 1. Partition the data
 
@@ -805,7 +805,7 @@ penguin_knn_fit %>%
 ## 1 accuracy multiclass     0.988
 ```
 
-### What is $k$?
+#### What is $k$?
 
 It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
 
@@ -1699,8 +1699,8 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 
 ******
 1. Bootstrap sample from the training set.
-2. Grow an un-pruned tree on this bootstrap sample.
-* *At each split*, select $m$ variables and determine the best split using only these predictors.
+2. Grow an un-pruned tree on the bootstrap sample.
+* *At each split*, select $m$ variables and determine the best split using only the $m$ predictors.
 Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random Forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
 * Do *not* prune the tree.  Save the tree as is!
 
@@ -1763,7 +1763,7 @@ All learners are bad when there are too many noisy variables because the respons
 
 **Variable importance** is measured by two different metrics (from R help on `importance`):
 
-* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).  Within the oob values, permute the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (with the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
+* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).**Permute** the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (for the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
 * **purity:** The decrease (or increase, depending on the plot) in node purity: root sum of squares (RSS) [deviance/gini for classification trees].  That is, the amount of total decrease in RSS from splitting on *that* variable, averaged over all trees.
 
 
@@ -1780,211 +1780,170 @@ If the number of variables is very large, forests can be run once with all the v
 
 
 ```r
-data(iris)
-library(tidyverse)
-library(caret)
-library(ranger)
-library(e1071)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
 
-inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-inTrain,]
-```
+penguins <- penguins %>%
+  drop_na()
 
-
-```r
-modFit <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger")
-modFit
-```
-
-```
-## Random Forest 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling: Bootstrapped (25 reps) 
-## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
-## Resampling results across tuning parameters:
-## 
-##   mtry  splitrule   Accuracy   Kappa    
-##   2     gini        0.9510313  0.9254883
-##   2     extratrees  0.9458269  0.9175811
-##   3     gini        0.9510313  0.9254883
-##   3     extratrees  0.9458269  0.9175811
-##   4     gini        0.9480755  0.9210098
-##   4     extratrees  0.9491620  0.9227209
-## 
-## Tuning parameter 'min.node.size' was held constant at a value of 1
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 2, splitrule = gini
-##  and min.node.size = 1.
-```
-
-```r
-caret::confusionMatrix(data=predict(modFit, newdata = iris.test), 
-                reference = iris.test$Species)
-```
-
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         2
-##   virginica       0          1        13
-## 
-## Overall Statistics
-##                                          
-##                Accuracy : 0.9333         
-##                  95% CI : (0.8173, 0.986)
-##     No Information Rate : 0.3333         
-##     P-Value [Acc > NIR] : < 2.2e-16      
-##                                          
-##                   Kappa : 0.9            
-##                                          
-##  Mcnemar's Test P-Value : NA             
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.8667
-## Specificity                 1.0000            0.9333           0.9667
-## Pos Pred Value              1.0000            0.8750           0.9286
-## Neg Pred Value              1.0000            0.9655           0.9355
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.2889
-## Detection Prevalence        0.3333            0.3556           0.3111
-## Balanced Accuracy           1.0000            0.9333           0.9167
-```
-
-
-#### Parameters...  `mtry` and `num.trees`
-
-Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
-
-
-```r
-modFit.m <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = 500,
-                tuneGrid= data.frame(mtry=1:4, splitrule = "gini",
-                                     min.node.size = 5))
-modFit.m
-```
-
-```
-## Random Forest 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling results across tuning parameters:
-## 
-##   mtry  Accuracy  Kappa    
-##   1     0.952381  0.9285714
-##   2     0.952381  0.9285714
-##   3     0.952381  0.9285714
-##   4     0.952381  0.9285714
-## 
-## Tuning parameter 'splitrule' was held constant at a value of gini
-## 
-## Tuning parameter 'min.node.size' was held constant at a value of 5
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 1, splitrule = gini
-##  and min.node.size = 5.
-```
-
-```r
-plot(modFit.m)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-70-1.png" width="480" style="display: block; margin: auto;" />
-
-
-
-
-```r
+# partition
 set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
 
-acc.ntree = c()
-for(i in seq(10, 260, by = 50)){
-modFit.ntree <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = i,
-                tuneGrid= data.frame(mtry=3, splitrule = "gini",
-                                     min.node.size = 5))
+# recipe
+penguin_rf_recipe <-
+  recipe(body_mass_g ~ . ,
+         data = penguin_train) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_mutate(year = as.factor(year)) 
 
-acc.ntree <- c(acc.ntree, modFit.ntree$finalModel$prediction.error)
-}
+#model
+penguin_rf <- rand_forest(mtry = tune(),
+                           trees = tune()) %>%
+  set_engine("ranger", importance = "permutation") %>%
+  set_mode("regression")
 
-data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
-    ggplot( aes(x=ntree, y = acc.ntree)) + geom_line() +
-    xlab("number of trees in the RF") +
-    ylab("OOB Accuracy") +
-    ylim(c(0.04, 0.06))
+# workflow
+penguin_rf_wflow <- workflow() %>%
+  add_model(penguin_rf) %>%
+  add_recipe(penguin_rf_recipe)
+
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+penguin_grid <- grid_regular(mtry(range = c(2,7)),
+                             trees(range = c(1,500)),
+                             levels = 5)
+
+# tune
+penguin_rf_tune <- 
+  penguin_rf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+select_best(penguin_rf_tune, "rmse")
+```
+
+```
+## # A tibble: 1 × 3
+##    mtry trees .config              
+##   <int> <int> <chr>                
+## 1     2   375 Preprocessor1_Model16
+```
+
+Which `mtry` and number of trees?
+
+
+```r
+penguin_rf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "rmse") %>%
+  ggplot() + 
+  geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
+
+
+Get the final model:
+
+
+```r
+penguin_rf_best <- finalize_model(
+  penguin_rf,
+  select_best(penguin_rf_tune, "rmse"))
+
+penguin_rf_best
+```
+
+```
+## Random Forest Model Specification (regression)
+## 
+## Main Arguments:
+##   mtry = 2
+##   trees = 375
+## 
+## Engine-Specific Arguments:
+##   importance = permutation
+## 
+## Computational engine: ranger
+```
+
+```r
+penguin_rf_final <-
+  workflow() %>%
+  add_model(penguin_rf_best) %>%
+  add_recipe(penguin_rf_recipe) %>%
+  fit(data = penguin_train)
+
+penguin_rf_final
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: rand_forest()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 2 Recipe Steps
+## 
+## • step_unknown()
+## • step_mutate()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Ranger result
+## 
+## Call:
+##  ranger::ranger(x = maybe_data_frame(x), y = y, mtry = min_cols(~2L,      x), num.trees = ~375L, importance = ~"permutation", num.threads = 1,      verbose = FALSE, seed = sample.int(10^5, 1)) 
+## 
+## Type:                             Regression 
+## Number of trees:                  375 
+## Sample size:                      249 
+## Number of independent variables:  7 
+## Mtry:                             2 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       84149.09 
+## R squared (OOB):                  0.8634591
+```
+
+Predict the test data:
+
+
+
+```r
+penguin_rf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  ggplot() +
+  geom_point(aes(x = body_mass_g, y = .pred)) + 
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 <img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;" />
 
+
 ####  Variable Importance {-}
 
-In order to get the variable importance, you need to specify importance within the building of the forest.
+In order to get the variable importance, you need to specify importance within the model of the forest.
 
-See if you can figure out every single line of the `ggplot` code.
-
-```r
-modFit.VI <- caret::train(Species ~ ., 
-                data=iris.train, 
-                importance = "permutation",
-                method="ranger")
-
-ranger::importance(modFit.VI$finalModel)
-```
-
-```
-## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.014669229  0.005659636  0.321919861  0.311967973
-```
 
 ```r
-data.frame(importance = modFit.VI$finalModel$variable.importance,
-           variables = names(modFit.VI$finalModel$variable.importance)) %>% 
-    ggplot(aes(x = reorder(variables, importance), y = importance)) +
-    geom_bar(stat = "identity") + 
-    xlab("Variable") + 
-    coord_flip() 
+library(vip)
+
+penguin_rf_final %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "point")
 ```
 
 <img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
-
-plot both the given labels as well as the predicted labels
-
-```r
-iris.test <- iris.test %>%
-    mutate(testSpecies = predict(modFit, iris.test))
-
-ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length, 
-                      shape = Species, col = testSpecies)) + 
-    geom_point(size=3)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;" />
-
-
-
-
 
 ## Model Choices
 
@@ -1992,11 +1951,11 @@ There are *soooooo* many choices we've made along the way.  The following list s
 
 |  $\mbox{  }$ 	| $\mbox{  }$	|
 |---------------------------------------------	|-------------------------------	|
-| * explanatory variable choice 	| * k (kNN) 	|
+| * explanatory variable choice 	| * $k$ ($k$-NN) 	|
 | * number of explanatory variables 	| * distance measure 	|
-| * functions/transformation of explanatory 	| * k (CV) 	|
-| * transformation of response 	| * CV set.seed 	|
-| * response:continuous vs. categorical 	| * alpha prune 	|
+| * functions/transformation of explanatory 	| * V (CV) 	|
+| * transformation of response 	| * CV `set.seed` 	|
+| * response:continuous vs. categorical 	| * $\alpha$ prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
 | * train/test split (`set.seed`) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|
@@ -2050,7 +2009,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-75)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-74)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -2064,7 +2023,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-76)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-75)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -2253,7 +2212,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-78)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-77)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -2262,17 +2221,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-78)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-81)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -2317,7 +2276,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-82)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-81)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -2348,7 +2307,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-83)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-82)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -2534,7 +2493,7 @@ plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width,
      slice=list(Sepal.Length = 3, Petal.Length = 3))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-86-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 3 groups
