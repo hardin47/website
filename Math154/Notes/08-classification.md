@@ -2362,188 +2362,363 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. G
 
 ### R SVM Example
 
-We'll go back to the iris data.  As a first pass, let's use SVM to distinguish between Setosa and Versicolor/Virginica.
+We'll go back to the penguin data.  As a first pass, let's use SVM to distinguish between male and female penguins.  I removed the missing data from the dataset to make predictions easier.
 
 
 ```r
-library(kernlab)
-library(e1071)
-library(caret)
-data(iris)
+library(tidymodels)
+library(palmerpenguins)
 
-iris2 <- iris %>% dplyr::mutate(Species2 = as.factor(ifelse(Species == "setosa", "S", "V"))) %>%
-  dplyr::select(-Species)
+penguins <- penguins %>%
+  drop_na()
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
 ```
 
-
-#### Building an SVM on training data with radial kernel
+#### Linear SVM (no tuning) {-}
 
 
 ```r
-set.seed(4747)
-iris.svm.rad <- train(Species2 ~ ., data=iris2, method="svmRadial", 
-                 trControl = trainControl(method="cv"),
-                 tuneGrid= expand.grid(C=c(0.01,0.1,1,10,100), sigma=c(.5,1,2,3,4)),
-                 preProcess = c("center", "scale"))
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
 
-iris.svm.rad
+summary(penguin_svm_recipe)
 ```
 
 ```
-## Support Vector Machines with Radial Basis Function Kernel 
-## 
-## 150 samples
-##   4 predictor
-##   2 classes: 'S', 'V' 
-## 
-## Pre-processing: centered (4), scaled (4) 
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 135, 135, 135, 135, 135, 135, ... 
-## Resampling results across tuning parameters:
-## 
-##   C      sigma  Accuracy   Kappa    
-##   1e-02  0.5    0.6666667  0.0000000
-##   1e-02  1.0    0.6666667  0.0000000
-##   1e-02  2.0    0.6666667  0.0000000
-##   1e-02  3.0    0.6666667  0.0000000
-##   1e-02  4.0    0.6666667  0.0000000
-##   1e-01  0.5    0.9866667  0.9684211
-##   1e-01  1.0    0.9800000  0.9508772
-##   1e-01  2.0    0.9466667  0.8684211
-##   1e-01  3.0    0.8800000  0.6892931
-##   1e-01  4.0    0.7933333  0.4411765
-##   1e+00  0.5    0.9933333  0.9842105
-##   1e+00  1.0    0.9933333  0.9842105
-##   1e+00  2.0    0.9866667  0.9684211
-##   1e+00  3.0    0.9866667  0.9684211
-##   1e+00  4.0    0.9866667  0.9684211
-##   1e+01  0.5    0.9933333  0.9842105
-##   1e+01  1.0    0.9933333  0.9842105
-##   1e+01  2.0    0.9866667  0.9684211
-##   1e+01  3.0    0.9866667  0.9684211
-##   1e+01  4.0    0.9866667  0.9684211
-##   1e+02  0.5    0.9933333  0.9842105
-##   1e+02  1.0    0.9933333  0.9842105
-##   1e+02  2.0    0.9866667  0.9684211
-##   1e+02  3.0    0.9866667  0.9684211
-##   1e+02  4.0    0.9866667  0.9684211
-## 
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were sigma = 1 and C = 1.
-```
-
-#### Training Error
-
-
-```r
-iris.train.pred <- predict(iris.svm.rad, iris2)
-caret::confusionMatrix(iris.train.pred, iris2$Species2)$overall
-```
-
-```
-##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   1.000000e+00   1.000000e+00   9.757074e-01   1.000000e+00   6.666667e-01 
-## AccuracyPValue  McnemarPValue 
-##   3.857546e-27            NaN
+## # A tibble: 5 × 4
+##   variable          type    role      source  
+##   <chr>             <chr>   <chr>     <chr>   
+## 1 bill_length_mm    numeric predictor original
+## 2 bill_depth_mm     numeric predictor original
+## 3 flipper_length_mm numeric predictor original
+## 4 body_mass_g       numeric predictor original
+## 5 sex               nominal outcome   original
 ```
 
 ```r
-caret::confusionMatrix(iris.train.pred, iris2$Species2)
+# model
+penguin_svm_lin <- svm_linear() %>%
+  set_engine("LiblineaR") %>%
+  set_mode("classification")
+
+penguin_svm_lin
 ```
 
 ```
-## Confusion Matrix and Statistics
+## Linear Support Vector Machine Specification (classification)
 ## 
-##           Reference
-## Prediction   S   V
-##          S  50   0
-##          V   0 100
-##                                      
-##                Accuracy : 1          
-##                  95% CI : (0.9757, 1)
-##     No Information Rate : 0.6667     
-##     P-Value [Acc > NIR] : < 2.2e-16  
-##                                      
-##                   Kappa : 1          
-##                                      
-##  Mcnemar's Test P-Value : NA         
-##                                      
-##             Sensitivity : 1.0000     
-##             Specificity : 1.0000     
-##          Pos Pred Value : 1.0000     
-##          Neg Pred Value : 1.0000     
-##              Prevalence : 0.3333     
-##          Detection Rate : 0.3333     
-##    Detection Prevalence : 0.3333     
-##       Balanced Accuracy : 1.0000     
-##                                      
-##        'Positive' Class : S          
+## Computational engine: LiblineaR
+```
+
+```r
+# workflow
+penguin_svm_lin_wflow <- workflow() %>%
+  add_model(penguin_svm_lin) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_lin_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_linear()
 ## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Linear Support Vector Machine Specification (classification)
+## 
+## Computational engine: LiblineaR
+```
+
+```r
+# fit
+penguin_svm_lin_fit <- 
+  penguin_svm_lin_wflow %>%
+  fit(data = penguin_train)
+
+penguin_svm_lin_fit 
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_linear()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## $TypeDetail
+## [1] "L2-regularized L2-loss support vector classification dual (L2R_L2LOSS_SVC_DUAL)"
+## 
+## $Type
+## [1] 1
+## 
+## $W
+##      bill_length_mm bill_depth_mm flipper_length_mm body_mass_g       Bias
+## [1,]       0.248908      1.080195        -0.2256375    1.328448 0.06992734
+## 
+## $Bias
+## [1] 1
+## 
+## $ClassNames
+## [1] male   female
+## Levels: female male
+## 
+## $NbClass
+## [1] 2
+## 
+## attr(,"class")
+## [1] "LiblineaR"
 ```
 
 
-#### Visualizing the Boundary
-
-`caret` doesn't allow for visualization, so I've applied the `svm` function directly here.  I had to try various combinations of variables before finding a boundary that was visually interesting.  Note that just being in the yellow or red part doesn't necessarily indicate missclassification.  Remember that the boundary is in 4 dimensions and is not linear.
+#### RBF SVM (with tuning) {-}
 
 
 ```r
-iris.svm <- e1071::svm(Species2 ~ ., data = iris2, kernel = "radial")
-plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width, 
-     slice=list(Sepal.Length = 3, Petal.Length = 3))
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
+
+summary(penguin_svm_recipe)
+```
+
+```
+## # A tibble: 5 × 4
+##   variable          type    role      source  
+##   <chr>             <chr>   <chr>     <chr>   
+## 1 bill_length_mm    numeric predictor original
+## 2 bill_depth_mm     numeric predictor original
+## 3 flipper_length_mm numeric predictor original
+## 4 body_mass_g       numeric predictor original
+## 5 sex               nominal outcome   original
+```
+
+```r
+# model
+penguin_svm_rbf <- svm_rbf(cost = tune(),
+                           rbf_sigma = tune()) %>%
+  set_engine("kernlab") %>%
+  set_mode("classification")
+
+penguin_svm_rbf
+```
+
+```
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = tune()
+##   rbf_sigma = tune()
+## 
+## Computational engine: kernlab
+```
+
+```r
+# workflow
+penguin_svm_rbf_wflow <- workflow() %>%
+  add_model(penguin_svm_rbf) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_rbf_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_rbf()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = tune()
+##   rbf_sigma = tune()
+## 
+## Computational engine: kernlab
+```
+
+```r
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+# the tuned parameters also have default values you can use
+penguin_grid <- grid_regular(cost(),
+                             rbf_sigma(),
+                             levels = 8)
+
+penguin_grid
+```
+
+```
+## # A tibble: 64 × 2
+##         cost     rbf_sigma
+##        <dbl>         <dbl>
+##  1  0.000977 0.0000000001 
+##  2  0.00431  0.0000000001 
+##  3  0.0190   0.0000000001 
+##  4  0.0841   0.0000000001 
+##  5  0.371    0.0000000001 
+##  6  1.64     0.0000000001 
+##  7  7.25     0.0000000001 
+##  8 32        0.0000000001 
+##  9  0.000977 0.00000000268
+## 10  0.00431  0.00000000268
+## # … with 54 more rows
+```
+
+```r
+# tune
+# this takes a few minutes
+penguin_svm_rbf_tune <- 
+  penguin_svm_rbf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+penguin_svm_rbf_tune 
+```
+
+```
+## # Tuning results
+## # 4-fold cross-validation 
+## # A tibble: 4 × 4
+##   splits           id    .metrics           .notes          
+##   <list>           <chr> <list>             <list>          
+## 1 <split [186/63]> Fold1 <tibble [128 × 6]> <tibble [0 × 1]>
+## 2 <split [187/62]> Fold2 <tibble [128 × 6]> <tibble [0 × 1]>
+## 3 <split [187/62]> Fold3 <tibble [128 × 6]> <tibble [0 × 1]>
+## 4 <split [187/62]> Fold4 <tibble [128 × 6]> <tibble [0 × 1]>
+```
+
+##### What is best?
+
+
+```r
+penguin_svm_rbf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy") %>%
+  ggplot() + 
+  geom_line(aes(color = as.factor(cost), y = mean, x = rbf_sigma)) +
+  labs(color = "Cost")
 ```
 
 <img src="08-classification_files/figure-html/unnamed-chunk-86-1.png" width="480" style="display: block; margin: auto;" />
 
 
-#### 3 groups
+```r
+penguin_svm_rbf_tune %>%
+  autoplot()
+```
 
-> For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
+<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
+
+##### RBF SVM final model
 
 
 ```r
-set.seed(474747)
-train.obs <- sample(1:150, 100, replace = FALSE)
-iris.train <- iris[train.obs, ]
-iris.test <- iris[-train.obs, ]
-```
+penguin_svm_rbf_best <- finalize_model(
+  penguin_svm_rbf,
+  select_best(penguin_svm_rbf_tune, "accuracy"))
 
-
-```r
-iris.svm3 <- caret::train(Species ~ ., data=iris.train, method="svmRadial", 
-                 trControl = trainControl(method="none"),
-                 tuneGrid= expand.grid(C=1, sigma=2),
-                 preProcess = c("center", "scale"))
-```
-
-
-
-```r
-predict(iris.svm3, iris.test)
+penguin_svm_rbf_best
 ```
 
 ```
-##  [1] setosa     setosa     setosa     setosa     setosa     setosa    
-##  [7] setosa     setosa     setosa     setosa     setosa     setosa    
-## [13] virginica  setosa     setosa     setosa     versicolor versicolor
-## [19] versicolor versicolor versicolor versicolor versicolor virginica 
-## [25] versicolor versicolor versicolor versicolor versicolor versicolor
-## [31] versicolor versicolor versicolor virginica  virginica  virginica 
-## [37] virginica  virginica  virginica  versicolor virginica  virginica 
-## [43] virginica  versicolor virginica  virginica  virginica  virginica 
-## [49] virginica  virginica 
-## Levels: setosa versicolor virginica
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = 0.371498572284237
+##   rbf_sigma = 1
+## 
+## Computational engine: kernlab
 ```
 
 ```r
-table(predict(iris.svm3, iris.test), iris.test$Species)
+penguin_svm_rbf_final <-
+  workflow() %>%
+  add_model(penguin_svm_rbf_best) %>%
+  add_recipe(penguin_svm_recipe) %>%
+  fit(data = penguin_train)
+```
+
+
+##### Test predictions
+
+
+```r
+library(yardstick)
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  select(sex, .pred_class) %>%
+  table()
 ```
 
 ```
-##             
-##              setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         16         2
-##   virginica       1          1        15
+##         .pred_class
+## sex      female male
+##   female     39    5
+##   male        4   36
 ```
+
+```r
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  conf_mat(sex, .pred_class)
+```
+
+```
+##           Truth
+## Prediction female male
+##     female     39    4
+##     male        5   36
+```
+
+```r
+# https://yardstick.tidymodels.org/articles/metric-types.html
+class_metrics <- yardstick::metric_set(accuracy,sens,
+                                       spec, f_meas)
+
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  class_metrics(truth = sex, estimate = .pred_class)
+```
+
+```
+## # A tibble: 4 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy binary         0.893
+## 2 sens     binary         0.886
+## 3 spec     binary         0.9  
+## 4 f_meas   binary         0.897
+```
+
 

@@ -1853,73 +1853,162 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. G
 
 ### R SVM Example
 
-We'll go back to the iris data.  As a first pass, let's use SVM to distinguish between Setosa and Versicolor/Virginica.
+We'll go back to the penguin data.  As a first pass, let's use SVM to distinguish between male and female penguins.  I removed the missing data from the dataset to make predictions easier.
 
 ```{r}
-library(kernlab)
-library(e1071)
-library(caret)
-data(iris)
+library(tidymodels)
+library(palmerpenguins)
 
-iris2 <- iris %>% dplyr::mutate(Species2 = as.factor(ifelse(Species == "setosa", "S", "V"))) %>%
-  dplyr::select(-Species)
+penguins <- penguins %>%
+  drop_na()
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+```
+
+#### Linear SVM (no tuning) {-}
+
+```{r}
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
+
+summary(penguin_svm_recipe)
+
+# model
+penguin_svm_lin <- svm_linear() %>%
+  set_engine("LiblineaR") %>%
+  set_mode("classification")
+
+penguin_svm_lin
+
+# workflow
+penguin_svm_lin_wflow <- workflow() %>%
+  add_model(penguin_svm_lin) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_lin_wflow
+
+
+# fit
+penguin_svm_lin_fit <- 
+  penguin_svm_lin_wflow %>%
+  fit(data = penguin_train)
+
+penguin_svm_lin_fit 
 ```
 
 
-#### Building an SVM on training data with radial kernel
+#### RBF SVM (with tuning) {-}
 
 ```{r}
-set.seed(4747)
-iris.svm.rad <- train(Species2 ~ ., data=iris2, method="svmRadial", 
-                 trControl = trainControl(method="cv"),
-                 tuneGrid= expand.grid(C=c(0.01,0.1,1,10,100), sigma=c(.5,1,2,3,4)),
-                 preProcess = c("center", "scale"))
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
 
-iris.svm.rad
+summary(penguin_svm_recipe)
 
+# model
+penguin_svm_rbf <- svm_rbf(cost = tune(),
+                           rbf_sigma = tune()) %>%
+  set_engine("kernlab") %>%
+  set_mode("classification")
+
+penguin_svm_rbf
+
+# workflow
+penguin_svm_rbf_wflow <- workflow() %>%
+  add_model(penguin_svm_rbf) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_rbf_wflow
+
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+# the tuned parameters also have default values you can use
+penguin_grid <- grid_regular(cost(),
+                             rbf_sigma(),
+                             levels = 8)
+
+penguin_grid
+
+# tune
+# this takes a few minutes
+penguin_svm_rbf_tune <- 
+  penguin_svm_rbf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+penguin_svm_rbf_tune 
 ```
 
-#### Training Error
+##### What is best?
 
 ```{r}
-iris.train.pred <- predict(iris.svm.rad, iris2)
-caret::confusionMatrix(iris.train.pred, iris2$Species2)$overall
-caret::confusionMatrix(iris.train.pred, iris2$Species2)
-```
-
-
-#### Visualizing the Boundary
-
-`caret` doesn't allow for visualization, so I've applied the `svm` function directly here.  I had to try various combinations of variables before finding a boundary that was visually interesting.  Note that just being in the yellow or red part doesn't necessarily indicate missclassification.  Remember that the boundary is in 4 dimensions and is not linear.
-
-```{r}
-iris.svm <- e1071::svm(Species2 ~ ., data = iris2, kernel = "radial")
-plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width, 
-     slice=list(Sepal.Length = 3, Petal.Length = 3))
-```
-
-
-#### 3 groups
-
-> For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
-
-```{r}
-set.seed(474747)
-train.obs <- sample(1:150, 100, replace = FALSE)
-iris.train <- iris[train.obs, ]
-iris.test <- iris[-train.obs, ]
+penguin_svm_rbf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy") %>%
+  ggplot() + 
+  geom_line(aes(color = as.factor(cost), y = mean, x = rbf_sigma)) +
+  labs(color = "Cost")
 ```
 
 ```{r}
-iris.svm3 <- caret::train(Species ~ ., data=iris.train, method="svmRadial", 
-                 trControl = trainControl(method="none"),
-                 tuneGrid= expand.grid(C=1, sigma=2),
-                 preProcess = c("center", "scale"))
+penguin_svm_rbf_tune %>%
+  autoplot()
 ```
 
+##### RBF SVM final model
 
 ```{r}
-predict(iris.svm3, iris.test)
-table(predict(iris.svm3, iris.test), iris.test$Species)
+penguin_svm_rbf_best <- finalize_model(
+  penguin_svm_rbf,
+  select_best(penguin_svm_rbf_tune, "accuracy"))
+
+penguin_svm_rbf_best
+
+
+penguin_svm_rbf_final <-
+  workflow() %>%
+  add_model(penguin_svm_rbf_best) %>%
+  add_recipe(penguin_svm_recipe) %>%
+  fit(data = penguin_train)
 ```
+
+
+##### Test predictions
+
+```{r}
+library(yardstick)
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  select(sex, .pred_class) %>%
+  table()
+
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  conf_mat(sex, .pred_class)
+
+# https://yardstick.tidymodels.org/articles/metric-types.html
+class_metrics <- yardstick::metric_set(accuracy,sens,
+                                       spec, f_meas)
+
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  class_metrics(truth = sex, estimate = .pred_class)
+```
+
 
