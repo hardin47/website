@@ -342,7 +342,7 @@ See also the guide to the applet which give lots of great advice.
 
 $k$-means clustering is an unsupervised partitioning algorithm designed to find a partition of the observations such that the following objective function is minimized (find the smallest within cluster sum of squares):
 
-$$\text{arg}\,\max\limits_{C_1, \ldots, C_k} \, \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
 
 
 As described in the algorithm below, reallocating observations can only improve the minimization criteria with the algorithm stopping when no changes of the observations will lower the objective function.  The algorithm leads to a *local optimum*, with no confirmation that the global minimum has occurred.  Often the $k$- means algorithm is run multiple times with different random starts, and the partition leading to the lowest objective criteria is chosen.
@@ -375,6 +375,34 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 3. If a point is equidistant from two clusters, the point won't move.
 4. The algorithm must converge in finite number of steps because there are finitely many points.
 
+#### Scaling matters {-}
+
+Note that if the variables are on very different scales, whichever variable is larger in magnitude will dominate the distances (and therefore the clustering).  Unlesss you *explicitly* want that to happen (which would be odd), you should scale the variables (subtract the mean and divide by the standard deviation) so that the distance is calculated on Z-scores instead of on the raw data.
+
+In the example below, the $k=2$ k-means algorithm is not able to see the cigar-shaped structure (on the raw data) because the distances are dominated by the x1 variable (which does not differentiate the clusters).  
+
+```{r}
+set.seed(47)
+norm_clust <- data.frame(
+  x1 = rnorm(1000, 0, 15),
+  x2 = c(rnorm(500, 5, 1), rnorm(500, 0, 1)))
+
+norm_clust %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on raw data")
+
+norm_clust %>%
+  mutate(across(everything(), scale)) %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on normalized / scaled data")
+```
+
 **strengths**
 
 * No hierarchical structure / points can move from one cluster to another.
@@ -390,7 +418,7 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the "center" is no longer defined in Euclidean terms.
 
 The two main steps are to Build (akin to assigning points to clusters) and to Swap (akin to redefining cluster centers).  The objective function the algorithm tries to minimize is the average dissimilarity of objects to the closest representative object.  (The PAM algorithm is a good (not necessarily global optimum) solution to minimizing the objective function.)  
-$$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
 Where $D_i$ represents this distance from observation $i$ to the closest medoid, $m_k$.
 
 
@@ -414,10 +442,10 @@ Where $D_i$ represents this distance from observation $i$ to the closest medoid,
 2. Iterate until the cluster assignments stop changing:
 
 (a) (Repeat for $k \in \{1, 2, ...K\}$) For a given cluster, $C_k$, find the observation in the cluster minimizing total distance to other points in that cluster:
-$$i^*_k = \argmin_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
+$$i^*_k = \text{arg}\,\min\limits_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
 Then $m_k = x_{i^*_k}, k=1, 2, \ldots, K$ are the current estimates of the cluster centers.
 (b) Given a current set of cluster centers $\{m_1, m_2, \ldots, m_K\}$, minimize the total error by assigning each observation to the closest (current) cluster center:
-$$C_i = \argmin_{1 \leq k \leq K} d(x_i, m_k)$$
+$$C_i = \text{arg}\,\min\limits_{1 \leq k \leq K} d(x_i, m_k)$$
 
 ******
 

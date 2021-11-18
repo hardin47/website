@@ -323,7 +323,7 @@ See also the guide to the applet which give lots of great advice.
 
 $k$-means clustering is an unsupervised partitioning algorithm designed to find a partition of the observations such that the following objective function is minimized (find the smallest within cluster sum of squares):
 
-$$\text{arg}\,\max\limits_{C_1, \ldots, C_k} \, \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
 
 
 As described in the algorithm below, reallocating observations can only improve the minimization criteria with the algorithm stopping when no changes of the observations will lower the objective function.  The algorithm leads to a *local optimum*, with no confirmation that the global minimum has occurred.  Often the $k$- means algorithm is run multiple times with different random starts, and the partition leading to the lowest objective criteria is chosen.
@@ -357,6 +357,41 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 3. If a point is equidistant from two clusters, the point won't move.
 4. The algorithm must converge in finite number of steps because there are finitely many points.
 
+#### Scaling matters {-}
+
+Note that if the variables are on very different scales, whichever variable is larger in magnitude will dominate the distances (and therefore the clustering).  Unlesss you *explicitly* want that to happen (which would be odd), you should scale the variables (subtract the mean and divide by the standard deviation) so that the distance is calculated on Z-scores instead of on the raw data.
+
+In the example below, the $k=2$ k-means algorithm is not able to see the cigar-shaped structure (on the raw data) because the distances are dominated by the x1 variable (which does not differentiate the clusters).  
+
+
+```r
+set.seed(47)
+norm_clust <- data.frame(
+  x1 = rnorm(1000, 0, 15),
+  x2 = c(rnorm(500, 5, 1), rnorm(500, 0, 1)))
+
+norm_clust %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on raw data")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+norm_clust %>%
+  mutate(across(everything(), scale)) %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on normalized / scaled data")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-10-2.png" width="480" style="display: block; margin: auto;" />
+
 **strengths**
 
 * No hierarchical structure / points can move from one cluster to another.
@@ -372,7 +407,7 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the "center" is no longer defined in Euclidean terms.
 
 The two main steps are to Build (akin to assigning points to clusters) and to Swap (akin to redefining cluster centers).  The objective function the algorithm tries to minimize is the average dissimilarity of objects to the closest representative object.  (The PAM algorithm is a good (not necessarily global optimum) solution to minimizing the objective function.)  
-$$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
 Where $D_i$ represents this distance from observation $i$ to the closest medoid, $m_k$.
 
 
@@ -396,10 +431,10 @@ Where $D_i$ represents this distance from observation $i$ to the closest medoid,
 2. Iterate until the cluster assignments stop changing:
 
 (a) (Repeat for $k \in \{1, 2, ...K\}$) For a given cluster, $C_k$, find the observation in the cluster minimizing total distance to other points in that cluster:
-$$i^*_k = \argmin_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
+$$i^*_k = \text{arg}\,\min\limits_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
 Then $m_k = x_{i^*_k}, k=1, 2, \ldots, K$ are the current estimates of the cluster centers.
 (b) Given a current set of cluster centers $\{m_1, m_2, \ldots, m_K\}$, minimize the total error by assigning each observation to the closest (current) cluster center:
-$$C_i = \argmin_{1 \leq k \leq K} d(x_i, m_k)$$
+$$C_i = \text{arg}\,\min\limits_{1 \leq k \leq K} d(x_i, m_k)$$
 
 ******
 
@@ -551,7 +586,7 @@ The EM algorithm is an incredibly useful tool for solving complicated maximizati
 
 Consider the Old Faithful geyser Yellowstone National Park, Wyoming, USA with the following histogram of data on waiting times between each eruption:
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 \begin{align}
 Y_1 &\sim N(\mu_1, \sigma_1^2)\\
@@ -673,18 +708,18 @@ kclust %>% augment(penguins_km)
 
 ```
 ## # A tibble: 342 × 5
-##    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g .cluster
-##             <dbl>         <dbl>             <int>       <int> <fct>   
-##  1           39.1          18.7               181        3750 1       
-##  2           39.5          17.4               186        3800 1       
-##  3           40.3          18                 195        3250 1       
-##  4           36.7          19.3               193        3450 1       
-##  5           39.3          20.6               190        3650 1       
-##  6           38.9          17.8               181        3625 1       
-##  7           39.2          19.6               195        4675 3       
-##  8           34.1          18.1               193        3475 1       
-##  9           42            20.2               190        4250 3       
-## 10           37.8          17.1               186        3300 1       
+##    bill_length_mm[,1] bill_depth_mm[,… flipper_length_… body_mass_g[,1] .cluster
+##                 <dbl>            <dbl>            <dbl>           <dbl> <fct>   
+##  1             -0.883           0.784            -1.42          -0.563  1       
+##  2             -0.810           0.126            -1.06          -0.501  1       
+##  3             -0.663           0.430            -0.421         -1.19   1       
+##  4             -1.32            1.09             -0.563         -0.937  1       
+##  5             -0.847           1.75             -0.776         -0.688  1       
+##  6             -0.920           0.329            -1.42          -0.719  1       
+##  7             -0.865           1.24             -0.421          0.590  1       
+##  8             -1.80            0.480            -0.563         -0.906  1       
+##  9             -0.352           1.54             -0.776          0.0602 3       
+## 10             -1.12           -0.0259           -1.06          -1.12   1       
 ## # … with 332 more rows
 ```
 
@@ -697,11 +732,11 @@ kclust %>% tidy()
 
 ```
 ## # A tibble: 3 × 7
-##   bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  size  withinss
-##            <dbl>         <dbl>             <dbl>       <dbl> <int>     <dbl>
-## 1           41.0          17.9              189.       3459.   144 10043669.
-## 2           48.6          15.4              220.       5360.    81  9956899.
-## 3           44.3          17.4              202.       4315.   117  9651728.
+##   bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  size withinss
+##            <dbl>         <dbl>             <dbl>       <dbl> <int>    <dbl>
+## 1         -1.05          0.486            -0.890      -0.769   132     122.
+## 2          0.656        -1.10              1.16        1.09    123     143.
+## 3          0.660         0.816            -0.286      -0.374    87     113.
 ## # … with 1 more variable: cluster <fct>
 ```
 
@@ -714,9 +749,9 @@ kclust %>% glance()
 
 ```
 ## # A tibble: 1 × 4
-##        totss tot.withinss  betweenss  iter
-##        <dbl>        <dbl>      <dbl> <int>
-## 1 219386618.    29652295. 189734322.     2
+##   totss tot.withinss betweenss  iter
+##   <dbl>        <dbl>     <dbl> <int>
+## 1  1364         378.      986.     2
 ```
 
 
@@ -780,7 +815,7 @@ clusterings %>%
   ggtitle("Total Within Sum of Squares")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -806,7 +841,7 @@ assignments %>%
   facet_wrap(~ k)
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
 
 Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
 
@@ -824,7 +859,7 @@ assignments %>%
   ggtitle("Species vs cluster prediction across different values of k")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
 For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
 
@@ -842,6 +877,6 @@ assignments %>%
   ggtitle("Island vs cluster prediction across different values of k")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
 
 
