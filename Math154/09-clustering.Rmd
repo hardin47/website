@@ -10,11 +10,14 @@ library(tidyverse)
 library(caret)
 ```
 
+```{r include = FALSE, echo = FALSE, eval = FALSE}
 ## 11/21/19 Agenda {#Nov21}
 1. unsupervised methods
 2. distance / dissimilarity
 3. hierarchical clustering
 4. partitioning clustering
+```
+
 
 The classification models we've discussed are all supervised learning techniques.  The word *supervised* refers to the fact that we know the response variable of all of the training observations.  Next up, we'll discuss clustering which is an *unsupervised* technique -- none of the observations have a given response variable.  For example, we might want to cluster a few hundred melanoma patients based on their genetic data.  We are looking for patterns in who groups together, but we don't have a preconceived idea of which patients belong to which group.
 
@@ -339,7 +342,7 @@ See also the guide to the applet which give lots of great advice.
 
 $k$-means clustering is an unsupervised partitioning algorithm designed to find a partition of the observations such that the following objective function is minimized (find the smallest within cluster sum of squares):
 
-$$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
+$$\text{arg}\,\max\limits_{C_1, \ldots, C_k} \, \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
 
 
 As described in the algorithm below, reallocating observations can only improve the minimization criteria with the algorithm stopping when no changes of the observations will lower the objective function.  The algorithm leads to a *local optimum*, with no confirmation that the global minimum has occurred.  Often the $k$- means algorithm is run multiple times with different random starts, and the partition leading to the lowest objective criteria is chosen.
@@ -623,4 +626,144 @@ Note that in the previous $k$-means algorithm we iterated between two steps of a
 Indeed, although the EM-algorithm above is slightly different than the previous $k$-means algorithm, the two methods typically converge to the same result and are both considered to be different implementations of a $k$-means algorithm.  
 
 See the following applet for a visual representation of how the EM-algorithm converges: http://www.socr.ucla.edu/applets.dir/mixtureem.html.
+
+### R k-means Example
+
+Again, using the `penguins` dataset, $k$-means clustering will be run.  We try multiple different values of $k$ to come up with a partition of the penguins.  We can look at the clusterings on scatterplots of the numerical variables.  We can also check to see if the clustering aligns with the categorical variables like `species` and `island`.
+
+Notice that we are only using the numerical variables.  And the numerical variables have been scaled (substract the mean and divide by the standard deviation).
+
+Full example has been adapted from https://www.tidymodels.org/learn/statistics/k-means/.
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
+
+penguins_km <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  mutate(across(bill_length_mm:body_mass_g, scale))
+
+set.seed(47)
+kclust <- penguins_km %>%
+  kmeans(centers = 3)
+
+kclust
+```
+
+The function `augment` works at the observation level:
+
+```{r}
+kclust %>% augment(penguins_km)
+```
+
+The function `tidy()` works at the per-cluster level:
+
+```{r}
+kclust %>% tidy()
+```
+
+The function `glance()` works at the per-model level:
+
+```{r}
+kclust %>% glance()
+```
+
+
+###  Trying various values of k {-}
+
+
+```{r}
+kmax <- 9
+kclusts <- 
+  tibble(k = 1:kmax) %>%
+  mutate(
+    kclust = map(k, ~kmeans(penguins_km, .x)),
+    tidied = map(kclust, tidy),
+    glanced = map(kclust, glance),
+    augmented = map(kclust, augment, penguins_km)
+  )
+
+kclusts
+```
+
+
+For each of the values of $k$ the `augment`ed, `tidy`ed, and `glance`d information can be calculated.  Note that you might want to find how the total within sum of squares decreases as a function of $k$.  (Will the within sum of squares always decrease as a function of $k?$  Does it here?  Why not?)  It seems as though $k=3$ or $k=4$ is probably sufficient (larger values of $k$ do not reduce the sums of squares substantially).
+
+```{r}
+clusters <- 
+  kclusts %>%
+  unnest(cols = c(tidied))
+
+assignments <- 
+  kclusts %>% 
+  unnest(cols = c(augmented))
+
+clusterings <- 
+  kclusts %>%
+  unnest(cols = c(glanced))
+```
+
+```{r}
+clusterings %>%
+  ggplot(aes(x = k, y = tot.withinss)) + 
+  geom_line() + 
+  geom_point() + ylab("") +
+  ggtitle("Total Within Sum of Squares")
+```
+
+
+
+
+Adding back the rest of the penguin information (`species`, `sex`, `island`, etc.) in order to determine if the unsupervised clusters align with any of the non-numeric information given in the dataframe.
+
+```{r}
+assignments <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(species, island, sex, year) %>%
+  slice(rep(1:n(), times = kmax)) %>%
+  cbind(assignments)
+```
+
+From the two variables `flipper_length_mm` and `bill_lengh_mm` it seems that two clusters is probably sufficient.  However, it would probably make sense to look at the cluster colorings across all four of the variables and in higher dimensional space (e.g., 3-D projections).
+
+```{r}
+assignments %>%
+ ggplot(aes(x = flipper_length_mm, y = bill_length_mm)) +
+  geom_point(aes(color = .cluster), alpha = 0.8) + 
+  facet_wrap(~ k)
+```
+
+Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
+
+```{r}
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, species) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = species, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") + 
+  scale_fill_gradient(low = "white", high = "red") + 
+  ggtitle("Species vs cluster prediction across different values of k")
+```
+
+For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
+
+```{r}
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, island) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = island, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") +
+  scale_fill_gradient(low = "white", high = "red") +
+  ggtitle("Island vs cluster prediction across different values of k")
+```
+
 

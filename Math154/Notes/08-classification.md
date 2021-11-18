@@ -446,7 +446,7 @@ $$\bigg\Downarrow$$
 <p class="caption">(\#fig:unnamed-chunk-19)Image credit: Alison Hill</p>
 </div>
 
-#### Reflecting on Model Building
+#### Reflecting on Model Building {-}
 
 In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>, Kuhn and Silge walk through an example of an entire model building process.  Note that each of the stages is visited often before coming up with an appropriate model. 
 
@@ -705,11 +705,11 @@ ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 
 #### $k$-NN to predict penguin species {-}
 
-#### 1. Partition the data
+#### 1. Partition the data {-}
 
 
 
-#### 2. Build a recipe
+#### 2. Build a recipe {-}
 
 ```r
 penguin_knn_recipe <-
@@ -734,7 +734,7 @@ summary(penguin_knn_recipe)
 ## 6 species           nominal outcome     original
 ```
 
-#### 3. Select a model
+#### 3. Select a model {-}
 
 (note that we've used the default number of neighbors (here $k=7$).)
 
@@ -753,7 +753,7 @@ penguin_knn
 ```
 
 
-#### 4. Create a workflow
+#### 4. Create a workflow {-}
 
 ```r
 penguin_knn_wflow <- workflow() %>%
@@ -780,7 +780,7 @@ penguin_knn_wflow
 ```
 
 
-#### 5. Fit (/ predict) 
+#### 5. Fit (/ predict)  {-}
 
 
 ```r
@@ -805,7 +805,7 @@ penguin_knn_fit %>%
 ## 1 accuracy multiclass     0.988
 ```
 
-#### What is $k$?
+#### What is $k$? {-}
 
 It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
 
@@ -828,7 +828,7 @@ As we saw above, cross validation randomly splits the training data into V disti
 
 The final performance is based on the hold-out predictions by averaging the statistics from the V blocks.
 
-#### 1b.  A new partition of the training data
+#### 1b.  A new partition of the training data {-}
 
 
 ```r
@@ -837,7 +837,7 @@ penguin_vfold <- vfold_cv(penguin_train,
                           v = 3, strata = species)
 ```
 
-#### 3. Select a model
+#### 3. Select a model {-}
 
 Now the knn model uses `tune()` to indicate that we actually don't know how many neighbors to use.
 
@@ -847,7 +847,7 @@ penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
   set_mode("classification")
 ```
 
-#### 4. Re-create a workflow
+#### 4. Re-create a workflow {-}
 
 This time, use the model that has not set the number of neighbors.
 
@@ -859,7 +859,7 @@ penguin_knn_wflow_tune <- workflow() %>%
 ```
 
 
-#### 5. Fit the model
+#### 5. Fit the model {-}
 
 The model is fit to all three of the folds created above for each value of $k$ in `k_grid`.
 
@@ -896,12 +896,12 @@ penguin_knn_wflow_tune %>%
 ```
 
 
-#### 6. Validate the model
+#### 6. Validate the model {-}
 
 Using $k$ = 9, the model is re-trained on the training data and tested on the test data (to estimate overall model accuracy).
 
 
-##### 3. select a model
+##### 3. select a model {-}
 
 
 ```r
@@ -921,7 +921,7 @@ penguin_knn_final
 ## Computational engine: kknn
 ```
 
-##### 4. create a workflow
+##### 4. create a workflow {-}
 
 
 ```r
@@ -951,7 +951,7 @@ penguin_knn_wflow_final
 ## Computational engine: kknn
 ```
 
-##### 5. fit the model
+##### 5. fit the model {-}
 
 ```r
 penguin_knn_fit_final <- penguin_knn_wflow_final %>%
@@ -959,7 +959,7 @@ penguin_knn_fit_final <- penguin_knn_wflow_final %>%
 ```
 
 
-##### 6. validate the model
+##### 6. validate the model {-}
 
 ```r
 penguin_knn_fit_final %>% 
@@ -1045,7 +1045,7 @@ Decision trees are used for all sorts of predictive and descriptive models.  The
 
 
 
-#### Classification Trees
+#### Classification Trees {-}
 
 A *classification tree* is used to predict a categorical response variable (rather than a quantitative one).  The end predicted value will be the one of the *most commonly occurring class* of training observations in the region to which it belongs.  The goal is to create regions which are as homogeneous as possible with respect to the response variable - categories.
 
@@ -1080,7 +1080,7 @@ and we seek the value of $j$ and $s$ that minimize the equation:
 
 
 
-#### Regression Trees
+#### Regression Trees {-}
 
 
 The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $|T|$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_{|T|}$.  For every observation that falls into the region $R_m$, we make the same prediction - the mean of the response values for the training observations in $R_m$.  So how do we find the regions $R_1, \ldots, R_{|T|}$?
@@ -1110,7 +1110,7 @@ where $\overline{y}_{R_1}$ is the mean response for the training observations in
 4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
 
 
-#### (Avoiding) Overfitting
+#### (Avoiding) Overfitting {-}
 
 Ideally, the tree would not overfit the training data.  One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don't represent the test data).
 
@@ -1135,7 +1135,7 @@ One possible algorithm for building a tree is to split based on the reduction in
 ******
 
 
-#### Cost Complexity Pruning
+#### Cost Complexity Pruning {-}
 
 Also known as *weakest link pruning*, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$ (instead of considering every single subtree).  Generally, the idea is that there is a cost to having a larger (more complex!) tree.  We define the cost complexity criterion ($\alpha > 0$):
 \begin{align}
@@ -2131,7 +2131,7 @@ Note that we have a convex space (can be proved), and so we can't get stuck in a
 
 ### Not Linearly Separable {#notlinsvm}
 
-#### Transformations
+#### Transformations {-}
 
 Simultaneously,  <center><p style="color:red">the data can be transformed into a new space where the data **are** linearly separable.</p></center>   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
 
@@ -2236,9 +2236,9 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 
 
-#### What is a Kernel? {#kernels}
+### What is a Kernel? {#kernels}
 
-What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g. a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
+What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g., a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
 
 A helpful website about kernels: http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html
 
@@ -2268,7 +2268,7 @@ $$K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x
 Note, here $\gamma, r$ must be tuned using cross validation (along with the penalty/cost parameter $C$).  One benefit of the sigmoid kernel is that it has equivalence to a two-layer perceptron neural network.
 
 
-#### Soft Margins
+#### Soft Margins {-}
 
 But what if the data aren't linearly separable?  The optimization problem can be changed to allow for points to be on the other side of the margin.  The optimization problem is slightly more complicated, but basically the same idea:
 $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
@@ -2615,7 +2615,7 @@ penguin_svm_rbf_tune
 ## 4 <split [187/62]> Fold4 <tibble [128 × 6]> <tibble [0 × 1]>
 ```
 
-##### What is best?
+##### What is best? {-}
 
 
 ```r
@@ -2637,7 +2637,7 @@ penguin_svm_rbf_tune %>%
 
 <img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
 
-##### RBF SVM final model
+##### RBF SVM final model {-}
 
 
 ```r
@@ -2667,7 +2667,7 @@ penguin_svm_rbf_final <-
 ```
 
 
-##### Test predictions
+##### Test predictions {-}
 
 
 ```r
