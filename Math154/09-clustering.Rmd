@@ -230,6 +230,13 @@ Gives a more direct "distance" between categorical variables.
 knitr::include_graphics("figs/distR.png")
 ```
 
+#### Distance on strings {-}
+
+Consider the following infographic which compares different methods for computing distances between strings.
+
+```{r fig.cap = "Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html.", out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/text-distance-infographics.png")
+```
 
 ## Hierarchical Clustering {#hier}
 
@@ -317,6 +324,96 @@ knitr::include_graphics("figs/singlexamp.jpg")
 ```
 
 
+### R hierarchical Example
+
+Again, using the `penguins` dataset, hierarchical clustering will be run.  We can look at the dendrogram, in particular its alignment to the categorical variables like `species` and `island`.
+
+Notice that we are only using the numerical variables.  And the numerical variables have been scaled (subtract the mean and divide by the standard deviation).
+
+Full example has been adapted from https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html.
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
+
+penguins_h <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  mutate(across(bill_length_mm:body_mass_g, scale))
+
+set.seed(47)
+penguin_hclust <- penguins_h %>%
+  dist() %>%
+  hclust(method = "complete")
+
+penguin_hclust
+
+penguin_dend <- as.dendrogram(penguin_hclust)
+```
+
+#### Plotting {-}
+
+The basic dendrogram:
+
+```{r}
+plot(penguin_hclust)
+```
+
+Zooming in on a cluster:
+
+```{r}
+plot(penguin_dend[[1]])
+```
+
+Adding color to branches and nodes
+
+```{r}
+library(colorspace) # get nice colors
+species_col <- rev(rainbow_hcl(3))[as.numeric(penguins$species)]
+```
+
+
+
+```{r}
+library(dendextend)
+# order the branches as closely as possible to the original order
+penguin_dend <- rotate(penguin_dend, 1:342)
+```
+
+```{r}
+# color branches based on the clusters
+penguin_dend <- color_branches(penguin_dend, k = 3)
+
+# Manually match the labels, as much as possible, to the real classification of the flowers:
+labels_colors(penguin_dend) <-
+   rainbow_hcl(3)[sort_levels_values(
+      as.numeric(penguins$species)[order.dendrogram(penguin_dend)]
+   )]
+
+# We shall add the flower type to the labels:
+labels(penguin_dend) <- paste(as.character(penguins$species)[order.dendrogram(penguin_dend)],
+                           "(",labels(penguin_dend),")", 
+                           sep = "")
+# We hang the dendrogram a bit:
+penguin_dend <- hang.dendrogram(penguin_dend,hang_height=0.1)
+
+# reduce the size of the labels:
+penguin_dend <- assign_values_to_leaves_nodePar(penguin_dend, 0.5, "lab.cex")
+penguin_dend <- set(penguin_dend, "labels_cex", 0.5)
+# And plot:
+par(mar = c(3,3,3,7))
+plot(penguin_dend, 
+     main = "Clustered penguin data set
+     (the labels give the true penguin species)", 
+     horiz =  TRUE,  nodePar = list(cex = .007))
+penguin_species <- rev(levels(penguins$species))
+legend("topleft", legend = penguin_species, fill = rainbow_hcl(3))
+```
+
+
+
 
 ## Partitioning Clustering {#part}
 
@@ -377,7 +474,7 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 
 #### Scaling matters {-}
 
-Note that if the variables are on very different scales, whichever variable is larger in magnitude will dominate the distances (and therefore the clustering).  Unlesss you *explicitly* want that to happen (which would be odd), you should scale the variables (subtract the mean and divide by the standard deviation) so that the distance is calculated on Z-scores instead of on the raw data.
+Note that if the variables are on very different scales, whichever variable is larger in magnitude will dominate the distances (and therefore the clustering).  Unless you *explicitly* want that to happen (which would be odd), you should scale the variables (subtract the mean and divide by the standard deviation) so that the distance is calculated on Z-scores instead of on the raw data.
 
 In the example below, the $k=2$ k-means algorithm is not able to see the cigar-shaped structure (on the raw data) because the distances are dominated by the x1 variable (which does not differentiate the clusters).  
 
@@ -412,6 +509,148 @@ norm_clust %>%
 
 * $k$ has to be predefined to run the algorithm.
 * $k$-means is based on Euclidean distance (*only*).
+
+### R k-means Example
+
+Again, using the `penguins` dataset, $k$-means clustering will be run.  We try multiple different values of $k$ to come up with a partition of the penguins.  We can look at the clusterings on scatterplots of the numerical variables.  We can also check to see if the clustering aligns with the categorical variables like `species` and `island`.
+
+Notice that we are only using the numerical variables.  And the numerical variables have been scaled (subtract the mean and divide by the standard deviation).
+
+Full example has been adapted from https://www.tidymodels.org/learn/statistics/k-means/.
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
+
+penguins_km <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  mutate(across(bill_length_mm:body_mass_g, scale))
+
+set.seed(47)
+penguin_kclust <- penguins_km %>%
+  kmeans(centers = 3)
+
+penguin_kclust
+```
+
+The function `augment` works at the observation level:
+
+```{r}
+penguin_kclust %>% augment(penguins_km)
+```
+
+The function `tidy()` works at the per-cluster level:
+
+```{r}
+penguin_kclust %>% tidy()
+```
+
+The function `glance()` works at the per-model level:
+
+```{r}
+penguin_kclust %>% glance()
+```
+
+
+####  Trying various values of k {-}
+
+
+```{r}
+kmax <- 9
+penguin_kclusts <- 
+  tibble(k = 1:kmax) %>%
+  mutate(
+    penguin_kclust = map(k, ~kmeans(penguins_km, .x)),
+    tidied = map(penguin_kclust, tidy),
+    glanced = map(penguin_kclust, glance),
+    augmented = map(penguin_kclust, augment, penguins_km)
+  )
+
+penguin_kclusts
+```
+
+
+For each of the values of $k$ the `augment`ed, `tidy`ed, and `glance`d information can be calculated.  Note that you might want to find how the total within sum of squares decreases as a function of $k$.  (Will the within sum of squares always decrease as a function of $k?$  Does it here?  Why not?)  It seems as though $k=3$ or $k=4$ is probably sufficient (larger values of $k$ do not reduce the sums of squares substantially).
+
+```{r}
+clusters <- 
+  penguin_kclusts %>%
+  unnest(cols = c(tidied))
+
+assignments <- 
+  penguin_kclusts %>% 
+  unnest(cols = c(augmented))
+
+clusterings <- 
+  penguin_kclusts %>%
+  unnest(cols = c(glanced))
+```
+
+```{r}
+clusterings %>%
+  ggplot(aes(x = k, y = tot.withinss)) + 
+  geom_line() + 
+  geom_point() + ylab("") +
+  ggtitle("Total Within Sum of Squares")
+```
+
+
+
+
+Adding back the rest of the penguin information (`species`, `sex`, `island`, etc.) in order to determine if the unsupervised clusters align with any of the non-numeric information given in the dataframe.
+
+```{r}
+assignments <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(species, island, sex, year) %>%
+  slice(rep(1:n(), times = kmax)) %>%
+  cbind(assignments)
+```
+
+From the two variables `flipper_length_mm` and `bill_lengh_mm` it seems that two clusters is probably sufficient.  However, it would probably make sense to look at the cluster colorings across all four of the variables and in higher dimensional space (e.g., 3-D projections).
+
+```{r}
+assignments %>%
+ ggplot(aes(x = flipper_length_mm, y = bill_length_mm)) +
+  geom_point(aes(color = .cluster), alpha = 0.8) + 
+  facet_wrap(~ k)
+```
+
+Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
+
+```{r}
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, species) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = species, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") + 
+  scale_fill_gradient(low = "white", high = "red") + 
+  ggtitle("Species vs cluster prediction across different values of k")
+```
+
+For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
+
+```{r}
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, island) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = island, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") +
+  scale_fill_gradient(low = "white", high = "red") +
+  ggtitle("Island vs cluster prediction across different values of k")
+```
+
+
+
 
 ### Partitioning Around Medoids
 
@@ -654,144 +893,5 @@ Note that in the previous $k$-means algorithm we iterated between two steps of a
 Indeed, although the EM-algorithm above is slightly different than the previous $k$-means algorithm, the two methods typically converge to the same result and are both considered to be different implementations of a $k$-means algorithm.  
 
 See the following applet for a visual representation of how the EM-algorithm converges: http://www.socr.ucla.edu/applets.dir/mixtureem.html.
-
-### R k-means Example
-
-Again, using the `penguins` dataset, $k$-means clustering will be run.  We try multiple different values of $k$ to come up with a partition of the penguins.  We can look at the clusterings on scatterplots of the numerical variables.  We can also check to see if the clustering aligns with the categorical variables like `species` and `island`.
-
-Notice that we are only using the numerical variables.  And the numerical variables have been scaled (substract the mean and divide by the standard deviation).
-
-Full example has been adapted from https://www.tidymodels.org/learn/statistics/k-means/.
-
-```{r}
-library(tidyverse)
-library(tidymodels)
-library(palmerpenguins)
-data(penguins)
-
-penguins_km <- penguins %>%
-  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  mutate(across(bill_length_mm:body_mass_g, scale))
-
-set.seed(47)
-kclust <- penguins_km %>%
-  kmeans(centers = 3)
-
-kclust
-```
-
-The function `augment` works at the observation level:
-
-```{r}
-kclust %>% augment(penguins_km)
-```
-
-The function `tidy()` works at the per-cluster level:
-
-```{r}
-kclust %>% tidy()
-```
-
-The function `glance()` works at the per-model level:
-
-```{r}
-kclust %>% glance()
-```
-
-
-###  Trying various values of k {-}
-
-
-```{r}
-kmax <- 9
-kclusts <- 
-  tibble(k = 1:kmax) %>%
-  mutate(
-    kclust = map(k, ~kmeans(penguins_km, .x)),
-    tidied = map(kclust, tidy),
-    glanced = map(kclust, glance),
-    augmented = map(kclust, augment, penguins_km)
-  )
-
-kclusts
-```
-
-
-For each of the values of $k$ the `augment`ed, `tidy`ed, and `glance`d information can be calculated.  Note that you might want to find how the total within sum of squares decreases as a function of $k$.  (Will the within sum of squares always decrease as a function of $k?$  Does it here?  Why not?)  It seems as though $k=3$ or $k=4$ is probably sufficient (larger values of $k$ do not reduce the sums of squares substantially).
-
-```{r}
-clusters <- 
-  kclusts %>%
-  unnest(cols = c(tidied))
-
-assignments <- 
-  kclusts %>% 
-  unnest(cols = c(augmented))
-
-clusterings <- 
-  kclusts %>%
-  unnest(cols = c(glanced))
-```
-
-```{r}
-clusterings %>%
-  ggplot(aes(x = k, y = tot.withinss)) + 
-  geom_line() + 
-  geom_point() + ylab("") +
-  ggtitle("Total Within Sum of Squares")
-```
-
-
-
-
-Adding back the rest of the penguin information (`species`, `sex`, `island`, etc.) in order to determine if the unsupervised clusters align with any of the non-numeric information given in the dataframe.
-
-```{r}
-assignments <- penguins %>%
-  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  select(species, island, sex, year) %>%
-  slice(rep(1:n(), times = kmax)) %>%
-  cbind(assignments)
-```
-
-From the two variables `flipper_length_mm` and `bill_lengh_mm` it seems that two clusters is probably sufficient.  However, it would probably make sense to look at the cluster colorings across all four of the variables and in higher dimensional space (e.g., 3-D projections).
-
-```{r}
-assignments %>%
- ggplot(aes(x = flipper_length_mm, y = bill_length_mm)) +
-  geom_point(aes(color = .cluster), alpha = 0.8) + 
-  facet_wrap(~ k)
-```
-
-Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
-
-```{r}
-assignments %>%
-  group_by(k) %>%
-  select(.cluster, species) %>%
-  table() %>%
-  as.data.frame() %>%
-    ggplot() +
-    geom_tile(aes(x = .cluster, y = species, fill = Freq)) + 
-  facet_wrap( ~ k) + ylab("") + 
-  scale_fill_gradient(low = "white", high = "red") + 
-  ggtitle("Species vs cluster prediction across different values of k")
-```
-
-For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
-
-```{r}
-assignments %>%
-  group_by(k) %>%
-  select(.cluster, island) %>%
-  table() %>%
-  as.data.frame() %>%
-    ggplot() +
-    geom_tile(aes(x = .cluster, y = island, fill = Freq)) + 
-  facet_wrap( ~ k) + ylab("") +
-  scale_fill_gradient(low = "white", high = "red") +
-  ggtitle("Island vs cluster prediction across different values of k")
-```
 
 
