@@ -104,7 +104,8 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
  \end{align}
 
 
-Distance properties don't hold for Pearson correlation.
+##### Distance properties don't hold for Pearson correlation {-}
+
 
 3.   ${\bf y}=a{\bf x}$
  \begin{align}
@@ -120,7 +121,90 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
  $d_P({\bf x}, {\bf y}) + d_P({\bf y}, {\bf z})  <  d_P({\bf z}, {\bf x})$
  $\rightarrow\leftarrow$
 
+**Regular Pearson distance**
 
+
+```r
+x1 <- c(1,2,3)
+x2 <- c(1, 4, 10)
+x3 <- c(9, 2, 2)
+
+# d(1,2)
+1 - cor(x1, x2)
+```
+
+```
+## [1] 0.01801949
+```
+
+```r
+# d(1,3)
+1 - cor(x1, x3)
+```
+
+```
+## [1] 1.866025
+```
+
+```r
+# d(2,3)
+1 - cor(x2, x3)
+```
+
+```
+## [1] 1.755929
+```
+
+```r
+# d(1,3) > d(1,2) + d(2,3)
+1 - cor(x1, x2) + 1 - cor(x2, x3)
+```
+
+```
+## [1] 1.773948
+```
+
+
+**Absolute Pearson distance**
+
+Using absolute distance doesn't fix things.
+
+
+```r
+# d(1,2)
+1 - abs(cor(x1, x2))
+```
+
+```
+## [1] 0.01801949
+```
+
+```r
+# d(1,3)
+1 - abs(cor(x1, x3))
+```
+
+```
+## [1] 0.1339746
+```
+
+```r
+# d(2,3)
+1 - abs(cor(x2, x3))
+```
+
+```
+## [1] 0.2440711
+```
+
+```r
+# d(2,3) > d(1,2) + d(1,3)
+1 - abs(cor(x1, x2)) + 1 - abs(cor(x1, x3))
+```
+
+```
+## [1] 0.1519941
+```
 
 <img src="figs/corEucdist.jpeg" width="80%" style="display: block; margin: auto;" />
 
@@ -194,7 +278,7 @@ d_H({\bf x}, {\bf y}) = \sum_{i=1}^p I(x_i \ne y_i)
 
 <div class="figure" style="text-align: center">
 <img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-5)The Hamming distance across the two DNA strands is 7.</p>
+<p class="caption">(\#fig:unnamed-chunk-7)The Hamming distance across the two DNA strands is 7.</p>
 </div>
 
 
@@ -212,7 +296,7 @@ Gives a more direct "distance" between categorical variables.
 
 <div class="figure" style="text-align: center">
 <img src="figs/distR.png" alt="The function `dist` in `R` calculates the distances given above." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-6)The function `dist` in `R` calculates the distances given above.</p>
+<p class="caption">(\#fig:unnamed-chunk-8)The function `dist` in `R` calculates the distances given above.</p>
 </div>
 
 #### Distance on strings {-}
@@ -221,7 +305,7 @@ Consider the following infographic which compares different methods for computin
 
 <div class="figure" style="text-align: center">
 <img src="figs/text-distance-infographics.png" alt="Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-7)Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html.</p>
+<p class="caption">(\#fig:unnamed-chunk-9)Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html.</p>
 </div>
 
 ## Hierarchical Clustering {#hier}
@@ -267,7 +351,7 @@ Toy Example of **Single Linkage Agglomerative Hierarchical Clustering**
 | B 	| 0.2 	| 0 	|  	|  	|  |
 | C 	| 0.6 	| 0.5 	| 0  	|  	|  |
 | D 	| 1 	| 0.9 	| 0.4 	| 0 	|  |
-| E 	| 0.9 	| 0.8 	| 5 	| 0.3 	|  0 |
+| E 	| 0.9 	| 0.8 	| 0.5 	| 0.3 	|  0 |
 
 
 Link A and B!
@@ -357,7 +441,7 @@ The basic dendrogram:
 plot(penguin_hclust)
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 Zooming in on a cluster:
 
@@ -366,7 +450,7 @@ Zooming in on a cluster:
 plot(penguin_dend[[1]])
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 Adding color to branches and nodes
 
@@ -416,7 +500,7 @@ penguin_species <- rev(levels(penguins$species))
 legend("topleft", legend = penguin_species, fill = rainbow_hcl(3))
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -455,7 +539,7 @@ Note that the following algorithm is simply one $k$-means algorithm.  Other algo
 
 <div class="figure" style="text-align: center">
 <img src="figs/kmeansISLRswap.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" /><img src="figs/kmeansISLRrand.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-16)From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.</p>
+<p class="caption">(\#fig:unnamed-chunk-18)From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.</p>
 </div>
 
 ******
@@ -500,7 +584,7 @@ norm_clust %>%
   ggtitle("k-means (k=2) on raw data")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 norm_clust %>%
@@ -512,7 +596,7 @@ norm_clust %>%
   ggtitle("k-means (k=2) on normalized / scaled data")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-17-2.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;" />
 
 **strengths**
 
@@ -698,7 +782,7 @@ clusterings %>%
   ggtitle("Total Within Sum of Squares")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -724,7 +808,7 @@ assignments %>%
   facet_wrap(~ k)
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
 
 Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
 
@@ -742,7 +826,7 @@ assignments %>%
   ggtitle("Species vs cluster prediction across different values of k")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
 
@@ -760,7 +844,7 @@ assignments %>%
   ggtitle("Island vs cluster prediction across different values of k")
 ```
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -949,7 +1033,7 @@ The EM algorithm is an incredibly useful tool for solving complicated maximizati
 
 Consider the Old Faithful geyser Yellowstone National Park, Wyoming, USA with the following histogram of data on waiting times between each eruption:
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
 
 \begin{align}
 Y_1 &\sim N(\mu_1, \sigma_1^2)\\
