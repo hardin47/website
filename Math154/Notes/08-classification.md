@@ -1169,6 +1169,7 @@ However, you might notice that in R the `cost_complexity` value is typically les
 ##### Variations on a theme {-}
 
 The main ideas above are consistent throughout all CART algorithms.  However, the exact details of implementation can change from function to function, and often times it is very difficult to decipher exactly which equation is being used.  In the `tree` function in R, much of the decision making is done on `deviance` which is defined as:
+
 $$\mbox{numerical: } \mbox{deviance} = \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2$$
 
 
