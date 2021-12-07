@@ -116,7 +116,7 @@ The course has been a mix of computational statistics and data science procedure
   - Where did the data come from, and what biases might be inherent?
   - What population is appropriate for any of the inferential claims I'm making?
   - How might individual's privacy or anonymity be impacted by what I've created?
-  - Is it possible that might work could be misinterpreted or misused?
+  - Is it possible that my work could be misinterpreted or misused?
   
 
 <img src="figs/info_architect.jpeg" title="Warning story about a white supremacist with data power." alt="Warning story about a white supremacist with data power." width="90%" style="display: block; margin: auto;" />
