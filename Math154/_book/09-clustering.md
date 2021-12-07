@@ -3,11 +3,8 @@
 
 
 
-## 11/21/19 Agenda {#Nov21}
-1. unsupervised methods
-2. distance / dissimilarity
-3. hierarchical clustering
-4. partitioning clustering
+
+
 
 The classification models we've discussed are all supervised learning techniques.  The word *supervised* refers to the fact that we know the response variable of all of the training observations.  Next up, we'll discuss clustering which is an *unsupervised* technique -- none of the observations have a given response variable.  For example, we might want to cluster a few hundred melanoma patients based on their genetic data.  We are looking for patterns in who groups together, but we don't have a preconceived idea of which patients belong to which group.
 
@@ -107,7 +104,8 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
  \end{align}
 
 
-Distance properties don't hold for Pearson correlation.
+##### Distance properties don't hold for Pearson correlation {-}
+
 
 3.   ${\bf y}=a{\bf x}$
  \begin{align}
@@ -123,7 +121,90 @@ d_P({\bf x}, {\bf y}) &= 1 - r_P ({\bf x}, {\bf y})\\
  $d_P({\bf x}, {\bf y}) + d_P({\bf y}, {\bf z})  <  d_P({\bf z}, {\bf x})$
  $\rightarrow\leftarrow$
 
+**Regular Pearson distance**
 
+
+```r
+x1 <- c(1,2,3)
+x2 <- c(1, 4, 10)
+x3 <- c(9, 2, 2)
+
+# d(1,2)
+1 - cor(x1, x2)
+```
+
+```
+## [1] 0.01801949
+```
+
+```r
+# d(1,3)
+1 - cor(x1, x3)
+```
+
+```
+## [1] 1.866025
+```
+
+```r
+# d(2,3)
+1 - cor(x2, x3)
+```
+
+```
+## [1] 1.755929
+```
+
+```r
+# d(1,3) > d(1,2) + d(2,3)
+1 - cor(x1, x2) + 1 - cor(x2, x3)
+```
+
+```
+## [1] 1.773948
+```
+
+
+**Absolute Pearson distance**
+
+Using absolute distance doesn't fix things.
+
+
+```r
+# d(1,2)
+1 - abs(cor(x1, x2))
+```
+
+```
+## [1] 0.01801949
+```
+
+```r
+# d(1,3)
+1 - abs(cor(x1, x3))
+```
+
+```
+## [1] 0.1339746
+```
+
+```r
+# d(2,3)
+1 - abs(cor(x2, x3))
+```
+
+```
+## [1] 0.2440711
+```
+
+```r
+# d(2,3) > d(1,2) + d(1,3)
+1 - abs(cor(x1, x2)) + 1 - abs(cor(x1, x3))
+```
+
+```
+## [1] 0.1519941
+```
 
 <img src="figs/corEucdist.jpeg" width="80%" style="display: block; margin: auto;" />
 
@@ -197,7 +278,7 @@ d_H({\bf x}, {\bf y}) = \sum_{i=1}^p I(x_i \ne y_i)
 
 <div class="figure" style="text-align: center">
 <img src="figs/hamdistGCTA.png" alt="The Hamming distance across the two DNA strands is 7." width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-4)The Hamming distance across the two DNA strands is 7.</p>
+<p class="caption">(\#fig:unnamed-chunk-7)The Hamming distance across the two DNA strands is 7.</p>
 </div>
 
 
@@ -215,9 +296,17 @@ Gives a more direct "distance" between categorical variables.
 
 <div class="figure" style="text-align: center">
 <img src="figs/distR.png" alt="The function `dist` in `R` calculates the distances given above." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-5)The function `dist` in `R` calculates the distances given above.</p>
+<p class="caption">(\#fig:unnamed-chunk-8)The function `dist` in `R` calculates the distances given above.</p>
 </div>
 
+#### Distance on strings {-}
+
+Consider the following infographic which compares different methods for computing distances between strings.
+
+<div class="figure" style="text-align: center">
+<img src="figs/text-distance-infographics.png" alt="Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html." width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-9)Comparison of string distance metrics from https://www.kdnuggets.com/2019/01/comparison-text-distance-metrics.html.</p>
+</div>
 
 ## Hierarchical Clustering {#hier}
 
@@ -262,7 +351,7 @@ Toy Example of **Single Linkage Agglomerative Hierarchical Clustering**
 | B 	| 0.2 	| 0 	|  	|  	|  |
 | C 	| 0.6 	| 0.5 	| 0  	|  	|  |
 | D 	| 1 	| 0.9 	| 0.4 	| 0 	|  |
-| E 	| 0.9 	| 0.8 	| 5 	| 0.3 	|  0 |
+| E 	| 0.9 	| 0.8 	| 0.5 	| 0.3 	|  0 |
 
 
 Link A and B!
@@ -301,6 +390,120 @@ d_{(AB)(CDE)} = d_{BC} = 0.5
 <img src="figs/singlexamp.jpg" width="80%" style="display: block; margin: auto;" />
 
 
+### R hierarchical Example
+
+Again, using the `penguins` dataset, hierarchical clustering will be run.  We can look at the dendrogram, in particular its alignment to the categorical variables like `species` and `island`.
+
+Notice that we are only using the numerical variables.  And the numerical variables have been scaled (subtract the mean and divide by the standard deviation).
+
+Full example has been adapted from https://cran.r-project.org/web/packages/dendextend/vignettes/Cluster_Analysis.html.
+
+
+```r
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
+
+penguins_h <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  mutate(across(bill_length_mm:body_mass_g, scale))
+
+set.seed(47)
+penguin_hclust <- penguins_h %>%
+  dist() %>%
+  hclust(method = "complete")
+
+penguin_hclust
+```
+
+```
+## 
+## Call:
+## hclust(d = ., method = "complete")
+## 
+## Cluster method   : complete 
+## Distance         : euclidean 
+## Number of objects: 342
+```
+
+```r
+penguin_dend <- as.dendrogram(penguin_hclust)
+```
+
+#### Plotting {-}
+
+The basic dendrogram:
+
+
+```r
+plot(penguin_hclust)
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+
+Zooming in on a cluster:
+
+
+```r
+plot(penguin_dend[[1]])
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+
+Adding color to branches and nodes
+
+
+```r
+library(colorspace) # get nice colors
+species_col <- rev(rainbow_hcl(3))[as.numeric(penguins$species)]
+```
+
+
+
+
+```r
+library(dendextend)
+# order the branches as closely as possible to the original order
+penguin_dend <- rotate(penguin_dend, 1:342)
+```
+
+
+```r
+# color branches based on the clusters
+penguin_dend <- color_branches(penguin_dend, k = 3)
+
+# Manually match the labels, as much as possible, to the real classification of the flowers:
+labels_colors(penguin_dend) <-
+   rainbow_hcl(3)[sort_levels_values(
+      as.numeric(penguins$species)[order.dendrogram(penguin_dend)]
+   )]
+
+# We shall add the flower type to the labels:
+labels(penguin_dend) <- paste(as.character(penguins$species)[order.dendrogram(penguin_dend)],
+                           "(",labels(penguin_dend),")", 
+                           sep = "")
+# We hang the dendrogram a bit:
+penguin_dend <- hang.dendrogram(penguin_dend,hang_height=0.1)
+
+# reduce the size of the labels:
+penguin_dend <- assign_values_to_leaves_nodePar(penguin_dend, 0.5, "lab.cex")
+penguin_dend <- set(penguin_dend, "labels_cex", 0.5)
+# And plot:
+par(mar = c(3,3,3,7))
+plot(penguin_dend, 
+     main = "Clustered penguin data set
+     (the labels give the true penguin species)", 
+     horiz =  TRUE,  nodePar = list(cex = .007))
+penguin_species <- rev(levels(penguins$species))
+legend("topleft", legend = penguin_species, fill = rainbow_hcl(3))
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
 
 ## Partitioning Clustering {#part}
 
@@ -326,7 +529,7 @@ See also the guide to the applet which give lots of great advice.
 
 $k$-means clustering is an unsupervised partitioning algorithm designed to find a partition of the observations such that the following objective function is minimized (find the smallest within cluster sum of squares):
 
-$$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K 2 \sum_{i \in C_k} \sum_{j=1}^p (x_{ij} - \overline{x}_{kj})^2 \Bigg\}$$
 
 
 As described in the algorithm below, reallocating observations can only improve the minimization criteria with the algorithm stopping when no changes of the observations will lower the objective function.  The algorithm leads to a *local optimum*, with no confirmation that the global minimum has occurred.  Often the $k$- means algorithm is run multiple times with different random starts, and the partition leading to the lowest objective criteria is chosen.
@@ -336,7 +539,7 @@ Note that the following algorithm is simply one $k$-means algorithm.  Other algo
 
 <div class="figure" style="text-align: center">
 <img src="figs/kmeansISLRswap.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" /><img src="figs/kmeansISLRrand.png" alt="From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani." width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-8)From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.</p>
+<p class="caption">(\#fig:unnamed-chunk-18)From *An Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani.</p>
 </div>
 
 ******
@@ -360,6 +563,41 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 3. If a point is equidistant from two clusters, the point won't move.
 4. The algorithm must converge in finite number of steps because there are finitely many points.
 
+#### Scaling matters {-}
+
+Note that if the variables are on very different scales, whichever variable is larger in magnitude will dominate the distances (and therefore the clustering).  Unless you *explicitly* want that to happen (which would be odd), you should scale the variables (subtract the mean and divide by the standard deviation) so that the distance is calculated on Z-scores instead of on the raw data.
+
+In the example below, the $k=2$ k-means algorithm is not able to see the cigar-shaped structure (on the raw data) because the distances are dominated by the x1 variable (which does not differentiate the clusters).  
+
+
+```r
+set.seed(47)
+norm_clust <- data.frame(
+  x1 = rnorm(1000, 0, 15),
+  x2 = c(rnorm(500, 5, 1), rnorm(500, 0, 1)))
+
+norm_clust %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on raw data")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+norm_clust %>%
+  mutate(across(everything(), scale)) %>%
+  kmeans(centers = 2) %>%
+  augment(norm_clust) %>%
+  ggplot() + 
+  geom_point(aes(x = x1, y = x2, color = .cluster)) +
+  ggtitle("k-means (k=2) on normalized / scaled data")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-19-2.png" width="480" style="display: block; margin: auto;" />
+
 **strengths**
 
 * No hierarchical structure / points can move from one cluster to another.
@@ -370,12 +608,253 @@ Why does the $k$-means algorithm converge / (local) minimize the objective funct
 * $k$ has to be predefined to run the algorithm.
 * $k$-means is based on Euclidean distance (*only*).
 
+### R k-means Example
+
+Again, using the `penguins` dataset, $k$-means clustering will be run.  We try multiple different values of $k$ to come up with a partition of the penguins.  We can look at the clusterings on scatterplots of the numerical variables.  We can also check to see if the clustering aligns with the categorical variables like `species` and `island`.
+
+Notice that we are only using the numerical variables.  And the numerical variables have been scaled (subtract the mean and divide by the standard deviation).
+
+Full example has been adapted from https://www.tidymodels.org/learn/statistics/k-means/.
+
+
+```r
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
+
+penguins_km <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  mutate(across(bill_length_mm:body_mass_g, scale))
+
+set.seed(47)
+penguin_kclust <- penguins_km %>%
+  kmeans(centers = 3)
+
+penguin_kclust
+```
+
+```
+## K-means clustering with 3 clusters of sizes 132, 123, 87
+## 
+## Cluster means:
+##   bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+## 1     -1.0465260     0.4858415        -0.8899121  -0.7694891
+## 2      0.6562677    -1.0983711         1.1571696   1.0901639
+## 3      0.6600059     0.8157307        -0.2857869  -0.3737654
+## 
+## Clustering vector:
+##   [1] 1 1 1 1 1 1 1 1 3 1 1 1 1 1 1 1 3 1 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [38] 1 1 1 1 1 3 1 1 1 1 1 3 1 1 1 3 1 1 1 1 1 1 1 3 1 1 1 1 1 1 1 3 1 1 1 3 1
+##  [75] 3 1 1 1 3 1 3 1 1 1 1 1 1 1 1 1 3 1 1 1 3 1 1 1 3 1 3 1 1 1 1 1 1 1 3 1 3
+## [112] 1 3 1 3 1 1 1 1 1 1 1 3 1 1 1 1 1 3 1 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [149] 1 1 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+## [186] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+## [223] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+## [260] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3
+## [297] 1 3 3 3 3 3 3 3 1 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3
+## [334] 3 3 3 3 3 3 3 3 3
+## 
+## Within cluster sum of squares by cluster:
+## [1] 122.1477 143.1502 112.9852
+##  (between_SS / total_SS =  72.3 %)
+## 
+## Available components:
+## 
+## [1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+## [6] "betweenss"    "size"         "iter"         "ifault"
+```
+
+The function `augment` works at the observation level:
+
+
+```r
+penguin_kclust %>% augment(penguins_km)
+```
+
+```
+## # A tibble: 342 × 5
+##    bill_length_mm[,1] bill_depth_mm[,… flipper_length_… body_mass_g[,1] .cluster
+##                 <dbl>            <dbl>            <dbl>           <dbl> <fct>   
+##  1             -0.883           0.784            -1.42          -0.563  1       
+##  2             -0.810           0.126            -1.06          -0.501  1       
+##  3             -0.663           0.430            -0.421         -1.19   1       
+##  4             -1.32            1.09             -0.563         -0.937  1       
+##  5             -0.847           1.75             -0.776         -0.688  1       
+##  6             -0.920           0.329            -1.42          -0.719  1       
+##  7             -0.865           1.24             -0.421          0.590  1       
+##  8             -1.80            0.480            -0.563         -0.906  1       
+##  9             -0.352           1.54             -0.776          0.0602 3       
+## 10             -1.12           -0.0259           -1.06          -1.12   1       
+## # … with 332 more rows
+```
+
+The function `tidy()` works at the per-cluster level:
+
+
+```r
+penguin_kclust %>% tidy()
+```
+
+```
+## # A tibble: 3 × 7
+##   bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  size withinss
+##            <dbl>         <dbl>             <dbl>       <dbl> <int>    <dbl>
+## 1         -1.05          0.486            -0.890      -0.769   132     122.
+## 2          0.656        -1.10              1.16        1.09    123     143.
+## 3          0.660         0.816            -0.286      -0.374    87     113.
+## # … with 1 more variable: cluster <fct>
+```
+
+The function `glance()` works at the per-model level:
+
+
+```r
+penguin_kclust %>% glance()
+```
+
+```
+## # A tibble: 1 × 4
+##   totss tot.withinss betweenss  iter
+##   <dbl>        <dbl>     <dbl> <int>
+## 1  1364         378.      986.     2
+```
+
+
+####  Trying various values of k {-}
+
+
+
+```r
+kmax <- 9
+penguin_kclusts <- 
+  tibble(k = 1:kmax) %>%
+  mutate(
+    penguin_kclust = map(k, ~kmeans(penguins_km, .x)),
+    tidied = map(penguin_kclust, tidy),
+    glanced = map(penguin_kclust, glance),
+    augmented = map(penguin_kclust, augment, penguins_km)
+  )
+
+penguin_kclusts
+```
+
+```
+## # A tibble: 9 × 5
+##       k penguin_kclust tidied           glanced          augmented         
+##   <int> <list>         <list>           <list>           <list>            
+## 1     1 <kmeans>       <tibble [1 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 2     2 <kmeans>       <tibble [2 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 3     3 <kmeans>       <tibble [3 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 4     4 <kmeans>       <tibble [4 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 5     5 <kmeans>       <tibble [5 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 6     6 <kmeans>       <tibble [6 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 7     7 <kmeans>       <tibble [7 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 8     8 <kmeans>       <tibble [8 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+## 9     9 <kmeans>       <tibble [9 × 7]> <tibble [1 × 4]> <tibble [342 × 5]>
+```
+
+
+For each of the values of $k$ the `augment`ed, `tidy`ed, and `glance`d information can be calculated.  Note that you might want to find how the total within sum of squares decreases as a function of $k$.  (Will the within sum of squares always decrease as a function of $k?$  Does it here?  Why not?)  It seems as though $k=3$ or $k=4$ is probably sufficient (larger values of $k$ do not reduce the sums of squares substantially).
+
+
+```r
+clusters <- 
+  penguin_kclusts %>%
+  unnest(cols = c(tidied))
+
+assignments <- 
+  penguin_kclusts %>% 
+  unnest(cols = c(augmented))
+
+clusterings <- 
+  penguin_kclusts %>%
+  unnest(cols = c(glanced))
+```
+
+
+```r
+clusterings %>%
+  ggplot(aes(x = k, y = tot.withinss)) + 
+  geom_line() + 
+  geom_point() + ylab("") +
+  ggtitle("Total Within Sum of Squares")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+
+Adding back the rest of the penguin information (`species`, `sex`, `island`, etc.) in order to determine if the unsupervised clusters align with any of the non-numeric information given in the dataframe.
+
+
+```r
+assignments <- penguins %>%
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+  select(species, island, sex, year) %>%
+  slice(rep(1:n(), times = kmax)) %>%
+  cbind(assignments)
+```
+
+From the two variables `flipper_length_mm` and `bill_lengh_mm` it seems that two clusters is probably sufficient.  However, it would probably make sense to look at the cluster colorings across all four of the variables and in higher dimensional space (e.g., 3-D projections).
+
+
+```r
+assignments %>%
+ ggplot(aes(x = flipper_length_mm, y = bill_length_mm)) +
+  geom_point(aes(color = .cluster), alpha = 0.8) + 
+  facet_wrap(~ k)
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+
+Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
+
+
+```r
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, species) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = species, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") + 
+  scale_fill_gradient(low = "white", high = "red") + 
+  ggtitle("Species vs cluster prediction across different values of k")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+
+For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
+
+
+```r
+assignments %>%
+  group_by(k) %>%
+  select(.cluster, island) %>%
+  table() %>%
+  as.data.frame() %>%
+    ggplot() +
+    geom_tile(aes(x = .cluster, y = island, fill = Freq)) + 
+  facet_wrap( ~ k) + ylab("") +
+  scale_fill_gradient(low = "white", high = "red") +
+  ggtitle("Island vs cluster prediction across different values of k")
+```
+
+<img src="09-clustering_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+
 ### Partitioning Around Medoids
 
 As an alternative to $k$-means, Kaufman and Rousseeuw developed Partitioning around Medoids (*Finding Groups in Data: an introduction to cluster analysis*, 1990).    The particular strength of PAM is that it allows for *any* dissimilarity metric.  That is, a dissimilarity based on correlations is no problem, but the algorithm gets more complicated because the "center" is no longer defined in Euclidean terms.
 
 The two main steps are to Build (akin to assigning points to clusters) and to Swap (akin to redefining cluster centers).  The objective function the algorithm tries to minimize is the average dissimilarity of objects to the closest representative object.  (The PAM algorithm is a good (not necessarily global optimum) solution to minimizing the objective function.)  
-$$\argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \argmin_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
+$$\text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}D_i \Bigg\} = \text{arg}\,\min\limits_{C_1, \ldots, C_k} \Bigg\{ \sum_{k=1}^K \sum_{i \in C_k}d(x_i, m_k) \Bigg\}$$
 Where $D_i$ represents this distance from observation $i$ to the closest medoid, $m_k$.
 
 
@@ -399,10 +878,10 @@ Where $D_i$ represents this distance from observation $i$ to the closest medoid,
 2. Iterate until the cluster assignments stop changing:
 
 (a) (Repeat for $k \in \{1, 2, ...K\}$) For a given cluster, $C_k$, find the observation in the cluster minimizing total distance to other points in that cluster:
-$$i^*_k = \argmin_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
+$$i^*_k = \text{arg}\,\min\limits_{i \in C_k} \sum_{i' \in C_k} d(x_i, x_{i'})$$
 Then $m_k = x_{i^*_k}, k=1, 2, \ldots, K$ are the current estimates of the cluster centers.
 (b) Given a current set of cluster centers $\{m_1, m_2, \ldots, m_K\}$, minimize the total error by assigning each observation to the closest (current) cluster center:
-$$C_i = \argmin_{1 \leq k \leq K} d(x_i, m_k)$$
+$$C_i = \text{arg}\,\min\limits_{1 \leq k \leq K} d(x_i, m_k)$$
 
 ******
 
@@ -554,7 +1033,7 @@ The EM algorithm is an incredibly useful tool for solving complicated maximizati
 
 Consider the Old Faithful geyser Yellowstone National Park, Wyoming, USA with the following histogram of data on waiting times between each eruption:
 
-<img src="09-clustering_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="09-clustering_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
 
 \begin{align}
 Y_1 &\sim N(\mu_1, \sigma_1^2)\\
@@ -608,4 +1087,5 @@ Note that in the previous $k$-means algorithm we iterated between two steps of a
 Indeed, although the EM-algorithm above is slightly different than the previous $k$-means algorithm, the two methods typically converge to the same result and are both considered to be different implementations of a $k$-means algorithm.  
 
 See the following applet for a visual representation of how the EM-algorithm converges: http://www.socr.ucla.edu/applets.dir/mixtureem.html.
+
 

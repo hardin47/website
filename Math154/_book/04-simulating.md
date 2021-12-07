@@ -83,7 +83,7 @@ sum(replicate(100000, sticks())) / 100000
 ```
 
 ```
-## [1] 0.5
+## [1] 0.498
 ```
 
 
@@ -100,7 +100,7 @@ sum(replicate(100000, sticks_beta())) / 100000
 ```
 
 ```
-## [1] 0.5
+## [1] 0.499
 ```
 
 **Example**  Or consider the problem where the goal is to estimate $E(X)$ where $X=\max \{ k: \sum_{i=1}^k U_i < 1 \}$ and $U_i$ are uniform(0,1).  The simulation problem is quite straightforward.  Look carefully at the pieces.  How are they broken down into steps?  Notice that the steps go from inside out.
@@ -128,7 +128,7 @@ mean(allk)
 ```
 
 ```
-## [1] 1.71
+## [1] 1.73
 ```
 
 #### Using functional programming and the `map()` function

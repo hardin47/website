@@ -2,16 +2,12 @@
 
 
 
-## 10/8/19 Agenda {#Oct8}
-1. Review: logic of confidence intervals
-2. Logic of bootstrapping (resample from the sample *with* replacement)
-3. BS SE of a statistic
 
 ## Introduction
 
 As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample).
 
-Main idea:  we will be able to estimate the **variability** of our estimator (difference in medians, ordinary least square with non-normal errors, etc.).
+Main idea:  we will be able to estimate the **variability** of the estimator (difference in medians, ordinary least square with non-normal errors, etc.).
 
 * It's not so strange to get $\hat{\theta}$ and SE($\hat{\theta}$) from the data (consider $\hat{p}$ & $\sqrt{\hat{p}(1-\hat{p})/n}$ and $\overline{X}$ & $s/\sqrt{n}$).
 * We'll only consider confidence intervals for now.
@@ -29,11 +25,11 @@ Let $\theta$ be the parameter of interest, and let $\hat{\theta}$ be the estimat
 \begin{align}
 \hat{\theta}(\cdot) = \frac{1}{B} \sum_{i=1}^B \hat{\theta}_i
 \end{align}
-is our best guess for $\theta$.  If $\hat{\theta}$ is very different from $\theta$, we would call it **biased**.
+is the best guess for $\theta$.  If $\hat{\theta}$ is very different from $\theta$, we would call it **biased**.
 \begin{align}
 SE(\hat{\theta}) &= \bigg[ \frac{1}{B-1} \sum_{i=1}^B(\hat{\theta}_i - \hat{\theta}(\cdot))^2 \bigg]^{1/2}\\
-q_1 &= [0.25 n] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
-q_3 &= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
+q_1 &= [0.25 B] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
+q_3 &= [0.75 B] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
 \end{align}
 
 If we could, we would completely characterize the sampling distribution (as a function of $\theta$) which would allow us to make inference on $\theta$ when we only had $\hat{\theta}$.
@@ -95,32 +91,22 @@ We can *resample* from the *sample* to represent samples from the actual populat
 
 ### Bootstrap Procedure
 
-1. Resample data **with replacement**.
+1. Resample data **with replacement** from the original sample.
 2. Calculate the statistic of interest for each resample.
 3. Repeat 1. and 2. $B$ times.
 4. Use the bootstrap distribution for inference.
 
-In R:
-```
-install.packages('bootstrap')
-library(bootstrap)
-install.packages('boot')
-library(boot)
-?bootstrap
-?boott
-?bootpred
-```
 
 ### Bootstrap Notation
 
 
-Take lots ($B$) of sample of size n from the sample, $\hat{F}(x)$ (instead of from the population, $F(x)$ ) to create a bootstrap distribution for $\hat{\theta}^*$ (instead of the sampling distribution for $\hat{\theta}$).
+Take many ($B$) resamples of size $n$ from the sample, $\hat{F}(x)$ (instead of from the population, $F(x)$ ) to create a bootstrap distribution for $\hat{\theta}^*$ (instead of the sampling distribution for $\hat{\theta}$).
 
-Let $\hat{\theta}^*(b)$ be the calculated statistic of interest for the $b^{th}$ bootstrap sample.  Our best guess for $\theta$ is:
+Let $\hat{\theta}^*(b)$ be the calculated statistic of interest for the $b^{th}$ bootstrap sample.  The best guess for $\theta$ is:
 \begin{align}
 \hat{\theta}^* = \frac{1}{B} \sum_{b=1}^B \hat{\theta}^*(b)
 \end{align}
-(if $\hat{\theta}^*$ is very different from $\hat{\theta}$, we call it biased.)  And the estimated value for the standard error of our estimate is
+(if $\hat{\theta}^*$ is very different from $\hat{\theta}$, we call it biased.)  And the estimated value for the standard error of the estimate is
 \begin{align}
 \hat{SE}^* = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
 \end{align}
@@ -216,15 +202,10 @@ Fisher also introduced the $r$ to $Z$ transformation:
 \begin{align}
 Z = \frac{1}{2} \ln \Big[\frac{1+r}{1-r}\Big]
 \end{align}
-We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is simply an inverse hyperbolic tangent function.)
+We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is an inverse hyperbolic tangent function.)
 \end{enumerate}
 -->
 
-## 10/10/19 Agenda {#Oct10}
-1. Normal CI using BS SE
-2. Bootstrap-t (studentized) CIs 
-3. Percentile CIs
-4. properties / advantages / disadvantages
 
 The StatKey applets which demonstrate bootstrapping are here:  http://www.lock5stat.com/StatKey/
 
@@ -235,7 +216,7 @@ https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 
 ## Bootstrap Confidence Intervals {#BSCI}
 
-### Normal (standard) CI with BS SE: `type="norm"`
+### Normal (standard) CI with BootSE: `type="norm"`
 
 Keep in mind that what we are trying to do is approximate the sampling distribution of $\hat{\theta}$.  In fact, what we are really able to do here is to estimate the sampling distribution of $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$.  We hope that:
 
@@ -270,7 +251,7 @@ P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\t
 
 That is, it's the endpoints that are random, and we have a 0.95 probability that we'll get a random sample which will produce endpoints which will capture the true parameter.
 
-1. We could simply use the BS SE within the CI formula (and did for the interval above).  The problem is that such an interval will only be accurate if the distribution for $\hat{\theta}$ is reasonably normal.  If there is any bias or skew, the CI will not have desired coverage levels (@efrontibs, pg 161 and chapter 22).
+1. We could use the Boot SE within the CI formula (and did for the interval above).  The problem is that such an interval will only be accurate if the distribution for $\hat{\theta}$ is reasonably normal.  If there is any bias or skew, the CI will not have desired coverage levels (@efrontibs, pg 161 and chapter 22).
 
 2. Now consider using the bootstrap to estimate the distribution for $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$.
 \begin{align}
@@ -278,10 +259,10 @@ T^*(b) &= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
 \end{align}
 
 
-where $\hat{\theta}^*(b)$ is the value of $\hat{\theta}$ for the $b^{th}$ bootstrap sample, and $\hat{SE}^*(b)$ is the estimated standard error of $\hat{\theta}^*(b)$ for the $b^{th}$ bootstrap sample.  The $\alpha^{th}$ percentile of $T^*(b)$ is estimated by the value of $\hat{t}_\alpha$ such that
+where $\hat{\theta}^*(b)$ is the value of $\hat{\theta}$ for the $b^{th}$ bootstrap sample, and $\hat{SE}^*(b)$ is the estimated standard error of $\hat{\theta}^*(b)$ for the $b^{th}$ bootstrap sample.  The $\alpha^{th}$ percentile of $T^*(b)$ is estimated by the value of $\hat{t}^*_\alpha$ such that
 
 \begin{align}
-\frac{\# \{T^*(b) \leq \hat{t}_{\alpha/2} \} }{B} = \alpha/2
+\frac{\# \{T^*(b) \leq \hat{t}^*_{\alpha/2} \} }{B} = \alpha/2
 \end{align}
 
 For example, if $B=1000$, the estimate of the 5% point is the $50^{th}$ smallest value of the $T^*(b)$s, and the estimate of the 95% point is the $950^{th}$ smallest value of the $T^*(b)$s.
@@ -289,7 +270,7 @@ For example, if $B=1000$, the estimate of the 5% point is the $50^{th}$ smallest
 
 Finally, the boostrap-t confidence interval is:
 \begin{equation} 
-(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}^*,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}^*) (\#eq:BSt)
+(\hat{\theta} - \hat{t}^*_{1-\alpha/2}\hat{SE}^*,  \hat{\theta} - \hat{t}^*_{\alpha/2}\hat{SE}^*) (\#eq:BSt)
 \end{equation}
 
 
@@ -299,7 +280,7 @@ To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as 
 
 2. Take $B_2$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$.
 
-3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{t}_\alpha/2$ and $\hat{t}_{1-\alpha/2}$.
+3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{t}^*_\alpha/2$ and $\hat{t}^*_{1-\alpha/2}$.
 
 4. Calculate the CI as in equation (\@ref(eq:BSt)).
 
@@ -308,15 +289,15 @@ To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as 
 
 * Bootstrap-t intervals are somewhat erratic and can be influenced by a few outliers.  Percentile methods can be more reliable.  [The balance of which is best when is an open question depending a lot on the data distribution and statistic of interest.]
 
-* $B=100$ or 200 is probably not enough for a bootstrap-t CI (500 or 1000 is better).  However, $B=25$ may be enough to estimate the SE in the inner-BS procedure.  ($B=1000$ is needed for computing percentiles.)
+* $B=100$ or 200 is probably not enough for a bootstrap-t CI (500 or 1000 is better).  However, $B=25$ may be enough to estimate the SE in the inner-Bootprocedure.  ($B=1000$ is needed for computing percentiles.)
 
 * In choosing the appropriate multiplier:
 
     * When it is the correct multiplier to use, the normal multiplier ($z$) is good for all $n$ and all samples.
     * When it is the correct multiplier to use, the t multiplier is good for all samples but a specified $n$.
-    * When it is the correct multiplier to use, the bootstrap-t multiplier is good for *this} sample only.
+    * When it is the correct multiplier to use, the bootstrap-t multiplier is good for *this* sample only.
 
-* The resulting intervals will typically not be symmetric (that is $\hat{t}_\alpha \ne - \hat{t}_{1-\alpha}$).  This is part of the improvement over $z$ or $t$ intervals.
+* The resulting intervals will typically not be symmetric (that is $\hat{t}^*_\alpha \ne - \hat{t}^*_{1-\alpha}$).  This is part of the improvement over $z$ or $t$ intervals.
 
 * Bootstrap-t intervals are good for location statistics (mean, quantiles, trimmed means) but cannot be trusted for other statistics like the correlation (which do not necessarily vary based on ideas of shift).
 
@@ -332,10 +313,10 @@ The interval between the $\alpha/2$ and $1-\alpha/2$ quantiles of the bootstrap 
 
 <p style="color:red">You do not need to know *why* the percentile interval works...  but isn't it so cool to see how it works???</p>
 
-Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron's "backwards" intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
+Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If the observed $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of the CI will get up to the true parameter value at the correct rate?  (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron's "backwards" intervals.) Or, if the sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
 
 
-To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where g is a monotonic function (assume wlog that g is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
+To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of the statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where g is a monotonic function (assume wlog that g is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
 
 \begin{equation}
  \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2) (\#eq:phidist).
@@ -359,7 +340,7 @@ Substituting in (\@ref(eq:phiint)), gives the percentile interval for $\theta$,
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
 \end{align}
 
-(A similar argument gives the same derivation of the two sided confidence interval.  Proof from @carp2000)  In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! 
+(A similar argument gives the same derivation of the two sided confidence interval.  Proof from @carp2000)  In order for a percentile interval to be appropriate, the technical condition is only that a normalizing transformation **exists**.  We do not need to actually find the transformation! 
 
 <!--
 \begin{align}
@@ -380,7 +361,7 @@ That is, if in fact $\hat{\theta}^*$ has a normal distribution, the percentiles 
 -->
 
 
-**The transformation respecting property**  A CI is transformation respecting if, for any monotone transformation, the CI for the transformed parameter is simply the transformed CI for the unstransformed parameter.  Let $\phi = m(\theta)$.
+**The transformation respecting property**  A CI is transformation respecting if, for any monotone transformation, the CI for the transformed parameter is (exactly) the transformed CI for the unstransformed parameter.  Let $\phi = m(\theta)$.
 
 \begin{align}
 [\phi_{lo}, \phi_{up}] = [m(\theta_{lo}), m(\theta_{up})]
@@ -406,11 +387,11 @@ Then the percentile interval based on $\hat{\theta}$ equals $[m^{-1}(\hat{\phi} 
 
 And we can approximate $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$ using $[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]$
 
-In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
+In order for a percentile interval to be appropriate, the technical condition is that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
 
 See Charlotte's example on bootstrapping a loess smooth for her thesis data (carryingcap.r).  The idea was this:  Charlotte had some data that she wanted to model (using differential equations).  She asked me how to tell whether or not her new model was reflective of the data / population.  So, we fit a loess spline to see the shape of the data.  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit.
 
-Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
+Keeping in mind that the theory we've covered here doesn't exactly work for this situation (the work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
 -->
 
 
@@ -421,16 +402,17 @@ Keeping in mind that the theory we've covered here doesn't exactly work for this
 \begin{align}
 \hat{\theta} \sim N(\theta + bias, \hat{SE}^2)
 \end{align}
-no transformation $\phi = m(\theta)$ can fix things up.  Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has simply fixed the situation when the distribution is non-normal.
+no transformation $\phi = m(\theta)$ can fix things up.  Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has only fixed the specific situation of the sampling distribution being is non-normal.
 
 
-### What makes a CI good?
+### What makes a CI procedure good?
 
+The following qualities that may or may not result from a confidence interval procedure are what determines the choice of method for the researcher.
 
 * Symmetry (??): the interval is symmetric, pivotal around some value.  Not necessarily a good thing.  Maybe a bad thing to force?
 * Resistant: BS-t is particularly not resistant to outliers or crazy sampling distributions of the statistic (can make it more robust with a variance stabilizing transformation)
 * Range preserving: the CI always contains only values that fall within an allowable range ($p, \rho$,...)
-* Transformation respecting: for any monotone transformation, $\phi = m(\theta)$, the interval for $\theta$ is simply mapped by $m(\theta)$.  If $[\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]$ is a $(1-\alpha)100$% interval for $\theta$, then
+* Transformation respecting: for any monotone transformation, $\phi = m(\theta)$, the interval for $\theta$ is mapped directly by $m(\theta)$.  If $[\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]$ is a $(1-\alpha)100$% interval for $\theta$, then
 
 \begin{align}
 [\hat{\phi}_{(lo)},\hat{\phi}_{(hi)}] = [m(\hat{\theta}_{(lo)}),m(\hat{\theta}_{(hi)})]
@@ -444,7 +426,7 @@ P(\theta < \hat{\theta}_{(lo)})&=\alpha/2\\
 P(\theta > \hat{\theta}_{(hi)})&=\alpha/2\\
 \end{align}
 
-* Note:  all of our intervals are approximate.  We judge them based on how accurately they cover $\theta$.
+* Note:  all of the intervals are approximate.  We judge them based on how accurately they cover $\theta$.
 
     * A CI is first order accurate if:
 \begin{align}
@@ -465,7 +447,7 @@ BS-t is $2^{nd}$ order accurate for a large general class of functions.  However
 
 | CI 	| Symmetric 	| Range Resp 	| Trans Resp 	| Accuracy 	| Normal Samp Dist? 	| Other 	|
 |:-----:	|:---------:	|:----------:	|:----------:	|:--------------:	|:-----------------:	|------------------------------------	|
-| BS SE 	| Yes 	| No 	| No 	| $1^{st}$ order 	| Yes 	| param assump $F(\hat{\theta})$ 	|
+| BootSE 	| Yes 	| No 	| No 	| $1^{st}$ order 	| Yes 	| param assump $F(\hat{\theta})$ 	|
 | BS-t 	| No 	| No 	| No 	| $2^{nd}$ order 	| Yes/No 	| computer intensive 	|
 | perc 	| No 	| Yes 	| Yes 	| $1^{st}$ order 	| No 	| small $n \rightarrow$ low accuracy 	|
 | BCa 	| No 	| Yes 	| Yes 	| $2^{nd}$ order 	| No 	| limited param assump 	|
@@ -498,7 +480,7 @@ all of those of the percentile method; allows for bias in $\hat{F}^*(\hat{\theta
 
 #### Bootstrap CI and Hypothesis Testing
 
-If a null value for a parameter is not contained in a CI, we reject the null hypothesis; similarly, we do not reject a null value if it does lie inside the CI.  Using BS CIs, we can apply the same logic, and test any hypothesis of interest (note: we can always create one-sided intervals as well!).  But simply using CIs leaves out the p-value information.  How do we get a p-value from a CI? Consider an alternative definition for the p-value:
+If a null value for a parameter is not contained in a CI, we reject the null hypothesis; similarly, we do not reject a null value if it does lie inside the CI.  Using BootCIs, we can apply the same logic, and test any hypothesis of interest (note: we can always create one-sided intervals as well!).  But using CIs leaves out the p-value information.  How do we get a p-value from a CI? Consider an alternative definition for the p-value:
 
 
 **p-value:**  The smallest level of significance at which you would reject $H_0$.
@@ -598,7 +580,7 @@ But remember that $z_0$ represents the bias for $\phi(\hat{\theta})$, not for $\
 \begin{align}
 \hat{z}_0 &= \Phi^{-1} \bigg( \frac{ \# \hat{\theta}^*(b) < \hat{\theta}}{B} \bigg)
 \end{align}
-That is, if $\hat{\theta}^*$ underestimates $\hat{\theta}$, then $\hat{\theta}$ likely underestimates $\theta$; $z_0 > 0$.  We think of $z_0$ and the normal quantile associated with the proportion of BS replicates less than $\hat{\theta}$.
+That is, if $\hat{\theta}^*$ underestimates $\hat{\theta}$, then $\hat{\theta}$ likely underestimates $\theta$; $z_0 > 0$.  We think of $z_0$ and the normal quantile associated with the proportion of Bootreplicates less than $\hat{\theta}$.
 
 * **skew:**
 $a$ is a measure of skew.
@@ -607,7 +589,7 @@ bias&= E(\hat{\theta} - \theta)\\
 var &= E(\hat{\theta} - \theta)^2 = \sigma^2\\
 skew &= E(\hat{\theta} - \theta)^3 / \sigma^3\\
 \end{align}
-We can think of the skew as the rate of chance of the standard error on a normalized scale.  If there is no skew, we will estimate $a=0$.  Our estimate of $a$ comes from a procedure known as the jackknife.
+We can think of the skew as the rate of chance of the standard error on a normalized scale.  If there is no skew, we will estimate $a=0$.  The estimate of $a$ comes from a procedure known as the jackknife.
 
 \begin{align}
 \hat{a} = \frac{\sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^3}{6 [ \sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^2 ] ^{3/2}}
@@ -616,7 +598,7 @@ We can think of the skew as the rate of chance of the standard error on a normal
 
 ## R example: Heroin
 
-Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
+Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) spent a clinic for methadone maintenance treatment for people addicted to heroin.  The data in `heroin.txt` include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the median as well as the 25% trimmed mean.  We treat the group of 238 patients as representative of the population. [From @ISCAM, Investigation 4.5.3]
 
 
 
@@ -629,711 +611,424 @@ Motivation:  to estimate the variability of a statistic (*not* dependent on $H_0
 
 
 ```r
-heroin <- readr::read_table2("http://www.rossmanchance.com/iscam2/data/heroin.txt")
-names(heroin)
+heroin <- read_table("http://www.rossmanchance.com/iscam2/data/heroin.txt")
+heroin %>%
+  select(-prison)
 ```
 
-
-
 ```
-## [1] "id"     "clinic" "status" "times"  "prison" "dose"
+## # A tibble: 238 × 5
+##       id clinic status times  dose
+##    <dbl>  <dbl>  <dbl> <dbl> <dbl>
+##  1     1      1      1   428    50
+##  2     2      1      1   275    55
+##  3     3      1      1   262    55
+##  4     4      1      1   183    30
+##  5     5      1      1   259    65
+##  6     6      1      1   714    55
+##  7     7      1      1   438    65
+##  8     8      1      0   796    60
+##  9     9      1      1   892    50
+## 10    10      1      1   393    65
+## # … with 228 more rows
 ```
-
-
-
-```r
-head(heroin)
-```
-
-
-
-```
-## # A tibble: 6 x 6
-##      id clinic status times prison  dose
-##   <dbl>  <dbl>  <dbl> <dbl>  <dbl> <dbl>
-## 1     1      1      1   428      0    50
-## 2     2      1      1   275      1    55
-## 3     3      1      1   262      0    55
-## 4     4      1      1   183      0    30
-## 5     5      1      1   259      1    65
-## 6     6      1      1   714      0    55
-```
-
-
 
 
 #### Observed Test Statistic(s) {-}
 
-
 ```r
-obs.stat<-heroin %>% summarize(medtime = median(times)) %>% pull()
-obs.stat2<-heroin %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
-obs.stat
+heroin %>%
+  summarize(obs_med = median(times), 
+            obs_tr_mean = mean(times, trim = 0.25))
 ```
 
-
-
 ```
-## [1] 368
+## # A tibble: 1 × 2
+##   obs_med obs_tr_mean
+##     <dbl>       <dbl>
+## 1    368.        378.
 ```
-
-
-
-```r
-obs.stat2
-```
-
-
-
-```
-## [1] 378
-```
-
-
 
 #### Bootstrapped data! {-}
 
-
 ```r
 set.seed(4747)
-heroin.rs<-heroin %>% sample_frac(size=1, replace=TRUE)
 
-heroin.rs %>% summarize(medtime = median(times)) %>% pull()
+heroin %>% 
+  sample_frac(size=1, replace=TRUE) %>%
+  summarize(boot_med = median(times), 
+            boot_tr_mean = mean(times, trim = 0.25))
 ```
 
-
-
 ```
-## [1] 368
+## # A tibble: 1 × 2
+##   boot_med boot_tr_mean
+##      <dbl>        <dbl>
+## 1      368         372.
 ```
-
-
-
-```r
-heroin.rs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
-```
-
-
-
-```
-## [1] 372
-```
-
-
 
 ####  Need to bootstrap a lot of times... {-}
 
-Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals).  However, the package and funciton `boot` will do the boostrapping for you.
+Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals).  (There is a package **boot** which will bootstrap for you, but you need to write functions to use it.)
 
-
+**set variables**
 
 ```r
-test.stat<-c()
-test.stat2<-c()
-sd.test.stat<-c()
-sd.test.stat2<-c()
-
-reps1 <- 1000
-reps2 <- 100
-
+n_rep1 <- 100
+n_rep2 <- 20
 set.seed(4747)
-for(i in 1:reps1){ 
-	heroin.rs<-heroin %>% sample_frac(size=1, replace=TRUE)
-	test.stat<-c(test.stat,heroin.rs %>% summarize(medtime = median(times)) %>% pull())
-	test.stat2<-c(test.stat2,heroin.rs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull())
+```
 
-	test.stat.rs<-c()
-	test.stat2.rs<-c()
+**boot stat function**
 
-	for(j in 1:reps2){
-	heroin.rsrs<-heroin.rs %>% sample_frac(size=1, replace=TRUE)
-	test.stat.rs<-c(test.stat.rs,heroin.rsrs %>% summarize(medtime = median(times)) %>% pull())
-	test.stat2.rs<-c(test.stat2.rs,heroin.rsrs %>% summarize(tmeantime = mean(times, trim=0.25)) %>% pull())
-	}
-	sd.test.stat<-c(sd.test.stat,sd(test.stat.rs))
-	sd.test.stat2<-c(sd.test.stat2,sd(test.stat2.rs))
+```r
+boot_stat_func <- function(df){ 
+	df %>% 
+    mutate(obs_med = median(times),
+           obs_tr_mean = mean(times, trim = 0.25)) %>%
+    sample_frac(size=1, replace=TRUE) %>%
+    summarize(boot_med = median(times), 
+              boot_tr_mean = mean(times, trim = 0.25),
+              obs_med = mean(obs_med),
+              obs_tr_mean = mean(obs_tr_mean))}
+```
+
+**resample function**
+
+```r
+boot_1_func <- function(df){
+  df %>% 
+    sample_frac(size=1, replace=TRUE)
 }
 ```
 
+**bootstrapping**
 
+```r
+map_df(1:n_rep1, ~boot_stat_func(df = heroin))
+```
 
+```
+## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       <dbl>        <dbl>   <dbl>       <dbl>
+##  1     368          372.    368.        378.
+##  2     358          363.    368.        378.
+##  3     431          421.    368.        378.
+##  4     332.         350.    368.        378.
+##  5     310.         331.    368.        378.
+##  6     376          382.    368.        378.
+##  7     366          365.    368.        378.
+##  8     378.         382.    368.        378.
+##  9     394          386.    368.        378.
+## 10     392.         402.    368.        378.
+## # … with 90 more rows
+```
 
-#### What do the distributions look like? {-}
+#### What do the **data** distributions look like? {-}
+
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-11-1.png" width="384" style="display: block; margin: auto;" /><img src="06-bootstrap_files/figure-html/unnamed-chunk-11-2.png" width="384" style="display: block; margin: auto;" />
+
+#### What do the sampling distributions look like? {-}
 
 The distributions of both the median and the trimmed mean are symmetric and bell-shaped.  However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).
 
-<img src="06-bootstrap_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" /><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-2.png" width="480" style="display: block; margin: auto;" />
-
-
-#### What do the distributions look like? {-}
-
-The distributions of both the median and the trimmed mean are symmetric and bell-shaped.  However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).
-
-
-
-```r
-bs.stats <- data.frame(test.stat, test.stat2)
-ggplot(bs.stats, aes(x=test.stat)) + 
-  geom_histogram(bins=20) + 
-  ggtitle("dist of median") +  
-  xlab(paste("mean=",round(mean(test.stat),2),
-             ";SE=", round(sd(test.stat),2)))
-```
-
-<img src="06-bootstrap_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
-
-```r
-ggplot(bs.stats, aes(x=test.stat2)) + 
-  geom_histogram(bins=20) + 
-  ggtitle("dist of trimmed mean") +  
-  xlab(paste("mean=",round(mean(test.stat),2),
-             ";SE=", round(sd(test.stat),2)))
-```
-
-<img src="06-bootstrap_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;" />
-
-
-#### OR using the built in functions {-}
-
-
-```r
-sampletmean <- function(x,d,trimperc){
-  return(mean(x[d], trim=trimperc))
-}
-set.seed(4747)
-bs.tmean.resamps <- boot::boot(heroin$times,sampletmean, reps1, trimperc=.25)
-```
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /><img src="06-bootstrap_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
 
 
 
 #### What does the boot output look like? {-}
 
-
 ```r
-#bs.tmean.resamps <- boot(heroin$times,sampletmean, reps1, trimperc=.25)
-str(bs.tmean.resamps)
+boot_stats <- map_df(1:n_rep1, ~boot_stat_func(df = heroin))
+
+boot_stats
+```
+
+```
+## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       <dbl>        <dbl>   <dbl>       <dbl>
+##  1     362          373.    368.        378.
+##  2     342.         345.    368.        378.
+##  3     388.         393.    368.        378.
+##  4     452          428.    368.        378.
+##  5     400.         400.    368.        378.
+##  6     348          363.    368.        378.
+##  7     399          405.    368.        378.
+##  8     394          398.    368.        378.
+##  9     358          359.    368.        378.
+## 10     299          332.    368.        378.
+## # … with 90 more rows
 ```
 
 
 
-```
-## List of 11
-##  $ t0       : num 378
-##  $ t        : num [1:1000, 1] 364 377 372 392 349 ...
-##  $ R        : num 1000
-##  $ data     : num [1:238] 428 275 262 183 259 714 438 796 892 393 ...
-##  $ seed     : int [1:626] 10403 624 -1645349161 -2081516244 1489809469 823736794 -755145325 950390200 -1779428263 1453445190 ...
-##  $ statistic:function (x, d, trimperc)  
-##   ..- attr(*, "srcref")= 'srcref' int [1:8] 1 16 3 1 16 1 1 3
-##   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x7fa91addbff0> 
-##  $ sim      : chr "ordinary"
-##  $ call     : language boot::boot(data = heroin$times, statistic = sampletmean, R = reps1,      trimperc = 0.25)
-##  $ stype    : chr "i"
-##  $ strata   : num [1:238] 1 1 1 1 1 1 1 1 1 1 ...
-##  $ weights  : num [1:238] 0.0042 0.0042 0.0042 0.0042 0.0042 ...
-##  - attr(*, "class")= chr "boot"
-##  - attr(*, "boot_type")= chr "boot"
-```
-
-
-
+#### 95% normal CI with Boot SE {-}
 
 
 ```r
-samplemed <- function(x,d){
-  return(median(x[d]))
-}
-set.seed(4747)
-bs.med.resamps <- boot::boot(heroin$times,samplemed, reps1)
+boot_stats %>%
+  summarize(low_med = mean(obs_med) + qnorm(0.025) * sd(boot_med), 
+         up_med = mean(obs_med) + qnorm(0.975) * sd(boot_med),
+         low_tr_mean = mean(obs_tr_mean) + qnorm(0.025) * sd(boot_tr_mean), 
+         up_tr_mean = mean(obs_tr_mean) + qnorm(0.975) * sd(boot_tr_mean))
 ```
 
-
-
-#### SE of median {-}
-
-Whew!  They are very close (one using for loops, one using the boot function).
-
-
-
-```r
-sd(test.stat)  # SE of median
 ```
-
-
-
+## # A tibble: 1 × 4
+##   low_med up_med low_tr_mean up_tr_mean
+##     <dbl>  <dbl>       <dbl>      <dbl>
+## 1    301.   434.        332.       425.
 ```
-## [1] 30.8
-```
-
-
-
-```r
-bs.med.resamps
-```
-
-
-
-```
-## 
-## ORDINARY NONPARAMETRIC BOOTSTRAP
-## 
-## 
-## Call:
-## boot::boot(data = heroin$times, statistic = samplemed, R = reps1)
-## 
-## 
-## Bootstrap Statistics :
-##     original  bias    std. error
-## t1*      368    7.64        32.2
-```
-
-
-
-#### SE of trimmed mean {-}
-
-Whew!  They are very close (one using for loops, one using the boot function).
-
-
-
-```r
-sd(test.stat2)  # SE of trimmed mean
-```
-
-
-
-```
-## [1] 21.9
-```
-
-
-
-```r
-bs.tmean.resamps
-```
-
-
-
-```
-## 
-## ORDINARY NONPARAMETRIC BOOTSTRAP
-## 
-## 
-## Call:
-## boot::boot(data = heroin$times, statistic = sampletmean, R = reps1, 
-##     trimperc = 0.25)
-## 
-## 
-## Bootstrap Statistics :
-##     original  bias    std. error
-## t1*      378   0.635        22.3
-```
-
-
-
-
-#### 95% normal CI with BS SE {-}
-
-##### Without built in functions {-}
-
-
-```r
-obs.stat + qnorm(c(.025,.975))*sd(test.stat)
-```
-
-
-
-```
-## [1] 307 428
-```
-
-
-
-```r
-obs.stat2 + qnorm(c(.025,.975))*sd(test.stat2)
-```
-
-
-
-```
-## [1] 335 421
-```
-
-
-
-
-##### With built in functions {-}
-
-
-```r
-se.bs <- sd(bs.med.resamps$t)
-se.bs2 <- sd(bs.tmean.resamps$t)
-
-obs.stat + qnorm(c(0.025,.975))*se.bs 
-```
-
-
-
-```
-## [1] 304 431
-```
-
-
-
-```r
-obs.stat2 + qnorm(c(0.025,.975))*se.bs2 
-```
-
-
-
-```
-## [1] 335 422
-```
-
-
 
 
 #### 95% Percentile CI {-}
 
-##### Without built in functions {-}
-
 
 ```r
-quantile(test.stat, c(.025, .975))
+boot_stats %>%
+  summarize(perc_CI_med = quantile(boot_med, c(0.025, 0.975)), 
+            perc_CI_tr_mean = quantile(boot_tr_mean, c(0.025, 0.975)), 
+            q = c(0.025, 0.975))
 ```
 
-
-
 ```
-##  2.5% 97.5% 
-##   322   450
+## # A tibble: 2 × 3
+##   perc_CI_med perc_CI_tr_mean     q
+##         <dbl>           <dbl> <dbl>
+## 1        319.            329. 0.025
+## 2        448.            423. 0.975
 ```
 
+#### 95% Bootstrap-t CI {-}
 
+Note that the t-value is needed (which requires a different SE for each bootstrap sample).  It is necessary to bootstrap twice.
+
+
+**re-resample function**
 
 ```r
-quantile(test.stat2, c(.025, .975))
+boot_2_func <- function(df, reps){
+  resample2 <- 1:reps
+  df %>%
+    summarize(boot_med = median(times), boot_tr_mean = mean(times, trim = 0.25)) %>%
+    cbind(resample2, map_df(resample2, ~df %>% 
+             sample_frac(size=1, replace=TRUE) %>%
+             summarize(boot_2_med = median(times), 
+                       boot_2_tr_mean = mean(times, trim = 0.25)))) %>%
+    select(resample2, everything())
+}
 ```
+]
 
-
-
-```
-##  2.5% 97.5% 
-##   337   423
-```
-
-
-
-
-##### With built in functions {-}
-
+**double bootstrap!**
 
 ```r
-quantile(bs.med.resamps$t, c(.025, .975))
+boot_2_stats <- data.frame(resample1 = 1:n_rep1) %>%
+  mutate(first_boot = map(1:n_rep1, ~boot_1_func(df = heroin))) %>%
+  mutate(second_boot = map(first_boot, boot_2_func, reps = n_rep2)) 
 ```
 
+#### Summarizing the double bootstrap
 
-
-```
-##  2.5% 97.5% 
-##   320   452
-```
-
-
+**results**
 
 ```r
-quantile(bs.tmean.resamps$t, c(.025, .975))
+boot_2_stats %>%
+  unnest(second_boot) %>%
+  unnest(first_boot) 
 ```
 
-
-
 ```
-##  2.5% 97.5% 
-##   334   423
+## # A tibble: 476,000 × 12
+##    resample1    id clinic status times prison  dose resample2 boot_med
+##        <int> <dbl>  <dbl>  <dbl> <dbl>  <dbl> <dbl>     <int>    <dbl>
+##  1         1   137      2      0   563      0    70         1      372
+##  2         1    91      1      0   840      0    80         1      372
+##  3         1   250      1      1   117      0    40         1      372
+##  4         1   168      2      0   788      0    70         1      372
+##  5         1    67      1      1   386      0    60         1      372
+##  6         1     3      1      1   262      0    55         1      372
+##  7         1   104      2      0   713      0    50         1      372
+##  8         1   251      1      1   175      1    60         1      372
+##  9         1    68      1      0   439      0    80         1      372
+## 10         1   118      2      0   532      0    70         1      372
+## # … with 475,990 more rows, and 3 more variables: boot_tr_mean <dbl>,
+## #   boot_2_med <dbl>, boot_2_tr_mean <dbl>
 ```
 
-
-
-##### With built in functions more directly {-}
-
+**summary for resample 1**
 
 ```r
-boot::boot.ci(bs.med.resamps, type="perc")
+boot_2_stats %>%
+  unnest(second_boot) %>%
+  unnest(first_boot) %>%
+  select(resample1, resample2, everything() ) %>%
+  filter(resample1 == 1) %>%
+  select(boot_med, boot_tr_mean, boot_2_med, boot_2_tr_mean) %>%
+  skim_without_charts() %>% as_tibble() %>% 
+  select(skim_variable, numeric.mean, numeric.sd, numeric.p50)
 ```
 
-
-
 ```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.resamps, type = "perc")
-## 
-## Intervals : 
-## Level     Percentile     
-## 95%   (320, 452 )  
-## Calculations and Intervals on Original Scale
+## # A tibble: 4 × 4
+##   skim_variable  numeric.mean numeric.sd numeric.p50
+##   <chr>                 <dbl>      <dbl>       <dbl>
+## 1 boot_med               372         0          372 
+## 2 boot_tr_mean           378.        0          378.
+## 3 boot_2_med             370.       46.6        365.
+## 4 boot_2_tr_mean         372.       24.7        370.
 ```
 
-
+**summary for all resamples**
 
 ```r
-boot::boot.ci(bs.tmean.resamps, type="perc")
+boot_t_stats <- boot_2_stats %>%
+  unnest(second_boot) %>%
+  unnest(first_boot) %>%
+  group_by(resample1) %>%
+  summarize(boot_se_med = sd(boot_2_med),
+            boot_se_tr_mean = sd(boot_2_tr_mean),
+            boot_med = mean(boot_med),  # doesn't do anything, just copies over
+            boot_tr_mean = mean(boot_tr_mean))  %>% # the variables into the output
+  mutate(boot_t_med = (boot_med - mean(boot_med)) / boot_se_med,
+            boot_t_tr_mean = (boot_tr_mean - mean(boot_tr_mean)) / boot_se_tr_mean)
+
+  
+boot_t_stats
 ```
 
-
-
 ```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.resamps, type = "perc")
-## 
-## Intervals : 
-## Level     Percentile     
-## 95%   (334, 423 )  
-## Calculations and Intervals on Original Scale
+## # A tibble: 100 × 7
+##    resample1 boot_se_med boot_se_tr_mean boot_med boot_tr_mean boot_t_med
+##        <int>       <dbl>           <dbl>    <dbl>        <dbl>      <dbl>
+##  1         1        46.6            24.7     372          378.     0.0222
+##  2         2        24.8            25.3     344          370.    -1.09  
+##  3         3        36.9            24.2     372.         380.     0.0145
+##  4         4        20.8            19.7     354          359.    -0.817 
+##  5         5        30.1            22.0     308          331.    -2.09  
+##  6         6        25.5            24.5     318          336.    -2.08  
+##  7         7        24.9            20.3     367          378.    -0.159 
+##  8         8        46.3            25.0     402          393.     0.670 
+##  9         9        32.3            20.8     388.         380.     0.512 
+## 10        10        18.1            15.1     381          384.     0.555 
+## # … with 90 more rows, and 1 more variable: boot_t_tr_mean <dbl>
 ```
 
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
+<img src="06-bootstrap_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### 95% Bootstrap-t CI {-}
 
-##### Without built in functions {-}
-
 Note that the t-value is needed (which requires a different SE for each bootstrap sample).
 
-
+**t-values**
 
 ```r
-t.hat<-(test.stat - obs.stat)/sd.test.stat
-t.hat2<-(test.stat2 - obs.stat2)/sd.test.stat2
+boot_t_stats %>%
+  select(boot_t_med, boot_t_tr_mean)
+```
 
-t.hat.95 = quantile(t.hat, c(.025,.975))
-t.hat2.95 = quantile(t.hat2, c(.025,.975))
+```
+## # A tibble: 100 × 2
+##    boot_t_med boot_t_tr_mean
+##         <dbl>          <dbl>
+##  1     0.0222          0.140
+##  2    -1.09           -0.160
+##  3     0.0145          0.257
+##  4    -0.817          -0.767
+##  5    -2.09           -1.98 
+##  6    -2.08           -1.56 
+##  7    -0.159           0.202
+##  8     0.670           0.764
+##  9     0.512           0.280
+## 10     0.555           0.625
+## # … with 90 more rows
+```
+]
 
-obs.stat + t.hat.95*sd(test.stat)
+**multipliers**
+
+```r
+boot_q <- boot_t_stats %>%
+  select(boot_t_med, boot_t_tr_mean) %>%
+  summarize(q_t_med = quantile(boot_t_med, c(0.025, 0.975)), 
+            q_t_tr_mean = quantile(boot_t_tr_mean, c(0.025, 0.975)),
+            q = c(0.025, 0.975))
+
+boot_q
+```
+
+```
+## # A tibble: 2 × 3
+##   q_t_med q_t_tr_mean     q
+##     <dbl>       <dbl> <dbl>
+## 1   -2.08       -2.01 0.025
+## 2    2.25        2.03 0.975
 ```
 
 
+**pull numbers**
+
+```r
+boot_q_med <- boot_q %>% select(q_t_med) %>% pull()
+boot_q_med
+```
 
 ```
 ##  2.5% 97.5% 
-##   322   446
+## -2.08  2.25
 ```
-
-
 
 ```r
-obs.stat2 + t.hat2.95*sd(test.stat2) 
+boot_q_tr_mean <- boot_q %>% select(q_t_tr_mean) %>% pull()
+boot_q_tr_mean
 ```
-
-
 
 ```
 ##  2.5% 97.5% 
-##   337   423
+## -2.01  2.03
 ```
 
 
-
-
-##### With built in functions {-}
-
-Trimmed mean:
-
+**BS-t CI**
 
 ```r
-sampletmean2 <- function(x, d, R2, trimperc) {
-   boot.samp = x[d]  # boostrapped sample
-   m.bs = mean(boot.samp, trim=trimperc)  # bootstrapped mean
-   v.bs = var(boot::boot(boot.samp, sampletmean, R2, trim=trimperc)$t)
-   return(c(m.bs, v.bs))  # boot expects the statistic to be the 1st and the var to be the 2nd
-}
-set.seed(4747)
-bs.tmean.reresamps <- boot::boot(heroin$times, sampletmean2, R=reps1, R2=reps2, trimperc=.25)
+boot_t_stats %>%
+  summarize(boot_t_CI_med = mean(boot_med) + 
+                                  boot_q_med*sd(boot_med),
+            boot_t_CI_tr_mean = mean(boot_tr_mean) + 
+                                  boot_q_tr_mean * sd(boot_tr_mean),
+            q = c(0.025, 0.975))
+```
+
+```
+## # A tibble: 2 × 3
+##   boot_t_CI_med boot_t_CI_tr_mean     q
+##           <dbl>             <dbl> <dbl>
+## 1          306.              330. 0.025
+## 2          441.              418. 0.975
 ```
 
 
-
-Median:
-
-
-```r
-samplemed2 <- function(x, d, R2) {
-   boot.samp = x[d]  # boostrapped sample
-   m.bs = median(boot.samp)  # bootstrapped mean
-   v.bs = var(boot::boot(boot.samp, samplemed, R2)$t)
-   return(c(m.bs, v.bs))  # boot expects the statistic to be the 1st and the var to be the 2nd
-}
-set.seed(4747)
-bs.med.reresamps <- boot::boot(heroin$times, samplemed2, R=reps1, R2=reps2)
-```
-
-
-
-The confidence intervals (BS-t intervals, called "studentized"):
-
-
-```r
-boot::boot.ci(bs.med.reresamps, type="stud")
-```
-
-
-
-```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.reresamps, type = "stud")
-## 
-## Intervals : 
-## Level    Studentized     
-## 95%   (292, 421 )  
-## Calculations and Intervals on Original Scale
-```
-
-
-
-```r
-boot::boot.ci(bs.tmean.reresamps, type="stud")
-```
-
-
-
-```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.reresamps, type = "stud")
-## 
-## Intervals : 
-## Level    Studentized     
-## 95%   (335, 423 )  
-## Calculations and Intervals on Original Scale
-```
-
-
-
-
-<h4 style = "color:red">95% BCa interval (not responsible for BCa) {-} <h4>
-
-##### With built in functions {-}
-
-
-```r
-boot::boot.ci(bs.med.reresamps, type="bca")
-```
-
-
-
-```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.reresamps, type = "bca")
-## 
-## Intervals : 
-## Level       BCa          
-## 95%   (316, 450 )  
-## Calculations and Intervals on Original Scale
-```
-
-
-
-```r
-boot::boot.ci(bs.tmean.reresamps, type="bca")
-```
-
-
-
-```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.reresamps, type = "bca")
-## 
-## Intervals : 
-## Level       BCa          
-## 95%   (333, 423 )  
-## Calculations and Intervals on Original Scale
-```
-
-
-
-
-##### Without built in functions {-}
-
-
-```r
-test.stat.jk<-c()
-test.stat2.jk<-c()
-
-set.seed(4747)
-for(i in 1:length(heroin$times)){
-
-	test.stat.jk<-c(test.stat.jk,median(heroin$times[-i]))
-	 test.stat2.jk<-c(test.stat2.jk,mean(heroin$times[-i],trim=.25))
-}
-
-zo.hat<-qnorm(sum(test.stat<obs.stat)/reps1,0,1)
-a.hat<- sum((mean(test.stat.jk) - test.stat.jk)^3)/
-                 (6*(sum((mean(test.stat.jk)-test.stat.jk)^2)^1.5))
-
-zo.hat2<- qnorm(sum(test.stat2< obs.stat2)/reps1,0,1)
-a.hat2<- sum((mean(test.stat2.jk) - test.stat2.jk)^3)/
-                 (6*(sum((mean(test.stat2.jk)-test.stat2.jk)^2)^1.5))
-
-alpha1.bca<-pnorm(zo.hat + (zo.hat + qnorm(.975))/(1 - a.hat*(zo.hat + qnorm(.975))))
-alpha2.bca<-pnorm(zo.hat + (zo.hat + qnorm(.025))/(1 - a.hat*(zo.hat + qnorm(.025))))
-
-
-alpha1.bca2<-pnorm(zo.hat2 + (zo.hat2 + qnorm(.975))/(1 - a.hat2*(zo.hat2 + qnorm(.975))))
-alpha2.bca2<-pnorm(zo.hat2 + (zo.hat2 + qnorm(.025))/(1 - a.hat2*(zo.hat2 + qnorm(.025))))
-
-
-c(sort(test.stat)[ceiling(reps1*alpha2.bca)],sort(test.stat)[ceiling(reps1*alpha1.bca)])
-```
-
-
-
-```
-## [1] 317 444
-```
-
-
-
-```r
-c(sort(test.stat2)[ceiling(reps1*alpha2.bca2)],sort(test.stat2)[ceiling(reps1*alpha1.bca2)])
-```
-
-
-
-```
-## [1] 337 424
-```
-
-
-
-#### Comparison of intervals {-}
+#### Comparison of intervals
 
 The first three columns  correspond to the CIs for the true median of the survival times.  The second three columns correspond to the CIs for the true trimmed mean of the survival times.
 
 
-|  	| 	| median  	|  	| 	|  trimmed mean 	|  	|
-|------------	|:------:	|:----------:	|:--------:	|:------------:	|:----------:	|:----------:	|
-| CI 	| lower 	| observed 	| upper 	| lower 	| observed 	| upper 	|
-| --- 	| ----- 	| ----- 	| ----- 	| ----- 	| ------ 	| -------- 	|
-| Percentile 	| 321.00 	| 367.50 	| 452.00 	| 339.38 	| 378.30 	| 423.46 	|
-| CI w BS SE 	| 306.33 	| 367.50 	| 428.67 	| 335.21 	| 378.30 	| 421.39 	|
-| BS-t 	| 294.98 	| 367.50 	| 418.00 	| 334.28 	| 378.30 	| 418.09 	|
-| BCa 	| 317.00 	| 367.50 	| 444.00 	| 338.29 	| 378.30 	| 422.43 	|
+CI | lower | obs Med | upper | lower | obs Tr Mean | upper
+--- | ----- | ----- | ----- | ----- | ------ | -------- | 
+Percentile | 321 | 367.50| 434.58 | 334.86 | 378.30 | 429.77
+w BS SE | 309.98 | 367.50| 425.01 | 336.90 | 378.30 | 419.77
+BS-t | 309.30 | 367.50| 425.31 | 331.02 | 378.30 | 421.17
+
+
+
+
+
 
 
 

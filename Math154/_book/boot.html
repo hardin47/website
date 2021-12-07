@@ -6,17 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 6 Bootstrapping | Computational Statistics</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="6.1 10/8/19 Agenda Review: logic of confidence intervals Logic of bootstrapping (resample from the sample with replacement) BS SE of a statistic  6.2 Introduction As we did with permutation tests,...">
-<meta name="generator" content="bookdown 0.23 with bs4_book()">
+<meta name="description" content="6.1 Introduction As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample). Main idea: we will be able to estimate...">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 6 Bootstrapping | Computational Statistics">
 <meta property="og:type" content="book">
-<meta property="og:description" content="6.1 10/8/19 Agenda Review: logic of confidence intervals Logic of bootstrapping (resample from the sample with replacement) BS SE of a statistic  6.2 Introduction As we did with permutation tests,...">
+<meta property="og:description" content="6.1 Introduction As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample). Main idea: we will be able to estimate...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 6 Bootstrapping | Computational Statistics">
-<meta name="twitter:description" content="6.1 10/8/19 Agenda Review: logic of confidence intervals Logic of bootstrapping (resample from the sample with replacement) BS SE of a statistic  6.2 Introduction As we did with permutation tests,...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11.1/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="twitter:description" content="6.1 Introduction As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample). Main idea: we will be able to estimate...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11.3/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.0/transition.js"></script><script src="libs/bs3compat-0.3.0/tabs.js"></script><script src="libs/bs3compat-0.3.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
     const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
     for (let popover of popovers){
@@ -80,22 +80,12 @@
 <h1>
 <span class="header-section-number">6</span> Bootstrapping<a class="anchor" aria-label="anchor" href="#boot"><i class="fas fa-link"></i></a>
 </h1>
-<div id="Oct8" class="section level2" number="6.1">
+<div id="introduction" class="section level2" number="6.1">
 <h2>
-<span class="header-section-number">6.1</span> 10/8/19 Agenda<a class="anchor" aria-label="anchor" href="#Oct8"><i class="fas fa-link"></i></a>
-</h2>
-<ol style="list-style-type: decimal">
-<li>Review: logic of confidence intervals</li>
-<li>Logic of bootstrapping (resample from the sample <em>with</em> replacement)</li>
-<li>BS SE of a statistic</li>
-</ol>
-</div>
-<div id="introduction" class="section level2" number="6.2">
-<h2>
-<span class="header-section-number">6.2</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
 </h2>
 <p>As we did with permutation tests, we are going to use random samples to describe the population (assuming we have a simple random sample).</p>
-<p>Main idea: we will be able to estimate the <strong>variability</strong> of our estimator (difference in medians, ordinary least square with non-normal errors, etc.).</p>
+<p>Main idea: we will be able to estimate the <strong>variability</strong> of the estimator (difference in medians, ordinary least square with non-normal errors, etc.).</p>
 <ul>
 <li>It’s not so strange to get <span class="math inline">\(\hat{\theta}\)</span> and SE(<span class="math inline">\(\hat{\theta}\)</span>) from the data (consider <span class="math inline">\(\hat{p}\)</span> &amp; <span class="math inline">\(\sqrt{\hat{p}(1-\hat{p})/n}\)</span> and <span class="math inline">\(\overline{X}\)</span> &amp; <span class="math inline">\(s/\sqrt{n}\)</span>).</li>
 <li>We’ll only consider confidence intervals for now.</li>
@@ -109,19 +99,19 @@
 </li>
 </ul>
 </div>
-<div id="BSnotation" class="section level2" number="6.3">
+<div id="BSnotation" class="section level2" number="6.2">
 <h2>
-<span class="header-section-number">6.3</span> Basics &amp; Notation<a class="anchor" aria-label="anchor" href="#BSnotation"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.2</span> Basics &amp; Notation<a class="anchor" aria-label="anchor" href="#BSnotation"><i class="fas fa-link"></i></a>
 </h2>
 <p>Let <span class="math inline">\(\theta\)</span> be the parameter of interest, and let <span class="math inline">\(\hat{\theta}\)</span> be the estimate of <span class="math inline">\(\theta\)</span>. If we could, we’d take lots of samples of size <span class="math inline">\(n\)</span> from the population to create a <strong>sampling distribution</strong> for <span class="math inline">\(\hat{\theta}\)</span>. Consider taking <span class="math inline">\(B\)</span> random samples from <span class="math inline">\(F\)</span>:</p>
 <p><span class="math display">\[\begin{align}
 \hat{\theta}(\cdot) = \frac{1}{B} \sum_{i=1}^B \hat{\theta}_i
 \end{align}\]</span>
-is our best guess for <span class="math inline">\(\theta\)</span>. If <span class="math inline">\(\hat{\theta}\)</span> is very different from <span class="math inline">\(\theta\)</span>, we would call it <strong>biased</strong>.
+is the best guess for <span class="math inline">\(\theta\)</span>. If <span class="math inline">\(\hat{\theta}\)</span> is very different from <span class="math inline">\(\theta\)</span>, we would call it <strong>biased</strong>.
 <span class="math display">\[\begin{align}
 SE(\hat{\theta}) &amp;= \bigg[ \frac{1}{B-1} \sum_{i=1}^B(\hat{\theta}_i - \hat{\theta}(\cdot))^2 \bigg]^{1/2}\\
-q_1 &amp;= [0.25 n] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
-q_3 &amp;= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
+q_1 &amp;= [0.25 B] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
+q_3 &amp;= [0.75 B] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
 \end{align}\]</span></p>
 <p>If we could, we would completely characterize the sampling distribution (as a function of <span class="math inline">\(\theta\)</span>) which would allow us to make inference on <span class="math inline">\(\theta\)</span> when we only had <span class="math inline">\(\hat{\theta}\)</span>.</p>
 <div class="figure" style="text-align: center">
@@ -130,9 +120,9 @@ q_3 &amp;= [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
 Figure 1.2: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig
 </p>
 </div>
-<div id="the-plug-in-principle" class="section level3" number="6.3.1">
+<div id="the-plug-in-principle" class="section level3" number="6.2.1">
 <h3>
-<span class="header-section-number">6.3.1</span> The Plug-in Principle<a class="anchor" aria-label="anchor" href="#the-plug-in-principle"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.2.1</span> The Plug-in Principle<a class="anchor" aria-label="anchor" href="#the-plug-in-principle"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall
 <span class="math display">\[\begin{align}
@@ -164,9 +154,9 @@ F \rightarrow x &amp;\Rightarrow \hat{F} \rightarrow x^*\\
 %\mbox{Fisher's Information: } I(\theta) &\approx& I(\hat{\theta})
 --></p>
 </div>
-<div id="the-bootstrap-idea" class="section level3" number="6.3.2">
+<div id="the-bootstrap-idea" class="section level3" number="6.2.2">
 <h3>
-<span class="header-section-number">6.3.2</span> The Bootstrap Idea<a class="anchor" aria-label="anchor" href="#the-bootstrap-idea"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.2.2</span> The Bootstrap Idea<a class="anchor" aria-label="anchor" href="#the-bootstrap-idea"><i class="fas fa-link"></i></a>
 </h3>
 <p>We can <em>resample</em> from the <em>sample</em> to represent samples from the actual population! The <em>boostrap distribution</em> of a statistic, based on many resamples, represents the <strong>sampling distribution</strong> of the statistic based on many samples. Is this okay?? What are we assuming?</p>
 <ol style="list-style-type: decimal">
@@ -174,35 +164,27 @@ F \rightarrow x &amp;\Rightarrow \hat{F} \rightarrow x^*\\
 <li><p>As <span class="math inline">\(B \rightarrow \infty\)</span>, <span class="math inline">\(\hat{F}(\hat{\theta}^*) \rightarrow F(\hat{\theta})\)</span> (with large <span class="math inline">\(n\)</span>). Or really, what we typically see if <span class="math inline">\(\hat{F}(\hat{\theta}^* / \hat{\theta}) \rightarrow F(\hat{\theta} / \theta)\)</span> or <span class="math inline">\(\hat{F}(\hat{\theta}^* - \hat{\theta}) \rightarrow F(\hat{\theta} - \theta)\)</span></p></li>
 </ol>
 </div>
-<div id="bootstrap-procedure" class="section level3" number="6.3.3">
+<div id="bootstrap-procedure" class="section level3" number="6.2.3">
 <h3>
-<span class="header-section-number">6.3.3</span> Bootstrap Procedure<a class="anchor" aria-label="anchor" href="#bootstrap-procedure"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.2.3</span> Bootstrap Procedure<a class="anchor" aria-label="anchor" href="#bootstrap-procedure"><i class="fas fa-link"></i></a>
 </h3>
 <ol style="list-style-type: decimal">
-<li>Resample data <strong>with replacement</strong>.</li>
+<li>Resample data <strong>with replacement</strong> from the original sample.</li>
 <li>Calculate the statistic of interest for each resample.</li>
 <li>Repeat 1. and 2. <span class="math inline">\(B\)</span> times.</li>
 <li>Use the bootstrap distribution for inference.</li>
 </ol>
-<p>In R:</p>
-<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages('bootstrap')
-library(bootstrap)
-install.packages('boot')
-library(boot)
-?bootstrap
-?boott
-?bootpred</a></code></pre>
 </div>
-<div id="bootstrap-notation" class="section level3" number="6.3.4">
+<div id="bootstrap-notation" class="section level3" number="6.2.4">
 <h3>
-<span class="header-section-number">6.3.4</span> Bootstrap Notation<a class="anchor" aria-label="anchor" href="#bootstrap-notation"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.2.4</span> Bootstrap Notation<a class="anchor" aria-label="anchor" href="#bootstrap-notation"><i class="fas fa-link"></i></a>
 </h3>
-<p>Take lots (<span class="math inline">\(B\)</span>) of sample of size n from the sample, <span class="math inline">\(\hat{F}(x)\)</span> (instead of from the population, <span class="math inline">\(F(x)\)</span> ) to create a bootstrap distribution for <span class="math inline">\(\hat{\theta}^*\)</span> (instead of the sampling distribution for <span class="math inline">\(\hat{\theta}\)</span>).</p>
-<p>Let <span class="math inline">\(\hat{\theta}^*(b)\)</span> be the calculated statistic of interest for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. Our best guess for <span class="math inline">\(\theta\)</span> is:
+<p>Take many (<span class="math inline">\(B\)</span>) resamples of size <span class="math inline">\(n\)</span> from the sample, <span class="math inline">\(\hat{F}(x)\)</span> (instead of from the population, <span class="math inline">\(F(x)\)</span> ) to create a bootstrap distribution for <span class="math inline">\(\hat{\theta}^*\)</span> (instead of the sampling distribution for <span class="math inline">\(\hat{\theta}\)</span>).</p>
+<p>Let <span class="math inline">\(\hat{\theta}^*(b)\)</span> be the calculated statistic of interest for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. The best guess for <span class="math inline">\(\theta\)</span> is:
 <span class="math display">\[\begin{align}
 \hat{\theta}^* = \frac{1}{B} \sum_{b=1}^B \hat{\theta}^*(b)
 \end{align}\]</span>
-(if <span class="math inline">\(\hat{\theta}^*\)</span> is very different from <span class="math inline">\(\hat{\theta}\)</span>, we call it biased.) And the estimated value for the standard error of our estimate is
+(if <span class="math inline">\(\hat{\theta}^*\)</span> is very different from <span class="math inline">\(\hat{\theta}\)</span>, we call it biased.) And the estimated value for the standard error of the estimate is
 <span class="math display">\[\begin{align}
 \hat{SE}^* = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*(b) - \hat{\theta}^*)^2 \bigg]^{1/2}
 \end{align}\]</span></p>
@@ -295,33 +277,22 @@ Fisher also introduced the $r$ to $Z$ transformation:
 \begin{align}
 Z = \frac{1}{2} \ln \Big[\frac{1+r}{1-r}\Big]
 \end{align}
-We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is simply an inverse hyperbolic tangent function.)
+We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is an inverse hyperbolic tangent function.)
 \end{enumerate}
 -->
-</div>
-</div>
-<div id="Oct10" class="section level2" number="6.4">
-<h2>
-<span class="header-section-number">6.4</span> 10/10/19 Agenda<a class="anchor" aria-label="anchor" href="#Oct10"><i class="fas fa-link"></i></a>
-</h2>
-<ol style="list-style-type: decimal">
-<li>Normal CI using BS SE</li>
-<li>Bootstrap-t (studentized) CIs</li>
-<li>Percentile CIs</li>
-<li>properties / advantages / disadvantages</li>
-</ol>
 <p>The StatKey applets which demonstrate bootstrapping are here: <a href="http://www.lock5stat.com/StatKey/" class="uri">http://www.lock5stat.com/StatKey/</a></p>
 <!--
 https://www.unc.edu/courses/2007spring/biol/145/001/docs/lectures/Sep17.html
 -->
 </div>
-<div id="BSCI" class="section level2" number="6.5">
+</div>
+<div id="BSCI" class="section level2" number="6.3">
 <h2>
-<span class="header-section-number">6.5</span> Bootstrap Confidence Intervals<a class="anchor" aria-label="anchor" href="#BSCI"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3</span> Bootstrap Confidence Intervals<a class="anchor" aria-label="anchor" href="#BSCI"><i class="fas fa-link"></i></a>
 </h2>
-<div id="normal-standard-ci-with-bs-se-typenorm" class="section level3" number="6.5.1">
+<div id="normal-standard-ci-with-bootse-typenorm" class="section level3" number="6.3.1">
 <h3>
-<span class="header-section-number">6.5.1</span> Normal (standard) CI with BS SE: <code>type="norm"</code><a class="anchor" aria-label="anchor" href="#normal-standard-ci-with-bs-se-typenorm"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.1</span> Normal (standard) CI with BootSE: <code>type="norm"</code><a class="anchor" aria-label="anchor" href="#normal-standard-ci-with-bootse-typenorm"><i class="fas fa-link"></i></a>
 </h3>
 <p>Keep in mind that what we are trying to do is approximate the sampling distribution of <span class="math inline">\(\hat{\theta}\)</span>. In fact, what we are really able to do here is to estimate the sampling distribution of <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>. We hope that:</p>
 <p><span class="math display">\[\begin{align}
@@ -335,9 +306,9 @@ P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\t
 <p>That is, it’s the endpoints that are random, and we have a 0.95 probability that we’ll get a random sample which will produce endpoints which will capture the true parameter.</p>
 <p>A 95% CI for <span class="math inline">\(\theta\)</span> would then be: <span class="math display">\[\hat{\theta} \pm z_{(\alpha/2)} \hat{SE}^*\]</span></p>
 </div>
-<div id="bootstrap-t-confidence-intervals-typestud" class="section level3" number="6.5.2">
+<div id="bootstrap-t-confidence-intervals-typestud" class="section level3" number="6.3.2">
 <h3>
-<span class="header-section-number">6.5.2</span> Bootstrap-t Confidence Intervals: <code>type="stud"</code><a class="anchor" aria-label="anchor" href="#bootstrap-t-confidence-intervals-typestud"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.2</span> Bootstrap-t Confidence Intervals: <code>type="stud"</code><a class="anchor" aria-label="anchor" href="#bootstrap-t-confidence-intervals-typestud"><i class="fas fa-link"></i></a>
 </h3>
 <p>(The idea here is that we are calculating the “t-multiplier” that is used in the CI. It was William Gosset who went my the pseudonym of “Student” who originally figured out the distribution of the t-multiplier, so the following intervals are called either “studentized” or “t” bootstrap confidence intervals.)</p>
 <p>Recall the derivation of conventional confidence intervals:</p>
@@ -347,47 +318,47 @@ P\bigg(\hat{\theta} - z_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\t
 \end{align}\]</span></p>
 <p>That is, it’s the endpoints that are random, and we have a 0.95 probability that we’ll get a random sample which will produce endpoints which will capture the true parameter.</p>
 <ol style="list-style-type: decimal">
-<li><p>We could simply use the BS SE within the CI formula (and did for the interval above). The problem is that such an interval will only be accurate if the distribution for <span class="math inline">\(\hat{\theta}\)</span> is reasonably normal. If there is any bias or skew, the CI will not have desired coverage levels (<span class="citation"><a href="references.html#ref-efrontibs" role="doc-biblioref">Efron and Tibshirani</a> (<a href="references.html#ref-efrontibs" role="doc-biblioref">1993</a>)</span>, pg 161 and chapter 22).</p></li>
+<li><p>We could use the Boot SE within the CI formula (and did for the interval above). The problem is that such an interval will only be accurate if the distribution for <span class="math inline">\(\hat{\theta}\)</span> is reasonably normal. If there is any bias or skew, the CI will not have desired coverage levels (<span class="citation"><a href="references.html#ref-efrontibs" role="doc-biblioref">Efron and Tibshirani</a> (<a href="references.html#ref-efrontibs" role="doc-biblioref">1993</a>)</span>, pg 161 and chapter 22).</p></li>
 <li><p>Now consider using the bootstrap to estimate the distribution for <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>.
 <span class="math display">\[\begin{align}
 T^*(b) &amp;= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
 \end{align}\]</span></p></li>
 </ol>
-<p>where <span class="math inline">\(\hat{\theta}^*(b)\)</span> is the value of <span class="math inline">\(\hat{\theta}\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample, and <span class="math inline">\(\hat{SE}^*(b)\)</span> is the estimated standard error of <span class="math inline">\(\hat{\theta}^*(b)\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. The <span class="math inline">\(\alpha^{th}\)</span> percentile of <span class="math inline">\(T^*(b)\)</span> is estimated by the value of <span class="math inline">\(\hat{t}_\alpha\)</span> such that</p>
+<p>where <span class="math inline">\(\hat{\theta}^*(b)\)</span> is the value of <span class="math inline">\(\hat{\theta}\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample, and <span class="math inline">\(\hat{SE}^*(b)\)</span> is the estimated standard error of <span class="math inline">\(\hat{\theta}^*(b)\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. The <span class="math inline">\(\alpha^{th}\)</span> percentile of <span class="math inline">\(T^*(b)\)</span> is estimated by the value of <span class="math inline">\(\hat{t}^*_\alpha\)</span> such that</p>
 <p><span class="math display">\[\begin{align}
-\frac{\# \{T^*(b) \leq \hat{t}_{\alpha/2} \} }{B} = \alpha/2
+\frac{\# \{T^*(b) \leq \hat{t}^*_{\alpha/2} \} }{B} = \alpha/2
 \end{align}\]</span></p>
 <p>For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the 5% point is the <span class="math inline">\(50^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s, and the estimate of the 95% point is the <span class="math inline">\(950^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s.</p>
 <p>Finally, the boostrap-t confidence interval is:
 <span class="math display" id="eq:BSt">\[\begin{equation} 
-(\hat{\theta} - \hat{t}_{1-\alpha/2}\hat{SE}^*,  \hat{\theta} - \hat{t}_{\alpha/2}\hat{SE}^*) \tag{6.1}
+(\hat{\theta} - \hat{t}^*_{1-\alpha/2}\hat{SE}^*,  \hat{\theta} - \hat{t}^*_{\alpha/2}\hat{SE}^*) \tag{6.1}
 \end{equation}\]</span></p>
 <p>To find a bootstrap-t interval, we have to bootstrap twice. The algorithm is as follows:</p>
 <ol style="list-style-type: decimal">
 <li><p>Generate <span class="math inline">\(B_1\)</span> bootstrap samples, and for each sample <span class="math inline">\(\underline{X}^{*b}\)</span> compute the bootstrap estimate <span class="math inline">\(\hat{\theta}^*(b)\)</span>.</p></li>
 <li><p>Take <span class="math inline">\(B_2\)</span> bootstrap samples from <span class="math inline">\(\underline{X}^{*b}\)</span>, and estimate the standard error, <span class="math inline">\(\hat{SE}^*(b)\)</span>.</p></li>
-<li><p>Find <span class="math inline">\(B_1\)</span> values for <span class="math inline">\(T^*(b)\)</span>. Calculate <span class="math inline">\(\hat{t}_\alpha/2\)</span> and <span class="math inline">\(\hat{t}_{1-\alpha/2}\)</span>.</p></li>
+<li><p>Find <span class="math inline">\(B_1\)</span> values for <span class="math inline">\(T^*(b)\)</span>. Calculate <span class="math inline">\(\hat{t}^*_\alpha/2\)</span> and <span class="math inline">\(\hat{t}^*_{1-\alpha/2}\)</span>.</p></li>
 <li><p>Calculate the CI as in equation (<a href="boot.html#eq:BSt">(6.1)</a>).</p></li>
 </ol>
 <ul>
 <li><p>If <span class="math inline">\(B\cdot \alpha\)</span> is not an integer, use <span class="math inline">\(k=\lfloor (B+1) \alpha \rfloor\)</span> and <span class="math inline">\(B+1-k\)</span>.</p></li>
 <li><p>Bootstrap-t intervals are somewhat erratic and can be influenced by a few outliers. Percentile methods can be more reliable. [The balance of which is best when is an open question depending a lot on the data distribution and statistic of interest.]</p></li>
-<li><p><span class="math inline">\(B=100\)</span> or 200 is probably not enough for a bootstrap-t CI (500 or 1000 is better). However, <span class="math inline">\(B=25\)</span> may be enough to estimate the SE in the inner-BS procedure. (<span class="math inline">\(B=1000\)</span> is needed for computing percentiles.)</p></li>
+<li><p><span class="math inline">\(B=100\)</span> or 200 is probably not enough for a bootstrap-t CI (500 or 1000 is better). However, <span class="math inline">\(B=25\)</span> may be enough to estimate the SE in the inner-Bootprocedure. (<span class="math inline">\(B=1000\)</span> is needed for computing percentiles.)</p></li>
 <li>
 <p>In choosing the appropriate multiplier:</p>
 <ul>
 <li>When it is the correct multiplier to use, the normal multiplier (<span class="math inline">\(z\)</span>) is good for all <span class="math inline">\(n\)</span> and all samples.</li>
 <li>When it is the correct multiplier to use, the t multiplier is good for all samples but a specified <span class="math inline">\(n\)</span>.</li>
-<li>When it is the correct multiplier to use, the bootstrap-t multiplier is good for *this} sample only.</li>
+<li>When it is the correct multiplier to use, the bootstrap-t multiplier is good for <em>this</em> sample only.</li>
 </ul>
 </li>
-<li><p>The resulting intervals will typically not be symmetric (that is <span class="math inline">\(\hat{t}_\alpha \ne - \hat{t}_{1-\alpha}\)</span>). This is part of the improvement over <span class="math inline">\(z\)</span> or <span class="math inline">\(t\)</span> intervals.</p></li>
+<li><p>The resulting intervals will typically not be symmetric (that is <span class="math inline">\(\hat{t}^*_\alpha \ne - \hat{t}^*_{1-\alpha}\)</span>). This is part of the improvement over <span class="math inline">\(z\)</span> or <span class="math inline">\(t\)</span> intervals.</p></li>
 <li><p>Bootstrap-t intervals are good for location statistics (mean, quantiles, trimmed means) but cannot be trusted for other statistics like the correlation (which do not necessarily vary based on ideas of shift).</p></li>
 </ul>
 </div>
-<div id="percentile-confidence-intervals-typeperc" class="section level3" number="6.5.3">
+<div id="percentile-confidence-intervals-typeperc" class="section level3" number="6.3.3">
 <h3>
-<span class="header-section-number">6.5.3</span> Percentile Confidence Intervals: <code>type="perc"</code><a class="anchor" aria-label="anchor" href="#percentile-confidence-intervals-typeperc"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.3</span> Percentile Confidence Intervals: <code>type="perc"</code><a class="anchor" aria-label="anchor" href="#percentile-confidence-intervals-typeperc"><i class="fas fa-link"></i></a>
 </h3>
 <p>The interval between the <span class="math inline">\(\alpha/2\)</span> and <span class="math inline">\(1-\alpha/2\)</span> quantiles of the bootstrap distribution of a statistic is a <span class="math inline">\((1-\alpha)100\%\)</span> bootstrap percentile confidence interval for the corresponding parameter:</p>
 <p><span class="math display">\[\begin{align}
@@ -396,8 +367,8 @@ T^*(b) &amp;= \frac{\hat{\theta}^*(b) - \hat{\theta}}{\hat{SE}^*(b)}
 <p style="color:red">
 You do not need to know <em>why</em> the percentile interval works… but isn’t it so cool to see how it works???
 </p>
-<p>Why does it work? It isn’t immediately obvious that the interval above will capture the true parameter, <span class="math inline">\(\theta\)</span>, at a rate or 95%. Consider a skewed sampling distribution. If your <span class="math inline">\(\hat{\theta}\)</span> comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate? (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron’s “backwards” intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won’t capture the parameter with the correct rate.</p>
-<p>To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let <span class="math inline">\(\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)\)</span>, where g is a monotonic function (assume wlog that g is increasing). The point is to choose (if possible) <span class="math inline">\(g(\cdot)\)</span> such that</p>
+<p>Why does it work? It isn’t immediately obvious that the interval above will capture the true parameter, <span class="math inline">\(\theta\)</span>, at a rate or 95%. Consider a skewed sampling distribution. If the observed <span class="math inline">\(\hat{\theta}\)</span> comes from the long tail, is it obvious that the short tail side of the CI will get up to the true parameter value at the correct rate? (Hall (*The Bootstrap and Edgeworth Expansion}, Springer, 1992, and earlier papers) refers to these as Efron’s “backwards” intervals.) Or, if the sampling distribution is biased, the percentiles of the bootstrap interval won’t capture the parameter with the correct rate.</p>
+<p>To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of the statistic. Let <span class="math inline">\(\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)\)</span>, where g is a monotonic function (assume wlog that g is increasing). The point is to choose (if possible) <span class="math inline">\(g(\cdot)\)</span> such that</p>
 <p><span class="math display" id="eq:phidist">\[\begin{equation}
  \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2) \tag{6.2}.
  \end{equation}\]</span>
@@ -415,7 +386,7 @@ Substituting in (<a href="boot.html#eq:phiint">(6.3)</a>), gives the percentile 
 <p><span class="math display">\[\begin{align}
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
 \end{align}\]</span></p>
-<p>(A similar argument gives the same derivation of the two sided confidence interval. Proof from <span class="citation"><a href="references.html#ref-carp2000" role="doc-biblioref">Carpenter and Bithell</a> (<a href="references.html#ref-carp2000" role="doc-biblioref">2000</a>)</span>) In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists. We do not need to actually find the transformation!</p>
+<p>(A similar argument gives the same derivation of the two sided confidence interval. Proof from <span class="citation"><a href="references.html#ref-carp2000" role="doc-biblioref">Carpenter and Bithell</a> (<a href="references.html#ref-carp2000" role="doc-biblioref">2000</a>)</span>) In order for a percentile interval to be appropriate, the technical condition is only that a normalizing transformation <strong>exists</strong>. We do not need to actually find the transformation!</p>
 <!--
 \begin{align}
 P\bigg(t_{(\alpha/2), df} \leq \frac{\hat{\theta} - \theta}{SE(\theta)} \leq t_{(1-\alpha/2), df}\bigg)&= 1 - \alpha\\
@@ -433,7 +404,7 @@ Then $\hat{\theta}_{lo} = \hat{\theta} - t_{(1-\alpha/2), df} \hat{SE} \approx \
 
 That is, if in fact $\hat{\theta}^*$ has a normal distribution, the percentiles will equal the appropriate CI bounds, and so we know that the probability theory will hold.
 -->
-<p><strong>The transformation respecting property</strong> A CI is transformation respecting if, for any monotone transformation, the CI for the transformed parameter is simply the transformed CI for the unstransformed parameter. Let <span class="math inline">\(\phi = m(\theta)\)</span>.</p>
+<p><strong>The transformation respecting property</strong> A CI is transformation respecting if, for any monotone transformation, the CI for the transformed parameter is (exactly) the transformed CI for the unstransformed parameter. Let <span class="math inline">\(\phi = m(\theta)\)</span>.</p>
 <p><span class="math display">\[\begin{align}
 [\phi_{lo}, \phi_{up}] = [m(\theta_{lo}), m(\theta_{up})]
 \end{align}\]</span></p>
@@ -453,28 +424,29 @@ Then the percentile interval based on $\hat{\theta}$ equals $[m^{-1}(\hat{\phi} 
 
 And we can approximate $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$ using $[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]$
 
-In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
+In order for a percentile interval to be appropriate, the technical condition is that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
 
 See Charlotte's example on bootstrapping a loess smooth for her thesis data (carryingcap.r).  The idea was this:  Charlotte had some data that she wanted to model (using differential equations).  She asked me how to tell whether or not her new model was reflective of the data / population.  So, we fit a loess spline to see the shape of the data.  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit.
 
-Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
+Keeping in mind that the theory we've covered here doesn't exactly work for this situation (the work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  We just have to be careful about multiple comparisons and non-independent data values.
 -->
 <p><strong>The range preserving property</strong> Another advantage of the percentile interval is that it is range preserving. That is, the CI always produces endpoints that fall within the allowable range of the parameter.</p>
 <p><strong>Bias</strong> The percentile interval is not, however, perfect. If the statistic is a biased estimator of the parameter, there will not exist a transformation such that the distribution is centered around the correct function of the parameter. Formally, if
 <span class="math display">\[\begin{align}
 \hat{\theta} \sim N(\theta + bias, \hat{SE}^2)
 \end{align}\]</span>
-no transformation <span class="math inline">\(\phi = m(\theta)\)</span> can fix things up. Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has simply fixed the situation when the distribution is non-normal.</p>
+no transformation <span class="math inline">\(\phi = m(\theta)\)</span> can fix things up. Keep in mind that standard intervals can fail in a variety of ways, and the percentile method has only fixed the specific situation of the sampling distribution being is non-normal.</p>
 </div>
-<div id="what-makes-a-ci-good" class="section level3" number="6.5.4">
+<div id="what-makes-a-ci-procedure-good" class="section level3" number="6.3.4">
 <h3>
-<span class="header-section-number">6.5.4</span> What makes a CI good?<a class="anchor" aria-label="anchor" href="#what-makes-a-ci-good"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4</span> What makes a CI procedure good?<a class="anchor" aria-label="anchor" href="#what-makes-a-ci-procedure-good"><i class="fas fa-link"></i></a>
 </h3>
+<p>The following qualities that may or may not result from a confidence interval procedure are what determines the choice of method for the researcher.</p>
 <ul>
 <li>Symmetry (??): the interval is symmetric, pivotal around some value. Not necessarily a good thing. Maybe a bad thing to force?</li>
 <li>Resistant: BS-t is particularly not resistant to outliers or crazy sampling distributions of the statistic (can make it more robust with a variance stabilizing transformation)</li>
 <li>Range preserving: the CI always contains only values that fall within an allowable range (<span class="math inline">\(p, \rho\)</span>,…)</li>
-<li>Transformation respecting: for any monotone transformation, <span class="math inline">\(\phi = m(\theta)\)</span>, the interval for <span class="math inline">\(\theta\)</span> is simply mapped by <span class="math inline">\(m(\theta)\)</span>. If <span class="math inline">\([\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]\)</span> is a <span class="math inline">\((1-\alpha)100\)</span>% interval for <span class="math inline">\(\theta\)</span>, then</li>
+<li>Transformation respecting: for any monotone transformation, <span class="math inline">\(\phi = m(\theta)\)</span>, the interval for <span class="math inline">\(\theta\)</span> is mapped directly by <span class="math inline">\(m(\theta)\)</span>. If <span class="math inline">\([\hat{\theta}_{(lo)},\hat{\theta}_{(hi)}]\)</span> is a <span class="math inline">\((1-\alpha)100\)</span>% interval for <span class="math inline">\(\theta\)</span>, then</li>
 </ul>
 <p><span class="math display">\[\begin{align}
 [\hat{\phi}_{(lo)},\hat{\phi}_{(hi)}] = [m(\hat{\theta}_{(lo)}),m(\hat{\theta}_{(hi)})]
@@ -489,7 +461,7 @@ P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2\\
 \end{align}\]</span></p>
 <ul>
 <li>
-<p>Note: all of our intervals are approximate. We judge them based on how accurately they cover <span class="math inline">\(\theta\)</span>.</p>
+<p>Note: all of the intervals are approximate. We judge them based on how accurately they cover <span class="math inline">\(\theta\)</span>.</p>
 <ul>
 <li><p>A CI is first order accurate if:
 <span class="math display">\[\begin{align}
@@ -517,7 +489,7 @@ P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2+ \frac{const_{hi}}{n}\\
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="center">BS SE</td>
+<td align="center">BootSE</td>
 <td align="center">Yes</td>
 <td align="center">No</td>
 <td align="center">No</td>
@@ -561,9 +533,9 @@ P(\theta &gt; \hat{\theta}_{(hi)})&amp;=\alpha/2+ \frac{const_{hi}}{n}\\
 </table></div>
 <p>All of the above criteria speak to the coverage rates of the parameters. But note that they must be taken in context. Much also depends on:
 the choice of statistic itself; the original data distribution; any outlying observations; etc.</p>
-<div id="advantages-and-disadvantages" class="section level4" number="6.5.4.1">
+<div id="advantages-and-disadvantages" class="section level4" number="6.3.4.1">
 <h4>
-<span class="header-section-number">6.5.4.1</span> Advantages and Disadvantages<a class="anchor" aria-label="anchor" href="#advantages-and-disadvantages"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.1</span> Advantages and Disadvantages<a class="anchor" aria-label="anchor" href="#advantages-and-disadvantages"><i class="fas fa-link"></i></a>
 </h4>
 <ul>
 <li>Normal Approximation
@@ -602,11 +574,11 @@ all of those of the percentile method; allows for bias in <span class="math inli
 </li>
 </ul>
 </div>
-<div id="bootstrap-ci-and-hypothesis-testing" class="section level4" number="6.5.4.2">
+<div id="bootstrap-ci-and-hypothesis-testing" class="section level4" number="6.3.4.2">
 <h4>
-<span class="header-section-number">6.5.4.2</span> Bootstrap CI and Hypothesis Testing<a class="anchor" aria-label="anchor" href="#bootstrap-ci-and-hypothesis-testing"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.3.4.2</span> Bootstrap CI and Hypothesis Testing<a class="anchor" aria-label="anchor" href="#bootstrap-ci-and-hypothesis-testing"><i class="fas fa-link"></i></a>
 </h4>
-<p>If a null value for a parameter is not contained in a CI, we reject the null hypothesis; similarly, we do not reject a null value if it does lie inside the CI. Using BS CIs, we can apply the same logic, and test any hypothesis of interest (note: we can always create one-sided intervals as well!). But simply using CIs leaves out the p-value information. How do we get a p-value from a CI? Consider an alternative definition for the p-value:</p>
+<p>If a null value for a parameter is not contained in a CI, we reject the null hypothesis; similarly, we do not reject a null value if it does lie inside the CI. Using BootCIs, we can apply the same logic, and test any hypothesis of interest (note: we can always create one-sided intervals as well!). But using CIs leaves out the p-value information. How do we get a p-value from a CI? Consider an alternative definition for the p-value:</p>
 <p><strong>p-value:</strong> The smallest level of significance at which you would reject <span class="math inline">\(H_0\)</span>.</p>
 <p>So, what we want is for the null value (<span class="math inline">\(\theta_0\)</span>) to be one of the endpoints of the confidence interval with some level of confidence <span class="math inline">\(1-2\alpha_0\)</span>. <span class="math inline">\(\alpha_0\)</span> will then be the one-sided p-value, <span class="math inline">\(2\alpha_0\)</span> will be the two-sided p-value.</p>
 <p>For percentile intervals,
@@ -692,7 +664,7 @@ bias &amp;= E(\hat{\theta}) - \theta\\
 <p><span class="math display">\[\begin{align}
 \hat{z}_0 &amp;= \Phi^{-1} \bigg( \frac{ \# \hat{\theta}^*(b) &lt; \hat{\theta}}{B} \bigg)
 \end{align}\]</span>
-That is, if <span class="math inline">\(\hat{\theta}^*\)</span> underestimates <span class="math inline">\(\hat{\theta}\)</span>, then <span class="math inline">\(\hat{\theta}\)</span> likely underestimates <span class="math inline">\(\theta\)</span>; <span class="math inline">\(z_0 &gt; 0\)</span>. We think of <span class="math inline">\(z_0\)</span> and the normal quantile associated with the proportion of BS replicates less than <span class="math inline">\(\hat{\theta}\)</span>.</p>
+That is, if <span class="math inline">\(\hat{\theta}^*\)</span> underestimates <span class="math inline">\(\hat{\theta}\)</span>, then <span class="math inline">\(\hat{\theta}\)</span> likely underestimates <span class="math inline">\(\theta\)</span>; <span class="math inline">\(z_0 &gt; 0\)</span>. We think of <span class="math inline">\(z_0\)</span> and the normal quantile associated with the proportion of Bootreplicates less than <span class="math inline">\(\hat{\theta}\)</span>.</p>
 <ul>
 <li>
 <strong>skew:</strong>
@@ -702,7 +674,7 @@ bias&amp;= E(\hat{\theta} - \theta)\\
 var &amp;= E(\hat{\theta} - \theta)^2 = \sigma^2\\
 skew &amp;= E(\hat{\theta} - \theta)^3 / \sigma^3\\
 \end{align}\]</span>
-We can think of the skew as the rate of chance of the standard error on a normalized scale. If there is no skew, we will estimate <span class="math inline">\(a=0\)</span>. Our estimate of <span class="math inline">\(a\)</span> comes from a procedure known as the jackknife.</li>
+We can think of the skew as the rate of chance of the standard error on a normalized scale. If there is no skew, we will estimate <span class="math inline">\(a=0\)</span>. The estimate of <span class="math inline">\(a\)</span> comes from a procedure known as the jackknife.</li>
 </ul>
 <p><span class="math display">\[\begin{align}
 \hat{a} = \frac{\sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^3}{6 [ \sum_{i=1}^n (\hat{\theta} - \hat{\theta}_{(i)})^2 ] ^{3/2}}
@@ -710,11 +682,11 @@ We can think of the skew as the rate of chance of the standard error on a normal
 </div>
 </div>
 </div>
-<div id="r-example-heroin" class="section level2" number="6.6">
+<div id="r-example-heroin" class="section level2" number="6.4">
 <h2>
-<span class="header-section-number">6.6</span> R example: Heroin<a class="anchor" aria-label="anchor" href="#r-example-heroin"><i class="fas fa-link"></i></a>
+<span class="header-section-number">6.4</span> R example: Heroin<a class="anchor" aria-label="anchor" href="#r-example-heroin"><i class="fas fa-link"></i></a>
 </h2>
-<p>Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment. The data in <code>heroin.txt</code> include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4). For about 37% of the subjects, the study ended while they were still the in clinic (status=0). Thus, their survival time has been truncated. For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time. Below we explore using the median as well as the 25% trimmed mean. We treat the group of 238 patients as representative of the population. <span class="citation">(From <a href="references.html#ref-ISCAM" role="doc-biblioref">Chance and Rossman 2018a</a>, Investigation 4.5.3)</span></p>
+<p>Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) spent a clinic for methadone maintenance treatment for people addicted to heroin. The data in <code>heroin.txt</code> include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4). For about 37% of the subjects, the study ended while they were still the in clinic (status=0). Thus, their survival time has been truncated. For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time. Below we explore using the median as well as the 25% trimmed mean. We treat the group of 238 patients as representative of the population. <span class="citation">(From <a href="references.html#ref-ISCAM" role="doc-biblioref">Chance and Rossman 2018a</a>, Investigation 4.5.3)</span></p>
 <div id="why-bootstrap" class="section level4 unnumbered">
 <h4>Why bootstrap?<a class="anchor" aria-label="anchor" href="#why-bootstrap"><i class="fas fa-link"></i></a>
 </h4>
@@ -723,479 +695,357 @@ We can think of the skew as the rate of chance of the standard error on a normal
 <div id="reading-in-the-data" class="section level4 unnumbered">
 <h4>Reading in the data<a class="anchor" aria-label="anchor" href="#reading-in-the-data"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb437"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">heroin</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_table2.html">read_table2</a></span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam2/data/heroin.txt"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "id"     "clinic" "status" "times"  "prison" "dose"</code></pre>
-<div class="sourceCode" id="cb439"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 6 x 6
-##      id clinic status times prison  dose
-##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-## 1     1      1      1   428      0    50
-## 2     2      1      1   275      1    55
-## 3     3      1      1   262      0    55
-## 4     4      1      1   183      0    30
-## 5     5      1      1   259      1    65
-## 6     6      1      1   714      0    55</code></pre>
+<div class="sourceCode" id="cb428"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">heroin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/readr/man/read_table.html">read_table</a></span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam2/data/heroin.txt"</span><span class="op">)</span>
+<span class="va">heroin</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">prison</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 238 × 5
+##       id clinic status times  dose
+##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1     1      1      1   428    50
+##  2     2      1      1   275    55
+##  3     3      1      1   262    55
+##  4     4      1      1   183    30
+##  5     5      1      1   259    65
+##  6     6      1      1   714    55
+##  7     7      1      1   438    65
+##  8     8      1      0   796    60
+##  9     9      1      1   892    50
+## 10    10      1      1   393    65
+## # … with 228 more rows</code></pre>
 </div>
 <div id="observed-test-statistics" class="section level4 unnumbered">
 <h4>Observed Test Statistic(s)<a class="anchor" aria-label="anchor" href="#observed-test-statistics"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb441"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>medtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">obs.stat2</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">obs.stat</span></code></pre></div>
-<pre><code>## [1] 368</code></pre>
-<div class="sourceCode" id="cb443"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat2</span></code></pre></div>
-<pre><code>## [1] 378</code></pre>
+<div class="sourceCode" id="cb430"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">heroin</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>obs_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>, 
+            obs_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##   obs_med obs_tr_mean
+##     &lt;dbl&gt;       &lt;dbl&gt;
+## 1    368.        378.</code></pre>
 </div>
 <div id="bootstrapped-data" class="section level4 unnumbered">
 <h4>Bootstrapped data!<a class="anchor" aria-label="anchor" href="#bootstrapped-data"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb445"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb432"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">heroin.rs</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="va">heroin.rs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>medtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 368</code></pre>
-<div class="sourceCode" id="cb447"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">heroin.rs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 372</code></pre>
+<span class="va">heroin</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>, 
+            boot_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##   boot_med boot_tr_mean
+##      &lt;dbl&gt;        &lt;dbl&gt;
+## 1      368         372.</code></pre>
 </div>
 <div id="need-to-bootstrap-a-lot-of-times" class="section level4 unnumbered">
 <h4>Need to bootstrap a lot of times…<a class="anchor" aria-label="anchor" href="#need-to-bootstrap-a-lot-of-times"><i class="fas fa-link"></i></a>
 </h4>
-<p>Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals). However, the package and funciton <code>boot</code> will do the boostrapping for you.</p>
-<div class="sourceCode" id="cb449"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">test.stat2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">sd.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">sd.test.stat2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">reps1</span> <span class="op">&lt;-</span> <span class="fl">1000</span>
-<span class="va">reps2</span> <span class="op">&lt;-</span> <span class="fl">100</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps1</span><span class="op">)</span><span class="op">{</span> 
-    <span class="va">heroin.rs</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-    <span class="va">test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat</span>,<span class="va">heroin.rs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>medtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">test.stat2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat2</span>,<span class="va">heroin.rs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-    <span class="va">test.stat.rs</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-    <span class="va">test.stat2.rs</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-
-    <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps2</span><span class="op">)</span><span class="op">{</span>
-    <span class="va">heroin.rsrs</span><span class="op">&lt;-</span><span class="va">heroin.rs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-    <span class="va">test.stat.rs</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat.rs</span>,<span class="va">heroin.rsrs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>medtime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">test.stat2.rs</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat2.rs</span>,<span class="va">heroin.rsrs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">}</span>
-    <span class="va">sd.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sd.test.stat</span>,<span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat.rs</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">sd.test.stat2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sd.test.stat2</span>,<span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat2.rs</span><span class="op">)</span><span class="op">)</span>
+<p>Below is the code showing how to bootstrap using for loops (nested to create the t multipliers needed for the BS-t intervals). (There is a package <strong>boot</strong> which will bootstrap for you, but you need to write functions to use it.)</p>
+<p><strong>set variables</strong></p>
+<div class="sourceCode" id="cb434"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">n_rep1</span> <span class="op">&lt;-</span> <span class="fl">100</span>
+<span class="va">n_rep2</span> <span class="op">&lt;-</span> <span class="fl">20</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span></code></pre></div>
+<p><strong>boot stat function</strong></p>
+<div class="sourceCode" id="cb435"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_stat_func</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">{</span> 
+    <span class="va">df</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>obs_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>,
+           obs_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>, 
+              boot_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>,
+              obs_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_med</span><span class="op">)</span>,
+              obs_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_tr_mean</span><span class="op">)</span><span class="op">)</span><span class="op">}</span></code></pre></div>
+<p><strong>resample function</strong></p>
+<div class="sourceCode" id="cb436"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_1_func</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">df</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
+<p><strong>bootstrapping</strong></p>
+<div class="sourceCode" id="cb437"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map_df</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_rep1</span>, <span class="op">~</span><span class="fu">boot_stat_func</span><span class="op">(</span>df <span class="op">=</span> <span class="va">heroin</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       &lt;dbl&gt;        &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+##  1     368          372.    368.        378.
+##  2     358          363.    368.        378.
+##  3     431          421.    368.        378.
+##  4     332.         350.    368.        378.
+##  5     310.         331.    368.        378.
+##  6     376          382.    368.        378.
+##  7     366          365.    368.        378.
+##  8     378.         382.    368.        378.
+##  9     394          386.    368.        378.
+## 10     392.         402.    368.        378.
+## # … with 90 more rows</code></pre>
 </div>
-<div id="what-do-the-distributions-look-like" class="section level4 unnumbered">
-<h4>What do the distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-distributions-look-like"><i class="fas fa-link"></i></a>
+<div id="what-do-the-data-distributions-look-like" class="section level4 unnumbered">
+<h4>What do the <strong>data</strong> distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-data-distributions-look-like"><i class="fas fa-link"></i></a>
+</h4>
+<p><img src="06-bootstrap_files/figure-html/unnamed-chunk-11-1.png" width="384" style="display: block; margin: auto;"><img src="06-bootstrap_files/figure-html/unnamed-chunk-11-2.png" width="384" style="display: block; margin: auto;"></p>
+</div>
+<div id="what-do-the-sampling-distributions-look-like" class="section level4 unnumbered">
+<h4>What do the sampling distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-sampling-distributions-look-like"><i class="fas fa-link"></i></a>
 </h4>
 <p>The distributions of both the median and the trimmed mean are symmetric and bell-shaped. However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).</p>
-<p><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;"><img src="06-bootstrap_files/figure-html/unnamed-chunk-8-2.png" width="480" style="display: block; margin: auto;"></p>
-</div>
-<div id="what-do-the-distributions-look-like-1" class="section level4 unnumbered">
-<h4>What do the distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-distributions-look-like-1"><i class="fas fa-link"></i></a>
-</h4>
-<p>The distributions of both the median and the trimmed mean are symmetric and bell-shaped. However, the trimmed mean has a more normal distribution (as evidenced by the points of the qq plot falling on the line y=x).</p>
-<div class="sourceCode" id="cb450"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bs.stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">test.stat</span>, <span class="va">test.stat2</span><span class="op">)</span>
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">bs.stats</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">test.stat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_histogram</span><span class="op">(</span>bins<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"dist of median"</span><span class="op">)</span> <span class="op">+</span>  
-  <span class="fu">xlab</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"mean="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span>,
-             <span class="st">";SE="</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-bootstrap_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb451"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">bs.stats</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">test.stat2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_histogram</span><span class="op">(</span>bins<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"dist of trimmed mean"</span><span class="op">)</span> <span class="op">+</span>  
-  <span class="fu">xlab</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"mean="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span>,
-             <span class="st">";SE="</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-bootstrap_files/figure-html/unnamed-chunk-9-2.png" width="480" style="display: block; margin: auto;"></div>
-</div>
-<div id="or-using-the-built-in-functions" class="section level4 unnumbered">
-<h4>OR using the built in functions<a class="anchor" aria-label="anchor" href="#or-using-the-built-in-functions"><i class="fas fa-link"></i></a>
-</h4>
-<div class="sourceCode" id="cb452"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sampletmean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>,<span class="va">d</span>,<span class="va">trimperc</span><span class="op">)</span><span class="op">{</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>, trim<span class="op">=</span><span class="va">trimperc</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">bs.tmean.resamps</span> <span class="op">&lt;-</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span>,<span class="va">sampletmean</span>, <span class="va">reps1</span>, trimperc<span class="op">=</span><span class="fl">.25</span><span class="op">)</span></code></pre></div>
+<p><img src="06-bootstrap_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"><img src="06-bootstrap_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 <div id="what-does-the-boot-output-look-like" class="section level4 unnumbered">
 <h4>What does the boot output look like?<a class="anchor" aria-label="anchor" href="#what-does-the-boot-output-look-like"><i class="fas fa-link"></i></a>
 </h4>
-<div class="sourceCode" id="cb453"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#bs.tmean.resamps &lt;- boot(heroin$times,sampletmean, reps1, trimperc=.25)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">bs.tmean.resamps</span><span class="op">)</span></code></pre></div>
-<pre><code>## List of 11
-##  $ t0       : num 378
-##  $ t        : num [1:1000, 1] 364 377 372 392 349 ...
-##  $ R        : num 1000
-##  $ data     : num [1:238] 428 275 262 183 259 714 438 796 892 393 ...
-##  $ seed     : int [1:626] 10403 624 -1645349161 -2081516244 1489809469 823736794 -755145325 950390200 -1779428263 1453445190 ...
-##  $ statistic:function (x, d, trimperc)  
-##   ..- attr(*, "srcref")= 'srcref' int [1:8] 1 16 3 1 16 1 1 3
-##   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x7fa91addbff0&gt; 
-##  $ sim      : chr "ordinary"
-##  $ call     : language boot::boot(data = heroin$times, statistic = sampletmean, R = reps1,      trimperc = 0.25)
-##  $ stype    : chr "i"
-##  $ strata   : num [1:238] 1 1 1 1 1 1 1 1 1 1 ...
-##  $ weights  : num [1:238] 0.0042 0.0042 0.0042 0.0042 0.0042 ...
-##  - attr(*, "class")= chr "boot"
-##  - attr(*, "boot_type")= chr "boot"</code></pre>
-<div class="sourceCode" id="cb455"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">samplemed</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>,<span class="va">d</span><span class="op">)</span><span class="op">{</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">d</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">bs.med.resamps</span> <span class="op">&lt;-</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span>,<span class="va">samplemed</span>, <span class="va">reps1</span><span class="op">)</span></code></pre></div>
-</div>
-<div id="se-of-median" class="section level4 unnumbered">
-<h4>SE of median<a class="anchor" aria-label="anchor" href="#se-of-median"><i class="fas fa-link"></i></a>
-</h4>
-<p>Whew! They are very close (one using for loops, one using the boot function).</p>
-<div class="sourceCode" id="cb456"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span>  <span class="co"># SE of median</span></code></pre></div>
-<pre><code>## [1] 30.8</code></pre>
-<div class="sourceCode" id="cb458"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bs.med.resamps</span></code></pre></div>
-<pre><code>## 
-## ORDINARY NONPARAMETRIC BOOTSTRAP
-## 
-## 
-## Call:
-## boot::boot(data = heroin$times, statistic = samplemed, R = reps1)
-## 
-## 
-## Bootstrap Statistics :
-##     original  bias    std. error
-## t1*      368    7.64        32.2</code></pre>
-</div>
-<div id="se-of-trimmed-mean" class="section level4 unnumbered">
-<h4>SE of trimmed mean<a class="anchor" aria-label="anchor" href="#se-of-trimmed-mean"><i class="fas fa-link"></i></a>
-</h4>
-<p>Whew! They are very close (one using for loops, one using the boot function).</p>
-<div class="sourceCode" id="cb460"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">)</span>  <span class="co"># SE of trimmed mean</span></code></pre></div>
-<pre><code>## [1] 21.9</code></pre>
-<div class="sourceCode" id="cb462"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bs.tmean.resamps</span></code></pre></div>
-<pre><code>## 
-## ORDINARY NONPARAMETRIC BOOTSTRAP
-## 
-## 
-## Call:
-## boot::boot(data = heroin$times, statistic = sampletmean, R = reps1, 
-##     trimperc = 0.25)
-## 
-## 
-## Bootstrap Statistics :
-##     original  bias    std. error
-## t1*      378   0.635        22.3</code></pre>
-</div>
-<div id="normal-ci-with-bs-se" class="section level4 unnumbered">
-<h4>95% normal CI with BS SE<a class="anchor" aria-label="anchor" href="#normal-ci-with-bs-se"><i class="fas fa-link"></i></a>
-</h4>
-<div id="without-built-in-functions" class="section level5 unnumbered">
-<h5>Without built in functions<a class="anchor" aria-label="anchor" href="#without-built-in-functions"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb464"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 307 428</code></pre>
-<div class="sourceCode" id="cb466"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 335 421</code></pre>
-</div>
-<div id="with-built-in-functions" class="section level5 unnumbered">
-<h5>With built in functions<a class="anchor" aria-label="anchor" href="#with-built-in-functions"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb468"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">se.bs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">bs.med.resamps</span><span class="op">$</span><span class="va">t</span><span class="op">)</span>
-<span class="va">se.bs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">bs.tmean.resamps</span><span class="op">$</span><span class="va">t</span><span class="op">)</span>
+<div class="sourceCode" id="cb439"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map_df</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_rep1</span>, <span class="op">~</span><span class="fu">boot_stat_func</span><span class="op">(</span>df <span class="op">=</span> <span class="va">heroin</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">obs.stat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="va">se.bs</span> </code></pre></div>
-<pre><code>## [1] 304 431</code></pre>
-<div class="sourceCode" id="cb470"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="va">se.bs2</span> </code></pre></div>
-<pre><code>## [1] 335 422</code></pre>
+<span class="va">boot_stats</span></code></pre></div>
+<pre><code>## # A tibble: 100 × 4
+##    boot_med boot_tr_mean obs_med obs_tr_mean
+##       &lt;dbl&gt;        &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+##  1     362          373.    368.        378.
+##  2     342.         345.    368.        378.
+##  3     388.         393.    368.        378.
+##  4     452          428.    368.        378.
+##  5     400.         400.    368.        378.
+##  6     348          363.    368.        378.
+##  7     399          405.    368.        378.
+##  8     394          398.    368.        378.
+##  9     358          359.    368.        378.
+## 10     299          332.    368.        378.
+## # … with 90 more rows</code></pre>
 </div>
+<div id="normal-ci-with-boot-se" class="section level4 unnumbered">
+<h4>95% normal CI with Boot SE<a class="anchor" aria-label="anchor" href="#normal-ci-with-boot-se"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb441"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>low_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_med</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">0.025</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span>, 
+         up_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_med</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">0.975</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span>,
+         low_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_tr_mean</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">0.025</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span>, 
+         up_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">obs_tr_mean</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">0.975</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 4
+##   low_med up_med low_tr_mean up_tr_mean
+##     &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+## 1    301.   434.        332.       425.</code></pre>
 </div>
 <div id="percentile-ci" class="section level4 unnumbered">
 <h4>95% Percentile CI<a class="anchor" aria-label="anchor" href="#percentile-ci"><i class="fas fa-link"></i></a>
 </h4>
-<div id="without-built-in-functions-1" class="section level5 unnumbered">
-<h5>Without built in functions<a class="anchor" aria-label="anchor" href="#without-built-in-functions-1"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb472"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">test.stat</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>, <span class="fl">.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   322   450</code></pre>
-<div class="sourceCode" id="cb474"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">test.stat2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>, <span class="fl">.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   337   423</code></pre>
-</div>
-<div id="with-built-in-functions-1" class="section level5 unnumbered">
-<h5>With built in functions<a class="anchor" aria-label="anchor" href="#with-built-in-functions-1"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb476"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">bs.med.resamps</span><span class="op">$</span><span class="va">t</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>, <span class="fl">.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   320   452</code></pre>
-<div class="sourceCode" id="cb478"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">bs.tmean.resamps</span><span class="op">$</span><span class="va">t</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>, <span class="fl">.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   334   423</code></pre>
-</div>
-<div id="with-built-in-functions-more-directly" class="section level5 unnumbered">
-<h5>With built in functions more directly<a class="anchor" aria-label="anchor" href="#with-built-in-functions-more-directly"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb480"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.med.resamps</span>, type<span class="op">=</span><span class="st">"perc"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.resamps, type = "perc")
-## 
-## Intervals : 
-## Level     Percentile     
-## 95%   (320, 452 )  
-## Calculations and Intervals on Original Scale</code></pre>
-<div class="sourceCode" id="cb482"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.tmean.resamps</span>, type<span class="op">=</span><span class="st">"perc"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.resamps, type = "perc")
-## 
-## Intervals : 
-## Level     Percentile     
-## 95%   (334, 423 )  
-## Calculations and Intervals on Original Scale</code></pre>
-</div>
+<div class="sourceCode" id="cb443"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>perc_CI_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">boot_med</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span>, 
+            perc_CI_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">boot_tr_mean</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span>, 
+            q <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 3
+##   perc_CI_med perc_CI_tr_mean     q
+##         &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;
+## 1        319.            329. 0.025
+## 2        448.            423. 0.975</code></pre>
 </div>
 <div id="bootstrap-t-ci" class="section level4 unnumbered">
 <h4>95% Bootstrap-t CI<a class="anchor" aria-label="anchor" href="#bootstrap-t-ci"><i class="fas fa-link"></i></a>
 </h4>
-<div id="without-built-in-functions-2" class="section level5 unnumbered">
-<h5>Without built in functions<a class="anchor" aria-label="anchor" href="#without-built-in-functions-2"><i class="fas fa-link"></i></a>
-</h5>
-<p>Note that the t-value is needed (which requires a different SE for each bootstrap sample).</p>
-<div class="sourceCode" id="cb484"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">t.hat</span><span class="op">&lt;-</span><span class="op">(</span><span class="va">test.stat</span> <span class="op">-</span> <span class="va">obs.stat</span><span class="op">)</span><span class="op">/</span><span class="va">sd.test.stat</span>
-<span class="va">t.hat2</span><span class="op">&lt;-</span><span class="op">(</span><span class="va">test.stat2</span> <span class="op">-</span> <span class="va">obs.stat2</span><span class="op">)</span><span class="op">/</span><span class="va">sd.test.stat2</span>
-
-<span class="va">t.hat.95</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">t.hat</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span>
-<span class="va">t.hat2.95</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">t.hat2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">obs.stat</span> <span class="op">+</span> <span class="va">t.hat.95</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span></code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   322   446</code></pre>
-<div class="sourceCode" id="cb486"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obs.stat2</span> <span class="op">+</span> <span class="va">t.hat2.95</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">)</span> </code></pre></div>
-<pre><code>##  2.5% 97.5% 
-##   337   423</code></pre>
+<p>Note that the t-value is needed (which requires a different SE for each bootstrap sample). It is necessary to bootstrap twice.</p>
+<p><strong>re-resample function</strong></p>
+<div class="sourceCode" id="cb445"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_2_func</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span>, <span class="va">reps</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">resample2</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps</span>
+  <span class="va">df</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>, boot_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">resample2</span>, <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map_df</a></span><span class="op">(</span><span class="va">resample2</span>, <span class="op">~</span><span class="va">df</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+             <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+             <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_2_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">times</span><span class="op">)</span>, 
+                       boot_2_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+    <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">resample2</span>, <span class="fu"><a href="https://rdrr.io/pkg/tidyselect/man/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p>]</p>
+<p><strong>double bootstrap!</strong></p>
+<div class="sourceCode" id="cb446"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_2_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>resample1 <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n_rep1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>first_boot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_rep1</span>, <span class="op">~</span><span class="fu">boot_1_func</span><span class="op">(</span>df <span class="op">=</span> <span class="va">heroin</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>second_boot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map</a></span><span class="op">(</span><span class="va">first_boot</span>, <span class="va">boot_2_func</span>, reps <span class="op">=</span> <span class="va">n_rep2</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
 </div>
-<div id="with-built-in-functions-2" class="section level5 unnumbered">
-<h5>With built in functions<a class="anchor" aria-label="anchor" href="#with-built-in-functions-2"><i class="fas fa-link"></i></a>
-</h5>
-<p>Trimmed mean:</p>
-<div class="sourceCode" id="cb488"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sampletmean2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">d</span>, <span class="va">R2</span>, <span class="va">trimperc</span><span class="op">)</span> <span class="op">{</span>
-   <span class="va">boot.samp</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>  <span class="co"># boostrapped sample</span>
-   <span class="va">m.bs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot.samp</span>, trim<span class="op">=</span><span class="va">trimperc</span><span class="op">)</span>  <span class="co"># bootstrapped mean</span>
-   <span class="va">v.bs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">var</a></span><span class="op">(</span><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">boot.samp</span>, <span class="va">sampletmean</span>, <span class="va">R2</span>, trim<span class="op">=</span><span class="va">trimperc</span><span class="op">)</span><span class="op">$</span><span class="va">t</span><span class="op">)</span>
-   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">m.bs</span>, <span class="va">v.bs</span><span class="op">)</span><span class="op">)</span>  <span class="co"># boot expects the statistic to be the 1st and the var to be the 2nd</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">bs.tmean.reresamps</span> <span class="op">&lt;-</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span>, <span class="va">sampletmean2</span>, R<span class="op">=</span><span class="va">reps1</span>, R2<span class="op">=</span><span class="va">reps2</span>, trimperc<span class="op">=</span><span class="fl">.25</span><span class="op">)</span></code></pre></div>
-<p>Median:</p>
-<div class="sourceCode" id="cb489"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">samplemed2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">d</span>, <span class="va">R2</span><span class="op">)</span> <span class="op">{</span>
-   <span class="va">boot.samp</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>  <span class="co"># boostrapped sample</span>
-   <span class="va">m.bs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">boot.samp</span><span class="op">)</span>  <span class="co"># bootstrapped mean</span>
-   <span class="va">v.bs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">var</a></span><span class="op">(</span><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">boot.samp</span>, <span class="va">samplemed</span>, <span class="va">R2</span><span class="op">)</span><span class="op">$</span><span class="va">t</span><span class="op">)</span>
-   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">m.bs</span>, <span class="va">v.bs</span><span class="op">)</span><span class="op">)</span>  <span class="co"># boot expects the statistic to be the 1st and the var to be the 2nd</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="va">bs.med.reresamps</span> <span class="op">&lt;-</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.html">boot</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span>, <span class="va">samplemed2</span>, R<span class="op">=</span><span class="va">reps1</span>, R2<span class="op">=</span><span class="va">reps2</span><span class="op">)</span></code></pre></div>
-<p>The confidence intervals (BS-t intervals, called “studentized”):</p>
-<div class="sourceCode" id="cb490"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.med.reresamps</span>, type<span class="op">=</span><span class="st">"stud"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.reresamps, type = "stud")
-## 
-## Intervals : 
-## Level    Studentized     
-## 95%   (292, 421 )  
-## Calculations and Intervals on Original Scale</code></pre>
-<div class="sourceCode" id="cb492"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.tmean.reresamps</span>, type<span class="op">=</span><span class="st">"stud"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.reresamps, type = "stud")
-## 
-## Intervals : 
-## Level    Studentized     
-## 95%   (335, 423 )  
-## Calculations and Intervals on Original Scale</code></pre>
-<h4 style="color:red">
-95% BCa interval (not responsible for BCa) {-}
+<div id="summarizing-the-double-bootstrap" class="section level4" number="6.4.0.1">
 <h4>
+<span class="header-section-number">6.4.0.1</span> Summarizing the double bootstrap<a class="anchor" aria-label="anchor" href="#summarizing-the-double-bootstrap"><i class="fas fa-link"></i></a>
 </h4>
-<a class="anchor" aria-label="anchor" href="#with-built-in-functions-2"><i class="fas fa-link"></i></a>
+<p><strong>results</strong></p>
+<div class="sourceCode" id="cb447"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_2_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">second_boot</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">first_boot</span><span class="op">)</span> </code></pre></div>
+<pre><code>## # A tibble: 476,000 × 12
+##    resample1    id clinic status times prison  dose resample2 boot_med
+##        &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;
+##  1         1   137      2      0   563      0    70         1      372
+##  2         1    91      1      0   840      0    80         1      372
+##  3         1   250      1      1   117      0    40         1      372
+##  4         1   168      2      0   788      0    70         1      372
+##  5         1    67      1      1   386      0    60         1      372
+##  6         1     3      1      1   262      0    55         1      372
+##  7         1   104      2      0   713      0    50         1      372
+##  8         1   251      1      1   175      1    60         1      372
+##  9         1    68      1      0   439      0    80         1      372
+## 10         1   118      2      0   532      0    70         1      372
+## # … with 475,990 more rows, and 3 more variables: boot_tr_mean &lt;dbl&gt;,
+## #   boot_2_med &lt;dbl&gt;, boot_2_tr_mean &lt;dbl&gt;</code></pre>
+<p><strong>summary for resample 1</strong></p>
+<div class="sourceCode" id="cb449"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_2_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">second_boot</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">first_boot</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">resample1</span>, <span class="va">resample2</span>, <span class="fu"><a href="https://rdrr.io/pkg/tidyselect/man/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span><span class="op">(</span><span class="va">resample1</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">boot_med</span>, <span class="va">boot_tr_mean</span>, <span class="va">boot_2_med</span>, <span class="va">boot_2_tr_mean</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">skim_without_charts</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/tibble/man/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">skim_variable</span>, <span class="va">numeric.mean</span>, <span class="va">numeric.sd</span>, <span class="va">numeric.p50</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 4
+##   skim_variable  numeric.mean numeric.sd numeric.p50
+##   &lt;chr&gt;                 &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+## 1 boot_med               372         0          372 
+## 2 boot_tr_mean           378.        0          378.
+## 3 boot_2_med             370.       46.6        365.
+## 4 boot_2_tr_mean         372.       24.7        370.</code></pre>
+<p><strong>summary for all resamples</strong></p>
+<div class="sourceCode" id="cb451"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_t_stats</span> <span class="op">&lt;-</span> <span class="va">boot_2_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">second_boot</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/tidyr/man/nest.html">unnest</a></span><span class="op">(</span><span class="va">first_boot</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/group_by.html">group_by</a></span><span class="op">(</span><span class="va">resample1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_se_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_2_med</span><span class="op">)</span>,
+            boot_se_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_2_tr_mean</span><span class="op">)</span>,
+            boot_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span>,  <span class="co"># doesn't do anything, just copies over</span>
+            boot_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span><span class="op">)</span>  <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="co"># the variables into the output</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>boot_t_med <span class="op">=</span> <span class="op">(</span><span class="va">boot_med</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">boot_se_med</span>,
+            boot_t_tr_mean <span class="op">=</span> <span class="op">(</span><span class="va">boot_tr_mean</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">boot_se_tr_mean</span><span class="op">)</span>
+
+  
+<span class="va">boot_t_stats</span></code></pre></div>
+<pre><code>## # A tibble: 100 × 7
+##    resample1 boot_se_med boot_se_tr_mean boot_med boot_tr_mean boot_t_med
+##        &lt;int&gt;       &lt;dbl&gt;           &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+##  1         1        46.6            24.7     372          378.     0.0222
+##  2         2        24.8            25.3     344          370.    -1.09  
+##  3         3        36.9            24.2     372.         380.     0.0145
+##  4         4        20.8            19.7     354          359.    -0.817 
+##  5         5        30.1            22.0     308          331.    -2.09  
+##  6         6        25.5            24.5     318          336.    -2.08  
+##  7         7        24.9            20.3     367          378.    -0.159 
+##  8         8        46.3            25.0     402          393.     0.670 
+##  9         9        32.3            20.8     388.         380.     0.512 
+## 10        10        18.1            15.1     381          384.     0.555 
+## # … with 90 more rows, and 1 more variable: boot_t_tr_mean &lt;dbl&gt;</code></pre>
+<div class="inline-figure"><img src="06-bootstrap_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-bootstrap_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="bootstrap-t-ci-1" class="section level4 unnumbered">
+<h4>95% Bootstrap-t CI<a class="anchor" aria-label="anchor" href="#bootstrap-t-ci-1"><i class="fas fa-link"></i></a>
 </h4>
+<p>Note that the t-value is needed (which requires a different SE for each bootstrap sample).</p>
+<p><strong>t-values</strong></p>
+<div class="sourceCode" id="cb453"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_t_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">boot_t_med</span>, <span class="va">boot_t_tr_mean</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 100 × 2
+##    boot_t_med boot_t_tr_mean
+##         &lt;dbl&gt;          &lt;dbl&gt;
+##  1     0.0222          0.140
+##  2    -1.09           -0.160
+##  3     0.0145          0.257
+##  4    -0.817          -0.767
+##  5    -2.09           -1.98 
+##  6    -2.08           -1.56 
+##  7    -0.159           0.202
+##  8     0.670           0.764
+##  9     0.512           0.280
+## 10     0.555           0.625
+## # … with 90 more rows</code></pre>
+<p>]</p>
+<p><strong>multipliers</strong></p>
+<div class="sourceCode" id="cb455"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_q</span> <span class="op">&lt;-</span> <span class="va">boot_t_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">boot_t_med</span>, <span class="va">boot_t_tr_mean</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>q_t_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">boot_t_med</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span>, 
+            q_t_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">quantile</a></span><span class="op">(</span><span class="va">boot_t_tr_mean</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span>,
+            q <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">boot_q</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 3
+##   q_t_med q_t_tr_mean     q
+##     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;
+## 1   -2.08       -2.01 0.025
+## 2    2.25        2.03 0.975</code></pre>
+<p><strong>pull numbers</strong></p>
+<div class="sourceCode" id="cb457"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_q_med</span> <span class="op">&lt;-</span> <span class="va">boot_q</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">q_t_med</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">boot_q_med</span></code></pre></div>
+<pre><code>##  2.5% 97.5% 
+## -2.08  2.25</code></pre>
+<div class="sourceCode" id="cb459"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_q_tr_mean</span> <span class="op">&lt;-</span> <span class="va">boot_q</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">q_t_tr_mean</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">boot_q_tr_mean</span></code></pre></div>
+<pre><code>##  2.5% 97.5% 
+## -2.01  2.03</code></pre>
+<p><strong>BS-t CI</strong></p>
+<div class="sourceCode" id="cb461"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">boot_t_stats</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/summarise.html">summarize</a></span><span class="op">(</span>boot_t_CI_med <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span> <span class="op">+</span> 
+                                  <span class="va">boot_q_med</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_med</span><span class="op">)</span>,
+            boot_t_CI_tr_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span> <span class="op">+</span> 
+                                  <span class="va">boot_q_tr_mean</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sd</a></span><span class="op">(</span><span class="va">boot_tr_mean</span><span class="op">)</span>,
+            q <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 3
+##   boot_t_CI_med boot_t_CI_tr_mean     q
+##           &lt;dbl&gt;             &lt;dbl&gt; &lt;dbl&gt;
+## 1          306.              330. 0.025
+## 2          441.              418. 0.975</code></pre>
 </div>
-<div id="with-built-in-functions-3" class="section level5 unnumbered">
-<h5>With built in functions<a class="anchor" aria-label="anchor" href="#with-built-in-functions-3"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb494"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.med.reresamps</span>, type<span class="op">=</span><span class="st">"bca"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.med.reresamps, type = "bca")
-## 
-## Intervals : 
-## Level       BCa          
-## 95%   (316, 450 )  
-## Calculations and Intervals on Original Scale</code></pre>
-<div class="sourceCode" id="cb496"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/boot.ci.html">boot.ci</a></span><span class="op">(</span><span class="va">bs.tmean.reresamps</span>, type<span class="op">=</span><span class="st">"bca"</span><span class="op">)</span></code></pre></div>
-<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot::boot.ci(boot.out = bs.tmean.reresamps, type = "bca")
-## 
-## Intervals : 
-## Level       BCa          
-## 95%   (333, 423 )  
-## Calculations and Intervals on Original Scale</code></pre>
-</div>
-<div id="without-built-in-functions-3" class="section level5 unnumbered">
-<h5>Without built in functions<a class="anchor" aria-label="anchor" href="#without-built-in-functions-3"><i class="fas fa-link"></i></a>
-</h5>
-<div class="sourceCode" id="cb498"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">test.stat.jk</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">test.stat2.jk</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-
-    <span class="va">test.stat.jk</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat.jk</span>,<span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">median</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span><span class="op">[</span><span class="op">-</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
-     <span class="va">test.stat2.jk</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">test.stat2.jk</span>,<span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">$</span><span class="va">times</span><span class="op">[</span><span class="op">-</span><span class="va">i</span><span class="op">]</span>,trim<span class="op">=</span><span class="fl">.25</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="va">zo.hat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">&lt;</span><span class="va">obs.stat</span><span class="op">)</span><span class="op">/</span><span class="va">reps1</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>
-<span class="va">a.hat</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat.jk</span><span class="op">)</span> <span class="op">-</span> <span class="va">test.stat.jk</span><span class="op">)</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">/</span>
-                 <span class="op">(</span><span class="fl">6</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat.jk</span><span class="op">)</span><span class="op">-</span><span class="va">test.stat.jk</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">1.5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">zo.hat2</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">&lt;</span> <span class="va">obs.stat2</span><span class="op">)</span><span class="op">/</span><span class="va">reps1</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>
-<span class="va">a.hat2</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat2.jk</span><span class="op">)</span> <span class="op">-</span> <span class="va">test.stat2.jk</span><span class="op">)</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">/</span>
-                 <span class="op">(</span><span class="fl">6</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mosaic/man/aggregating.html">mean</a></span><span class="op">(</span><span class="va">test.stat2.jk</span><span class="op">)</span><span class="op">-</span><span class="va">test.stat2.jk</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">1.5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">alpha1.bca</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">a.hat</span><span class="op">*</span><span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">alpha2.bca</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.025</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">a.hat</span><span class="op">*</span><span class="op">(</span><span class="va">zo.hat</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.025</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-
-<span class="va">alpha1.bca2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">a.hat2</span><span class="op">*</span><span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="va">alpha2.bca2</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.025</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">a.hat2</span><span class="op">*</span><span class="op">(</span><span class="va">zo.hat2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fl">.025</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-
-<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="va">reps1</span><span class="op">*</span><span class="va">alpha2.bca</span><span class="op">)</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">test.stat</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="va">reps1</span><span class="op">*</span><span class="va">alpha1.bca</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 317 444</code></pre>
-<div class="sourceCode" id="cb500"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="va">reps1</span><span class="op">*</span><span class="va">alpha2.bca2</span><span class="op">)</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">test.stat2</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="va">reps1</span><span class="op">*</span><span class="va">alpha1.bca2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 337 424</code></pre>
-</div>
-</div>
-<div id="comparison-of-intervals" class="section level4 unnumbered">
-<h4>Comparison of intervals<a class="anchor" aria-label="anchor" href="#comparison-of-intervals"><i class="fas fa-link"></i></a>
+<div id="comparison-of-intervals" class="section level4" number="6.4.0.2">
+<h4>
+<span class="header-section-number">6.4.0.2</span> Comparison of intervals<a class="anchor" aria-label="anchor" href="#comparison-of-intervals"><i class="fas fa-link"></i></a>
 </h4>
 <p>The first three columns correspond to the CIs for the true median of the survival times. The second three columns correspond to the CIs for the true trimmed mean of the survival times.</p>
 <div class="inline-table"><table class="table table-sm">
 <thead><tr class="header">
-<th></th>
-<th align="center"></th>
-<th align="center">median</th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center">trimmed mean</th>
-<th align="center"></th>
+<th>CI</th>
+<th>lower</th>
+<th>obs Med</th>
+<th>upper</th>
+<th>lower</th>
+<th>obs Tr Mean</th>
+<th>upper</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>CI</td>
-<td align="center">lower</td>
-<td align="center">observed</td>
-<td align="center">upper</td>
-<td align="center">lower</td>
-<td align="center">observed</td>
-<td align="center">upper</td>
-</tr>
-<tr class="even">
-<td>—</td>
-<td align="center">—–</td>
-<td align="center">—–</td>
-<td align="center">—–</td>
-<td align="center">—–</td>
-<td align="center">——</td>
-<td align="center">——–</td>
-</tr>
-<tr class="odd">
 <td>Percentile</td>
-<td align="center">321.00</td>
-<td align="center">367.50</td>
-<td align="center">452.00</td>
-<td align="center">339.38</td>
-<td align="center">378.30</td>
-<td align="center">423.46</td>
+<td>321</td>
+<td>367.50</td>
+<td>434.58</td>
+<td>334.86</td>
+<td>378.30</td>
+<td>429.77</td>
 </tr>
 <tr class="even">
-<td>CI w BS SE</td>
-<td align="center">306.33</td>
-<td align="center">367.50</td>
-<td align="center">428.67</td>
-<td align="center">335.21</td>
-<td align="center">378.30</td>
-<td align="center">421.39</td>
+<td>w BS SE</td>
+<td>309.98</td>
+<td>367.50</td>
+<td>425.01</td>
+<td>336.90</td>
+<td>378.30</td>
+<td>419.77</td>
 </tr>
 <tr class="odd">
 <td>BS-t</td>
-<td align="center">294.98</td>
-<td align="center">367.50</td>
-<td align="center">418.00</td>
-<td align="center">334.28</td>
-<td align="center">378.30</td>
-<td align="center">418.09</td>
-</tr>
-<tr class="even">
-<td>BCa</td>
-<td align="center">317.00</td>
-<td align="center">367.50</td>
-<td align="center">444.00</td>
-<td align="center">338.29</td>
-<td align="center">378.30</td>
-<td align="center">422.43</td>
+<td>309.30</td>
+<td>367.50</td>
+<td>425.31</td>
+<td>331.02</td>
+<td>378.30</td>
+<td>421.17</td>
 </tr>
 </tbody>
 </table></div>
@@ -1209,29 +1059,27 @@ We can think of the skew as the rate of chance of the standard error on a normal
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#boot"><span class="header-section-number">6</span> Bootstrapping</a></li>
-<li><a class="nav-link" href="#Oct8"><span class="header-section-number">6.1</span> 10/8/19 Agenda</a></li>
-<li><a class="nav-link" href="#introduction"><span class="header-section-number">6.2</span> Introduction</a></li>
+<li><a class="nav-link" href="#introduction"><span class="header-section-number">6.1</span> Introduction</a></li>
 <li>
-<a class="nav-link" href="#BSnotation"><span class="header-section-number">6.3</span> Basics &amp; Notation</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#the-plug-in-principle"><span class="header-section-number">6.3.1</span> The Plug-in Principle</a></li>
-<li><a class="nav-link" href="#the-bootstrap-idea"><span class="header-section-number">6.3.2</span> The Bootstrap Idea</a></li>
-<li><a class="nav-link" href="#bootstrap-procedure"><span class="header-section-number">6.3.3</span> Bootstrap Procedure</a></li>
-<li><a class="nav-link" href="#bootstrap-notation"><span class="header-section-number">6.3.4</span> Bootstrap Notation</a></li>
+<a class="nav-link" href="#BSnotation"><span class="header-section-number">6.2</span> Basics &amp; Notation</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-plug-in-principle"><span class="header-section-number">6.2.1</span> The Plug-in Principle</a></li>
+<li><a class="nav-link" href="#the-bootstrap-idea"><span class="header-section-number">6.2.2</span> The Bootstrap Idea</a></li>
+<li><a class="nav-link" href="#bootstrap-procedure"><span class="header-section-number">6.2.3</span> Bootstrap Procedure</a></li>
+<li><a class="nav-link" href="#bootstrap-notation"><span class="header-section-number">6.2.4</span> Bootstrap Notation</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#Oct10"><span class="header-section-number">6.4</span> 10/10/19 Agenda</a></li>
 <li>
-<a class="nav-link" href="#BSCI"><span class="header-section-number">6.5</span> Bootstrap Confidence Intervals</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#normal-standard-ci-with-bs-se-typenorm"><span class="header-section-number">6.5.1</span> Normal (standard) CI with BS SE: type="norm"</a></li>
-<li><a class="nav-link" href="#bootstrap-t-confidence-intervals-typestud"><span class="header-section-number">6.5.2</span> Bootstrap-t Confidence Intervals: type="stud"</a></li>
-<li><a class="nav-link" href="#percentile-confidence-intervals-typeperc"><span class="header-section-number">6.5.3</span> Percentile Confidence Intervals: type="perc"</a></li>
-<li><a class="nav-link" href="#what-makes-a-ci-good"><span class="header-section-number">6.5.4</span> What makes a CI good?</a></li>
+<a class="nav-link" href="#BSCI"><span class="header-section-number">6.3</span> Bootstrap Confidence Intervals</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#normal-standard-ci-with-bootse-typenorm"><span class="header-section-number">6.3.1</span> Normal (standard) CI with BootSE: type="norm"</a></li>
+<li><a class="nav-link" href="#bootstrap-t-confidence-intervals-typestud"><span class="header-section-number">6.3.2</span> Bootstrap-t Confidence Intervals: type="stud"</a></li>
+<li><a class="nav-link" href="#percentile-confidence-intervals-typeperc"><span class="header-section-number">6.3.3</span> Percentile Confidence Intervals: type="perc"</a></li>
+<li><a class="nav-link" href="#what-makes-a-ci-procedure-good"><span class="header-section-number">6.3.4</span> What makes a CI procedure good?</a></li>
 <li><a class="nav-link" href="#bootstrap-ci-and-hypothesis-testing">
 BCa CI: type="bca"
 </a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#r-example-heroin"><span class="header-section-number">6.6</span> R example: Heroin</a></li>
+<li><a class="nav-link" href="#r-example-heroin"><span class="header-section-number">6.4</span> R example: Heroin</a></li>
 </ul>
 
       <div class="book-extra">
@@ -1249,7 +1097,7 @@ BCa CI: type="bca"
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-09-27.</p>
+    <p>"<strong>Computational Statistics</strong>" was written by Jo Hardin. It was last built on 2021-12-01.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

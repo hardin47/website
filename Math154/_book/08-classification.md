@@ -2,7 +2,7 @@
 
 
 
-<!--
+<!---
 Daniela Witten talking about inference in prediction: https://www.youtube.com/watch?v=Y4UJjzuYjfM 
 R Unconference 2013
 
@@ -13,9 +13,10 @@ One of the most satisfying aspects of this unit is that you can now turn student
 
 \textcolor{red}{See zissermanML.pdf for much more on regression trees, SVM, etc.}
 \url{http://www.dabi.temple.edu/~hbling/8590.002/Montillo_RandomForests_4-2-2009.pdf}
--->
+--->
 
 
+<!---
 ## 10/29/19 Agenda {#Oct29}
 1. classification
 2. $k$-Nearest Neighbors
@@ -26,16 +27,17 @@ One of the most satisfying aspects of this unit is that you can now turn student
 **Important Note**:  For the majority of the classification and clustering methods, we will use the `caret` package in R.  For more information see: http://topepo.github.io/caret/index.html
 
 Also, check out the `caret` cheat sheet:  https://github.com/rstudio/cheatsheets/raw/master/caret.pdf
+--->
 
 @Baumer15 provides a concise explanation of how both statistics and data science work to enhance ideas of machine learning, one aspect of which is classification:
 
 
-> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x, and the conceit is
+> In order to understand machine learning, one must recognize the differences between the mindset of the data miner and the statistician, notably characterized by @brei01, who distinguished two types of models f for y, the response variable, and x, a vector of explanatory variables. One might consider a *data model* f such that y $\sim$ f(x), assess whether f could reasonably have been the process that generated y from x, and then make inferences about f. The goal here is to learn about the real process that generated y from x.
 
 > Alternatively, one might construct an *algorithmic model* f, such that $y \sim f(x)$, and use f to predict unobserved values of y. If it can be determined that f does in fact do a good job of predicting values of y, one might not care to learn much about f. In the former case, since we want to learn about f, a simpler model may be preferred. Conversely, in the latter case, since we want to predict new values of y, we may be indifferent to model complexity (other than concerns about overfitting and scalability).
 
 
-Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  For most of the methods below, we will consider classifying into categories (in fact, usually only two categories), but sometimes (e.g., support vector machines and linear regression) the goal is to predict a numeric variable.
+Classification is a supervised learning technique to extract general patterns from the data in order to build a predictor for a new test or validation data set.  That is, the model should *classify* new points into groups (or with a numerical response values) based on a model built from a set of data which provides known group membership for each value.  We will consider classifying into categories (often only one of two categories) as well as predicting a numeric variable  (e.g., support vector machines and linear regression).
 
 Some examples of classification techniques include: linear regression, logistic regression, neural networks, **classification trees**, **Random Forests**, **k-nearest neighbors**, **support vector machines**, n&auml;ive Bayes, and linear discriminant analysis.  We will cover the methods in **bold**.
 
@@ -46,14 +48,25 @@ Some examples of classification techniques include: linear regression, logistic 
 3. Simple models provide better insight into causality and specific associations.
 4. Fewer predictors implies fewer variables to collect in later studies.
 
-That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the classification method known as $k$-Nearest Neighbors.
+That said, the model should still represent the complexity of the data!  We describe the trade-off above as the "bias-variance" trade-off. In order to fully understand that trade-off, let's first cover the structure of model building and also the classification method known as $k$-Nearest Neighbors.
 
 
-## Cross Validation {#cv}
+## Model Building Process
 
-### Bias-variance trade-off
+All classification and prediction models have the same basic steps.  The data is preprocessed, the model is trained, and then the model is validated.
 
-####  Excellent resource {-} 
+<img src="figs/process.png" width="60%" style="display: block; margin: auto;" />
+
+
+If the variables and information used to train the model has not been fully tuned, processed, and considered for the model, it won't matter how sophisticated or special the model is.  Garbage in, garbage out.
+
+<img src="figs/garbage.png" width="60%" style="display: block; margin: auto;" />
+
+### Cross Validation {#cv}
+
+#### Bias-variance trade-off {-}
+
+**Excellent resource**
 
 for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
 
@@ -77,18 +90,18 @@ Note the bias-variance trade-off.  We want our prediction error to be small, so 
 
 <div class="figure" style="text-align: center">
 <img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-2)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+<p class="caption">(\#fig:unnamed-chunk-4)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
 </div>
 
 
 The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
 
-### Implementing Cross Validation 
+#### Implementing Cross Validation {-}
 
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-3)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-5)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -107,11 +120,11 @@ Suppose that we build a classifier on a given data set.  We'd like to know how w
 3. predict class membership for the observation which was removed
 4. repeat by removing each observation one at a time
 
-* $k$-fold cross validation ($k$-fold CV)
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.]
-    * LOOCV is a special case of $k$-fold CV with $k=n$
-    * advantage of $k$-fold is computational
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+* $V$-fold cross validation ($V$-fold CV)
+    * like LOOCV except that the algorithm is run $V$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $V$-fold CV with $V=n$
+    * advantage of $V$-fold is computational
+    * $V$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $V$-fold, prediction is on $n$ values from $V$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
 
 
 #### CV for **Model assessment** 10-fold {-}
@@ -155,14 +168,480 @@ To do both, one approach is to use test/training data *and* CV in order to both 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-4)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-6)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
+
+
+### **tidymodels** 
+
+The **tidymodels** framework provides a series of steps that allow for systematic model building.  The steps are:
+
+
+1. partition the data
+2. build a recipe
+3. select a model
+4. create a workflow
+5. fit the model  
+6. validate the model
+
+
+#### 1. Partition the data {-}
+
+Put the testing data in your pocket (keep it secret from R!!)
+
+<div class="figure" style="text-align: center">
+<img src="figs/testtrain.png" alt="Image credit: Julia Silge" width="1066" />
+<p class="caption">(\#fig:unnamed-chunk-7)Image credit: Julia Silge</p>
+</div>
+
+#### 2. build a recipe {-}
+
+1. Start the `recipe()`
+2. Define the **variables** involved
+3. Describe preprocessing **step-by-step**
+
+**feature engineering** or preprocessing:
+
+> feature engineering is the process of transforming raw data into features (variables) that are better predictors (for the model at hand).
+
+Examples include:
+
+* create new variables (e.g., combine levels -> from state to region)
+* transform variable (e.g., log, polar coordinates)
+* continuous variables -> discrete (e.g., binning)
+* numerical categorical data -> factors / character strings (one hot encoding)
+* time -> discretized time
+* missing values -> imputed
+* NA -> level
+* continuous variables -> center & scale ("normalize")
+
+
+**`step_` functions**
+
+For more information: https://recipes.tidymodels.org/reference/index.html
+
+
+```r
+ls(pattern = '^step_', env = as.environment('package:recipes'))
+```
+
+```
+##  [1] "step_arrange"       "step_bagimpute"     "step_bin2factor"   
+##  [4] "step_BoxCox"        "step_bs"            "step_center"       
+##  [7] "step_classdist"     "step_corr"          "step_count"        
+## [10] "step_cut"           "step_date"          "step_depth"        
+## [13] "step_discretize"    "step_downsample"    "step_dummy"        
+## [16] "step_factor2string" "step_filter"        "step_geodist"      
+## [19] "step_holiday"       "step_hyperbolic"    "step_ica"          
+## [22] "step_impute_bag"    "step_impute_knn"    "step_impute_linear"
+## [25] "step_impute_lower"  "step_impute_mean"   "step_impute_median"
+## [28] "step_impute_mode"   "step_impute_roll"   "step_indicate_na"  
+## [31] "step_integer"       "step_interact"      "step_intercept"    
+## [34] "step_inverse"       "step_invlogit"      "step_isomap"       
+## [37] "step_knnimpute"     "step_kpca"          "step_kpca_poly"    
+## [40] "step_kpca_rbf"      "step_lag"           "step_lincomb"      
+## [43] "step_log"           "step_logit"         "step_lowerimpute"  
+## [46] "step_meanimpute"    "step_medianimpute"  "step_modeimpute"   
+## [49] "step_mutate"        "step_mutate_at"     "step_naomit"       
+## [52] "step_nnmf"          "step_normalize"     "step_novel"        
+## [55] "step_ns"            "step_num2factor"    "step_nzv"          
+## [58] "step_ordinalscore"  "step_other"         "step_pca"          
+## [61] "step_pls"           "step_poly"          "step_profile"      
+## [64] "step_range"         "step_ratio"         "step_regex"        
+## [67] "step_relevel"       "step_relu"          "step_rename"       
+## [70] "step_rename_at"     "step_rm"            "step_rollimpute"   
+## [73] "step_sample"        "step_scale"         "step_select"       
+## [76] "step_shuffle"       "step_slice"         "step_spatialsign"  
+## [79] "step_sqrt"          "step_string2factor" "step_unknown"      
+## [82] "step_unorder"       "step_upsample"      "step_window"       
+## [85] "step_YeoJohnson"    "step_zv"
+```
+
+#### 3. select a model {-}
+
+To specify a model:
+
+1. pick a **model**
+2. set the **mode** (regression vs classification, if needed)
+3. set the **engine**
+
+Examples of engines for some of the classification algorithms we will cover in class:
+
+
+
+```r
+show_engines("nearest_neighbor")
+```
+
+```
+## # A tibble: 2 × 2
+##   engine mode          
+##   <chr>  <chr>         
+## 1 kknn   classification
+## 2 kknn   regression
+```
+
+```r
+show_engines("decision_tree")
+```
+
+```
+## # A tibble: 5 × 2
+##   engine mode          
+##   <chr>  <chr>         
+## 1 rpart  classification
+## 2 rpart  regression    
+## 3 C5.0   classification
+## 4 spark  classification
+## 5 spark  regression
+```
+
+```r
+show_engines("rand_forest")
+```
+
+```
+## # A tibble: 6 × 2
+##   engine       mode          
+##   <chr>        <chr>         
+## 1 ranger       classification
+## 2 ranger       regression    
+## 3 randomForest classification
+## 4 randomForest regression    
+## 5 spark        classification
+## 6 spark        regression
+```
+
+```r
+show_engines("svm_poly")
+```
+
+```
+## # A tibble: 2 × 2
+##   engine  mode          
+##   <chr>   <chr>         
+## 1 kernlab classification
+## 2 kernlab regression
+```
+
+```r
+show_engines("svm_rbf")
+```
+
+```
+## # A tibble: 4 × 2
+##   engine    mode          
+##   <chr>     <chr>         
+## 1 kernlab   classification
+## 2 kernlab   regression    
+## 3 liquidSVM classification
+## 4 liquidSVM regression
+```
+
+```r
+show_engines("linear_reg")
+```
+
+```
+## # A tibble: 5 × 2
+##   engine mode      
+##   <chr>  <chr>     
+## 1 lm     regression
+## 2 glmnet regression
+## 3 stan   regression
+## 4 spark  regression
+## 5 keras  regression
+```
+
+#### 4. Create a workflow {-}
+
+A workflow combines the model / engine with the recipe.
+
+
+#### 5. Fit the model {-}
+
+Putting it all together, the `fit()` will give the model specifications.
+
+#### 6. Validate the model {-}
+
+**model parameters**
+
+* Some model parameters are tuned from the data (some aren't).
+  - linear model coefficients are optimized (not tuned)
+  - k-nn value of "k" is tuned
+
+* If the model is tuned using the data, the same data **cannot** be used to assess the model.
+
+* With Cross Validation, you iteratively put data in your pocket.
+
+* For example, keep 1/5 of the data in your pocket, build the model on the remaining 4/5 of the data.
+
+**Cross validation** for tuning parameters.  Note that all of the cross validation is done on the **training** data.
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-10)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-18)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-19)Image credit: Alison Hill</p>
+</div>
+
+#### Reflecting on Model Building {-}
+
+In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>, Kuhn and Silge walk through an example of an entire model building process.  Note that each of the stages is visited often before coming up with an appropriate model. 
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild1.png" alt="Image credit: https://www.tmwr.org/" width="816" />
+<p class="caption">(\#fig:unnamed-chunk-20)Image credit: https://www.tmwr.org/</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild2.png" alt="Image credit: https://www.tmwr.org/" width="775" />
+<p class="caption">(\#fig:unnamed-chunk-21)Image credit: https://www.tmwr.org/</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/modelbuild3.png" alt="Image credit: https://www.tmwr.org/" width="796" />
+<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
+</div>
+
+
+
+### R model: penguins
+
+<div class="figure" style="text-align: right">
+<img src="figs/penguins.png" alt="Image credit: Alison Hill" width="30%" />
+<p class="caption">(\#fig:unnamed-chunk-23)Image credit: Alison Hill</p>
+</div>
+
+
+```r
+penguins
+```
+
+```
+## # A tibble: 344 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    <fct>   <fct>              <dbl>         <dbl>             <int>       <int>
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 334 more rows, and 2 more variables: sex <fct>, year <int>
+```
+
+#### 1. Partition the data {-}
+
+
+```r
+library(tidymodels)
+library(palmerpenguins)
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+```
+
+#### 2. build a recipe {-}
+
+
+```r
+penguin_recipe <-
+  recipe(body_mass_g ~ species + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm + sex + year,
+         data = penguin_train) %>%
+  step_mutate(year = as.factor(year)) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_relevel(sex, ref_level = "female") %>%
+  update_role(island, new_role = "id variable")
+```
+
+
+
+```r
+summary(penguin_recipe)
+```
+
+```
+## # A tibble: 8 × 4
+##   variable          type    role        source  
+##   <chr>             <chr>   <chr>       <chr>   
+## 1 species           nominal predictor   original
+## 2 island            nominal id variable original
+## 3 bill_length_mm    numeric predictor   original
+## 4 bill_depth_mm     numeric predictor   original
+## 5 flipper_length_mm numeric predictor   original
+## 6 sex               nominal predictor   original
+## 7 year              numeric predictor   original
+## 8 body_mass_g       numeric outcome     original
+```
+
+#### 3. select a model {-}
+
+
+```r
+penguin_lm <- linear_reg() %>%
+  set_engine("lm")
+```
+
+
+```r
+penguin_lm
+```
+
+```
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+
+#### 4. Create a workflow {-}
+
+
+```r
+penguin_wflow <- workflow() %>%
+  add_model(penguin_lm) %>%
+  add_recipe(penguin_recipe)
+```
+
+
+```r
+penguin_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: linear_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 3 Recipe Steps
+## 
+## • step_mutate()
+## • step_unknown()
+## • step_relevel()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+
+#### 5. Fit the model {-}
+
+
+```r
+penguin_fit <- penguin_wflow %>%
+  fit(data = penguin_train)
+```
+
+
+
+```r
+penguin_fit %>% tidy()
+```
+
+```
+## # A tibble: 10 × 5
+##    term              estimate std.error statistic  p.value
+##    <chr>                <dbl>     <dbl>     <dbl>    <dbl>
+##  1 (Intercept)        -2417.     665.      -3.64  3.36e- 4
+##  2 speciesChinstrap    -208.      92.9     -2.24  2.58e- 2
+##  3 speciesGentoo        985.     152.       6.48  5.02e-10
+##  4 bill_length_mm        13.5      8.29     1.63  1.04e- 1
+##  5 bill_depth_mm         80.9     22.1      3.66  3.10e- 4
+##  6 flipper_length_mm     20.8      3.62     5.74  2.81e- 8
+##  7 sexmale              351.      52.6      6.67  1.72e-10
+##  8 sexunknown            47.6    103.       0.460 6.46e- 1
+##  9 year2008             -24.8     47.5     -0.521 6.03e- 1
+## 10 year2009             -61.9     46.0     -1.35  1.80e- 1
+```
+
+#### 6. Cross validation {-}
+
+(See Section \@ref(cv) and future R examples for a full description of cross validation.)
+
 
 
 ## $k$-Nearest Neighbors {#knn}
 
 
-The $k$-Nearest Neighbor algorithm does exactly what it sounds like it does.  The user decides on the integer value for $k$, and a point is classified to be in the group for which the majority of the $k$ closest points in the training data.
+The $k$-Nearest Neighbor algorithm does exactly what it sounds like it does.  
+
+* user decides on the integer value for $k$
+
+* user decides on a distance metric (most $k$-NN algorithms default to Euclidean distance)
+
+* a point is classified to be in the same group as the majority of the $k$ **closest** points in the training data.
+
 
 ### $k$-NN algorithm
 
@@ -184,259 +663,350 @@ Note: if the response variable is continuous (instead of categorical), find the 
 * Euclidean distance is dominated by scale
 * it can be computationally unwieldy (and unneeded!!) to calculate all distances (there are algorithms to search smartly)
 * the output doesn't provide any information about which explanatory variables are informative.
-
+* doesn't work well with large datasets (the cost of prediction is high, and the model doesn't always find the structure)
+* doesn't work well in high dimensions (curse of dimensionality -- distance becomes meaningless in high dimensions)
+* we need a lot of feature scaling
+* sensitive to noise and outliers
 
 **Strengths of $k$-NN**:
 
-* it can easily work for any number of categories
+* it can easily work for any number of categories (of the outcome variable)
 * it can predict a quantitative response variable
 * the bias of 1-NN is often low (but the variance is high)
 * any distance metric can be used (so the algorithm models the data appropriately)
-* the method is simple to implement / understand
+* the method is straightforward to implement / understand
+* there is no training period (i.e., no discrimination function is created)
 * model is nonparametric (no distributional assumptions on the data)
 * great model for imputing missing data
 
 <img src="figs/knnmodel.jpg" width="100%" style="display: block; margin: auto;" /><img src="figs/knnK.jpg" width="100%" style="display: block; margin: auto;" />
 
 
-###  R knn Example  
+###  R k-NN: penguins
 
-R code for using the `caret` package to cluster the `iris` data.  The `caret` package vignette for `knn` is here: http://topepo.github.io/caret/miscellaneous-model-functions.html#yet-another-k-nearest-neighbor-function
+We will fit a $k$-Nearest Neighbor algorithm to the `penguins` dataset.  As previously (and as to come), we'll use the entire **tidymodels** workflow including partitioning the data, build a recipe, select a model, create a workflow, fit a model, and validate the model
 
 
 
 ```r
 library(GGally) # for plotting
-library(caret)  # for partitioning & classification
-data(iris)
+library(tidymodels)
+data(penguins)
 ```
 
-#### iris Data {-}
+#### penguin data {-}
 
 
 ```r
-ggpairs(iris, color="Species", alpha=.4)
+ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 
-#### kNN {-}
+#### $k$-NN to predict penguin species {-}
 
-Without thinking about test / training data, a naive model is:
+#### 1. Partition the data {-}
+
+
+
+#### 2. Build a recipe {-}
+
+```r
+penguin_knn_recipe <-
+  recipe(species ~ body_mass_g + island + bill_length_mm + 
+           bill_depth_mm + flipper_length_mm,
+         data = penguin_train) %>%
+  update_role(island, new_role = "id variable") %>%
+  step_normalize(all_predictors())
+
+summary(penguin_knn_recipe)
+```
+
+```
+## # A tibble: 6 × 4
+##   variable          type    role        source  
+##   <chr>             <chr>   <chr>       <chr>   
+## 1 body_mass_g       numeric predictor   original
+## 2 island            nominal id variable original
+## 3 bill_length_mm    numeric predictor   original
+## 4 bill_depth_mm     numeric predictor   original
+## 5 flipper_length_mm numeric predictor   original
+## 6 species           nominal outcome     original
+```
+
+#### 3. Select a model {-}
+
+(note that we've used the default number of neighbors (here $k=7$).)
+
+```r
+penguin_knn <- nearest_neighbor() %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn
+```
+
+```
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Computational engine: kknn
+```
+
+
+#### 4. Create a workflow {-}
+
+```r
+penguin_knn_wflow <- workflow() %>%
+  add_model(penguin_knn) %>%
+  add_recipe(penguin_knn_recipe)
+
+penguin_knn_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: nearest_neighbor()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Computational engine: kknn
+```
+
+
+#### 5. Fit (/ predict)  {-}
 
 
 ```r
-fitControl <-caret::trainControl(method="none", classProbs = TRUE)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris,
-                        method="knn",
-                        trControl = fitControl,
-                        tuneGrid= data.frame(k=3))
+penguin_knn_fit <- penguin_knn_wflow %>%
+  fit(data = penguin_train)
+```
 
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris), 
-                reference = iris$Species)
+For the next R code chunk break it down into pieces -- that is, run each line one at a time.
+
+```r
+penguin_knn_fit %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
 ```
 
 ```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         50          0         0
-##   versicolor      0         47         3
-##   virginica       0          3        47
-## 
-## Overall Statistics
-##                                          
-##                Accuracy : 0.96           
-##                  95% CI : (0.915, 0.9852)
-##     No Information Rate : 0.3333         
-##     P-Value [Acc > NIR] : < 2.2e-16      
-##                                          
-##                   Kappa : 0.94           
-##                                          
-##  Mcnemar's Test P-Value : NA             
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9400           0.9400
-## Specificity                 1.0000            0.9700           0.9700
-## Pos Pred Value              1.0000            0.9400           0.9400
-## Neg Pred Value              1.0000            0.9700           0.9700
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3133           0.3133
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9550           0.9550
+## # A tibble: 1 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy multiclass     0.988
 ```
 
+#### What is $k$? {-}
 
-#### Why naive? {-}
-
-1. Not good to train and test on the same data set!
-2. Assumed the knowledge of $k$ groups.
-3. Was Euclidean distance the right thing to use?  [The `knn` package in R only uses Euclidean distance.]
+It turns out that the default value for $k$ in the **kknn** engine is 7.  Is 7 best?
 
 
-#### Using test/training data sets. {-}
+**Cross Validation!!!**
 
-One of the common pieces to use in the `caret` package is creating test and training datasets for cross validation.
+The red observations are used to fit the model, the black observations are used to assess the model.
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="60%" />
+<p class="caption">(\#fig:unnamed-chunk-43)Image credit: Alison Hill</p>
+</div>
+
+
+As we saw above, cross validation randomly splits the training data into V distinct blocks of roughly equal size.
+
+* leave out the first block of analysis data and fit a model.
+* the model is used to predict the held-out block of assessment data.
+* continue the process until all V assessment blocks have been predicted
+
+The final performance is based on the hold-out predictions by averaging the statistics from the V blocks.
+
+#### 1b.  A new partition of the training data {-}
 
 
 ```r
-set.seed(4747)
-inTrain <- caret::createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-c(inTrain),]
-
-fitControl <- caret::trainControl(method="none")
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=5))
-
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                reference = iris.test$Species)
+set.seed(470)
+penguin_vfold <- vfold_cv(penguin_train,
+                          v = 3, strata = species)
 ```
 
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         1
-##   virginica       0          1        14
-## 
-## Overall Statistics
-##                                           
-##                Accuracy : 0.9556          
-##                  95% CI : (0.8485, 0.9946)
-##     No Information Rate : 0.3333          
-##     P-Value [Acc > NIR] : < 2.2e-16       
-##                                           
-##                   Kappa : 0.9333          
-##                                           
-##  Mcnemar's Test P-Value : NA              
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.9333
-## Specificity                 1.0000            0.9667           0.9667
-## Pos Pred Value              1.0000            0.9333           0.9333
-## Neg Pred Value              1.0000            0.9667           0.9667
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.3111
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9500           0.9500
+#### 3. Select a model {-}
+
+Now the knn model uses `tune()` to indicate that we actually don't know how many neighbors to use.
+
+```r
+penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
 ```
 
-#### $k$ neighbors?  CV on TRAINING to find $k$ {-}
+#### 4. Re-create a workflow {-}
+
+This time, use the model that has not set the number of neighbors.
 
 
 ```r
-set.seed(47)
-fitControl <- caret::trainControl(method="cv", number=10)
-tr.iris <- caret::train(Species ~ ., 
-                        data=iris.train, 
-                        method="knn", 
-                        trControl = fitControl, 
-                        tuneGrid= data.frame(k=c(1,3,5,7,9,11)))
-tr.iris
-```
-
-```
-## k-Nearest Neighbors 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 95, 93, 95, 95, 94, 95, ... 
-## Resampling results across tuning parameters:
-## 
-##   k   Accuracy   Kappa    
-##    1  0.9516667  0.9275521
-##    3  0.9316667  0.8974822
-##    5  0.9205556  0.8805824
-##    7  0.9500000  0.9249006
-##    9  0.9616667  0.9427036
-##   11  0.9716667  0.9580882
-## 
-## Accuracy was used to select the optimal model using the largest value.
-## The final value used for the model was k = 11.
+penguin_knn_wflow_tune <- workflow() %>%
+  add_model(penguin_knn_tune) %>%
+  add_recipe(penguin_knn_recipe)
 ```
 
 
+#### 5. Fit the model {-}
 
-#### Then measure accuracy by testing on test data! {-}
+The model is fit to all three of the folds created above for each value of $k$ in `k_grid`.
 
 
 ```r
-caret::confusionMatrix(data=predict(tr.iris, newdata = iris.test), 
-                       reference = iris.test$Species)
+k_grid <- data.frame(neighbors = seq(1, 15, by = 4))
+k_grid
 ```
 
 ```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         1
-##   virginica       0          1        14
-## 
-## Overall Statistics
-##                                           
-##                Accuracy : 0.9556          
-##                  95% CI : (0.8485, 0.9946)
-##     No Information Rate : 0.3333          
-##     P-Value [Acc > NIR] : < 2.2e-16       
-##                                           
-##                   Kappa : 0.9333          
-##                                           
-##  Mcnemar's Test P-Value : NA              
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.9333
-## Specificity                 1.0000            0.9667           0.9667
-## Pos Pred Value              1.0000            0.9333           0.9333
-## Neg Pred Value              1.0000            0.9667           0.9667
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.3111
-## Detection Prevalence        0.3333            0.3333           0.3333
-## Balanced Accuracy           1.0000            0.9500           0.9500
+##   neighbors
+## 1         1
+## 2         5
+## 3         9
+## 4        13
+```
+
+```r
+penguin_knn_wflow_tune %>%
+  tune_grid(resamples = penguin_vfold, 
+           grid = k_grid) %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy")
+```
+
+```
+## # A tibble: 4 × 7
+##   neighbors .metric  .estimator  mean     n   std_err .config             
+##       <dbl> <chr>    <chr>      <dbl> <int>     <dbl> <chr>               
+## 1         1 accuracy multiclass 0.971     2 0.00595   Preprocessor1_Model1
+## 2         5 accuracy multiclass 0.977     2 0.000134  Preprocessor1_Model2
+## 3         9 accuracy multiclass 0.988     2 0.0000668 Preprocessor1_Model3
+## 4        13 accuracy multiclass 0.983     2 0.00568   Preprocessor1_Model4
 ```
 
 
+#### 6. Validate the model {-}
 
+Using $k$ = 9, the model is re-trained on the training data and tested on the test data (to estimate overall model accuracy).
+
+
+##### 3. select a model {-}
+
+
+```r
+penguin_knn_final <- nearest_neighbor(neighbors = 9) %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+
+penguin_knn_final
+```
+
+```
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Main Arguments:
+##   neighbors = 9
+## 
+## Computational engine: kknn
+```
+
+##### 4. create a workflow {-}
+
+
+```r
+penguin_knn_wflow_final <- workflow() %>%
+  add_model(penguin_knn_final) %>%
+  add_recipe(penguin_knn_recipe)
+
+penguin_knn_wflow_final
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: nearest_neighbor()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## K-Nearest Neighbor Model Specification (classification)
+## 
+## Main Arguments:
+##   neighbors = 9
+## 
+## Computational engine: kknn
+```
+
+##### 5. fit the model {-}
+
+```r
+penguin_knn_fit_final <- penguin_knn_wflow_final %>%
+  fit(data = penguin_train)
+```
+
+
+##### 6. validate the model {-}
+
+```r
+penguin_knn_fit_final %>% 
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  metrics(truth = species, estimate = .pred_class) %>%
+  filter(.metric == "accuracy")
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy multiclass     0.977
+```
+
+
+Huh.  Seems like $k=9$ didn't do as well as $k=7$ (the value we tried at the very beginning before cross validating).
+
+Well, it turns out, that's the nature of variability, randomness, and model building.
+
+We don't know truth, and we won't every find a perfect model.
+
+
+<!---
 ## 10/31/19 Agenda {#Oct31}
 1. trees (CART)
 2. building trees (binary recursive splitting)
 3. homogeneity measures
 4. pruning trees
+--->
 
 
-## CART {#cart}
+## Decision Trees {#cart}
 
 Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tree intuition.  Step-by-step, they build a recursive binary tree in order to model the differences between homes in SF and homes in NYC.
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-12)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
+<p class="caption">(\#fig:unnamed-chunk-52)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
 Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-13)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+<p class="caption">(\#fig:unnamed-chunk-53)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
 </div>
 
 
@@ -475,7 +1045,7 @@ Decision trees are used for all sorts of predictive and descriptive models.  The
 
 
 
-#### Classification Trees
+#### Classification Trees {-}
 
 A *classification tree* is used to predict a categorical response variable (rather than a quantitative one).  The end predicted value will be the one of the *most commonly occurring class* of training observations in the region to which it belongs.  The goal is to create regions which are as homogeneous as possible with respect to the response variable - categories.
 
@@ -510,7 +1080,7 @@ and we seek the value of $j$ and $s$ that minimize the equation:
 
 
 
-#### Regression Trees
+#### Regression Trees {-}
 
 
 The goal of the algorithm in a *regression tree* is to split the set of possible value for the data into $|T|$ distinct and non-overlapping regions, $R_1, R_2, \ldots, R_{|T|}$.  For every observation that falls into the region $R_m$, we make the same prediction - the mean of the response values for the training observations in $R_m$.  So how do we find the regions $R_1, \ldots, R_{|T|}$?
@@ -540,14 +1110,14 @@ where $\overline{y}_{R_1}$ is the mean response for the training observations in
 4. Keep repeating the process until a stopping criterion is reached - for example, until no region contains more than 5 observations.
 
 
-#### (Avoiding) Overfitting
+#### (Avoiding) Overfitting {-}
 
 Ideally, the tree would not overfit the training data.  One could imagine how easy it would be to grow the tree over the training data so as to end up with terminal nodes which are completely homogeneous (but then don't represent the test data).
 
 
 See the following (amazing!) demonstration for intuition on model validation / overfitting:  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
 
-One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  We use cross validation to build the subtree so as to not overfit the data.
+One possible algorithm for building a tree is to split based on the reduction in RSS (or Gini index, etc.) exceeding some (presumably high) threshold.  However, the strategy is known to be short sighted, as a split later down the tree may contain a large amount of information.  A better strategy is to grow a very large tree $T_0$ and then prune it back in order to obtain a subtree.  Use cross validation to build the subtree so as to not overfit the data.
 
 
 ******
@@ -556,8 +1126,8 @@ One possible algorithm for building a tree is to split based on the reduction in
 ******
 1.  Use recursive binary splitting to grow a large tree on the training data, stopping only when each terminal node has fewer than some minimum number of observations.
 2.  Apply cost complexity pruning to the large tree in order to obtain a sequence of best subtrees, as a function of $\alpha$.
-3. Use $K$-fold cross-validation to choose $\alpha$.  That is, divide the training observations into $K$ folds.  For each $k=1, 2, \ldots, K$:
-    a. Repeat Steps 1 and 2 on all but the $k$th fold of the training data.
+3. Use $V$-fold cross-validation to choose $\alpha$.  That is, divide the training observations into $V$ folds.  For each $v=1, 2, \ldots, V$:
+    a. Repeat Steps 1 and 2 on all but the $V$th fold of the training data.
     b. Evaluate the mean squared prediction error on the data in the left-out $k$th fold, as a function of $\alpha$.
     For each value of $\alpha$, average the prediction error (either misclassification or RSS), and pick $\alpha$ to minimize the average error.
 4. Return the subtree from Step 2 that corresponds to the chosen value of $\alpha$.
@@ -565,12 +1135,12 @@ One possible algorithm for building a tree is to split based on the reduction in
 ******
 
 
-#### Cost Complexity Pruning
+#### Cost Complexity Pruning {-}
 
 Also known as *weakest link pruning*, the idea is to consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$ (instead of considering every single subtree).  Generally, the idea is that there is a cost to having a larger (more complex!) tree.  We define the cost complexity criterion ($\alpha > 0$):
 \begin{align}
-\mbox{numerical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha|T|\\
-\mbox{categorical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha|T|
+\mbox{numerical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &= \sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
 \end{align}
 where $k(m)$ is the class with the majority of observations in node $m$ and $|T|$ is the number of terminal nodes in the tree.
 
@@ -583,13 +1153,27 @@ The way to think about cost complexity is to consider $\alpha$ increasing.  As $
 
 <img src="figs/treealpha.jpg" width="100%" style="display: block; margin: auto;" />
 
+
+**A note on $\alpha$**
+
+In the text (*Introduction to Statistical Learning*) and almost everywhere else you might look, the cost complexity is defined as in previous slides.
+
+However, you might notice that in R the `cost_complexity` value is typically less than 1.  From what I can tell, the value of the function that is being minimized in R is the **average** of the squared errors and the missclassification **rate**.
+
+\begin{align}
+\mbox{numerical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2 + \alpha \cdot |T|\\
+\mbox{categorical: } C_\alpha(T) &= \frac{1}{n}\sum_{m=1}^{|T|} \sum_{i \in R_m} I(y_i \ne k(m)) + \alpha \cdot |T|
+\end{align}
+
+
 ##### Variations on a theme {-}
 
 The main ideas above are consistent throughout all CART algorithms.  However, the exact details of implementation can change from function to function, and often times it is very difficult to decipher exactly which equation is being used.  In the `tree` function in R, much of the decision making is done on `deviance` which is defined as:
-\begin{align}
-\mbox{numerical: } \mbox{deviance} &= \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2\\
-\mbox{categorical: }  \mbox{deviance} &= -2\sum_{m=1}^{|T|} \sum_{k=1}^K n_{mk} \log \hat{p}_{mk}\\
-\end{align}
+
+$$\mbox{numerical: deviance} = \sum_{m=1}^{|T|}  \sum_{i \in R_m} (y_i - \overline{y}_{R_m})^2$$
+
+
+$$\mbox{categorical: deviance} = -2\sum_{m=1}^{|T|} \sum_{k=1}^K n_{mk} \log \hat{p}_{mk}$$
 
 For the CART algorithm, minimize the deviance (for both types of variables).  The categorical deviance will be small if most of the observations are in the majority group  (with high proportion).  Also, $\lim_{\epsilon \rightarrow 0} \epsilon \log(\epsilon) = 0$.  Additionally, methods of cross validation can also vary.  In particular, if the number of variables is large, the tree algorithm can be slow and so the cross validation process - choice of $\alpha$ - needs to be efficient.
 
@@ -601,21 +1185,19 @@ Notice that CV is used for both model building and model assessment.  It is poss
 
 
 ******
-**Algorithm**:  CV for both $k_1$-fold CV building and $k_2$-fold CV assessment
+**Algorithm**:  CV for both $V_1$-fold CV building and $V_2$-fold CV assessment
 
 ******
-1. Partition the data in $k_1$ groups.
-2. Remove the first group, and train the data on the remaining $k_1-1$ groups.
-3. Use $k_2$-fold cross-validation (on the $k_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $k_2$ folds and find $\alpha$ that minimizes the error.
-4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $k_1$ hold out samples.
-5. Repeat steps 2-4 using the remaining $k_1 - 1$ groups.
+1. Partition the data in $V_1$ groups.
+2. Remove the first group, and train the data on the remaining $V_1-1$ groups.
+3. Use $V_2$-fold cross-validation (on the $V_1-1$ groups) to choose $\alpha$.  That is, divide the training observations into $V_2$ folds and find $\alpha$ that minimizes the error.
+4. Using the subtree that corresponds to the chosen value of $\alpha$, predict the first of the $V_1$ hold out samples.
+5. Repeat steps 2-4 using the remaining $V_1 - 1$ groups.
 
 ******
 
 
 ### R CART Example
-
-There are multiple tree building options in R both in the `caret` package and `party`, `rpart`, and `tree` packages.
 
 The Census Bureau divides the country up into "tracts" of approximately
 equal population. For the 1990 Census, California was divided into 20640 tracts.  One data sets (houses on http://lib.stat.cmu.edu/datasets/; http://lib.stat.cmu.edu/datasets/houses.zip) records the following for each tract in California: Median house price, median house age, total number of rooms, total number of bedrooms, total number of occupants, total number of houses, median income (in thousands of dollars), latitude and longitude.  It appeared in Pace and Barry (1997), "Sparse Spatial Autoregressions", **Statistics and Probability Letters**. 
@@ -631,330 +1213,386 @@ Note on `maxdepth`:  as you might expect, `maxdepth` indicates the longest lengt
 
 #### Regression Trees  {-}
 
+For technical reasons (e.g., see [here](https://github.com/tidymodels/TMwR/issues/33)), the `step_log()` on the outcome variable step gives problems with predictions at the end.  Therefore, we mutate the outcome variable within the dataset before starting the model building process. 
+
 
 ```r
 real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
-                          header=TRUE)
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
 
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate, 
-                         method="rpart2", 
-                         trControl = fitControl, 
-                         tuneGrid= data.frame(maxdepth=5))
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
 
-rpart.plot::rpart.plot(tr.house$finalModel)
+# recipe
+house_cart_recipe <-
+  recipe(logValue ~ Longitude + Latitude ,
+         data = house_train)
+# model
+house_cart <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_wflow <- workflow() %>%
+  add_model(house_cart) %>%
+  add_recipe(house_cart_recipe)
+
+# fit
+house_cart_fit <- house_cart_wflow %>%
+  fit(data = house_train)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
 
-
-
-#### Scatterplot  {-}
-
-Compare the predictions with the dataset (darker is more expensive) which seem to capture the global price trend.  Note that this plot uses the `tree` model (instead of the `rpart2` model) because the optimization is different.
+#### Model Output {-}
 
 
 ```r
-tree.model <- tree::tree(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate)
-
-price.deciles <- quantile(real.estate$MedianHouseValue, 0:10/10)
-cut.prices    <- cut(real.estate$MedianHouseValue, 
-                     price.deciles, 
-                     include.lowest=TRUE)
-plot(real.estate$Longitude, 
-     real.estate$Latitude, 
-     col=grey(10:2/11)[cut.prices], 
-     pch=20, 
-     xlab="Longitude",ylab="Latitude")
-
-tree::partition.tree(tree.model, 
-                     ordvars=c("Longitude","Latitude"), 
-                     add=TRUE) 
+house_cart_fit
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" />
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##   1) root 15480 5024.405000 12.08947  
+##     2) Latitude>=38.485 1541  283.738200 11.59436  
+##       4) Latitude>=39.355 506   48.267930 11.31530 *
+##       5) Latitude< 39.355 1035  176.803400 11.73079 *
+##     3) Latitude< 38.485 13939 4321.152000 12.14421  
+##       6) Longitude>=-121.645 10454 3320.946000 12.06198  
+##        12) Latitude>=34.635 2166  491.986400 11.52110  
+##          24) Longitude>=-120.265 1083  166.051200 11.28432 *
+##          25) Longitude< -120.265 1083  204.505800 11.75787 *
+##        13) Latitude< 34.635 8288 2029.685000 12.20333  
+##          26) Longitude>=-118.315 6240 1373.830000 12.09295  
+##            52) Longitude>=-117.575 2130  516.313400 11.87918  
+##             104) Latitude>=33.605 821  123.684300 11.64002 *
+##             105) Latitude< 33.605 1309  316.218800 12.02918  
+##               210) Longitude>=-116.33 97    8.931327 11.17127 *
+##               211) Longitude< -116.33 1212  230.181300 12.09784  
+##                 422) Longitude>=-117.165 796  101.805300 11.94935 *
+##                 423) Longitude< -117.165 416   77.245280 12.38196 *
+##            53) Longitude< -117.575 4110  709.740000 12.20373  
+##             106) Latitude>=33.735 3529  542.838300 12.14908  
+##               212) Latitude< 34.105 2931  379.526800 12.09154  
+##                 424) Longitude< -118.165 1114  147.375800 11.91911 *
+##                 425) Longitude>=-118.165 1817  178.722200 12.19726 *
+##               213) Latitude>=34.105 598  106.051400 12.43109 *
+##             107) Latitude< 33.735 581   92.340630 12.53568 *
+##          27) Longitude< -118.315 2048  348.149000 12.53967  
+##            54) Latitude>=34.165 949  106.791800 12.38022 *
+##            55) Latitude< 34.165 1099  196.395200 12.67735  
+##             110) Longitude>=-118.365 431   85.796770 12.38191 *
+##             111) Longitude< -118.365 668   48.703000 12.86798 *
+##       7) Longitude< -121.645 3485  717.479900 12.39087  
+##        14) Latitude>=37.925 796  133.300900 12.10055 *
+##        15) Latitude< 37.925 2689  497.226200 12.47681 *
+```
+
+The following scatter plot can only be made when the CART is built using two numerical predictor variables.
+
+
+```r
+#remotes::install_github("grantmcdermott/parttree")
+library(parttree)
+house_train %>%
+  ggplot(aes(y = Longitude, x = Latitude)) + 
+  geom_parttree(data = house_cart_fit, alpha = 0.2) +
+  geom_point(aes(color = MedianHouseValue)) 
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-58-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+#### Predicting  {-}
+
+As seen in the image above, there are only 12 region so there are only 12 predicted values.  The plot below seems a little odd at first glance, but it should make sense after careful consideration of what is the outcome measurement and what is the predicted value.
+
+
+```r
+house_cart_fit %>%
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.1)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
 #### Finer partition  {-}
 
-```
-12) Latitude>=34.7 2844  645.0 11.5 
-```
-
-the node that splits at latitude greater than 34.7 has 2844 houses.  645 is the "deviance" which is the sum of squares value for that node.  the predicted value is the average of the points in that node: 11.5.  it is not a terminal node (no asterisk).
-
-
-```r
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.house <- caret::train(log(MedianHouseValue) ~ Longitude + Latitude, 
-                         data=real.estate, 
-                         method="rpart2",
-                         trControl = fitControl, 
-                         tuneGrid= data.frame(maxdepth=5))
-
-tr.house$finalModel
-```
+From above: 
 
 ```
-## n= 20640 
-## 
-## node), split, n, deviance, yval
-##       * denotes terminal node
-## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) Latitude>=38.485 2061  383.26410 11.59422  
-##      4) Latitude>=39.355 674   65.51082 11.31630 *
-##      5) Latitude< 39.355 1387  240.39580 11.72928 *
-##    3) Latitude< 38.485 18579 5750.77400 12.13931  
-##      6) Longitude>=-121.655 13941 4395.52000 12.05527  
-##       12) Latitude>=34.675 2844  645.27310 11.51018  
-##         24) Longitude>=-120.275 1460  212.47730 11.28145 *
-##         25) Longitude< -120.275 1384  275.83120 11.75148 *
-##       13) Latitude< 34.675 11097 2688.68000 12.19497  
-##         26) Longitude>=-118.315 8384 1823.33000 12.08687  
-##           52) Longitude>=-117.545 2839  691.79800 11.87672 *
-##           53) Longitude< -117.545 5545  941.96340 12.19446 *
-##         27) Longitude< -118.315 2713  464.62720 12.52902 *
-##      7) Longitude< -121.655 4638  960.79250 12.39194  
-##       14) Latitude>=37.925 1063  177.59430 12.09533 *
-##       15) Latitude< 37.925 3575  661.87260 12.48013 *
+       12) Latitude>=34.675 2182  513.95640 11.52385  
 ```
+
+The node that splits at latitude greater than 34.675 has 2182 houses.  513.9564 is the "deviance" which is the sum of squares value for that node.  The predicted value is the average of the points in that node: 11.5.  It is not a terminal node (no asterisk).
 
 
 #### More variables {-}
 
-Including all the variables, not only the latitude and longitude:
+Including all the variables, not only the latitude and longitude.  Note the predictions are much better!
 
 
 ```r
-set.seed(4747)
-fitControl <- caret::trainControl(method="none")
-tr.full.house <- caret::train(log(MedianHouseValue) ~ ., 
-                              data=real.estate, 
-                              method="rpart2", 
-                              trControl = fitControl, 
-                              tuneGrid= data.frame(maxdepth=5))
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
 
-tr.full.house$finalModel
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
+
+# recipe
+house_cart_full_recipe <-
+  recipe(logValue ~ . ,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_full_wflow <- workflow() %>%
+  add_model(house_cart) %>%
+  add_recipe(house_cart_full_recipe)
+
+# fit
+house_cart_full_fit <- house_cart_full_wflow %>%
+  fit(data = house_train)
+```
+
+
+```r
+house_cart_full_fit %>%
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.01)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-61-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Cross Validation (model building!)  {-}
+
+
+
+```r
+real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
+                          header=TRUE) %>%
+  mutate(logValue = log(MedianHouseValue))
+
+# partition
+set.seed(47)
+house_split <- initial_split(real.estate)
+house_train <- training(house_split)
+house_test <- testing(house_split)
+
+set.seed(4321)
+house_vfold <- vfold_cv(house_train, v = 10)
+
+cart_grid <- expand.grid(tree_depth = seq(2, 20, by = 2))
+
+# recipe
+house_cart_tune_recipe <-
+  recipe(logValue ~ .,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart_tune <- decision_tree(tree_depth = tune()) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_tune_wflow <- workflow() %>%
+  add_model(house_cart_tune) %>%
+  add_recipe(house_cart_tune_recipe)
+
+# tuning / fit
+house_tuned <- house_cart_tune_wflow %>%
+  tune_grid(resamples = house_vfold, 
+           grid = cart_grid) 
+```
+
+**CV accuracy**
+
+
+
+```r
+house_tuned %>% collect_metrics() %>%
+  filter()
 ```
 
 ```
-## n= 20640 
+## # A tibble: 20 × 7
+##    tree_depth .metric .estimator  mean     n std_err .config              
+##         <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+##  1          2 rmse    standard   0.428    10 0.00224 Preprocessor1_Model01
+##  2          2 rsq     standard   0.436    10 0.00665 Preprocessor1_Model01
+##  3          4 rmse    standard   0.383    10 0.00242 Preprocessor1_Model02
+##  4          4 rsq     standard   0.547    10 0.00629 Preprocessor1_Model02
+##  5          6 rmse    standard   0.366    10 0.00239 Preprocessor1_Model03
+##  6          6 rsq     standard   0.588    10 0.00586 Preprocessor1_Model03
+##  7          8 rmse    standard   0.366    10 0.00239 Preprocessor1_Model04
+##  8          8 rsq     standard   0.588    10 0.00586 Preprocessor1_Model04
+##  9         10 rmse    standard   0.366    10 0.00239 Preprocessor1_Model05
+## 10         10 rsq     standard   0.588    10 0.00586 Preprocessor1_Model05
+## 11         12 rmse    standard   0.366    10 0.00239 Preprocessor1_Model06
+## 12         12 rsq     standard   0.588    10 0.00586 Preprocessor1_Model06
+## 13         14 rmse    standard   0.366    10 0.00239 Preprocessor1_Model07
+## 14         14 rsq     standard   0.588    10 0.00586 Preprocessor1_Model07
+## 15         16 rmse    standard   0.366    10 0.00239 Preprocessor1_Model08
+## 16         16 rsq     standard   0.588    10 0.00586 Preprocessor1_Model08
+## 17         18 rmse    standard   0.366    10 0.00239 Preprocessor1_Model09
+## 18         18 rsq     standard   0.588    10 0.00586 Preprocessor1_Model09
+## 19         20 rmse    standard   0.366    10 0.00239 Preprocessor1_Model10
+## 20         20 rsq     standard   0.588    10 0.00586 Preprocessor1_Model10
+```
+
+```r
+house_tuned %>%
+  autoplot(metric = "rmse")
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-63-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+house_tuned %>% 
+  select_best("rmse")
+```
+
+```
+## # A tibble: 1 × 2
+##   tree_depth .config              
+##        <dbl> <chr>                
+## 1          6 Preprocessor1_Model03
+```
+**Final model + prediction on test data**
+
+
+Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes (depth of 6) corresponds to the tree with the lowest deviance.
+
+
+```r
+# recipe
+house_cart_final_recipe <-
+  recipe(logValue ~ .,
+         data = house_train) %>%
+  update_role(MedianHouseValue, new_role = "id variable")
+
+# model
+house_cart_final <- decision_tree(tree_depth = 6) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# workflow
+house_cart_final_wflow <- workflow() %>%
+  add_model(house_cart_final) %>%
+  add_recipe(house_cart_final_recipe)
+
+# tuning / fit
+house_final <- house_cart_final_wflow %>%
+  fit(data = house_train)
+```
+
+
+**Predicting the final model on test data**
+
+
+```r
+house_final
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: decision_tree()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 0 Recipe Steps
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## n= 15480 
 ## 
 ## node), split, n, deviance, yval
 ##       * denotes terminal node
 ## 
-##  1) root 20640 6685.26300 12.08488  
-##    2) MedianIncome< 3.5471 10381 2662.31300 11.77174  
-##      4) MedianIncome< 2.51025 4842 1193.71700 11.57572  
-##        8) Latitude>=34.465 2520  557.77450 11.38771  
-##         16) Longitude>=-120.275 728   77.14396 11.08365 *
-##         17) Longitude< -120.275 1792  385.97890 11.51124  
-##           34) Latitude>=37.905 1103  150.31490 11.35795 *
-##           35) Latitude< 37.905 689  168.25420 11.75664 *
-##        9) Latitude< 34.465 2322  450.19880 11.77976  
-##         18) Longitude>=-117.775 878  144.15330 11.52580 *
-##         19) Longitude< -117.775 1444  214.98520 11.93418 *
-##      5) MedianIncome>=2.51025 5539 1119.89800 11.94310  
-##       10) Latitude>=37.925 1104  123.65980 11.68124 *
-##       11) Latitude< 37.925 4435  901.69050 12.00829  
-##         22) Longitude>=-122.235 4084  770.65270 11.96811  
-##           44) Latitude>=34.455 1270  284.66500 11.76617 *
-##           45) Latitude< 34.455 2814  410.82510 12.05924 *
-##         23) Longitude< -122.235 351   47.73002 12.47579 *
-##    3) MedianIncome>=3.5471 10259 1974.99300 12.40175  
-##      6) MedianIncome< 5.5892 7265 1156.09500 12.25720  
-##       12) MedianHouseAge< 38.5 5907  858.59850 12.20694 *
-##       13) MedianHouseAge>=38.5 1358  217.69860 12.47578 *
-##      7) MedianIncome>=5.5892 2994  298.73550 12.75251  
-##       14) MedianIncome< 7.393 2008  176.41530 12.64297 *
-##       15) MedianIncome>=7.393 986   49.16749 12.97557 *
+##  1) root 15480 5024.40500 12.08947  
+##    2) MedianIncome< 3.54635 7696 1992.69800 11.77343  
+##      4) MedianIncome< 2.5165 3632  904.76740 11.57590  
+##        8) Latitude>=34.445 1897  412.81950 11.38488  
+##         16) Longitude>=-120.265 549   63.97662 11.08633 *
+##         17) Longitude< -120.265 1348  279.98120 11.50647 *
+##        9) Latitude< 34.445 1735  347.04430 11.78476  
+##         18) Longitude>=-117.775 645  111.86670 11.52607 *
+##         19) Longitude< -117.775 1090  166.47070 11.93784 *
+##      5) MedianIncome>=2.5165 4064  819.58450 11.94995  
+##       10) Latitude>=37.925 809   91.49688 11.68589 *
+##       11) Latitude< 37.925 3255  657.65510 12.01558  
+##         22) Longitude>=-122.235 2992  563.13610 11.97426  
+##           44) Latitude>=34.455 940  203.99070 11.77685  
+##             88) Longitude>=-120.155 338   31.54079 11.36422 *
+##             89) Longitude< -120.155 602   82.59029 12.00852 *
+##           45) Latitude< 34.455 2052  305.72870 12.06470  
+##             90) Longitude>=-118.285 1476  171.16160 11.95681 *
+##             91) Longitude< -118.285 576   73.36843 12.34115 *
+##         23) Longitude< -122.235 263   31.29310 12.48567 *
+##    3) MedianIncome>=3.54635 7784 1502.97400 12.40194  
+##      6) MedianIncome< 5.59185 5526  876.96730 12.25670  
+##       12) MedianHouseAge< 38.5 4497  651.27750 12.20567  
+##         24) MedianIncome< 4.53095 2616  388.38650 12.11491 *
+##         25) MedianIncome>=4.53095 1881  211.37640 12.33189 *
+##       13) MedianHouseAge>=38.5 1029  162.80030 12.47972 *
+##      7) MedianIncome>=5.59185 2258  224.13060 12.75740  
+##       14) MedianIncome< 7.393 1527  134.00030 12.64684 *
+##       15) MedianIncome>=7.393 731   32.47344 12.98835 *
 ```
-
-```r
-rpart.plot::rpart.plot(tr.full.house$finalModel)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
-
-
-#### Cross Validation (model building!)  {-}
-
-Turns out that the tree does "better" by being more complex -- why is that?  The tree with 14 nodes corresponds to the tree with the highest accuracy / lowest deviance.
-
 
 
 ```r
-# here, let's use all the variables and all the samples
-set.seed(4747)
-fitControl <- caret::trainControl(method="cv")
-tree.cv.house <- caret::train(log(MedianHouseValue) ~ ., 
-                              data=real.estate, 
-                              method="rpart2",
-                              trControl=fitControl,
-                              tuneGrid=data.frame(maxdepth=1:20),
-                              parms=list(split="gini"))
-  
-tree.cv.house  
+house_final %>% 
+  predict(new_data = house_test) %>%
+  cbind(house_test) %>%
+  ggplot() +
+  geom_point(aes(x = logValue, y = .pred), alpha = 0.1) + 
+  xlab("log of the Median House Value") +
+  ylab("predicted value of log Median House")
 ```
 
-```
-## CART 
-## 
-## 20640 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 18576, 18576, 18576, 18575, 18576, 18576, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4748682  0.3041572  0.3848606
-##    2        0.4478756  0.3809354  0.3563586
-##    3        0.4282733  0.4340116  0.3393296
-##    4        0.4178448  0.4611563  0.3296215
-##    5        0.4054431  0.4924175  0.3184901
-##    6        0.3962472  0.5155365  0.3103266
-##    7        0.3948428  0.5189584  0.3092563
-##    8        0.3935306  0.5221099  0.3080369
-##    9        0.3891254  0.5326804  0.3044392
-##   10        0.3836652  0.5456808  0.3000226
-##   11        0.3786873  0.5574177  0.2956848
-##   12        0.3739131  0.5685161  0.2907504
-##   13        0.3712711  0.5746216  0.2868830
-##   14        0.3703641  0.5767271  0.2858720
-##   15        0.3703641  0.5767271  0.2858720
-##   16        0.3703641  0.5767271  0.2858720
-##   17        0.3703641  0.5767271  0.2858720
-##   18        0.3703641  0.5767271  0.2858720
-##   19        0.3703641  0.5767271  0.2858720
-##   20        0.3703641  0.5767271  0.2858720
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 14.
-```
-
-```r
-rpart.plot::rpart.plot(tree.cv.house$finalModel)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
-
-```r
-plot(tree.cv.house)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-20-2.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;" />
 
 
-#### Training / test data for model building AND model accuracy {-}
-
-
-```r
-# first create two datasets: one training, one test
-inTrain <- caret::createDataPartition(y = real.estate$MedianHouseValue, 
-                                      p=.8, list=FALSE)
-house.train <- real.estate[inTrain,]
-house.test <- real.estate[-c(inTrain),]
-
-
-# then use CV on the training data to find the best maxdepth
-set.seed(4747)
-fitControl <- caret::trainControl(method="cv")
-tree.cvtrain.house <- caret::train(log(MedianHouseValue) ~ ., 
-                                   data=house.train, 
-                                   method="rpart2",
-                                   trControl=fitControl, 
-                                   tuneGrid=data.frame(maxdepth=1:20),
-                                   parms=list(split="gini"))
-
-
-tree.cvtrain.house
-```
-
-```
-## CART 
-## 
-## 16513 samples
-##     8 predictor
-## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 14862, 14862, 14862, 14862, 14862, 14861, ... 
-## Resampling results across tuning parameters:
-## 
-##   maxdepth  RMSE       Rsquared   MAE      
-##    1        0.4756049  0.2994314  0.3851775
-##    2        0.4497958  0.3734197  0.3581148
-##    3        0.4289837  0.4302083  0.3396992
-##    4        0.4192079  0.4558965  0.3304520
-##    5        0.4026435  0.4979229  0.3153937
-##    6        0.3960649  0.5141665  0.3102682
-##    7        0.3960649  0.5141665  0.3102682
-##    8        0.3924388  0.5229961  0.3072433
-##    9        0.3875832  0.5347306  0.3027262
-##   10        0.3830783  0.5454004  0.2981715
-##   11        0.3783297  0.5566766  0.2941443
-##   12        0.3724797  0.5702362  0.2883089
-##   13        0.3694837  0.5770987  0.2850918
-##   14        0.3694837  0.5770987  0.2850918
-##   15        0.3694837  0.5770987  0.2850918
-##   16        0.3694837  0.5770987  0.2850918
-##   17        0.3694837  0.5770987  0.2850918
-##   18        0.3694837  0.5770987  0.2850918
-##   19        0.3694837  0.5770987  0.2850918
-##   20        0.3694837  0.5770987  0.2850918
-## 
-## RMSE was used to select the optimal model using the smallest value.
-## The final value used for the model was maxdepth = 13.
-```
-
-```r
-tree.train.house <- caret::train(log(MedianHouseValue) ~ ., 
-                                 data=house.train, 
-                                 method="rpart2",
-                                 trControl=caret::trainControl(method="none"),
-                                 tuneGrid=data.frame(maxdepth=14),
-                                 parms=list(split="gini"))
-```
-
-**for classification results** use `confusionMatrix` instead of `postResample`
-
-
-```r
-test.pred <- predict(tree.train.house, house.test)
-caret::postResample(pred = test.pred, obs=log(house.test$MedianHouseValue))
-```
-
-```
-##      RMSE  Rsquared       MAE 
-## 0.3696649 0.5840583 0.2846395
-```
-
-
-#### Other tree R packages  {-}
-
-* `rpart` is faster than `tree`
-
-* `party`  gives great plotting options
-
-* `maptree` also gives trees from hierarchical clustering
-
-* `randomForest`  up next!
-
-Reference: slides built from http://www.stat.cmu.edu/~cshalizi/350/lectures/22/lecture-22.pdf
-
+<!---
 ## 11/5/19 Agenda {#Nov5}
 1. pruning
 2. variable selection
 3. bagging (no boosting)
 4. OOB error rate
+--->
+
 
 ## Bagging {#bagging}
 
@@ -963,7 +1601,7 @@ The tree based models given by CART are easy to understand and implement, but th
 
 **Bagging = Bootstrap Aggregating**.  The idea is that sometimes when you fit multiple models and aggregate those models together, you get a smoother model fit which will give you a better balance between bias in your fit and variance in your fit.  Bagging can be applied to any classifier to reduce variability.
 
-<p style = "color:red">Recall that the variance of the sample mean is variance / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
+<p style = "color:red">Recall that the variance of the sample mean is variance of data / n.  So we've seen the idea that averaging an outcome gives reduced variability.</p>
 
 ### Bagging algorithm
 
@@ -971,8 +1609,8 @@ The tree based models given by CART are easy to understand and implement, but th
 **Algorithm**:  Bagging Forest
 
 ******
-1. Resample *cases* (observational units, not variables) and recalculate predictions.  Choose $N' \leq N$ for the number of observations in the new training set through random sampling with replacement.  Almost always we use $N' = N$ for a full bootstrap.
-2. Build a tree on each new set of $N'$ training observations.
+1. Resample (bootstrap) *cases* (observational units, not variables).  
+2. Build a tree on each new set of (bootstrapped) training observations.
 3. Average (regression) or majority vote (classification).
 4. Note that for every bootstrap sample, approximately 2/3 of the observations will be chosen and 1/3 of them will not be chosen.
 
@@ -980,7 +1618,7 @@ The tree based models given by CART are easy to understand and implement, but th
 ******
 
 \begin{align}
-P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
+P(\mbox{observation $i$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n} \bigg)^n\\
 \lim_{n \rightarrow \infty} \bigg(1 - \frac{1}{n} \bigg)^n = \frac{1}{e} \approx \frac{1}{3}
 \end{align} 
 
@@ -1014,8 +1652,9 @@ P(\mbox{observation $n$ is not in the bootstrap sample}) &= \bigg(1 - \frac{1}{n
 
 Additionally, with bagging, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:
 
-* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.
-* Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
+* Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the $b^{th}$ tree.
+* Put each case left out in the construction of the $b^{th}$ tree down the $b^{th}$ tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees.  
+* At the end of the run, take $j$ to be the class that got most of the votes every time case $i$ was oob. The proportion of times that $j$ is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests.
 
 
 How does it work?  Consider the following predictions for a silly toy data set of 9 observations.  Recall that $\sim 1/3$ of the observations will be left out at each bootstrap sample.  Those are the observations for which predictions will be made.  In the table below, an X is given if there is a prediction made for that value.
@@ -1039,12 +1678,13 @@ Let the OOB prediction for the $i^{th}$ observation to be  $\hat{y}_{(-i)}$
 \mbox{OOB}_{\mbox{error}} &= \frac{1}{n} \sum_{i=1}^n  (y_i - \hat{y}_{(-i)})^2  \ \ \ \ \ \ \ \ \mbox{regression}\\
 \end{align}
 
+<!---
 ## 11/7/19 Agenda {#Nov7}
 1. OOB again
 2. Random Forests
 3. variable importance
 4. R code / examples
-
+--->
 
 ## Random Forests {#rf}
 
@@ -1060,8 +1700,8 @@ Random Forests are an extension to bagging for regression trees (note: bagging c
 
 ******
 1. Bootstrap sample from the training set.
-2. Grow an un-pruned tree on this bootstrap sample.
-* *At each split*, select $m$ variables and determine the best split using only these predictors.
+2. Grow an un-pruned tree on the bootstrap sample.
+* *At each split*, select $m$ variables and determine the best split using only the $m$ predictors.
 Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Random Forests are not overly sensitive to the value of $m$.  [splits are chosen as with trees:   according to either squared error or gini index / cross entropy / classification error.]
 * Do *not* prune the tree.  Save the tree as is!
 
@@ -1076,7 +1716,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-23)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-67)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1099,7 +1739,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 * Bagging alone uses the full set of predictors to determine every tree  (it is the observations that are bootstrapped).  Random Forests use a subset of predictors.
 * Note that to predict for a particular observation, we start at the top, walk down the tree, and get the prediction.  We average (or majority vote) the predictions to get one prediction for the observation at hand.
-* Bagging is a special case of Random Forest where $m=k$.
+* Bagging is a special case of Random Forest where $m=p$.
 * generally, models do not overfit the data and CV is not needed.  However, CV can be used to fit the tuning parameters ($m$, node size, max number of nodes, etc.).   
 
 > "Random forests does not overfit. You can run as many trees as you want."  Brieman,  http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
@@ -1111,10 +1751,6 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 Build trees until the error no longer decreases
 * **$m$**
 Try the recommended defaults, half of them, and twice of them - pick the best (use CV to avoid overfitting).
-* **$N'$ samples**
-$N'$ should be the same size as the training data.
-
-
 
 
 
@@ -1128,7 +1764,7 @@ All learners are bad when there are too many noisy variables because the respons
 
 **Variable importance** is measured by two different metrics (from R help on `importance`):
 
-* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).  Within the oob values, permute the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (with the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
+* (permutation) **accuracy:** For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression).**Permute** the $j^{th}$ variable and recalculate the prediction error.  The difference between the two are then averaged over all trees (for the $j^{th}$ variable) to give the importance for the $j^{th}$ variable.
 * **purity:** The decrease (or increase, depending on the plot) in node purity: root sum of squares (RSS) [deviance/gini for classification trees].  That is, the amount of total decrease in RSS from splitting on *that* variable, averaged over all trees.
 
 
@@ -1145,211 +1781,170 @@ If the number of variables is very large, forests can be run once with all the v
 
 
 ```r
-data(iris)
-library(tidyverse)
-library(caret)
-library(ranger)
-library(e1071)
+library(tidymodels)
+library(palmerpenguins)
+data(penguins)
 
-inTrain <- createDataPartition(y = iris$Species, p=0.7, list=FALSE)
-iris.train <- iris[inTrain,]
-iris.test <- iris[-inTrain,]
-```
+penguins <- penguins %>%
+  drop_na()
 
-
-```r
-modFit <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger")
-modFit
-```
-
-```
-## Random Forest 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling: Bootstrapped (25 reps) 
-## Summary of sample sizes: 105, 105, 105, 105, 105, 105, ... 
-## Resampling results across tuning parameters:
-## 
-##   mtry  splitrule   Accuracy   Kappa    
-##   2     gini        0.9519882  0.9268222
-##   2     extratrees  0.9501667  0.9239468
-##   3     gini        0.9509638  0.9252363
-##   3     extratrees  0.9511923  0.9254990
-##   4     gini        0.9489015  0.9221052
-##   4     extratrees  0.9501289  0.9238519
-## 
-## Tuning parameter 'min.node.size' was held constant at a value of 1
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 2, splitrule = gini
-##  and min.node.size = 1.
-```
-
-```r
-caret::confusionMatrix(data=predict(modFit, newdata = iris.test), 
-                reference = iris.test$Species)
-```
-
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         14         2
-##   virginica       0          1        13
-## 
-## Overall Statistics
-##                                          
-##                Accuracy : 0.9333         
-##                  95% CI : (0.8173, 0.986)
-##     No Information Rate : 0.3333         
-##     P-Value [Acc > NIR] : < 2.2e-16      
-##                                          
-##                   Kappa : 0.9            
-##                                          
-##  Mcnemar's Test P-Value : NA             
-## 
-## Statistics by Class:
-## 
-##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            0.9333           0.8667
-## Specificity                 1.0000            0.9333           0.9667
-## Pos Pred Value              1.0000            0.8750           0.9286
-## Neg Pred Value              1.0000            0.9655           0.9355
-## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3111           0.2889
-## Detection Prevalence        0.3333            0.3556           0.3111
-## Balanced Accuracy           1.0000            0.9333           0.9167
-```
-
-
-#### Parameters...  `mtry` and `num.trees`
-
-Working with both parameters is a little bit odd in this case because the iris data only has 4 variables (which makes it a poor candidate for Random Forests).  Hopefully the code below will help for other problems where Random Forests are more appropriate.
-
-
-```r
-modFit.m <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = 500,
-                tuneGrid= data.frame(mtry=1:4, splitrule = "gini",
-                                     min.node.size = 5))
-modFit.m
-```
-
-```
-## Random Forest 
-## 
-## 105 samples
-##   4 predictor
-##   3 classes: 'setosa', 'versicolor', 'virginica' 
-## 
-## No pre-processing
-## Resampling results across tuning parameters:
-## 
-##   mtry  Accuracy   Kappa    
-##   1     0.9428571  0.9142857
-##   2     0.9523810  0.9285714
-##   3     0.9523810  0.9285714
-##   4     0.9523810  0.9285714
-## 
-## Tuning parameter 'splitrule' was held constant at a value of gini
-## 
-## Tuning parameter 'min.node.size' was held constant at a value of 5
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were mtry = 2, splitrule = gini
-##  and min.node.size = 5.
-```
-
-```r
-plot(modFit.m)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
-
-
-
-
-```r
+# partition
 set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
 
-acc.ntree = c()
-for(i in seq(10, 260, by = 50)){
-modFit.ntree <- caret::train(Species ~ ., 
-                data=iris.train, 
-                method="ranger", 
-                trControl = trainControl(method="oob"),
-                num.trees = i,
-                tuneGrid= data.frame(mtry=3, splitrule = "gini",
-                                     min.node.size = 5))
+# recipe
+penguin_rf_recipe <-
+  recipe(body_mass_g ~ . ,
+         data = penguin_train) %>%
+  step_unknown(sex, new_level = "unknown") %>%
+  step_mutate(year = as.factor(year)) 
 
-acc.ntree <- c(acc.ntree, modFit.ntree$finalModel$prediction.error)
-}
+#model
+penguin_rf <- rand_forest(mtry = tune(),
+                           trees = tune()) %>%
+  set_engine("ranger", importance = "permutation") %>%
+  set_mode("regression")
 
-data.frame( ntree = seq(10, 260, by = 50), acc.ntree) %>%
-    ggplot( aes(x=ntree, y = acc.ntree)) + geom_line() +
-    xlab("number of trees in the RF") +
-    ylab("OOB Accuracy") +
-    ylim(c(0.04, 0.06))
+# workflow
+penguin_rf_wflow <- workflow() %>%
+  add_model(penguin_rf) %>%
+  add_recipe(penguin_rf_recipe)
+
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+penguin_grid <- grid_regular(mtry(range = c(2,7)),
+                             trees(range = c(1,500)),
+                             levels = 5)
+
+# tune
+penguin_rf_tune <- 
+  penguin_rf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+select_best(penguin_rf_tune, "rmse")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+```
+## # A tibble: 1 × 3
+##    mtry trees .config              
+##   <int> <int> <chr>                
+## 1     2   375 Preprocessor1_Model16
+```
+
+Which `mtry` and number of trees?
+
+
+```r
+penguin_rf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "rmse") %>%
+  ggplot() + 
+  geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
+
+
+Get the final model:
+
+
+```r
+penguin_rf_best <- finalize_model(
+  penguin_rf,
+  select_best(penguin_rf_tune, "rmse"))
+
+penguin_rf_best
+```
+
+```
+## Random Forest Model Specification (regression)
+## 
+## Main Arguments:
+##   mtry = 2
+##   trees = 375
+## 
+## Engine-Specific Arguments:
+##   importance = permutation
+## 
+## Computational engine: ranger
+```
+
+```r
+penguin_rf_final <-
+  workflow() %>%
+  add_model(penguin_rf_best) %>%
+  add_recipe(penguin_rf_recipe) %>%
+  fit(data = penguin_train)
+
+penguin_rf_final
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: rand_forest()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 2 Recipe Steps
+## 
+## • step_unknown()
+## • step_mutate()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Ranger result
+## 
+## Call:
+##  ranger::ranger(x = maybe_data_frame(x), y = y, mtry = min_cols(~2L,      x), num.trees = ~375L, importance = ~"permutation", num.threads = 1,      verbose = FALSE, seed = sample.int(10^5, 1)) 
+## 
+## Type:                             Regression 
+## Number of trees:                  375 
+## Sample size:                      249 
+## Number of independent variables:  7 
+## Mtry:                             2 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       84149.09 
+## R squared (OOB):                  0.8634591
+```
+
+Predict the test data:
+
+
+
+```r
+penguin_rf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  ggplot() +
+  geom_point(aes(x = body_mass_g, y = .pred)) + 
+  geom_abline(intercept = 0, slope = 1)
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;" />
+
 
 ####  Variable Importance {-}
 
-In order to get the variable importance, you need to specify importance within the building of the forest.
+In order to get the variable importance, you need to specify importance within the model of the forest.
 
-See if you can figure out every single line of the `ggplot` code.
 
 ```r
-modFit.VI <- caret::train(Species ~ ., 
-                data=iris.train, 
-                importance = "permutation",
-                method="ranger")
+library(vip)
 
-ranger::importance(modFit.VI$finalModel)
+penguin_rf_final %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "point")
 ```
 
-```
-## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-##  0.026859630  0.006130369  0.297439677  0.323197349
-```
-
-```r
-data.frame(importance = modFit.VI$finalModel$variable.importance,
-           variables = names(modFit.VI$finalModel$variable.importance)) %>% 
-    ggplot(aes(x = reorder(variables, importance), y = importance)) +
-    geom_bar(stat = "identity") + 
-    xlab("Variable") + 
-    coord_flip() 
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
-
-plot both the given labels as well as the predicted labels
-
-```r
-iris.test <- iris.test %>%
-    mutate(testSpecies = predict(modFit, iris.test))
-
-ggplot(iris.test, aes(x=Petal.Width, y=Petal.Length, 
-                      shape = Species, col = testSpecies)) + 
-    geom_point(size=3)
-```
-
-<img src="08-classification_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
-
-
-
-
+<img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
 
 ## Model Choices
 
@@ -1357,11 +1952,11 @@ There are *soooooo* many choices we've made along the way.  The following list s
 
 |  $\mbox{  }$ 	| $\mbox{  }$	|
 |---------------------------------------------	|-------------------------------	|
-| * explanatory variable choice 	| * k (kNN) 	|
+| * explanatory variable choice 	| * $k$ ($k$-NN) 	|
 | * number of explanatory variables 	| * distance measure 	|
-| * functions/transformation of explanatory 	| * k (CV) 	|
-| * transformation of response 	| * CV set.seed 	|
-| * response:continuous vs. categorical 	| * alpha prune 	|
+| * functions/transformation of explanatory 	| * V (CV) 	|
+| * transformation of response 	| * CV `set.seed` 	|
+| * response:continuous vs. categorical 	| * $\alpha$ prune 	|
 | * how missing data is dealt with 	| * maxdepth prune 	|
 | * train/test split (`set.seed`) 	| * prune or not 	|
 | * train/test proportion 	| * gini / entropy (split) 	|
@@ -1371,10 +1966,13 @@ There are *soooooo* many choices we've made along the way.  The following list s
 | * accuracy vs sensitivity vs specificity 	| * OOB vs CV for tuning 	|
 
 
+<!---
 ## 11/12/19 Agenda {#Nov12}
 1. linearly separable
 2. dot products
 3. support vector formulation
+--->
+
 
 ## Support Vector Machines
 
@@ -1412,7 +2010,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-31)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-74)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -1426,7 +2024,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-32)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-75)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -1504,10 +2102,10 @@ Find derivatives, set them equal to zero.  Note that we can differentiate with r
 > $${\bf w} = \sum \alpha_i  y_i  {\bf x}_i$$
 
 
-Use the value of ${\bf w}$ to plug back into $L$ to maximize.
+Use the value of ${\bf w}$ to plug back into $L$ to minimize
 
 \begin{align}
-L &= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) {\bf x}_i + b ) - 1]\\
+L &= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum_i \alpha_i [ y_i ((\sum_j \alpha_j y_j {\bf x}_j) \cdot{\bf x}_i + b ) - 1]\\
 &= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - \sum \alpha_i y_i b + \sum \alpha_i\\
 &= -\frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf x}_j) - 0 + \sum \alpha_i\\
 &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j
@@ -1517,7 +2115,7 @@ L &= \frac{1}{2}(\sum_i \alpha_i y_i {\bf x}_i) \cdot (\sum_j \alpha_j y_j {\bf 
 > $$L = \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j {\bf x}_i \cdot  {\bf x}_j$$
 
 
-The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, <center><p style="color:red">the optimization depends only on the dot product of pairs of samples</p></center>.  And the decision rule *also* depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  {\bf w} \cdot {\bf x}_i$, because $y_i = 1/y_i$.]
+The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so why did we go to all the work?  We need to understand the dependencies of sample vectors.  That is, <center><p style="color:red">the optimization depends only on the dot product of pairs of samples.</p></center>And the decision rule *also* depends only on the dot product of the new observation with the original samples.  [Note, the points on the margin / gutter can be used to solve for $b$: $b =y_i -  {\bf w} \cdot {\bf x}_i$, because $y_i = 1/y_i$.]
 
 > Decision Rule, call positive if:
 > $$\sum \alpha_i y_i {\bf x}_i \cdot {\bf u} + b \geq 0$$
@@ -1525,17 +2123,16 @@ The computer / numerical analyst is going to solve $L$ for the $\alpha_i$, so wh
 
 Note that we have a convex space (can be proved), and so we can't get stuck in a local maximum.
 
-
+<!---
 ### 11/14/19 Agenda {#Nov14}
 1. not linearly separable (SVM)
 2. kernels (SVM)
 3. support vector formulation
-
-
+--->
 
 ### Not Linearly Separable {#notlinsvm}
 
-#### Transformations
+#### Transformations {-}
 
 Simultaneously,  <center><p style="color:red">the data can be transformed into a new space where the data **are** linearly separable.</p></center>   If we can transform the data into a different space (where they are linearly separable), then we can transform the data into the new space and then do the same thing!  That is, consider the function $\phi$ such that our new space consists of vectors $\phi({\bf x})$.
 
@@ -1557,10 +2154,13 @@ L &= \sum \alpha_i -\frac{1}{2} \sum_i \sum_j  \alpha_i \alpha_j y_i y_j \phi({\
 \sum \alpha_i y_i K({\bf x}_i, {\bf u}) + b &\geq& 0
 \end{align}
 
+<!---
 ### 11/19/19 Agenda {#Nov19}
 1. kernels
 2. not separable: soft margins / cost
 3. one vs. one / one vs. all
+--->
+
 
 ##### Kernel Examples: {-}
 
@@ -1613,7 +2213,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-34)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-77)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -1622,24 +2222,24 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-35)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-78)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-36)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-37)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- gamma too big</p>
 </div>
 
 
 
-#### What is a Kernel? {#kernels}
+### What is a Kernel? {#kernels}
 
-What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g. a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
+What is a kernel: A kernel function is a function that obeys certain mathematical properties. I won't go into these properties right now, but for now think of a kernel as a function as a function of the dot product between two vectors,  (e.g., a measure of "similarity" between the two vectors).  If $K$ is a function of two vectors ${\bf x}$ and ${\bf y}$, then it is a kernel function if $K$ is the dot product of $\phi()$ applied to those vectors.  We know that $\phi()$ exists if $K$ is symmetric and if when $K_{ij} = K({\bf x}_i, {\bf x}_j)$, the matrix ${\bf K} = [K_{ij}]$ is positive definite.
 
 A helpful website about kernels: http://www.eric-kim.net/eric-kim-net/posts/1/kernel_trick.html
 
@@ -1669,7 +2269,7 @@ $$K_S({\bf x}, {\bf y}) = \tanh(\gamma {\bf x}\cdot {\bf y} + r) = \phi_S({\bf x
 Note, here $\gamma, r$ must be tuned using cross validation (along with the penalty/cost parameter $C$).  One benefit of the sigmoid kernel is that it has equivalence to a two-layer perceptron neural network.
 
 
-#### Soft Margins
+#### Soft Margins {-}
 
 But what if the data aren't linearly separable?  The optimization problem can be changed to allow for points to be on the other side of the margin.  The optimization problem is slightly more complicated, but basically the same idea:
 $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, \ \  \xi_i \geq 0$$
@@ -1677,7 +2277,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-38)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-81)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -1708,7 +2308,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-39)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-82)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -1763,188 +2363,363 @@ Alternatively, each group can be compared with each other group (e.g., Red vs. G
 
 ### R SVM Example
 
-We'll go back to the iris data.  As a first pass, let's use SVM to distinguish between Setosa and Versicolor/Virginica.
+We'll go back to the penguin data.  As a first pass, let's use SVM to distinguish between male and female penguins.  I removed the missing data from the dataset to make predictions easier.
 
 
 ```r
-library(kernlab)
-library(e1071)
-library(caret)
-data(iris)
+library(tidymodels)
+library(palmerpenguins)
 
-iris2 <- iris %>% dplyr::mutate(Species2 = as.factor(ifelse(Species == "setosa", "S", "V"))) %>%
-  dplyr::select(-Species)
+penguins <- penguins %>%
+  drop_na()
+
+set.seed(47)
+penguin_split <- initial_split(penguins)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
 ```
 
-
-#### Building an SVM on training data with radial kernel
+#### Linear SVM (no tuning) {-}
 
 
 ```r
-set.seed(4747)
-iris.svm.rad <- train(Species2 ~ ., data=iris2, method="svmRadial", 
-                 trControl = trainControl(method="cv"),
-                 tuneGrid= expand.grid(C=c(0.01,0.1,1,10,100), sigma=c(.5,1,2,3,4)),
-                 preProcess = c("center", "scale"))
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
 
-iris.svm.rad
+summary(penguin_svm_recipe)
 ```
 
 ```
-## Support Vector Machines with Radial Basis Function Kernel 
+## # A tibble: 5 × 4
+##   variable          type    role      source  
+##   <chr>             <chr>   <chr>     <chr>   
+## 1 bill_length_mm    numeric predictor original
+## 2 bill_depth_mm     numeric predictor original
+## 3 flipper_length_mm numeric predictor original
+## 4 body_mass_g       numeric predictor original
+## 5 sex               nominal outcome   original
+```
+
+```r
+# model
+penguin_svm_lin <- svm_linear() %>%
+  set_engine("LiblineaR") %>%
+  set_mode("classification")
+
+penguin_svm_lin
+```
+
+```
+## Linear Support Vector Machine Specification (classification)
 ## 
-## 150 samples
-##   4 predictor
-##   2 classes: 'S', 'V' 
+## Computational engine: LiblineaR
+```
+
+```r
+# workflow
+penguin_svm_lin_wflow <- workflow() %>%
+  add_model(penguin_svm_lin) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_lin_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_linear()
 ## 
-## Pre-processing: centered (4), scaled (4) 
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 135, 135, 135, 135, 135, 135, ... 
-## Resampling results across tuning parameters:
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
 ## 
-##   C      sigma  Accuracy   Kappa    
-##   1e-02  0.5    0.6666667  0.0000000
-##   1e-02  1.0    0.6666667  0.0000000
-##   1e-02  2.0    0.6666667  0.0000000
-##   1e-02  3.0    0.6666667  0.0000000
-##   1e-02  4.0    0.6666667  0.0000000
-##   1e-01  0.5    0.9866667  0.9684211
-##   1e-01  1.0    0.9800000  0.9508772
-##   1e-01  2.0    0.9466667  0.8684211
-##   1e-01  3.0    0.8800000  0.6892931
-##   1e-01  4.0    0.7933333  0.4411765
-##   1e+00  0.5    0.9933333  0.9842105
-##   1e+00  1.0    0.9933333  0.9842105
-##   1e+00  2.0    0.9866667  0.9684211
-##   1e+00  3.0    0.9866667  0.9684211
-##   1e+00  4.0    0.9866667  0.9684211
-##   1e+01  0.5    0.9933333  0.9842105
-##   1e+01  1.0    0.9933333  0.9842105
-##   1e+01  2.0    0.9866667  0.9684211
-##   1e+01  3.0    0.9866667  0.9684211
-##   1e+01  4.0    0.9866667  0.9684211
-##   1e+02  0.5    0.9933333  0.9842105
-##   1e+02  1.0    0.9933333  0.9842105
-##   1e+02  2.0    0.9866667  0.9684211
-##   1e+02  3.0    0.9866667  0.9684211
-##   1e+02  4.0    0.9866667  0.9684211
+## • step_normalize()
 ## 
-## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were sigma = 1 and C = 1.
-```
-
-#### Training Error
-
-
-```r
-iris.train.pred <- predict(iris.svm.rad, iris2)
-caret::confusionMatrix(iris.train.pred, iris2$Species2)$overall
-```
-
-```
-##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   1.000000e+00   1.000000e+00   9.757074e-01   1.000000e+00   6.666667e-01 
-## AccuracyPValue  McnemarPValue 
-##   3.857546e-27            NaN
-```
-
-```r
-caret::confusionMatrix(iris.train.pred, iris2$Species2)
-```
-
-```
-## Confusion Matrix and Statistics
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Linear Support Vector Machine Specification (classification)
 ## 
-##           Reference
-## Prediction   S   V
-##          S  50   0
-##          V   0 100
-##                                      
-##                Accuracy : 1          
-##                  95% CI : (0.9757, 1)
-##     No Information Rate : 0.6667     
-##     P-Value [Acc > NIR] : < 2.2e-16  
-##                                      
-##                   Kappa : 1          
-##                                      
-##  Mcnemar's Test P-Value : NA         
-##                                      
-##             Sensitivity : 1.0000     
-##             Specificity : 1.0000     
-##          Pos Pred Value : 1.0000     
-##          Neg Pred Value : 1.0000     
-##              Prevalence : 0.3333     
-##          Detection Rate : 0.3333     
-##    Detection Prevalence : 0.3333     
-##       Balanced Accuracy : 1.0000     
-##                                      
-##        'Positive' Class : S          
+## Computational engine: LiblineaR
+```
+
+```r
+# fit
+penguin_svm_lin_fit <- 
+  penguin_svm_lin_wflow %>%
+  fit(data = penguin_train)
+
+penguin_svm_lin_fit 
+```
+
+```
+## ══ Workflow [trained] ══════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_linear()
 ## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## $TypeDetail
+## [1] "L2-regularized L2-loss support vector classification dual (L2R_L2LOSS_SVC_DUAL)"
+## 
+## $Type
+## [1] 1
+## 
+## $W
+##      bill_length_mm bill_depth_mm flipper_length_mm body_mass_g       Bias
+## [1,]       0.248908      1.080195        -0.2256375    1.328448 0.06992734
+## 
+## $Bias
+## [1] 1
+## 
+## $ClassNames
+## [1] male   female
+## Levels: female male
+## 
+## $NbClass
+## [1] 2
+## 
+## attr(,"class")
+## [1] "LiblineaR"
 ```
 
 
-#### Visualizing the Boundary
-
-`caret` doesn't allow for visualization, so I've applied the `svm` function directly here.  I had to try various combinations of variables before finding a boundary that was visually interesting.  Note that just being in the yellow or red part doesn't necessarily indicate missclassification.  Remember that the boundary is in 4 dimensions and is not linear.
+#### RBF SVM (with tuning) {-}
 
 
 ```r
-iris.svm <- e1071::svm(Species2 ~ ., data = iris2, kernel = "radial")
-plot(iris.svm, data = iris2, Sepal.Width ~ Petal.Width, 
-     slice=list(Sepal.Length = 3, Petal.Length = 3))
-```
+# recipe
+penguin_svm_recipe <-
+  recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
+           body_mass_g, data = penguin_train) %>%
+  step_normalize(all_predictors())
 
-<img src="08-classification_files/figure-html/unnamed-chunk-43-1.png" width="480" style="display: block; margin: auto;" />
-
-
-#### 3 groups
-
-> For multiclass-classification with k classes, k > 2, `ksvm` uses the ‘one-against-one’-approach, in which k(k-1)/2 binary classifiers are trained; the appropriate class is found by a voting scheme
-
-
-```r
-set.seed(474747)
-train.obs <- sample(1:150, 100, replace = FALSE)
-iris.train <- iris[train.obs, ]
-iris.test <- iris[-train.obs, ]
-```
-
-
-```r
-iris.svm3 <- caret::train(Species ~ ., data=iris.train, method="svmRadial", 
-                 trControl = trainControl(method="none"),
-                 tuneGrid= expand.grid(C=1, sigma=2),
-                 preProcess = c("center", "scale"))
-```
-
-
-
-```r
-predict(iris.svm3, iris.test)
+summary(penguin_svm_recipe)
 ```
 
 ```
-##  [1] setosa     setosa     setosa     setosa     setosa     setosa    
-##  [7] setosa     setosa     setosa     setosa     setosa     setosa    
-## [13] virginica  setosa     setosa     setosa     versicolor versicolor
-## [19] versicolor versicolor versicolor versicolor versicolor virginica 
-## [25] versicolor versicolor versicolor versicolor versicolor versicolor
-## [31] versicolor versicolor versicolor virginica  virginica  virginica 
-## [37] virginica  virginica  virginica  versicolor virginica  virginica 
-## [43] virginica  versicolor virginica  virginica  virginica  virginica 
-## [49] virginica  virginica 
-## Levels: setosa versicolor virginica
+## # A tibble: 5 × 4
+##   variable          type    role      source  
+##   <chr>             <chr>   <chr>     <chr>   
+## 1 bill_length_mm    numeric predictor original
+## 2 bill_depth_mm     numeric predictor original
+## 3 flipper_length_mm numeric predictor original
+## 4 body_mass_g       numeric predictor original
+## 5 sex               nominal outcome   original
 ```
 
 ```r
-table(predict(iris.svm3, iris.test), iris.test$Species)
+# model
+penguin_svm_rbf <- svm_rbf(cost = tune(),
+                           rbf_sigma = tune()) %>%
+  set_engine("kernlab") %>%
+  set_mode("classification")
+
+penguin_svm_rbf
 ```
 
 ```
-##             
-##              setosa versicolor virginica
-##   setosa         15          0         0
-##   versicolor      0         16         2
-##   virginica       1          1        15
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = tune()
+##   rbf_sigma = tune()
+## 
+## Computational engine: kernlab
 ```
+
+```r
+# workflow
+penguin_svm_rbf_wflow <- workflow() %>%
+  add_model(penguin_svm_rbf) %>%
+  add_recipe(penguin_svm_recipe)
+
+penguin_svm_rbf_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: svm_rbf()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────
+## 1 Recipe Step
+## 
+## • step_normalize()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = tune()
+##   rbf_sigma = tune()
+## 
+## Computational engine: kernlab
+```
+
+```r
+# CV
+set.seed(234)
+penguin_folds <- vfold_cv(penguin_train,
+                          v = 4)
+
+# parameters
+# the tuned parameters also have default values you can use
+penguin_grid <- grid_regular(cost(),
+                             rbf_sigma(),
+                             levels = 8)
+
+penguin_grid
+```
+
+```
+## # A tibble: 64 × 2
+##         cost     rbf_sigma
+##        <dbl>         <dbl>
+##  1  0.000977 0.0000000001 
+##  2  0.00431  0.0000000001 
+##  3  0.0190   0.0000000001 
+##  4  0.0841   0.0000000001 
+##  5  0.371    0.0000000001 
+##  6  1.64     0.0000000001 
+##  7  7.25     0.0000000001 
+##  8 32        0.0000000001 
+##  9  0.000977 0.00000000268
+## 10  0.00431  0.00000000268
+## # … with 54 more rows
+```
+
+```r
+# tune
+# this takes a few minutes
+penguin_svm_rbf_tune <- 
+  penguin_svm_rbf_wflow %>%
+  tune_grid(resamples = penguin_folds,
+            grid = penguin_grid)
+
+penguin_svm_rbf_tune 
+```
+
+```
+## # Tuning results
+## # 4-fold cross-validation 
+## # A tibble: 4 × 4
+##   splits           id    .metrics           .notes          
+##   <list>           <chr> <list>             <list>          
+## 1 <split [186/63]> Fold1 <tibble [128 × 6]> <tibble [0 × 1]>
+## 2 <split [187/62]> Fold2 <tibble [128 × 6]> <tibble [0 × 1]>
+## 3 <split [187/62]> Fold3 <tibble [128 × 6]> <tibble [0 × 1]>
+## 4 <split [187/62]> Fold4 <tibble [128 × 6]> <tibble [0 × 1]>
+```
+
+##### What is best? {-}
+
+
+```r
+penguin_svm_rbf_tune %>%
+  collect_metrics() %>%
+  filter(.metric == "accuracy") %>%
+  ggplot() + 
+  geom_line(aes(color = as.factor(cost), y = mean, x = rbf_sigma)) +
+  labs(color = "Cost")
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-86-1.png" width="480" style="display: block; margin: auto;" />
+
+
+```r
+penguin_svm_rbf_tune %>%
+  autoplot()
+```
+
+<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
+
+##### RBF SVM final model {-}
+
+
+```r
+penguin_svm_rbf_best <- finalize_model(
+  penguin_svm_rbf,
+  select_best(penguin_svm_rbf_tune, "accuracy"))
+
+penguin_svm_rbf_best
+```
+
+```
+## Radial Basis Function Support Vector Machine Specification (classification)
+## 
+## Main Arguments:
+##   cost = 0.371498572284237
+##   rbf_sigma = 1
+## 
+## Computational engine: kernlab
+```
+
+```r
+penguin_svm_rbf_final <-
+  workflow() %>%
+  add_model(penguin_svm_rbf_best) %>%
+  add_recipe(penguin_svm_recipe) %>%
+  fit(data = penguin_train)
+```
+
+
+##### Test predictions {-}
+
+
+```r
+library(yardstick)
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  select(sex, .pred_class) %>%
+  table()
+```
+
+```
+##         .pred_class
+## sex      female male
+##   female     39    5
+##   male        4   36
+```
+
+```r
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  conf_mat(sex, .pred_class)
+```
+
+```
+##           Truth
+## Prediction female male
+##     female     39    4
+##     male        5   36
+```
+
+```r
+# https://yardstick.tidymodels.org/articles/metric-types.html
+class_metrics <- yardstick::metric_set(accuracy,sens,
+                                       spec, f_meas)
+
+penguin_svm_rbf_final %>%
+  predict(new_data = penguin_test) %>%
+  cbind(penguin_test) %>%
+  class_metrics(truth = sex, estimate = .pred_class)
+```
+
+```
+## # A tibble: 4 × 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy binary         0.893
+## 2 sens     binary         0.886
+## 3 spec     binary         0.9  
+## 4 f_meas   binary         0.897
+```
+
 

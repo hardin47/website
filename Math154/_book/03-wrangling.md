@@ -176,13 +176,13 @@ babynames %>% glimpse()
 ```
 
 ```
-## Observations: 1,924,665
-## Variables: 5
-## $ year <dbl> 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880,…
-## $ sex  <chr> "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F",…
-## $ name <chr> "Mary", "Anna", "Emma", "Elizabeth", "Minnie", "Margaret", …
-## $ n    <int> 7065, 2604, 2003, 1939, 1746, 1578, 1472, 1414, 1320, 1288,…
-## $ prop <dbl> 0.07238359, 0.02667896, 0.02052149, 0.01986579, 0.01788843,…
+## Rows: 1,924,665
+## Columns: 5
+## $ year <dbl> 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880,…
+## $ sex  <chr> "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", …
+## $ name <chr> "Mary", "Anna", "Emma", "Elizabeth", "Minnie", "Margaret", "Ida",…
+## $ n    <int> 7065, 2604, 2003, 1939, 1746, 1578, 1472, 1414, 1320, 1288, 1258,…
+## $ prop <dbl> 0.07238359, 0.02667896, 0.02052149, 0.01986579, 0.01788843, 0.016…
 ```
 
 ```r
@@ -190,7 +190,7 @@ babynames %>% head()
 ```
 
 ```
-## # A tibble: 6 x 5
+## # A tibble: 6 × 5
 ##    year sex   name          n   prop
 ##   <dbl> <chr> <chr>     <int>  <dbl>
 ## 1  1880 F     Mary       7065 0.0724
@@ -206,7 +206,7 @@ babynames %>% tail()
 ```
 
 ```
-## # A tibble: 6 x 5
+## # A tibble: 6 × 5
 ##    year sex   name       n       prop
 ##   <dbl> <chr> <chr>  <int>      <dbl>
 ## 1  2017 M     Zyhier     5 0.00000255
@@ -222,14 +222,14 @@ babynames %>% sample_n(size=5)
 ```
 
 ```
-## # A tibble: 5 x 5
-##    year sex   name       n       prop
-##   <dbl> <chr> <chr>  <int>      <dbl>
-## 1  1997 M     Jaqwon     5 0.0000025 
-## 2  1988 F     Jamera     7 0.00000364
-## 3  2001 M     Othon      6 0.0000029 
-## 4  2001 M     Dean     744 0.000360  
-## 5  2006 F     Ngoc       8 0.00000383
+## # A tibble: 5 × 5
+##    year sex   name        n       prop
+##   <dbl> <chr> <chr>   <int>      <dbl>
+## 1  1964 M     Myles     112 0.0000552 
+## 2  1981 F     Saima      12 0.00000671
+## 3  2003 M     Nykolas    13 0.00000619
+## 4  1997 F     Yobana      6 0.00000314
+## 5  2006 M     Brilee      6 0.00000274
 ```
 
 ```r
@@ -256,7 +256,7 @@ starwars %>% dim()
 ```
 
 ```
-## [1] 87 13
+## [1] 87 14
 ```
 
 ```r
@@ -265,8 +265,8 @@ starwars %>% names()
 
 ```
 ##  [1] "name"       "height"     "mass"       "hair_color" "skin_color"
-##  [6] "eye_color"  "birth_year" "gender"     "homeworld"  "species"   
-## [11] "films"      "vehicles"   "starships"
+##  [6] "eye_color"  "birth_year" "sex"        "gender"     "homeworld" 
+## [11] "species"    "films"      "vehicles"   "starships"
 ```
 
 ```r
@@ -274,15 +274,15 @@ starwars %>% head()
 ```
 
 ```
-## # A tibble: 6 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   <chr>  <int> <dbl> <chr>      <chr>      <chr>          <dbl> <chr> 
-## 1 Luke…    172    77 blond      fair       blue            19   male  
-## 2 C-3PO    167    75 <NA>       gold       yellow         112   <NA>  
-## 3 R2-D2     96    32 <NA>       white, bl… red             33   <NA>  
-## 4 Dart…    202   136 none       white      yellow          41.9 male  
-## 5 Leia…    150    49 brown      light      brown           19   female
-## 6 Owen…    178   120 brown, gr… light      blue            52   male  
+## # A tibble: 6 × 14
+##   name     height  mass hair_color  skin_color eye_color birth_year sex   gender
+##   <chr>     <int> <dbl> <chr>       <chr>      <chr>          <dbl> <chr> <chr> 
+## 1 Luke Sk…    172    77 blond       fair       blue            19   male  mascu…
+## 2 C-3PO       167    75 <NA>        gold       yellow         112   none  mascu…
+## 3 R2-D2        96    32 <NA>        white, bl… red             33   none  mascu…
+## 4 Darth V…    202   136 none        white      yellow          41.9 male  mascu…
+## 5 Leia Or…    150    49 brown       light      brown           19   fema… femin…
+## 6 Owen La…    178   120 brown, grey light      blue            52   male  mascu…
 ## # … with 5 more variables: homeworld <chr>, species <chr>, films <list>,
 ## #   vehicles <list>, starships <list>
 ```
@@ -293,16 +293,9 @@ starwars %>%
 ```
 
 ```
-##          gender  min      Q1 median      Q3  max       mean       sd  n
-## 1        female   45   49.25   52.5   55.90   75   54.02000  8.37215 10
-## 2 hermaphrodite 1358 1358.00 1358.0 1358.00 1358 1358.00000       NA  1
-## 3          male   15   76.50   80.0   87.25  159   81.00455 28.22371 44
-## 4          none  140  140.00  140.0  140.00  140  140.00000       NA  1
-##   missing
-## 1       9
-## 2       0
-## 3      18
-## 4       1
+##      gender min Q1 median   Q3  max      mean         sd  n missing
+## 1  feminine  45 50     55 56.2   75  54.68889   8.591921  9       8
+## 2 masculine  15 75     80 88.0 1358 106.14694 184.972677 49      17
 ```
 
 ```r
@@ -311,14 +304,15 @@ starwars %>%
 ```
 
 ```
-## # A tibble: 5 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   <chr>  <int> <dbl> <chr>      <chr>      <chr>          <dbl> <chr> 
-## 1 C-3PO    167    75 <NA>       gold       yellow           112 <NA>  
-## 2 R2-D2     96    32 <NA>       white, bl… red               33 <NA>  
-## 3 R5-D4     97    32 <NA>       white, red red               NA <NA>  
-## 4 IG-88    200   140 none       metal      red               15 none  
-## 5 BB8       NA    NA none       none       black             NA none  
+## # A tibble: 6 × 14
+##   name   height  mass hair_color skin_color  eye_color birth_year sex   gender  
+##   <chr>   <int> <dbl> <chr>      <chr>       <chr>          <dbl> <chr> <chr>   
+## 1 C-3PO     167    75 <NA>       gold        yellow           112 none  masculi…
+## 2 R2-D2      96    32 <NA>       white, blue red               33 none  masculi…
+## 3 R5-D4      97    32 <NA>       white, red  red               NA none  masculi…
+## 4 IG-88     200   140 none       metal       red               15 none  masculi…
+## 5 R4-P17     96    NA none       silver, red red, blue         NA none  feminine
+## 6 BB8        NA    NA none       none        black             NA none  masculi…
 ## # … with 5 more variables: homeworld <chr>, species <chr>, films <list>,
 ## #   vehicles <list>, starships <list>
 ```
@@ -330,14 +324,9 @@ starwars %>%
 ```
 
 ```
-##          gender  min     Q1 median      Q3  max       mean        sd  n
-## 1        female   45   50.0     55   56.20   75   54.68889  8.591921  9
-## 2 hermaphrodite 1358 1358.0   1358 1358.00 1358 1358.00000        NA  1
-## 3          male   15   76.5     80   87.25  159   81.00455 28.223707 44
-##   missing
-## 1       7
-## 2       0
-## 3      16
+##      gender min Q1 median   Q3  max      mean         sd  n missing
+## 1  feminine  45 50     55 56.2   75  54.68889   8.591921  9       7
+## 2 masculine  15 77     80 88.0 1358 109.38222 192.397084 45      16
 ```
 
 ```r
@@ -346,7 +335,7 @@ starwars %>%
 ```
 
 ```
-## # A tibble: 87 x 4
+## # A tibble: 87 × 4
 ##    name               hair_color    skin_color  eye_color
 ##    <chr>              <chr>         <chr>       <chr>    
 ##  1 Luke Skywalker     blond         fair        blue     
@@ -369,7 +358,7 @@ starwars %>%
 ```
 
 ```
-## # A tibble: 87 x 4
+## # A tibble: 87 × 4
 ##    name               height  mass   bmi
 ##    <chr>               <int> <dbl> <dbl>
 ##  1 Luke Skywalker        172    77  26.0
@@ -391,21 +380,21 @@ starwars %>%
 ```
 
 ```
-## # A tibble: 87 x 13
-##    name  height  mass hair_color skin_color eye_color birth_year gender
-##    <chr>  <int> <dbl> <chr>      <chr>      <chr>          <dbl> <chr> 
-##  1 Jabb…    175  1358 <NA>       green-tan… orange         600   herma…
-##  2 Grie…    216   159 none       brown, wh… green, y…       NA   male  
-##  3 IG-88    200   140 none       metal      red             15   none  
-##  4 Dart…    202   136 none       white      yellow          41.9 male  
-##  5 Tarf…    234   136 brown      brown      blue            NA   male  
-##  6 Owen…    178   120 brown, gr… light      blue            52   male  
-##  7 Bossk    190   113 none       green      red             53   male  
-##  8 Chew…    228   112 brown      unknown    blue           200   male  
-##  9 Jek …    180   110 brown      fair       blue            NA   male  
-## 10 Dext…    198   102 none       brown      yellow          NA   male  
-## # … with 77 more rows, and 5 more variables: homeworld <chr>,
-## #   species <chr>, films <list>, vehicles <list>, starships <list>
+## # A tibble: 87 × 14
+##    name    height  mass hair_color  skin_color eye_color birth_year sex   gender
+##    <chr>    <int> <dbl> <chr>       <chr>      <chr>          <dbl> <chr> <chr> 
+##  1 Jabba …    175  1358 <NA>        green-tan… orange         600   herm… mascu…
+##  2 Grievo…    216   159 none        brown, wh… green, y…       NA   male  mascu…
+##  3 IG-88      200   140 none        metal      red             15   none  mascu…
+##  4 Darth …    202   136 none        white      yellow          41.9 male  mascu…
+##  5 Tarfful    234   136 brown       brown      blue            NA   male  mascu…
+##  6 Owen L…    178   120 brown, grey light      blue            52   male  mascu…
+##  7 Bossk      190   113 none        green      red             53   male  mascu…
+##  8 Chewba…    228   112 brown       unknown    blue           200   male  mascu…
+##  9 Jek To…    180   110 brown       fair       blue            NA   male  mascu…
+## 10 Dexter…    198   102 none        brown      yellow          NA   male  mascu…
+## # … with 77 more rows, and 5 more variables: homeworld <chr>, species <chr>,
+## #   films <list>, vehicles <list>, starships <list>
 ```
 
 ```r
@@ -419,10 +408,10 @@ starwars %>%
 ```
 
 ```
-## # A tibble: 9 x 3
+## # A tibble: 9 × 3
 ##   species    num  mass
 ##   <chr>    <int> <dbl>
-## 1 Droid        5  69.8
+## 1 Droid        6  69.8
 ## 2 Gungan       3  74  
 ## 3 Human       35  82.8
 ## 4 Kaminoan     2  88  
@@ -430,7 +419,7 @@ starwars %>%
 ## 6 Twi'lek      2  55  
 ## 7 Wookiee      2 124  
 ## 8 Zabrak       2  80  
-## 9 <NA>         5  48
+## 9 <NA>         4  48
 ```
 
 
@@ -442,32 +431,25 @@ names(NHANES)
 ```
 
 ```
-##  [1] "ID"               "SurveyYr"         "Gender"          
-##  [4] "Age"              "AgeDecade"        "AgeMonths"       
-##  [7] "Race1"            "Race3"            "Education"       
-## [10] "MaritalStatus"    "HHIncome"         "HHIncomeMid"     
-## [13] "Poverty"          "HomeRooms"        "HomeOwn"         
-## [16] "Work"             "Weight"           "Length"          
-## [19] "HeadCirc"         "Height"           "BMI"             
-## [22] "BMICatUnder20yrs" "BMI_WHO"          "Pulse"           
-## [25] "BPSysAve"         "BPDiaAve"         "BPSys1"          
-## [28] "BPDia1"           "BPSys2"           "BPDia2"          
-## [31] "BPSys3"           "BPDia3"           "Testosterone"    
-## [34] "DirectChol"       "TotChol"          "UrineVol1"       
-## [37] "UrineFlow1"       "UrineVol2"        "UrineFlow2"      
-## [40] "Diabetes"         "DiabetesAge"      "HealthGen"       
-## [43] "DaysPhysHlthBad"  "DaysMentHlthBad"  "LittleInterest"  
-## [46] "Depressed"        "nPregnancies"     "nBabies"         
-## [49] "Age1stBaby"       "SleepHrsNight"    "SleepTrouble"    
-## [52] "PhysActive"       "PhysActiveDays"   "TVHrsDay"        
-## [55] "CompHrsDay"       "TVHrsDayChild"    "CompHrsDayChild" 
-## [58] "Alcohol12PlusYr"  "AlcoholDay"       "AlcoholYear"     
-## [61] "SmokeNow"         "Smoke100"         "Smoke100n"       
-## [64] "SmokeAge"         "Marijuana"        "AgeFirstMarij"   
-## [67] "RegularMarij"     "AgeRegMarij"      "HardDrugs"       
-## [70] "SexEver"          "SexAge"           "SexNumPartnLife" 
-## [73] "SexNumPartYear"   "SameSex"          "SexOrientation"  
-## [76] "PregnantNow"
+##  [1] "ID"               "SurveyYr"         "Gender"           "Age"             
+##  [5] "AgeDecade"        "AgeMonths"        "Race1"            "Race3"           
+##  [9] "Education"        "MaritalStatus"    "HHIncome"         "HHIncomeMid"     
+## [13] "Poverty"          "HomeRooms"        "HomeOwn"          "Work"            
+## [17] "Weight"           "Length"           "HeadCirc"         "Height"          
+## [21] "BMI"              "BMICatUnder20yrs" "BMI_WHO"          "Pulse"           
+## [25] "BPSysAve"         "BPDiaAve"         "BPSys1"           "BPDia1"          
+## [29] "BPSys2"           "BPDia2"           "BPSys3"           "BPDia3"          
+## [33] "Testosterone"     "DirectChol"       "TotChol"          "UrineVol1"       
+## [37] "UrineFlow1"       "UrineVol2"        "UrineFlow2"       "Diabetes"        
+## [41] "DiabetesAge"      "HealthGen"        "DaysPhysHlthBad"  "DaysMentHlthBad" 
+## [45] "LittleInterest"   "Depressed"        "nPregnancies"     "nBabies"         
+## [49] "Age1stBaby"       "SleepHrsNight"    "SleepTrouble"     "PhysActive"      
+## [53] "PhysActiveDays"   "TVHrsDay"         "CompHrsDay"       "TVHrsDayChild"   
+## [57] "CompHrsDayChild"  "Alcohol12PlusYr"  "AlcoholDay"       "AlcoholYear"     
+## [61] "SmokeNow"         "Smoke100"         "Smoke100n"        "SmokeAge"        
+## [65] "Marijuana"        "AgeFirstMarij"    "RegularMarij"     "AgeRegMarij"     
+## [69] "HardDrugs"        "SexEver"          "SexAge"           "SexNumPartnLife" 
+## [73] "SexNumPartYear"   "SameSex"          "SexOrientation"   "PregnantNow"
 ```
 
 ```r
@@ -530,7 +512,7 @@ NHANES %>% summarize(n())
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   `n()`
 ##   <int>
 ## 1 10000
@@ -542,7 +524,7 @@ NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarize(sum(Weightlb, na.rm=TRUE)
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   `sum(Weightlb, na.rm = TRUE)`
 ##                           <dbl>
 ## 1                      1549419.
@@ -554,7 +536,7 @@ NHANES %>% mutate(Weightlb = Weight*2.2) %>% summarize(mean(Weightlb, na.rm=TRUE
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   `mean(Weightlb, na.rm = TRUE)`
 ##                            <dbl>
 ## 1                           156.
@@ -568,7 +550,7 @@ NHANES %>% group_by(Gender) %>% summarize(n())
 ```
 
 ```
-## # A tibble: 2 x 2
+## # A tibble: 2 × 2
 ##   Gender `n()`
 ##   <fct>  <int>
 ## 1 female  5020
@@ -581,7 +563,7 @@ NHANES %>% group_by(Gender) %>% mutate(Weightlb = Weight*2.2) %>%
 ```
 
 ```
-## # A tibble: 2 x 2
+## # A tibble: 2 × 2
 ##   Gender `mean(Weightlb, na.rm = TRUE)`
 ##   <fct>                           <dbl>
 ## 1 female                           146.
@@ -594,7 +576,7 @@ NHANES %>% group_by(SmokeNow) %>% summarize(n())
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   SmokeNow `n()`
 ##   <fct>    <int>
 ## 1 No        1745
@@ -608,7 +590,7 @@ NHANES %>% group_by(SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>%
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   SmokeNow `mean(Weightlb, na.rm = TRUE)`
 ##   <fct>                             <dbl>
 ## 1 No                                 186.
@@ -622,7 +604,7 @@ NHANES %>% group_by(Diabetes) %>% summarize(n())
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   Diabetes `n()`
 ##   <fct>    <int>
 ## 1 No        9098
@@ -636,7 +618,7 @@ NHANES %>% group_by(Diabetes) %>% mutate(Weightlb = Weight*2.2) %>%
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   Diabetes `mean(Weightlb, na.rm = TRUE)`
 ##   <fct>                             <dbl>
 ## 1 No                                155. 
@@ -650,7 +632,7 @@ NHANES %>% group_by(SmokeNow, Gender) %>% summarize(n())
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ## # Groups:   SmokeNow [3]
 ##   SmokeNow Gender `n()`
 ##   <fct>    <fct>  <int>
@@ -668,7 +650,7 @@ NHANES %>% group_by(SmokeNow, Gender) %>% mutate(Weightlb = Weight*2.2) %>%
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ## # Groups:   SmokeNow [3]
 ##   SmokeNow Gender `mean(Weightlb, na.rm = TRUE)`
 ##   <fct>    <fct>                           <dbl>
@@ -686,7 +668,7 @@ NHANES %>% group_by(Diabetes, SmokeNow) %>% summarize(n())
 ```
 
 ```
-## # A tibble: 8 x 3
+## # A tibble: 8 × 3
 ## # Groups:   Diabetes [3]
 ##   Diabetes SmokeNow `n()`
 ##   <fct>    <fct>    <int>
@@ -706,7 +688,7 @@ NHANES %>% group_by(Diabetes, SmokeNow) %>% mutate(Weightlb = Weight*2.2) %>%
 ```
 
 ```
-## # A tibble: 8 x 3
+## # A tibble: 8 × 3
 ## # Groups:   Diabetes [3]
 ##   Diabetes SmokeNow `mean(Weightlb, na.rm = TRUE)`
 ##   <fct>    <fct>                             <dbl>
@@ -729,7 +711,7 @@ babynames %>% group_by(sex) %>%
 ```
 
 ```
-## # A tibble: 2 x 2
+## # A tibble: 2 × 2
 ##   sex       total
 ##   <chr>     <int>
 ## 1 F     172371079
@@ -742,7 +724,7 @@ babynames %>% group_by(year, sex) %>%
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ## # Groups:   year [3]
 ##    year sex   name_count
 ##   <dbl> <chr>      <int>
@@ -760,7 +742,7 @@ babynames %>% group_by(year, sex) %>%
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ## # Groups:   year [3]
 ##    year sex   name_count
 ##   <dbl> <chr>      <int>
@@ -779,12 +761,12 @@ babysamp %>% select(year) %>% distinct() %>% table()
 
 ```
 ## .
-## 1898 1903 1911 1913 1917 1919 1920 1921 1922 1928 1929 1935 1946 1948 1950 
-##    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1 
-## 1951 1954 1956 1958 1962 1970 1972 1973 1975 1977 1978 1980 1983 1985 1989 
-##    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1 
-## 1991 1998 1999 2001 2002 2003 2006 2007 2008 2009 2011 2014 2015 2017 
-##    1    1    1    1    1    1    1    1    1    1    1    1    1    1
+## 1907 1915 1921 1922 1925 1928 1930 1946 1950 1951 1952 1953 1954 1965 1966 1969 
+##    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1 
+## 1971 1973 1974 1975 1978 1979 1980 1981 1985 1987 1993 1998 1999 2000 2001 2002 
+##    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1 
+## 2004 2005 2007 2008 2010 2012 2014 2016 2017 
+##    1    1    1    1    1    1    1    1    1
 ```
 
 ```r
@@ -793,12 +775,12 @@ babysamp %>% distinct() %>% select(year) %>% table()
 
 ```
 ## .
-## 1898 1903 1911 1913 1917 1919 1920 1921 1922 1928 1929 1935 1946 1948 1950 
-##    1    1    1    1    1    1    1    1    1    1    1    1    2    1    1 
-## 1951 1954 1956 1958 1962 1970 1972 1973 1975 1977 1978 1980 1983 1985 1989 
-##    1    1    1    1    1    1    1    1    1    1    1    1    1    2    1 
-## 1991 1998 1999 2001 2002 2003 2006 2007 2008 2009 2011 2014 2015 2017 
-##    2    3    1    1    1    1    1    1    1    1    1    1    2    1
+## 1907 1915 1921 1922 1925 1928 1930 1946 1950 1951 1952 1953 1954 1965 1966 1969 
+##    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1 
+## 1971 1973 1974 1975 1978 1979 1980 1981 1985 1987 1993 1998 1999 2000 2001 2002 
+##    2    1    3    1    1    1    1    1    1    2    2    1    2    1    1    1 
+## 2004 2005 2007 2008 2010 2012 2014 2016 2017 
+##    3    1    1    2    1    1    1    1    1
 ```
 
 ```r
@@ -1281,7 +1263,7 @@ day(rightnow)
 ```
 
 ```
-## [1] 17
+## [1] 4
 ```
 
 ```r
@@ -1289,7 +1271,7 @@ week(rightnow)
 ```
 
 ```
-## [1] 38
+## [1] 44
 ```
 
 ```r
@@ -1297,7 +1279,7 @@ month(rightnow, label=FALSE)
 ```
 
 ```
-## [1] 9
+## [1] 11
 ```
 
 ```r
@@ -1305,7 +1287,7 @@ month(rightnow, label=TRUE)
 ```
 
 ```
-## [1] Sep
+## [1] Nov
 ## 12 Levels: Jan < Feb < Mar < Apr < May < Jun < Jul < Aug < Sep < ... < Dec
 ```
 
@@ -1314,7 +1296,7 @@ year(rightnow)
 ```
 
 ```
-## [1] 2019
+## [1] 2021
 ```
 
 ```r
@@ -1322,7 +1304,7 @@ minute(rightnow)
 ```
 
 ```
-## [1] 54
+## [1] 2
 ```
 
 ```r
@@ -1330,7 +1312,7 @@ hour(rightnow)
 ```
 
 ```
-## [1] 4
+## [1] 9
 ```
 
 ```r
@@ -1338,7 +1320,7 @@ yday(rightnow)
 ```
 
 ```
-## [1] 260
+## [1] 308
 ```
 
 ```r
@@ -1346,7 +1328,7 @@ mday(rightnow)
 ```
 
 ```
-## [1] 17
+## [1] 4
 ```
 
 ```r
@@ -1354,7 +1336,7 @@ wday(rightnow, label=FALSE)
 ```
 
 ```
-## [1] 3
+## [1] 5
 ```
 
 ```r
@@ -1362,7 +1344,7 @@ wday(rightnow, label=TRUE)
 ```
 
 ```
-## [1] Tue
+## [1] Thu
 ## Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 ```
 
@@ -1436,19 +1418,19 @@ head(flightsWK)
 ```
 
 ```
-## # A tibble: 6 x 22
-##    year month   day dep_time sched_dep_time dep_delay arr_time
-##   <int> <int> <int>    <int>          <int>     <dbl>    <int>
-## 1  2013     1     1      517            515         2      830
-## 2  2013     1     1      533            529         4      850
-## 3  2013     1     1      542            540         2      923
-## 4  2013     1     1      544            545        -1     1004
-## 5  2013     1     1      554            600        -6      812
-## 6  2013     1     1      554            558        -4      740
-## # … with 15 more variables: sched_arr_time <int>, arr_delay <dbl>,
-## #   carrier <chr>, flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
-## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>,
-## #   time_hour <dttm>, ymdday <date>, weekdy <ord>, whichweek <dbl>
+## # A tibble: 6 × 22
+##    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+##   <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+## 1  2013     1     1      517            515         2      830            819
+## 2  2013     1     1      533            529         4      850            830
+## 3  2013     1     1      542            540         2      923            850
+## 4  2013     1     1      544            545        -1     1004           1022
+## 5  2013     1     1      554            600        -6      812            837
+## 6  2013     1     1      554            558        -4      740            728
+## # … with 14 more variables: arr_delay <dbl>, carrier <chr>, flight <int>,
+## #   tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>,
+## #   hour <dbl>, minute <dbl>, time_hour <dttm>, ymdday <date>, weekdy <ord>,
+## #   whichweek <dbl>
 ```
 
 ```r
@@ -1462,7 +1444,7 @@ flightsWK %>% select(year, month, day, ymdday, weekdy, whichweek, dep_time,
 ```
 
 ```
-## # A tibble: 6 x 9
+## # A tibble: 6 × 9
 ##    year month   day ymdday     weekdy whichweek dep_time arr_time air_time
 ##   <int> <int> <int> <date>     <ord>      <dbl>    <int>    <int>    <dbl>
 ## 1  2013     1     1 2013-01-01 Tue            1      517      830      227
