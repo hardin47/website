@@ -1,0 +1,6 @@
+# Shrinkage Methods {#shrink}
+
+
+
+
+

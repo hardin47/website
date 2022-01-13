@@ -1,0 +1,6 @@
+# Smoothing Methods {#smooth}
+
+
+
+
+
