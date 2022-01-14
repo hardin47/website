@@ -176,7 +176,8 @@ Infants %>% head()
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: choice (factor)
+## # A tibble: 1 × 1
 ##    stat
 ##   <dbl>
 ## 1 0.875
@@ -204,7 +205,7 @@ null_help %>%
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   p_value
 ##     <dbl>
 ## 1   0.002

@@ -469,7 +469,7 @@ Cuckoo %>%
 ```
 
 ```
-## # A tibble: 6 x 2
+## # A tibble: 6 × 2
 ##   Bird          mean_length
 ##   <fct>               <dbl>
 ## 1 hedge_sparrow        23.1
@@ -487,7 +487,7 @@ Cuckoo %>%
 ```
 
 ```
-## # A tibble: 6 x 5
+## # A tibble: 6 × 5
 ##   term            estimate std.error statistic   p.value
 ##   <chr>              <dbl>     <dbl>     <dbl>     <dbl>
 ## 1 (Intercept)      23.1        0.243   95.1    1.87e-110
@@ -508,7 +508,7 @@ Cuckoo %>%
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic      p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl> <dbl>     <dbl>        <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.313         0.283 0.909      10.4 0.0000000315     5  -156.  326.  345.
@@ -666,7 +666,7 @@ teachers %>%
 ## 
 ## data:  base by degree
 ## t = -0.14639, df = 65.238, p-value = 0.442
-## alternative hypothesis: true difference in means is less than 0
+## alternative hypothesis: true difference in means between group BA and group MA is less than 0
 ## 95 percent confidence interval:
 ##      -Inf 3664.912
 ## sample estimates:
@@ -694,7 +694,8 @@ set.seed(47)
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: base (numeric)
+## # A tibble: 1 × 1
 ##     stat
 ##    <dbl>
 ## 1 56416.
@@ -722,7 +723,7 @@ null_dist %>%
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   p_value
 ##     <dbl>
 ## 1       0
@@ -743,7 +744,9 @@ set.seed(47)
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: base (numeric)
+## Explanatory: degree (factor)
+## # A tibble: 1 × 1
 ##    stat
 ##   <dbl>
 ## 1  352.
@@ -771,7 +774,7 @@ null_dist %>%
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   p_value
 ##     <dbl>
 ## 1   0.454
@@ -820,7 +823,7 @@ NBAsalary %>%
 ```
 
 ```
-## # A tibble: 2 x 7
+## # A tibble: 2 × 7
 ##   conference    mu sigma     N `min(salary)` `max(salary)` `median(salary)`
 ##   <chr>      <dbl> <dbl> <int>         <dbl>         <dbl>            <dbl>
 ## 1 eastern     6.61  7.01   227        0.0577          33.3             3.81

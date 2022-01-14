@@ -254,7 +254,7 @@ lm(log(price) ~ sqft + bedrooms, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
@@ -285,7 +285,7 @@ lm(log(price) ~  bedrooms, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term        estimate std.error statistic  p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)   12.3      0.219      56.3  1.03e-66
@@ -417,7 +417,7 @@ lm(velocity ~ bodymass, data = cats) %>%
 ```
 
 ```
-## # A tibble: 2 x 7
+## # A tibble: 2 × 7
 ##   term        estimate std.error statistic  p.value conf.low  conf.high
 ##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>      <dbl>
 ## 1 (Intercept) 394.      23.4         16.8  1.35e-11 345.     444.      
@@ -436,7 +436,7 @@ lm(velocity ~ bodymass, data = cats) %>%
 ```
 
 ```
-## # A tibble: 18 x 8
+## # A tibble: 18 × 8
 ##    velocity bodymass .fitted .resid   .hat .sigma   .cooksd .std.resid
 ##       <dbl>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>     <dbl>      <dbl>
 ##  1     334.     3640    350. -15.6  0.0656   30.3 0.0104       -0.545 
@@ -481,7 +481,7 @@ lm(velocity ~ bodymass, data = cats) %>%
 ```
 
 ```
-## # A tibble: 1 x 4
+## # A tibble: 1 × 4
 ##   bodymass .fitted .lower .upper
 ##      <dbl>   <dbl>  <dbl>  <dbl>
 ## 1     4700    337.   321.   353.
@@ -493,7 +493,7 @@ lm(velocity ~ bodymass, data = cats) %>%
 ```
 
 ```
-## # A tibble: 1 x 4
+## # A tibble: 1 × 4
 ##   bodymass .fitted .lower .upper
 ##      <dbl>   <dbl>  <dbl>  <dbl>
 ## 1     4700    337.   272.   402.
@@ -566,7 +566,7 @@ lm(price ~ sqft, data = house) %>%
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term        estimate std.error statistic  p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)   65930.   60994.       1.08 2.83e- 1
@@ -579,7 +579,7 @@ lm(price ~ bedrooms, data=house) %>%
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term        estimate std.error statistic p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 ## 1 (Intercept)  220612.   107208.      2.06 0.0428 
@@ -595,7 +595,7 @@ lm(price ~ sqft, data = house) %>%
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared   sigma statistic  p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl>   <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.421         0.414 222137.      58.8 3.35e-11     1 -1139. 2283. 2290.
@@ -608,7 +608,7 @@ lm(price ~ bedrooms, data=house) %>%
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared   sigma statistic p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl>   <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1    0.0808        0.0695 279815.      7.12 0.00919     1 -1158. 2321. 2329.
@@ -685,7 +685,7 @@ lm(ln_price ~ sqft + bedrooms, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 12.2      0.174         70.1  1.39e-73
@@ -698,7 +698,7 @@ lm(ln_price ~ sqft + bedrooms, data=house) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.448         0.435 0.450      32.5 4.62e-11     2  -50.0  108.  118.
@@ -711,7 +711,7 @@ lm(ln_price ~ sqft + baths, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 12.1      0.151        80.0   4.07e-78
@@ -724,7 +724,7 @@ lm(ln_price ~ sqft + baths, data=house) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.443         0.429 0.452      31.8 7.07e-11     2  -50.4  109.  118.
@@ -737,7 +737,7 @@ lm(ln_price ~ sqft + bedrooms + baths, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 4 x 5
+## # A tibble: 4 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 12.2      0.175        69.5   1.38e-72
@@ -751,7 +751,7 @@ lm(ln_price ~ sqft + bedrooms + baths, data=house) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.449         0.428 0.453      21.4 2.98e-10     3  -49.9  110.  122.
@@ -781,7 +781,7 @@ lm(ln_price ~ sqft, data=house) %>% tidy()
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 12.0      0.124         97.4  1.08e-85
@@ -793,7 +793,7 @@ lm(ln_price ~ sqft, data=house) %>% glance()
 ```
 
 ```
-## # A tibble: 1 x 12
+## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
 ##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
 ## 1     0.441         0.434 0.450      63.8 7.87e-12     1  -50.5  107.  114.
@@ -814,7 +814,7 @@ lm(ln_price ~ sqft, data=house) %>%
 ```
 
 ```
-## # A tibble: 1 x 4
+## # A tibble: 1 × 4
 ##    sqft .fitted .lower .upper
 ##   <dbl>   <dbl>  <dbl>  <dbl>
 ## 1  2000    12.9   12.8   13.0
@@ -831,7 +831,7 @@ lm(ln_price ~ sqft, data=house) %>%
 ```
 
 ```
-## # A tibble: 1 x 4
+## # A tibble: 1 × 4
 ##    sqft .fitted .lower .upper
 ##   <dbl>   <dbl>  <dbl>  <dbl>
 ## 1  2000    12.9   12.0   13.8
@@ -883,7 +883,7 @@ lm(ln_price ~ sqft + bedrooms + baths, data=house) %>%
 ```
 
 ```
-## # A tibble: 1 x 6
+## # A tibble: 1 × 6
 ##    sqft bedrooms baths .fitted .lower .upper
 ##   <dbl>    <dbl> <dbl>   <dbl>  <dbl>  <dbl>
 ## 1  2000        3     2    12.9   12.8   13.0
@@ -896,7 +896,7 @@ lm(ln_price ~ sqft + bedrooms + baths, data=house) %>%
 ```
 
 ```
-## # A tibble: 1 x 6
+## # A tibble: 1 × 6
 ##    sqft bedrooms baths .fitted .lower .upper
 ##   <dbl>    <dbl> <dbl>   <dbl>  <dbl>  <dbl>
 ## 1  2000        3     2    12.9   12.0   13.8
@@ -945,7 +945,7 @@ head(flu_1819)
 ```
 
 ```
-## # A tibble: 6 x 7
+## # A tibble: 6 × 7
 ##   place       responseTime daysNonpharm datePeak   timePeak magPeak excessDeaths
 ##   <chr>              <dbl>        <dbl> <date>        <dbl>   <dbl>        <dbl>
 ## 1 Albany, NY             3           47 2018-10-24       15   162.          553.
@@ -1011,7 +1011,7 @@ flu_1819 %>%
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)   552.       67.0        8.24 5.50e-10
@@ -1027,7 +1027,7 @@ flu_1819 %>%
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)    628.      41.7       15.0  7.92e-18
@@ -1042,7 +1042,7 @@ flu_1819 %>%
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term         estimate std.error statistic  p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)    452.       28.8      15.7  1.90e-18
@@ -1058,7 +1058,7 @@ flu_1819 %>%
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term         estimate std.error statistic       p.value
 ##   <chr>           <dbl>     <dbl>     <dbl>         <dbl>
 ## 1 (Intercept)  167.        21.0      7.95   0.00000000132
@@ -1074,7 +1074,7 @@ flu_1819 %>%
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term          estimate std.error statistic  p.value
 ##   <chr>            <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept)   5.20       0.211     24.6    5.69e-25

@@ -275,7 +275,9 @@ WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: smoking (factor)
+## Explanatory: lungs (factor)
+## # A tibble: 1 × 1
 ##    stat
 ##   <dbl>
 ## 1  1.30
@@ -600,7 +602,9 @@ WynderGraham <- data.frame(lungs = c(rep("cancer", 605), rep("healthy", 780)),
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: smoking (factor)
+## Explanatory: lungs (factor)
+## # A tibble: 1 × 1
 ##    stat
 ##   <dbl>
 ## 1  9.39

@@ -256,7 +256,7 @@ cats %>%
 ```
 
 ```
-## # A tibble: 2 x 5
+## # A tibble: 2 × 5
 ##   term        estimate std.error statistic  p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 ## 1 (Intercept) 394.      23.4         16.8  1.35e-11
@@ -276,7 +276,7 @@ lm(velocity ~ bodymass, data = .) %>% augment()
 ```
 
 ```
-## # A tibble: 18 x 8
+## # A tibble: 18 × 8
 ##    velocity bodymass .fitted .resid   .hat .sigma   .cooksd .std.resid
 ##       <dbl>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>     <dbl>      <dbl>
 ##  1     334.     3640    350. -15.6  0.0656   30.3 0.0104       -0.545 

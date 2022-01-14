@@ -94,7 +94,9 @@ discrim %>% head()
 ```
 
 ```
-## # A tibble: 1 x 1
+## Response: decision (factor)
+## Explanatory: gender (factor)
+## # A tibble: 1 × 1
 ##    stat
 ##   <dbl>
 ## 1 0.292
@@ -122,7 +124,7 @@ null_discrim %>%
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   p_value
 ##     <dbl>
 ## 1   0.026
