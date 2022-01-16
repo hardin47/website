@@ -70,7 +70,7 @@ The two classes are remarkably similar in content and structure.  Indeed, there 
 * Use R Markdown to run reproducible analyses that include all aspects of the data analysis.
 
 **Who should take Math 58(B)?**
-Every educated citizen should have a basic understanding of statistics.  Ok, ok, I have my own biases, but I'm not the only person who thinks this!  (https://www.ted.com/talks/arthur_benjamin_s_formula_for_changing_math_education)  In terms of your academic interests, you should take introductory statistics if you would like to take upper division statistics or if you are planning to analyze data in a field outside of statistics (e.g., biology, EA, psychology, etc.).    Upper division statistics courses *require* introductory statistics, and it is not easy to just "learn" statistics on your own over the summer.  I highly recommend taking an introductory statistics course.
+Every educated citizen should have a basic understanding of statistics.  Ok, ok, I have my own biases, but I'm  <a href = "https://www.ted.com/talks/arthur_benjamin_s_formula_for_changing_math_education" target = "_blank">not the only person who thinks this!</a>  In terms of your academic interests, you should take introductory statistics if you would like to take upper division statistics or if you are planning to analyze data in a field outside of statistics (e.g., biology, EA, psychology, etc.).    Upper division statistics courses *require* introductory statistics, and it is not easy to just "learn" statistics on your own over the summer.  I highly recommend taking an introductory statistics course.
 
 If you have already taken AP Statistics, you may or may not want to repeat the material.  If you had a strong course with an excellent teacher and scored well on the exam, you probably do not need to repeat the material.  If you are uncertain about many of the concepts, then you may want to re-take the course before jumping into upper division statistics courses.  We will use R extensively, and you probably didn't use R in your AP Statistics classes.  Most upper division statistics classes will expect you to be able to jump into R head first, and introductory statistics gives a more gentle introduction to R.   
 
@@ -296,13 +296,20 @@ In an ideal world, every study would have participants who were randomly sampled
 
 * In a political poll, it seems reasonable that the participants who are called (not necessarily the people who respond!) are a random sample from the population.  It does not make sense, however, to randomly allocate those people to different treatments.  Why not?
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-### Types of studies: IMS Chapter 1
+### Types of studies: IMS Chapters 1 + 2
 
 1. What is the difference between an observational study and an experiment?
-2. Why aren't all studies done as experiments?
 3. What is a confounding variable?
 4. Have you looked at Figure \@ref(fig:randSleuth) and Figure \@ref(fig:randgoodQ)? Do you understand the two figures?  Could you explain what their main message is to a friend? [Random sampling vs. Random allocation]
 5. How is the statistical meaning of the word *cause* different from the usage in the sentence: *The ball that hit me in the head caused me to get a headache.*
 6. What are the meanings of the words: randomized, double-blind (single-blind), control, placebo, and comparative.  Why are these ideas important to interpreting study results?
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. Why aren't all studies done as experiments?
+2. Why do statisticians worry so much about claiming causation?
+3. Why aren't all studies double-blind?
+4. Why aren't all studies done on data that has been randomly sampled from a population?
+

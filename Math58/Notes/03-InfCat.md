@@ -1223,7 +1223,7 @@ Spring Break 1 !
 -->
 
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 
 ### (no IMS) Relative Risk & Odds Ratios
@@ -1270,4 +1270,5 @@ Spring Break 1 !
 6. What is one reason to choose to use the binomial distribution?
 
 
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
 

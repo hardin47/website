@@ -1202,7 +1202,7 @@ Gilead, a large pharmaceutical company, issued a press release describing result
 <p class="caption">(\#fig:unnamed-chunk-37)Gilead remdesivir trial covered in the NYT, https://www.nytimes.com/2020/04/29/health/gilead-remdesivir-coronavirus.html</p>
 </div>
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 ### Correlation & Simple Linear Regression: IMS Sections 8.1 & 8.2
 
@@ -1234,3 +1234,4 @@ Gilead, a large pharmaceutical company, issued a press release describing result
 * How are the model conditions assessed?
 
 
+## <i class="fas fa-balance-scale"></i> Ethics Considerations

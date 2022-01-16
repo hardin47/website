@@ -925,7 +925,7 @@ t_salaries %>%
 <img src="04-InfNum_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
 
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 
 The reflection questions below that we will not cover are marked with an asterisk *.
@@ -957,7 +957,7 @@ The reflection questions below that we will not cover are marked with an asteris
 7. How do you create a CI?  How do you interpret the CI?
 8. What if your data are NOT normal?  What strategies can you try out?
 
-####  (won't cover spring 2021) Paired sample, difference in means: IMS Section 7.3
+###  (won't cover spring 2022) Paired sample, difference in means: IMS Section 7.3
 
 1. What changed about the studies (data structure) in section 4.2 as compared with 4.1 or 4.3?
 2. What is the statistic of interest now?  What is the parameter of interest?
@@ -967,8 +967,7 @@ The reflection questions below that we will not cover are marked with an asteris
 6. What is the easiest way to think of / analyze paired data?
 
 
-
-#### ANOVA: IMS Section 7.5
+### ANOVA: IMS Section 7.5
 
 1. Why are these tests called ANalysis Of VAriance (ANOVA)?
 2. Describe the variability in the numerator and the variability in the denominator.  What does each measure?
@@ -976,5 +975,6 @@ The reflection questions below that we will not cover are marked with an asteris
 4. What features of the data affect the power of the test?  What does power mean here?
 5. What are the technical conditions?  Why do we need equal variances here?
 
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
 

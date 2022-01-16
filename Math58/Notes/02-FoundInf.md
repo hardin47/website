@@ -965,7 +965,7 @@ we cannot accept the null.
 -->
 
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 ### hypothesis testing: IMS Chapter 5
 
@@ -1021,6 +1021,10 @@ we cannot accept the null.
 2. What is the difference between a Type I and Type II error?
 3. Which is worse: a Type I error or a Type II error?
 4. What is power?  How is power calculated?  What does power depend on?
+
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
 
 
 

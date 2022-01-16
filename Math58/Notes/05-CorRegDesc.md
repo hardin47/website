@@ -338,18 +338,22 @@ ggpairs(house, columns = c(1,2,4,5))
 <img src="05-CorRegDesc_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 
-## Reflection Questions
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-### Correlation & Simple Linear Regression: Chapter 3
+### Correlation & Simple Linear Regression: IMS Chapter 7
 
-* What does correlation measure?
-* What values of correlation ($r$) would indicate large positive correlation?  What about a large negative correlation?
-* Sketch a scatterplot that has a strong relationship between the two variables but a correlation of virtually zero (hint: your plot will not be linear).
-* How is $R^2$ interpreted?  Why is that?  Make the argument which uses the ideas of "percent of variability in the response variable"? 
-* In a linear model what is an error / residual term and how it is calculated?
-* How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
-* Is least squares the only possible way to fit a line to a cloud of points?  How else might we do it?  Why do we tend to use least squares?
-* Why is it dangerous to extrapolate?
-* Is linear regression always appropriate when comparing two continuous variables?
+1. What does correlation measure?
+2. What values of correlation ($r$) would indicate large positive correlation?  What about a large negative correlation?
+3. Sketch a scatterplot that has a strong relationship between the two variables but a correlation of virtually zero (hint: your plot will not be linear).
+4. How is $R^2$ interpreted?  Why is that?  Make the argument which uses the ideas of "percent of variability in the response variable"? 
+5. In a linear model what is an error / residual term and how it is calculated?
+6. How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
+7. Is least squares the only possible way to fit a line to a cloud of points?  How else might we do it?  Why do we tend to use least squares?
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. What does the phrase "correlation is not causation" mean?  and why is it important to remember?
+2. Why is it dangerous to extrapolate?
+3. Is linear regression always appropriate when comparing two continuous variables?  When wouldn't it be?  
 
 
