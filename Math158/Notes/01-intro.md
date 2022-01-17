@@ -139,15 +139,16 @@ true.  The rule is: reject $H_0$ if p-value $< \alpha$.  The resulting test will
 8. How should the line be appropriately interpreted?
 
 
+## R: reproduciblity
 
  
-## Reproducibility {#repro}
+### Reproducibility {#repro}
 
 Reproducibility has long been considered an important topic for consideration in any research project.  However, recently there has been increased press and available examples for understanding the impact that non-reproducible science can have.  
 
 @reprobook provide a full textbook on the structure of reproducible research as well as dozens of case studies to help hone skills and consider different aspects of the reproducible pipeline.  Below are a handful of examples to get us started.
 
-### Need for Reproducibility
+#### Need for Reproducibility
 
 
 <div class="figure" style="text-align: center">
@@ -155,7 +156,7 @@ Reproducibility has long been considered an important topic for consideration in
 <p class="caption">(\#fig:unnamed-chunk-4)slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016</p>
 </div>
 
-###  Example 1 {-}
+####  Example 1 {-}
 Science retracts gay marriage paper without agreement of lead author LaCour
 
 
@@ -171,7 +172,7 @@ Science retracts gay marriage paper without agreement of lead author LaCour
 * Methods we'll discuss can't prevent fraud, but they can make it easier to discover issues.
 * Source: http://news.sciencemag.org/policy/2015/05/science-retracts-gay-marriage-paper-without-lead-author-s-consent
 
-### Example 2 {-}
+#### Example 2 {-}
 Seizure study retracted after authors realize data got "terribly mixed"
 
 <img src="figs/chakrabarti.jpg" width="682" style="display: block; margin: auto;" />
@@ -183,7 +184,7 @@ Seizure study retracted after authors realize data got "terribly mixed"
 * Source: http://retractionwatch.com/2013/02/01/seizure-study-retracted-after-authors-realize-data-got-terribly-mixed/
 
 
-### Example 3 {-}
+#### Example 3 {-}
 Bad spreadsheet merge kills depression paper, quick fix resurrects it
 
 
@@ -199,7 +200,7 @@ Bad spreadsheet merge kills depression paper, quick fix resurrects it
 * Source: http://retractionwatch.com/2014/07/01/bad-spreadsheet-merge-kills-depression-paper-quick-fix-resurrects-it/
 
 
-### Example 4 {-}
+#### Example 4 {-}
 
 PNAS paper retracted due to problems with figure and reproducibility (April 2016):
 http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-retracted/
@@ -208,14 +209,14 @@ http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-
 <img src="figs/goldschmidt.jpg" width="1340" style="display: block; margin: auto;" />
 
 
-### The reproducible data analysis process
+#### The reproducible data analysis process
 
 * Scriptability $\rightarrow$ R
 * Literate programming $\rightarrow$ R Markdown
 * Version control $\rightarrow$ Git / GitHub
 
  
-#### Scripting and literate programming {-}
+##### Scripting and literate programming {-}
 
 Donald Knuth "Literate Programming" (1983) 
 
@@ -225,7 +226,7 @@ Donald Knuth "Literate Programming" (1983)
 * and tools for putting them to practice have also been around
 * but they have never been as accessible as the current tools
 
-#### Reproducibility checklist {-}
+##### Reproducibility checklist {-}
 
 * Are the tables and figures reproducible from the code and data?
 * Does the code actually do what you think it does?
@@ -233,7 +234,7 @@ Donald Knuth "Literate Programming" (1983)
 * Can the code be used for other data?
 * Can you extend the code to do other things?
 
-#### Tools: R & R Studio {-}
+##### Tools: R & R Studio {-}
 
 See a great video (less than 2 min) on a reproducible workflow: https://www.youtube.com/watch?v=s3JldKoA0zw&feature=youtu.be
 
@@ -252,7 +253,7 @@ See a great video (less than 2 min) on a reproducible workflow: https://www.yout
 <p class="caption">(\#fig:unnamed-chunk-10)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
 </div>
 
-#### Tools: Git & GitHub {-}
+##### Tools: Git & GitHub {-}
 
 * You must submit assignments via GitHub
 * Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
@@ -261,7 +262,7 @@ See a great video (less than 2 min) on a reproducible workflow: https://www.yout
 
 Admittedly, there is a steep learning curve with Git.  However, it is among the tools which you are most likely to use in your future endeavors, so spending a little time focusing on the concepts now may pay off big time in the future.  Beyond practicing and working through http://happygitwithr.com/, you may want to read a little bit about what Git is doing behind the scenes.  This reference: [Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) is very good and accessible.
 
-#### Tools: a GitHub merge conflict (demo) {-}
+##### Tools: a GitHub merge conflict (demo) {-}
 
 * On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
 * Then, in RStudio also edit the README document with a different change.
@@ -276,7 +277,7 @@ Admittedly, there is a steep learning curve with Git.  However, it is among the 
 <p class="caption">(\#fig:unnamed-chunk-11)https://xkcd.com/1597/</p>
 </div>
 
-#### Steps for weekly homework {-}
+##### Steps for weekly homework {-}
 
 1. You will get a link to the new assignment (clicking on the link will create a new private repo)  
 2. Use R (within R Studio)  

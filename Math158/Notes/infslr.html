@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 5 Inference on SLR Parameters | Linear Models</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="The normal error regression model is not important for estimating a line. A computer will happily minimize the sum of squares for any model you choose. However, to do inference on linear...">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
+<meta property="og:title" content="Chapter 5 Inference on SLR Parameters | Linear Models">
+<meta property="og:type" content="book">
+<meta property="og:description" content="The normal error regression model is not important for estimating a line. A computer will happily minimize the sum of squares for any model you choose. However, to do inference on linear...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 5 Inference on SLR Parameters | Linear Models">
+<meta name="twitter:description" content="The normal error regression model is not important for estimating a line. A computer will happily minimize the sum of squares for any model you choose. However, to do inference on linear...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Linear Models</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="wrang.html"><span class="header-section-number">2</span> Data Wrangling</a></li>
+<li><a class="" href="viz.html"><span class="header-section-number">3</span> Visualization</a></li>
+<li><a class="" href="slr.html"><span class="header-section-number">4</span> Simple Linear Regression</a></li>
+<li><a class="active" href="infslr.html"><span class="header-section-number">5</span> Inference on SLR Parameters</a></li>
+<li><a class="" href="diag1.html"><span class="header-section-number">6</span> Diagnostic Measures I</a></li>
+<li><a class="" href="simult.html"><span class="header-section-number">7</span> Simultaneous Inference</a></li>
+<li><a class="" href="la.html"><span class="header-section-number">8</span> Linear Algebra</a></li>
+<li><a class="" href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
+<li><a class="" href="build.html"><span class="header-section-number">10</span> Model Building</a></li>
+<li><a class="" href="diag2.html"><span class="header-section-number">11</span> Diagnostics II</a></li>
+<li><a class="" href="shrink.html"><span class="header-section-number">12</span> Shrinkage Methods</a></li>
+<li><a class="" href="smooth.html"><span class="header-section-number">13</span> Smoothing Methods</a></li>
+<li><a class="" href="anova.html"><span class="header-section-number">14</span> ANOVA</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="infslr" class="section level1" number="5">
+<h1>
+<span class="header-section-number">5</span> Inference on SLR Parameters<a class="anchor" aria-label="anchor" href="#infslr"><i class="fas fa-link"></i></a>
+</h1>
+<p>The normal error regression model is not important for estimating a line. A computer will happily minimize the sum of squares for any model you choose. However, to do inference on linear parameters, you must have a normal error regression model. From here on, unless otherwise stated, we will assume that the normal error regression model holds.<span class="math display">\[Y_i = \beta_0 + \beta_1 x_i  + \epsilon_i\]</span> where <span class="math inline">\(x_i\)</span> is known, <span class="math inline">\(\beta_0, \beta_1\)</span> are parameters, and <span class="math inline">\(\epsilon_i \sim N(0, \sigma^2)\)</span> independently.</p>
+<p><strong>Sampling Distribution:</strong> A sampling distribution is a distribution of a statistic measured on repeated random samples from a population. Consider the <a href="http://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm" target="_blank">sampling applet</a> which provides a nice visual of a sampling distribution.</p>
+<div id="inference-on-beta_1" class="section level2" number="5.1">
+<h2>
+<span class="header-section-number">5.1</span> Inference on <span class="math inline">\(\beta_1\)</span><a class="anchor" aria-label="anchor" href="#inference-on-beta_1"><i class="fas fa-link"></i></a>
+</h2>
+<p>recall: <span class="math display">\[b_1 = \frac{\sum(x_i - \overline{x})(y_i - \overline{y})}{\sum(x_i - \overline{x})^2}\]</span>
+We also know that,
+<span class="math display">\[\begin{eqnarray*}
+E[b_1] &amp;=&amp; \beta_1\\
+\sigma^2\{b_1\} &amp;=&amp; \frac{\sigma^2}{\sum(x_i - \overline{x})^2}\\
+s^2\{ b_1 \} &amp;=&amp; \frac{MSE}{\sum(x_i - \overline{x})^2}\\
+\end{eqnarray*}\]</span>
+The variability of the <em>slope</em> becomes smaller for <span class="math inline">\(x_i\)</span> values that are more spread out. This should make sense to you intuitively because if the <span class="math inline">\(x_i\)</span> values are spread out, slight deviations in their measurements (i.e., different random samples) won’t change the slope of the line very much. But if the <span class="math inline">\(x_i\)</span> exist only in a narrow range, it would be easy to get vastly different <span class="math inline">\(b_1\)</span> values depending on the particular random sample.</p>
+<div id="distribution-of-b_1" class="section level3 unnumbered">
+<h3>Distribution of <span class="math inline">\(b_1\)</span><a class="anchor" aria-label="anchor" href="#distribution-of-b_1"><i class="fas fa-link"></i></a>
+</h3>
+<p>The distribution of <span class="math inline">\(b_1\)</span> (under the condition that <span class="math inline">\(E[b_1] = \beta_1\)</span> <em>and</em> the normal error regression model), should seem very familiar to you: <span class="math display">\[\frac{b_1 - \beta_1}{s\{b_1\}} \sim t_{n-2}.\]</span>
+Recall that we use a t distribution on the standardized variable because we are not dividing by a constant. Instead, we divide by the standard error which induces extra variability and thus a t distribution.</p>
+<p>Indeed, if <span class="math inline">\(H_0: \beta_1=0\)</span> is true, then
+<span class="math display">\[\begin{eqnarray*}
+\frac{b_1 - 0}{s\{b_1\}} \sim t_{n-2}
+\end{eqnarray*}\]</span>
+Note that the degrees of freedom are now <span class="math inline">\(n-2\)</span> because we are estimating two parameters (<span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>). We reject the null hypothesis, if our <span class="math inline">\(b_1\)</span> leads us to a t-statistic that is larger than we would expect by random chance (i.e., our p-value is small).</p>
+<p><strong>p-value:</strong> The p-value is the probability of the observed data or more extreme if, in fact, the null hypothesis is true.</p>
+</div>
+<div id="ci-for-beta_1" class="section level3 unnumbered">
+<h3>CI for <span class="math inline">\(\beta_1\)</span><a class="anchor" aria-label="anchor" href="#ci-for-beta_1"><i class="fas fa-link"></i></a>
+</h3>
+<p>As with many other statistics for which we know the standard error, we can create intervals that give us some confidence in the statements (about the parameter) we are making. In general, confidence intervals are of the form:</p>
+<center>
+point estimate <span class="math inline">\(\pm\)</span> multiplier * SE(point estimate)
+</center>
+<p>An <span class="math inline">\((1-\alpha)100\%\)</span> confidence interval for the slope parameter, <span class="math inline">\(\beta_1\)</span>: is
+<span class="math display">\[\begin{eqnarray*}
+b_1 &amp;\pm&amp; t_{\alpha/2,n-2} s\{b_1\}\\
+b_1 &amp;\pm&amp; t_{\alpha/2, n-2} \sqrt{MSE/\sum(x_i - \overline{x})^2}\\
+\end{eqnarray*}\]</span></p>
+<p>Remember that <span class="math inline">\(\beta_1\)</span> is not random. The randomness comes from the <em>data</em>, and so it is the endpoints of the CI that are random. In interpreting a CI, we give an interval of plausible values for <span class="math inline">\(\beta_1\)</span> that would not have been rejected had we done a hypothesis test. Alternatively, we think of the CI as a set of values for <span class="math inline">\(\beta_1\)</span> that we are fairly certain contains <span class="math inline">\(\beta_1\)</span>. If we were to repeat the process many times, <span class="math inline">\((1-\alpha)100\%\)</span> of the time our interval captures the true parameter.</p>
+<p>Again, in regression we are finding linear relationships. We cannot claim that the relationship between explanatory and response variables are causative. Only with randomized studies will we be able to find causative mechanisms.</p>
+</div>
+<div id="parameter-interpretation" class="section level3 unnumbered">
+<h3>Parameter Interpretation<a class="anchor" aria-label="anchor" href="#parameter-interpretation"><i class="fas fa-link"></i></a>
+</h3>
+<p>A confidence interval gives us an estimate for the parameter(s) in our model, our goal is to understand the interpretation of these quantities.</p>
+<p><strong>Intercept <span class="math inline">\(\beta_0\)</span>:</strong> The average value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(x\)</span> is 0. Often, this doesn’t make any sense. For example, studying the relationship between height and weight, <span class="math inline">\(\beta_0\)</span> is the average weight of someone who is 0 inches tall. Nonsense. Very often <span class="math inline">\(\beta_0\)</span> is just a placeholder, a number that needs to be specified but has no interpretation.</p>
+<p><strong>Slope <span class="math inline">\(\beta_1\)</span>:</strong> <span class="math inline">\(\beta_1\)</span> can be interpreted as the increase in the average of <span class="math inline">\(Y\)</span> when <span class="math inline">\(x\)</span> is incremented by a single unit. <span class="math display">\[E[Y|x+1]-E[Y|x]=\beta_0+\beta_1(x+1)-(\beta_0+\beta_1x)=\beta_1\]</span></p>
+<p><strong>Variance <span class="math inline">\(\sigma^2\)</span>:</strong> The average squared deviation of an observation from the line.</p>
+</div>
+</div>
+<div id="estimating-a-response" class="section level2" number="5.2">
+<h2>
+<span class="header-section-number">5.2</span> Estimating a response<a class="anchor" aria-label="anchor" href="#estimating-a-response"><i class="fas fa-link"></i></a>
+</h2>
+<div id="interpolation-vs-extrapolation" class="section level3" number="5.2.1">
+<h3>
+<span class="header-section-number">5.2.1</span> Interpolation vs Extrapolation<a class="anchor" aria-label="anchor" href="#interpolation-vs-extrapolation"><i class="fas fa-link"></i></a>
+</h3>
+<p>One big problem with using the regression model is the condition of linearity and whether or not it actually holds. As a result, if we are attempting to say something about <span class="math inline">\(Y\)</span> at a value of <span class="math inline">\(x^*\)</span> where we don’t typically have any data, we can only reasonably do so as long as <span class="math inline">\(x^*\)</span> is contained in the range of data we do have. This is called <em>interpolation</em>. <em>Extrapolation</em> on the other hand is trying to use your regression line outside of your range of data. The problem with extrapolation is that we have no evidence, nor any ability to check, whether the linear condition holds beyond the range of our data. Consider the following example:</p>
+<p>We are interested in the amount of crop produced by a single plant as a function of the amount of compost added to the soil. We take several plants, and apply small, but differing, amounts of compost to the plants. What we see is as compost increases, the output of the plant increases as well, seemingly in a linear fashion. Naivete might lead us to think that, using the regression line, we can use 100 kilograms of compost on a single plant and receive a huge amount of crop in return. In truth, this will kill the plant. We have no evidence that the relationship is linear for anything outside of the range of our data, and thus extrapolation is a mistake.</p>
+<p>With interpolation, we have data to support the linear relationship, and thus should be fine. In trying to say something about what will happen at particular values of <span class="math inline">\(x\)</span>, call them <span class="math inline">\(x_h\)</span>, we need to think about exactly what we want to say. If we know ahead of time what we want to say, we can design our experiment in smart ways, as we will see.</p>
+</div>
+<div id="prediction-intervals-vs-confidence-intervals" class="section level3" number="5.2.2">
+<h3>
+<span class="header-section-number">5.2.2</span> Prediction Intervals vs Confidence Intervals<a class="anchor" aria-label="anchor" href="#prediction-intervals-vs-confidence-intervals"><i class="fas fa-link"></i></a>
+</h3>
+<p>The linear regression line gives us our guess at the mean response for an individual at a particular value <span class="math inline">\(x_h\)</span>.</p>
+<p>Our conditions give us <span class="math display">\[E[Y|x]=\beta_0+\beta_1x\]</span>
+Plugging in our estimators, we get <span class="math display">\[\hat{y_i}=b_0+b_1 x_i\]</span> as our fitted value. Comparing the two, its clear that our best fit line gives us our guess for the mean response. However, how accurate is this guess?</p>
+<p>A confidence interval gives you a range of plausible values for <span class="math inline">\(E[Y|x]\)</span>. That is, the mean response at a fixed value of <span class="math inline">\(x\)</span>. A confidence interval differs from a prediction interval, which is intended to not only contain the mean response, but rather the value of the response for the next individual observed at value <span class="math inline">\(x_h\)</span>. As a result, the prediction interval will need to be larger than the confidence interval.</p>
+</div>
+<div id="standard-errors-and-experimental-design" class="section level3" number="5.2.3">
+<h3>
+<span class="header-section-number">5.2.3</span> Standard Errors and Experimental Design<a class="anchor" aria-label="anchor" href="#standard-errors-and-experimental-design"><i class="fas fa-link"></i></a>
+</h3>
+<p>The following are the standard errors for <span class="math inline">\(\hat{\beta}_0\)</span>, <span class="math inline">\(\hat{\beta}_1\)</span>, the fitted value at <span class="math inline">\(x_h\)</span>: <span class="math inline">\(\hat{y}_{x_h}\)</span>, and a new value at <span class="math inline">\(x_h\)</span>: <span class="math inline">\(\hat{y}_{x_h(new)}\)</span>.</p>
+<p><span class="math inline">\(\sigma^2\)</span> is the variance of the errors.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\sigma^2\{b_0\}&amp;=&amp;\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum(x_i-\bar{x})^2}\right]\\
+\sigma^2\{b_1\}&amp;=&amp;\frac{\sigma^2}{\sum(x_i-\bar{x})^2}\\
+\sigma^2\{\hat{y}_{x_h}\}&amp;=&amp;\sigma^2\left[\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]\\
+\sigma^2\{\hat{y}_{x_h(new)}\}&amp;=&amp; \sigma^2 + \sigma^2\{\hat{y}_{x_h}\} = \sigma^2\left[1+\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]
+\end{eqnarray*}\]</span></p>
+<p>These quantities are estimated by replacing <span class="math inline">\(\sigma^2\)</span> with our guess, which is <span class="math inline">\(MSE\)</span>. Clearly, <span class="math inline">\(b_0\)</span> is just a fitted value itself (when <span class="math inline">\(x_h=0\)</span>), so that is a special case of the 3rd formula. The difference between the last two is one standard deviation. This should make sense, the variance of the next observation is just the variance of the mean, and then the variance of the error on top of the mean.<br>
+Confidence intervals are essentially our best guess plus or minus two standard deviations. To be exact, instead of 2, we use <span class="math inline">\(qt(.975,n-2)\)</span>. The idea is that the smaller we can make the standard errors (the square root of the variances above), the smaller our confidence intervals will be, and the more information we will have.</p>
+<div id="notes-1" class="section level4 unnumbered">
+<h4>Notes:<a class="anchor" aria-label="anchor" href="#notes-1"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>The prediction of a future (or mean) response is most accurate when <span class="math inline">\(x_h = \overline{x}\)</span>. Think about the behavior of the regression line away from <span class="math inline">\(\overline{x}\)</span>. The line is much more variable at the extremes.<br>
+</li>
+<li>Confidence limits (i.e., % coverage) for <span class="math inline">\(E[Y_h], \beta_0, \beta_1\)</span> are not sensitive to departures from normality. Especially for large sample sizes (because of the central limit theorem).</li>
+<li>Coverage percentages for <span class="math inline">\(\hat{y}_h\)</span> are very sensitive to departures from normality. There is no central limit theorem here because we are not estimating an average.<br>
+</li>
+<li>Confidence limits apply only to one confidence interval (i.e., not the entire line). We won’t simultaneously be 95% confident for lots of different intervals. We’ll address this issue later.</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="anova-approach-to-regression" class="section level2" number="5.3">
+<h2>
+<span class="header-section-number">5.3</span> ANOVA approach to regression<a class="anchor" aria-label="anchor" href="#anova-approach-to-regression"><i class="fas fa-link"></i></a>
+</h2>
+<p>As mentioned previously, we can think of the variability in <span class="math inline">\(Y\)</span> as the total variability. We could measure that variability without knowing anything about the explanatory variable(s). But, knowledge of the explanatory variables helps us predict <span class="math inline">\(Y\)</span>, that is, they remove some of the variability associated with the response. Consider the following terms</p>
+<p><span class="math display">\[\begin{eqnarray*}
+SSTO &amp;=&amp; \sum (y_i - \overline{y})^2\\
+SSE &amp;=&amp; \sum (y_i - \hat{y}_i)^2\\
+SSR &amp;=&amp; \sum (\hat{y}_i - \overline{y})^2
+\end{eqnarray*}\]</span></p>
+<p>where SSTO is the sum of squares total; SSE is the sum of squared errors; and SSR is the sum of squares of the regression line. It seems quite obvious that</p>
+<p><span class="math display">\[\begin{eqnarray*}
+y_i - \overline{y} &amp;=&amp; \hat{y}_i - \overline{y} + y_i - \hat{y}_i\\
+\mbox{total deviation} &amp;=&amp; \mbox{dev of reg around mean} + \mbox{dev around line}
+\end{eqnarray*}\]</span>
+But it might not be so obvious that <span class="math display">\[SSTO = SSR + SSE.\]</span> We can derive the relationship using algebra
+<span class="math display">\[\begin{eqnarray*}
+\sum(y_i - \overline{y})^2 &amp;=&amp; \sum [ (\hat{y}_i - \overline{y}) + (y_i - \hat{y}_i)]^2\\
+&amp;=&amp; \sum(\hat{y}_i - \overline{y})^2 + \sum(y_i - \hat{y}_i)^2 + 2 \sum (\hat{y}_i - \overline{y})(y_i - \hat{y}_i)\\
+&amp;=&amp; \sum(\hat{y}_i - \overline{y})^2 + \sum(y_i - \hat{y}_i)^2\\
+\end{eqnarray*}\]</span>
+where the last term is zeroed out using equations (1.17) and (1.20) in ALSM (pgs 23-24).</p>
+<div id="mean-squares" class="section level3" number="5.3.1">
+<h3>
+<span class="header-section-number">5.3.1</span> Mean Squares<a class="anchor" aria-label="anchor" href="#mean-squares"><i class="fas fa-link"></i></a>
+</h3>
+<p>Sums of squares are increasing in number of data values. To accommodate any number of observations, we use mean squares instead of sums of square</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>MSR = SSR / 1</th>
+<th>E[MSR] = <span class="math inline">\(\sigma^2 + \beta_1^2 \sum(x_i - \overline{x})^2\)</span>
+</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td>MSE = SSE/ (n-2)</td>
+<td>E[MSE] = <span class="math inline">\(\sigma^2\)</span>
+</td>
+</tr></tbody>
+</table></div>
+<div id="notes-2" class="section level4 unnumbered">
+<h4>Notes:<a class="anchor" aria-label="anchor" href="#notes-2"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>MSE estimates <span class="math inline">\(\sigma^2\)</span> regardless of whether or not <span class="math inline">\(\beta_1 = 0\)</span>.<br>
+</li>
+<li>When <span class="math inline">\(\beta_1=0\)</span>, MSR also estimates <span class="math inline">\(\sigma^2\)</span>.<br>
+</li>
+<li>A comparison of MSR and MSE would seem to indicate whether or not <span class="math inline">\(\beta_1=0\)</span>.<br>
+Note that we can think about MSR as the variability of the regression line around the line <span class="math inline">\(\overline{y}\)</span>. If <span class="math inline">\(\beta_1=0\)</span>, then the regression line varies such that MSR is just measuring the natural variability of the error terms (<span class="math inline">\(\sigma^2\)</span>). But if <span class="math inline">\(\beta_1 \ne 0\)</span>, then the <span class="math inline">\(b_1\)</span> values still vary naturally PLUS there is a bit of a difference from the line <span class="math inline">\(\beta_1\)</span> to the line at <span class="math inline">\(\mu_Y\)</span>.</li>
+</ol>
+</div>
+</div>
+<div id="f-test-of-beta_1-0-versus-beta_1-ne-0" class="section level3" number="5.3.2">
+<h3>
+<span class="header-section-number">5.3.2</span> F test of <span class="math inline">\(\beta_1 = 0\)</span> versus <span class="math inline">\(\beta_1 \ne 0\)</span><a class="anchor" aria-label="anchor" href="#f-test-of-beta_1-0-versus-beta_1-ne-0"><i class="fas fa-link"></i></a>
+</h3>
+<p><span class="math display">\[\begin{eqnarray*}
+H_0: \beta_1 = 0\\
+H_a: \beta_1 \ne 0
+\end{eqnarray*}\]</span>
+test statistic is <span class="math display">\[F^* = \frac{MSR}{MSE} = \frac{\sum(\hat{y}_i - \overline{y})^2}{\sum(y_i - \hat{y}_i)^2 / (n-2)}.\]</span> Large values of <span class="math inline">\(F^*\)</span> support <span class="math inline">\(H_a\)</span>, values of <span class="math inline">\(F^*\)</span> close to 1 support <span class="math inline">\(H_0\)</span>. <strong>If <span class="math inline">\(H_0\)</span> is true, then</strong> <span class="math display">\[F^* \sim F_{1,n-2}.\]</span> Note that the F-test is always a one-sided test (meaning that we reject only for <em>BIG</em> values of <span class="math inline">\(F^*\)</span>), though we are assessing a two-sided hypothesis.</p>
+<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Credit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 6
+##   term         df     sumsq    meansq statistic    p.value
+##   &lt;chr&gt;     &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 Limit         1 62624255. 62624255.     1148.  2.53e-119
+## 2 Residuals   398 21715657.    54562.       NA  NA</code></pre>
+<p>Notice that the <code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code> output includes all of the information in the sums of squares to do the F-test and calculate <span class="math inline">\(R^2\)</span>. Also, with the <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function from <strong>broom</strong> the output is in a dataframe that is easy to work with.</p>
+</div>
+<div id="equivalence-of-f-and-t-tests" class="section level3" number="5.3.3">
+<h3>
+<span class="header-section-number">5.3.3</span> Equivalence of F and t-tests<a class="anchor" aria-label="anchor" href="#equivalence-of-f-and-t-tests"><i class="fas fa-link"></i></a>
+</h3>
+<p><span class="math display">\[F^* = \frac{SSR}{SSE/(n-2)} = \frac{b_1^2 \sum(x_i - \overline{x})^2}{MSE} = \frac{b_1^2}{MSE/\sum(x_i - \overline{x})^2} = \bigg(\frac{b_1}{s\{b_1\} }\bigg)^2 = (t^*)^2\]</span>
+We’re going to continue to use this test as our models get more complicated. The general strategy will always be:<br>
+1. Fit full model: <span class="math inline">\(SSE_{full} = \sum(y_i - b_0 - b_1 x_i)^2 = \sum(y_i - \hat{y}_i)^2\)</span><br>
+2. Fit reduced model (under <span class="math inline">\(H_0\)</span>): <span class="math inline">\(SSE_{reduced} = \sum(y_i - b_0)^2 = \sum(y_i - \overline{y})^2 = SSTO\)</span><br>
+3. <span class="math inline">\(F^* = \frac{SSE_{reduced} - SSE_{full}}{df_{reduced} - df_{full}} \div \frac{SSE_{full}}{df_{full}} = \frac{MSR}{MSE}\)</span></p>
+</div>
+</div>
+<div id="descriptive-measures-of-linear-association" class="section level2" number="5.4">
+<h2>
+<span class="header-section-number">5.4</span> Descriptive Measures of Linear Association<a class="anchor" aria-label="anchor" href="#descriptive-measures-of-linear-association"><i class="fas fa-link"></i></a>
+</h2>
+<p>We discuss r (the correlation) and <span class="math inline">\(R^2\)</span> (the coefficient of determination) as descriptive measures of linear association because typically we are not interested in estimating a parameter. Instead, <span class="math inline">\(r\)</span> and <span class="math inline">\(R^2\)</span> tell us how well our linear model fits the data.</p>
+<div id="correlation" class="section level3" number="5.4.1">
+<h3>
+<span class="header-section-number">5.4.1</span> Correlation<a class="anchor" aria-label="anchor" href="#correlation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Consider a scatterplot, there is variability in both directions: <span class="math inline">\((x_i - \overline{x}) \ \&amp; \ (y_i - \overline{y})\)</span>.</p>
+<p><strong>Positive Relationship:</strong> As <span class="math inline">\(x\)</span> increases, if <span class="math inline">\(Y\)</span> also tends to increase, then the two variables are said to have a positive relationship (example: shoe size and height).<br><strong>Negative Relationship:</strong> As <span class="math inline">\(x\)</span> increases, if <span class="math inline">\(Y\)</span> tends to decrease, the two variables are said to have a negative relationship (example: outside temperature and heating oil used).</p>
+<p>So if the variables have a positive relationship, <span class="math inline">\(r=\sqrt{R^2}\)</span>. If the variables have a negative relationship, then <span class="math inline">\(r=-\sqrt{R^2}\)</span>.<br><span class="math inline">\(r\)</span> can be calculated directly as well, and is given by the following formula:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{sample covariance}&amp;&amp;\\
+cov(x,y) &amp;=&amp; \frac{1}{n-1}\sum (x_i - \overline{x}) (y_i - \overline{y})\\
+\mbox{sample correlation}&amp;&amp;\\
+r(x,y) &amp;=&amp; \frac{cov(x,y)}{s_x s_y}\\
+&amp;=&amp; \frac{\frac{1}{n-1} \sum (x_i - \overline{x}) (y_i - \overline{y})}{\sqrt{\frac{\sum(x_i - \overline{x})^2}{n-1} \frac{\sum(y_i - \overline{y})^2}{n-1}}}\\
+&amp;=&amp; \frac{\sum[(x_i-\bar{x})(y_i-\bar{y})]}{\sqrt{\sum(x_i-\bar{x})^2\sum(y_i-\bar{y})^2}}
+\end{eqnarray*}\]</span></p>
+<p>The numerator of the correlation describes the relationship between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. If, when <span class="math inline">\(x\)</span> tends to be large (above its mean), if <span class="math inline">\(y\)</span> also tends to be large (above its mean), then we will have the product of two positive numbers, which is positive. Likewise, if when <span class="math inline">\(x\)</span> is small, <span class="math inline">\(y\)</span> also tends to be small, we will have the product of two negative numbers, again positive. So a positive relationship will result in a lot of positive numbers being summed in the numerator, and thus <span class="math inline">\(r\)</span> will be positive.<br>
+When the relationship is negative, one will tend to be negative when the other is positive, thus the sum will involve a lot of negative terms causing <span class="math inline">\(r\)</span> to be negative. The denominator is always positive.<br>
+One more thing to note is that <span class="math inline">\(r\)</span> is not affected by the choice of what to label the predictor and what to label the response. If the roles of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are switched, <span class="math inline">\(r\)</span> will remain unaffected. Thus, <span class="math inline">\(r\)</span>, unlike the value of our line, is symmetric.</p>
+<ul>
+<li>$-1 r  $.</li>
+<li><span class="math inline">\(b_1 = r \frac{s_y}{s_x}\)</span></li>
+<li>if <span class="math inline">\(r=0, b_1=0\)</span>
+</li>
+<li>if <span class="math inline">\(r=1, b_1 &gt; 0\)</span> but can be anything!</li>
+<li><span class="math inline">\(r &lt; 0 \leftrightarrow b_1 &lt; 0, r &gt; 0 \leftrightarrow b_1 &gt; 0\)</span></li>
+</ul>
+</div>
+<div id="coefficient-of-determination" class="section level3" number="5.4.2">
+<h3>
+<span class="header-section-number">5.4.2</span> Coefficient of Determination<a class="anchor" aria-label="anchor" href="#coefficient-of-determination"><i class="fas fa-link"></i></a>
+</h3>
+<p>The coefficient of determination, given as <span class="math inline">\(R^2\)</span>, has a nice interpretation, that of being the <strong>proportion of variability in <span class="math inline">\(y\)</span> explained by the variable <span class="math inline">\(x\)</span></strong>. Recall, <span class="math inline">\(SSE\)</span>, or sum of squared errors (or residuals) was a measure of the amount of variable remaining in the data after accounting for the information in <span class="math inline">\(x\)</span>. <span class="math inline">\(SSTO\)</span> or total sums of squares, measured the total amount of variability in the variable <span class="math inline">\(y\)</span>. The coefficient of determination is given as
+<span class="math display">\[R^2=1-\frac{SSE}{SSTO}\]</span>
+or, defining <span class="math inline">\(SSR\)</span> as the regression sum of squares (the amount of variation explained by the regression) <span class="math display">\[R^2=\frac{SSR}{SSTO}.\]</span></p>
+<p><strong>Limitations:</strong><br>
+1. High <span class="math inline">\(R^2\)</span> does not necessarily produce good “predictions.” If there is a lot of variability around the line (i.e., within the data), you can have wide prediction intervals for your response.<br>
+2. High <span class="math inline">\(R^2\)</span> does not necessarily mean the line is a good fit. Quadratic (or other) relationships can sometimes lead to a high <span class="math inline">\(R^2\)</span>. Additionally, one outlier can have a huge effect on the value of <span class="math inline">\(R^2\)</span>.<br>
+3. <span class="math inline">\(R^2 \approx 0\)</span> does not mean that there is no relationship between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. Instead, <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> might have a perfect quadratic relationship.</p>
+</div>
+</div>
+<div id="reflection-questions-2" class="section level2" number="5.5">
+<h2>
+<span class="header-section-number">5.5</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-2"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>What are the different ways to use inference on the model parameters?<br>
+</li>
+<li>What is the difference between a prediction and a confidence interval? When should each be used?<br>
+</li>
+<li>How are the sums of squares broken up into meaningful pieces? What are the differences between SSTO, SSE, and SSR?<br>
+</li>
+<li>What is the interpretation of <span class="math inline">\(R^2\)</span>?</li>
+</ol>
+</div>
+<div id="ethics-considerations-1" class="section level2" number="5.6">
+<h2>
+<span class="header-section-number">5.6</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-1"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="r-slr-inference" class="section level2" number="5.7">
+<h2>
+<span class="header-section-number">5.7</span> R: SLR Inference<a class="anchor" aria-label="anchor" href="#r-slr-inference"><i class="fas fa-link"></i></a>
+</h2>
+<div id="cis" class="section level3" number="5.7.1">
+<h3>
+<span class="header-section-number">5.7.1</span> CIs<a class="anchor" aria-label="anchor" href="#cis"><i class="fas fa-link"></i></a>
+</h3>
+<p>Also available through <strong>broom</strong>are CIs for the coefficients.</p>
+<div class="sourceCode" id="cb246"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Credit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span>conf.int <span class="op">=</span> <span class="cn">TRUE</span>, conf.level <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 7
+##   term        estimate std.error statistic   p.value conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) -293.     26.7         -11.0 1.18e- 24 -337.     -249.   
+## 2 Limit          0.172   0.00507      33.9 2.53e-119    0.163     0.180</code></pre>
+<p>R did the t-test automatically, but it could be done by hand using the provided SE.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+H_0:&amp;&amp; \beta_1 = 0\\
+H_a:&amp;&amp; \beta_1 \ne 0\\
+t &amp;=&amp; \frac{0.172 - 0}{0.00507} = 33.9\\
+p-value &amp;=&amp; 2 P(t_{398} \geq 33.9) = 2*(1-pt(33.9, 398)) = \mbox{very small}\\
+\end{eqnarray*}\]</span></p>
+<p>Because the p-value is so small, reject the null hypothesis: to model a linear relationship between <code>Limit</code> and <code>Balance</code>, the slope coefficient must be different from zero (greater than zero if we are doing a one-sided test). Note that knowing we have a positive relationship does not tell us that <code>Balance</code> is a <em>result</em> of <code>Limit</code>. That is, there is no reason to believe a causative mechanism.</p>
+<p>A 90% confidence interval for the slope coefficient, <span class="math inline">\(\beta_1\)</span> is (0.163, 0.18). The true population slope to model <code>Limit</code> and <code>Balance</code> is somewhere between (0.163, 0.18). Note that even if the values seem small, they are <em>significantly</em> (not necessarily <em>substantially</em>) away from zero. We should not be tempted to confuse small with zero, as the magnitude of the slope coefficient depends heavily on the units of measurement for our variables.</p>
+</div>
+<div id="predictions" class="section level3" number="5.7.2">
+<h3>
+<span class="header-section-number">5.7.2</span> Predictions<a class="anchor" aria-label="anchor" href="#predictions"><i class="fas fa-link"></i></a>
+</h3>
+<p>Fortunately, R allows for creating mean and prediction intervals. We need to create a new data set that has the same variable name as our predictor, and the value we are interested in, we might call it <code>newcredit</code>. Then use <code><a href="https://rdrr.io/pkg/generics/man/augment.html">augment()</a></code> to give either a confidence or prediction interval, as follows.</p>
+<div class="sourceCode" id="cb248"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># store the linear model object so that we can use it later.</span>
+<span class="va">credit_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">Credit</span><span class="op">)</span>
+
+<span class="co"># create a new dataframe</span>
+<span class="va">newcredit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>Limit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">5000</span>, <span class="fl">7000</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># get df from the model</span>
+<span class="va">credit_df</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">credit_df</span></code></pre></div>
+<pre><code>## [1] 398</code></pre>
+<div class="sourceCode" id="cb250"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># new data predictions</span>
+<span class="va">credit_pred</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="va">newcredit</span>, type.predict <span class="op">=</span> <span class="st">"response"</span>, se_fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">credit_pred</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 3
+##   Limit .fitted .se.fit
+##   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1  2000    50.5    18.1
+## 2  5000   565.     11.8
+## 3  7000   909.     16.4</code></pre>
+<div class="sourceCode" id="cb252"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># get the multiplier / critical value for creating intervals</span>
+<span class="va">crit_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="fl">0.975</span>, <span class="va">credit_df</span><span class="op">)</span>
+<span class="va">crit_val</span></code></pre></div>
+<pre><code>## [1] 1.97</code></pre>
+<div class="sourceCode" id="cb254"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># SE of the mean response</span>
+<span class="va">se_fit</span> <span class="op">&lt;-</span> <span class="va">credit_pred</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">.se.fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">se_fit</span></code></pre></div>
+<pre><code>##    1    2    3 
+## 18.1 11.8 16.4</code></pre>
+<div class="sourceCode" id="cb256"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># esimate of the overall variability, $\sigma$</span>
+<span class="va">credit_sig</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">credit_sig</span></code></pre></div>
+<pre><code>## [1] 234</code></pre>
+<div class="sourceCode" id="cb258"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># calculate the SE of the predictions</span>
+<span class="va">se_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">credit_sig</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">se_fit</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+<span class="va">se_pred</span></code></pre></div>
+<pre><code>##   1   2   3 
+## 234 234 234</code></pre>
+<div class="sourceCode" id="cb260"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># calculating both confidence intervals for the mean responses and</span>
+<span class="co"># prediction intervals for the individual responses</span>
+
+<span class="va">credit_pred</span> <span class="op">&lt;-</span> <span class="va">credit_pred</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>lower_PI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">-</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">se_pred</span>,
+         upper_PI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">+</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">se_pred</span>,
+         lower_CI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">-</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">se_fit</span>,
+         upper_CI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">+</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">se_fit</span><span class="op">)</span>
+
+<span class="va">credit_pred</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 7
+##   Limit .fitted .se.fit lower_PI upper_PI lower_CI upper_CI
+##   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1  2000    50.5    18.1    -410.     511.     14.9     86.1
+## 2  5000   565.     11.8     106.    1025.    542.     589. 
+## 3  7000   909.     16.4     448.    1369.    876.     941.</code></pre>
+<p>Or, to create intervals for the entire range of explanatory variables:</p>
+<div class="sourceCode" id="cb262"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">credit_pred_all</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>type.predict <span class="op">=</span> <span class="st">"response"</span>, se_fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>.se.pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">credit_sig</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">.se.fit</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>lower_PI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">-</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">.se.pred</span>,
+         upper_PI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">+</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">.se.pred</span>,
+         lower_CI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">-</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">.se.fit</span>,
+         upper_CI <span class="op">=</span> <span class="va">.fitted</span> <span class="op">+</span> <span class="va">crit_val</span> <span class="op">*</span> <span class="va">.se.fit</span><span class="op">)</span>
+
+<span class="va">credit_pred_all</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Limit</span>, y <span class="op">=</span> <span class="va">Balance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">stat_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower_PI</span>, ymax <span class="op">=</span> <span class="va">upper_PI</span><span class="op">)</span>, 
+              alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower_CI</span>, ymax <span class="op">=</span> <span class="va">upper_CI</span><span class="op">)</span>, 
+              alpha <span class="op">=</span> <span class="fl">0.2</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="anova-output" class="section level3" number="5.7.3">
+<h3>
+<span class="header-section-number">5.7.3</span> ANOVA output<a class="anchor" aria-label="anchor" href="#anova-output"><i class="fas fa-link"></i></a>
+</h3>
+<p>Note that <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> creates a dataframe which is slighlty easier to work with, but regardless of <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> the <code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code> function provides the exact same output.</p>
+<div class="sourceCode" id="cb263"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Credit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Balance
+##            Df   Sum Sq  Mean Sq F value Pr(&gt;F)    
+## Limit       1 62624255 62624255    1148 &lt;2e-16 ***
+## Residuals 398 21715657    54562                   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Credit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 6
+##   term         df     sumsq    meansq statistic    p.value
+##   &lt;chr&gt;     &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 Limit         1 62624255. 62624255.     1148.  2.53e-119
+## 2 Residuals   398 21715657.    54562.       NA  NA</code></pre>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="slr.html"><span class="header-section-number">4</span> Simple Linear Regression</a></div>
+<div class="next"><a href="diag1.html"><span class="header-section-number">6</span> Diagnostic Measures I</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#infslr"><span class="header-section-number">5</span> Inference on SLR Parameters</a></li>
+<li>
+<a class="nav-link" href="#inference-on-beta_1"><span class="header-section-number">5.1</span> Inference on \(\beta_1\)</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#distribution-of-b_1">Distribution of \(b_1\)</a></li>
+<li><a class="nav-link" href="#ci-for-beta_1">CI for \(\beta_1\)</a></li>
+<li><a class="nav-link" href="#parameter-interpretation">Parameter Interpretation</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#estimating-a-response"><span class="header-section-number">5.2</span> Estimating a response</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#interpolation-vs-extrapolation"><span class="header-section-number">5.2.1</span> Interpolation vs Extrapolation</a></li>
+<li><a class="nav-link" href="#prediction-intervals-vs-confidence-intervals"><span class="header-section-number">5.2.2</span> Prediction Intervals vs Confidence Intervals</a></li>
+<li><a class="nav-link" href="#standard-errors-and-experimental-design"><span class="header-section-number">5.2.3</span> Standard Errors and Experimental Design</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#anova-approach-to-regression"><span class="header-section-number">5.3</span> ANOVA approach to regression</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#mean-squares"><span class="header-section-number">5.3.1</span> Mean Squares</a></li>
+<li><a class="nav-link" href="#f-test-of-beta_1-0-versus-beta_1-ne-0"><span class="header-section-number">5.3.2</span> F test of \(\beta_1 = 0\) versus \(\beta_1 \ne 0\)</a></li>
+<li><a class="nav-link" href="#equivalence-of-f-and-t-tests"><span class="header-section-number">5.3.3</span> Equivalence of F and t-tests</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#descriptive-measures-of-linear-association"><span class="header-section-number">5.4</span> Descriptive Measures of Linear Association</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#correlation"><span class="header-section-number">5.4.1</span> Correlation</a></li>
+<li><a class="nav-link" href="#coefficient-of-determination"><span class="header-section-number">5.4.2</span> Coefficient of Determination</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#reflection-questions-2"><span class="header-section-number">5.5</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-1"><span class="header-section-number">5.6</span>  Ethics Considerations</a></li>
+<li>
+<a class="nav-link" href="#r-slr-inference"><span class="header-section-number">5.7</span> R: SLR Inference</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#cis"><span class="header-section-number">5.7.1</span> CIs</a></li>
+<li><a class="nav-link" href="#predictions"><span class="header-section-number">5.7.2</span> Predictions</a></li>
+<li><a class="nav-link" href="#anova-output"><span class="header-section-number">5.7.3</span> ANOVA output</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/02a-inf-slr.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/02a-inf-slr.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-01-17.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
