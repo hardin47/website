@@ -12,7 +12,7 @@ Consider the situation where we have two variables, which we denote by $x$ and $
 In the two variable case, we assume that $f(x)$ is a linear function of $x$.  That is, we assume the model $$Y_i=\beta_0+\beta_1 x_i+\epsilon_i.$$  Our attempts to estimate the function $f$ has now been reduced to trying to estimate two numbers, the intercept $\beta_0$ and the slope $\beta_1$: the *parameters*.  
 
 
-Consider the following 4 models.  Note the differences between **statistics** vs. **parameters** and also between **individual observations** vs. ** averages**.  Convince yourself that you know when to use each model.
+Consider the following 4 models.  Note the differences between **statistics** vs. **parameters** and also between **individual observations** vs. **averages**.  Convince yourself that you know when to use each model.
 
 \begin{eqnarray*}
 E[Y_i|x_i] &=& \beta_0 + \beta_1 x_i \\
