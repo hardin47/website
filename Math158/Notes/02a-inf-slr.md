@@ -79,7 +79,7 @@ Plugging in our estimators, we get $$\hat{y_i}=b_0+b_1 x_i$$ as our fitted value
 A confidence interval gives you a range of plausible values for $E[Y|x]$. That is, the mean response at a fixed value of $x$.  A confidence interval differs from a prediction interval, which is intended to not only contain the mean response, but rather the value of the response for the next individual observed at value $x_h$.  As a result, the prediction interval will need to be larger than the confidence interval.
 
 ### Standard Errors and Experimental Design
-The following are the standard errors for $\hat{\beta}_0$, $\hat{\beta}_1$, the fitted value at $x_h$: $\hat{y}_{x_h}$, and a new value at $x_h$: $\hat{y}_{x_h(new)}$.  
+The following are the standard errors for $b_0$, $b_1$, the fitted value at $x_h$: $\hat{y}_{x_h}$, and a new value at $x_h$: $\hat{y}_{x_h(new)}$.  
 
 $\sigma^2$ is the variance of the errors.  
 
@@ -152,19 +152,23 @@ H_a: \beta_1 \ne 0
 test statistic is $$F^* = \frac{MSR}{MSE} = \frac{\sum(\hat{y}_i - \overline{y})^2}{\sum(y_i - \hat{y}_i)^2 / (n-2)}.$$  Large values of $F^*$ support $H_a$, values of $F^*$ close to 1 support $H_0$.  **If $H_0$ is true, then** $$F^* \sim F_{1,n-2}.$$  Note that the F-test is always a one-sided test (meaning that we reject only for *BIG* values of $F^*$), though we are assessing a two-sided hypothesis.
 
 
+
+
+
+
 ```r
-Credit %>%
-  lm(Balance ~ Limit, data = .) %>%
+ames_inf %>%
+  lm(price_ln ~ area, data = .) %>%
   anova() %>%
   tidy()
 ```
 
 ```
 ## # A tibble: 2 × 6
-##   term         df     sumsq    meansq statistic    p.value
-##   <chr>     <int>     <dbl>     <dbl>     <dbl>      <dbl>
-## 1 Limit         1 62624255. 62624255.     1148.  2.53e-119
-## 2 Residuals   398 21715657.    54562.       NA  NA
+##   term         df sumsq   meansq statistic p.value
+##   <chr>     <int> <dbl>    <dbl>     <dbl>   <dbl>
+## 1 area          1  233. 233.         2901.       0
+## 2 Residuals  2902  234.   0.0805       NA       NA
 ```
 
 
@@ -239,53 +243,212 @@ or, defining $SSR$ as the regression sum of squares (the amount of variation exp
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
+1. If the technical conditions are violated, what does the CI tell us about the slope parameter?  What if it is only the normality condition?  
+2. If the technical conditions are violated what does the PI tell us about the predicted values?  What if is is only the normality condition?  
+3. What confounding variables might exist that link `Limit` and `Balance` as positively correlated but not causal?  
+4. What population might the `ames` data be representative of?  What population might the `Credit` data be representative of? (Hint:  look at the data documentation by typing `?ames` or `?Credit`.)
 
 ## R: SLR Inference
 
 ### CIs
 
-Also available through **broom** are CIs for the coefficients.
+Also available through **broom** are CIs for the coefficients.  Consider the `ames` dataset available through the **openintro** package.
+
+> Data set contains information from the Ames Assessor's Office used in computing assessed values for individual residential properties sold in Ames, IA from 2006 to 2010.
+
+For reasons we will discuss in the coming chapters, we'll consider the $\ln$ of the price of the home, and we will also only consider homes which are less than 3000 square feet.
 
 
 ```r
-Credit %>%
-  lm(Balance ~ Limit, data = .) %>%
+library(openintro)
+ames_inf <- ames %>%
+  filter(area <= 3000) %>%
+  mutate(price_ln = log(price))
+```
+
+
+
+```r
+ames_inf %>%
+  ggplot(aes(x = area, y = price_ln)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE)
+```
+
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+```r
+ames_inf %>%
+  lm(price_ln ~ area, data = .) %>% 
   tidy(conf.int = TRUE, conf.level = 0.9)
 ```
 
 ```
 ## # A tibble: 2 × 7
-##   term        estimate std.error statistic   p.value conf.low conf.high
-##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-## 1 (Intercept) -293.     26.7         -11.0 1.18e- 24 -337.     -249.   
-## 2 Limit          0.172   0.00507      33.9 2.53e-119    0.163     0.180
+##   term         estimate std.error statistic p.value  conf.low conf.high
+##   <chr>           <dbl>     <dbl>     <dbl>   <dbl>     <dbl>     <dbl>
+## 1 (Intercept) 11.1      0.0177        628.        0 11.1      11.1     
+## 2 area         0.000614 0.0000114      53.9       0  0.000595  0.000632
 ```
 
 
-R did the t-test automatically, but it could be done by hand using the provided SE.
+R did the t-test automatically, but it could be done by hand using the provided SE (available in the column called `std.error`).
 
 \begin{eqnarray*}
 H_0:&& \beta_1 = 0\\
 H_a:&& \beta_1 \ne 0\\
-t &=& \frac{0.172 - 0}{0.00507} = 33.9\\
-p-value &=& 2 P(t_{398} \geq 33.9) = 2*(1-pt(33.9, 398)) = \mbox{very small}\\
+t &=& \frac{0.000613 - 0}{0.0000114} = 53.86\\
+p-value &=& 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{very small}\\
 \end{eqnarray*}
 
-Because the p-value is so small, reject the null hypothesis: to model a linear relationship between `Limit` and `Balance`, the slope coefficient must be different from zero (greater than zero if we are doing a one-sided test).  Note that knowing we have a positive relationship does not tell us that `Balance` is a *result* of `Limit`.  That is, there is no reason to believe a causative mechanism.
+Because the p-value is so small, reject the null hypothesis: to model a linear relationship between `area` and `price_ln`, the slope coefficient must be different from zero (greater than zero if we are doing a one-sided test).  Note that knowing we have a positive relationship does not tell us that `price_ln` is a *result* of `area`.  That is, there is no reason to believe a causative mechanism.
 
-A 90% confidence interval for the slope coefficient, $\beta_1$ is (0.163, 0.18).  The true population slope to model `Limit` and `Balance` is somewhere between (0.163, 0.18).  Note that even if the values seem small, they are *significantly* (not necessarily *substantially*) away from zero.  We should not be tempted to confuse small with zero, as the magnitude of the slope coefficient depends heavily on the units of measurement for our variables.
+A 90% confidence interval for the slope coefficient, $\beta_1$ is (0.000595, 0.000632).  The true population slope to model `area` and `price_ln` is somewhere between (0.000595, 0.000632).  Note that even though the values seem small, they are *significantly* (not necessarily *substantially*) away from zero.  We should not be tempted to confuse small with zero, as the magnitude of the slope coefficient depends heavily on the units of measurement for our variables.
 
 ### Predictions
 
-Fortunately, R allows for creating mean and prediction intervals.  We need to create a new data set that has the same variable name as our predictor, and the value we are interested in, we might call it `newcredit`. Then use `augment()`  to give either a confidence or prediction interval, as follows.  
+#### Predicting Ames
+
+Fortunately, R allows for creating mean and prediction intervals.  We need to create a new data set that has the same variable name as our predictor, and the value we are interested in, we might call it `new_ames`. Then use `augment()`  to give either a confidence or prediction interval, as follows.  
 
 
 ```r
 # store the linear model object so that we can use it later.
+ames_lm <- lm(price_ln ~ area, data = ames_inf)
+
+# create a new dataframe
+new_ames <- data.frame(area = c(1000, 1500, 2000))
+
+# get df from the model
+ames_df <- ames_lm %>% glance() %>% select(df.residual) %>% pull()
+ames_df
+```
+
+```
+## [1] 2902
+```
+
+```r
+# new data predictions
+ames_pred <- ames_lm %>% 
+  augment(newdata = new_ames, type.predict = "response", se_fit = TRUE)
+ames_pred
+```
+
+```
+## # A tibble: 3 × 3
+##    area .fitted .se.fit
+##   <dbl>   <dbl>   <dbl>
+## 1  1000    11.7 0.00760
+## 2  1500    12.0 0.00527
+## 3  2000    12.3 0.00792
+```
+
+
+
+```r
+# get the multiplier / critical value for creating intervals
+crit_val <- qt(0.975, ames_df)
+crit_val
+```
+
+```
+## [1] 1.96
+```
+
+```r
+# SE of the mean response
+se_fit <- ames_pred %>% select(.se.fit) %>% pull()
+se_fit
+```
+
+```
+##       1       2       3 
+## 0.00760 0.00527 0.00792
+```
+
+```r
+# esimate of the overall variability, $\sigma$
+ames_sig <- ames_lm %>% glance() %>% select(sigma) %>% pull()
+ames_sig
+```
+
+```
+## [1] 0.284
+```
+
+```r
+# calculate the SE of the predictions
+se_pred <- sqrt(ames_sig^2 + se_fit^2)
+se_pred
+```
+
+```
+##     1     2     3 
+## 0.284 0.284 0.284
+```
+
+
+```r
+# calculating both confidence intervals for the mean responses and
+# prediction intervals for the individual responses
+
+ames_pred <- ames_pred %>%
+  mutate(lower_PI = .fitted - crit_val * se_pred,
+         upper_PI = .fitted + crit_val * se_pred,
+         lower_CI = .fitted - crit_val * se_fit,
+         upper_CI = .fitted + crit_val * se_fit)
+
+ames_pred
+```
+
+```
+## # A tibble: 3 × 7
+##    area .fitted .se.fit lower_PI upper_PI lower_CI upper_CI
+##   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>    <dbl>    <dbl>
+## 1  1000    11.7 0.00760     11.2     12.3     11.7     11.7
+## 2  1500    12.0 0.00527     11.5     12.6     12.0     12.0
+## 3  2000    12.3 0.00792     11.8     12.9     12.3     12.3
+```
+
+Or, to create intervals for the entire range of explanatory variables:
+
+
+```r
+ames_pred_all <- ames_lm %>% 
+  augment(type.predict = "response", se_fit = TRUE) %>%
+  mutate(.se.pred = sqrt(ames_sig^2 + .se.fit^2)) %>%
+  mutate(lower_PI = .fitted - crit_val * .se.pred,
+         upper_PI = .fitted + crit_val * .se.pred,
+         lower_CI = .fitted - crit_val * .se.fit,
+         upper_CI = .fitted + crit_val * .se.fit)
+
+ames_pred_all %>%
+  ggplot(aes(x = area, y = price_ln)) + 
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE) +
+  geom_ribbon(aes(ymin = lower_PI, ymax = upper_PI), 
+              alpha = 0.2) + 
+  geom_ribbon(aes(ymin = lower_CI, ymax = upper_CI), 
+              alpha = 0.2, fill = "red")
+```
+
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Predicting Credit
+
+In contrast to the `ames` data, note how the predictions (particulary the CI around the line) drastically changes when the sample size is small.
+
+
+```r
+library(ISLR)  # source of the Credit data
+# store the linear model object so that we can use it later.
 credit_lm <- lm(Balance ~ Limit, data = Credit)
 
 # create a new dataframe
-newcredit <- data.frame(Limit = c(2000, 5000, 7000))
+new_credit <- data.frame(Limit = c(1000, 3000, 7000))
 
 # get df from the model
 credit_df <- credit_lm %>% glance() %>% select(df.residual) %>% pull()
@@ -299,7 +462,7 @@ credit_df
 ```r
 # new data predictions
 credit_pred <- credit_lm %>% 
-  augment(newdata = newcredit, type.predict = "response", se_fit = TRUE)
+  augment(newdata = new_credit, type.predict = "response", se_fit = TRUE)
 credit_pred
 ```
 
@@ -307,9 +470,9 @@ credit_pred
 ## # A tibble: 3 × 3
 ##   Limit .fitted .se.fit
 ##   <dbl>   <dbl>   <dbl>
-## 1  2000    50.5    18.1
-## 2  5000   565.     11.8
-## 3  7000   909.     16.4
+## 1  1000   -121.    22.2
+## 2  3000    222.    14.6
+## 3  7000    909.    16.4
 ```
 
 
@@ -332,7 +495,7 @@ se_fit
 
 ```
 ##    1    2    3 
-## 18.1 11.8 16.4
+## 22.2 14.6 16.4
 ```
 
 ```r
@@ -353,7 +516,7 @@ se_pred
 
 ```
 ##   1   2   3 
-## 234 234 234
+## 235 234 234
 ```
 
 
@@ -374,12 +537,10 @@ credit_pred
 ## # A tibble: 3 × 7
 ##   Limit .fitted .se.fit lower_PI upper_PI lower_CI upper_CI
 ##   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>    <dbl>    <dbl>
-## 1  2000    50.5    18.1    -410.     511.     14.9     86.1
-## 2  5000   565.     11.8     106.    1025.    542.     589. 
-## 3  7000   909.     16.4     448.    1369.    876.     941.
+## 1  1000   -121.    22.2    -582.     340.    -165.    -77.4
+## 2  3000    222.    14.6    -238.     682.     193.    251. 
+## 3  7000    909.    16.4     448.    1369.     876.    941.
 ```
-
-
 
 Or, to create intervals for the entire range of explanatory variables:
 
@@ -403,7 +564,7 @@ credit_pred_all %>%
               alpha = 0.2, fill = "red")
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### ANOVA output
@@ -412,33 +573,52 @@ Note that `tidy()` creates a dataframe which is slighlty easier to work with, bu
 
 
 ```r
-Credit %>%
-  lm(Balance ~ Limit, data = .) %>%
+ames_inf %>%
+  lm(price_ln ~ area, data = .) %>%
   anova() 
 ```
 
 ```
 ## Analysis of Variance Table
 ## 
-## Response: Balance
-##            Df   Sum Sq  Mean Sq F value Pr(>F)    
-## Limit       1 62624255 62624255    1148 <2e-16 ***
-## Residuals 398 21715657    54562                   
+## Response: price_ln
+##             Df Sum Sq Mean Sq F value Pr(>F)    
+## area         1    233   233.4    2901 <2e-16 ***
+## Residuals 2902    234     0.1                   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```r
-Credit %>%
-  lm(Balance ~ Limit, data = .) %>%
+ames_inf %>%
+  lm(price_ln ~ area, data = .) %>%
   anova() %>%
   tidy()
 ```
 
 ```
 ## # A tibble: 2 × 6
-##   term         df     sumsq    meansq statistic    p.value
-##   <chr>     <int>     <dbl>     <dbl>     <dbl>      <dbl>
-## 1 Limit         1 62624255. 62624255.     1148.  2.53e-119
-## 2 Residuals   398 21715657.    54562.       NA  NA
+##   term         df sumsq   meansq statistic p.value
+##   <chr>     <int> <dbl>    <dbl>     <dbl>   <dbl>
+## 1 area          1  233. 233.         2901.       0
+## 2 Residuals  2902  234.   0.0805       NA       NA
 ```
+
+
+
+
+```r
+ames_inf %>%
+  mutate(bedrooms = case_when(
+    Bedroom.AbvGr <=1 ~ "1",
+    Bedroom.AbvGr <=2 ~ "2",
+    Bedroom.AbvGr <=3 ~ "3",
+    TRUE ~ "4+"
+  )) %>%
+  ggplot(aes(x = area, y = price_ln, color = bedrooms)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE)
+```
+
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+

@@ -82,7 +82,7 @@ $$\epsilon_i \stackrel{iid}{\sim} N(0, \sigma^2)$$
 
 ### Important Features of the Model with Normal Errors
 
-1. $\epsilon_i$ is a *random& error term (that is, $\epsilon_i$ is a random variable).  
+1. $\epsilon_i$ is a *random* error term (that is, $\epsilon_i$ is a random variable).  
 2. $Y_i$ is a random variable because of $\epsilon_i$.  
 3. We assume $E[\epsilon_i]=0$, therefore $E[Y_i | x_i] = \beta_0 + \beta_1 x_i$.  (E is the expected value which can be thought of as the long run average or the population mean.)  That is, the relationship between the explanatory and response variables is **linear**.  
 4. $\epsilon_i$ is the amount by which $Y_i$ values exceed or fall short of the regression line.  
@@ -108,14 +108,14 @@ function of $\epsilon_i$, $Y_i$ is also a random variable.
 Furthermore, we are assuming that the mean of the $\epsilon_i$ are 0.  This tells us that for a fixed value of $x_i$, the average value of $Y_i$ is given as $\beta_0+\beta_1 x_i$. We write this as
 $$E[Y_i | x_i] = \mu_{Y_i|x_i}=\beta_0+\beta_1 x_i$$ where $\mu$ represents the mean.  So the fitted values are the estimates of the mean of the $Y_i$ at the plugged-in value of $x_i$.  
 
-2. **Condition of Independence** The individual observations are independent of each other.  We are assuming that our data is a random sample from the population of interest.  As a contrast to this condition, suppose we are interested in the number of pieces in a jigsaw puzzle and the time it takes to complete it.  If all our data come from one person (e.g., multiple puzzles), who happens to be very good at jigsaw puzzles.  Then our estimate of the line will be much lower than it should be, because this person will finish all the puzzles quickly, i.e. small values for $y_i$.  However, had our data been independent, then we have the chance of also getting someone who is very bad at jigsaw puzzles and things even out in some way.  
+2. **Condition of Independence** The individual observations are independent of each other.  We are assuming that our data is a random sample from the population of interest.  As a contrast to this condition, suppose we are interested in the number of pieces in a jigsaw puzzle and the time it takes to complete it.  If all our data come from one person (e.g., multiple puzzles), who happens to be very good at jigsaw puzzles, then our estimate of the line will be much lower than it should be, because this person will finish all the puzzles quickly, i.e. small values for $y_i$.  However, had our data been independent, then we have the chance of also getting someone who is very bad at jigsaw puzzles and things even out to get an unbiased estimate of the line.  
 
 3. **Condition of Constant Variance**  The error terms, in addition to having a mean of 0, are assumed to have a variance $\sigma^2$ that does not depend on the value of $x_i$.  This is assumed because we are
 looking at each point with equal importance.  Suppose that we knew that at a particular value of $x_i$, the variance of $\epsilon_i$ was 0. Then the observed value of $y_i$ is actually $\mu_y$, and
 thus we should force our line to go through that point, since the true line goes through that point.  This is an extreme case, but in the case of non-constant variance, we should regard the values
 observed with smaller variation with higher importance, as they will tend to be more accurate.  We denote the variance condition by $$Var(Y_i|x_i)=\sigma^2\{Y_i|x_i\}=\sigma^2.$$  
 
-4. **Condition of a Normal Distribution**  Lastly, we assume that the distribution of the error terms is normal, a common distribution.  The reason for the normal condition is theoretic, as the techniques we will be using to say something about the $\beta_i$ based on the $\hat{\beta}_i$ and the data assumes the normal distribution, as its easy to work with.  
+4. **Condition of a Normal Distribution**  Lastly, we assume that the distribution of the error terms is normal, a common distribution.  The reason for the normal condition is theoretic, as the techniques we will be using to say something about the $\beta_i$ based on the $b_i$ and the data assumes the normal distribution, as its easy to work with.  
 
 
 ### Maximum Likelihood
