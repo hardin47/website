@@ -196,13 +196,13 @@ Residuals measure the scatter of points above and below the least squares regres
 
 \begin{eqnarray*}
 e_i &=& (Y_i - \hat{Y}_i)\\
-SSE &=& \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (e_i)^2 \mbox{{\bf SUM}}\\
-MSE&=& \frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2 \mbox{{\bf MEAN}}\\
-s_Y^2 &=& \frac{\sum_i(Y_i - \overine{Y})^2}{n-1}\\
-R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)} = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\sum_i(Y_i - \overine{Y})^2}
+SSE &=& \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (e_i)^2 \ \ \mbox{(sum)}\\
+MSE&=& \frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2 \ \ \mbox{(mean)}\\
+s_Y^2 &=& \frac{\sum_i(Y_i - \overline{Y})^2}{n-1}\\
+R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)} = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\sum_i(Y_i - \overline{Y})^2}
 \end{eqnarray*}
 
-
+$R^2$ is the proportion of variability in $Y$ which can be explained (i.e., removed) by knowing $x$.  
 
 ## R code for regression 
 
@@ -211,7 +211,7 @@ R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)} = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\s
 
 
 
-Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.
+Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.  Also, $R^2 = (-0.496)^2 = 0.246.$  24.6% of the variability in velocity can be explained by the bodymass.
 
 
 
