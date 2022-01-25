@@ -196,9 +196,10 @@ Residuals measure the scatter of points above and below the least squares regres
 
 \begin{eqnarray*}
 e_i &=& (Y_i - \hat{Y}_i)\\
-MSE&=& \frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2\\
-SSE &=& \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (e_i)^2\\
-R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)}
+SSE &=& \sum_i (Y_i - \hat{Y}_i)^2 = \sum_i (e_i)^2 \mbox{{\bf SUM}}\\
+MSE&=& \frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2} = \frac{\sum_i (e_i)^2}{n-2} = s^2 \mbox{{\bf MEAN}}\\
+s_Y^2 &=& \frac{\sum_i(Y_i - \overine{Y})^2}{n-1}\\
+R^2 &=& 1 - \frac{Var(e_i)}{Var(Y_i)} = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\sum_i(Y_i - \overine{Y})^2}
 \end{eqnarray*}
 
 
