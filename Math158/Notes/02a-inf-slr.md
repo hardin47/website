@@ -19,12 +19,12 @@ s^2\{ b_1 \} &=& \frac{MSE}{\sum(x_i - \overline{x})^2}\\
 The variability of the *slope* becomes smaller for $x_i$ values that are more spread out.  This should make sense to you intuitively because if the $x_i$ values are spread out, slight deviations in their measurements (i.e., different random samples) won't change the slope of the line very much.  But if the $x_i$ exist only in a narrow range, it would be easy to get vastly different $b_1$ values depending on the particular random sample.  
 
 ### Distribution of $b_1$ {-}  
-The distribution of $b_1$ (under the condition that $E[b_1] = \beta_1$ *and* the normal error regression model), should seem very familiar to you: $$\frac{b_1 - \beta_1}{s\{b_1\}} \sim t_{n-2}.$$
+The distribution of $b_1$ (under the condition that $E[b_1] = \beta_1$ *and* the normal error regression model), should seem very familiar to you: $$T = \frac{b_1 - \beta_1}{s\{b_1\}} \sim t_{n-2}.$$
 Recall that we use a t distribution on the standardized variable because we are not dividing by a constant.  Instead, we divide by the standard error which induces extra variability and thus a t distribution.  
 
 Indeed, if $H_0: \beta_1=0$ is true, then
 \begin{eqnarray*}
-\frac{b_1 - 0}{s\{b_1\}} \sim t_{n-2}
+T = \frac{b_1 - 0}{s\{b_1\}} \sim t_{n-2}
 \end{eqnarray*}
 Note that the degrees of freedom are now $n-2$ because we are estimating two parameters ($\beta_0$ and $\beta_1$).  We reject the null hypothesis, if our $b_1$ leads us to a t-statistic that is larger than we would expect by random chance (i.e., our p-value is small).  
 
@@ -38,8 +38,8 @@ point estimate $\pm$ multiplier * SE(point estimate)</center>
 
 An $(1-\alpha)100\%$ confidence interval for the slope parameter, $\beta_1$: is
 \begin{eqnarray*}
-b_1 &\pm& t_{\alpha/2,n-2} s\{b_1\}\\
-b_1 &\pm& t_{\alpha/2, n-2} \sqrt{MSE/\sum(x_i - \overline{x})^2}\\
+b_1 &\pm& t^*_{\alpha/2,n-2} s\{b_1\}\\
+b_1 &\pm& t^*_{\alpha/2, n-2} \sqrt{MSE/\sum(x_i - \overline{x})^2}\\
 \end{eqnarray*}
 
 Remember that $\beta_1$ is not random.  The randomness comes from the *data*, and so it is the endpoints of the CI that are random.  In interpreting a CI, we give an interval of plausible values for $\beta_1$ that would not have been rejected had we done a hypothesis test.  Alternatively, we think of the CI as a set of values for $\beta_1$ that we are fairly certain contains $\beta_1$.  If we were to repeat the process many times, $(1-\alpha)100\%$ of the time our interval captures the true parameter.  
@@ -51,7 +51,7 @@ Again, in regression we are finding linear relationships.  We cannot claim that 
 ### Parameter Interpretation {-}
 A confidence interval gives us an estimate for the parameter(s) in our model, our goal is to understand the interpretation of these quantities.  
 
-**Intercept $\beta_0$:**  The average value of $Y$ when $x$ is 0. Often, this doesn't make any sense.  For example, studying the relationship between height and weight, $\beta_0$ is the average weight of someone who is 0 inches tall.  Nonsense.  Very often $\beta_0$ is just a placeholder, a number that needs to be specified but has no interpretation.  
+**Intercept $\beta_0$:**  The average value of $Y$ when $x$ is 0. Often, the intercept is not interpretable on its own.  For example, studying the relationship between height and weight, $\beta_0$ is the average weight of someone who is 0 inches tall.  Nonsense.  Very often $\beta_0$ is a placeholder, a number that needs to be specified but has no interpretation.  
 
 **Slope $\beta_1$:** $\beta_1$ can be interpreted as the increase in the average of $Y$ when $x$ is incremented by a single unit. $$E[Y|x+1]-E[Y|x]=\beta_0+\beta_1(x+1)-(\beta_0+\beta_1x)=\beta_1$$
 
@@ -74,24 +74,38 @@ With interpolation, we have data to support the linear relationship, and thus sh
 The linear regression line gives us our guess at the mean response for an individual at a particular value $x_h$.  
 
 Our conditions give us $$E[Y|x]=\beta_0+\beta_1x$$
-Plugging in our estimators, we get $$\hat{y_i}=b_0+b_1 x_i$$ as our fitted value.  Comparing the two, its clear that our best fit line gives us our guess for the mean response.  However, how accurate is this guess?  
+
+Plugging in our estimators, we get $$\hat{y_i}=b_0+b_1 x_i$$ as our fitted value. However, how accurate is this guess?  
 
 A confidence interval gives you a range of plausible values for $E[Y|x]$. That is, the mean response at a fixed value of $x$.  A confidence interval differs from a prediction interval, which is intended to not only contain the mean response, but rather the value of the response for the next individual observed at value $x_h$.  As a result, the prediction interval will need to be larger than the confidence interval.
 
-### Standard Errors and Experimental Design
-The following are the standard errors for $b_0$, $b_1$, the fitted value at $x_h$: $\hat{y}_{x_h}$, and a new value at $x_h$: $\hat{y}_{x_h(new)}$.  
+### Variability of point estimates
+The following are the variances for $b_0$, $b_1$, the fitted value at $x_h$: $\hat{y}_{x_h}$, and a new value at $x_h$: $\hat{y}_{x_h(new)}$.  
 
 $\sigma^2$ is the variance of the errors.  
 
 \begin{eqnarray*}
-\sigma^2\{b_0\}&=&\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum(x_i-\bar{x})^2}\right]\\
-\sigma^2\{b_1\}&=&\frac{\sigma^2}{\sum(x_i-\bar{x})^2}\\
-\sigma^2\{\hat{y}_{x_h}\}&=&\sigma^2\left[\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]\\
-\sigma^2\{\hat{y}_{x_h(new)}\}&=& \sigma^2 + \sigma^2\{\hat{y}_{x_h}\} = \sigma^2\left[1+\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]
+\mbox{var}(b_0)&=&\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum(x_i-\bar{x})^2}\right]\\
+\mbox{var}(b_1)&=&\frac{\sigma^2}{\sum(x_i-\bar{x})^2}\\
+\mbox{var}(\hat{y}_{x_h})&=&\sigma^2\left[\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]\\
+\mbox{var}(\hat{y}_{x_h(new)})&=& \sigma^2 + \mbox(var)(\hat{y}_{x_h}) = \sigma^2\left[1+\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]
 \end{eqnarray*}
 
-These quantities are estimated by replacing $\sigma^2$ with our guess, which is $MSE$.  Clearly, $b_0$ is just a fitted value itself (when $x_h=0$), so that is a special case of the 3rd formula.  The difference between the last two is one standard deviation.  This should make sense, the variance of the next observation is just the variance of the mean, and then the variance of the error on top of the mean.  
-Confidence intervals are essentially our best guess plus or minus two standard deviations.  To be exact, instead of 2, we use $qt(.975,n-2)$.  The idea is that the smaller we can make the standard errors (the square root of the variances above), the smaller our confidence intervals will be, and the more information we will have.  
+These quantities are estimated by replacing $\sigma^2$ with our guess, which is $MSE$.  $b_0$ is a fitted value itself (when $x_h=0$), so the variability of $b_0$ is a special case of the 3rd formula.  The difference between the last two is one $\sigma^2$.  This should make sense, the variance of the next observation (point) is the variance of the mean (i.e., the predicted regression line) plus then the variance of the error on top of the mean.  
+
+#### Standard Error:
+
+The phrase "standard error" indicates the variability (square root of the variance) of a **statistic** under the situation where the variability is an estimate (that is, MSE is used instead of $\sigma^2$).  The SE of the quantities above are therefore given by:
+
+\begin{eqnarray*}
+\mbox{SE}(b_0)&=& \sqrt{MSE\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum(x_i-\bar{x})^2}\right]}\\
+\mbox{SE}(b_1)&=& \sqrt{\frac{MSE}{\sum(x_i-\bar{x})^2}}\\
+\mbox{SE}(\hat{y}_{x_h})&=& \sqrt{MSE\left[\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]}\\
+\mbox{SE}(\hat{y}_{x_h(new)})&=& \sqrt{MSE + \mbox(SE)(\hat{y}_{x_h})^2} = \sqrt{MSE\left[1+\frac{1}{n}+\frac{(x_h-\bar{x})^2}{\sum(x_i-\bar{x})^2}\right]}
+\end{eqnarray*}
+
+
+Confidence intervals are essentially our best guess plus or minus two standard errors.  To be exact, instead of 2, we use $qt(.975,n-2)$.  The idea is that the smaller we can make the standard errors, the smaller the confidence intervals will be, and the more information we will have.  
 
 #### Notes: {-}
 1. The prediction of a future (or mean) response is most accurate when $x_h = \overline{x}$.  Think about the behavior of the regression line away from $\overline{x}$.  The line is much more variable at the extremes.  
@@ -110,13 +124,13 @@ SSE &=& \sum (y_i - \hat{y}_i)^2\\
 SSR &=& \sum (\hat{y}_i - \overline{y})^2
 \end{eqnarray*}
 
-where SSTO is the sum of squares total; SSE is the sum of squared errors; and SSR is the sum of squares of the regression line.  It seems quite obvious that
+where SSTO is the sum of squares total; SSE is the sum of squared errors; and SSR is the sum of squares of the regression line.  Unsquared, the residuals have a nice relationship:
 
 \begin{eqnarray*}
 y_i - \overline{y} &=& \hat{y}_i - \overline{y} + y_i - \hat{y}_i\\
 \mbox{total deviation} &=& \mbox{dev of reg around mean} + \mbox{dev around line}
 \end{eqnarray*}
-But it might not be so obvious that $$SSTO = SSR + SSE.$$  We can derive the relationship using algebra
+But when the residuals are each squared, it is not at all obvious that $$SSTO = SSR + SSE.$$  However, we can derive the relationship using algebra:
 \begin{eqnarray*}
 \sum(y_i - \overline{y})^2 &=& \sum [ (\hat{y}_i - \overline{y}) + (y_i - \hat{y}_i)]^2\\
 &=& \sum(\hat{y}_i - \overline{y})^2 + \sum(y_i - \hat{y}_i)^2 + 2 \sum (\hat{y}_i - \overline{y})(y_i - \hat{y}_i)\\
@@ -140,7 +154,7 @@ Sums of squares are increasing in number of data values.  To accommodate any num
 1. MSE estimates $\sigma^2$ regardless of whether or not $\beta_1 = 0$.  
 2. When $\beta_1=0$, MSR also estimates $\sigma^2$.  
 3. A comparison of MSR and MSE would seem to indicate whether or not $\beta_1=0$.  
-Note that we can think about MSR as the variability of the regression line around the line $\overline{y}$.  If $\beta_1=0$, then the regression line varies such that MSR is just measuring the natural variability of the error terms ($\sigma^2$).  But if $\beta_1 \ne 0$, then the $b_1$ values still vary naturally PLUS there is a bit of a difference from the line $\beta_1$ to the line at $\mu_Y$.
+Note that we can think about MSR as the variability of the regression line around the line $\overline{y}$.  If $\beta_1=0$, then the regression line varies such that MSR is measuring the natural variability of the error terms ($\sigma^2$).  But if $\beta_1 \ne 0$, then the $b_1$ values still vary naturally PLUS there is a bit of a difference from the line $\beta_1$ to the line at $\mu_Y$.
 
 
 ### F test of $\beta_1 = 0$ versus $\beta_1 \ne 0$
@@ -149,7 +163,7 @@ Note that we can think about MSR as the variability of the regression line aroun
 H_0: \beta_1 = 0\\
 H_a: \beta_1 \ne 0
 \end{eqnarray*}
-test statistic is $$F^* = \frac{MSR}{MSE} = \frac{\sum(\hat{y}_i - \overline{y})^2}{\sum(y_i - \hat{y}_i)^2 / (n-2)}.$$  Large values of $F^*$ support $H_a$, values of $F^*$ close to 1 support $H_0$.  **If $H_0$ is true, then** $$F^* \sim F_{1,n-2}.$$  Note that the F-test is always a one-sided test (meaning that we reject only for *BIG* values of $F^*$), though we are assessing a two-sided hypothesis.
+test statistic is $$F = \frac{MSR}{MSE} = \frac{\sum(\hat{y}_i - \overline{y})^2}{\sum(y_i - \hat{y}_i)^2 / (n-2)}.$$  Large values of $F$ support $H_a$, values of $F$ close to 1 support $H_0$.  **If $H_0$ is true, then** $$F \sim F_{1,n-2}.$$  Note that the F-test is always a one-sided test (meaning that we reject only for *BIG* values of $F$), though we are assessing a two-sided hypothesis.
 
 
 
@@ -177,12 +191,12 @@ Notice that the `anova()` output  includes all of the information in the sums of
 
 ### Equivalence of F and t-tests
 
-$$F^* = \frac{SSR}{SSE/(n-2)} = \frac{b_1^2 \sum(x_i - \overline{x})^2}{MSE} = \frac{b_1^2}{MSE/\sum(x_i - \overline{x})^2} = \bigg(\frac{b_1}{s\{b_1\} }\bigg)^2 = (t^*)^2$$
+$$F = \frac{SSR}{SSE/(n-2)} = \frac{b_1^2 \sum(x_i - \overline{x})^2}{MSE} = \frac{b_1^2}{MSE/\sum(x_i - \overline{x})^2} = \bigg(\frac{b_1}{s\{b_1\} }\bigg)^2 = (T)^2$$
 We're going to continue to use this test as our models get more complicated.  The general strategy will always be:  
 
 1. Fit full model: $SSE_{full} = \sum(y_i - b_0 - b_1 x_i)^2 = \sum(y_i - \hat{y}_i)^2$  
 2. Fit reduced model (under $H_0$):  $SSE_{reduced} = \sum(y_i - b_0)^2 = \sum(y_i - \overline{y})^2 = SSTO$  
-3. $F^* = \frac{SSE_{reduced} - SSE_{full}}{df_{reduced} - df_{full}}  \div \frac{SSE_{full}}{df_{full}} = \frac{MSR}{MSE}$
+3. $F = \frac{SSE_{reduced} - SSE_{full}}{df_{reduced} - df_{full}}  \div \frac{SSE_{full}}{df_{full}} = \frac{MSR}{MSE}$
 
 
 ## Descriptive Measures of Linear Association
@@ -191,7 +205,23 @@ We discuss r (the correlation) and $R^2$ (the coefficient of determination) as d
 
 ### Correlation
 
-Consider a scatterplot, there is variability in both directions:  $(x_i - \overline{x}) \ \& \ (y_i - \overline{y})$.  
+Consider a scatterplot, there is variability in both directions:  $(x_i - \overline{x}) \ \& \ (y_i - \overline{y})$.  The data shown below represent crop types taken from [Our World in Data](https://ourworldindata.org/crop-yields) as part of [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-01).  Each point in each plot is a different country.  The x and y variables represent the proportion of total yield in the last 50 years which is due to that crop type. 
+
+
+
+
+
+<div class="figure" style="text-align: center">
+<img src="02a-inf-slr_files/figure-html/plots6ave-1.png" alt="The % of total yield for different crops (across the last 50 years).  Each point represents a country.  Now lines at the average x and average y values have been superimposed onto the plots." width="672" />
+<p class="caption">(\#fig:plots6ave)The % of total yield for different crops (across the last 50 years).  Each point represents a country.  Now lines at the average x and average y values have been superimposed onto the plots.</p>
+</div>
+
+
+
+For each red dot (on each plot), consider the distance the observation is from the $\overline{X}$ line and the $\overline{Y}$ line.  Is the observation (red dot) above both?  below both?  above one and below the other?  
+
+How does the particular red dot (observation) contribute to the correlation?  In a positive way (to make $r$ bigger)?  In a negative way (to make $r$ smaller)?
+
 
 **Positive Relationship:** As $x$ increases, if $Y$ also tends to increase, then the two variables are said to have a positive relationship (example: shoe size and height).  
 **Negative Relationship:** As $x$ increases, if $Y$ tends to decrease, the two variables are said to have a negative relationship (example: outside temperature and heating oil used).  
@@ -275,7 +305,7 @@ ames_inf %>%
   geom_smooth(method = lm, se = FALSE)
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -435,7 +465,7 @@ ames_pred_all %>%
               alpha = 0.2, fill = "red")
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Predicting Credit
 
@@ -564,7 +594,7 @@ credit_pred_all %>%
               alpha = 0.2, fill = "red")
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### ANOVA output
@@ -620,5 +650,5 @@ ames_inf %>%
   geom_smooth(method = lm, se = FALSE)
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
 

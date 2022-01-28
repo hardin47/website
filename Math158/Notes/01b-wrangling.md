@@ -1472,7 +1472,7 @@ by Saurav Kaushik   https://www.analyticsvidhya.com/blog/2017/03/beginners-guide
 
 We will see the R package **purrr** in greater detail as we go, but for now, let's get a hint for how it works.  
 
-We are going to focus on the `map` family of functions which will just get us started.  Lots of other good **purrr** functions like `pluck()` and `accumulate()`.
+We are going to focus on the `map` family of functions which will get us started.  Lots of other good **purrr** functions like `pluck()` and `accumulate()`.
 
 Much of below is taken from a [tutorial](https://www.rebeccabarter.com/blog/2019-08-19_purrr/) by Rebecca Barter.
 
