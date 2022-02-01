@@ -198,7 +198,8 @@ An increase in 1 unit of x is associated with a multiplicative change of $e^{\be
 E[\ln(Y)] \ne \ln(E[Y])\\
 median(\ln(Y)) = \ln(median(Y))
 \end{eqnarray*}
-{\bf Example 3} Transforming $x$ and $Y$:  $x' = \ln(x)$ and  $Y' = \ln(Y)$  $$E[\ln(Y)] = \beta_0  + \beta_1 \ln(x)$$
+
+**Example 3:** Transforming $x$ and $Y$:  $x' = \ln(x)$ and  $Y' = \ln(Y)$  $$E[\ln(Y)] = \beta_0  + \beta_1 \ln(x)$$
 \begin{eqnarray*}
 \frac{median(Y|2x)}{median(Y|x)} &=& \frac{e^{\beta_0 + \beta_1 \ln(2x)}}{e^{\beta_0 + \beta_1 \ln(x)}}\\
 &=& e^{\beta_1 (\ln(2x) - \ln(x))}\\
