@@ -18,7 +18,7 @@
 2. If the explanatory variable is binary, SLR becomes the two-sided t-test.  
 Remember, $x_i$ are constants, so we don't think of them as having a distribution.  Also, we are allowed to construct whatever $x_i$ we want.  That said,  
 3. A larger range of $x_i$ will produce less variable predictions.  
-4. However, outliers in the x-direction can be very influential.\\
+4. However, outliers in the x-direction can be very influential.
 
 
 ### Residuals
@@ -30,7 +30,7 @@ Remember, $x_i$ are constants, so we don't think of them as having a distributio
 
 
 **mean:** $\overline{e} = 0$ (by definition!).  Therefore, the average of the residuals provides no information about whether $E[\epsilon]=0$.    
-(note: $\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.  
+(note: $\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.)  
 **variance:** $$s^2 = \frac{1}{(n-2)} \sum (y_i - \hat{y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE$$
 **non-independent:** because $\sum e_i=0$, the residuals are not independent.  It is the $\epsilon_i$, errors, we assume to be independent.  
 
@@ -95,71 +95,14 @@ $\Rightarrow e_i \mbox{ and } y_i$ are correlated and therefore **not** independ
 
 
 
-```r
-set.seed(47)
-n <- 100
-corr_data <- data.frame(explanatory = rnorm(n, mean = 47, sd = 5)) %>%
-  mutate(response = 3 + 0.2*explanatory + rnorm(n, mean = 0, sd = 0.5))
-
-uncorr_data <- data.frame(explanatory = rnorm(n, mean = 47, sd = 5)) %>%
-  mutate(response = 3 + 0*explanatory + rnorm(n, mean = 0, sd = 0.5))
-```
-
-
-```r
-p1 <- corr_data %>%
-  ggplot(aes(x = explanatory, y = response)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p2<- corr_data %>%
-  lm(response ~ explanatory, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p3<- corr_data %>%
-  lm(response ~ explanatory, data = .) %>%
-  augment() %>% 
-  ggplot(aes(x = response, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p1 + p2 + p3
-```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-3-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-3-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-3)With correlated data, it is hard to see the dependence between the response variable and the residuals.  However, a careful look at the third plot shows that there is a slightly stronger correlating between the response variable and the residuals than there is between the fitted values and the residuals.</p>
 </div>
 
-
-```r
-p4 <- uncorr_data %>%
-  ggplot(aes(x = explanatory, y = response)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p5 <- uncorr_data %>%
-  lm(response ~ explanatory, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p6 <- uncorr_data %>%
-  lm(response ~ explanatory, data = .) %>%
-  augment() %>% 
-  ggplot(aes(x = response, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p4 + p5 + p6
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-4-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-4-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-4)With uncorrelated data, it is much easier to see the dependence between the response variable and the residuals.</p>
 </div>
 
@@ -171,8 +114,8 @@ p4 + p5 + p6
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/transfor.pdf" alt="Taken from *Applied Linear Statistical Models*, 5th ed. by Kutner et al. Figures 3.13 and 3.15" width="500px" />
-<p class="caption">(\#fig:unnamed-chunk-5)Taken from *Applied Linear Statistical Models*, 5th ed. by Kutner et al. Figures 3.13 and 3.15</p>
+<img src="figs/transfor.png" alt="Taken from Applied Linear Statistical Models, 5th ed. by Kutner et al. Figures 3.13 and 3.15." width="500px" />
+<p class="caption">(\#fig:unnamed-chunk-5)Taken from Applied Linear Statistical Models, 5th ed. by Kutner et al. Figures 3.13 and 3.15.</p>
 </div>
 
 
@@ -201,123 +144,38 @@ Consider the following data which was collected by The World Bank in 2020^[http:
 
 
 
-
-```r
-p7 <- GDP %>%
-  ggplot(aes(x = urban, y = gdp)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p8 <- GDP %>%
-  lm(gdp ~ urban, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p7 + p8
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-7-1.png" alt="It seems as though the original data don't meet the LINE conditions needed for inference in a linear model." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-7-1.png" alt="It seems as though the original data don't meet the LINE conditions needed for inference in a linear model." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-7)It seems as though the original data don't meet the LINE conditions needed for inference in a linear model.</p>
 </div>
 
 
 Let's try to transform the variables to get a model which seems to conform to the LINE technical conditions.
 
-
-```r
-p9 <- GDP %>%
-  ggplot(aes(x = ln_urban, y = gdp)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p10 <- GDP %>%
-  lm(gdp ~ ln_urban, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p9 + p10
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-8-1.png" alt="ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-8-1.png" alt="ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-8)ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse.</p>
 </div>
 
 Alas, it really seems like the `gdp` variable is more of the problem than the `urban` variable.  Let's transform `gdp` instead.
 
-
-```r
-p11 <- GDP %>%
-  ggplot(aes(x = urban, y = sq_gdp)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p12 <- GDP %>%
-  lm(sq_gdp ~ urban, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p11 + p12
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-9-1.png" alt="urban vs gdp^2:  squaring gdp also makes the relationship worse." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-9-1.png" alt="urban vs gdp^2:  squaring gdp also makes the relationship worse." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-9)urban vs gdp^2:  squaring gdp also makes the relationship worse.</p>
 </div>
 
 The needed transformation should spread out the small `gdp` values and shrink the large `gdp` values.
 
-
-```r
-p13 <- GDP %>%
-  ggplot(aes(x = urban, y = sqrt_gdp)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p14 <- GDP %>%
-  lm(sqrt_gdp ~ urban, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p13 + p14
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-10-1.png" alt="urban vs sqrt(gdp):  the square root of gdp seems to help!." width="480" />
-<p class="caption">(\#fig:unnamed-chunk-10)urban vs sqrt(gdp):  the square root of gdp seems to help!.</p>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-10-1.png" alt="urban vs sqrt(gdp):  the square root of gdp seems to help!" width="672" />
+<p class="caption">(\#fig:unnamed-chunk-10)urban vs sqrt(gdp):  the square root of gdp seems to help!</p>
 </div>
 
 
 The natural log is a stronger function than the square root (that is, it will shrink large values even more.).
 
-
-```r
-p15 <- GDP %>%
-  ggplot(aes(x = urban, y = ln_gdp)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
-p16 <- GDP %>%
-  lm(ln_gdp ~ urban, data = .) %>%
-  augment() %>%
-  ggplot(aes(x = .fitted, y = .resid)) + 
-  geom_point() + 
-  geom_hline(yintercept = 0)
-
-p15 + p16
-```
-
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-11-1.png" alt="urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-11-1.png" alt="urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-11)urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions.</p>
 </div>
 
@@ -381,7 +239,7 @@ mammals %>%
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-<img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 mammals %>%
@@ -392,7 +250,7 @@ mammals %>%
   geom_hline(yintercept = 0)
 ```
 
-<img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
 
 Let's try some log transformations (square root transformations might also make sense).  
 
@@ -421,7 +279,7 @@ p1 + p2
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-13)Taking the natural log of the body weight doesn't seem to create a model with a linear shape.</p>
 </div>
 
@@ -443,7 +301,7 @@ p3 + p4
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672" />
 <p class="caption">(\#fig:unnamed-chunk-14)Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape.</p>
 </div>
 
@@ -465,7 +323,7 @@ p5 + p6
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="480" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672" />
 <p class="caption">(\#fig:unnamed-chunk-15)Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!</p>
 </div>
 

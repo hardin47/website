@@ -110,7 +110,7 @@ Remember, <span class="math inline">\(x_i\)</span> are constants, so we don’t 
 </li>
 <li>A larger range of <span class="math inline">\(x_i\)</span> will produce less variable predictions.<br>
 </li>
-<li>However, outliers in the x-direction can be very influential.\</li>
+<li>However, outliers in the x-direction can be very influential.</li>
 </ol>
 </div>
 <div id="residuals" class="section level3" number="6.1.1">
@@ -122,7 +122,7 @@ Remember, <span class="math inline">\(x_i\)</span> are constants, so we don’t 
 \mbox{error term: } \epsilon_i &amp;=&amp; y_i - E[Y_i] \ \ \ \mbox{we cannot measure}
 \end{eqnarray*}\]</span></p>
 <p><strong>mean:</strong> <span class="math inline">\(\overline{e} = 0\)</span> (by definition!). Therefore, the average of the residuals provides no information about whether <span class="math inline">\(E[\epsilon]=0\)</span>.<br>
-(note: <span class="math inline">\(\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0\)</span> because <span class="math inline">\(\frac{\delta Q}{\delta \beta_0} = 0\)</span>.<br><strong>variance:</strong> <span class="math display">\[s^2 = \frac{1}{(n-2)} \sum (y_i - \hat{y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE\]</span>
+(note: <span class="math inline">\(\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0\)</span> because <span class="math inline">\(\frac{\delta Q}{\delta \beta_0} = 0\)</span>.)<br><strong>variance:</strong> <span class="math display">\[s^2 = \frac{1}{(n-2)} \sum (y_i - \hat{y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE\]</span>
 <strong>non-independent:</strong> because <span class="math inline">\(\sum e_i=0\)</span>, the residuals are not independent. It is the <span class="math inline">\(\epsilon_i\)</span>, errors, we assume to be independent.</p>
 <div id="semistudentized-residuals" class="section level4 unnumbered">
 <h4>semistudentized residuals<a class="anchor" aria-label="anchor" href="#semistudentized-residuals"><i class="fas fa-link"></i></a>
@@ -188,65 +188,15 @@ Remember, <span class="math inline">\(x_i\)</span> are constants, so we don’t 
 </h4>
 <p>We know that <span class="math inline">\(e_i\)</span> and <span class="math inline">\(\hat{y}_i\)</span> are uncorrelated (this can be shown using linear algebra, also note that <span class="math inline">\(\sum e_i \hat{y}_i = 0\)</span>). So, if we go from the resid vs. fitted scatterplot to the resid vs. observed scatter plot, we shift each point in the x-direction (only) by an amount equal to the residual. If the residual is negative, then the point will shift to the left. If the residual is positive, then the point will shift to the right. We thus create a positively correlated relationship (between resid and observed). The degree of the shift will depend on the relative magnitudes of the residuals and predicted values.</p>
 <p><span class="math inline">\(\Rightarrow e_i \mbox{ and } y_i\)</span> are correlated and therefore <strong>not</strong> independent. Consider the two examples below. In both examples, the residual is correlated with the response variable. However, it is easier to see the correlation when the residual is not also responsible for the relationship between the response variable and the explanatory variable.</p>
-<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
-<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span>
-<span class="va">corr_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>explanatory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">47</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>response <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> <span class="fl">0.2</span><span class="op">*</span><span class="va">explanatory</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">uncorr_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>explanatory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">47</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>response <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> <span class="fl">0</span><span class="op">*</span><span class="va">explanatory</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">corr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">explanatory</span>, y <span class="op">=</span> <span class="va">response</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p2</span><span class="op">&lt;-</span> <span class="va">corr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="va">explanatory</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p3</span><span class="op">&lt;-</span> <span class="va">corr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="va">explanatory</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">response</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-3"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-3-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-3-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable." width="672"><p class="caption">
 Figure 1.3: With correlated data, it is hard to see the dependence between the response variable and the residuals. However, a careful look at the third plot shows that there is a slightly stronger correlating between the response variable and the residuals than there is between the fitted values and the residuals.
 </p>
 </div>
-<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p4</span> <span class="op">&lt;-</span> <span class="va">uncorr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">explanatory</span>, y <span class="op">=</span> <span class="va">response</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p5</span> <span class="op">&lt;-</span> <span class="va">uncorr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="va">explanatory</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p6</span> <span class="op">&lt;-</span> <span class="va">uncorr_data</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="va">explanatory</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">response</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p4</span> <span class="op">+</span> <span class="va">p5</span> <span class="op">+</span> <span class="va">p6</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-4"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-4-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-4-1.png" alt="Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable." width="672"><p class="caption">
 Figure 1.4: With uncorrelated data, it is much easier to see the dependence between the response variable and the residuals.
 </p>
 </div>
@@ -259,8 +209,8 @@ Figure 1.4: With uncorrelated data, it is much easier to see the dependence betw
 <p><strong>Important note!!</strong> The idea behind transformations is to make the model as appropriate as possible for the data at hand. We want to find the correct <strong>linear</strong> model; we want our conditions to hold. We are not trying to find the most <em>significant</em> model or big <span class="math inline">\(R^2\)</span>.</p>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-5"></span>
-<img src="figs/transfor.pdf" alt="Taken from *Applied Linear Statistical Models*, 5th ed. by Kutner et al. Figures 3.13 and 3.15" width="500px"><p class="caption">
-Figure 6.1: Taken from <em>Applied Linear Statistical Models</em>, 5th ed. by Kutner et al. Figures 3.13 and 3.15
+<img src="figs/transfor.png" alt="Taken from Applied Linear Statistical Models, 5th ed. by Kutner et al. Figures 3.13 and 3.15." width="500px"><p class="caption">
+Figure 6.1: Taken from Applied Linear Statistical Models, 5th ed. by Kutner et al. Figures 3.13 and 3.15.
 </p>
 </div>
 </div>
@@ -291,107 +241,37 @@ instance, we might think of fitting a linear relationship to the new variables <
 <blockquote>
 <p>Urban Population (% of total): “Urban population refers to people living in urban areas as defined by national statistical offices. It is calculated using World Bank population estimates and urban ratios from the United Nations World Urbanization Prospects.”</p>
 </blockquote>
-<div class="sourceCode" id="cb288"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p7</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="va">gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p8</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">gdp</span> <span class="op">~</span> <span class="va">urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p7</span> <span class="op">+</span> <span class="va">p8</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-7"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-7-1.png" alt="It seems as though the original data don't meet the LINE conditions needed for inference in a linear model." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-7-1.png" alt="It seems as though the original data don't meet the LINE conditions needed for inference in a linear model." width="672"><p class="caption">
 Figure 6.2: It seems as though the original data don’t meet the LINE conditions needed for inference in a linear model.
 </p>
 </div>
 <p>Let’s try to transform the variables to get a model which seems to conform to the LINE technical conditions.</p>
-<div class="sourceCode" id="cb289"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p9</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ln_urban</span>, y <span class="op">=</span> <span class="va">gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p10</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">gdp</span> <span class="op">~</span> <span class="va">ln_urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p9</span> <span class="op">+</span> <span class="va">p10</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-8"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-8-1.png" alt="ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-8-1.png" alt="ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse." width="672"><p class="caption">
 Figure 6.3: ln(urban) vs gdp: seems like taking the natural log of urban makes the relationship worse.
 </p>
 </div>
 <p>Alas, it really seems like the <code>gdp</code> variable is more of the problem than the <code>urban</code> variable. Let’s transform <code>gdp</code> instead.</p>
-<div class="sourceCode" id="cb290"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p11</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="va">sq_gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p12</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sq_gdp</span> <span class="op">~</span> <span class="va">urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p11</span> <span class="op">+</span> <span class="va">p12</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-9"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-9-1.png" alt="urban vs gdp^2:  squaring gdp also makes the relationship worse." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-9-1.png" alt="urban vs gdp^2:  squaring gdp also makes the relationship worse." width="672"><p class="caption">
 Figure 1.5: urban vs gdp^2: squaring gdp also makes the relationship worse.
 </p>
 </div>
 <p>The needed transformation should spread out the small <code>gdp</code> values and shrink the large <code>gdp</code> values.</p>
-<div class="sourceCode" id="cb291"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p13</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="va">sqrt_gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p14</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sqrt_gdp</span> <span class="op">~</span> <span class="va">urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p13</span> <span class="op">+</span> <span class="va">p14</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-10"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-10-1.png" alt="urban vs sqrt(gdp):  the square root of gdp seems to help!." width="480"><p class="caption">
-Figure 1.6: urban vs sqrt(gdp): the square root of gdp seems to help!.
+<img src="02b-diag1_files/figure-html/unnamed-chunk-10-1.png" alt="urban vs sqrt(gdp):  the square root of gdp seems to help!" width="672"><p class="caption">
+Figure 1.6: urban vs sqrt(gdp): the square root of gdp seems to help!
 </p>
 </div>
 <p>The natural log is a stronger function than the square root (that is, it will shrink large values even more.).</p>
-<div class="sourceCode" id="cb292"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p15</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="va">ln_gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="va">p16</span> <span class="op">&lt;-</span> <span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_gdp</span> <span class="op">~</span> <span class="va">urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="va">p15</span> <span class="op">+</span> <span class="va">p16</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-11"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-11-1.png" alt="urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-11-1.png" alt="urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions." width="672"><p class="caption">
 Figure 1.7: urban vs ln(gdp): the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions.
 </p>
 </div>
@@ -454,7 +334,7 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
 </h2>
 <p>Consider the <code>mammals</code> dataset in the <strong>MASS</strong> package (be careful with the <strong>MASS</strong>, it will overwrite the <strong>dplyr</strong> functions <code>filter</code> and <code>select</code>) representing the average brain (g) and body (kg) weights for 62 species of land mammals<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Allison, T. and Cicchetti, D. V. (1976) Sleep in mammals: ecological and constitutional correlates. Science 194, 732–734.&lt;/p&gt;"><sup>3</sup></a>.</p>
 <p>From a first glance at the linear model, it doesn’t seem like there is really any linear relationship at all! And certainly the residuals don’t look like what we’d hoped for the LINE technical conditions.</p>
-<div class="sourceCode" id="cb293"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span>  <span class="co"># be careful with MASS, it messes up filter and select</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">mammals</span><span class="op">)</span>
 
@@ -462,17 +342,17 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">body</span>, y <span class="op">=</span> <span class="va">brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb294"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">brain</span> <span class="op">~</span> <span class="va">body</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;"></div>
 <p>Let’s try some log transformations (square root transformations might also make sense).</p>
-<div class="sourceCode" id="cb295"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mammals</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>ln_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">body</span><span class="op">)</span>,
          ln_brain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">brain</span><span class="op">)</span><span class="op">)</span>
@@ -494,11 +374,11 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
 <span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-13"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672"><p class="caption">
 Figure 6.4: Taking the natural log of the body weight doesn’t seem to create a model with a linear shape.
 </p>
 </div>
-<div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb288"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p3</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">body</span>, y <span class="op">=</span> <span class="va">ln_brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -514,11 +394,11 @@ Figure 6.4: Taking the natural log of the body weight doesn’t seem to create a
 <span class="va">p3</span> <span class="op">+</span> <span class="va">p4</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-14"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672"><p class="caption">
 Figure 6.5: Taking the natural log of the brain weight also doesn’t seem to create a model with a linear shape.
 </p>
 </div>
-<div class="sourceCode" id="cb297"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb289"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p5</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ln_body</span>, y <span class="op">=</span> <span class="va">ln_brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -534,7 +414,7 @@ Figure 6.5: Taking the natural log of the brain weight also doesn’t seem to cr
 <span class="va">p5</span> <span class="op">+</span> <span class="va">p6</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-15"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="480"><p class="caption">
+<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672"><p class="caption">
 Figure 6.6: Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!
 </p>
 </div>

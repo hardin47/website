@@ -4,7 +4,7 @@
 
 ```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
-                      fig.height=3, fig.width=5,  
+                      fig.height=4, fig.width=7,  
                       cache=TRUE, fig.align = "center")
 
 library(tidyverse)
@@ -29,7 +29,7 @@ library(patchwork)
 2. If the explanatory variable is binary, SLR becomes the two-sided t-test.  
 Remember, $x_i$ are constants, so we don't think of them as having a distribution.  Also, we are allowed to construct whatever $x_i$ we want.  That said,  
 3. A larger range of $x_i$ will produce less variable predictions.  
-4. However, outliers in the x-direction can be very influential.\\
+4. However, outliers in the x-direction can be very influential.
 
 
 ### Residuals
@@ -41,7 +41,7 @@ Remember, $x_i$ are constants, so we don't think of them as having a distributio
 
 
 **mean:** $\overline{e} = 0$ (by definition!).  Therefore, the average of the residuals provides no information about whether $E[\epsilon]=0$.    
-(note: $\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.  
+(note: $\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.)  
 **variance:** $$s^2 = \frac{1}{(n-2)} \sum (y_i - \hat{y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE$$
 **non-independent:** because $\sum e_i=0$, the residuals are not independent.  It is the $\epsilon_i$, errors, we assume to be independent.  
 
@@ -105,7 +105,7 @@ We know that $e_i$ and $\hat{y}_i$ are uncorrelated (this can be shown using lin
 $\Rightarrow e_i \mbox{ and } y_i$ are correlated and therefore **not** independent.  Consider the two examples below.  In both examples, the residual is correlated with the response variable.  However, it is easier to see the correlation when the residual is not also responsible for the relationship between the response variable and the explanatory variable.
 
 
-```{r}
+```{r echo = FALSE}
 set.seed(47)
 n <- 100
 corr_data <- data.frame(explanatory = rnorm(n, mean = 47, sd = 5)) %>%
@@ -115,7 +115,7 @@ uncorr_data <- data.frame(explanatory = rnorm(n, mean = 47, sd = 5)) %>%
   mutate(response = 3 + 0*explanatory + rnorm(n, mean = 0, sd = 0.5))
 ```
 
-```{r fig.cap = "With correlated data, it is hard to see the dependence between the response variable and the residuals.  However, a careful look at the third plot shows that there is a slightly stronger correlating between the response variable and the residuals than there is between the fitted values and the residuals.", fig.alt = "Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable."}
+```{r fig.cap = "With correlated data, it is hard to see the dependence between the response variable and the residuals.  However, a careful look at the third plot shows that there is a slightly stronger correlating between the response variable and the residuals than there is between the fitted values and the residuals.", fig.alt = "Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are correlated, and the fitted vs residual plot shows some correlation due to the mathematical properties which make the error terms correlated to the response variable.", echo = FALSE}
 p1 <- corr_data %>%
   ggplot(aes(x = explanatory, y = response)) + 
   geom_point() + 
@@ -138,7 +138,7 @@ p3<- corr_data %>%
 p1 + p2 + p3
 ```
 
-```{r fig.cap = "With uncorrelated data, it is much easier to see the dependence between the response variable and the residuals.", fig.alt = "Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable."}
+```{r fig.cap = "With uncorrelated data, it is much easier to see the dependence between the response variable and the residuals.", fig.alt = "Three scatterplots.  The first is explanatory vs response; the second is fitted vs residual; the third is response vs residual.  The data are uncorrelated, but the fitted vs residual plot shows a strong correlation due to the mathematical properties which make the error terms correlated to the response variable.", echo = FALSE}
 p4 <- uncorr_data %>%
   ggplot(aes(x = explanatory, y = response)) + 
   geom_point() + 
@@ -168,8 +168,8 @@ p4 + p5 + p6
 **Important note!!**  The idea behind transformations is to make the model as appropriate as possible for the data at hand.  We want to find the correct **linear** model; we want our conditions to hold.  We are not trying to find the most *significant* model or big $R^2$.
 
 
-```{r, out.width = "500px", echo=FALSE, fig.cap = "Taken from *Applied Linear Statistical Models*, 5th ed. by Kutner et al. Figures 3.13 and 3.15"}
-knitr::include_graphics("figs/transfor.pdf")
+```{r, out.width = "500px", echo=FALSE, fig.cap = "Taken from Applied Linear Statistical Models, 5th ed. by Kutner et al. Figures 3.13 and 3.15."}
+knitr::include_graphics("figs/transfor.png")
 ``` 
 
 
@@ -206,7 +206,7 @@ GDP <- readr::read_csv("GDP-2020.csv") %>%
 ```
 
 
-```{r fig.cap = "It seems as though the original data don't meet the LINE conditions needed for inference in a linear model."}
+```{r fig.cap = "It seems as though the original data don't meet the LINE conditions needed for inference in a linear model.", echo = FALSE}
 p7 <- GDP %>%
   ggplot(aes(x = urban, y = gdp)) + 
   geom_point() + 
@@ -225,7 +225,7 @@ p7 + p8
 
 Let's try to transform the variables to get a model which seems to conform to the LINE technical conditions.
 
-```{r fig.cap = "ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse."}
+```{r fig.cap = "ln(urban) vs gdp:  seems like taking the natural log of urban makes the relationship worse.", echo = FALSE}
 p9 <- GDP %>%
   ggplot(aes(x = ln_urban, y = gdp)) + 
   geom_point() + 
@@ -243,7 +243,7 @@ p9 + p10
 
 Alas, it really seems like the `gdp` variable is more of the problem than the `urban` variable.  Let's transform `gdp` instead.
 
-```{r fig.cap = "urban vs gdp^2:  squaring gdp also makes the relationship worse."}
+```{r fig.cap = "urban vs gdp^2:  squaring gdp also makes the relationship worse.", echo = FALSE}
 p11 <- GDP %>%
   ggplot(aes(x = urban, y = sq_gdp)) + 
   geom_point() + 
@@ -261,7 +261,7 @@ p11 + p12
 
 The needed transformation should spread out the small `gdp` values and shrink the large `gdp` values.
 
-```{r fig.cap = "urban vs sqrt(gdp):  the square root of gdp seems to help!."}
+```{r fig.cap = "urban vs sqrt(gdp):  the square root of gdp seems to help!", echo = FALSE}
 p13 <- GDP %>%
   ggplot(aes(x = urban, y = sqrt_gdp)) + 
   geom_point() + 
@@ -280,7 +280,7 @@ p13 + p14
 
 The natural log is a stronger function than the square root (that is, it will shrink large values even more.).
 
-```{r fig.cap = "urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions."}
+```{r fig.cap = "urban vs ln(gdp):  the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions.", echo = FALSE}
 p15 <- GDP %>%
   ggplot(aes(x = urban, y = ln_gdp)) + 
   geom_point() + 
