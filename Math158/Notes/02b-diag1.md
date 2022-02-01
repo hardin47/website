@@ -46,7 +46,7 @@ $$e_i^* = \frac{e_i - \overline{e}}{\sqrt{MSE}} = \frac{e_i}{\sqrt{MSE}}$$  But 
 [6] Box plot (histogram) of residuals.  
 
 What do I do if the plots show that the conditions don't hold??  
-1. Abandon regression model and use something more appropriate (nonparametrics, time series, loess, ...)   
+1. Abandon regression model and use something more appropriate.  If you are interested in the coefficients: nonparametrics, time series, random forests.  If you are only interested in prediction, maybe it is okay that the conditions don't hold?  But maybe not (e.g., independence is key!).  Other prediction models include: random forests, support vector machines, neural networks, loess (smoothing).      
 2. Transform the variables so that the model does hold.
 
 #### Violating Linearity {-}
