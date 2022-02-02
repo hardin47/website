@@ -180,7 +180,8 @@ The natural log is a stronger function than the square root (that is, it will sh
 </div>
 
 
-The Box-Cox transformations are a class of transformations.  Generally, $\ln, \exp$, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions.
+The Box-Cox transformations are a class of transformations.  Generally, $\ln, \exp$, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions.  We won't spend time learning about Box-Cox, but you can read about them to learn more about transforming variables.
+
 
 ### Interpreting Regression Coefficients {-}
 
@@ -206,6 +207,45 @@ median(\ln(Y)) = \ln(median(Y))
 &=& e^{\beta_1 \ln(2)} = 2^{\beta_1}
 \end{eqnarray*}
 A doubling of $x$ is associated with a multiplicative change of $2^{\beta_1}$ in median of Y.
+
+
+Note that the model regressing GDP on % urban used a log transformation on GDP (the response, or Y variable).  As such we know that:
+
+\begin{eqnarray*}
+\hat{\ln(Y)} &=& \mbox{median}(\ln(Y)) = b_0 + b_1 \cdot x\\
+\mbox{median}(Y) &=& \exp(b_0 + b_1 \cdot x)
+\end{eqnarray*}
+
+By using the coefficients which are output from the linear model regressing `ln_gdp` on `urban`, we can find a model which predicts the **median** `gdp` (not transformed!) as a function of `urban`.
+
+
+```r
+GDP %>%
+  lm(ln_gdp ~ urban, data = .) %>%
+  tidy()
+```
+
+```
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+## 1 (Intercept)   6.11     0.202        30.3 1.18e-74
+## 2 urban         0.0425   0.00308      13.8 2.29e-30
+```
+
+\begin{eqnarray*}
+\mbox{median}(\verb;ln_gdp;) &=& \exp(6.11 +  0.043 \cdot \verb;urban;)
+\end{eqnarray*}
+
+
+```r
+GDP %>%
+  ggplot() + 
+  geom_point(aes(x = urban, y = gdp)) + 
+  geom_line(aes(x = urban, y = exp(6.11 + 0.043*urban)), color = "red")
+```
+
+<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" />
 
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
@@ -240,7 +280,7 @@ mammals %>%
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-<img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
 
 ```r
 mammals %>%
@@ -251,7 +291,7 @@ mammals %>%
   geom_hline(yintercept = 0)
 ```
 
-<img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
+<img src="02b-diag1_files/figure-html/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" />
 
 Let's try some log transformations (square root transformations might also make sense).  
 
@@ -280,8 +320,8 @@ p1 + p2
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672" />
-<p class="caption">(\#fig:unnamed-chunk-13)Taking the natural log of the body weight doesn't seem to create a model with a linear shape.</p>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672" />
+<p class="caption">(\#fig:unnamed-chunk-15)Taking the natural log of the body weight doesn't seem to create a model with a linear shape.</p>
 </div>
 
 
@@ -302,8 +342,8 @@ p3 + p4
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672" />
-<p class="caption">(\#fig:unnamed-chunk-14)Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape.</p>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-16-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672" />
+<p class="caption">(\#fig:unnamed-chunk-16)Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape.</p>
 </div>
 
 
@@ -324,8 +364,8 @@ p5 + p6
 ```
 
 <div class="figure" style="text-align: center">
-<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672" />
-<p class="caption">(\#fig:unnamed-chunk-15)Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!</p>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-17-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672" />
+<p class="caption">(\#fig:unnamed-chunk-17)Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!</p>
 </div>
 
 

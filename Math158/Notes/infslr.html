@@ -497,13 +497,49 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower_CI</span>, ymax <span class="op">=</span> <span class="va">upper_CI</span><span class="op">)</span>, 
               alpha <span class="op">=</span> <span class="fl">0.2</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;"></div>
+<p>Or, it turns out, there are <strong>easier</strong> ways for the computer to find confidence and prediction intervals:</p>
+<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ames_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="va">new_ames</span>, interval <span class="op">=</span> <span class="st">"confidence"</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 4
+##    area .fitted .lower .upper
+##   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1  1000    11.7   11.7   11.7
+## 2  1500    12.0   12.0   12.0
+## 3  2000    12.3   12.3   12.3</code></pre>
+<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ames_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="va">new_ames</span>, interval <span class="op">=</span> <span class="st">"prediction"</span><span class="op">)</span>  </code></pre></div>
+<pre><code>## # A tibble: 3 × 4
+##    area .fitted .lower .upper
+##   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1  1000    11.7   11.2   12.3
+## 2  1500    12.0   11.5   12.6
+## 3  2000    12.3   11.8   12.9</code></pre>
+<p>Also, graphs can be made, but we’ll need to keep the output (and use the entire dataset instead of <code>new_ames</code>).</p>
+<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ames_conf</span> <span class="op">&lt;-</span> <span class="va">ames_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>interval <span class="op">=</span> <span class="st">"confidence"</span><span class="op">)</span>
+
+<span class="va">ames_pred</span> <span class="op">&lt;-</span> <span class="va">ames_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>interval <span class="op">=</span> <span class="st">"prediction"</span><span class="op">)</span>  
+
+<span class="va">ames_pred</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">area</span>, y <span class="op">=</span> <span class="va">price_ln</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">.lower</span>, ymax <span class="op">=</span> <span class="va">.upper</span><span class="op">)</span>, 
+              alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="va">ames_conf</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">.lower</span>, ymax <span class="op">=</span> <span class="va">.upper</span><span class="op">)</span>, 
+              alpha <span class="op">=</span> <span class="fl">0.2</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="predicting-credit" class="section level4" number="5.7.2.2">
 <h4>
 <span class="header-section-number">5.7.2.2</span> Predicting Credit<a class="anchor" aria-label="anchor" href="#predicting-credit"><i class="fas fa-link"></i></a>
 </h4>
 <p>In contrast to the <code>ames</code> data, note how the predictions (particulary the CI around the line) drastically changes when the sample size is small.</p>
-<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb270"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://www.statlearning.com">ISLR</a></span><span class="op">)</span>  <span class="co"># source of the Credit data</span>
 <span class="co"># store the linear model object so that we can use it later.</span>
 <span class="va">credit_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Balance</span> <span class="op">~</span> <span class="va">Limit</span>, data <span class="op">=</span> <span class="va">Credit</span><span class="op">)</span>
@@ -515,7 +551,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 <span class="va">credit_df</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">credit_df</span></code></pre></div>
 <pre><code>## [1] 398</code></pre>
-<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb272"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># new data predictions</span>
 <span class="va">credit_pred</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="va">new_credit</span>, type.predict <span class="op">=</span> <span class="st">"response"</span>, se_fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
@@ -526,29 +562,29 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 ## 1  1000   -121.    22.2
 ## 2  3000    222.    14.6
 ## 3  7000    909.    16.4</code></pre>
-<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># get the multiplier / critical value for creating intervals</span>
 <span class="va">crit_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="fl">0.975</span>, <span class="va">credit_df</span><span class="op">)</span>
 <span class="va">crit_val</span></code></pre></div>
 <pre><code>## [1] 1.97</code></pre>
-<div class="sourceCode" id="cb271"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># SE of the mean response</span>
 <span class="va">se_fit</span> <span class="op">&lt;-</span> <span class="va">credit_pred</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">.se.fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">se_fit</span></code></pre></div>
 <pre><code>##    1    2    3 
 ## 22.2 14.6 16.4</code></pre>
-<div class="sourceCode" id="cb273"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb278"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># esimate of the overall variability, $\sigma$</span>
 <span class="va">credit_sig</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">credit_sig</span></code></pre></div>
 <pre><code>## [1] 234</code></pre>
-<div class="sourceCode" id="cb275"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb280"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate the SE of the predictions</span>
 <span class="va">se_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">credit_sig</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">se_fit</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
 <span class="va">se_pred</span></code></pre></div>
 <pre><code>##   1   2   3 
 ## 235 234 234</code></pre>
-<div class="sourceCode" id="cb277"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb282"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculating both confidence intervals for the mean responses and</span>
 <span class="co"># prediction intervals for the individual responses</span>
 
@@ -566,7 +602,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 ## 2  3000    222.    14.6    -238.     682.     193.    251. 
 ## 3  7000    909.    16.4     448.    1369.     876.    941.</code></pre>
 <p>Or, to create intervals for the entire range of explanatory variables:</p>
-<div class="sourceCode" id="cb279"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">credit_pred_all</span> <span class="op">&lt;-</span> <span class="va">credit_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span>type.predict <span class="op">=</span> <span class="st">"response"</span>, se_fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>.se.pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">credit_sig</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">.se.fit</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -583,7 +619,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
               alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower_CI</span>, ymax <span class="op">=</span> <span class="va">upper_CI</span><span class="op">)</span>, 
               alpha <span class="op">=</span> <span class="fl">0.2</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 </div>
 <div id="anova-output" class="section level3" number="5.7.3">
@@ -591,7 +627,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 <span class="header-section-number">5.7.3</span> ANOVA output<a class="anchor" aria-label="anchor" href="#anova-output"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> creates a dataframe which is slighlty easier to work with, but regardless of <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> the <code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code> function provides the exact same output.</p>
-<div class="sourceCode" id="cb280"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ames_inf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">price_ln</span> <span class="op">~</span> <span class="va">area</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
@@ -603,7 +639,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 ## Residuals 2902    234     0.1                   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb282"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ames_inf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">price_ln</span> <span class="op">~</span> <span class="va">area</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -613,7 +649,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 ##   &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 area          1  233. 233.         2901.       0
 ## 2 Residuals  2902  234.   0.0805       NA       NA</code></pre>
-<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb289"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ames_inf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>bedrooms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/case_when.html">case_when</a></span><span class="op">(</span>
     <span class="va">Bedroom.AbvGr</span> <span class="op">&lt;=</span><span class="fl">1</span> <span class="op">~</span> <span class="st">"1"</span>,
@@ -624,7 +660,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">area</span>, y <span class="op">=</span> <span class="va">price_ln</span>, color <span class="op">=</span> <span class="va">bedrooms</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="02a-inf-slr_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;"></div>
 
 </div>
 </div>
@@ -689,7 +725,7 @@ p-value &amp;=&amp; 2 P(t_{2902} \geq 53.86) = 2*(1-pt(53.86, 2902)) = \mbox{ver
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-01.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-02.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

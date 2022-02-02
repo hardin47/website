@@ -275,7 +275,7 @@ Figure 1.6: urban vs sqrt(gdp): the square root of gdp seems to help!
 Figure 1.7: urban vs ln(gdp): the natural log of gdp creates a residual plot that seems to follow all of the LINE technical conditions.
 </p>
 </div>
-<p>The Box-Cox transformations are a class of transformations. Generally, <span class="math inline">\(\ln, \exp\)</span>, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions.</p>
+<p>The Box-Cox transformations are a class of transformations. Generally, <span class="math inline">\(\ln, \exp\)</span>, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions. We won’t spend time learning about Box-Cox, but you can read about them to learn more about transforming variables.</p>
 </div>
 <div id="interpreting-regression-coefficients" class="section level3 unnumbered">
 <h3>Interpreting Regression Coefficients<a class="anchor" aria-label="anchor" href="#interpreting-regression-coefficients"><i class="fas fa-link"></i></a>
@@ -299,6 +299,30 @@ median(\ln(Y)) = \ln(median(Y))
 &amp;=&amp; e^{\beta_1 \ln(2)} = 2^{\beta_1}
 \end{eqnarray*}\]</span>
 A doubling of <span class="math inline">\(x\)</span> is associated with a multiplicative change of <span class="math inline">\(2^{\beta_1}\)</span> in median of Y.</p>
+<p>Note that the model regressing GDP on % urban used a log transformation on GDP (the response, or Y variable). As such we know that:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\hat{\ln(Y)} &amp;=&amp; \mbox{median}(\ln(Y)) = b_0 + b_1 \cdot x\\
+\mbox{median}(Y) &amp;=&amp; \exp(b_0 + b_1 \cdot x)
+\end{eqnarray*}\]</span></p>
+<p>By using the coefficients which are output from the linear model regressing <code>ln_gdp</code> on <code>urban</code>, we can find a model which predicts the <strong>median</strong> <code>gdp</code> (not transformed!) as a function of <code>urban</code>.</p>
+<div class="sourceCode" id="cb290"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">ln_gdp</span> <span class="op">~</span> <span class="va">urban</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)   6.11     0.202        30.3 1.18e-74
+## 2 urban         0.0425   0.00308      13.8 2.29e-30</code></pre>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{median}(\verb;ln_gdp;) &amp;=&amp; \exp(6.11 +  0.043 \cdot \verb;urban;)
+\end{eqnarray*}\]</span></p>
+<div class="sourceCode" id="cb292"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">GDP</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="va">gdp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">urban</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">6.11</span> <span class="op">+</span> <span class="fl">0.043</span><span class="op">*</span><span class="va">urban</span><span class="op">)</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;"></div>
 </div>
 </div>
 <div id="reflection-questions-3" class="section level2" number="6.5">
@@ -334,7 +358,7 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
 </h2>
 <p>Consider the <code>mammals</code> dataset in the <strong>MASS</strong> package (be careful with the <strong>MASS</strong>, it will overwrite the <strong>dplyr</strong> functions <code>filter</code> and <code>select</code>) representing the average brain (g) and body (kg) weights for 62 species of land mammals<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Allison, T. and Cicchetti, D. V. (1976) Sleep in mammals: ecological and constitutional correlates. Science 194, 732–734.&lt;/p&gt;"><sup>3</sup></a>.</p>
 <p>From a first glance at the linear model, it doesn’t seem like there is really any linear relationship at all! And certainly the residuals don’t look like what we’d hoped for the LINE technical conditions.</p>
-<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb293"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span>  <span class="co"># be careful with MASS, it messes up filter and select</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">mammals</span><span class="op">)</span>
 
@@ -342,17 +366,17 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">body</span>, y <span class="op">=</span> <span class="va">brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb294"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">brain</span> <span class="op">~</span> <span class="va">body</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="02b-diag1_files/figure-html/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;"></div>
 <p>Let’s try some log transformations (square root transformations might also make sense).</p>
-<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb295"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mammals</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>ln_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">body</span><span class="op">)</span>,
          ln_brain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">brain</span><span class="op">)</span><span class="op">)</span>
@@ -373,12 +397,12 @@ A doubling of <span class="math inline">\(x\)</span> is associated with a multip
 
 <span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-13"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-15"></span>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of the body weight doesn't seem to create a model with a linear shape." width="672"><p class="caption">
 Figure 6.4: Taking the natural log of the body weight doesn’t seem to create a model with a linear shape.
 </p>
 </div>
-<div class="sourceCode" id="cb288"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb296"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p3</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">body</span>, y <span class="op">=</span> <span class="va">ln_brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -393,12 +417,12 @@ Figure 6.4: Taking the natural log of the body weight doesn’t seem to create a
 
 <span class="va">p3</span> <span class="op">+</span> <span class="va">p4</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-14"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-14-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-16"></span>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-16-1.png" alt="Taking the natural log of the brain weight also doesn't seem to create a model with a linear shape." width="672"><p class="caption">
 Figure 6.5: Taking the natural log of the brain weight also doesn’t seem to create a model with a linear shape.
 </p>
 </div>
-<div class="sourceCode" id="cb289"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb297"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p5</span> <span class="op">&lt;-</span> <span class="va">mammals</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ln_body</span>, y <span class="op">=</span> <span class="va">ln_brain</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
@@ -413,8 +437,8 @@ Figure 6.5: Taking the natural log of the brain weight also doesn’t seem to cr
 
 <span class="va">p5</span> <span class="op">+</span> <span class="va">p6</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-15"></span>
-<img src="02b-diag1_files/figure-html/unnamed-chunk-15-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-17"></span>
+<img src="02b-diag1_files/figure-html/unnamed-chunk-17-1.png" alt="Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!" width="672"><p class="caption">
 Figure 6.6: Taking the natural log of both the brain and the body weight does seem to create a model with a linear shape!
 </p>
 </div>
@@ -461,7 +485,7 @@ Figure 6.6: Taking the natural log of both the brain and the body weight does se
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-01.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-02.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

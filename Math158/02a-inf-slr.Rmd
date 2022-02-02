@@ -482,6 +482,37 @@ ames_pred_all %>%
               alpha = 0.2, fill = "red")
 ```
 
+
+Or, it turns out, there are **easier** ways for the computer to find confidence and prediction intervals:
+
+```{r}
+ames_lm %>% 
+  augment(newdata = new_ames, interval = "confidence")
+
+ames_lm %>% 
+  augment(newdata = new_ames, interval = "prediction")  
+```
+
+Also, graphs can be made, but we'll need to keep the output (and use the entire dataset instead of `new_ames`).
+
+```{r}
+ames_conf <- ames_lm %>% 
+  augment(interval = "confidence")
+
+ames_pred <- ames_lm %>% 
+  augment(interval = "prediction")  
+
+ames_pred %>%
+  ggplot(aes(x = area, y = price_ln)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), 
+              alpha = 0.2) + 
+  geom_ribbon(ames_conf, mapping = aes(ymin = .lower, ymax = .upper), 
+              alpha = 0.2, fill = "red")
+```
+
+
 #### Predicting Credit
 
 In contrast to the `ames` data, note how the predictions (particulary the CI around the line) drastically changes when the sample size is small.

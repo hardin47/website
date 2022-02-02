@@ -297,7 +297,8 @@ p15 + p16
 ```
 
 
-The Box-Cox transformations are a class of transformations.  Generally, $\ln, \exp$, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions.
+The Box-Cox transformations are a class of transformations.  Generally, $\ln, \exp$, square root, and polynomial transformations are sufficient to fit a linear model which satisfies the necessary technical conditions.  We won't spend time learning about Box-Cox, but you can read about them to learn more about transforming variables.
+
 
 ### Interpreting Regression Coefficients {-}
 
@@ -323,6 +324,33 @@ median(\ln(Y)) = \ln(median(Y))
 &=& e^{\beta_1 \ln(2)} = 2^{\beta_1}
 \end{eqnarray*}
 A doubling of $x$ is associated with a multiplicative change of $2^{\beta_1}$ in median of Y.
+
+
+Note that the model regressing GDP on % urban used a log transformation on GDP (the response, or Y variable).  As such we know that:
+
+\begin{eqnarray*}
+\hat{\ln(Y)} &=& \mbox{median}(\ln(Y)) = b_0 + b_1 \cdot x\\
+\mbox{median}(Y) &=& \exp(b_0 + b_1 \cdot x)
+\end{eqnarray*}
+
+By using the coefficients which are output from the linear model regressing `ln_gdp` on `urban`, we can find a model which predicts the **median** `gdp` (not transformed!) as a function of `urban`.
+
+```{r}
+GDP %>%
+  lm(ln_gdp ~ urban, data = .) %>%
+  tidy()
+```
+
+\begin{eqnarray*}
+\mbox{median}(\verb;ln_gdp;) &=& \exp(6.11 +  0.043 \cdot \verb;urban;)
+\end{eqnarray*}
+
+```{r}
+GDP %>%
+  ggplot() + 
+  geom_point(aes(x = urban, y = gdp)) + 
+  geom_line(aes(x = urban, y = exp(6.11 + 0.043*urban)), color = "red")
+```
 
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions

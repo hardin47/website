@@ -467,6 +467,61 @@ ames_pred_all %>%
 
 <img src="02a-inf-slr_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;" />
 
+
+Or, it turns out, there are **easier** ways for the computer to find confidence and prediction intervals:
+
+
+```r
+ames_lm %>% 
+  augment(newdata = new_ames, interval = "confidence")
+```
+
+```
+## # A tibble: 3 × 4
+##    area .fitted .lower .upper
+##   <dbl>   <dbl>  <dbl>  <dbl>
+## 1  1000    11.7   11.7   11.7
+## 2  1500    12.0   12.0   12.0
+## 3  2000    12.3   12.3   12.3
+```
+
+```r
+ames_lm %>% 
+  augment(newdata = new_ames, interval = "prediction")  
+```
+
+```
+## # A tibble: 3 × 4
+##    area .fitted .lower .upper
+##   <dbl>   <dbl>  <dbl>  <dbl>
+## 1  1000    11.7   11.2   12.3
+## 2  1500    12.0   11.5   12.6
+## 3  2000    12.3   11.8   12.9
+```
+
+Also, graphs can be made, but we'll need to keep the output (and use the entire dataset instead of `new_ames`).
+
+
+```r
+ames_conf <- ames_lm %>% 
+  augment(interval = "confidence")
+
+ames_pred <- ames_lm %>% 
+  augment(interval = "prediction")  
+
+ames_pred %>%
+  ggplot(aes(x = area, y = price_ln)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), 
+              alpha = 0.2) + 
+  geom_ribbon(ames_conf, mapping = aes(ymin = .lower, ymax = .upper), 
+              alpha = 0.2, fill = "red")
+```
+
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+
+
 #### Predicting Credit
 
 In contrast to the `ames` data, note how the predictions (particulary the CI around the line) drastically changes when the sample size is small.
@@ -594,7 +649,7 @@ credit_pred_all %>%
               alpha = 0.2, fill = "red")
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ### ANOVA output
@@ -650,5 +705,5 @@ ames_inf %>%
   geom_smooth(method = lm, se = FALSE)
 ```
 
-<img src="02a-inf-slr_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02a-inf-slr_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
