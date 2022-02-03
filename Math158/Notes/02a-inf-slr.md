@@ -400,7 +400,7 @@ se_fit
 ```
 
 ```r
-# esimate of the overall variability, $\sigma$
+# esimate of the overall variability, sigma
 ames_sig <- ames_lm %>% glance() %>% select(sigma) %>% pull()
 ames_sig
 ```
