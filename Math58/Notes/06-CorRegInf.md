@@ -25,7 +25,7 @@ SE$_r: \sqrt{\frac{1-r^2}{n-2}}$
 **BUT**, $r$ is only normally distributed when $\rho$ = 0!  Otherwise, the distribution of $r$ from sample to sample is skewed (think about the scenario when $\rho = 0.9$).
 
 
-#### Hypothesis Testing
+#### Hypothesis Testing {-}
 
 \begin{eqnarray*}
 H_0:&& \rho = 0\\
@@ -34,7 +34,7 @@ t^* &=& \frac{r}{SE_r} = \frac{r}{\sqrt{(1-r^2)/(n-2)}}\\
 t^* &\sim& t_{n-2}  \mbox{ when } H_0 \mbox{ is true}
 \end{eqnarray*}
 
-#### Confidence Interval
+#### Confidence Interval {-}
 
 If $\rho \ne 0$, then the SE might be okay, but the sampling distribution of $r$ will not be normal (and thus will not be a $t$ when we use the SE).
 

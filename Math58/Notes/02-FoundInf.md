@@ -350,7 +350,7 @@ If the goal is to create intervals that capture the true parameter at a higher r
 The larger confidence level will capture the true parameter at a higher rate (which is a good thing!), but it comes at a cost of also creating an interval that is much wider than a 90% interval.
 An interval that is too wide will not be helpful in trying to understand the population at hand (which is why we don't attempt to create "100% intervals" which would be given by (0,1), useless for learning anything new).
 
-####  A note on sample size
+####  A note on sample size {-}
 
 By working with the applets, you may notice that the variability of the proportions decreases substantially with larger sample sizes.  However the *rate* by which an confidence procedure captures the parameter is completely separated from the value of the sample sizes.
 The confidence procedure will capture at the set rate regardless of sample size.
@@ -522,7 +522,7 @@ xpnorm(c(-1, 0.5), 0, 1)
 
 Note that normal probabilities can be estimated for any variable that has a distribution which is well approximated by the bell shape given by a normal curve.  Below we calculate Z scores and probabilities for a non-proportion setting and then ask whether the values could possibly be normal.  (What do you think?)
 
-#### Example: Athletic comparison^[taken from https://askgoodquestions.blog/2019/08/26/8-end-of-the-alphabet/ by Allan Rossman, he borrowed from 2011 AP Statistics exam]
+#### Example: Athletic comparison^[taken from https://askgoodquestions.blog/2019/08/26/8-end-of-the-alphabet/ by Allan Rossman, he borrowed from 2011 AP Statistics exam] {-}
 
 The example below allows for a comparison between two athletes based on speed and strength.  The following information is provided about the sample of individuals who were measured:
 
@@ -722,7 +722,7 @@ xpnorm(-19.05, 0, 1, plot=TRUE)
 ```
 
 
-#### Confidence Interval for true population proportion
+#### Confidence Interval for true population proportion {-}
 
 Given the extreme poverty set-up above, the question turns from one of a hypothesis test to one of a confidence interval.  Note that we are making one more change to the question, we are curious about the proportion of people who think that the rate has doubled.
 
