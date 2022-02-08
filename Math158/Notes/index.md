@@ -1,7 +1,7 @@
 --- 
 title: "Linear Models"
 author: "Jo Hardin"
-date: "2022-02-07"
+date: "2022-02-08"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:

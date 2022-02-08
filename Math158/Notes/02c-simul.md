@@ -53,7 +53,7 @@ $$b_1 \pm B \cdot s\{b_1\}$$
 
 ## Simultaneous Estimation of a Mean Response
 
-As with the intervals for the parameters, creating intervals for multiple mean responses leads to problems of multiple comparisons.  Again, the goal is to adjust the intervals such that the probability of getting a dataset which will lead to intervals covering {\em all} mean responses is $1-\alpha$.
+As with the intervals for the parameters, creating intervals for multiple mean responses leads to problems of multiple comparisons.  Again, the goal is to adjust the intervals such that the probability of getting a dataset which will lead to intervals covering *all* mean responses is $1-\alpha$.
 
 (Note that the reason for simultaneous inference is because the combination of natural sampling variability in $b_0$ and $b_1$ could lead to the mean responses being correct for $E[Y_h]$ over some range of $x$ values and incorrect for a different range of $x$ values.)
 
