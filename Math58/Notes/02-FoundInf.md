@@ -315,9 +315,9 @@ Note the physical object which connects to resampling is a bag of marbles.  For 
 The bootstrap process is typically referred to as **resampling with replacement**.
 :::
 
-Two good applets for understanding bootstrapping and sampling distributions are:
-* StatKey (*Statistics: Unlocking the Power of Data*)  http://www.lock5stat.com/StatKey/bootstrap_1_cat/bootstrap_1_cat.html 
-* ISCAM http://www.rossmanchance.com/applets/2021/oneprop/OneProp.htm
+Two good applets for understanding bootstrapping and sampling distributions are:  
+* StatKey (*Statistics: Unlocking the Power of Data*)  http://www.lock5stat.com/StatKey/bootstrap_1_cat/bootstrap_1_cat.html   
+* ISCAM http://www.rossmanchance.com/applets/2021/oneprop/OneProp.htm  
 
 ### Bootstrapping Confidence Intervals {#bootCI}
 
@@ -337,13 +337,15 @@ Reminder of where we are:
 > If you are two feet from me, then I am two feet from you.
 
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>**95% Bootstrap Percentile Confidence Interval for $p$**  
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>-----
+**95% Bootstrap Percentile Confidence Interval for $p$**  
   
 From the bootstrapped proportions, find the bootstrap value at 2.5\% and 97.5\% and refer to them as "lower" and "upper" respectively.
 
 The interval given by:  (lower, upper)  will be a 95% confidence interval for $p$.
 
-Note that the "95%" value is the confidence level and describes how often the process outlined above will actually work to capture the true parameter of interest.</div>\EndKnitrBlock{definition}
+Note that the "95%" value is the confidence level and describes how often the process outlined above will actually work to capture the true parameter of interest.
+-----</div>\EndKnitrBlock{definition}
 
 As you might suspect, if the goal is to create intervals that capture the true parameter at a lower rate (say, 90%) then the endpoints of the interval will be taken from the 5% and 95% bootstrapped proportion values.
 If the goal is to create intervals that capture the true parameter at a higher rate (say, 99%) then the endpoints of the interval will be taken from the 0.5% and 99.5% bootstrapped proportion values.

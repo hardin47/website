@@ -551,7 +551,7 @@ We won't show it, but $SSTO = SST + SSE$.
 R^2 = \frac{SST}{SSTO} = 1 - \frac{SSE}{SSTO}
 \end{eqnarray*}
 
-Notice that $MSTO$ is simply the variability in x completely regardless of the model (groups, etc.)  It is the same value we would have calculated for the variance of x if we hadn't known anything about the groups of interest.  $SST$ is the proportion of that variability that we attribute ({\em explain}) by breaking the response down by groups.
+Notice that $MSTO$ is simply the variability in x completely regardless of the model (groups, etc.)  It is the same value we would have calculated for the variance of x if we hadn't known anything about the groups of interest.  $SST$ is the proportion of that variability that we attribute (*explain*) by breaking the response down by groups.
 
 For the egg length data:
 \begin{eqnarray*}
