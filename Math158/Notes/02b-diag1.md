@@ -212,7 +212,7 @@ A doubling of $x$ is associated with a multiplicative change of $2^{\beta_1}$ in
 Note that the model regressing GDP on % urban used a log transformation on GDP (the response, or Y variable).  As such we know that:
 
 \begin{eqnarray*}
-\hat{\ln(Y)} &=& \mbox{median}(\ln(Y)) = b_0 + b_1 \cdot x\\
+\widehat{\ln(Y)} &=& \mbox{median}(\ln(Y)) = b_0 + b_1 \cdot x\\
 \mbox{median}(Y) &=& \exp(b_0 + b_1 \cdot x)
 \end{eqnarray*}
 
@@ -242,7 +242,7 @@ GDP %>%
 GDP %>%
   ggplot() + 
   geom_point(aes(x = urban, y = gdp)) + 
-  geom_line(aes(x = urban, y = exp(6.11 + 0.0425*urban)), color = "red")
+  geom_line(aes(x = urban, y = exp(6.11 + 0.0425*urban)), color = "blue")
 ```
 
 <div class="figure" style="text-align: center">
