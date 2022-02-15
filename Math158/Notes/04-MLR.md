@@ -64,8 +64,8 @@ $\beta_1$ and $\beta_2$.  There were two independent variables, high temperature
 
 **Qualitative Predictor Variables**:  When including a categorical variable in the model, it must be written as one (or more) binary varables.  For example, 
 
-\begin{eqnarray*}X_2=\begin{aligned} &0& \quad &\mbox{if \quad weekend}&\\
-&1&\quad &\mbox{if \quad weekday}&\end{aligned}\end{eqnarray*} 
+\begin{eqnarray*}X_2=\begin{aligned} &0& \quad &\mbox{if  weekend}&\\
+&1&\quad &\mbox{if  weekday}&\end{aligned}\end{eqnarray*} 
 
 In general, if the qualitative variable has $k$ levels, then  $k-1$ of "dummy'' (i.e., binary) variables must be included.  For instance, for the variables school year, (2013, 2014, 2015, 2016), there would 3 variables (coded as, for example: 1=2013, 0=not 2013). For a given observation, if the three dummy variables are all zero, then the model would know that the observation took place during the school year that was not coded for.  
 
@@ -96,7 +96,7 @@ Another way to think of interaction is whether the change in $E[Y]$ for a change
 E[Y]=\beta_0+\beta_1X_{1}+\beta_2X_{2}+\beta_3X_{1}X_{2}\\
 \frac{\partial E[Y]}{\partial X_1} = \beta_1 + \beta_3 X_2\\
 \end{eqnarray*}
-{\em MLR model Clicker Questions 38-40}
+
 
 **Polynomial Regression:** The response variable might be a function of a polynomial of our predictor giving rise to a polynomial model:
 $$Y_i=\beta_0+\beta_1X_i+\beta_2X_i^2+\epsilon_i$$
@@ -118,7 +118,7 @@ forth.
 
 
 
-#### Example: thermometers
+#### Example: thermometers {-}
 
 Consider a new dataset.  The data were collected by Michael Ernst at St. Cloud University in Minnesota (during the Polar Vortex in January of 2019).  
 
@@ -392,11 +392,12 @@ Note that we can interpret this interval to say that $(1-\alpha)100\%$ of the re
 
 #### Skipping {-}
 In the text we will skip:  
+
 * surface prediction  
 * simultaneous confidence intervals  
 * prediction of more than one value  
 * or at more than one $X_h$  
-* tests for normality / error variance / constant variance / lack of fit (we will use residual plots instead)
+* formal hypothesis tests for normality / error variance / constant variance / lack of fit (use residual plots instead)
 
 
 
@@ -495,11 +496,14 @@ Note that in both AIC and SBC we don't consider the constant term because models
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
+1. What do we mean by "keeping all other variables constant" when interpreting a single coefficient in a multiple regression model?  Why is the interpretation important?  
+2. Why is it important to include all variables of interest in the model?
+3. Can including some variables change the relationships between other variables?
 
 The big question up next: with all these options, how do we decide what to include and what not to include?
 
 
-## R: MLR with Rail Trails}
+## R: MLR with Rail Trails
 
 The variables used in the following analysis are `hightemp`, `volume`, `precip` and `weekday`.  A description of the data is given at:
 
