@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 9 Multiple Linear Regression | Linear Models</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="When we get there, use the function bestregsubsets(). library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(  ...">
+<meta name="description" content='library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(   Bedroom.AbvGr &lt;=1 ~ "1",   Bedroom.AbvGr &lt;=2 ~ "2",  ...'>
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 9 Multiple Linear Regression | Linear Models">
 <meta property="og:type" content="book">
-<meta property="og:description" content="When we get there, use the function bestregsubsets(). library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(  ...">
+<meta property="og:description" content='library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(   Bedroom.AbvGr &lt;=1 ~ "1",   Bedroom.AbvGr &lt;=2 ~ "2",  ...'>
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 9 Multiple Linear Regression | Linear Models">
-<meta name="twitter:description" content="When we get there, use the function bestregsubsets(). library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(  ...">
+<meta name="twitter:description" content='library(openintro) ames_inf &lt;- ames %&gt;%  filter(area &lt;= 3000) %&gt;%  mutate(price_ln = log(price)) ames_inf %&gt;%  mutate(bedrooms = case_when(   Bedroom.AbvGr &lt;=1 ~ "1",   Bedroom.AbvGr &lt;=2 ~ "2",  ...'>
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -83,7 +83,6 @@
 <h1>
 <span class="header-section-number">9</span> Multiple Linear Regression<a class="anchor" aria-label="anchor" href="#mlr"><i class="fas fa-link"></i></a>
 </h1>
-<p>When we get there, use the function <code>bestregsubsets()</code>.</p>
 <div class="sourceCode" id="cb338"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://openintrostat.github.io/openintro/">openintro</a></span><span class="op">)</span>
 <span class="va">ames_inf</span> <span class="op">&lt;-</span> <span class="va">ames</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -101,6 +100,94 @@
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="04-MLR_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;"></div>
+<div id="basic-model-set-up" class="section level2" number="9.1">
+<h2>
+<span class="header-section-number">9.1</span> Basic Model Set-Up<a class="anchor" aria-label="anchor" href="#basic-model-set-up"><i class="fas fa-link"></i></a>
+</h2>
+<p>When looking at the volume of riders on a bike trail, we can use the data collected to understand the relationships at a deeper level. The trail is in Massachusetts, so the expected relationship is positive: the higher the temp the more riders we expect. However, volume is also related to whether or not it is a weekend. Indeed, we think about the volume of riders as a function of both the temperature and the day of the week. Thus there are two predictor variables in the model.</p>
+<div id="notation" class="section level3" number="9.1.1">
+<h3>
+<span class="header-section-number">9.1.1</span> Notation<a class="anchor" aria-label="anchor" href="#notation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Consider <span class="math inline">\(n\)</span> observations. The response variable for the <span class="math inline">\(i^{th}\)</span> individual, denoted by <span class="math inline">\(Y_i\)</span> as before, is observed. The variation remaining in <span class="math inline">\(Y_i\)</span> that isn’t explained by the predictors will also remain the same, denoted by <span class="math inline">\(\epsilon_i\)</span> and called the random error. Since there is now more than one predictor, an additional subscript is added to <span class="math inline">\(X\)</span>, denoting the value of the <span class="math inline">\(k^{th}\)</span> predictor variable for the <span class="math inline">\(i^{th}\)</span> individual by <span class="math inline">\(X_{ik}\)</span>. Thus the model is now:
+<span class="math display">\[\begin{eqnarray*}
+Y_i&amp;=&amp;\beta_0+\beta_1X_{i1}+\beta_2X_{i2}+ \cdots + \beta_{p-1}X_{i,p-1} + \epsilon_i\\
+E[Y]&amp;=&amp;\beta_0+\beta_1X_{1}+\beta_2X_{2}+ \cdots + \beta_{p-1}X_{p-1}\\
+Y_i&amp;=&amp;b_0+b_1X_{i1}+b_2X_{i2}+ \cdots + b_{p-1}X_{i,p-1} + e_i\\
+\hat{Y}&amp;=&amp;b_0+b_1X_{1}+b_2X_{2}+ \cdots + b_{p-1}X_{p-1}\\
+&amp;&amp;\\
+E[\underline{Y}] &amp;=&amp; X \underline{\beta}\\
+\underline{\hat{Y}} &amp;=&amp; X \underline{b}\\
+\end{eqnarray*}\]</span>
+In the Rail Trails example, <span class="math inline">\(X_{i1}\)</span> might denote the volume of riders on the <span class="math inline">\(i^{th}\)</span> day, while <span class="math inline">\(X_{i2}\)</span> will denote an indicator variable on whether the day is a weekend or week day.</p>
+</div>
+<div id="fitting-the-model" class="section level3" number="9.1.2">
+<h3>
+<span class="header-section-number">9.1.2</span> Fitting the Model<a class="anchor" aria-label="anchor" href="#fitting-the-model"><i class="fas fa-link"></i></a>
+</h3>
+<p>To estimate the coefficients, use the same principle as before, that of least
+squares. That is, minimize
+<span class="math display">\[\sum_{i=1}^n(Y_i-(\beta_0+\beta_1X_{i1}+\beta_2X_{i2} + \cdots + \beta_{p-1}X_{i,p-1}))^2\]</span>
+We are interested in finding the least squares estimates of the parameters of the model <span class="math inline">\(b_i\)</span>. To do that, we have something that looks like
+<span class="math display">\[(\underline{Y}-\mathbf{X}\underline{\beta})^t(\underline{Y}-\mathbf{X}\underline{\beta})\]</span>
+that we are trying to minimize (it is the sum of the squared residuals). Calculus gives:
+<span class="math display">\[\mathbf{X}^t\underline{Y}-\mathbf{X}^t\mathbf{X}\mathbf{\beta}=0,\]</span>
+and solving for the unknown <span class="math inline">\(\underline{\beta}\)</span> gives:
+<span class="math display">\[\underline{b}=(\mathbf{X}^t\mathbf{X})^{-1}(\mathbf{X}^t\underline{Y}).\]</span>
+Where the transpose is a concession because multiplication and division work slightly differently in the matrix context. The inverse, denoted by the power -1, provides a way to solve the equation.<br>
+Thus,
+<span class="math display">\[\hat{\underline{Y}}=\mathbf{X}\underline{b}=\mathbf{X}(\mathbf{X}^t\mathbf{X})^{-1}\mathbf{X}^t\underline{Y}:=\mathbf{H}\underline{Y}\]</span>
+and
+<span class="math display">\[\mathbf{H}=\mathbf{X}(\mathbf{X}^t\mathbf{X})^{-1}\mathbf{X}^t\]</span>
+is once again the <strong>hat matrix</strong> (because multiplying H by
+<span class="math inline">\(\underline{Y}\)</span> it puts a hat on it).<br>
+The hat matrix will come up again when learning about leverage.</p>
+</div>
+<div id="types-of-multiple-regression" class="section level3" number="9.1.3">
+<h3>
+<span class="header-section-number">9.1.3</span> Types of Multiple Regression<a class="anchor" aria-label="anchor" href="#types-of-multiple-regression"><i class="fas fa-link"></i></a>
+</h3>
+<p>The multiple linear regression model is useful in a variety of situations. A few are discussed here. The above example was of the first type:<br><strong><span class="math inline">\(p-1\)</span> predictor variables</strong>: We say <span class="math inline">\(p-1\)</span> instead of <span class="math inline">\(p\)</span> because
+including the intercept there are <span class="math inline">\(p\)</span> parameters in need of
+estimation.<br>
+In the previous example, <span class="math inline">\(p=3\)</span>, in order to estimate <span class="math inline">\(\beta_0\)</span>,
+<span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>. There were two independent variables, high temperature and weekday status.</p>
+<p><strong>Qualitative Predictor Variables</strong>: When including a categorical variable in the model, it must be written as one (or more) binary varables. For example,</p>
+<p><span class="math display">\[\begin{eqnarray*}X_2=\begin{aligned} &amp;0&amp; \quad &amp;\mbox{if \quad weekend}&amp;\\
+&amp;1&amp;\quad &amp;\mbox{if \quad weekday}&amp;\end{aligned}\end{eqnarray*}\]</span></p>
+<p>In general, if the qualitative variable has <span class="math inline">\(k\)</span> levels, then <span class="math inline">\(k-1\)</span> of "dummy’’ (i.e., binary) variables must be included. For instance, for the variables school year, (2013, 2014, 2015, 2016), there would 3 variables (coded as, for example: 1=2013, 0=not 2013). For a given observation, if the three dummy variables are all zero, then the model would know that the observation took place during the school year that was not coded for.</p>
+<p><strong>Transformed Variables</strong>: As with simple linear regression, it is often a good idea to transform variables to ensure that model technical conditions hold.</p>
+<p><strong>Interaction Effects:</strong> A model that is “additive” means that the response is a function of all the predictors added together. Some variables interact with each other. An interaction model can be of the form
+<span class="math display">\[E[Y]=\beta_0+\beta_1X_{1}+\beta_2X_{2}+\beta_3X_{1}X_{2}\]</span>
+where the interaction is multiplicative. Often the idea of fitting an interaction comes from some sort of knowledge about the variables themselves.<br>
+Assume that <span class="math inline">\(E[Y]\)</span> is the average volume of riders on days with <span class="math inline">\(X_{1}\)</span> high temp, and <span class="math inline">\(X_{2}\)</span> is whether or not it was a weekday. The interaction model provides a way to break the model down for particular groups, the model provides a <em>different</em> linear model for weekdays and weekends.</p>
+<p>Weekday=0
+<span class="math display">\[\begin{eqnarray*}
+E[Y]&amp;=&amp;\beta_0+\beta_1X_{1}+\beta_2 0+\beta_3X_{1} 0\\
+&amp;=&amp;\beta_0+\beta_1X_{1}\\
+\end{eqnarray*}\]</span></p>
+<p>Weekday=1
+<span class="math display">\[\begin{eqnarray*}
+E[Y]&amp;=&amp;\beta_0+\beta_1X_{1}+\beta_2 1+\beta_3X_{1} 1\\
+&amp;=&amp;(\beta_0 + \beta_2) +(\beta_1 + \beta_3) X_{1}\\
+\end{eqnarray*}\]</span></p>
+<p>The additive model (i.e., no interactions) states that the dummy variables only move the line up or down. If the volume of ridership is different for the different days but does not depend on high temp, then only the additive component is included. If the day of the week changes the relationship between high temp and volume, then the interaction term should be included.<br>
+Variables <strong>interact</strong> if the effect of one predictor variable depends on the levels of the other predictor variables.<br>
+Another way to think of interaction is whether the change in <span class="math inline">\(E[Y]\)</span> for a change in one of your variables (e.g., <span class="math inline">\(X_1\)</span>) is mediated by another variable (e.g., <span class="math inline">\(X_2\)</span>).</p>
+<p><span class="math display">\[\begin{eqnarray*}
+E[Y]=\beta_0+\beta_1X_{1}+\beta_2X_{2}+\beta_3X_{1}X_{2}\\
+\frac{\partial E[Y]}{\partial X_1} = \beta_1 + \beta_3 X_2\\
+\end{eqnarray*}\]</span>
+{}</p>
+<p><strong>Polynomial Regression:</strong> The response variable might be a function of a polynomial of our predictor giving rise to a polynomial model:
+<span class="math display">\[Y_i=\beta_0+\beta_1X_i+\beta_2X_i^2+\epsilon_i\]</span>
+which represents <span class="math inline">\(Y\)</span> as a quadratic function of <span class="math inline">\(X\)</span>.</p>
+<p>The term <strong>linear model</strong> therefore does not refer to the response surface, rather to the fact that the model is linear in the parameters. Though we are fitting a hyper-plane to our data, when we think about what the surface looks like in terms of our original variables, it may be highly non-linear due to transformations and so
+forth.</p>
+<div id="example-thermometers" class="section level4" number="9.1.3.1">
+<h4>
+<span class="header-section-number">9.1.3.1</span> Example: thermometers<a class="anchor" aria-label="anchor" href="#example-thermometers"><i class="fas fa-link"></i></a>
+</h4>
 <p>Consider a new dataset. The data were collected by Michael Ernst at St. Cloud University in Minnesota (during the Polar Vortex in January of 2019).</p>
 <blockquote>
 <p>In late fall and early winter, as the temperature dropped (as it tends to do in MN), Michael started to get suspicious that the thermometer wasn’t entirely accurate. So, he put another thermometer that he trusted outside near the new one and where he could read the temperature through the window. He wrote down the temperature every once in a while throughout most of December and January.</p>
@@ -109,19 +196,17 @@
 <p>There are two variables: Temp, which is the actual temperature (based on the trusted thermometer), and Reading, which is the reading on the suspect thermometer.</p>
 </blockquote>
 <div class="sourceCode" id="cb340"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">temperature</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readr/man/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"Temperature.csv"</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb341"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Temp</span>, y <span class="op">=</span> <span class="va">Reading</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-5-1"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-5-1.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-8-1"></span>
+<img src="04-MLR_files/figure-html/unnamed-chunk-8-1.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
 Figure 9.1: The scatterplot looks linear… but the residual plot doesn’t!
 </p>
 </div>
-<div class="sourceCode" id="cb342"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb341"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Reading</span> <span class="op">~</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -129,73 +214,731 @@ Figure 9.1: The scatterplot looks linear… but the residual plot doesn’t!
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-5-2"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-5-2.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-8-2"></span>
+<img src="04-MLR_files/figure-html/unnamed-chunk-8-2.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
 Figure 9.2: The scatterplot looks linear… but the residual plot doesn’t!
 </p>
 </div>
-<p>Hopefully, transforming the data will help. From figure it seems like square root of <code>Reading</code> or log of <code>Temp</code> might help. Let’s try both.</p>
-<div class="sourceCode" id="cb343"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">temperature</span> <span class="op">&lt;-</span> <span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>sqrt_read <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">Reading</span><span class="op">)</span>,
-         ln_temp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span><span class="op">)</span>
-    
-<span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Temp</span>, y <span class="op">=</span> <span class="va">sqrt_read</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<p>Hopefully, transforming the data will help. From figure it seems like square root of <code>Reading</code> or log of <code>Temp</code> might help. Let’s try both, but first we’ll have to shift them both (to get rid of the negative numbers) arbitrarily by 35 degrees.</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-6-1"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-6-1.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-9-1"></span>
+<img src="04-MLR_files/figure-html/unnamed-chunk-9-1.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
 Figure 9.3: The scatterplot looks linear… but the residual plot doesn’t!
 </p>
 </div>
-<div class="sourceCode" id="cb344"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sqrt_read</span> <span class="op">~</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-6-2"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-6-2.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
+<span style="display:block;" id="fig:unnamed-chunk-9-2"></span>
+<img src="04-MLR_files/figure-html/unnamed-chunk-9-2.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
 Figure 9.4: The scatterplot looks linear… but the residual plot doesn’t!
 </p>
 </div>
-<div class="sourceCode" id="cb345"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ln_temp</span>, y <span class="op">=</span> <span class="va">Reading</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-6-3"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-6-3.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
-Figure 9.5: The scatterplot looks linear… but the residual plot doesn’t!
-</p>
-</div>
-<div class="sourceCode" id="cb346"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Reading</span> <span class="op">~</span> <span class="va">ln_temp</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">.fitted</span>, y <span class="op">=</span> <span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-6-4"></span>
-<img src="04-MLR_files/figure-html/unnamed-chunk-6-4.png" alt="The scatterplot looks linear... but the residual plot doesn't!" width="480"><p class="caption">
-Figure 9.6: The scatterplot looks linear… but the residual plot doesn’t!
-</p>
-</div>
 <p>Doesn’t seem like transformations are going to work. What if a square term is added? Is it still a linear model? (Yes!) Are the residuals better? (Yes!)</p>
+<div class="sourceCode" id="cb342"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lin_mod</span> <span class="op">&lt;-</span> <span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Reading</span> <span class="op">~</span> <span class="va">Temp</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
 
+<span class="va">quad_mod_1</span> <span class="op">&lt;-</span> <span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Reading</span> <span class="op">~</span> <span class="va">temp_sq</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
+
+<span class="va">quad_mod_2</span> <span class="op">&lt;-</span> <span class="va">temperature</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Reading</span> <span class="op">~</span> <span class="va">Temp</span> <span class="op">+</span> <span class="va">temp_sq</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
+
+<span class="va">lin_mod</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    -4.93   0.138       -35.7 8.50e-46
+## 2 Temp            1.19   0.00867     137.  7.94e-85</code></pre>
+<div class="sourceCode" id="cb344"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">quad_mod_1</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic    p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 (Intercept) -14.4      2.79        -5.16 0.00000229
+## 2 temp_sq       0.0241   0.00727      3.32 0.00147</code></pre>
+<div class="sourceCode" id="cb346"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">quad_mod_2</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept) -4.12     0.144       -28.7  2.33e-39
+## 2 Temp         1.21     0.00690     176.   5.36e-91
+## 3 temp_sq     -0.00295  0.000374     -7.90 3.65e-11</code></pre>
+<p><img src="04-MLR_files/figure-html/unnamed-chunk-11-1.png" width="480" style="display: block; margin: auto;"><img src="04-MLR_files/figure-html/unnamed-chunk-11-2.png" width="480" style="display: block; margin: auto;"><img src="04-MLR_files/figure-html/unnamed-chunk-11-3.png" width="480" style="display: block; margin: auto;"></p>
+<p>The quadratic term alone (without the linear term) doesn’t help the model fit because the model forces the linear coefficient to be zero. By making the linear part zero, we force the vertex (of the parabola) to be at X=0 which doesn’t make sense for the model fit. Indeed, typically a quadratic term without a linear term is a good idea if (a) there is a curved relationship with constant errors and the vertex is not in the plot, and/or (b) you really believe that there is a reason why <span class="math inline">\(Y\)</span> should be a (linear) function of <span class="math inline">\(X^2\)</span>.</p>
+</div>
+</div>
+<div id="revisiting-other-important-definitions" class="section level3" number="9.1.4">
+<h3>
+<span class="header-section-number">9.1.4</span> Revisiting Other Important Definitions<a class="anchor" aria-label="anchor" href="#revisiting-other-important-definitions"><i class="fas fa-link"></i></a>
+</h3>
+<p>Because solving for our regression coefficients <span class="math inline">\((\underline{b})\)</span> involves the exact same matrix algebra, all of the other pieces involved with the linear regression model are given using the same matrix notation.
+<span class="math display">\[\begin{eqnarray*}
+\underline{b} &amp;=&amp; (X^t X)^{-1} X^t \underline{Y}\\
+\underline{e} &amp;=&amp; \underline{Y} - \hat{\underline{Y}}\\
+&amp;=&amp; \underline{Y} - X \underline{b}\\
+&amp;=&amp; (I - H) \underline{Y}\\
+\underline{\hat{Y}} &amp;=&amp; X \underline{b}\\
+ &amp;=&amp; X (X^t X)^{-1} (X^t \underline{Y})\\
+&amp;=&amp; H \underline{Y}\\
+s^2(\underline{e}) &amp;=&amp; MSE \cdot (I-H)\\
+\sigma^2(\underline{e}) &amp;=&amp; \sigma^2 \cdot (I-H)\\
+s^2(\underline{\epsilon}) &amp;=&amp; MSE \cdot I\\
+\sigma^2(\underline{\epsilon}) &amp;=&amp; \sigma^2 I\\
+\end{eqnarray*}\]</span></p>
+<p>Equivalently, the components of the ANOVA table remain the same, with the slight change that now the degrees of freedom are generalized to account for the fact that we are estimating <span class="math inline">\(p\)</span> parameters.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+SSR &amp;=&amp; \sum (\hat{Y}_i - \overline{Y})^2 = \underline{b}^t X^t \underline{Y} - \bigg(\frac{1}{n} \bigg) \underline{Y}^t J \underline{Y}\\
+SSE &amp;=&amp; \sum (Y_i - \hat{Y}_i)^2 = \underline{Y}^t \underline{Y} - \underline{b}^t X^t \underline{Y}\\
+SSTO &amp;=&amp; \sum (Y_i - \overline{Y})^2 = \underline{Y}^t \underline{Y} - \bigg(\frac{1}{n} \bigg) \underline{Y}^t J \underline{Y}\\
+\end{eqnarray*}\]</span></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>source</th>
+<th align="center">SS</th>
+<th align="center">df</th>
+<th align="center">MS</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Regression</td>
+<td align="center">SSR</td>
+<td align="center">p-1</td>
+<td align="center">MSR = SSR/(p-1)</td>
+</tr>
+<tr class="even">
+<td>Error</td>
+<td align="center">SSE</td>
+<td align="center">n-p</td>
+<td align="center">MSE = SSE/(n-p)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Note (with <span class="math inline">\(p=3\)</span>, two explanatory variables):
+<span class="math display">\[\begin{eqnarray*}
+E[MSE] &amp;=&amp; \sigma^2\\
+E[MSR] &amp;=&amp; \sigma^2 + 0.5[\beta_1^2 \sum(X_{1i} - \overline{X}_1)^2 + \beta_2^2 \sum(X_{2i} - \overline{X}_2)^2 + 2 \beta_1 \beta_2 \sum(X_{1i} - \overline{X}_1)(X_{2i} - \overline{X}_2)]
+\end{eqnarray*}\]</span></p>
+</div>
+</div>
+<div id="inference" class="section level2" number="9.2">
+<h2>
+<span class="header-section-number">9.2</span> Inference<a class="anchor" aria-label="anchor" href="#inference"><i class="fas fa-link"></i></a>
+</h2>
+<div id="f-test" class="section level3" number="9.2.1">
+<h3>
+<span class="header-section-number">9.2.1</span> F-test<a class="anchor" aria-label="anchor" href="#f-test"><i class="fas fa-link"></i></a>
+</h3>
+<p>The F-test from simple linear regression, can now be generalized to a test addressing whether <em>all</em> the non-intercept coefficients are simultaneously zero. The test asks whether the explanatory variables as a set add anything to the model in terms of predicting the response variable.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+H_0:&amp;&amp; \beta_1 = \beta_2 = \cdots = \beta_{p-1} = 0\\
+H_a:&amp;&amp; \mbox{ not all } \beta_k = 0 \mbox{ (some still might be zero)}
+\end{eqnarray*}\]</span></p>
+<p>As before, we measure the ratio of MSR to MSE to decide whether the regression and error components are measuring the same quantity (residual error).
+<span class="math display">\[\begin{eqnarray*}
+F^* = \frac{MSR}{MSE} \sim F_{(p-1, n-p)}  \mbox{ if $H_0$ is true (!)}
+\end{eqnarray*}\]</span>
+Remember that MSE always estimates <span class="math inline">\(\sigma^2\)</span>, but MSR only estimates <span class="math inline">\(\sigma^2\)</span> if all the <span class="math inline">\(\beta_k\)</span> coefficients simultaneously equal zero.</p>
+</div>
+<div id="coefficient-of-multiple-determination" class="section level3" number="9.2.2">
+<h3>
+<span class="header-section-number">9.2.2</span> Coefficient of Multiple Determination<a class="anchor" aria-label="anchor" href="#coefficient-of-multiple-determination"><i class="fas fa-link"></i></a>
+</h3>
+<p>Recall that we measured the proportion of variability explained by the linear model using <span class="math inline">\(R^2\)</span>. The interpretation is the same now that we have <span class="math inline">\(p-1\)</span> predictors. <span class="math display">\[ R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}\]</span> As before:
+<span class="math display">\[\begin{eqnarray*}
+R^2 &amp;=&amp; 0 \mbox{ if } b_k = 0 \ \ \forall k=1, \ldots, p-1\\
+R^2 &amp;=&amp; 1 \mbox{ if } \hat{Y}_i = Y_i \ \ \forall i
+\end{eqnarray*}\]</span>
+But now we are in a situation where adding more variables <em>always</em> increases <span class="math inline">\(R^2\)</span>. That is, as we add more explanatory variables to our model, the <span class="math inline">\(R^2\)</span> value increases.\</p>
+<p>If <span class="math inline">\(\beta_k=0 \forall k\)</span>, <span class="math inline">\(E[MSR] = \sigma^2 \rightarrow E[SSR] = \sigma^2(p-1)\)</span>, and also <span class="math inline">\(E[SSTO] = \sigma^2(n-1) \rightarrow R^2 \approx (p-1)/(n-1)\)</span>.</p>
+<div id="adjusted-r2" class="section level4 unnumbered">
+<h4>Adjusted <span class="math inline">\(R^2\)</span><a class="anchor" aria-label="anchor" href="#adjusted-r2"><i class="fas fa-link"></i></a>
+</h4>
+<p>To account for the problem of <span class="math inline">\(R^2\)</span> increasing with the number of variables, we compare the mean squares instead of the sums of squares. Now, the value is no longer increasing in the number of variables because there is a trade-off between reducing the errors (SSE) and losing a degree of freedom. <span class="math display">\[R^2_a = 1 - \frac{SSE/(n-p)}{SSTO/(n-1)} = 1 - \frac{(n-1)}{(n-p)} \frac{SSE}{SSTO}\]</span></p>
+</div>
+</div>
+<div id="inference-about-regression-parameters" class="section level3" number="9.2.3">
+<h3>
+<span class="header-section-number">9.2.3</span> Inference about Regression Parameters<a class="anchor" aria-label="anchor" href="#inference-about-regression-parameters"><i class="fas fa-link"></i></a>
+</h3>
+<div id="coefficients" class="section level4 unnumbered">
+<h4>Coefficients<a class="anchor" aria-label="anchor" href="#coefficients"><i class="fas fa-link"></i></a>
+</h4>
+<p>We know that
+<span class="math display">\[\begin{eqnarray*}
+\sigma^2\{ \underline{b} \} &amp;=&amp; \sigma^2 (X^t X)^{-1}\\
+s^2\{ \underline{b} \} &amp;=&amp; MSE (X^t X)^{-1}\\
+\end{eqnarray*}\]</span>
+We can use the estimate and the SE to create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating <span class="math inline">\(p\)</span> parameters, so our degrees of freedom is <span class="math inline">\(n-p\)</span>).
+<span class="math display">\[\begin{eqnarray*}
+\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\end{eqnarray*}\]</span>
+A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math inline">\(\beta_k\)</span> is given by<span class="math display">\[b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}\]</span>
+Note that the t-test is done separately for EACH <span class="math inline">\(\beta\)</span> coefficient. Which is to say that we are estimating MSE with all the variables in the model. The test then asks the effect of removing only the variable at hand. Both testing and interpretation of the regression coefficients are done <em>keeping all other variables constant</em>.</p>
+</div>
+<div id="linear-combinations-of-coefficients" class="section level4 unnumbered">
+<h4>Linear Combinations of Coefficients<a class="anchor" aria-label="anchor" href="#linear-combinations-of-coefficients"><i class="fas fa-link"></i></a>
+</h4>
+<p>Periodically, the question of interest will be related to a linear combination of coefficients. For example, we might be interested in testing whether the coefficient for <code>spring</code> is statistically different from the coefficient on <code>fall</code> [<span class="math inline">\(H_0: \beta_1 = \beta_2\)</span>]. Let
+<span class="math display">\[\begin{eqnarray*}
+\gamma &amp;=&amp; c_0 \beta_0 + c_1 \beta_1 + \ldots + c_p \beta_p\\
+g &amp;=&amp; c_0 b_0 + c_1 b_1 + \ldots + c_p b_p\\
+var(g) &amp;=&amp; c_0^2 \sigma^2\{b_0\} + c_1^2 \sigma^2\{b_1\} + \ldots + c_p^2 \sigma^2\{b_p\} + 2c_0c_1 cov(b_0, b_1) + 2 c_0 c_2 cov(b_0, b_2) + \ldots + 2c_{p-1}c_p cov(b_{p-1}, b_p)\\
+\end{eqnarray*}\]</span>
+With the estimate of the difference and the SE, a t-statistic (or create a CI) provides formal inference on coefficients. Note below that the function <code><a href="https://rdrr.io/r/stats/vcov.html">vcov()</a></code> estimates the variances and covariance of the coefficients.
+<span class="math display">\[\begin{eqnarray*}
+\hat{var}(b_1 - b_2) &amp;=&amp; (1)^2 s^2\{b_1\} + (-1)^2 s^2\{ b_2\} + 2(1)(-1)\hat{cov}(b_1, b_2)\\
+&amp;=&amp; 889 + 1862 -  2*604 = 1543\\
+H_0: &amp;&amp; \beta_1 = \beta_2\\
+t-stat &amp;=&amp; \frac{(-50.1 - (-126.8)) - 0}{ \sqrt{1543}} = 1.952\\
+p-value &amp;=&amp; 2 * P(t_{87} \geq 1.952) = 0.054
+\end{eqnarray*}\]</span>
+The p-value is borderline, but certainly there is not strong evidence to say that fall and spring are significantly different in the model. Note that fall and spring <em>are</em> significantly different from summer (the baseline). Note: no days were measured in winter.</p>
+<div class="sourceCode" id="cb348"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">spring</span> <span class="op">+</span> <span class="va">fall</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    422.       24.6     17.2  1.13e-29
+## 2 spring         -50.2      29.8     -1.68 9.57e- 2
+## 3 fall          -127.       43.2     -2.94 4.23e- 3</code></pre>
+<div class="sourceCode" id="cb350"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">spring</span> <span class="op">+</span> <span class="va">fall</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/vcov.html">vcov</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>##             (Intercept) spring fall
+## (Intercept)         604   -604 -604
+## spring             -604    889  604
+## fall               -604    604 1862</code></pre>
+</div>
+<div id="mean-response" class="section level4 unnumbered">
+<h4>Mean Response<a class="anchor" aria-label="anchor" href="#mean-response"><i class="fas fa-link"></i></a>
+</h4>
+<p>Again, using linear algebra as with simple linear regression:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\sigma^2\{\hat{Y}_h\} &amp;=&amp; \sigma^2 X_h^t (X^t X)^{-1} X_h\\
+s^2\{\hat{Y}_h\} &amp;=&amp; MSE X_h^t (X^t X)^{-1} X_h
+\end{eqnarray*}\]</span>
+Which allows us to create a <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math inline">\(E[Y_h] = X_h^t \underline{\beta}\)</span>: <span class="math display">\[\hat{Y}_h \pm t_{(1-\alpha/2, n-p)} s\{\hat{Y}_h\}\]</span>
+Where
+<span class="math display">\[\begin{eqnarray*}
+X_h^t &amp;=&amp; (1 \ \ X_{h 1} \ \ X_{h  2} \ \ldots \ X_{h  p-1})\\
+\hat{Y}_h &amp;=&amp; X_h^t \underline{b}
+\end{eqnarray*}\]</span></p>
+</div>
+<div id="future-predicted-response" class="section level4 unnumbered">
+<h4>Future / Predicted Response<a class="anchor" aria-label="anchor" href="#future-predicted-response"><i class="fas fa-link"></i></a>
+</h4>
+<p>A new observation uses the same derivation as the mean response, but we add in the variability of observations around the line.
+<span class="math display">\[\begin{eqnarray*}
+\sigma^2\{ \mbox{pred} \} = \sigma^2\{\hat{Y}_{h(new)}\} &amp;=&amp; \sigma^2 (1+ X_h^t (X^t X)^{-1} X_h)\\
+s^2\{ \mbox{pred} \} = s^2\{\hat{Y}_{h(new)}\} &amp;=&amp; MSE (1+ X_h^t (X^t X)^{-1} X_h)\\
+&amp;=&amp; MSE + s^2\{\hat{Y}_h\}
+\end{eqnarray*}\]</span>
+Which allows us to create a <span class="math inline">\((1-\alpha)100\%\)</span> prediction interval for a response at <span class="math inline">\(X_h\)</span>: <span class="math display">\[\hat{Y}_h \pm t_{(1-\alpha/2, n-p)} s\{\hat{Y}_{h(new)}\}\]</span>
+Note that we can interpret this interval to say that <span class="math inline">\((1-\alpha)100\%\)</span> of the response values from <span class="math inline">\(X_h\)</span> will fall in our interval.</p>
+</div>
+<div id="skipping" class="section level4 unnumbered">
+<h4>Skipping<a class="anchor" aria-label="anchor" href="#skipping"><i class="fas fa-link"></i></a>
+</h4>
+<p>In the text we will skip:<br>
+* surface prediction<br>
+* simultaneous confidence intervals<br>
+* prediction of more than one value<br>
+* or at more than one <span class="math inline">\(X_h\)</span><br>
+* tests for normality / error variance / constant variance / lack of fit (we will use residual plots instead)</p>
+<p>The idea for a good model is to find a balance between having small residuals and having too many predictors. That is, MSE should be small, but <span class="math inline">\(p\)</span> to be small as well. Recall that <span class="math inline">\(R^2_a\)</span> does balance MSE and <span class="math inline">\(p\)</span>, but in one specific way. Other ideas are given below. Later, models will be built using p-values for F-tests. However, there are myriad criteria that optimize the given model (i.e., which variables are best to include). Consider using the criteria to compare models with differing number of variables (same response, same model structure). The following are defined as:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+SSE_p &amp;=&amp; SSE \mbox{ from the model with $p$ parameters}\\
+SSE_{full} &amp;=&amp; SSE \mbox{ from the  model with all possible parameters}
+\end{eqnarray*}\]</span></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>criteria</th>
+<th>definition</th>
+<th>desired value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(p\)</span></td>
+<td>number of parameters</td>
+<td>small</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(SSE_p\)</span></td>
+<td>residual variability</td>
+<td>small</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(R^2_p\)</span></td>
+<td>% variability explained by model</td>
+<td>big</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(R^2_{a,p}\)</span></td>
+<td>adjusted <span class="math inline">\(R^2\)</span>
+</td>
+<td>big</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(C_p\)</span></td>
+<td>trade off between SSE and <span class="math inline">\(p\)</span>
+</td>
+<td>close to <span class="math inline">\(p\)</span> / small</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(AIC_p\)</span></td>
+<td>Akaike’s Information Criterion</td>
+<td>small</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(SBC_p\)</span></td>
+<td>Bayesian Information Criterion</td>
+<td>small</td>
+</tr>
+<tr class="even">
+<td>F*</td>
+<td>F test statistic</td>
+<td>big (for simpler models) (see section )</td>
+</tr>
+</tbody>
+</table></div>
+<p><span class="math inline">\(C_p\)</span>: <span class="math display">\[C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)\]</span><br><span class="math inline">\(AIC_p\)</span>: <span class="math display">\[AIC_p = n \ln(SSE_p) - n \ln(n) + 2p\]</span><br><span class="math inline">\(SBC_p = BIC_p\)</span>: <span class="math display">\[SBC_p = n \ln(SSE_p) - n \ln(n) + \ln(n) p\]</span><br>
+Both <span class="math inline">\(AIC_p\)</span> and <span class="math inline">\(SBC_p\)</span> measure the likelihood of the data (<span class="math inline">\(-2 \ln(likelihood)\)</span>) given a particular model with <span class="math inline">\(p-1\)</span> explanatory variables. We choose the model with the smallest <span class="math inline">\(AIC_p\)</span> or <span class="math inline">\(SBC_p\)</span>.<br>
+Note that we can use <em>any</em> of the criteria to build a model by either adding one variable at a time; starting with a full model (all the variables) and subtracting one variable at a time; or some combination of adding and subtracting variables.</p>
+</div>
+<div id="c_p-aic-and-sbc-in-r" class="section level4 unnumbered">
+<h4>
+<span class="math inline">\(C_p\)</span>, AIC, and SBC in R<a class="anchor" aria-label="anchor" href="#c_p-aic-and-sbc-in-r"><i class="fas fa-link"></i></a>
+</h4>
+<p>Ideally, the chosen model would minimize all three criteria. All three are trade-offs between SSE (want small) and <span class="math inline">\(p\)</span> (want small).<br><span class="math inline">\(C_p\)</span> also measures the trade-off between bias and variance.
+<span class="math display">\[\begin{eqnarray*}
+Bias(\hat{Y}_i) &amp;=&amp; E[\hat{Y}_i] - E[Y_i]\\
+MSE(\hat{Y}_i) &amp;=&amp; [Bias(\hat{Y}_i)]^2 + Var(\hat{Y}_i)\\
+\Gamma_p &amp;=&amp; \frac{1}{\sigma^2} [Bias(\hat{Y}_i)]^2 + Var(\hat{Y}_i)\\
+\Gamma_p &amp;=&amp; p  \mbox{ if there is no bias in the model}
+\end{eqnarray*}\]</span>
+But how do we estimate <span class="math inline">\(\Gamma_p\)</span>? If we know the population variance, <span class="math inline">\(\sigma^2\)</span>, we can estimate <span class="math inline">\(\Gamma_p\)</span> using:
+<span class="math display">\[\begin{eqnarray*}
+ C_p &amp;=&amp; p + \frac{(MSE_p - \sigma^2)(n-p)}{ \sigma^2}\\
+ \end{eqnarray*}\]</span>
+Estimating <span class="math inline">\(\sigma^2\)</span> using <span class="math inline">\(MSE_{full}\)</span> gives
+<span class="math display">\[\begin{eqnarray*}
+ C_p &amp;=&amp; p + \frac{MSE_p - MSE_{full})(n-p)}{ MSE_{full}} = \frac{SSE_p}{MSE_{full}} - (n-2p)\\
+ \end{eqnarray*}\]</span></p>
+<p><span class="math inline">\(C_p\)</span> estimates the quantity “total MSE divided by <span class="math inline">\(\sigma^2\)</span>.” It can be shown that <span class="math inline">\(\sum_{i=1}^n Var(\hat{Y}_i) = \sigma^2 p\)</span>. We want <span class="math inline">\(C_p\)</span> to be small or <span class="math inline">\(\approx p\)</span>. See the comments on page 359 of Kutner et al.<br>
+Note that when calculating <span class="math inline">\(C_P\)</span> on the full model (with P parameters), we get
+<span class="math display">\[\begin{eqnarray*}
+C_P &amp;=&amp; \frac{SSE_P}{MSE_P} - (n-2P)\\
+&amp;=&amp; (n-P) - n + 2P\\
+&amp;=&amp; P\\
+\end{eqnarray*}\]</span></p>
+<p>Estimating <span class="math inline">\(\sigma^2\)</span> using <span class="math inline">\(MSE_{full}\)</span> assumes that there are no biases in the full model with all of the predictors, an assumption that may or may not be valid, but can’t be tested without additional information (at the very least you have to have all of the important predictors involved).</p>
+<p>AIC and SBC are based on maximum likelihood estimates of the model parameters. The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data. The likelihood is a number between 0 and 1. For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2. In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical. However, when using least squares versus maximum likelihood, there is a difference in estimating <span class="math inline">\(\sigma^2\)</span>. We have been using the <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span> which is MSE = SSE / (n-p). The maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is SSE/n. The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating <span class="math inline">\(p\)</span> regression coefficients <em>and</em> <span class="math inline">\(\sigma^2\)</span>, we are actually estimating <span class="math inline">\(p+1\)</span> parameters. In short, the full AIC is given by the following.
+<span class="math display">\[\begin{eqnarray}
+E[AIC] &amp;=&amp; -2 \ln(L) + 2(p+1)\\\
+&amp;=&amp; -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) \label{sigi}\\
+&amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) \label{sig}\\
+AIC &amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) \label{mse}\\
+&amp;=&amp; 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
+&amp;=&amp; n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
+\end{eqnarray}\]</span>
+To go from ~ to ~ we assume that <span class="math inline">\(\sigma^2 = \sigma_i^2\)</span>; that is, the variance is constant for all individuals. To go from ~ to ~ we approximate <span class="math inline">\(\sigma^2\)</span> (and <span class="math inline">\(E[Y_i]\)</span>) using the maximum likelihood estimates for <span class="math inline">\(\sigma^2 = SSE / n\)</span> and <span class="math inline">\(\beta_k\)</span>.<br>
+SBC (BIC) uses the posterior likelihood and a similar derivation. SBC can be given as the following.
+<span class="math display">\[\begin{eqnarray*}
+SBC &amp;=&amp; -2 \ln(L_{posterior}) + \ln(n) (p+1)\\
+&amp;=&amp; n + n\ln(2\pi) + n \ln(SSE_p / n) + \ln(n)(p+1)\\
+&amp;=&amp; n \ln(SSE_p) - n \ln(n) + \ln(n) p + constant
+\end{eqnarray*}\]</span>
+Note that in both AIC and SBC we don’t consider the constant term because models are compared on the same data (<span class="math inline">\(n\)</span> is the same).</p>
+</div>
+</div>
+</div>
+<div id="reflection-questions-6" class="section level2" number="9.3">
+<h2>
+<span class="header-section-number">9.3</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-6"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>How does the model change when there are multiple variables?<br>
+</li>
+<li>What does interaction mean? How do we model it? How do we interpret it? What is the R code?<br>
+</li>
+<li>What are the considerations associated with a quadratic term?<br>
+</li>
+<li>How do we test whether all the variables are significant?<br>
+</li>
+<li>How do we test whether individual variables are significant?<br>
+</li>
+<li>How do we assess a linear combination of coefficients?<br>
+</li>
+<li>What is the difference between <span class="math inline">\(R^2\)</span> and <span class="math inline">\(R^2_a\)</span>?<br>
+</li>
+<li>How are prediction and mean confidence intervals created with multiple explanatory variables?</li>
+</ol>
+</div>
+<div id="ethics-considerations-5" class="section level2" number="9.4">
+<h2>
+<span class="header-section-number">9.4</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-5"><i class="fas fa-link"></i></a>
+</h2>
+<p>The big question up next: with all these options, how do we decide what to include and what not to include?</p>
+</div>
+<div id="r-mlr-with-rail-trails" class="section level2" number="9.5">
+<h2>
+<span class="header-section-number">9.5</span> R: MLR with Rail Trails}<a class="anchor" aria-label="anchor" href="#r-mlr-with-rail-trails"><i class="fas fa-link"></i></a>
+</h2>
+<p>The variables used in the following analysis are <code>hightemp</code>, <code>volume</code>, <code>precip</code> and <code>weekday</code>. A description of the data is given at:</p>
+<pre><code><a href="https://rdrr.io/r/base/library.html">library(mosiacData)
+?RailTrail</a></code></pre>
+<ol style="list-style-type: decimal">
+<li>It is <em>always</em> a good idea to graph your data and look at numerical summaries. Sometimes you’ll find out important artifacts or mistakes.</li>
+</ol>
+<div class="sourceCode" id="cb353"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hightemp</span>, y <span class="op">=</span> <span class="va">volume</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"high temp (F)"</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"number of riders"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-MLR_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb354"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">skim_without_charts</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table table-sm">
+<caption>
+<span id="tab:unnamed-chunk-16">Table 9.1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Piped data</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">90</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">11</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">logical</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">numeric</td>
+<td align="left">9</td>
+</tr>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Variable type: character</strong></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">dayType</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr></tbody>
+</table></div>
+<p><strong>Variable type: logical</strong></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="left">count</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">weekday</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.69</td>
+<td align="left">TRU: 62, FAL: 28</td>
+</tr></tbody>
+</table></div>
+<p><strong>Variable type: numeric</strong></p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">hightemp</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">68.83</td>
+<td align="right">13.02</td>
+<td align="right">41</td>
+<td align="right">59.25</td>
+<td align="right">69.5</td>
+<td align="right">77.75</td>
+<td align="right">97.00</td>
+</tr>
+<tr class="even">
+<td align="left">lowtemp</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">46.03</td>
+<td align="right">11.84</td>
+<td align="right">19</td>
+<td align="right">38.00</td>
+<td align="right">44.5</td>
+<td align="right">53.75</td>
+<td align="right">72.00</td>
+</tr>
+<tr class="odd">
+<td align="left">avgtemp</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">57.43</td>
+<td align="right">11.33</td>
+<td align="right">33</td>
+<td align="right">48.62</td>
+<td align="right">55.2</td>
+<td align="right">64.50</td>
+<td align="right">84.00</td>
+</tr>
+<tr class="even">
+<td align="left">spring</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.59</td>
+<td align="right">0.49</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">1.0</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+</tr>
+<tr class="odd">
+<td align="left">summer</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.28</td>
+<td align="right">0.45</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">1.00</td>
+<td align="right">1.00</td>
+</tr>
+<tr class="even">
+<td align="left">fall</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.13</td>
+<td align="right">0.34</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.00</td>
+<td align="right">1.00</td>
+</tr>
+<tr class="odd">
+<td align="left">cloudcover</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">5.81</td>
+<td align="right">3.23</td>
+<td align="right">0</td>
+<td align="right">3.65</td>
+<td align="right">6.4</td>
+<td align="right">8.47</td>
+<td align="right">10.00</td>
+</tr>
+<tr class="even">
+<td align="left">precip</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0.09</td>
+<td align="right">0.26</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.02</td>
+<td align="right">1.49</td>
+</tr>
+<tr class="odd">
+<td align="left">volume</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">375.40</td>
+<td align="right">127.46</td>
+<td align="right">129</td>
+<td align="right">291.50</td>
+<td align="right">373.0</td>
+<td align="right">451.25</td>
+<td align="right">736.00</td>
+</tr>
+</tbody>
+</table></div>
+<ol start="2" style="list-style-type: decimal">
+<li>We’re interested in predicting the volume of riders from the high temperature (in F) in a given day.</li>
+</ol>
+<div class="sourceCode" id="cb355"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">hightemp</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic       p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+## 1 (Intercept)   -17.1     59.4      -0.288 0.774        
+## 2 hightemp        5.70     0.848     6.72  0.00000000171</code></pre>
+<div class="sourceCode" id="cb357"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hightemp</span>, y <span class="op">=</span> <span class="va">volume</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"high temp (F)"</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"number of riders"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-MLR_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;"></div>
+<ol start="3" style="list-style-type: decimal">
+<li>What happens when <code>weekday</code> is included as a binary indicator variable?</li>
+</ol>
+<div class="sourceCode" id="cb358"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">hightemp</span> <span class="op">+</span> <span class="va">weekday</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term        estimate std.error statistic      p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 (Intercept)    42.8     64.3       0.665 0.508       
+## 2 hightemp        5.35     0.846     6.32  0.0000000109
+## 3 weekdayTRUE   -51.6     23.7      -2.18  0.0321</code></pre>
+<div class="sourceCode" id="cb360"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hightemp</span>, y <span class="op">=</span> <span class="va">volume</span>, color <span class="op">=</span> <span class="va">weekday</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">moderndive</span><span class="fu">::</span><span class="fu"><a href="moderndive.github.io/moderndive//reference/geom_parallel_slopes.html">geom_parallel_slopes</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"high temp (F)"</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"number of riders"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-MLR_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;"></div>
+<ul>
+<li>Note that the F p-value is no longer equal to the p-value(s) associated with the t-test for any of the coefficients. Also, the degrees of freedom are now (2, 87) because the model estimates 3 parameters.</li>
+<li>Write out the estimated regression model separately for weekdays and weekends, and sketch the lines onto the scatterplot.</li>
+<li>How are the new coefficients (<span class="math inline">\(b_0, b_1, b_2\)</span>) interpreted?</li>
+<li>How did the coefficient on <code>hightemp</code> change?</li>
+<li>How does <span class="math inline">\(R^2\)</span> change? MSE change?</li>
+<li>Why does it say <code>weekdayTRUE</code> instead of <code>weekday</code>?</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>What if <code>hightemp</code> and <code>weekday</code> <em>interact</em>?</li>
+</ol>
+<div class="sourceCode" id="cb361"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">hightemp</span> <span class="op">*</span> <span class="va">weekday</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 5
+##   term                 estimate std.error statistic p.value
+##   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)            135.      108.        1.25 0.215  
+## 2 hightemp                 4.07      1.47      2.78 0.00676
+## 3 weekdayTRUE           -186.      129.       -1.44 0.153  
+## 4 hightemp:weekdayTRUE     1.91      1.80      1.06 0.292</code></pre>
+<ul>
+<li>Note again that the F p-value is no longer equal to the t-stat p-value(s). Now the degrees of freedom are (3, 86) because the model estimates 4 parameters.</li>
+<li>Write out the estimated regression model separately for weekdays and non-weekdays, and sketch the lines onto the scatterplot.</li>
+<li>How do you interpret your new coefficients (<span class="math inline">\(b_0, b_1, b_2, b_3\)</span>)?</li>
+<li>What happened to the significance? How did the coefficient on <code>weekday</code> change?</li>
+<li>How does <span class="math inline">\(R^2\)</span> change? MSE change?</li>
+</ul>
+<div class="sourceCode" id="cb363"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hightemp</span>, y <span class="op">=</span> <span class="va">volume</span>, color <span class="op">=</span> <span class="va">weekday</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span><span class="op">(</span><span class="st">"high temp (F)"</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"number of riders"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-MLR_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;"></div>
+<ol start="5" style="list-style-type: decimal">
+<li>What happens to the model with an additional quantitative variable?</li>
+</ol>
+<div class="sourceCode" id="cb364"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">hightemp</span> <span class="op">+</span> <span class="va">weekday</span> <span class="op">+</span> <span class="va">precip</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    19.3     60.3       0.320 7.50e- 1
+## 2 hightemp        5.80     0.799     7.26  1.59e-10
+## 3 weekdayTRUE   -43.1     22.2      -1.94  5.52e- 2
+## 4 precip       -146.      38.9      -3.74  3.27e- 4</code></pre>
+<p>Note the p-values, parameter estimates, <span class="math inline">\(R^2\)</span>, MSE, F-stat, df, and F-stat p-values.</p>
+
+</div>
 </div>
   <div class="chapter-nav">
 <div class="prev"><a href="la.html"><span class="header-section-number">8</span> Regression using Matrices</a></div>
 <div class="next"><a href="build.html"><span class="header-section-number">10</span> Model Building</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
-      <ul class="nav navbar-nav"><li><a class="nav-link" href="#mlr"><span class="header-section-number">9</span> Multiple Linear Regression</a></li></ul>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#mlr"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
+<li>
+<a class="nav-link" href="#basic-model-set-up"><span class="header-section-number">9.1</span> Basic Model Set-Up</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#notation"><span class="header-section-number">9.1.1</span> Notation</a></li>
+<li><a class="nav-link" href="#fitting-the-model"><span class="header-section-number">9.1.2</span> Fitting the Model</a></li>
+<li><a class="nav-link" href="#types-of-multiple-regression"><span class="header-section-number">9.1.3</span> Types of Multiple Regression</a></li>
+<li><a class="nav-link" href="#revisiting-other-important-definitions"><span class="header-section-number">9.1.4</span> Revisiting Other Important Definitions</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#inference"><span class="header-section-number">9.2</span> Inference</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#f-test"><span class="header-section-number">9.2.1</span> F-test</a></li>
+<li><a class="nav-link" href="#coefficient-of-multiple-determination"><span class="header-section-number">9.2.2</span> Coefficient of Multiple Determination</a></li>
+<li><a class="nav-link" href="#inference-about-regression-parameters"><span class="header-section-number">9.2.3</span> Inference about Regression Parameters</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#reflection-questions-6"><span class="header-section-number">9.3</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-5"><span class="header-section-number">9.4</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-mlr-with-rail-trails"><span class="header-section-number">9.5</span> R: MLR with Rail Trails}</a></li>
+</ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
@@ -212,7 +955,7 @@ Figure 9.6: The scatterplot looks linear… but the residual plot doesn’t!
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-09.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-15.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

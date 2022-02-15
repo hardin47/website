@@ -24,14 +24,14 @@ Remember, $x_i$ are constants, so we don't think of them as having a distributio
 ### Residuals
 
 \begin{eqnarray*}
-\mbox{residual: } e_i &=& y_i -  \hat{y}_i \ \ \ \mbox{we can measure}\\
-\mbox{error term: } \epsilon_i &=& y_i - E[Y_i] \ \ \ \mbox{we cannot measure}
+\mbox{residual: } e_i &=& Y_i -  \hat{Y}_i \ \ \ \mbox{we can measure}\\
+\mbox{error term: } \epsilon_i &=& Y_i - E[Y_i] \ \ \ \mbox{we cannot measure}
 \end{eqnarray*}
 
 
 **mean:** $\overline{e} = 0$ (by definition!).  Therefore, the average of the residuals provides no information about whether $E[\epsilon]=0$.    
-(note: $\sum e_i = \sum(y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.)  
-**variance:** $$s^2 = \frac{1}{(n-2)} \sum (y_i - \hat{y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE$$
+(note: $\sum e_i = \sum(Y_i - b_0 - b_1 x_i) = 0$ because $\frac{\delta Q}{\delta \beta_0} = 0$.)  
+**variance:** $$s^2 = \frac{1}{(n-2)} \sum (Y_i - \hat{Y}_i)^2 = \frac{1}{(n-2)} \sum (e_i)^2 = \frac{1}{(n-2)} \sum (e_i - \overline{e})^2 = \frac{SSE}{(n-2)} = MSE$$
 **non-independent:** because $\sum e_i=0$, the residuals are not independent.  It is the $\epsilon_i$, errors, we assume to be independent.  
 
 #### semistudentized residuals {-}
@@ -89,9 +89,9 @@ What do I do if the plots show that the conditions don't hold??
 
 #### Why do we plot resid vs. fitted and not vs. observed? {-}
 
-We know that $e_i$ and $\hat{y}_i$ are uncorrelated (this can be shown using linear algebra, also note that $\sum e_i \hat{y}_i = 0$).  So, if we go from the resid vs. fitted scatterplot to the resid vs. observed scatter plot, we shift each point in the x-direction (only) by an amount equal to the residual.  If the residual is negative, then the point will shift to the left.  If the residual is positive, then the point will shift to the right. We thus create a positively correlated relationship (between resid and observed).  The degree of the shift will depend on the relative magnitudes of the residuals and predicted values.
+We know that $e_i$ and $\hat{Y}_i$ are uncorrelated (this can be shown using linear algebra, also note that $\sum e_i \hat{Y}_i = 0$).  So, if we go from the resid vs. fitted scatterplot to the resid vs. observed scatter plot, we shift each point in the x-direction (only) by an amount equal to the residual.  If the residual is negative, then the point will shift to the left.  If the residual is positive, then the point will shift to the right. We thus create a positively correlated relationship (between resid and observed).  The degree of the shift will depend on the relative magnitudes of the residuals and predicted values.
 
-$\Rightarrow e_i \mbox{ and } y_i$ are correlated and therefore **not** independent.  Consider the two examples below.  In both examples, the residual is correlated with the response variable.  However, it is easier to see the correlation when the residual is not also responsible for the relationship between the response variable and the explanatory variable.
+$\Rightarrow e_i \mbox{ and } Y_i$ are correlated and therefore **not** independent.  Consider the two examples below.  In both examples, the residual is correlated with the response variable.  However, it is easier to see the correlation when the residual is not also responsible for the relationship between the response variable and the explanatory variable.
 
 
 
@@ -253,7 +253,6 @@ GDP %>%
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-### Residuals
 1. How do we know if the model conditions hold?
 2. What do we do if the model conditions don't hold?
 3. With a log transformation, how is the slope coefficient interpreted?
