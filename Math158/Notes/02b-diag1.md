@@ -234,7 +234,7 @@ GDP %>%
 ```
 
 \begin{eqnarray*}
-\mbox{median}(\verb;ln_gdp;) &=& \exp(6.11 +  0.0425 \cdot \verb;urban;)
+\mbox{median}(\verb;gdp;) &=& \exp(6.11 +  0.0425 \cdot \verb;urban;)
 \end{eqnarray*}
 
 
@@ -247,7 +247,7 @@ GDP %>%
 
 <div class="figure" style="text-align: center">
 <img src="02b-diag1_files/figure-html/unnamed-chunk-13-1.png" alt="Scatter plot of % urban on the x-axis and GDP on the y-axis, representing a non-linear relationship.  An exponential curve is overlaid to represent the median GDP as a function of % urban." width="672" />
-<p class="caption">(\#fig:unnamed-chunk-13)The red exponential line represents the median GDP at a particular value of % urban.</p>
+<p class="caption">(\#fig:unnamed-chunk-13)The blue exponential line represents the median GDP at a particular value of % urban.</p>
 </div>
 
 
