@@ -258,7 +258,7 @@ SSTO &=& \sum (Y_i - \overline{Y})^2 = \underline{Y}^t \underline{Y} - \bigg(\fr
 Note (with $p=3$, two explanatory variables):
 \begin{eqnarray*}
 E[MSE] &=& \sigma^2\\
-E[MSR] &=& \sigma^2 + 0.5[\beta_1^2 \sum(X_{1i} - \overline{X}_1)^2 + \beta_2^2 \sum(X_{2i} - \overline{X}_2)^2 + 2 \beta_1 \beta_2 \sum(X_{1i} - \overline{X}_1)(X_{2i} - \overline{X}_2)]
+E[MSR] &=& \sigma^2 + 0.5[\beta_1^2 \sum(X_{i1} - \overline{X}_1)^2 + \beta_2^2 \sum(X_{i2} - \overline{X}_2)^2 + 2 \beta_1 \beta_2 \sum(X_{i1} - \overline{X}_1)(X_{i2} - \overline{X}_2)]
 \end{eqnarray*}
 
 
@@ -276,7 +276,7 @@ H_a:&& \mbox{ not all } \beta_k = 0 \mbox{ (some still might be zero)}
 
 As before, we measure the ratio of MSR to MSE to decide whether the regression and error components are measuring the same quantity (residual error).
 \begin{eqnarray*}
-F^* = \frac{MSR}{MSE} \sim F_{(p-1, n-p)}  \mbox{ if $H_0$ is true (!)}
+F = \frac{MSR}{MSE} \sim F_{(p-1, n-p)}  \mbox{ if $H_0$ is true (!)}
 \end{eqnarray*}
 Remember that MSE always estimates $\sigma^2$, but MSR only estimates $\sigma^2$ if all the $\beta_k$ coefficients simultaneously equal zero.
 
@@ -288,9 +288,10 @@ Recall that we measured the proportion of variability explained by the linear mo
 R^2 &=& 0 \mbox{ if } b_k = 0 \ \ \forall k=1, \ldots, p-1\\
 R^2 &=& 1 \mbox{ if } \hat{Y}_i = Y_i \ \ \forall i
 \end{eqnarray*}
-But now we are in a situation where adding more variables *always* increases $R^2$.  That is, as we add more explanatory variables to our model, the $R^2$ value increases.\\
 
-If $\beta_k=0 \forall k$, $E[MSR] = \sigma^2 \rightarrow E[SSR] = \sigma^2(p-1)$, and also $E[SSTO] = \sigma^2(n-1) \rightarrow R^2 \approx (p-1)/(n-1)$.
+But now we are in a situation where adding more variables *always* increases $R^2$.  That is, as we add more explanatory variables to our model, the $R^2$ value increases.
+
+If $\beta_k=0 \ \ \forall k$, $E[MSR] = \sigma^2 \rightarrow E[SSR] = \sigma^2(p-1)$, and also $E[SSTO] = \sigma^2(n-1) \rightarrow R^2 \approx (p-1)/(n-1)$.
 
 #### Adjusted $R^2$ {-}
 
@@ -305,11 +306,11 @@ To account for the problem of $R^2$ increasing with the number of variables, we 
 We know that
 \begin{eqnarray*}
 var\{ \underline{b} \} &=& \sigma^2 (X^t X)^{-1}\\
-s^2\{ \underline{b} \} &=& MSE (X^t X)^{-1}\\
+SE^2\{ \underline{b} \} &=& MSE (X^t X)^{-1}\\
 \end{eqnarray*}
 We can use the estimate and the SE to create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating $p$ parameters, so our degrees of freedom is $n-p$).
 \begin{eqnarray*}
-\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\frac{b_k - \beta_k}{SE\{b_k\}} \sim t_{(n-p)}
 \end{eqnarray*}
 A $(1-\alpha)100\%$ CI for $\beta_k$ is given by$$b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}$$
 Note that the t-test is done separately for EACH $\beta$ coefficient.  Which is to say that we are estimating MSE with all the variables in the model.  The test then asks the effect of removing only the variable at hand.  Both testing and interpretation of the regression coefficients are done *keeping all other variables constant*.
@@ -324,13 +325,13 @@ var(g) &=& c_0^2 var\{b_0\} + c_1^2 var\{b_1\} + \ldots + c_p^2 var\{b_p\} + 2c_
 \end{eqnarray*}
 With the estimate of the difference and the SE, a t-statistic (or create a CI) provides formal inference on coefficients.  Note below that the function `vcov()` estimates the variances and covariance of the coefficients.
 \begin{eqnarray*}
-\hat{var}(b_1 - b_2) &=& (1)^2 s^2\{b_1\} + (-1)^2 s^2\{ b_2\} + 2(1)(-1)\hat{cov}(b_1, b_2)\\
+\hat{var}(b_1 - b_2) &=& (1)^2 SE^2\{b_1\} + (-1)^2 SE^2\{ b_2\} + 2(1)(-1)\hat{cov}(b_1, b_2)\\
 &=& 889 + 1862 -  2*604 = 1543\\
 H_0: && \beta_1 = \beta_2\\
 t-stat &=& \frac{(-50.1 - (-126.8)) - 0}{ \sqrt{1543}} = 1.952\\
 p-value &=& 2 * P(t_{87} \geq 1.952) = 0.054
 \end{eqnarray*}
-The p-value is borderline, but certainly there is not strong evidence to say that fall and spring are significantly different in the model.  Note that fall and spring *are* significantly different from summer (the baseline).  Note:  no days were measured in winter.
+The p-value is borderline, but certainly there is not strong evidence to say that fall and spring are significantly different in the model.  The `tidy()` output shows that  fall *is* significantly different from summer (the baseline) and spring may or may not be different (p-value < 0.1).  Note:  no days were measured in winter.
 
 
 

@@ -298,7 +298,7 @@ SSTO &amp;=&amp; \sum (Y_i - \overline{Y})^2 = \underline{Y}^t \underline{Y} - \
 <p>Note (with <span class="math inline">\(p=3\)</span>, two explanatory variables):
 <span class="math display">\[\begin{eqnarray*}
 E[MSE] &amp;=&amp; \sigma^2\\
-E[MSR] &amp;=&amp; \sigma^2 + 0.5[\beta_1^2 \sum(X_{1i} - \overline{X}_1)^2 + \beta_2^2 \sum(X_{2i} - \overline{X}_2)^2 + 2 \beta_1 \beta_2 \sum(X_{1i} - \overline{X}_1)(X_{2i} - \overline{X}_2)]
+E[MSR] &amp;=&amp; \sigma^2 + 0.5[\beta_1^2 \sum(X_{i1} - \overline{X}_1)^2 + \beta_2^2 \sum(X_{i2} - \overline{X}_2)^2 + 2 \beta_1 \beta_2 \sum(X_{i1} - \overline{X}_1)(X_{i2} - \overline{X}_2)]
 \end{eqnarray*}\]</span></p>
 </div>
 </div>
@@ -317,7 +317,7 @@ H_a:&amp;&amp; \mbox{ not all } \beta_k = 0 \mbox{ (some still might be zero)}
 \end{eqnarray*}\]</span></p>
 <p>As before, we measure the ratio of MSR to MSE to decide whether the regression and error components are measuring the same quantity (residual error).
 <span class="math display">\[\begin{eqnarray*}
-F^* = \frac{MSR}{MSE} \sim F_{(p-1, n-p)}  \mbox{ if $H_0$ is true (!)}
+F = \frac{MSR}{MSE} \sim F_{(p-1, n-p)}  \mbox{ if $H_0$ is true (!)}
 \end{eqnarray*}\]</span>
 Remember that MSE always estimates <span class="math inline">\(\sigma^2\)</span>, but MSR only estimates <span class="math inline">\(\sigma^2\)</span> if all the <span class="math inline">\(\beta_k\)</span> coefficients simultaneously equal zero.</p>
 </div>
@@ -329,9 +329,9 @@ Remember that MSE always estimates <span class="math inline">\(\sigma^2\)</span>
 <span class="math display">\[\begin{eqnarray*}
 R^2 &amp;=&amp; 0 \mbox{ if } b_k = 0 \ \ \forall k=1, \ldots, p-1\\
 R^2 &amp;=&amp; 1 \mbox{ if } \hat{Y}_i = Y_i \ \ \forall i
-\end{eqnarray*}\]</span>
-But now we are in a situation where adding more variables <em>always</em> increases <span class="math inline">\(R^2\)</span>. That is, as we add more explanatory variables to our model, the <span class="math inline">\(R^2\)</span> value increases.\</p>
-<p>If <span class="math inline">\(\beta_k=0 \forall k\)</span>, <span class="math inline">\(E[MSR] = \sigma^2 \rightarrow E[SSR] = \sigma^2(p-1)\)</span>, and also <span class="math inline">\(E[SSTO] = \sigma^2(n-1) \rightarrow R^2 \approx (p-1)/(n-1)\)</span>.</p>
+\end{eqnarray*}\]</span></p>
+<p>But now we are in a situation where adding more variables <em>always</em> increases <span class="math inline">\(R^2\)</span>. That is, as we add more explanatory variables to our model, the <span class="math inline">\(R^2\)</span> value increases.</p>
+<p>If <span class="math inline">\(\beta_k=0 \ \ \forall k\)</span>, <span class="math inline">\(E[MSR] = \sigma^2 \rightarrow E[SSR] = \sigma^2(p-1)\)</span>, and also <span class="math inline">\(E[SSTO] = \sigma^2(n-1) \rightarrow R^2 \approx (p-1)/(n-1)\)</span>.</p>
 <div id="adjusted-r2" class="section level4 unnumbered">
 <h4>Adjusted <span class="math inline">\(R^2\)</span><a class="anchor" aria-label="anchor" href="#adjusted-r2"><i class="fas fa-link"></i></a>
 </h4>
@@ -348,11 +348,11 @@ But now we are in a situation where adding more variables <em>always</em> increa
 <p>We know that
 <span class="math display">\[\begin{eqnarray*}
 var\{ \underline{b} \} &amp;=&amp; \sigma^2 (X^t X)^{-1}\\
-s^2\{ \underline{b} \} &amp;=&amp; MSE (X^t X)^{-1}\\
+SE^2\{ \underline{b} \} &amp;=&amp; MSE (X^t X)^{-1}\\
 \end{eqnarray*}\]</span>
 We can use the estimate and the SE to create a test statistic that will have a t distribution when the null hypothesis is true (note that we are now estimating <span class="math inline">\(p\)</span> parameters, so our degrees of freedom is <span class="math inline">\(n-p\)</span>).
 <span class="math display">\[\begin{eqnarray*}
-\frac{b_k - \beta_k}{s\{b_k\}} \sim t_{(n-p)}
+\frac{b_k - \beta_k}{SE\{b_k\}} \sim t_{(n-p)}
 \end{eqnarray*}\]</span>
 A <span class="math inline">\((1-\alpha)100\%\)</span> CI for <span class="math inline">\(\beta_k\)</span> is given by<span class="math display">\[b_k \pm t_{(1-\alpha/2, n-p)} s\{b_k\}\]</span>
 Note that the t-test is done separately for EACH <span class="math inline">\(\beta\)</span> coefficient. Which is to say that we are estimating MSE with all the variables in the model. The test then asks the effect of removing only the variable at hand. Both testing and interpretation of the regression coefficients are done <em>keeping all other variables constant</em>.</p>
@@ -368,13 +368,13 @@ var(g) &amp;=&amp; c_0^2 var\{b_0\} + c_1^2 var\{b_1\} + \ldots + c_p^2 var\{b_p
 \end{eqnarray*}\]</span>
 With the estimate of the difference and the SE, a t-statistic (or create a CI) provides formal inference on coefficients. Note below that the function <code><a href="https://rdrr.io/r/stats/vcov.html">vcov()</a></code> estimates the variances and covariance of the coefficients.
 <span class="math display">\[\begin{eqnarray*}
-\hat{var}(b_1 - b_2) &amp;=&amp; (1)^2 s^2\{b_1\} + (-1)^2 s^2\{ b_2\} + 2(1)(-1)\hat{cov}(b_1, b_2)\\
+\hat{var}(b_1 - b_2) &amp;=&amp; (1)^2 SE^2\{b_1\} + (-1)^2 SE^2\{ b_2\} + 2(1)(-1)\hat{cov}(b_1, b_2)\\
 &amp;=&amp; 889 + 1862 -  2*604 = 1543\\
 H_0: &amp;&amp; \beta_1 = \beta_2\\
 t-stat &amp;=&amp; \frac{(-50.1 - (-126.8)) - 0}{ \sqrt{1543}} = 1.952\\
 p-value &amp;=&amp; 2 * P(t_{87} \geq 1.952) = 0.054
 \end{eqnarray*}\]</span>
-The p-value is borderline, but certainly there is not strong evidence to say that fall and spring are significantly different in the model. Note that fall and spring <em>are</em> significantly different from summer (the baseline). Note: no days were measured in winter.</p>
+The p-value is borderline, but certainly there is not strong evidence to say that fall and spring are significantly different in the model. The <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> output shows that fall <em>is</em> significantly different from summer (the baseline) and spring may or may not be different (p-value &lt; 0.1). Note: no days were measured in winter.</p>
 <div class="sourceCode" id="cb346"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">RailTrail</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">volume</span> <span class="op">~</span> <span class="va">spring</span> <span class="op">+</span> <span class="va">fall</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
