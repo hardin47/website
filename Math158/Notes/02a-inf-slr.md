@@ -13,8 +13,8 @@ recall:  $$b_1 = \frac{\sum(x_i - \overline{x})(y_i - \overline{y})}{\sum(x_i - 
 We also know that,
 \begin{eqnarray*}
 E[b_1] &=& \beta_1\\
-\sigma^2\{b_1\} &=& \frac{\sigma^2}{\sum(x_i - \overline{x})^2}\\
-s^2\{ b_1 \} &=& \frac{MSE}{\sum(x_i - \overline{x})^2}\\
+Var\{b_1\} &=& \frac{\sigma^2}{\sum(x_i - \overline{x})^2}\\
+SE^2\{ b_1 \} &=& \frac{MSE}{\sum(x_i - \overline{x})^2}\\
 \end{eqnarray*}
 The variability of the *slope* becomes smaller for $x_i$ values that are more spread out.  This should make sense to you intuitively because if the $x_i$ values are spread out, slight deviations in their measurements (i.e., different random samples) won't change the slope of the line very much.  But if the $x_i$ exist only in a narrow range, it would be easy to get vastly different $b_1$ values depending on the particular random sample.  
 

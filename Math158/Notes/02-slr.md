@@ -86,8 +86,8 @@ $$\epsilon_i \stackrel{iid}{\sim} N(0, \sigma^2)$$
 2. $Y_i$ is a random variable because of $\epsilon_i$.  
 3. We assume $E[\epsilon_i]=0$, therefore $E[Y_i | x_i] = \beta_0 + \beta_1 x_i$.  (E is the expected value which can be thought of as the long run average or the population mean.)  That is, the relationship between the explanatory and response variables is **linear**.  
 4. $\epsilon_i$ is the amount by which $Y_i$ values exceed or fall short of the regression line.  
-5. $var\{Y_i | x_i\} = \sigma^2\{Y_i | x_i \} = \sigma^2\{\epsilon_i\} = \sigma^2 \rightarrow$ we have **constant variance** around the regression line.  
-6. $\sigma\{Y_i, Y_j\} = \sigma\{\epsilon_i, \epsilon_j \} = 0 \rightarrow$ the **error terms are uncorrelated**.  
+5. $var\{Y_i | x_i\}  = var\{\epsilon_i\} = \sigma^2 \rightarrow$ we have **constant variance** around the regression line.  
+6. $SD\{Y_i, Y_j\} = SD\{\epsilon_i, \epsilon_j \} = 0 \rightarrow$ the **error terms are uncorrelated**.  
 7. $\epsilon_i \sim N(0, \sigma^2)$, the error terms are **normally distributed**.  
 8. $Y_i \sim N(\beta_0 + \beta_1 x_i, \sigma^2)$  
 
@@ -113,7 +113,7 @@ $$E[Y_i | x_i] = \mu_{Y_i|x_i}=\beta_0+\beta_1 x_i$$ where $\mu$ represents the 
 3. **Condition of Constant Variance**  The error terms, in addition to having a mean of 0, are assumed to have a variance $\sigma^2$ that does not depend on the value of $x_i$.  This is assumed because we are
 looking at each point with equal importance.  Suppose that we knew that at a particular value of $x_i$, the variance of $\epsilon_i$ was 0. Then the observed value of $y_i$ is actually $\mu_y$, and
 thus we should force our line to go through that point, since the true line goes through that point.  This is an extreme case, but in the case of non-constant variance, we should regard the values
-observed with smaller variation with higher importance, as they will tend to be more accurate.  We denote the variance condition by $$Var(Y_i|x_i)=\sigma^2\{Y_i|x_i\}=\sigma^2.$$  
+observed with smaller variation with higher importance, as they will tend to be more accurate.  We denote the variance condition by $$Var(Y_i|x_i)=\sigma^2.$$  
 
 4. **Condition of a Normal Distribution**  Lastly, we assume that the distribution of the error terms is normal, a common distribution.  The reason for the normal condition is theoretic, as the techniques we will be using to say something about the $\beta_i$ based on the $b_i$ and the data assumes the normal distribution, as its easy to work with.  
 
