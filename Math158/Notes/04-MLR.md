@@ -62,7 +62,7 @@ estimation.
 In the previous example, $p=3$, in order to estimate $\beta_0$,
 $\beta_1$ and $\beta_2$.  There were two independent variables, high temperature and weekday status.  
 
-**Qualitative Predictor Variables**:  When including a categorical variable in the model, it must be written as one (or more) binary varables.  For example, 
+**Qualitative Predictor Variables**:  When including a categorical variable in the model, it must be written as one (or more) binary variables.  For example, 
 
 \begin{eqnarray*}X_2=\begin{aligned} &0& \quad &\mbox{if  weekend}&\\
 &1&\quad &\mbox{if  weekday}&\end{aligned}\end{eqnarray*} 
@@ -405,8 +405,8 @@ In the text we will skip:
 
 
 
+### Criteria for Evaluating Models
 
-\subsection{Criteria for Evaluating Models}
 The idea for a good model is to find a balance between having small residuals and having too many predictors.  That is, MSE should be small, but $p$ to be small as well.  Recall that $R^2_a$ does balance MSE and $p$, but in one specific way.  Other ideas are given below.  Later, models will be built using p-values for F-tests.  However, there are myriad criteria that optimize the given model (i.e., which variables are best to include).  Consider using the criteria to compare models with differing number of variables (same response, same model structure).   The following are defined as:
 
 \begin{eqnarray*}
@@ -424,7 +424,7 @@ SSE_{full} &=& SSE \mbox{ from the  model with all possible parameters}
 | $C_p$       	| trade off between SSE and $p$     	| close to $p$ / small                                	|
 | $AIC_p$     	| Akaike's Information Criterion    	| small                                               	|
 | $SBC_p$     	| Bayesian Information Criterion    	| small                                               	|
-| F*          	| F test statistic                  	| big (for simpler models)  (see section \ref{nestF}) 	|
+| F*          	| F test statistic                  	| big (for simpler models)  (see section \@ref(sec:nestF) )	|
  
 $C_p$:   $$C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)$$    
 $AIC_p$: $$AIC_p = n \ln(SSE_p) - n \ln(n) + 2p$$    
@@ -463,17 +463,19 @@ C_P &=& \frac{SSE_P}{MSE_P} - (n-2P)\\
 Estimating $\sigma^2$ using $MSE_{full}$ assumes that there are no biases in the full model with all of the predictors, an assumption that may or may not be valid, but can't be tested without additional information (at the very least you have to have all of the important predictors involved).
 
 AIC and SBC are based on maximum likelihood estimates of the model parameters.  The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data.  The likelihood is a number between 0 and 1.  For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2.  In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical.  However, when using least squares versus maximum likelihood, there is a difference in estimating $\sigma^2$.  We have been using the *unbiased* estimate of $\sigma^2$ which is MSE = SSE / (n-p).  The maximum likelihood estimate of $\sigma^2$ is SSE/n.  The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating $p$ regression coefficients *and* $\sigma^2$, we are actually estimating $p+1$ parameters.  In short, the full AIC is given by the following.
+
 \begin{eqnarray}
 E[AIC] &=& -2 \ln(L) + 2(p+1)\\\
-&=& -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) \label{sigi}\\
-&=& -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) \label{sig}\\
-AIC &=& -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) \label{mse}\\
+&=& -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) (\#eq:sigi)\\
+&=& -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) (\#eq:sig)\\
+AIC &=& -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) (\#eq:mse)\\
 &=& 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
 &=& n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
 &=& n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
 &=& n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
 \end{eqnarray}
-To go from ~\eqref{sigi} to ~\eqref{sig} we assume that $\sigma^2 = \sigma_i^2$; that is, the variance is constant for all individuals.  To go from ~\eqref{sig} to ~\eqref{mse} we approximate $\sigma^2$ (and $E[Y_i]$) using the maximum likelihood estimates for $\sigma^2 = SSE / n$ and $\beta_k$.  
+
+To go from \@ref(eq:sigi) to \@ref(eq:sig) we assume that $\sigma^2 = \sigma_i^2$; that is, the variance is constant for all individuals.  To go from \@ref(eq:sig) to \@ref(eq:mse) we approximate $\sigma^2$ (and $E[Y_i]$) using the maximum likelihood estimates for $\sigma^2 = SSE / n$ and $\beta_k$.  
 SBC (BIC) uses the posterior likelihood and a similar derivation.  SBC can be given as the following.
 \begin{eqnarray*}
 SBC &=& -2 \ln(L_{posterior}) + \ln(n) (p+1)\\
@@ -482,6 +484,57 @@ SBC &=& -2 \ln(L_{posterior}) + \ln(n) (p+1)\\
 \end{eqnarray*}
 Note that in both AIC and SBC we don't consider the constant term because models are compared on the same data ($n$ is the same).
 
+
+#### AIC & BIC {-}
+
+Estimators of prediction error and *relative* quality of models:
+
+
+**Akaike's Information Criterion (AIC)**: $$AIC = n\log(SS_\text{Error}) - n \log(n) + 2(p+1)$$ <br>
+
+
+**Schwarz's Bayesian Information Criterion (BIC)**: $$BIC = n\log(SS_\text{Error}) - n\log(n) + log(n)\times(p+1)$$
+
+
+$$
+\begin{aligned} 
+& AIC = \color{blue}{n\log(SS_\text{Error})} - n \log(n) + 2(p+1) \\
+& BIC = \color{blue}{n\log(SS_\text{Error})} - n\log(n) + \log(n)\times(p+1) 
+\end{aligned}
+$$
+
+First Term: Decreases as *p* increases
+
+
+$$
+\begin{aligned} 
+& AIC = n\log(SS_\text{Error}) - \color{blue}{n \log(n)} + 2(p+1) \\
+& BIC = n\log(SS_\text{Error}) - \color{blue}{n\log(n)} + \log(n)\times(p+1) 
+\end{aligned}
+$$
+
+Second Term: Fixed for a given sample size *n*
+
+
+$$
+\begin{aligned} & AIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{2(p+1)} \\
+& BIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{\log(n)\times(p+1)} 
+\end{aligned}
+$$
+
+Third Term: Increases as *p* increases
+
+#### Using AIC & BIC {-}
+
+$$
+\begin{aligned} & AIC = n\log(SS_{Error}) - n \log(n) + \color{red}{2(p+1)} \\
+& BIC = n\log(SS_{Error}) - n\log(n) + \color{red}{\log(n)\times(p+1)} 
+\end{aligned}
+$$
+
+-   Choose model with the smaller value of AIC or BIC
+
+-   If $n \geq 8$, the **penalty** for BIC is larger than that of AIC, so BIC tends to favor *more parsimonious* models (i.e. models with fewer terms)
 
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
@@ -709,5 +762,264 @@ RailTrail %>%
 ```
 
 Note the p-values, parameter estimates, $R^2$, MSE, F-stat, df, and F-stat p-values.
+
+
+## R: Model comparison with Restaurant tips^[Thanks to Mine Centinkaya-Rundel for the majority of the content in this example.  Mine's course is at https://mine-cr.com/teaching/sta210/.]
+
+A student collected data from a restaurant where she was a waitress [@tips]. The student was interested in learning under what conditions a waitress can expect the largest tips—for example: At dinner time or late at night? From younger or older patrons? From patrons receiving free meals? From patrons drinking alcohol? From patrons tipping with cash or credit? And should tip amount be measured as total dollar amount or as a percentage? 
+
+> Which variables help us predict the amount customers tip at a restaurant?  Which model is best?
+
+Instead of jumping into the predictions immediately, let's look at the data itself.  What wrangling can we do to the data in order to make the model accurate and easy to communicate?
+
+
+
+
+```
+## # A tibble: 169 × 4
+##      Tip Party Meal   Age   
+##    <dbl> <dbl> <chr>  <chr> 
+##  1  2.99     1 Dinner Yadult
+##  2  2        1 Dinner Yadult
+##  3  5        1 Dinner SenCit
+##  4  4        3 Dinner Middle
+##  5 10.3      2 Dinner SenCit
+##  6  4.85     2 Dinner Middle
+##  7  5        4 Dinner Yadult
+##  8  4        3 Dinner Middle
+##  9  5        2 Dinner Middle
+## 10  1.58     1 Dinner SenCit
+## # … with 159 more rows
+```
+
+### Variables
+
+**Predictors / Explanatory**:
+
+
+-   `Party`: Number of people in the party
+-   `Meal`: Time of day (Lunch, Dinner, Late Night)
+-   `Age`: Age category of person paying the bill (Yadult, Middle, SenCit)
+
+
+**Outcome / Response**: `Tip`: Amount of tip
+
+#### Response: `Tip` {-}
+
+<img src="04-MLR_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Explanatory {-}
+
+<img src="04-MLR_files/figure-html/unnamed-chunk-27-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Relevel categorical explanatory {-}
+
+
+```r
+tips <- tips %>%
+  mutate(
+    Meal = fct_relevel(Meal, "Lunch", "Dinner", "Late Night"),
+    Age  = fct_relevel(Age, "Yadult", "Middle", "SenCit")
+  )
+```
+
+#### Explanatory, again {-}
+
+<img src="04-MLR_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+
+#### Response vs. predictors {-}
+
+<img src="04-MLR_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
+
+### Fit and summarize model
+
+
+```r
+tip_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age, data = tips)
+
+tidy(tip_fit, conf.int = TRUE) %>%
+  kable(digits = 3)
+```
+
+
+
+|term        | estimate| std.error| statistic| p.value| conf.low| conf.high|
+|:-----------|--------:|---------:|---------:|-------:|--------:|---------:|
+|(Intercept) |    -0.17|     0.366|    -0.465|   0.643|   -0.893|     0.553|
+|Party       |     1.84|     0.124|    14.758|   0.000|    1.591|     2.083|
+|AgeMiddle   |     1.01|     0.408|     2.475|   0.014|    0.204|     1.813|
+|AgeSenCit   |     1.39|     0.485|     2.862|   0.005|    0.430|     2.345|
+
+
+#### R-squared, $R^2$ {-}
+
+**Recall**: $R^2$ is the proportion of the variation in the response variable explained by the regression model.
+
+$$
+R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}} = 1 - \frac{686.44}{1913.11} = 0.641
+$$
+
+
+```r
+glance(tip_fit)
+```
+
+```
+## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
+## 1     0.641         0.635  2.04      98.3 1.56e-36     3  -358.  726.  742.
+## # … with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
+```
+
+### Model comparison
+
+#### R-squared, $R^2$ {-}
+
+-   $R^2$ will always increase as we add more variables to the model + If we add enough variables, we can always achieve $R^2=100\%$
+-   If we only use $R^2$ to choose a best fit model, we will be prone to choose the model with the most predictor variables
+
+#### Adjusted $R^2$ {-}
+
+-   **Adjusted** $R^2$: measure that includes a penalty for unnecessary predictor variables
+-   Similar to $R^2$, it is a measure of the amount of variation in the response that is explained by the regression model
+-   Differs from $R^2$ by using the mean squares rather than sums of squares and therefore adjusting for the number of predictor variables
+
+
+$$R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}}$$
+
+$$R^2_{adj} = 1 - \frac{SS_{Error}/(n-p-1)}{SS_{Total}/(n-1)}$$
+
+-   Adjusted $R^2$ can be used as a quick assessment to compare the fit of multiple models; however, it should not be the only assessment!
+-   Use $R^2$ when describing the relationship between the response and predictor variables
+
+
+```r
+tip_fit_1 <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age +  Meal, data = tips)
+
+glance(tip_fit_1) %>% 
+  select(r.squared, adj.r.squared)
+```
+
+```
+## # A tibble: 1 × 2
+##   r.squared adj.r.squared
+##       <dbl>         <dbl>
+## 1     0.674         0.664
+```
+
+
+```r
+tip_fit_2 <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age + Meal + Day, data = tips)
+
+glance(tip_fit_2) %>% 
+  select(r.squared, adj.r.squared)
+```
+
+```
+## # A tibble: 1 × 2
+##   r.squared adj.r.squared
+##       <dbl>         <dbl>
+## 1     0.683         0.662
+```
+
+
+
+#### Comparing models with AIC and BIC {-}
+
+
+```r
+tip_fit_1 <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age + Meal, data = tips)
+
+glance(tip_fit_1) %>% 
+  select(AIC, BIC)
+```
+
+```
+## # A tibble: 1 × 2
+##     AIC   BIC
+##   <dbl> <dbl>
+## 1  714.  736.
+```
+
+
+
+```r
+tip_fit_2 <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age + Meal + Day, data = tips)
+
+glance(tip_fit_2) %>% 
+  select(AIC, BIC)
+```
+
+```
+## # A tibble: 1 × 2
+##     AIC   BIC
+##   <dbl> <dbl>
+## 1  720.  757.
+```
+
+
+### Commonalities between criteria
+
+-   $R^2_{adj}$, AIC, and BIC all apply a penalty for more predictors
+-   The penalty for added model complexity attempts to strike a balance between underfitting (too few predictors in the model) and overfitting (too many predictors in the model)
+-   Goal: **Parsimony**
+
+#### Parsimony and Occam's razor {-}
+
+-   The principle of **parsimony** is attributed to William of Occam (early 14th-century English nominalist philosopher), who insisted that, given a set of equally good explanations for a given phenomenon, *the correct explanation is the simplest explanation*^[[@Rbook]]
+
+-   Called **Occam's razor** because he "shaved" his explanations down to the bare minimum  
+-   Parsimony in modeling:  
+  -   models should have as few parameters as possible 
+  -   linear models should be preferred to non-linear models 
+  -   experiments relying on few assumptions should be preferred to those relying on many 
+  -   models should be pared down until they are *minimal adequate* 
+  -   simple explanations should be preferred to complex explanations 
+    
+
+#### In pursuit of Occam's razor {-}
+
+-   Occam's razor states that among competing hypotheses that predict equally well, the one with the fewest assumptions should be selected
+
+-   Model selection follows this principle
+
+-   We only want to add another variable to the model if the addition of that variable brings something valuable in terms of predictive power to the model
+
+-   In other words, we prefer the simplest best model, i.e. **parsimonious** model
+
+#### Alternate views {-}
+
+> Sometimes a simple model will outperform a more complex model .
+> . . Nevertheless, I believe that deliberately limiting the complexity of the model is not fruitful when the problem is evidently complex.
+> Instead, if a simple model is found that outperforms some particular complex model, the appropriate response is to define a different complex model that captures whatever aspect of the problem led to the simple model performing well.
+>
+> <br>
+>
+> Radford Neal - Bayesian Learning for Neural Networks[Suggested blog post: [Occam](https://statmodeling.stat.columbia.edu/2012/06/26/occam-2/) by Andrew Gelman]
+
+
+#### Other concerns with the approach {-}
+
+-   All criteria we considered for model comparison require making predictions for our data and then uses the prediction error ($SS_{Error}$) somewhere in the formula
+-   But we're making prediction for the data we used to build the model (estimate the coefficients), which can lead to **overfitting**
+-   Instead we should
+    -   split our data into testing and training sets
+    -   "train" the model on the training data and pick a few models we're genuinely considering as potentially good models
+    -   test those models on the testing set
+
+
+
+
 
 

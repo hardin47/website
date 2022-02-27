@@ -5,9 +5,119 @@
 
 When we get there, use the function `bestregsubsets()`.
 
+> Is this the best model to explain variation in tips?
+
+
+## Another model summary^[Thanks to Mine Centinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.]
 
 
 
+
+
+
+
+
+```r
+anova(tip_fit$fit) %>%
+  tidy() %>%
+  kable(digits = 2)
+```
+
+
+
+|term      |  df| sumsq|  meansq| statistic| p.value|
+|:---------|---:|-----:|-------:|---------:|-------:|
+|Party     |   1|  1189| 1188.64|    285.71|    0.00|
+|Age       |   2|    38|   19.01|      4.57|    0.01|
+|Residuals | 165|   686|    4.16|        NA|      NA|
+
+# Analysis of variance (ANOVA)
+
+## Analysis of variance (ANOVA)
+
+-   **Main Idea:** Decompose the total variation on the outcome into:
+    -   the variation that can be explained by the each of the variables in the model
+
+    -   the variation that **can't** be explained by the model (left in the residuals)
+-   If the variation that can be explained by the variables in the model is greater than the variation in the residuals, this signals that the model might be "valuable" (at least one of the $\beta$s not equal to 0)
+
+## ANOVA output
+
+
+```r
+anova(tip_fit$fit) %>%
+  tidy() %>%
+  kable(digits = 2)
+```
+
+
+
+|term      |  df| sumsq|  meansq| statistic| p.value|
+|:---------|---:|-----:|-------:|---------:|-------:|
+|Party     |   1|  1189| 1188.64|    285.71|    0.00|
+|Age       |   2|    38|   19.01|      4.57|    0.01|
+|Residuals | 165|   686|    4.16|        NA|      NA|
+
+## ANOVA output, with totals
+
+
+|term      |  df| sumsq|meansq  |statistic |p.value |
+|:---------|---:|-----:|:-------|:---------|:-------|
+|Party     |   1|  1189|1188.64 |285.71    |0       |
+|Age       |   2|    38|19.01   |4.57      |0.01    |
+|Residuals | 165|   686|4.16    |          |        |
+|Total     | 168|  1913|        |          |        |
+
+## Sum of squares
+
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> term </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> sumsq </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Party </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;background-color: #D9E3E4 !important;"> 1189 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;background-color: #D9E3E4 !important;"> 38 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Residuals </td>
+   <td style="text-align:right;"> 165 </td>
+   <td style="text-align:right;background-color: #D9E3E4 !important;"> 686 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Total </td>
+   <td style="text-align:right;"> 168 </td>
+   <td style="text-align:right;background-color: #D9E3E4 !important;"> 1913 </td>
+  </tr>
+</tbody>
+</table>
+
+
+-   $SS_{Total}$: Total sum of squares, variability of outcome, $\sum_{i = 1}^n (y_i - \bar{y})^2$
+-   $SS_{Error}$: Residual sum of squares, variability of residuals, $\sum_{i = 1}^n (y_i - \hat{y})^2$
+-   $SS_{Model} = SS_{Total} - SS_{Error}$: Variability explained by the model
+
+
+
+## Testing Sets of Coefficients {#sec:nestF}
+
+## Model Selection
+
+## Other ways for comparing models
+
+## Getting the Variables Right
+
+## One Model Building Strategy
 
 ### Thoughts on Model Selection...
 

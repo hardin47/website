@@ -4,20 +4,21 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Chapter 10 Model Building | Linear Models</title>
+<title>Chapter 11 Model Building | Linear Models</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="When we get there, use the function bestregsubsets().  10.0.1 Thoughts on Model Selection… Question: Did females receive lower starting salaries than males? [From The Statistical Sleuth by Ramsey...">
+<meta name="description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips?  11.1 Another model summary7 anova(tip_fit$fit) %&gt;%  tidy() %&gt;%  kable(digits = 2) term...">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
-<meta property="og:title" content="Chapter 10 Model Building | Linear Models">
+<meta property="og:title" content="Chapter 11 Model Building | Linear Models">
 <meta property="og:type" content="book">
-<meta property="og:description" content="When we get there, use the function bestregsubsets().  10.0.1 Thoughts on Model Selection… Question: Did females receive lower starting salaries than males? [From The Statistical Sleuth by Ramsey...">
+<meta property="og:description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips?  11.1 Another model summary7 anova(tip_fit$fit) %&gt;%  tidy() %&gt;%  kable(digits = 2) term...">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Chapter 10 Model Building | Linear Models">
-<meta name="twitter:description" content="When we get there, use the function bestregsubsets().  10.0.1 Thoughts on Model Selection… Question: Did females receive lower starting salaries than males? [From The Statistical Sleuth by Ramsey...">
+<meta name="twitter:title" content="Chapter 11 Model Building | Linear Models">
+<meta name="twitter:description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips?  11.1 Another model summary7 anova(tip_fit$fit) %&gt;%  tidy() %&gt;%  kable(digits = 2) term...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
-<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script type="text/x-mathjax-config">
     const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
     for (let popover of popovers){
       const div = document.createElement('div');
@@ -66,11 +67,13 @@
 <li><a class="" href="simult.html"><span class="header-section-number">7</span> Simultaneous Inference</a></li>
 <li><a class="" href="la.html"><span class="header-section-number">8</span> Regression using Matrices</a></li>
 <li><a class="" href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
-<li><a class="active" href="build.html"><span class="header-section-number">10</span> Model Building</a></li>
-<li><a class="" href="diag2.html"><span class="header-section-number">11</span> Diagnostics II</a></li>
-<li><a class="" href="shrink.html"><span class="header-section-number">12</span> Shrinkage Methods</a></li>
-<li><a class="" href="smooth.html"><span class="header-section-number">13</span> Smoothing Methods</a></li>
-<li><a class="" href="anova.html"><span class="header-section-number">14</span> ANOVA</a></li>
+<li><a class="" href="process.html"><span class="header-section-number">10</span> Modeling as a Process6</a></li>
+<li><a class="active" href="build.html"><span class="header-section-number">11</span> Model Building</a></li>
+<li><a class="" href="analysis-of-variance-anova.html"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></li>
+<li><a class="" href="diag2.html"><span class="header-section-number">13</span> Diagnostics II</a></li>
+<li><a class="" href="shrink.html"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
+<li><a class="" href="smooth.html"><span class="header-section-number">15</span> Smoothing Methods</a></li>
+<li><a class="" href="anova.html"><span class="header-section-number">16</span> ANOVA</a></li>
 <li><a class="" href="references.html">References</a></li>
 </ul>
 
@@ -79,32 +82,70 @@
         </div>
       </nav>
 </div>
-  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="build" class="section level1" number="10">
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="build" class="section level1" number="11">
 <h1>
-<span class="header-section-number">10</span> Model Building<a class="anchor" aria-label="anchor" href="#build"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11</span> Model Building<a class="anchor" aria-label="anchor" href="#build"><i class="fas fa-link"></i></a>
 </h1>
 <p>When we get there, use the function <code>bestregsubsets()</code>.</p>
-<div id="thoughts-on-model-selection" class="section level3" number="10.0.1">
-<h3>
-<span class="header-section-number">10.0.1</span> Thoughts on Model Selection…<a class="anchor" aria-label="anchor" href="#thoughts-on-model-selection"><i class="fas fa-link"></i></a>
-</h3>
-<p>Question: Did females receive lower starting salaries than males? [From <strong>The Statistical Sleuth</strong> by Ramsey and Schafer]</p>
-<p>model: y = log(salary), x’s: seniority, age, experience, education, sex.</p>
-<p>In the Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex) In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in. What are the pluses/minuses of these approaches?</p>
-<p><strong>Response</strong> It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn’t start with sex would be more likely to include those associated covariates to start with.<br>
-One nice aspect of both methods in that they both end up with sex in the model; one difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn’t matter. However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.<br>
-In this case there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that’s part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one “best” model can be misleading.</p>
+<blockquote>
+<p>Is this the best model to explain variation in tips?</p>
+</blockquote>
+<div id="another-model-summary" class="section level2" number="11.1">
+<h2>
+<span class="header-section-number">11.1</span> Another model summary<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Thanks to Mine Centinkaya-Rundel for the majority of the content in this section Mine’s course is at &lt;a href="https://mine-cr.com/teaching/sta210/" class="uri"&gt;https://mine-cr.com/teaching/sta210/&lt;/a&gt;.&lt;/p&gt;'><sup>7</sup></a><a class="anchor" aria-label="anchor" href="#another-model-summary"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb473"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">tip_fit</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">kable</span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="right">meansq</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Party</td>
+<td align="right">1</td>
+<td align="right">1189</td>
+<td align="right">1188.64</td>
+<td align="right">285.71</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="right">2</td>
+<td align="right">38</td>
+<td align="right">19.01</td>
+<td align="right">4.57</td>
+<td align="right">0.01</td>
+</tr>
+<tr class="odd">
+<td align="left">Residuals</td>
+<td align="right">165</td>
+<td align="right">686</td>
+<td align="right">4.16</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
 
-</div>
-</div>
   <div class="chapter-nav">
-<div class="prev"><a href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></div>
-<div class="next"><a href="diag2.html"><span class="header-section-number">11</span> Diagnostics II</a></div>
+<div class="prev"><a href="process.html"><span class="header-section-number">10</span> Modeling as a Process6</a></div>
+<div class="next"><a href="analysis-of-variance-anova.html"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
-      <ul class="nav navbar-nav"><li>
-<a class="nav-link" href="#build"><span class="header-section-number">10</span> Model Building</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#thoughts-on-model-selection"><span class="header-section-number">10.0.1</span> Thoughts on Model Selection…</a></li></ul>
-</li></ul>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#build"><span class="header-section-number">11</span> Model Building</a></li>
+<li><a class="nav-link" href="#another-model-summary"><span class="header-section-number">11.1</span> Another model summary7</a></li>
+</ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
@@ -121,7 +162,7 @@ In this case there are two questions of interest; are there differences at all (
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-17.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-26.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

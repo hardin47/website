@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 12 Analysis of variance (ANOVA) | Linear Models</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="12.1 Analysis of variance (ANOVA)  Main Idea: Decompose the total variation on the outcome into: the variation that can be explained by the each of the variables in the model the variation that...">
+<meta name="generator" content="bookdown 0.24 with bs4_book()">
+<meta property="og:title" content="Chapter 12 Analysis of variance (ANOVA) | Linear Models">
+<meta property="og:type" content="book">
+<meta property="og:description" content="12.1 Analysis of variance (ANOVA)  Main Idea: Decompose the total variation on the outcome into: the variation that can be explained by the each of the variables in the model the variation that...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 12 Analysis of variance (ANOVA) | Linear Models">
+<meta name="twitter:description" content="12.1 Analysis of variance (ANOVA)  Main Idea: Decompose the total variation on the outcome into: the variation that can be explained by the each of the variables in the model the variation that...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Linear Models</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="wrang.html"><span class="header-section-number">2</span> Data Wrangling</a></li>
+<li><a class="" href="viz.html"><span class="header-section-number">3</span> Visualization</a></li>
+<li><a class="" href="slr.html"><span class="header-section-number">4</span> Simple Linear Regression</a></li>
+<li><a class="" href="infslr.html"><span class="header-section-number">5</span> Inference on SLR Parameters</a></li>
+<li><a class="" href="diag1.html"><span class="header-section-number">6</span> Diagnostic Measures I</a></li>
+<li><a class="" href="simult.html"><span class="header-section-number">7</span> Simultaneous Inference</a></li>
+<li><a class="" href="la.html"><span class="header-section-number">8</span> Regression using Matrices</a></li>
+<li><a class="" href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
+<li><a class="" href="process.html"><span class="header-section-number">10</span> Modeling as a Process6</a></li>
+<li><a class="" href="build.html"><span class="header-section-number">11</span> Model Building</a></li>
+<li><a class="active" href="analysis-of-variance-anova.html"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></li>
+<li><a class="" href="diag2.html"><span class="header-section-number">13</span> Diagnostics II</a></li>
+<li><a class="" href="shrink.html"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
+<li><a class="" href="smooth.html"><span class="header-section-number">15</span> Smoothing Methods</a></li>
+<li><a class="" href="anova.html"><span class="header-section-number">16</span> ANOVA</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="analysis-of-variance-anova" class="section level1" number="12">
+<h1>
+<span class="header-section-number">12</span> Analysis of variance (ANOVA)<a class="anchor" aria-label="anchor" href="#analysis-of-variance-anova"><i class="fas fa-link"></i></a>
+</h1>
+<div id="analysis-of-variance-anova-1" class="section level2" number="12.1">
+<h2>
+<span class="header-section-number">12.1</span> Analysis of variance (ANOVA)<a class="anchor" aria-label="anchor" href="#analysis-of-variance-anova-1"><i class="fas fa-link"></i></a>
+</h2>
+<ul>
+<li>
+<strong>Main Idea:</strong> Decompose the total variation on the outcome into:
+<ul>
+<li><p>the variation that can be explained by the each of the variables in the model</p></li>
+<li><p>the variation that <strong>can’t</strong> be explained by the model (left in the residuals)</p></li>
+</ul>
+</li>
+<li>If the variation that can be explained by the variables in the model is greater than the variation in the residuals, this signals that the model might be “valuable” (at least one of the <span class="math inline">\(\beta\)</span>s not equal to 0)</li>
+</ul>
+</div>
+<div id="anova-output-1" class="section level2" number="12.2">
+<h2>
+<span class="header-section-number">12.2</span> ANOVA output<a class="anchor" aria-label="anchor" href="#anova-output-1"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb474"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">tip_fit</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">kable</span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="right">meansq</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Party</td>
+<td align="right">1</td>
+<td align="right">1189</td>
+<td align="right">1188.64</td>
+<td align="right">285.71</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="right">2</td>
+<td align="right">38</td>
+<td align="right">19.01</td>
+<td align="right">4.57</td>
+<td align="right">0.01</td>
+</tr>
+<tr class="odd">
+<td align="left">Residuals</td>
+<td align="right">165</td>
+<td align="right">686</td>
+<td align="right">4.16</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div id="anova-output-with-totals" class="section level2" number="12.3">
+<h2>
+<span class="header-section-number">12.3</span> ANOVA output, with totals<a class="anchor" aria-label="anchor" href="#anova-output-with-totals"><i class="fas fa-link"></i></a>
+</h2>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="left">meansq</th>
+<th align="left">statistic</th>
+<th align="left">p.value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Party</td>
+<td align="right">1</td>
+<td align="right">1189</td>
+<td align="left">1188.64</td>
+<td align="left">285.71</td>
+<td align="left">0</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="right">2</td>
+<td align="right">38</td>
+<td align="left">19.01</td>
+<td align="left">4.57</td>
+<td align="left">0.01</td>
+</tr>
+<tr class="odd">
+<td align="left">Residuals</td>
+<td align="right">165</td>
+<td align="right">686</td>
+<td align="left">4.16</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Total</td>
+<td align="right">168</td>
+<td align="right">1913</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div id="sum-of-squares" class="section level2" number="12.4">
+<h2>
+<span class="header-section-number">12.4</span> Sum of squares<a class="anchor" aria-label="anchor" href="#sum-of-squares"><i class="fas fa-link"></i></a>
+</h2>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+df
+</th>
+<th style="text-align:right;">
+sumsq
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Party
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;background-color: #D9E3E4 !important;">
+1189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;background-color: #D9E3E4 !important;">
+38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:right;">
+165
+</td>
+<td style="text-align:right;background-color: #D9E3E4 !important;">
+686
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:right;">
+168
+</td>
+<td style="text-align:right;background-color: #D9E3E4 !important;">
+1913
+</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>
+<span class="math inline">\(SS_{Total}\)</span>: Total sum of squares, variability of outcome, <span class="math inline">\(\sum_{i = 1}^n (y_i - \bar{y})^2\)</span>
+</li>
+<li>
+<span class="math inline">\(SS_{Error}\)</span>: Residual sum of squares, variability of residuals, <span class="math inline">\(\sum_{i = 1}^n (y_i - \hat{y})^2\)</span>
+</li>
+<li>
+<span class="math inline">\(SS_{Model} = SS_{Total} - SS_{Error}\)</span>: Variability explained by the model</li>
+</ul>
+</div>
+<div id="sec:nestF" class="section level2" number="12.5">
+<h2>
+<span class="header-section-number">12.5</span> Testing Sets of Coefficients<a class="anchor" aria-label="anchor" href="#sec:nestF"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="model-selection" class="section level2" number="12.6">
+<h2>
+<span class="header-section-number">12.6</span> Model Selection<a class="anchor" aria-label="anchor" href="#model-selection"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="other-ways-for-comparing-models" class="section level2" number="12.7">
+<h2>
+<span class="header-section-number">12.7</span> Other ways for comparing models<a class="anchor" aria-label="anchor" href="#other-ways-for-comparing-models"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="getting-the-variables-right" class="section level2" number="12.8">
+<h2>
+<span class="header-section-number">12.8</span> Getting the Variables Right<a class="anchor" aria-label="anchor" href="#getting-the-variables-right"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="one-model-building-strategy" class="section level2" number="12.9">
+<h2>
+<span class="header-section-number">12.9</span> One Model Building Strategy<a class="anchor" aria-label="anchor" href="#one-model-building-strategy"><i class="fas fa-link"></i></a>
+</h2>
+<div id="thoughts-on-model-selection" class="section level3" number="12.9.1">
+<h3>
+<span class="header-section-number">12.9.1</span> Thoughts on Model Selection…<a class="anchor" aria-label="anchor" href="#thoughts-on-model-selection"><i class="fas fa-link"></i></a>
+</h3>
+<p>Question: Did females receive lower starting salaries than males? [From <strong>The Statistical Sleuth</strong> by Ramsey and Schafer]</p>
+<p>model: y = log(salary), x’s: seniority, age, experience, education, sex.</p>
+<p>In the Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex) In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in. What are the pluses/minuses of these approaches?</p>
+<p><strong>Response</strong> It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn’t start with sex would be more likely to include those associated covariates to start with.<br>
+One nice aspect of both methods in that they both end up with sex in the model; one difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn’t matter. However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.<br>
+In this case there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that’s part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one “best” model can be misleading.</p>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="build.html"><span class="header-section-number">11</span> Model Building</a></div>
+<div class="next"><a href="diag2.html"><span class="header-section-number">13</span> Diagnostics II</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#analysis-of-variance-anova"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></li>
+<li><a class="nav-link" href="#analysis-of-variance-anova-1"><span class="header-section-number">12.1</span> Analysis of variance (ANOVA)</a></li>
+<li><a class="nav-link" href="#anova-output-1"><span class="header-section-number">12.2</span> ANOVA output</a></li>
+<li><a class="nav-link" href="#anova-output-with-totals"><span class="header-section-number">12.3</span> ANOVA output, with totals</a></li>
+<li><a class="nav-link" href="#sum-of-squares"><span class="header-section-number">12.4</span> Sum of squares</a></li>
+<li><a class="nav-link" href="#sec:nestF"><span class="header-section-number">12.5</span> Testing Sets of Coefficients</a></li>
+<li><a class="nav-link" href="#model-selection"><span class="header-section-number">12.6</span> Model Selection</a></li>
+<li><a class="nav-link" href="#other-ways-for-comparing-models"><span class="header-section-number">12.7</span> Other ways for comparing models</a></li>
+<li><a class="nav-link" href="#getting-the-variables-right"><span class="header-section-number">12.8</span> Getting the Variables Right</a></li>
+<li>
+<a class="nav-link" href="#one-model-building-strategy"><span class="header-section-number">12.9</span> One Model Building Strategy</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#thoughts-on-model-selection"><span class="header-section-number">12.9.1</span> Thoughts on Model Selection…</a></li></ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/04b-build.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/04b-build.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-02-26.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
