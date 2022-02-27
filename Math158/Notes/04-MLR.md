@@ -764,7 +764,7 @@ RailTrail %>%
 Note the p-values, parameter estimates, $R^2$, MSE, F-stat, df, and F-stat p-values.
 
 
-## R: Model comparison with Restaurant tips^[Thanks to Mine Centinkaya-Rundel for the majority of the content in this example.  Mine's course is at https://mine-cr.com/teaching/sta210/.]
+## R: Model comparison with Restaurant tips^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this example.  Mine's course is at https://mine-cr.com/teaching/sta210/.]
 
 A student collected data from a restaurant where she was a waitress [@tips]. The student was interested in learning under what conditions a waitress can expect the largest tips—for example: At dinner time or late at night? From younger or older patrons? From patrons receiving free meals? From patrons drinking alcohol? From patrons tipping with cash or credit? And should tip amount be measured as total dollar amount or as a percentage? 
 

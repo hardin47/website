@@ -1,4 +1,4 @@
-# Modeling as a Process^[Thanks to Mine Centinkaya-Rundel for the majority of the content in this chapter.  Mine's course is at https://mine-cr.com/teaching/sta210/.] {#process}
+# Modeling as a Process^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this chapter.  Mine's course is at https://mine-cr.com/teaching/sta210/.] {#process}
 
 
 
@@ -1492,5 +1492,16 @@ office_preds1 %>%
 
 As seen before, the test $R^2$ on the test data is 0.468  (46.8% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.411. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
   
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
+
+1. What are the steps of the workflow / pipeline?  
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. 
+
+
+## R: Full pipeline with CV + assessment
+
 
 

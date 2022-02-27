@@ -8,7 +8,7 @@ When we get there, use the function `bestregsubsets()`.
 > Is this the best model to explain variation in tips?
 
 
-## Another model summary^[Thanks to Mine Centinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.]
+## Another model summary^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.]
 
 
 
