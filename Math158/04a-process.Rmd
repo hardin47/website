@@ -172,6 +172,8 @@ office_train
 
 -   **Feature engineering** allows us to get creative with our predictors in an effort to make them more useful for our model (to increase its predictive performance).
 
+> **Feature engineering** is the process of transforming raw data into features (variables) that are better predictors (for the model at hand).
+
 #### Feature engineering with dplyr {-}
 
 We can use the **dplyr** (in **tidyverse**) and, for example, the `mutate()` function to create new variables to use in the models.
@@ -211,7 +213,7 @@ Ideally, the feature engineering happens as part of the workflow.  That is, part
 
 ### Specifying a model
 
-Instead of using the `lm()` command, we're going to use the **tidymodels** framework to specify a model.  In Math 158 we will *always* use "lm", but if you take other applied statistics classes, you'll use different model specifications with the same feature engineering and modeling fitting steps.
+Instead of using the `lm()` command, we're going to use the **tidymodels** framework to specify a model.  In Math 158 we will *always* use "lm" as the engine, but if you take other applied statistics classes, you'll use different model specifications with the same feature engineering and modeling fitting steps.
 
 ```{r}
 office_spec <- linear_reg() %>%
@@ -394,6 +396,14 @@ office_rec <- recipe(imdb_rating ~ ., data = office_train) %>%
 office_rec
 ```
 
+**`step_` functions**
+
+For more information: https://recipes.tidymodels.org/reference/index.html
+
+```{r}
+ls(pattern = '^step_', env = as.environment('package:recipes'))
+```
+
 ### Building workflows
 
 
@@ -461,6 +471,8 @@ Are models with high or low $R^2$ more preferable?
 An alternative model performance statistic: **root mean square error**.
 
 $$RMSE = \sqrt{\frac{\sum_{i = 1}^n (y_i - \hat{y}_i)^2}{n}}$$
+Note: RMSE here is computed as it would be for any type of statistics or machine learning model (i.e., how far are the typical observations from the predicted value).  The change in denominator means that the MSE with $n$ won't estimate $\sigma^2$, but it also means that the metric allows us to compare different *kinds* of models (e.g., a linear regression vs. neural network vs. random forest) on the same scale.  And yes, this MSE will decrease as the number of parameters increases which is why we use cross validation or F-tests to constrain the model.
+
 
 * Are models with high or low RMSE are more preferable?
 * Is this RMSE considered low or high?
@@ -544,18 +556,14 @@ rsq_test <- rsq(office_test_pred, truth = imdb_rating, estimate = .pred) %>%
 
 Before we get into the details of cross validation, let's set up the scenario for when we need cross validation.  Recall that we use the test data to assess how the model does.  But we haven't yet thought about how to use the data to **build** a particular model.
 
-For example, let's set up a scenario to compare two different models.  The first model is the same one built with the recipe above.  The second model does not use `air_date` as a variable at all.
+For example, let's set up a scenario to compare two different models.  The first model doesn't use `air_date` at all but is otherwise similar to the model above.  The second model does also not use `air_date` as a variable and considers `season` as a numeric variable.
 
 **Model 1:**
 ```{r}
 office_rec1 <- recipe(imdb_rating ~ ., data = office_train) %>%
   update_role(title, new_role = "ID") %>%
-  step_date(air_date, features = c("dow", "month")) %>%
-  step_holiday(
-    air_date, 
-    holidays = c("USThanksgivingDay", "USChristmasDay", "USNewYearsDay", "USIndependenceDay"), 
-    keep_original_cols = FALSE
-  ) %>%
+  # delete the air_date variable
+  step_rm(air_date) %>%
   step_num2factor(season, levels = as.character(1:9)) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_zv(all_predictors())
@@ -635,7 +643,7 @@ office_wflow2 %>%
 #### "Spending" the data {-}
 
 -   We have already established that the idea of data spending where the test set was recommended for obtaining an unbiased estimate of performance.
--   However, we usually need to understand the effectiveness of the model *before using the test set*.
+-   However, we need to decide which model to choose *before using the test set*.
 -   Typically we can't decide on *which* final model to take to the test set without making model assessments.
 -   Remedy: Resampling to make model assessments on training data in a way that can generalize to new data.
 
@@ -827,12 +835,12 @@ office_ratings %>%
   )
 ```
 
-The original variability (measured by standard deviation) of the ratings was 0.538.  After running Model 1, the remaining variability (measured by RMSE averaged over the folds) is 0.482; after running Model 2, the remaining variability (measured by RMSE averaged over the folds) is 0.52.  
+The original variability (measured by standard deviation) of the ratings was 0.538.  After running Model 1, the remaining variability (measured by RMSE averaged over the folds) is 0.466; after running Model 2, the remaining variability (measured by RMSE averaged over the folds) is 0.52.  
 
 **Conclusions:**
 
 -  It seems as though the linear model does reduce the variability in the response variable (though not by much).
--  It seems as though the linear model which includes the `air_date` variable (and has 21 coefficients!) is a (slightly) better model than the variable which does not include `air_date` (and has only 4 coefficients).
+-  It seems as though the linear model which includes the `season` as a factor variable is a (slightly) better model than the one that uses `season` as numeric.
 
 #### Cross validation jargon {-}
 
@@ -868,18 +876,154 @@ office_preds1 %>%
   rmse(truth = imdb_rating, estimate = .pred)
 ```
 
-As seen before, the test $R^2$ on the test data is 0.468  (46.8% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.411. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
+The $R^2$ on the test data is 0.562  (56.2% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.415. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
   
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 1. What are the steps of the workflow / pipeline?  
+2. What are the types of feature engineering that can be done with the `step_` functions? 
+
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. Why is it important to use different parts of the dataset to do the two different tasks of model building and model assessment? 
+2. How does cross validation help to keep the model from overfitting the data at hand? 
+
 
 
 ## R: Full pipeline with CV + assessment
 
+Using the same example as above, the process has been synthesized into the essential aspects / code.
+
+### The data
+
+Break the data into test and training sets.
+
+```{r}
+set.seed(123)
+office_split <- initial_split(office_ratings) # prop = 3/4 by default
+office_train <- training(office_split)
+office_test  <- testing(office_split)
+```
+
+
+### The model / enigne
+
+Tell the computer to run linear regression using the `lm()` function.
+
+```{r}
+office_spec <- linear_reg() %>%
+  set_engine("lm")
+```
+
+### The recipe(s)
+
+Set the variables of interest (in the formula) and perform any necessary feature engineering.
+
+```{r}
+office_rec1 <- recipe(imdb_rating ~ ., data = office_train) %>%
+  update_role(title, new_role = "id") %>%
+  step_rm(air_date) %>%
+  step_num2factor(season, levels = as.character(1:9)) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors())
+
+office_rec2 <- recipe(imdb_rating ~ ., data = office_train) %>%
+  update_role(title, new_role = "id") %>%
+  step_rm(air_date) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors())
+```
+
+
+### The workflow(s)
+
+```{r}
+office_wflow1 <- workflow() %>%
+  add_model(office_spec) %>%
+  add_recipe(office_rec1)
+
+office_wflow2 <- workflow() %>%
+  add_model(office_spec) %>%
+  add_recipe(office_rec2)
+```
+
+
+### Choice:  fit the model? cross validate to decide between models?
+
+#### Fit the model {-}
+
+```{r}
+office_fit <- office_wflow %>%
+  fit(data = office_train)
+```
+
+The fit object is the same as the output of `lm()` that you are used to working with:
+```{r}
+office_fit %>% tidy()
+
+office_fit %>% glance()
+```
+
+#### Cross validate to choose between models {-}
+
+If cross validating, the model needs to be fit separately on each one of the hold out folds of the CV model.  Here, `v=5` is used, different from above where `v=3` was used to simplify the explanation.  Typically, the number of folds is 5 or 10.
+
+Note that the objects are now similar to what you've worked with previously (output of `lm()`), but they contain a separate fit (i.e., linear model) for each of the CV folds.
+
+```{r}
+set.seed(47)
+folds <- vfold_cv(office_train, v = 5)
+
+office_fit_rs1 <- office_wflow1 %>%
+  fit_resamples(folds)
+
+office_fit_rs2 <- office_wflow2 %>%
+  fit_resamples(folds)
+```
+
+### Assess the fit
+
+#### On the test data {-}
+
+Note that we'd only assess the fit to the test data if we are done with the model building process and we've chosen the model we want to move forward with.
+
+Again, $R^2$ and RMSE are both calculated in a general sense (i.e., RMSE uses $n$ in the denominator, not $n-p$, I agree, it is confusing!).
+
+If the first few lines don't make sense, run the pieces.  That is, run `predict(office_fit, office_test)` and then run `office_test %>% select(imdb_rating, title)` and then think about what it would mean to **bind** those columns together.
+
+```{r}
+office_test_pred <- predict(office_fit, office_test) %>%
+  bind_cols(office_test %>% select(imdb_rating, title))
+
+rsq(office_test_pred, truth = imdb_rating, estimate = .pred)
+
+rmse(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+
+#### On the CV folds {-}
+
+Note the difference in the information.  If you want the values per fold, don't summarize.  If you want the overall information, do summarize.
+
+```{r}
+office_fit_rs1 %>% collect_metrics()
+office_fit_rs2 %>% collect_metrics()
+
+office_fit_rs1 %>% collect_metrics(summarize = FALSE)
+office_fit_rs2 %>% collect_metrics(summarize = FALSE)
+```
+
+Note that the variables in Model 1 perform better using cross validation than the variables in Model 2, we choose Model 1 to report out:
+
+```{r}
+office_test_pred_1 <- office_wflow1 %>%
+  fit(office_train) %>%
+  predict(office_test) %>%
+  bind_cols(office_test %>% select(imdb_rating, title))
+
+rsq(office_test_pred_1, truth = imdb_rating, estimate = .pred)
+
+rmse(office_test_pred_1, truth = imdb_rating, estimate = .pred)
+```
 
 

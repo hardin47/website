@@ -146,6 +146,8 @@ office_train
 
 -   **Feature engineering** allows us to get creative with our predictors in an effort to make them more useful for our model (to increase its predictive performance).
 
+> **Feature engineering** is the process of transforming raw data into features (variables) that are better predictors (for the model at hand).
+
 #### Feature engineering with dplyr {-}
 
 We can use the **dplyr** (in **tidyverse**) and, for example, the `mutate()` function to create new variables to use in the models.
@@ -195,7 +197,7 @@ Ideally, the feature engineering happens as part of the workflow.  That is, part
 
 ### Specifying a model
 
-Instead of using the `lm()` command, we're going to use the **tidymodels** framework to specify a model.  In Math 158 we will *always* use "lm", but if you take other applied statistics classes, you'll use different model specifications with the same feature engineering and modeling fitting steps.
+Instead of using the `lm()` command, we're going to use the **tidymodels** framework to specify a model.  In Math 158 we will *always* use "lm" as the engine, but if you take other applied statistics classes, you'll use different model specifications with the same feature engineering and modeling fitting steps.
 
 
 ```r
@@ -646,6 +648,47 @@ office_rec
 ## Zero variance filter on all_predictors()
 ```
 
+**`step_` functions**
+
+For more information: https://recipes.tidymodels.org/reference/index.html
+
+
+```r
+ls(pattern = '^step_', env = as.environment('package:recipes'))
+```
+
+```
+##  [1] "step_arrange"       "step_bagimpute"     "step_bin2factor"   
+##  [4] "step_BoxCox"        "step_bs"            "step_center"       
+##  [7] "step_classdist"     "step_corr"          "step_count"        
+## [10] "step_cut"           "step_date"          "step_depth"        
+## [13] "step_discretize"    "step_downsample"    "step_dummy"        
+## [16] "step_factor2string" "step_filter"        "step_geodist"      
+## [19] "step_holiday"       "step_hyperbolic"    "step_ica"          
+## [22] "step_impute_bag"    "step_impute_knn"    "step_impute_linear"
+## [25] "step_impute_lower"  "step_impute_mean"   "step_impute_median"
+## [28] "step_impute_mode"   "step_impute_roll"   "step_indicate_na"  
+## [31] "step_integer"       "step_interact"      "step_intercept"    
+## [34] "step_inverse"       "step_invlogit"      "step_isomap"       
+## [37] "step_knnimpute"     "step_kpca"          "step_kpca_poly"    
+## [40] "step_kpca_rbf"      "step_lag"           "step_lincomb"      
+## [43] "step_log"           "step_logit"         "step_lowerimpute"  
+## [46] "step_meanimpute"    "step_medianimpute"  "step_modeimpute"   
+## [49] "step_mutate"        "step_mutate_at"     "step_naomit"       
+## [52] "step_nnmf"          "step_normalize"     "step_novel"        
+## [55] "step_ns"            "step_num2factor"    "step_nzv"          
+## [58] "step_ordinalscore"  "step_other"         "step_pca"          
+## [61] "step_pls"           "step_poly"          "step_profile"      
+## [64] "step_range"         "step_ratio"         "step_regex"        
+## [67] "step_relevel"       "step_relu"          "step_rename"       
+## [70] "step_rename_at"     "step_rm"            "step_rollimpute"   
+## [73] "step_sample"        "step_scale"         "step_select"       
+## [76] "step_shuffle"       "step_slice"         "step_spatialsign"  
+## [79] "step_sqrt"          "step_string2factor" "step_unknown"      
+## [82] "step_unorder"       "step_upsample"      "step_window"       
+## [85] "step_YeoJohnson"    "step_zv"
+```
+
 ### Building workflows
 
 
@@ -795,6 +838,8 @@ Are models with high or low $R^2$ more preferable?
 An alternative model performance statistic: **root mean square error**.
 
 $$RMSE = \sqrt{\frac{\sum_{i = 1}^n (y_i - \hat{y}_i)^2}{n}}$$
+Note: RMSE here is computed as it would be for any type of statistics or machine learning model (i.e., how far are the typical observations from the predicted value).  The change in denominator means that the MSE with $n$ won't estimate $\sigma^2$, but it also means that the metric allows us to compare different *kinds* of models (e.g., a linear regression vs. neural network vs. random forest) on the same scale.  And yes, this MSE will decrease as the number of parameters increases which is why we use cross validation or F-tests to constrain the model.
+
 
 * Are models with high or low RMSE are more preferable?
 * Is this RMSE considered low or high?
@@ -929,19 +974,15 @@ rsq_test <- rsq(office_test_pred, truth = imdb_rating, estimate = .pred) %>%
 
 Before we get into the details of cross validation, let's set up the scenario for when we need cross validation.  Recall that we use the test data to assess how the model does.  But we haven't yet thought about how to use the data to **build** a particular model.
 
-For example, let's set up a scenario to compare two different models.  The first model is the same one built with the recipe above.  The second model does not use `air_date` as a variable at all.
+For example, let's set up a scenario to compare two different models.  The first model doesn't use `air_date` at all but is otherwise similar to the model above.  The second model does also not use `air_date` as a variable and considers `season` as a numeric variable.
 
 **Model 1:**
 
 ```r
 office_rec1 <- recipe(imdb_rating ~ ., data = office_train) %>%
   update_role(title, new_role = "ID") %>%
-  step_date(air_date, features = c("dow", "month")) %>%
-  step_holiday(
-    air_date, 
-    holidays = c("USThanksgivingDay", "USChristmasDay", "USNewYearsDay", "USIndependenceDay"), 
-    keep_original_cols = FALSE
-  ) %>%
+  # delete the air_date variable
+  step_rm(air_date) %>%
   step_num2factor(season, levels = as.character(1:9)) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_zv(all_predictors())
@@ -1093,7 +1134,7 @@ office_wflow2
 #### "Spending" the data {-}
 
 -   We have already established that the idea of data spending where the test set was recommended for obtaining an unbiased estimate of performance.
--   However, we usually need to understand the effectiveness of the model *before using the test set*.
+-   However, we need to decide which model to choose *before using the test set*.
 -   Typically we can't decide on *which* final model to take to the test set without making model assessments.
 -   Remedy: Resampling to make model assessments on training data in a way that can generalize to new data.
 
@@ -1108,7 +1149,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:
 
 <div class="figure" style="text-align: center">
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-50)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-51)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
 </div>
 
 Aside: the "re" in "resamples" is for repeated samples.  Not to be confused where repeated samples are taken in bootstrapping with replacement.  In cross validation, the repeated samples are taken **without** replacement.
@@ -1137,7 +1178,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-51)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-52)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
 </div>
 
 
@@ -1167,7 +1208,7 @@ Note that the three repeated samples ("resamples") are taken without replacement
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-53)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-54)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
 </div>
 
 #### Fit resamples {-}
@@ -1431,12 +1472,12 @@ office_ratings %>%
 ## 1   6.7   9.7  8.26 0.538
 ```
 
-The original variability (measured by standard deviation) of the ratings was 0.538.  After running Model 1, the remaining variability (measured by RMSE averaged over the folds) is 0.482; after running Model 2, the remaining variability (measured by RMSE averaged over the folds) is 0.52.  
+The original variability (measured by standard deviation) of the ratings was 0.538.  After running Model 1, the remaining variability (measured by RMSE averaged over the folds) is 0.466; after running Model 2, the remaining variability (measured by RMSE averaged over the folds) is 0.52.  
 
 **Conclusions:**
 
 -  It seems as though the linear model does reduce the variability in the response variable (though not by much).
--  It seems as though the linear model which includes the `air_date` variable (and has 21 coefficients!) is a (slightly) better model than the variable which does not include `air_date` (and has only 4 coefficients).
+-  It seems as though the linear model which includes the `season` as a factor variable is a (slightly) better model than the one that uses `season` as numeric.
 
 #### Cross validation jargon {-}
 
@@ -1490,18 +1531,279 @@ office_preds1 %>%
 ## 1 rmse    standard       0.411
 ```
 
-As seen before, the test $R^2$ on the test data is 0.468  (46.8% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.411. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
+The $R^2$ on the test data is 0.562  (56.2% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.415. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
   
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 1. What are the steps of the workflow / pipeline?  
+2. What are the types of feature engineering that can be done with the `step_` functions? 
+
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. Why is it important to use different parts of the dataset to do the two different tasks of model building and model assessment? 
+2. How does cross validation help to keep the model from overfitting the data at hand? 
+
 
 
 ## R: Full pipeline with CV + assessment
 
+Using the same example as above, the process has been synthesized into the essential aspects / code.
+
+### The data
+
+Break the data into test and training sets.
+
+
+```r
+set.seed(123)
+office_split <- initial_split(office_ratings) # prop = 3/4 by default
+office_train <- training(office_split)
+office_test  <- testing(office_split)
+```
+
+
+### The model / enigne
+
+Tell the computer to run linear regression using the `lm()` function.
+
+
+```r
+office_spec <- linear_reg() %>%
+  set_engine("lm")
+```
+
+### The recipe(s)
+
+Set the variables of interest (in the formula) and perform any necessary feature engineering.
+
+
+```r
+office_rec1 <- recipe(imdb_rating ~ ., data = office_train) %>%
+  update_role(title, new_role = "id") %>%
+  step_rm(air_date) %>%
+  step_num2factor(season, levels = as.character(1:9)) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors())
+
+office_rec2 <- recipe(imdb_rating ~ ., data = office_train) %>%
+  update_role(title, new_role = "id") %>%
+  step_rm(air_date) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors())
+```
+
+
+### The workflow(s)
+
+
+```r
+office_wflow1 <- workflow() %>%
+  add_model(office_spec) %>%
+  add_recipe(office_rec1)
+
+office_wflow2 <- workflow() %>%
+  add_model(office_spec) %>%
+  add_recipe(office_rec2)
+```
+
+
+### Choice:  fit the model? cross validate to decide between models?
+
+#### Fit the model {-}
+
+
+```r
+office_fit <- office_wflow %>%
+  fit(data = office_train)
+```
+
+The fit object is the same as the output of `lm()` that you are used to working with:
+
+```r
+office_fit %>% tidy()
+```
+
+```
+## # A tibble: 21 × 5
+##    term         estimate std.error statistic  p.value
+##    <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+##  1 (Intercept)  6.40     0.510        12.5   1.51e-23
+##  2 episode     -0.00393  0.0171       -0.230 8.18e- 1
+##  3 total_votes  0.000375 0.0000414     9.07  2.75e-15
+##  4 season_X2    0.811    0.327         2.48  1.44e- 2
+##  5 season_X3    1.04     0.343         3.04  2.91e- 3
+##  6 season_X4    1.09     0.295         3.70  3.32e- 4
+##  7 season_X5    1.08     0.348         3.11  2.34e- 3
+##  8 season_X6    1.00     0.367         2.74  7.18e- 3
+##  9 season_X7    1.02     0.352         2.89  4.52e- 3
+## 10 season_X8    0.497    0.348         1.43  1.55e- 1
+## # … with 11 more rows
+```
+
+```r
+office_fit %>% glance()
+```
+
+```
+## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
+## 1     0.670         0.615 0.327      12.2 2.10e-20    20  -31.2  106.  171.
+## # … with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
+```
+
+#### Cross validate to choose between models {-}
+
+If cross validating, the model needs to be fit separately on each one of the hold out folds of the CV model.  Here, `v=5` is used, different from above where `v=3` was used to simplify the explanation.  Typically, the number of folds is 5 or 10.
+
+Note that the objects are now similar to what you've worked with previously (output of `lm()`), but they contain a separate fit (i.e., linear model) for each of the CV folds.
+
+
+```r
+set.seed(47)
+folds <- vfold_cv(office_train, v = 5)
+
+office_fit_rs1 <- office_wflow1 %>%
+  fit_resamples(folds)
+
+office_fit_rs2 <- office_wflow2 %>%
+  fit_resamples(folds)
+```
+
+### Assess the fit
+
+#### On the test data {-}
+
+Note that we'd only assess the fit to the test data if we are done with the model building process and we've chosen the model we want to move forward with.
+
+Again, $R^2$ and RMSE are both calculated in a general sense (i.e., RMSE uses $n$ in the denominator, not $n-p$, I agree, it is confusing!).
+
+If the first few lines don't make sense, run the pieces.  That is, run `predict(office_fit, office_test)` and then run `office_test %>% select(imdb_rating, title)` and then think about what it would mean to **bind** those columns together.
+
+
+```r
+office_test_pred <- predict(office_fit, office_test) %>%
+  bind_cols(office_test %>% select(imdb_rating, title))
+
+rsq(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 rsq     standard       0.468
+```
+
+```r
+rmse(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 rmse    standard       0.411
+```
+
+#### On the CV folds {-}
+
+Note the difference in the information.  If you want the values per fold, don't summarize.  If you want the overall information, do summarize.
+
+
+```r
+office_fit_rs1 %>% collect_metrics()
+```
+
+```
+## # A tibble: 2 × 6
+##   .metric .estimator  mean     n std_err .config             
+##   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+## 1 rmse    standard   0.366     5  0.0134 Preprocessor1_Model1
+## 2 rsq     standard   0.578     5  0.0278 Preprocessor1_Model1
+```
+
+```r
+office_fit_rs2 %>% collect_metrics()
+```
+
+```
+## # A tibble: 2 × 6
+##   .metric .estimator  mean     n std_err .config             
+##   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+## 1 rmse    standard   0.392     5  0.0284 Preprocessor1_Model1
+## 2 rsq     standard   0.500     5  0.0563 Preprocessor1_Model1
+```
+
+```r
+office_fit_rs1 %>% collect_metrics(summarize = FALSE)
+```
+
+```
+## # A tibble: 10 × 5
+##    id    .metric .estimator .estimate .config             
+##    <chr> <chr>   <chr>          <dbl> <chr>               
+##  1 Fold1 rmse    standard       0.321 Preprocessor1_Model1
+##  2 Fold1 rsq     standard       0.538 Preprocessor1_Model1
+##  3 Fold2 rmse    standard       0.359 Preprocessor1_Model1
+##  4 Fold2 rsq     standard       0.577 Preprocessor1_Model1
+##  5 Fold3 rmse    standard       0.376 Preprocessor1_Model1
+##  6 Fold3 rsq     standard       0.666 Preprocessor1_Model1
+##  7 Fold4 rmse    standard       0.404 Preprocessor1_Model1
+##  8 Fold4 rsq     standard       0.605 Preprocessor1_Model1
+##  9 Fold5 rmse    standard       0.367 Preprocessor1_Model1
+## 10 Fold5 rsq     standard       0.504 Preprocessor1_Model1
+```
+
+```r
+office_fit_rs2 %>% collect_metrics(summarize = FALSE)
+```
+
+```
+## # A tibble: 10 × 5
+##    id    .metric .estimator .estimate .config             
+##    <chr> <chr>   <chr>          <dbl> <chr>               
+##  1 Fold1 rmse    standard       0.307 Preprocessor1_Model1
+##  2 Fold1 rsq     standard       0.607 Preprocessor1_Model1
+##  3 Fold2 rmse    standard       0.357 Preprocessor1_Model1
+##  4 Fold2 rsq     standard       0.572 Preprocessor1_Model1
+##  5 Fold3 rmse    standard       0.458 Preprocessor1_Model1
+##  6 Fold3 rsq     standard       0.471 Preprocessor1_Model1
+##  7 Fold4 rmse    standard       0.387 Preprocessor1_Model1
+##  8 Fold4 rsq     standard       0.555 Preprocessor1_Model1
+##  9 Fold5 rmse    standard       0.450 Preprocessor1_Model1
+## 10 Fold5 rsq     standard       0.293 Preprocessor1_Model1
+```
+
+Note that the variables in Model 1 perform better using cross validation than the variables in Model 2, we choose Model 1 to report out:
+
+
+```r
+office_test_pred_1 <- office_wflow1 %>%
+  fit(office_train) %>%
+  predict(office_test) %>%
+  bind_cols(office_test %>% select(imdb_rating, title))
+
+rsq(office_test_pred_1, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 rsq     standard       0.468
+```
+
+```r
+rmse(office_test_pred_1, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 rmse    standard       0.411
+```
 
 
