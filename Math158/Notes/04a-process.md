@@ -22,9 +22,48 @@ input variables x (independent variables) go in one side, and on the other side 
 
 Here in Chapter \@ref(process), the focus will be on algorithmic modeling and developing models which are optimally predictive of the response variable at hand.
 
+**Spoiler:**
+
+- In Chapter \@ref{build}, the model building will use hypothesis testing and p-values.
+- In Chapter \@ref{shrink}, the model building will use mathematical optimization.
+
+There isn't a right way to model.  In fact, good data analysis is **hard**.  You are building a tool box.  Make sure to notice that not every tool is the same, and you have more than just one hammer to use.  Sometimes the tools can work together to form even better models.
+
 #### Worth a comment {-}
 
 Notice that the R code has gotten more interesting now.  How fun!! The R code will help the process!  The R package **tidymodels** includes tools to facilitate, in particular, feature engineering and cross validation.
+
+
+
+### Bias-variance trade-off {-}
+
+**Excellent resource**
+
+for explaining the bias-variance trade-off:  http://scott.fortmann-roe.com/docs/BiasVariance.html
+
+* **Variance** refers to the amount by which $\hat{f}$ would change if we estimated it using a different training set.  Generally, the closer the model fits the data, the more variable it will be (it'll be different for each data set!).  A model with many many explanatory variables will often fit the data too closely.
+
+* **Bias** refers to the error that is introduced by approximating the "truth" by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a *true* linear model.  However, if the true relationship is close to linear, then the linear model will have a low bias.
+
+Generally, the simpler the model, the lower the variance.  The more complicated the model, the lower the bias.  In this class, cross validation will be used to assess model fit.  [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]
+
+
+\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}
+
+* **irreducible error**  The irreducible error is the natural variability that comes with observations.  No matter how good the model is, we will never be able to predict perfectly.
+* **bias**  The bias of the model represents the difference between the true model and a model which is too simple.  That is, the more complicated the model (e.g., the more variables), the closer the points are to the prediction.  As the model gets more complicated (e.g., as variables are added), the bias goes down.
+* **variance**  The variance represents the variability of the model from sample to sample.  That is, a simple model (very few variables) would not change a lot from sample to sample.  The variance decreases as the model becomes more simple (e.g., variables are removed).
+
+
+Note the bias-variance trade-off.  We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance.  We cannot control the irreducible error.
+
+<div class="figure" style="text-align: center">
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-2)Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]</p>
+</div>
+
 
 ## Feature Engineering
 
@@ -54,15 +93,15 @@ Instead of jumping into the predictions immediately, let's look at the data itse
 
 #### IMDB ratings {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
 
 #### IMDB ratings vs. number of votes {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Outliers? {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Aside... {-}
 
@@ -70,11 +109,11 @@ If you like the [Dinner Party](https://www.imdb.com/title/tt1031477/) episode, I
 
 #### Rating vs. air date {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 #### IMDB ratings vs. seasons {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 ### Building a Model
 
@@ -998,29 +1037,19 @@ bake(office_train) %>%
 
 ```
 ## Rows: 141
-## Columns: 22
-## $ episode            <dbl> 18, 14, 8, 5, 22, 1, 15, 21, 18, 12, 25, 26, 12, 1,…
-## $ title              <fct> "Last Day in Florida", "Vandalism", "Performance Re…
-## $ total_votes        <dbl> 1429, 1402, 2416, 1515, 2783, 1897, 2283, 2041, 144…
-## $ imdb_rating        <dbl> 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0, 8.0, 8…
-## $ season_X2          <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X3          <dbl> 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X4          <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X5          <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, …
-## $ season_X6          <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, …
-## $ season_X7          <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, …
-## $ season_X8          <dbl> 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X9          <dbl> 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, …
-## $ air_date_dow_Tue   <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_dow_Thu   <dbl> 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
-## $ air_date_month_Feb <dbl> 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_month_Mar <dbl> 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_month_Apr <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, …
-## $ air_date_month_May <dbl> 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, …
-## $ air_date_month_Sep <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, …
-## $ air_date_month_Oct <dbl> 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, …
-## $ air_date_month_Nov <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, …
-## $ air_date_month_Dec <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## Columns: 12
+## $ episode     <dbl> 18, 14, 8, 5, 22, 1, 15, 21, 18, 12, 25, 26, 12, 1, 20, 8,…
+## $ title       <fct> "Last Day in Florida", "Vandalism", "Performance Review", …
+## $ total_votes <dbl> 1429, 1402, 2416, 1515, 2783, 1897, 2283, 2041, 1445, 1612…
+## $ imdb_rating <dbl> 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0, 8.0, 8.7, 8.9…
+## $ season_X2   <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0…
+## $ season_X3   <dbl> 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X4   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X5   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0…
+## $ season_X6   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0…
+## $ season_X7   <dbl> 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0…
+## $ season_X8   <dbl> 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X9   <dbl> 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1…
 ```
 
 
@@ -1074,10 +1103,9 @@ office_wflow1
 ## Model: linear_reg()
 ## 
 ## ── Preprocessor ────────────────────────────────────────────────────────────────
-## 5 Recipe Steps
+## 4 Recipe Steps
 ## 
-## • step_date()
-## • step_holiday()
+## • step_rm()
 ## • step_num2factor()
 ## • step_dummy()
 ## • step_zv()
@@ -1149,7 +1177,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:
 
 <div class="figure" style="text-align: center">
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-51)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-52)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
 </div>
 
 Aside: the "re" in "resamples" is for repeated samples.  Not to be confused where repeated samples are taken in bootstrapping with replacement.  In cross validation, the repeated samples are taken **without** replacement.
@@ -1178,7 +1206,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-52)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-53)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
 </div>
 
 
@@ -1208,7 +1236,7 @@ Note that the three repeated samples ("resamples") are taken without replacement
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-54)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-55)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
 </div>
 
 #### Fit resamples {-}
@@ -1234,7 +1262,7 @@ office_fit_rs1
 ##   <list>          <chr> <list>           <list>          
 ## 1 <split [94/47]> Fold1 <tibble [2 × 4]> <tibble [0 × 1]>
 ## 2 <split [94/47]> Fold2 <tibble [2 × 4]> <tibble [0 × 1]>
-## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [1 × 1]>
+## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [0 × 1]>
 ```
 
 
@@ -1291,8 +1319,8 @@ collect_metrics(office_fit_rs1)
 ## # A tibble: 2 × 6
 ##   .metric .estimator  mean     n std_err .config             
 ##   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-## 1 rmse    standard   0.402     3  0.0329 Preprocessor1_Model1
-## 2 rsq     standard   0.524     3  0.0410 Preprocessor1_Model1
+## 1 rmse    standard   0.373     3  0.0324 Preprocessor1_Model1
+## 2 rsq     standard   0.574     3  0.0614 Preprocessor1_Model1
 ```
 
 
@@ -1310,12 +1338,12 @@ cv_metrics1
 ## # A tibble: 6 × 5
 ##   id    .metric .estimator .estimate .config             
 ##   <chr> <chr>   <chr>          <dbl> <chr>               
-## 1 Fold1 rmse    standard       0.364 Preprocessor1_Model1
-## 2 Fold1 rsq     standard       0.590 Preprocessor1_Model1
-## 3 Fold2 rmse    standard       0.376 Preprocessor1_Model1
-## 4 Fold2 rsq     standard       0.449 Preprocessor1_Model1
-## 5 Fold3 rmse    standard       0.468 Preprocessor1_Model1
-## 6 Fold3 rsq     standard       0.534 Preprocessor1_Model1
+## 1 Fold1 rmse    standard       0.320 Preprocessor1_Model1
+## 2 Fold1 rsq     standard       0.687 Preprocessor1_Model1
+## 3 Fold2 rmse    standard       0.368 Preprocessor1_Model1
+## 4 Fold2 rsq     standard       0.476 Preprocessor1_Model1
+## 5 Fold3 rmse    standard       0.432 Preprocessor1_Model1
+## 6 Fold3 rsq     standard       0.558 Preprocessor1_Model1
 ```
 
 **Model 2:**
@@ -1352,18 +1380,18 @@ cv_metrics2
 <tbody>
   <tr>
    <td style="text-align:left;"> Fold1 </td>
-   <td style="text-align:right;"> 0.364 </td>
-   <td style="text-align:right;"> 0.590 </td>
+   <td style="text-align:right;"> 0.320 </td>
+   <td style="text-align:right;"> 0.687 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Fold2 </td>
-   <td style="text-align:right;"> 0.376 </td>
-   <td style="text-align:right;"> 0.449 </td>
+   <td style="text-align:right;"> 0.368 </td>
+   <td style="text-align:right;"> 0.476 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Fold3 </td>
-   <td style="text-align:right;"> 0.468 </td>
-   <td style="text-align:right;"> 0.534 </td>
+   <td style="text-align:right;"> 0.432 </td>
+   <td style="text-align:right;"> 0.558 </td>
   </tr>
 </tbody>
 </table>
@@ -1428,7 +1456,7 @@ cv_metrics1 %>%
 ## # A tibble: 1 × 4
 ##     min   max  mean     sd
 ##   <dbl> <dbl> <dbl>  <dbl>
-## 1 0.364 0.468 0.402 0.0569
+## 1 0.320 0.432 0.373 0.0562
 ```
 
 **Model 2:**
@@ -1516,7 +1544,7 @@ office_preds1 %>%
 ## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   <chr>   <chr>          <dbl>
-## 1 rsq     standard       0.468
+## 1 rsq     standard       0.476
 ```
 
 ```r
@@ -1528,7 +1556,7 @@ office_preds1 %>%
 ## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   <chr>   <chr>          <dbl>
-## 1 rmse    standard       0.411
+## 1 rmse    standard       0.412
 ```
 
 The $R^2$ on the test data is 0.562  (56.2% of the variability in the `imdb_rating` of the test data is explained by the model from the training data).  Additionally, the test RMSE is 0.415. As expected, the RMSE is lower for training than test; the $R^2$ is higher for training than test.
@@ -1537,12 +1565,15 @@ The $R^2$ on the test data is 0.562  (56.2% of the variability in the `imdb_rati
 
 1. What are the steps of the workflow / pipeline?  
 2. What are the types of feature engineering that can be done with the `step_` functions? 
+3. What is the different between model building and model assessment?
+4. In the examples, was cross validation used for model building or model assessment?
 
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
 1. Why is it important to use different parts of the dataset to do the two different tasks of model building and model assessment? 
 2. How does cross validation help to keep the model from overfitting the data at hand? 
+
 
 
 
@@ -1720,8 +1751,8 @@ office_fit_rs1 %>% collect_metrics()
 ## # A tibble: 2 × 6
 ##   .metric .estimator  mean     n std_err .config             
 ##   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-## 1 rmse    standard   0.366     5  0.0134 Preprocessor1_Model1
-## 2 rsq     standard   0.578     5  0.0278 Preprocessor1_Model1
+## 1 rmse    standard   0.355     5  0.0133 Preprocessor1_Model1
+## 2 rsq     standard   0.579     5  0.0338 Preprocessor1_Model1
 ```
 
 ```r
@@ -1744,16 +1775,16 @@ office_fit_rs1 %>% collect_metrics(summarize = FALSE)
 ## # A tibble: 10 × 5
 ##    id    .metric .estimator .estimate .config             
 ##    <chr> <chr>   <chr>          <dbl> <chr>               
-##  1 Fold1 rmse    standard       0.321 Preprocessor1_Model1
-##  2 Fold1 rsq     standard       0.538 Preprocessor1_Model1
-##  3 Fold2 rmse    standard       0.359 Preprocessor1_Model1
-##  4 Fold2 rsq     standard       0.577 Preprocessor1_Model1
-##  5 Fold3 rmse    standard       0.376 Preprocessor1_Model1
-##  6 Fold3 rsq     standard       0.666 Preprocessor1_Model1
-##  7 Fold4 rmse    standard       0.404 Preprocessor1_Model1
-##  8 Fold4 rsq     standard       0.605 Preprocessor1_Model1
-##  9 Fold5 rmse    standard       0.367 Preprocessor1_Model1
-## 10 Fold5 rsq     standard       0.504 Preprocessor1_Model1
+##  1 Fold1 rmse    standard       0.316 Preprocessor1_Model1
+##  2 Fold1 rsq     standard       0.545 Preprocessor1_Model1
+##  3 Fold2 rmse    standard       0.337 Preprocessor1_Model1
+##  4 Fold2 rsq     standard       0.608 Preprocessor1_Model1
+##  5 Fold3 rmse    standard       0.382 Preprocessor1_Model1
+##  6 Fold3 rsq     standard       0.672 Preprocessor1_Model1
+##  7 Fold4 rmse    standard       0.356 Preprocessor1_Model1
+##  8 Fold4 rsq     standard       0.598 Preprocessor1_Model1
+##  9 Fold5 rmse    standard       0.386 Preprocessor1_Model1
+## 10 Fold5 rsq     standard       0.470 Preprocessor1_Model1
 ```
 
 ```r
@@ -1792,7 +1823,7 @@ rsq(office_test_pred_1, truth = imdb_rating, estimate = .pred)
 ## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   <chr>   <chr>          <dbl>
-## 1 rsq     standard       0.468
+## 1 rsq     standard       0.476
 ```
 
 ```r
@@ -1803,7 +1834,7 @@ rmse(office_test_pred_1, truth = imdb_rating, estimate = .pred)
 ## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   <chr>   <chr>          <dbl>
-## 1 rmse    standard       0.411
+## 1 rmse    standard       0.412
 ```
 
 

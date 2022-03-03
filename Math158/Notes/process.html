@@ -109,10 +109,45 @@ input variables x (independent variables) go in one side, and on the other side 
 </ol>
 </blockquote>
 <p>Here in Chapter <a href="process.html#process">10</a>, the focus will be on algorithmic modeling and developing models which are optimally predictive of the response variable at hand.</p>
+<p><strong>Spoiler:</strong></p>
+<ul>
+<li>In Chapter @ref{build}, the model building will use hypothesis testing and p-values.</li>
+<li>In Chapter @ref{shrink}, the model building will use mathematical optimization.</li>
+</ul>
+<p>There isn’t a right way to model. In fact, good data analysis is <strong>hard</strong>. You are building a tool box. Make sure to notice that not every tool is the same, and you have more than just one hammer to use. Sometimes the tools can work together to form even better models.</p>
 <div id="worth-a-comment" class="section level4 unnumbered">
 <h4>Worth a comment<a class="anchor" aria-label="anchor" href="#worth-a-comment"><i class="fas fa-link"></i></a>
 </h4>
 <p>Notice that the R code has gotten more interesting now. How fun!! The R code will help the process! The R package <strong>tidymodels</strong> includes tools to facilitate, in particular, feature engineering and cross validation.</p>
+</div>
+<div id="bias-variance-trade-off" class="section level3 unnumbered">
+<h3>Bias-variance trade-off<a class="anchor" aria-label="anchor" href="#bias-variance-trade-off"><i class="fas fa-link"></i></a>
+</h3>
+<p><strong>Excellent resource</strong></p>
+<p>for explaining the bias-variance trade-off: <a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" class="uri">http://scott.fortmann-roe.com/docs/BiasVariance.html</a></p>
+<ul>
+<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
+<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
+</ul>
+<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit. [If time permits, Receiver Operating Characteristic (ROC) curves will also be covered.]</p>
+<p><span class="math display">\[\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}\]</span></p>
+<ul>
+<li>
+<strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
+<li>
+<strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, the more complicated the model (e.g., the more variables), the closer the points are to the prediction. As the model gets more complicated (e.g., as variables are added), the bias goes down.</li>
+<li>
+<strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (very few variables) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., variables are removed).</li>
+</ul>
+<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-2"></span>
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%"><p class="caption">
+Figure 1.2: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(<a href="references.html#ref-ESL" role="doc-biblioref">Hastie, Tibshirani, and Friedman 2001</a>)</span>
+</p>
+</div>
 </div>
 </div>
 <div id="feature-engineering" class="section level2" number="10.2">
@@ -141,17 +176,17 @@ input variables x (independent variables) go in one side, and on the other side 
 <div id="imdb-ratings" class="section level4 unnumbered">
 <h4>IMDB ratings<a class="anchor" aria-label="anchor" href="#imdb-ratings"><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="imdb-ratings-vs.-number-of-votes" class="section level4 unnumbered">
 <h4>IMDB ratings vs. number of votes<a class="anchor" aria-label="anchor" href="#imdb-ratings-vs.-number-of-votes"><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="outliers" class="section level4 unnumbered">
 <h4>Outliers?<a class="anchor" aria-label="anchor" href="#outliers"><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="aside" class="section level4 unnumbered">
 <h4>Aside…<a class="anchor" aria-label="anchor" href="#aside"><i class="fas fa-link"></i></a>
@@ -161,12 +196,12 @@ input variables x (independent variables) go in one side, and on the other side 
 <div id="rating-vs.-air-date" class="section level4 unnumbered">
 <h4>Rating vs. air date<a class="anchor" aria-label="anchor" href="#rating-vs.-air-date"><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="imdb-ratings-vs.-seasons" class="section level4 unnumbered">
 <h4>IMDB ratings vs. seasons<a class="anchor" aria-label="anchor" href="#imdb-ratings-vs.-seasons"><i class="fas fa-link"></i></a>
 </h4>
-<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04a-process_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="building-a-model" class="section level3" number="10.2.1">
 <h3>
@@ -778,7 +813,7 @@ input variables x (independent variables) go in one side, and on the other side 
 </h3>
 <p>Percentage of variability in the IMDB ratings explained by the model.</p>
 <div class="sourceCode" id="cb428"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rsq</span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -795,7 +830,7 @@ Note: RMSE here is computed as it would be for any type of statistics or machine
 <li>Is this RMSE considered low or high?</li>
 </ul>
 <div class="sourceCode" id="cb430"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rmse</span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -840,14 +875,14 @@ Note: RMSE here is computed as it would be for any type of statistics or machine
 </h4>
 <p><span class="math inline">\(R^2\)</span> of model fit to <strong>testing</strong> data</p>
 <div class="sourceCode" id="cb436"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rsq</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rsq     standard       0.468</code></pre>
 <p>RMSE of model fit to <strong>testing</strong> data</p>
 <div class="sourceCode" id="cb438"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rmse</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -857,19 +892,19 @@ Note: RMSE here is computed as it would be for any type of statistics or machine
 <h4>Training vs. testing<a class="anchor" aria-label="anchor" href="#training-vs.-testing"><i class="fas fa-link"></i></a>
 </h4>
 <div class="sourceCode" id="cb440"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rmse_train</span> <span class="op">&lt;-</span> <span class="fu">rmse</span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">rmse_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="va">.estimate</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>
 
-<span class="va">rsq_train</span> <span class="op">&lt;-</span> <span class="fu">rsq</span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">rsq_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_train_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="va">.estimate</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>
 
-<span class="va">rmse_test</span> <span class="op">&lt;-</span> <span class="fu">rmse</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">rmse_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="va">.estimate</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>
 
-<span class="va">rsq_test</span> <span class="op">&lt;-</span> <span class="fu">rsq</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">rsq_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/pull.html">pull</a></span><span class="op">(</span><span class="va">.estimate</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
@@ -927,29 +962,19 @@ The student scores on the second test do not accurately reflect what they know a
 <span class="fu">bake</span><span class="op">(</span><span class="va">office_train</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/pillar/man/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Rows: 141
-## Columns: 22
-## $ episode            &lt;dbl&gt; 18, 14, 8, 5, 22, 1, 15, 21, 18, 12, 25, 26, 12, 1,…
-## $ title              &lt;fct&gt; "Last Day in Florida", "Vandalism", "Performance Re…
-## $ total_votes        &lt;dbl&gt; 1429, 1402, 2416, 1515, 2783, 1897, 2283, 2041, 144…
-## $ imdb_rating        &lt;dbl&gt; 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0, 8.0, 8…
-## $ season_X2          &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X3          &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X4          &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X5          &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, …
-## $ season_X6          &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, …
-## $ season_X7          &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, …
-## $ season_X8          &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
-## $ season_X9          &lt;dbl&gt; 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, …
-## $ air_date_dow_Tue   &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_dow_Thu   &lt;dbl&gt; 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
-## $ air_date_month_Feb &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_month_Mar &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-## $ air_date_month_Apr &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, …
-## $ air_date_month_May &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, …
-## $ air_date_month_Sep &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, …
-## $ air_date_month_Oct &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, …
-## $ air_date_month_Nov &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, …
-## $ air_date_month_Dec &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</code></pre>
+## Columns: 12
+## $ episode     &lt;dbl&gt; 18, 14, 8, 5, 22, 1, 15, 21, 18, 12, 25, 26, 12, 1, 20, 8,…
+## $ title       &lt;fct&gt; "Last Day in Florida", "Vandalism", "Performance Review", …
+## $ total_votes &lt;dbl&gt; 1429, 1402, 2416, 1515, 2783, 1897, 2283, 2041, 1445, 1612…
+## $ imdb_rating &lt;dbl&gt; 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0, 8.0, 8.7, 8.9…
+## $ season_X2   &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0…
+## $ season_X3   &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X4   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X5   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0…
+## $ season_X6   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0…
+## $ season_X7   &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0…
+## $ season_X8   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ season_X9   &lt;dbl&gt; 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1…</code></pre>
 <p><strong>Model 2:</strong></p>
 <div class="sourceCode" id="cb444"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">office_rec2</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -985,10 +1010,9 @@ The student scores on the second test do not accurately reflect what they know a
 ## Model: linear_reg()
 ## 
 ## ── Preprocessor ────────────────────────────────────────────────────────────────
-## 5 Recipe Steps
+## 4 Recipe Steps
 ## 
-## • step_date()
-## • step_holiday()
+## • step_rm()
 ## • step_num2factor()
 ## • step_dummy()
 ## • step_zv()
@@ -1050,7 +1074,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:<
 <li>The model is evaluated with the <strong>assessment set</strong>.</li>
 </ul>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-51"></span>
+<span style="display:block;" id="fig:unnamed-chunk-52"></span>
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%"><p class="caption">
 Figure 10.1: Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
@@ -1083,7 +1107,7 @@ Figure 10.1: Repeated samples are taken from the training data, and with each re
 </h4>
 <p>Consider the example below where the <strong>training</strong> <strong>data</strong> are randomly split into 3 partitions:</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-52"></span>
+<span style="display:block;" id="fig:unnamed-chunk-53"></span>
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%"><p class="caption">
 Figure 10.2: Splitting the data into a partition of v=3 groups. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
@@ -1109,7 +1133,7 @@ Figure 10.2: Splitting the data into a partition of v=3 groups. Source: <span cl
 <li>Repeat v times, updating which partition is used for assessment each time</li>
 </ul>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-54"></span>
+<span style="display:block;" id="fig:unnamed-chunk-55"></span>
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%"><p class="caption">
 Figure 10.3: With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
@@ -1134,7 +1158,7 @@ Figure 10.3: With the data split into three groups, we can see how 2/3 of the ob
 ##   &lt;list&gt;          &lt;chr&gt; &lt;list&gt;           &lt;list&gt;          
 ## 1 &lt;split [94/47]&gt; Fold1 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt;
 ## 2 &lt;split [94/47]&gt; Fold2 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt;
-## 3 &lt;split [94/47]&gt; Fold3 &lt;tibble [2 × 4]&gt; &lt;tibble [1 × 1]&gt;</code></pre>
+## 3 &lt;split [94/47]&gt; Fold3 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
 <p><strong>Model 2:</strong></p>
 <div class="sourceCode" id="cb455"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">456</span><span class="op">)</span>
@@ -1177,8 +1201,8 @@ Figure 10.3: With the data split into three groups, we can see how 2/3 of the ob
 <pre><code>## # A tibble: 2 × 6
 ##   .metric .estimator  mean     n std_err .config             
 ##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-## 1 rmse    standard   0.402     3  0.0329 Preprocessor1_Model1
-## 2 rsq     standard   0.524     3  0.0410 Preprocessor1_Model1</code></pre>
+## 1 rmse    standard   0.373     3  0.0324 Preprocessor1_Model1
+## 2 rsq     standard   0.574     3  0.0614 Preprocessor1_Model1</code></pre>
 </div>
 <div id="deeper-look-into-cv-metrics" class="section level4 unnumbered">
 <h4>Deeper look into CV metrics<a class="anchor" aria-label="anchor" href="#deeper-look-into-cv-metrics"><i class="fas fa-link"></i></a>
@@ -1191,12 +1215,12 @@ Figure 10.3: With the data split into three groups, we can see how 2/3 of the ob
 <pre><code>## # A tibble: 6 × 5
 ##   id    .metric .estimator .estimate .config             
 ##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-## 1 Fold1 rmse    standard       0.364 Preprocessor1_Model1
-## 2 Fold1 rsq     standard       0.590 Preprocessor1_Model1
-## 3 Fold2 rmse    standard       0.376 Preprocessor1_Model1
-## 4 Fold2 rsq     standard       0.449 Preprocessor1_Model1
-## 5 Fold3 rmse    standard       0.468 Preprocessor1_Model1
-## 6 Fold3 rsq     standard       0.534 Preprocessor1_Model1</code></pre>
+## 1 Fold1 rmse    standard       0.320 Preprocessor1_Model1
+## 2 Fold1 rsq     standard       0.687 Preprocessor1_Model1
+## 3 Fold2 rmse    standard       0.368 Preprocessor1_Model1
+## 4 Fold2 rsq     standard       0.476 Preprocessor1_Model1
+## 5 Fold3 rmse    standard       0.432 Preprocessor1_Model1
+## 6 Fold3 rsq     standard       0.558 Preprocessor1_Model1</code></pre>
 <p><strong>Model 2:</strong></p>
 <div class="sourceCode" id="cb463"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cv_metrics2</span> <span class="op">&lt;-</span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="va">office_fit_rs2</span>, summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> 
@@ -1234,10 +1258,10 @@ R-squared
 Fold1
 </td>
 <td style="text-align:right;">
-0.364
+0.320
 </td>
 <td style="text-align:right;">
-0.590
+0.687
 </td>
 </tr>
 <tr>
@@ -1245,10 +1269,10 @@ Fold1
 Fold2
 </td>
 <td style="text-align:right;">
-0.376
+0.368
 </td>
 <td style="text-align:right;">
-0.449
+0.476
 </td>
 </tr>
 <tr>
@@ -1256,10 +1280,10 @@ Fold2
 Fold3
 </td>
 <td style="text-align:right;">
-0.468
+0.432
 </td>
 <td style="text-align:right;">
-0.534
+0.558
 </td>
 </tr>
 </tbody>
@@ -1336,7 +1360,7 @@ Fold3
 <pre><code>## # A tibble: 1 × 4
 ##     min   max  mean     sd
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
-## 1 0.364 0.468 0.402 0.0569</code></pre>
+## 1 0.320 0.432 0.373 0.0562</code></pre>
 <p><strong>Model 2:</strong></p>
 <div class="sourceCode" id="cb467"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cv_metrics2</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -1406,18 +1430,18 @@ Fold3
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/bind.html">bind_cols</a></span><span class="op">(</span><span class="va">office_test</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">imdb_rating</span>, <span class="va">title</span><span class="op">)</span><span class="op">)</span> 
 
 <span class="va">office_preds1</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">rsq</span><span class="op">(</span>truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rsq     standard       0.468</code></pre>
+## 1 rsq     standard       0.476</code></pre>
 <div class="sourceCode" id="cb473"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">office_preds1</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">rmse</span><span class="op">(</span>truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rmse    standard       0.411</code></pre>
+## 1 rmse    standard       0.412</code></pre>
 <p>The <span class="math inline">\(R^2\)</span> on the test data is 0.562 (56.2% of the variability in the <code>imdb_rating</code> of the test data is explained by the model from the training data). Additionally, the test RMSE is 0.415. As expected, the RMSE is lower for training than test; the <span class="math inline">\(R^2\)</span> is higher for training than test.</p>
 </div>
 <div id="reflection-questions-7" class="section level2" number="10.5">
@@ -1428,6 +1452,8 @@ Fold3
 <li>What are the steps of the workflow / pipeline?<br>
 </li>
 <li>What are the types of feature engineering that can be done with the <code>step_</code> functions?</li>
+<li>What is the different between model building and model assessment?</li>
+<li>In the examples, was cross validation used for model building or model assessment?</li>
 </ol>
 </div>
 <div id="ethics-considerations-6" class="section level2" number="10.6">
@@ -1561,13 +1587,13 @@ Fold3
 <code class="sourceCode R"><span class="va">office_test_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">office_fit</span>, <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/bind.html">bind_cols</a></span><span class="op">(</span><span class="va">office_test</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">imdb_rating</span>, <span class="va">title</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">rsq</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 ## 1 rsq     standard       0.468</code></pre>
 <div class="sourceCode" id="cb487"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rmse</span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_test_pred</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1582,8 +1608,8 @@ Fold3
 <pre><code>## # A tibble: 2 × 6
 ##   .metric .estimator  mean     n std_err .config             
 ##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-## 1 rmse    standard   0.366     5  0.0134 Preprocessor1_Model1
-## 2 rsq     standard   0.578     5  0.0278 Preprocessor1_Model1</code></pre>
+## 1 rmse    standard   0.355     5  0.0133 Preprocessor1_Model1
+## 2 rsq     standard   0.579     5  0.0338 Preprocessor1_Model1</code></pre>
 <div class="sourceCode" id="cb491"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">office_fit_rs2</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 6
@@ -1596,16 +1622,16 @@ Fold3
 <pre><code>## # A tibble: 10 × 5
 ##    id    .metric .estimator .estimate .config             
 ##    &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-##  1 Fold1 rmse    standard       0.321 Preprocessor1_Model1
-##  2 Fold1 rsq     standard       0.538 Preprocessor1_Model1
-##  3 Fold2 rmse    standard       0.359 Preprocessor1_Model1
-##  4 Fold2 rsq     standard       0.577 Preprocessor1_Model1
-##  5 Fold3 rmse    standard       0.376 Preprocessor1_Model1
-##  6 Fold3 rsq     standard       0.666 Preprocessor1_Model1
-##  7 Fold4 rmse    standard       0.404 Preprocessor1_Model1
-##  8 Fold4 rsq     standard       0.605 Preprocessor1_Model1
-##  9 Fold5 rmse    standard       0.367 Preprocessor1_Model1
-## 10 Fold5 rsq     standard       0.504 Preprocessor1_Model1</code></pre>
+##  1 Fold1 rmse    standard       0.316 Preprocessor1_Model1
+##  2 Fold1 rsq     standard       0.545 Preprocessor1_Model1
+##  3 Fold2 rmse    standard       0.337 Preprocessor1_Model1
+##  4 Fold2 rsq     standard       0.608 Preprocessor1_Model1
+##  5 Fold3 rmse    standard       0.382 Preprocessor1_Model1
+##  6 Fold3 rsq     standard       0.672 Preprocessor1_Model1
+##  7 Fold4 rmse    standard       0.356 Preprocessor1_Model1
+##  8 Fold4 rsq     standard       0.598 Preprocessor1_Model1
+##  9 Fold5 rmse    standard       0.386 Preprocessor1_Model1
+## 10 Fold5 rsq     standard       0.470 Preprocessor1_Model1</code></pre>
 <div class="sourceCode" id="cb495"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">office_fit_rs2</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span>summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 10 × 5
@@ -1628,17 +1654,17 @@ Fold3
   <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/bind.html">bind_cols</a></span><span class="op">(</span><span class="va">office_test</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">imdb_rating</span>, <span class="va">title</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">rsq</span><span class="op">(</span><span class="va">office_test_pred_1</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rsq.html">rsq</a></span><span class="op">(</span><span class="va">office_test_pred_1</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rsq     standard       0.468</code></pre>
+## 1 rsq     standard       0.476</code></pre>
 <div class="sourceCode" id="cb499"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rmse</span><span class="op">(</span><span class="va">office_test_pred_1</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/yardstick/man/rmse.html">rmse</a></span><span class="op">(</span><span class="va">office_test_pred_1</span>, truth <span class="op">=</span> <span class="va">imdb_rating</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rmse    standard       0.411</code></pre>
+## 1 rmse    standard       0.412</code></pre>
 
 </div>
 </div>
@@ -1652,7 +1678,9 @@ Fold3
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#process"><span class="header-section-number">10</span> Modeling as a Process6</a></li>
-<li><a class="nav-link" href="#comparing-models"><span class="header-section-number">10.1</span> Comparing Models</a></li>
+<li>
+<a class="nav-link" href="#comparing-models"><span class="header-section-number">10.1</span> Comparing Models</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#bias-variance-trade-off">Bias-variance trade-off</a></li></ul>
+</li>
 <li>
 <a class="nav-link" href="#feature-engineering"><span class="header-section-number">10.2</span> Feature Engineering</a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#building-a-model"><span class="header-section-number">10.2.1</span> Building a Model</a></li>
@@ -1699,7 +1727,7 @@ Fold3
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-02.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-03.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

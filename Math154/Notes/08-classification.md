@@ -94,14 +94,19 @@ Note the bias-variance trade-off.  We want our prediction error to be small, so 
 </div>
 
 
-The following visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
+The following interactive visualization does an excellent job of communicating the trade-off between bias and variance as a function of a specific tuning parameter, here: minimum node size of a classification tree.  http://www.r2d3.us/visual-intro-to-machine-learning-part-2/
+
+<div class="figure" style="text-align: center">
+<img src="figs/bias-var-cv.png" alt="Great interactive viz at http://www.r2d3.us/visual-intro-to-machine-learning-part-2/" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-5)Great interactive viz at http://www.r2d3.us/visual-intro-to-machine-learning-part-2/</p>
+</div>
 
 #### Implementing Cross Validation {-}
 
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-5)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-6)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -168,7 +173,7 @@ To do both, one approach is to use test/training data *and* CV in order to both 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-6)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-7)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
 
 
@@ -191,7 +196,7 @@ Put the testing data in your pocket (keep it secret from R!!)
 
 <div class="figure" style="text-align: center">
 <img src="figs/testtrain.png" alt="Image credit: Julia Silge" width="1066" />
-<p class="caption">(\#fig:unnamed-chunk-7)Image credit: Julia Silge</p>
+<p class="caption">(\#fig:unnamed-chunk-8)Image credit: Julia Silge</p>
 </div>
 
 #### 2. build a recipe {-}
@@ -380,70 +385,70 @@ Putting it all together, the `fit()` will give the model specifications.
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-10)Image credit: Alison Hill</p>
-</div>
-
-$$\bigg\Downarrow$$
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-18)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-19)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-20)Image credit: Alison Hill</p>
 </div>
 
 #### Reflecting on Model Building {-}
@@ -452,18 +457,18 @@ In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>,
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild1.png" alt="Image credit: https://www.tmwr.org/" width="816" />
-<p class="caption">(\#fig:unnamed-chunk-20)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-21)Image credit: https://www.tmwr.org/</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild2.png" alt="Image credit: https://www.tmwr.org/" width="775" />
-<p class="caption">(\#fig:unnamed-chunk-21)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
 </div>
 
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild3.png" alt="Image credit: https://www.tmwr.org/" width="796" />
-<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-23)Image credit: https://www.tmwr.org/</p>
 </div>
 
 
@@ -472,7 +477,7 @@ In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>,
 
 <div class="figure" style="text-align: right">
 <img src="figs/penguins.png" alt="Image credit: Alison Hill" width="30%" />
-<p class="caption">(\#fig:unnamed-chunk-23)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-24)Image credit: Alison Hill</p>
 </div>
 
 
@@ -701,7 +706,7 @@ data(penguins)
 ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
 
 #### $k$-NN to predict penguin species {-}
 
@@ -816,7 +821,7 @@ The red observations are used to fit the model, the black observations are used 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-43)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-44)Image credit: Alison Hill</p>
 </div>
 
 
@@ -999,14 +1004,14 @@ Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tr
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-52)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
+<p class="caption">(\#fig:unnamed-chunk-53)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
 Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-53)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+<p class="caption">(\#fig:unnamed-chunk-54)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
 </div>
 
 
@@ -1315,7 +1320,7 @@ house_train %>%
   geom_point(aes(color = MedianHouseValue)) 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-58-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1332,7 +1337,7 @@ house_cart_fit %>%
   geom_point(aes(x = logValue, y = .pred), alpha = 0.1)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1393,7 +1398,7 @@ house_cart_full_fit %>%
   geom_point(aes(x = logValue, y = .pred), alpha = 0.01)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-61-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-62-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Cross Validation (model building!)  {-}
 
@@ -1477,7 +1482,7 @@ house_tuned %>%
   autoplot(metric = "rmse")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-63-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-64-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 house_tuned %>% 
@@ -1582,7 +1587,7 @@ house_final %>%
   ylab("predicted value of log Median House")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-66-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-67-1.png" width="480" style="display: block; margin: auto;" />
 
 
 <!---
@@ -1716,7 +1721,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-67)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-68)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1849,7 +1854,7 @@ penguin_rf_tune %>%
   geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-69-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-70-1.png" width="480" style="display: block; margin: auto;" />
 
 
 Get the final model:
@@ -1928,7 +1933,7 @@ penguin_rf_final %>%
   geom_abline(intercept = 0, slope = 1)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ####  Variable Importance {-}
@@ -1944,7 +1949,7 @@ penguin_rf_final %>%
   vip(geom = "point")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;" />
 
 ## Model Choices
 
@@ -2010,7 +2015,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-74)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-75)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -2024,7 +2029,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-75)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-76)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -2213,7 +2218,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-77)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-78)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -2222,17 +2227,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-78)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-81)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -2277,7 +2282,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-81)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-82)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -2308,7 +2313,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-82)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-83)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -2628,7 +2633,7 @@ penguin_svm_rbf_tune %>%
   labs(color = "Cost")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-86-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2636,7 +2641,7 @@ penguin_svm_rbf_tune %>%
   autoplot()
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-88-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### RBF SVM final model {-}
 

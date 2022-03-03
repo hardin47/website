@@ -6,7 +6,7 @@
 <!--
 ## 1/23/20 Agenda {#Jan23}
 1. Example: gender discrimination
-2. `infer` again
+2. **infer** again
 3. Hypothesis testing structure
 -->
 
@@ -15,15 +15,13 @@
 Hypothesis testing is arguably the most fundamental process for decision making in statistics.
 The particular hypothesis test given here is called a Randomization Test.  Many other hypothesis tests (with slightly different structure but all of the same pieces) will be seen throughout the course.
 
-::: {.definition}
-**Randomization Test**
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-1"><strong>(\#def:unnamed-chunk-1) </strong></span>**Randomization Test**
 
-A hypothesis test that is based on simulated random assignment of the explanatory variable.  Each of the simulations is done under the condition that there is no association between the explanatory variable and the response variable.
-::: 
+A hypothesis test that is based on simulated random assignment of the explanatory variable.  Each of the simulations is done under the condition that there is no association between the explanatory variable and the response variable.</div>\EndKnitrBlock{definition}
 
 In this section we describe the structure of a randomization test within the framework of an example on gender discrimination. 
 
-::: {.example #gend} 
+
 **Gender Discrimination**
 
 > We consider a study investigating gender discrimination in the 1970s, which is set in the context of personnel decisions within a bank.^[Rosen B and Jerdee T. 1974. Influence of sex role stereotypes on personnel decisions. Journal of Applied Psychology 59(1):9-14.] The research question we hope to answer is, "Are females discriminated against in promotion decisions made by male managers?"
@@ -38,7 +36,7 @@ In this section we describe the structure of a randomization test within the fra
 |   | male   | 21       | 3            | 24    |
 |   | female | 14       | 10           | 24    |
 |   | total  | 35       | 13           | 48    |
-:::
+
 
 
 #### Always Ask {-}
@@ -115,7 +113,7 @@ visualize(null_discrim, bins = 10) +
   shade_p_value(obs_stat = diff_obs, direction = "greater")
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # calculate the actual p-value
@@ -291,7 +289,7 @@ Let's say you want to find out what proportion of videos on YouTube take place o
 If you had originally hypothesized that 47% of YouTube videos happen outside, then the variability of the sample proportion can be described by the following histogram.  That is to say, if each student in our class individually took a random sample of 128 YouTube videos (and again, with the condition that p = 0.47), their sample proportions would vary as below.  To do the simulation with the computer, think about repeatedly selecting 128 marbles from a bag with 47% red.
 
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
 
 
 But remember we are trying to model the situation where there is *not* a hypothesized value of the parameter in mind.  That is, we need to use only the information in the sample to estimate the unknown characteristics about the population.
@@ -303,17 +301,15 @@ As we saw in the figure above, when $p=0.47$, the sample proportions vary from a
 What happens if we use the **data** as a pseudo-population?  In the actual dataset, 37 of the 128 videos took place outside.  So $\hat{p} = 0.29$.  If the bag of marbles now has 29% red marbles (and 71% white marbles), how would the new bootstrapped sample proportions ($\hat{p}_{BS}$) vary?  Note that with 29% red marbles in the bag, each resample has a bootstrapped proportion which now varies around 0.29!  The range of possible values is still roughly plus or minus 0.1, and the shape of the distribution is bell-shaped and symmetric.
 
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
-::: {.definition}
-**Resample.**  To resample is to select observations from the observed sample one at a time, measure them, replace them back into the population, and repeat until the new "resample" is exactly the same size as the original sample.
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-5"><strong>(\#def:unnamed-chunk-5) </strong></span>**Resample.**  To resample is to select observations from the observed sample one at a time, measure them, replace them back into the population, and repeat until the new "resample" is exactly the same size as the original sample.
 
 Note the physical object which connects to resampling is a bag of marbles.  For example, in the kissing setting, the bag of marbles has 37 red marbles and 91 white marbles.  By *replacing* the marble after it has been selected and its color recorded, we are effectively creating an infinitely large bag of marbles with 29% red.
 
-The bootstrap process is typically referred to as **resampling with replacement**.
-:::
+The bootstrap process is typically referred to as **resampling with replacement**.</div>\EndKnitrBlock{definition}
 
 Two good applets for understanding bootstrapping and sampling distributions are:  
 * StatKey (*Statistics: Unlocking the Power of Data*)  http://www.lock5stat.com/StatKey/bootstrap_1_cat/bootstrap_1_cat.html   
@@ -337,7 +333,7 @@ Reminder of where we are:
 > If you are two feet from me, then I am two feet from you.
 
 
-\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-4"><strong>(\#def:unnamed-chunk-4) </strong></span>-----
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-6"><strong>(\#def:unnamed-chunk-6) </strong></span>-----
 **95% Bootstrap Percentile Confidence Interval for $p$**  
   
 From the bootstrapped proportions, find the bootstrap value at 2.5\% and 97.5\% and refer to them as "lower" and "upper" respectively.
@@ -478,7 +474,7 @@ library(mosaic)
 xpnorm(-1, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553
@@ -497,7 +493,7 @@ xpnorm(-1, 0, 1)
 xpnorm(-3.16, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0007888457
@@ -516,7 +512,7 @@ xpnorm(-3.16, 0, 1)
 xpnorm(c(-1, 0.5), 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-5-3.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-3.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.1586553 0.6914625
@@ -579,7 +575,7 @@ The Z score tells us that the minimum speed is only -1.33 standard deviations be
 xpnorm(-1.333, 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.0912659
@@ -639,16 +635,14 @@ For example, if a 99% confidence interval is desired, find the $Z^*$ value that 
 
 $$99\% \mbox{ CI for }p:  \hat{p} \pm 2.58 \sqrt{\frac{p(1-p)}{n}}$$
 
-::: {.definition}
-$Z^*$ is a value taken from a standard normal distribution (that is, N(mean = 0, sd = 1)) that contains a pre-specified amount of area between $-Z^*$ and $+Z^*$.
-:::
+\BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-9"><strong>(\#def:unnamed-chunk-9) </strong></span>$Z^*$ is a value taken from a standard normal distribution (that is, N(mean = 0, sd = 1)) that contains a pre-specified amount of area between $-Z^*$ and $+Z^*$.</div>\EndKnitrBlock{definition}
 
 
 ```r
 xpnorm(c(-2.58, 2.58), 0, 1, plot = TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.004940016 0.995059984
@@ -717,7 +711,7 @@ We could find the percent of samples that would have produced such a small $\hat
 xpnorm(-19.05, 0, 1, plot=TRUE)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 3.28511e-81
@@ -730,9 +724,9 @@ Given the extreme poverty set-up above, the question turns from one of a hypothe
 
 \begin{eqnarray*}
 p &=& \mbox{true proportion of people who incorrectly believe that the % of the}\\
-&=& \mbox{ world's population who live in extreme poverty has doubled}\\
+& & \mbox{ world's population who live in extreme poverty has doubled}\\
 \hat{p} &=& \mbox{sample proportion of people who incorrectly believe that the % of the}\\
-&=& \mbox{ world's population who live in extreme poverty has doubled}
+& & \mbox{ world's population who live in extreme poverty has doubled}
 \end{eqnarray*}
 
 It turns out that in the sample of 1005 adult Americans, 593 people thought that the rate had doubled.^[see results here: https://www.gapminder.org/ignorance/gms/]
@@ -792,7 +786,7 @@ Note that $Z^* = 1.645$ produces CIs that capture at a 90% rate.  $Z^* = 2.58$ p
 xpnorm(1.645, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.9500151
@@ -802,7 +796,7 @@ xpnorm(1.645, 0, 1)
 xpnorm(2.58, 0, 1)
 ```
 
-<img src="02-FoundInf_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
+<img src="02-FoundInf_files/figure-html/unnamed-chunk-15-2.png" width="480" style="display: block; margin: auto;" />
 
 ```
 ## [1] 0.99506
@@ -832,7 +826,7 @@ Assume that an alien has landed on Earth and wants to understand the gender dive
 
 a) Calculate the alien's 95% confidence interval. (uh... confidence interval for *what*?)  
 
-This calculation becomes .25 $\pm$ .085, which is the interval (.165 $\rightarrow$ .335).
+This calculation is: $0.25 \pm 1.96 \sqrt{(0.25 \cdot 0.75)/100} \rightarrow .25 \pm .085,$ which is the interval (.165 $\rightarrow$ .335).
 
 b) Interpret the interval.  
 
@@ -937,7 +931,7 @@ $p$ = baseball players **current** probability of hitting the ball
 
 You are encouraged to go to the applet on your own to convince yourself that  you understand why the ideas below are true.  http://www.rossmanchance.com/applets/2021/power/power.html
 
-**What are the Type I and Type II errors/**  A Type I error means the manager became convinced the player is better than a 0.250 hitter but in reality he is just still a 0.250 hitter.  A Type II error means the player has improved but does not do well enough in his 20 at-bats to convince the manager.
+**What are the Type I and Type II errors?**  A Type I error means the manager became convinced the player is better than a 0.250 hitter but in reality he is just still a 0.250 hitter.  A Type II error means the player has improved but does not do well enough in his 20 at-bats to convince the manager.
 
 **Who is worried about which type of error?**  Player would like to minimize the probability of a Type II error – of the manager missing his improvement.  The manager would like to minimize the probability of a Type I error – incorrectly thinking the player has improved
 
@@ -974,18 +968,18 @@ we cannot accept the null.
 1. What is the difference between a statistic and a parameter?
 2. In a typical study, do you have one statistic or more than one statistic?  And do you know the value of the statistic?
 3. In a typical study, do you have one parameter or more than one parameter? And do you know the value of the parameter?
-4. Explain what it means for a statistic to have a sampling distribution.  How does the distribution different when it is referred to as a null sampling distribution?
-5. What is a p-value?
-6. What is the difference between a one- and two-sided hypothesis?
+4. Explain what it means for a statistic to have a sampling distribution.  How does the distribution differ when it is referred to as a null sampling distribution?
+5. What is a p-value?  Can you define it?
+6. What is the difference between one- and two-sided hypotheses?
 7. What is the difference between a null hypothesis and an alternative hypothesis?
 
 ### Bootstrapping: IMS Section 5.2
 
 1. How is the bootstrap sampling distribution (of a statistic) created?  That is, what is the process?
-2. The bootstrap distribution is similar to the true sampling distribution in two of the following three ways (which two?):  center, variability (spread), shape (we've mostly seen bell-shaped so far).
+2. The bootstrap distribution is similar to the true (not null) sampling distribution in two of the following three ways (which two?):  center, variability (spread), shape (we've mostly seen bell-shaped so far).
 3. In what one way is the bootstrap distribution fundamentally different from the true sampling distribution?  Is it center, variability, or shape?
 3. How does the similarity of the bootstrap distribution to the true sampling distribution provide information about the true population parameter of interest?
-4. What does the confidence level (e.g., 90%, 95%, or 99%)?  That is, what is happening some percentage of the time?  
+4. What does the confidence level (e.g., 90%, 95%, or 99%) mean?  That is, what is happening some percentage of the time?  
 5. If we are lucky (and most of the time we are), then the confidence interval will capture what value?
 
 ### normal model: IMS Section 5.3 
@@ -1021,13 +1015,17 @@ we cannot accept the null.
 
 1. Why is it never okay to accept $H_0$?
 2. What is the difference between a Type I and Type II error?
-3. Which is worse: a Type I error or a Type II error?
-4. What is power?  How is power calculated?  What does power depend on?
+3. What is power?  How is power calculated?  What does power depend on?
 
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-
+1. What if the sample you take is biased?  What goes wrong with your inference conclusions?  (hint: think about the alien example)
+2. In comparing type I and type II errors (e.g., think about the prenatal testing), is one error necessarily worse?  Is that always true?
+3. What would you tell a friend who mistakenly thought that the p-value was the probability that the null hypothesis is true?  Or who mistakenly thought that the p-value was the probability that the observed data were generated by chance?
+4. What would you tell a friend who tried out all the different methods we've covered (e.g., different statistics, computational vs. mathematical models, etc.) and chose the one that gave them the smallest p-value?  What is wrong with their approach?
+5. Researchers typically select only one random sample from a population, and then they produce a confidence interval based on that sample. How do they know whether the resulting confidence interval is successful in capturing the unknown value of the population parameter?
+6. Why don't we always use 99% confidence intervals?
 
 
 

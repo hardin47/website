@@ -33,7 +33,7 @@ IMPORTANT: recall, the above interval is a method for capturing the **parameter*
 3. Confidence Intervals
 -->
 
-## Binomial distribution
+## Binomial distribution (not covered)
 
 The Binomial distribution describes the exact probabilities associated with binary outcomes.  We do not typically have time to cover the Binomial distribution in Introduction to Biostatistics.
 
@@ -218,10 +218,13 @@ How often will a type I error be made?  5% of the time.  Therefore ($p_{small}, 
 
 ## Relative Risk {#rr}
 
-Previously (e.g., Gender discrimination example, \@ref(ex:gend)) when working with the proportion of success in two separate groups, the proportion of success was subtracted (see also lab 4).  Next week, differences in proportions will be revisited, see section \@ref(diffprop).  First up, the new statistic of interest will be relative risk, followed by odds ratios.
+Previously (e.g., Gender discrimination example, section \@ref(randtest)) when working with the proportion of success in two separate groups, the proportion of success was subtracted (see also lab 4).  Next week, differences in proportions will be revisited, see section \@ref(diffprop).  First up, the new statistic of interest will be relative risk, followed by odds ratios.
 
 
 In particular, interest is in the ratio of probabilities.  [Note: the decision to measure a ratio instead of a difference comes with trying to model the particular research question at hand.  There is nothing inherently better about ratios versus differences.  It is, however, often easier to think about how a small probability changes if it is done as a ratio instead of a difference.]
+
+@ims do not discuss relative risk and odds ratios.  @iscam, however, provide quite a bit of detail about the concepts in Investigations 3.9, 3.10, 3.11.
+
 
 $$\mbox{Relative Risk (RR)} = \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}$$
 
@@ -250,14 +253,14 @@ To remember with relative risk:
 
 * The percent change is defined as:
 \begin{eqnarray*}
-(\widehat{RR} - 1)*100\% = \frac{\hat{p}_1 - \hat{p}_2}{\hat{p}_2}*100\% = \mbox{percent change from 2 to 1}
+(\widehat{RR} - 1)*100\% = \frac{\hat{p}_1 - \hat{p}_2}{\hat{p}_2}*100\% = \mbox{percent change from group 2 to group 1}
 \end{eqnarray*}
 
 * The CI for $p_1/p_2$ is typically considered significant if 1 is not in the interval.  That is because usually the null hypothesis is $H_0: p_1 = p_2$ or equivalently, $H_0: p_1/p_2 = 1$.
 
-### Using `infer` for inference on RR
+### Using **iner** for inference on RR
 
-As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.
+As with the difference in proportions, the **iner** syntax can be used to simulate a sampling distribution of the sample relative risk under the null hypothesis that the population proportions are identical.
 
 **NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
 
@@ -305,6 +308,13 @@ Experience shows that very few introductory statistics students have seen odds o
 
 
 @ims do not discuss relative risk and odds ratios.  @iscam, however, provide quite a bit of detail about the concepts in Investigations 3.9, 3.10, 3.11.
+
+Some important vocabulary:
+
+* **Case-control study:** identify observational units by the response variable
+* **Cohort study:** identify observational units by the explanatory variable   
+* **Cross-classification study:**  observational units are selected directly from the population without consideration of the response or explanatory variables  
+
 
 $$\mbox{risk} = \frac{\mbox{number of successes}}{\mbox{total number}}$$
 
@@ -381,7 +391,8 @@ The odds of heavy smoking is 9.39 times higher for those who have lung cancer th
 
 
 * **Case-control study:** identify observational units by the response variable
-* **Cohort study:** identify observational units by the explanatory variable 
+* **Cohort study:** identify observational units by the explanatory variable   
+* **Cross-classification study:**  observational units are selected directly from the population without consideration of the response or explanatory variables  
 
 The risk of being a light smoker if the person has lung cancer can be estimated, but there is no possible way to estimate the risk of lung cancer if you are a light smoker.  Consider a *population* of 1,000,000 people:
 
@@ -578,13 +589,13 @@ Note 5: $RR \approx OR$ if RR is very small (the denominator of the OR will be v
 
 
 
-### Using `infer` for inference on OR
+### Using **iner** for inference on OR
 
 <!--
 devtools::install_github("tidymodels/infer", ref="develop")
 -->
 
-As with the difference in proportions, the `infer` syntax can be used to simulate a sampling distribution of the sample odds ratio under the null hypothesis that the population proportions are identical.
+As with the difference in proportions, the **iner** syntax can be used to simulate a sampling distribution of the sample odds ratio under the null hypothesis that the population proportions are identical.
 
 **NOTE** in order to provide syntax that was comparable and correct for the RR and the OR, `smoking` has been specified as the response variable, and `lungs` has been specified as the explanatory variable.  
 
@@ -1231,19 +1242,19 @@ Spring Break 1 !
 1. What is the differences between cross-classification, cohort, and case-control studies?
 2. When is it not appropriate to calculate differences or ratios of proportions?  Why isn't it appropriate?
 3. How are odds calculated?  How is OR calculated?
-4. What do we do when we we can't calculate statistics based on proportions?  Why does this ``fix" work?
-5. What is the statistic of interest?  What is the parameter of interest?
+4. What do we do when we shouldn't calculate statistics based on proportions (e.g., difference in proportions or RR)?  Why does this "fix" work?
+5. For relative risk and odds ratios: What is the statistic of interest?  What is the parameter of interest?
 6. Why do we look at the natural log of the RR and the natural log of the OR when finding confidence intervals for the respective parameters?
 7. How do you calculate the SE for the $\ln(\widehat{RR})$ and $\ln(\widehat{OR})$?
-8. Once you have the CI for $\ln(RR)$ or for $\ln(OR)$, what do you do?  Why does that process work?
+8. Once you have the CI for $\ln(RR)$ or for $\ln(OR)$, what do you do to find the interval in the original units?  Why does that process work?
 
 
 
 ### 2 binary variables: IMS Section 6.2
 
-1. What is the statistic of interest?  What is the parameter of interest?
-2. How does the inference *change* now that there is binary (response) data taken from two populations?
-3. How does the inference *stay the same* now that there is binary (response) data taken from two populations?
+1. For difference in proportions: What is the statistic of interest?  What is the parameter of interest?
+2. How does the inference *change* (vs a single proportion) now with a binary (response) data taken from two populations?
+3. How does the inference *stay the same* (vs a single proportion) now with a binary (response) data taken from two populations?
 4. What does the Central Limit Theorem say about *two* sample proportions?
 5. When is it appropriate to apply a hypothesis test to the data?  And when is it appropriate to apply a confidence interval to the data?
 6. How do we calculate SE($\hat{p}_1 - \hat{p}_2$)?
@@ -1253,7 +1264,7 @@ Spring Break 1 !
 
 1. How would you describe the data seen in $r \times c$ tables?
 2. Describe the simulation mechanism that creates a sampling distribution under the assumption that the null hypothesis is true (like the cards in the first week of class using the gender discrimination example).
-3. What is the test statistic (for both the `infer` simulation and the chi-squared test with the mathematical model!!)?  Why do we need a complicated test statistic here and we didn't need one with $2 \times 2$ tables?
+3. What is the test statistic (for both the **infer** simulation and the chi-squared test with the mathematical model!!)?  Why do we need a complicated test statistic here and we didn't need one with $2 \times 2$ tables?
 4. How do you compute the expected count?  What is the intuition behind the computation?
 5. What is one benefit that the two sample z-test of proportions has?  That is, what is one thing we can do if we have a $2\times 2$ table instead of an $r \times c$ table?
 6. Describe the directionality of the test statistic.  That is, what values of $X^2$ make you reject $H_0$?
@@ -1272,3 +1283,5 @@ Spring Break 1 !
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
+1. Why shouldn't we calculate a difference in proportions or a relative risk if the data come from a case-control study?
+2. 
