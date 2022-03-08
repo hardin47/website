@@ -4,16 +4,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Chapter 11 Model Building | Linear Models</title>
+<title>Chapter 11 Statistical Model Building | Linear Models</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips? Note: when a single dataset is used to build and fit the model, we penalize the fitting...">
+<meta name="description" content="One of the main tools for statistical building multiple regression models is a nested F test. Two models are nested if the parameters in the smaller model are a subset of the parameters in the...">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
-<meta property="og:title" content="Chapter 11 Model Building | Linear Models">
+<meta property="og:title" content="Chapter 11 Statistical Model Building | Linear Models">
 <meta property="og:type" content="book">
-<meta property="og:description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips? Note: when a single dataset is used to build and fit the model, we penalize the fitting...">
+<meta property="og:description" content="One of the main tools for statistical building multiple regression models is a nested F test. Two models are nested if the parameters in the smaller model are a subset of the parameters in the...">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Chapter 11 Model Building | Linear Models">
-<meta name="twitter:description" content="When we get there, use the function bestregsubsets(). Is this the best model to explain variation in tips? Note: when a single dataset is used to build and fit the model, we penalize the fitting...">
+<meta name="twitter:title" content="Chapter 11 Statistical Model Building | Linear Models">
+<meta name="twitter:description" content="One of the main tools for statistical building multiple regression models is a nested F test. Two models are nested if the parameters in the smaller model are a subset of the parameters in the...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -68,7 +68,7 @@
 <li><a class="" href="la.html"><span class="header-section-number">8</span> Regression using Matrices</a></li>
 <li><a class="" href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
 <li><a class="" href="process.html"><span class="header-section-number">10</span> Modeling as a Process6</a></li>
-<li><a class="active" href="build.html"><span class="header-section-number">11</span> Model Building</a></li>
+<li><a class="active" href="build.html"><span class="header-section-number">11</span> Statistical Model Building</a></li>
 <li><a class="" href="analysis-of-variance-anova.html"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></li>
 <li><a class="" href="diag2.html"><span class="header-section-number">13</span> Diagnostics II</a></li>
 <li><a class="" href="shrink.html"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
@@ -84,54 +84,613 @@
 </div>
   </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="build" class="section level1" number="11">
 <h1>
-<span class="header-section-number">11</span> Model Building<a class="anchor" aria-label="anchor" href="#build"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11</span> Statistical Model Building<a class="anchor" aria-label="anchor" href="#build"><i class="fas fa-link"></i></a>
 </h1>
-<p>When we get there, use the function <code>bestregsubsets()</code>.</p>
+<p>One of the main tools for statistical building multiple regression models is a nested F test. Two models are <em>nested</em> if the parameters in the smaller model are a subset of the parameters in the larger model. AND the two models must contain the exact same observations (be careful of missing values for some variables and not for others!).</p>
+<p><span class="math display">\[\begin{eqnarray*}
+SSR &amp;=&amp; \sum (\hat{Y}_i - \overline{Y})^2 \\
+SSE &amp;=&amp; \sum (Y_i - \hat{Y}_i)^2 \\
+SSTO &amp;=&amp; \sum (Y_i - \overline{Y})^2 \\
+SSTO &amp;=&amp; SSE + SSR
+\end{eqnarray*}\]</span>
+Convince yourself that <span class="math inline">\(SSE(X_1) &gt; SSE(X_1, X_2)\)</span> (where the variables in parentheses indicate which variables are included in the model). It is because the calculus in least squares says that more variables will produce smaller SSE (otherwise <span class="math inline">\(b_2\)</span> would be estimated to be zero).</p>
+<p>Let <span class="math display">\[SSR(X_2 | X_1 ) = SSE(X_1) - SSE(X_1, X_2).\]</span> We call <span class="math inline">\(SSR(X_2 | X_1 )\)</span> the <strong>extra sum of squares</strong>. It is the marginal reduction in the error sum of squares when one (or more) explanatory variable(s) is added to the model (given that the other explanatory variables are already in the model). Because we know that SSTO does not change for any number of variables (make sure the sample size <span class="math inline">\(n\)</span> doesn’t change due to missing observations!), we can write SSR in a variety of ways.
+<span class="math display">\[\begin{eqnarray*}
+SSR(X_3| X_1, X_2) &amp;=&amp; SSE(X_1, X_2) - SSE(X_1, X_2, X_3)\\
+&amp;=&amp; SSR(X_1, X_2, X_3) - SSR(X_1, X_2)\\
+SSR(X_1, X_2 | X_3 ) &amp;=&amp; SSE(X_3) - SSE(X_1, X_2, X_3)\\
+&amp;=&amp; SSR(X_1, X_2, X_3) - SSR(X_3)\\
+\end{eqnarray*}\]</span>
+Consider two nested models:<br>
+Model 1: <span class="math inline">\(E[Y] = \beta_0 + \beta_1 X_1\)</span> <span class="math display">\[SSTO = SSR(X_1) + SSE(X_1)\]</span>
+Model 2: <span class="math inline">\(E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2\)</span><br><span class="math display">\[\begin{eqnarray*}
+SSTO &amp;=&amp; SSR(X_1, X_2) + SSE(X_1, X_2)\\
+SSR(X_1, X_2) &amp;=&amp; SSR(X_1) + SSR(X_2 | X_1) \\
+SSTO &amp;=&amp; SSR(X_1) + SSR(X_2 | X_1) + SSE(X_1, X_2)\\
+\end{eqnarray*}\]</span>
+(a) <span class="math inline">\(SSR(X_1)\)</span> measures the contribution of <span class="math inline">\(X_1\)</span> alone.<br>
+(b) <span class="math inline">\(SSR(X_2 | X_1)\)</span> measures the contribution of <span class="math inline">\(X_2\)</span> given <span class="math inline">\(X_1\)</span> is in the model.<br>
+A typical ANOVA table for a model with three explanatory variables will look something like the table below. Note the hierarchical structure to adding variables:</p>
+<div class="inline-table"><table class="table table-sm">
+<colgroup>
+<col width="22%">
+<col width="21%">
+<col width="6%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Source</th>
+<th>SS</th>
+<th align="center">df</th>
+<th>MS</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Regression</td>
+<td><span class="math inline">\(SSR(X_1, X_2, X_3)\)</span></td>
+<td align="center">3</td>
+<td><span class="math inline">\(MSR (X_1, X_2, X_3) = \frac{SSR(X_1, X_2, X_3)}{3}\)</span></td>
+</tr>
+<tr class="even">
+<td>   <span class="math inline">\(X_1\)</span>
+</td>
+<td><span class="math inline">\(SSR(X_1)\)</span></td>
+<td align="center">1</td>
+<td><span class="math inline">\(MSR(X_1) = \frac{SSR(X_1)}{1}\)</span></td>
+</tr>
+<tr class="odd">
+<td>   <span class="math inline">\(X_2 \| X_1\)</span>
+</td>
+<td><span class="math inline">\(SSR(X_2 \| X_1)\)</span></td>
+<td align="center">1</td>
+<td><span class="math inline">\(MSR(X_2 \| X_1) = \frac{SSR(X_2 \| X_1)}{1}\)</span></td>
+</tr>
+<tr class="even">
+<td>   <span class="math inline">\(X_3 \| X_1, X_2\)</span>
+</td>
+<td><span class="math inline">\(SSR(X_3 \| X_1, X_2)\)</span></td>
+<td align="center">1</td>
+<td><span class="math inline">\(MSR(X_3 \| X_1, X_2) = \frac{SSR(X_3 \| X_1, X_2)}{1}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Error</td>
+<td><span class="math inline">\(SSE(X_1, X_2, X_3)\)</span></td>
+<td align="center"><span class="math inline">\(n-4\)</span></td>
+<td><span class="math inline">\(MSE(X_1, X_2, X_3) = \frac{SSE(X_1, X_2, X_3)}{n-p}\)</span></td>
+</tr>
+</tbody>
+</table></div>
+<div id="nestF" class="section level2" number="11.1">
+<h2>
+<span class="header-section-number">11.1</span> Testing Sets of Coefficients<a class="anchor" aria-label="anchor" href="#nestF"><i class="fas fa-link"></i></a>
+</h2>
+<p>Previously, we have covered both t-tests for <span class="math inline">\(H_0: \beta_k = 0\)</span> and using the full model F-test to test whether all coefficients are non-significant. In fact, we can also use full and reduced models to compare mean squares to test any nested models. Recall:<br>
+1. Fit full model and obtain SSE(full model)<br>
+2. Fit reduced model under <span class="math inline">\(H_0\)</span> to get SSE(reduced)<br>
+3. Use <span class="math inline">\(F^* = \frac{SSE(reduced) - SSE(full)}{df_{reduced} - df_{full}} \div \frac{SSE(full)}{df_{full}}\)</span><br>
+Note 1: Our best estimate of <span class="math inline">\(\sigma^2\)</span> will come from the MSE on the full model. MSE is an unbiased estimate of <span class="math inline">\(\sigma^2\)</span>, so we will always use it as the denominator in the F test-statistic.<br>
+Note 2: The previous F test we learned (<span class="math inline">\(H_0: \beta_k = 0 \ \ \forall \ \  k \ne 0\)</span>) is the same as above because SSTO = SSE(reduced) for all <span class="math inline">\(\beta_k=0\)</span>, SSR(reduced) = 0. So, when testing if <span class="math inline">\(\beta_k = 0 \ \ \forall \ \  k \ne 0\)</span>: SSE(reduced) - SSE(full) = SSR(full).</p>
+<p>Consider testing the following hypotheses<br><span class="math inline">\(H_0: \beta_2 = \beta_3 = 0\)</span><br><span class="math inline">\(H_a:\)</span> not both zero<br>
+Full model: <span class="math inline">\(E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\)</span><br>
+Reduced model: <span class="math inline">\(E[Y] = \beta_0 + \beta_1 X_1\)</span><br><span class="math display">\[\begin{eqnarray*}
+SSE(full) &amp;=&amp; SSE(X_1, X_2, X_3)\\
+SSE(reduced) &amp;=&amp; SSE(X_1)\\
+F^* &amp;=&amp; \frac{SSE(X_1) - SSE(X_1, X_2, X_3)}{(n-2) - (n-4)} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&amp;=&amp; \frac{SSR(X_1, X_2, X_3) - SSR(X_1)}{(n-2) - (n-4)} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&amp;=&amp; \frac{SSR(X_2 | X_1) + SSR(X_3 | X_1, X_2)}{2} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&amp;=&amp; \frac{SSR(X_2, X_3 | X_1)}{2} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&amp;=&amp; \frac{MSR(X_2, X_3 | X_1)}{MSE(X_1, X_2, X_3)}
+\end{eqnarray*}\]</span></p>
+<div id="examples" class="section level3" number="11.1.1">
+<h3>
+<span class="header-section-number">11.1.1</span> Examples<a class="anchor" aria-label="anchor" href="#examples"><i class="fas fa-link"></i></a>
+</h3>
+<ul>
+<li>In considering the output below, let’s say that we’d like to test whether both smoking and mother’s age are needed in the model. The full model is: gained, smoke, mage in the model; the reduced model is the model with gained only.</li>
+</ul>
+<p><span class="math display">\[\begin{eqnarray*}
+F^* &amp;=&amp; \frac{(6241+9629) / 775 - 773)}{346801 / 773} = 17.69
+\end{eqnarray*}\]</span></p>
+<div class="sourceCode" id="cb501"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fl">1</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">pf</a></span><span class="op">(</span><span class="fl">17.69</span>,<span class="fl">2</span>,<span class="fl">773</span><span class="op">)</span></code></pre></div>
+<pre><code>## [1] 3.08e-08</code></pre>
+Alternatively,<br><p>Because our p-value is so low, we reject <span class="math inline">\(H_0: \beta_2 = \beta_3 = 0\)</span>, and we claim that at least one of smoke or mother’s age is needed in the model (possibly both).</p>
+<ul>
+<li><p>One reason to use a nested F-test (in lieu of a t-test), is for example, if you’d like to know whether race is an important variable in your model (see model 8(b) below). As noted below, race as a factor variable is responsible for 5 separate coefficients. In order to test whether race is significant, you would fit the model with and without race, and your null hypothesis would be testing <span class="math inline">\(H_0: \beta_2 = \beta_3 = \beta_4 = \beta_5 = \beta_6 = 0\)</span>.</p></li>
+<li><p>Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model. You might have 4 explanatory variables, and so you’d have <span class="math inline">\({4\choose2} = 6\)</span> interactions to consider. You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full). By nesting them, you don’t need to test each interaction coefficient one at a time.</p></li>
+<li><p>Let’s say you want to test <span class="math inline">\(H_0: \beta_1 = \beta_2\)</span>. Note the form of your full and reduced models.</p></li>
+</ul>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{full model}:&amp;&amp; E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\\
+\mbox{reduced model}: &amp;&amp; E[Y] = \beta_0 + \beta_c (X_1 + X_2) + \beta_3 X_3\\
+\end{eqnarray*}\]</span></p>
+<p>Because the reduced model is simply a specific form of the full model, the two models are nested. We can reformat the data (i.e., add the first two variables), and run the linear model in R. We can get SSE from the full model and from the reduced model and calculate the F statistic by hand.</p>
+<ul>
+<li>Let’s say you want to test <span class="math inline">\(H_0: \beta_3 = 47\)</span>. Again, note the form of your full and reduced models.</li>
+</ul>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{full model}:&amp;&amp; E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\\
+\mbox{reduced model}: &amp;&amp; E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + 47 * X_3\\
+\end{eqnarray*}\]</span>
+We don’t want to find a coefficient for <span class="math inline">\(X_3\)</span>, so we simply subtract <span class="math inline">\(47*X_3\)</span> from each Y value:
+<span class="math display">\[\begin{eqnarray*}
+\mbox{reduced model}: &amp;&amp; E[Y - 47* X_3] = \beta_0 + \beta_1 X_1 + \beta_2 X_2\\
+\end{eqnarray*}\]</span>
+Again, the reduced model is simply a specific form of the full model, the two models are nested. Using the reformatted data, we run linear models on both the full and reduced models and calculate the F statistic by hand.</p>
+</div>
+<div id="coefficient-of-partial-determination" class="section level3" number="11.1.2">
+<h3>
+<span class="header-section-number">11.1.2</span> Coefficient of Partial Determination<a class="anchor" aria-label="anchor" href="#coefficient-of-partial-determination"><i class="fas fa-link"></i></a>
+</h3>
+<p>Just as <span class="math inline">\(R^2\)</span> measures the proportion of reduction in the variation of <span class="math inline">\(Y\)</span> achieved by the set of explanatory variables, a <em>coefficient of partial determination</em> measures the marginal contribution of one X variable (or a set of X variables) when there are already others in the model.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+R^2_{Y 2|1} = \frac{SSE(X_1) - SSE(X_1, X_2)}{SSE(X_1)} = \frac{SSR(X_2|X_1)}{SSE(X_1)}
+\end{eqnarray*}\]</span></p>
+<p>The coefficient of partial determination measures the marginal contribution of one X variable when all others are already included in the model.</p>
+<p><span class="math inline">\(R^2_{Y2|1}\)</span> measures the proportionate reduction in “the variation in <span class="math inline">\(Y\)</span> remaining after <span class="math inline">\(X_1\)</span> is included in the model” that is gained by also including <span class="math inline">\(X_2\)</span> in the model.</p>
+</div>
+</div>
+<div id="multicollinearity" class="section level2" number="11.2">
+<h2>
+<span class="header-section-number">11.2</span> Multicollinearity<a class="anchor" aria-label="anchor" href="#multicollinearity"><i class="fas fa-link"></i></a>
+</h2>
+<p>Consider the multiple regression model:
+<span class="math display">\[\begin{eqnarray*}
+E[Y] &amp;=&amp; \beta_0 + \beta_1 X_1 + \beta_2 X_2\\
+Y &amp;=&amp; \mbox{amount of money in pocket}\\
+X_1 &amp;=&amp; \# \mbox{ of coins in pocket}\\
+X_2 &amp;=&amp; \# \mbox{ of pennies, nickels, dimes in pocket}
+\end{eqnarray*}\]</span>
+Using a completely non-random sample, I got the following data:</p>
+<div class="sourceCode" id="cb503"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">amount</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.37</span>, <span class="fl">1.01</span>, <span class="fl">1.5</span>, <span class="fl">0.56</span>, <span class="fl">0.61</span>, <span class="fl">3.06</span>, <span class="fl">5.42</span>, <span class="fl">1.75</span>, <span class="fl">5.4</span>, <span class="fl">0.56</span>,
+               <span class="fl">0.34</span>, <span class="fl">2.33</span>, <span class="fl">3.34</span><span class="op">)</span>
+<span class="va">num.coins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">37</span>,<span class="fl">28</span>,<span class="fl">9</span>,<span class="fl">11</span>,<span class="fl">4</span>,<span class="fl">6</span>,<span class="fl">17</span>,<span class="fl">15</span><span class="op">)</span>
+<span class="va">num.lowcoins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">8</span>,<span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">9</span>,<span class="fl">34</span>,<span class="fl">9</span>,<span class="fl">3</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">12</span>,<span class="fl">11</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb504"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)    0.732    0.668       1.10  0.297 
+## 2 num.coins      0.108    0.0424      2.55  0.0269</code></pre>
+<div class="sourceCode" id="cb506"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 5
+##   term         estimate std.error statistic p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)    1.73      0.680      2.54   0.0272
+## 2 num.lowcoins   0.0462    0.0591     0.781  0.451</code></pre>
+<div class="sourceCode" id="cb508"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span> <span class="op">+</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term         estimate std.error statistic  p.value
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)     0.307    0.466      0.660 0.524   
+## 2 num.coins       0.296    0.0578     5.13  0.000443
+## 3 num.lowcoins   -0.246    0.0656    -3.75  0.00376</code></pre>
+<div class="sourceCode" id="cb510"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span> <span class="op">+</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: amount
+##              Df Sum Sq Mean Sq F value Pr(&gt;F)   
+## num.coins     1  13.64   13.64    14.3 0.0036 **
+## num.lowcoins  1  13.48   13.48    14.1 0.0038 **
+## Residuals    10   9.57    0.96                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>A few things to notice from the output:</p>
+<ul>
+<li>all 3 of the variables are positively (pairwise correlated).</li>
+<li>the effect of the number of low coins is positive on amount by itself, but negative on amount when the number of coins is in the model.</li>
+<li>the number of low coins is not significant on its own, but it is significant when the number of coins is in the model.</li>
+<li><span class="math inline">\(R^2_{Y1} = 63.363/(63.363 + 28.208 + 21.366) = 0.561\)</span></li>
+<li>
+<span class="math inline">\(R^2_{Y2|1} = 28.208 / (28.208 + 21.366) = 0.569\)</span>. We see that when number of low coins is added to the model that already contains the number of coins, the SSE is reduced by 56.9%. [ <span class="math inline">\(SSR(X_1) = 63.363, SSR(X_2|X_1) = 28.208, SSE(X_1, X_2) = 21.366, SSE(X_1) = SSTO - SSR(X_1) = 28.208 + 21.366\)</span> ]</li>
+</ul>
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;"></div>
+<div id="effects-of-multicollinearity" class="section level4 unnumbered">
+<h4>Effects of Multicollinearity<a class="anchor" aria-label="anchor" href="#effects-of-multicollinearity"><i class="fas fa-link"></i></a>
+</h4>
+<p>In reality, there is always some degree of correlation between the explanatory variables (pg 283). for regression models, it is important to understand the entire context of the model, particularly for correlated variables.</p>
+<ol style="list-style-type: decimal">
+<li>Regardless of the degree of multicollinearity, our ability to obtain a good fit and make predictions (mean or individual) is not inhibited.</li>
+<li>If the variables are highly correlated, many different linear combinations of them will produce equally good fits. That is, different samples from the same population may produce wildly different estimated coefficients. For this reason, the variability associated with the coefficients can be quite high. Additionally, the explanatory variables can be statistically not significant even though a definite relationship exists between the response and the set of predictors.</li>
+<li>We can no longer interpret the coefficient to mean “the change in response when this variable increases by one unit and the others are held constant” because it may be impossible to hold the other variables constant. The regression coefficients do not reflect any inherent effect of the particular predictor variable on the response but rather a marginal or partial effect given whatever other correlated predictor variables are included in the model.</li>
+<li>Recall <span class="math inline">\(s^2\{\underline{b}\} = MSE (X^t X)^{-1}\)</span>. If <span class="math inline">\(X^t X\)</span> has a determinant which is close to zero, taking its inverse is akin to dividing by zero. That is to say, often the SE for the b coefficients can have large sampling variability.</li>
+<li>We will investigate multicollinearity in more depth in Chapter 10 through the Variance Inflation Factor (VIF).</li>
+</ol>
+<p>Note: No section ALSM 7.5 or Chapter 8 [Although there is some good stuff in there! Section 7.5 discusses when to standardize your variables – an action that can sometimes be crucially important.]</p>
+</div>
+</div>
+<div id="model-selection" class="section level2" number="11.3">
+<h2>
+<span class="header-section-number">11.3</span> Model Selection<a class="anchor" aria-label="anchor" href="#model-selection"><i class="fas fa-link"></i></a>
+</h2>
+<p>We need to come up with something clever to find the model we are going to use. We need to figure out which variables are going to enter into the model, how they are going to appear in the model (transformations, polynomials, interaction terms, etc), and whether we need to also transform our response variable. Why is this such a hard problem?<br>
+Suppose we could first agree on a criterion for the “best model.” Maybe we think the best model is that which has the lowest adjusted <span class="math inline">\(R^2\)</span>.<br>
+(Recall <span class="math inline">\(R_a^2=1-\frac{n-1}{n-p}\frac{SSE}{SSTO}\)</span>). Suppose we could also agree on a set of variables that could enter the model, and suppose there are <span class="math inline">\(m\)</span> of them. How many models do we need to look through?<br>
+The smallest model has no predictors in it, i.e. <span class="math display">\[E[Y]=\beta_0+\epsilon\]</span>
+The largest model has all <span class="math inline">\(m\)</span> of them in there, i.e. <span class="math display">\[E[Y]=\beta_0+\sum_{j=1}^m \beta_jX_j+\epsilon\]</span>
+and everything in between.<br>
+We can think of this like a tree, we have two choices regarding the first variable, either include it or not, then for each of those, we have two choices for the second, and so forth. There are <span class="math inline">\(2^m\)</span> possible models we have to look at. Suppose <span class="math inline">\(m=20\)</span>, which isn’t unusual. With 20 variables, there are about 1.05 million different possible models. With 30 variables, there are about 1.07 billion models. Are we going to search through them all? We might if <span class="math inline">\(m\)</span> is particularly small. <span class="math inline">\(m=3\)</span> gives 8 possible models, this is quite feasible. Such a search is called <em>all subsets</em>. But otherwise, we need to do something clever.</p>
+<hr>
+<p><strong>Algorithm: Best subset selection (from ISLR)</strong>
+******
+1. Let <span class="math inline">\(M_0\)</span> denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.
+2. For <span class="math inline">\(k = 1, 2, \ldots m\)</span>:
+(a) Fit all <span class="math inline">\({m\choose k}\)</span> models that contain exactly <span class="math inline">\(k\)</span> predictors (explanatory variables).
+(b) Pick the best among the <span class="math inline">\({m\choose k}\)</span> models, and call it <span class="math inline">\(M_k\)</span>. Here <em>best</em><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;note: defining by CV is much more computationally complicated, SSE is equivalent to AIC, &lt;span class="math inline"&gt;\(C_p\)&lt;/span&gt; or BIC if &lt;span class="math inline"&gt;\(k\)&lt;/span&gt; if fixed&lt;/p&gt;'><sup>7</sup></a> is defined as having the smallest SSE, or equivalently, largest <span class="math inline">\(R^2\)</span>.
+3. Select a single best model from among <span class="math inline">\(M_0, \ldots ,M_{m}\)</span> using cross-validated prediction error, <span class="math inline">\(C_p\)</span>, AIC, BIC, or adjusted <span class="math inline">\(R^2\)</span>.</p>
+<div id="forward-selection" class="section level3" number="11.3.1">
+<h3>
+<span class="header-section-number">11.3.1</span> Forward Selection<a class="anchor" aria-label="anchor" href="#forward-selection"><i class="fas fa-link"></i></a>
+</h3>
+<p>We start with an empty model and add the best available variable at each iteration, checking for needed transformations. (We should also look at interactions which we might suspect. However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.) Generally for forward selection:<br>
+1. We start with the response variable versus all variables and find the best predictor. If there are too many, we might just look at the correlation matrix. However, we may miss out of variables that are good predictors but aren’t linearly related. Therefore, if its possible, a scatter plot matrix would be best.<br>
+2. We locate the best variable, and regress the response variable on it.<br>
+3. If the variable seems to be useful, we keep it and move on to looking for a second.<br>
+4. If not, we stop.</p>
+<hr>
+<p><strong>Algorithm: Forward stepwise subset selection (from ISLR)</strong>
+******
+1. Let <span class="math inline">\(M_0\)</span> denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.<br>
+2. For <span class="math inline">\(k = 0, 1, \ldots m-1\)</span>:
+(a) Consider all <span class="math inline">\(m - k\)</span> models that augment the predictors in <span class="math inline">\(M_k\)</span> with one additional predictor.
+(b) Choose the best among these <span class="math inline">\(m - k\)</span> models, and call it <span class="math inline">\(M_{k+1}\)</span>. Here <em>best</em> is defined as having smallest SSE or highest <span class="math inline">\(R^2\)</span>.<br>
+3. Select a single best model from among <span class="math inline">\(M_0, \ldots ,M_{m}\)</span> using cross-validated prediction error, <span class="math inline">\(C_p\)</span>, AIC, BIC, or adjusted <span class="math inline">\(R^2\)</span>.</p>
+<hr>
+<p><strong>Algorithm: Forward selection with F tests</strong>
+******
+1. Let <span class="math inline">\(M_0\)</span> denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.
+2. Let <span class="math inline">\(k = 0\)</span>:
+(a) Consider all <span class="math inline">\(m - k\)</span> models that augment the predictors in <span class="math inline">\(M_k\)</span> with one additional predictor.
+(b) Choose the best among these <span class="math inline">\(m - k\)</span> models, and call it <span class="math inline">\(M_{k+1}\)</span>. Here <em>best</em> is defined as having smallest the smallest p-value for including the <span class="math inline">\((k+1)^{th}\)</span> variable given the <span class="math inline">\(k\)</span> variables are already in the model.
+(c) If the p-value from step (b) is less than <span class="math inline">\(\alpha_e\)</span>, consider <span class="math inline">\(M_{k+1}\)</span> and augment <span class="math inline">\(k\)</span> by 1. Go back to step (a). If the p-value from step (b) is larger than <span class="math inline">\(\alpha_e\)</span>, report model <span class="math inline">\(M_k\)</span> and stop the algorithm.</p>
+<div id="it-is-doing-exactly-what-we-want-right" class="section level4 unnumbered">
+<h4>It is doing exactly what we want, right???<a class="anchor" aria-label="anchor" href="#it-is-doing-exactly-what-we-want-right"><i class="fas fa-link"></i></a>
+</h4>
+<p>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Kelly who knows 85 topics. With two consultants you might choose Kelly first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Jamie, who knows 75 topics. The problem with this strategy is that it may be that the 75 subjects Jamie knows are already included in the 85 that Kelly knows, and therefore, Jamie does not provide any knowledge beyond that of Kelly. A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody. %(Example taken from American Statistician article that I refereed, August 2012.)</p>
+<pre><code>Consider people A, B, C, D who know the following topics:
+
+A: \{1, 2, 3, 4, 5, 6, 7\}
+
+B: \{8, 9, 10\}
+
+C: \{1, 2, 3, 4, 8, 10\}
+
+D: \{5, 6, 7, 9, 11\}
+
+
+Forward you would choose A  and then B (and you'd know topics 1-10).  Backward (or best subsets) you'd choose C and D (and you'd know topics 1-11).</code></pre>
+</div>
+<div id="forward-stepwise-selection-using-f-tests" class="section level4 unnumbered">
+<h4>Forward <em>Stepwise</em> Selection using F-tests<a class="anchor" aria-label="anchor" href="#forward-stepwise-selection-using-f-tests"><i class="fas fa-link"></i></a>
+</h4>
+<p>This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed. This is done by specifying two values, <span class="math inline">\(\alpha_e\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>enter</strong> the model, and <span class="math inline">\(\alpha_l\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>leave</strong> the model. We require that <span class="math inline">\(\alpha_e&lt;\alpha_l\)</span>, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum. This is bad.<br>
+1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than <span class="math inline">\(\alpha_e\)</span>.<br>
+2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than <span class="math inline">\(\alpha_e\)</span>. If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model). If its p-value is greater than <span class="math inline">\(\alpha_l\)</span>, we remove the variable.<br>
+3. We continue with this process until there are no more variables that meet either requirements. In many situations, this will help us from stopping at a less than desirable model.<br>
+How do you choose the <span class="math inline">\(\alpha\)</span> values? If you set <span class="math inline">\(\alpha_e\)</span> to be very small, you might walk away with no variables in your model, or at least not many. If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren’t necessary.</p>
+</div>
+</div>
+<div id="backward-selection" class="section level3" number="11.3.2">
+<h3>
+<span class="header-section-number">11.3.2</span> Backward Selection<a class="anchor" aria-label="anchor" href="#backward-selection"><i class="fas fa-link"></i></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>Start with the full model including every term (and possibly every interaction, etc.).<br>
+</li>
+<li>Remove the variable that is <em>least</em> significant (biggest p-value) in the model.<br>
+</li>
+<li>Continue removing variables until all variables are significant at the chosen <span class="math inline">\(\alpha\)</span> level.</li>
+</ol>
+<hr>
+<p><strong>Algorithm: Backward stepwise selection (from ISLR)</strong>
+******
+1. Let <span class="math inline">\(M_{full}\)</span> denote the <em>full</em> model, which contains all <span class="math inline">\(m\)</span> predictors.
+2. For <span class="math inline">\(k = m, m-1, \ldots, 1\)</span>:
+(a) Consider all k models that contain all but one of the predictors in <span class="math inline">\(M_k\)</span> (including a total of <span class="math inline">\(k - 1\)</span> predictors).
+(b) Choose the best among these <span class="math inline">\(k\)</span> models, and call it <span class="math inline">\(M_{k-1}\)</span>. Here <em>best</em> is defined as having smallest SSE or highest <span class="math inline">\(R^2\)</span>.
+3. Select a single best model from among <span class="math inline">\(M_0, \ldots ,M_{m}\)</span> using cross-validated prediction error, <span class="math inline">\(C_p\)</span>, AIC, BIC, or adjusted <span class="math inline">\(R^2\)</span>.</p>
+<hr>
+<p><strong>Algorithm: Backward selection with F tests</strong>
+******
+1. Let <span class="math inline">\(M_{full}\)</span> denote the <em>full</em> model, which contains all <span class="math inline">\(m\)</span> predictors.
+2. Let <span class="math inline">\(k = m\)</span>:
+(a) Consider all k models that contain all but one of the predictors in <span class="math inline">\(M_k\)</span> (including a total of <span class="math inline">\(k - 1\)</span> predictors).
+(b) Choose the best among these <span class="math inline">\(k\)</span> models, and call it <span class="math inline">\(M_{k-1}\)</span>. Here <em>best</em> is defined as having smallest the <em>largest</em> p-value for including the <span class="math inline">\((k)^{th}\)</span> variable given the <span class="math inline">\(k-1\)</span> variables are already in the model.
+(c) If the p-value from step (b) is <em>larger</em> than <span class="math inline">\(\alpha_r\)</span>, consider <span class="math inline">\(M_{k}\)</span> and decrease <span class="math inline">\(k\)</span> by 1. Go back to step (a). If the p-value from step (b) is smaller than <span class="math inline">\(\alpha_r\)</span>, report model <span class="math inline">\(M_k\)</span> and stop the algorithm.</p>
+<p>Do any of the above methods represent a fool-proof strategy for fitting a model? No, but they are a start. Remember, it is important to always check the residuals and logical interpretation of the model.</p>
+</div>
+</div>
+<div id="other-ways-for-comparing-models" class="section level2" number="11.4">
+<h2>
+<span class="header-section-number">11.4</span> Other ways for comparing models<a class="anchor" aria-label="anchor" href="#other-ways-for-comparing-models"><i class="fas fa-link"></i></a>
+</h2>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-11"></span>
+<img src="figs/sleuthmodelbuild.png" alt="A strategy for data analysis using statistical models. Source: @sleuth" width="100%"><p class="caption">
+Figure 1.7: A strategy for data analysis using statistical models. Source: <span class="citation"><a href="references.html#ref-sleuth" role="doc-biblioref">Ramsey and Schafer</a> (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>
+</p>
+</div>
+<div id="analysis-of-appropriateness-of-model" class="section level3" number="11.4.1">
+<h3>
+<span class="header-section-number">11.4.1</span> Analysis of Appropriateness of Model<a class="anchor" aria-label="anchor" href="#analysis-of-appropriateness-of-model"><i class="fas fa-link"></i></a>
+</h3>
+<div id="scatter-plot-matrix" class="section level4 unnumbered">
+<h4>Scatter Plot Matrix<a class="anchor" aria-label="anchor" href="#scatter-plot-matrix"><i class="fas fa-link"></i></a>
+</h4>
+<p>Plots all variables against all others. Gives indications of need to consider transformations of predictors. Also shows predictors that are highly correlated with other predictors, thus possibly not needing to be included in the model.</p>
+</div>
+<div id="correlation-matrix" class="section level4 unnumbered">
+<h4>Correlation Matrix<a class="anchor" aria-label="anchor" href="#correlation-matrix"><i class="fas fa-link"></i></a>
+</h4>
+<p>A numerical version of the scatterplot matrix, the correlation matrix computes the correlations between groups of variables. We want predictor variables that are highly correlated with the response, but we need to be careful about predictor variables that are highly correlated with each other.</p>
+</div>
+<div id="residual-plot" class="section level4 unnumbered">
+<h4>Residual Plot<a class="anchor" aria-label="anchor" href="#residual-plot"><i class="fas fa-link"></i></a>
+</h4>
+<p>Plots fitted values against residuals. As before, we should see no trend and constant variance.<br>
+Residuals should also be plotted against variables individually, including variables that were left out of the model, as well as possible interactions.<br>
+If there are trends in the residual plots against the variables in the model, you might consider a transformation or adding a polynomial term. If there are trends in the residual plots against variables left out of the model, you might consider adding those variables to the model. If there are trends in the residual plot against interaction terms (like <span class="math inline">\(X_1X_2\)</span>), then you might consider adding that interaction term to the model.</p>
+</div>
+</div>
+</div>
+<div id="getting-the-variables-right" class="section level2" number="11.5">
+<h2>
+<span class="header-section-number">11.5</span> Getting the Variables Right<a class="anchor" aria-label="anchor" href="#getting-the-variables-right"><i class="fas fa-link"></i></a>
+</h2>
+<p>In terms of selecting the variables to model a particular response, four things can happen:</p>
+<ul>
+<li>The regression model is correct!</li>
+<li>The regression model is underspecified.</li>
+<li>The regression model contains extraneous variables.</li>
+<li>The regression model is overspecified.</li>
+</ul>
+<div id="underspecified" class="section level4 unnumbered">
+<h4>Underspecified<a class="anchor" aria-label="anchor" href="#underspecified"><i class="fas fa-link"></i></a>
+</h4>
+<p>A regression model is underspecified if it is missing one or more important predictor variables. Being underspecified is the worst case scenario because the model ends up being biased and predictions are wrong for virtually every observation. Additionally, the estimate of MSE tends to be big which yields larger confidence intervals for the estimates (less chance for significance).</p>
+<p>Consider another SAT dataset. We see that if we don’t stratify by the fraction of students in the state who took the SAT (0-22%, 22-49%, 49-81%). So much changes! The slopes are negative in the large group and positive in the subgroups. Additionally, the <span class="math inline">\(R^2\)</span> value goes from 0.193 to 0.806!! The model without the fraction of students is underspecified and quite biased. It doesn’t matter how many observations we collect, the model will always be wrong. <strong>Underspecifying the model is the worst of the possible things that can happen.</strong></p>
+<div class="sourceCode" id="cb513"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ProjectMOSAIC/mosaic">mosaic</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ProjectMOSAIC/mosaicData">mosaicData</a></span><span class="op">)</span>
+
+<span class="va">SAT</span> <span class="op">&lt;-</span> <span class="va">SAT</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span><span class="va">SAT</span>, frac_group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">frac</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">22</span>, <span class="fl">49</span>, <span class="fl">81</span><span class="op">)</span>,
+                            labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"low fraction"</span>, 
+                                     <span class="st">"medium fraction"</span>, 
+                                     <span class="st">"high fraction"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">SAT</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span>, y <span class="op">=</span> <span class="va">sat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">frac_group</span>, color <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb514"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SAT</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span>, y <span class="op">=</span> <span class="va">sat</span>, group <span class="op">=</span> <span class="va">frac_group</span>, color <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span>, fullrange <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></div>
+</div>
+<div id="extraneous" class="section level4 unnumbered">
+<h4>Extraneous<a class="anchor" aria-label="anchor" href="#extraneous"><i class="fas fa-link"></i></a>
+</h4>
+<p>The third type of variable situation comes when extra variables are included in the model but the variables are neither related to the response nor are they correlated with the other explanatory variables. Generally, extraneous variables are not so problematic because they produce models with unbiased coefficient estimators, unbiased predictions, and unbiased MSE. The worst thing that happens is that the error degrees of freedom is lowered which makes confidence intervals wider and p-values bigger (lower power). Also problematic is that the model becomes unnecessarily complicated and harder to interpret.</p>
+</div>
+<div id="overspecified" class="section level4 unnumbered">
+<h4>Overspecified<a class="anchor" aria-label="anchor" href="#overspecified"><i class="fas fa-link"></i></a>
+</h4>
+<p>When a model is overspecified, there are one or more redundant variables. That is, the variables contain the same information as other variables (i.e., are correlated!). As we’ve seen, correlated variables cause trouble because they inflate the variance of the coefficient estimates. With correlated variables it is still possible to get unbiased prediction estimates, but the coefficients themselves are so variable that they cannot be interpreted (nor can inference be easily performed).</p>
+<p>Generally: the idea is to use a model building strategy with some criteria (F-tests, AIC, BIC, Adjusted <span class="math inline">\(R^2\)</span>, <span class="math inline">\(C_p\)</span>, LASSO, Ridge regression) to find the middle ground between an underspecified model and an overspecified model.</p>
+</div>
+</div>
+<div id="a-model-building-strategy" class="section level2" number="11.6">
+<h2>
+<span class="header-section-number">11.6</span> A Model Building Strategy<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Taken from &lt;a href="https://onlinecourses.science.psu.edu/stat501/node/332" class="uri"&gt;https://onlinecourses.science.psu.edu/stat501/node/332&lt;/a&gt;&lt;/p&gt;'><sup>8</sup></a><a class="anchor" aria-label="anchor" href="#a-model-building-strategy"><i class="fas fa-link"></i></a>
+</h2>
+<p>Model building is definitely an <strong>art</strong>. Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.</p>
+<div id="the-first-step" class="section level3 unnumbered">
+<h3>The first step<a class="anchor" aria-label="anchor" href="#the-first-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Decide on the type of model that is needed in order to achieve the goals of the study. In general, there are five reasons one might want to build a regression model. They are:</p>
+<ul>
+<li>For predictive reasons - that is, the model will be used to predict the response variable from a chosen set of predictors.</li>
+<li>For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors.</li>
+<li>For control purposes - that is, the model will be used to control a response variable by manipulating the values of the predictor variables.</li>
+<li>For inferential reasons - that is, the model will be used to explore the strength of the relationships between the response and the predictors.</li>
+<li>For data summary reasons - that is, the model will be used merely as a way to summarize a large set of data by a single equation.</li>
+</ul>
+</div>
+<div id="the-second-step" class="section level3 unnumbered">
+<h3>The second step<a class="anchor" aria-label="anchor" href="#the-second-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Decide which explanatory variables and response variable on which to collect the data. Collect the data.</p>
+</div>
+<div id="the-third-step" class="section level3 unnumbered">
+<h3>The third step<a class="anchor" aria-label="anchor" href="#the-third-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Explore the data. That is:</p>
+<ul>
+<li>On a univariate basis, check for outliers, gross data errors, and missing values.</li>
+<li>Study bivariate relationships to reveal other outliers, to suggest possible transformations, and to identify possible multicollinearities.</li>
+</ul>
+<p>I can’t possibly over-emphasize the data exploration step. There’s not a data analyst out there who hasn’t made the mistake of skipping this step and later regretting it when a data point was found in error, thereby nullifying hours of work.</p>
+</div>
+<div id="the-fourth-step" class="section level3 unnumbered">
+<h3>The fourth step<a class="anchor" aria-label="anchor" href="#the-fourth-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>(The fourth step is very good modeling practice. It gives you a sense of whether or not you’ve overfit the model in the building process.) Randomly divide the data into a training set and a validation set:</p>
+<ul>
+<li>The training set, with at least 15-20 error degrees of freedom, is used to estimate the model.</li>
+<li>The validation set is used for cross-validation of the fitted model.</li>
+</ul>
+</div>
+<div id="the-fifth-step" class="section level3 unnumbered">
+<h3>The fifth step<a class="anchor" aria-label="anchor" href="#the-fifth-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Using the training set, identify several candidate models:</p>
+<ul>
+<li>Use best subsets regression.</li>
+<li>Use all subsets, stepwise, forward, or backward selection regression. Using different alpha-to-remove and alpha-to-enter values can lead to a variety of models.</li>
+</ul>
+</div>
+<div id="the-sixth-step" class="section level3 unnumbered">
+<h3>The sixth step<a class="anchor" aria-label="anchor" href="#the-sixth-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Select and evaluate a few “good” models:</p>
+<ul>
+<li>Select the models based on the criteria we learned, as well as the number and nature of the predictors.</li>
+<li>Evaluate the selected models for violation of the model conditions.</li>
+<li>If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.</li>
+</ul>
+</div>
+<div id="the-seventh-and-final-step" class="section level3 unnumbered">
+<h3>The seventh and final step<a class="anchor" aria-label="anchor" href="#the-seventh-and-final-step"><i class="fas fa-link"></i></a>
+</h3>
+<p>Select the final model:</p>
+<ul>
+<li>A small mean square prediction error (or larger cross-validation <span class="math inline">\(R^2\)</span>) on the validation data is a good predictive model (for your population of interest).</li>
+<li>Consider residual plots, outliers, parsimony, relevance, and ease of measurement of predictors.</li>
+</ul>
+<p>And, most of all, don’t forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.</p>
+</div>
+<div id="thoughts-on-model-selection" class="section level3" number="11.6.1">
+<h3>
+<span class="header-section-number">11.6.1</span> Thoughts on Model Selection…<a class="anchor" aria-label="anchor" href="#thoughts-on-model-selection"><i class="fas fa-link"></i></a>
+</h3>
+<p>Question: Did females receive lower starting salaries than males? [From <strong>The Statistical Sleuth</strong> by Ramsey and Schafer]</p>
+<p>model: y = log(salary), x’s: seniority, age, experience, education, sex.</p>
+<p>In the Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex) In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in. What are the pluses/minuses of these approaches?</p>
+<p><strong>Response</strong> It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn’t start with sex would be more likely to include those associated covariates to start with.<br>
+One nice aspect of both methods in that they both end up with sex in the model; one difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn’t matter. However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.<br>
+In this case there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that’s part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one “best” model can be misleading.</p>
+</div>
+</div>
+<div id="reflection-questions-8" class="section level2" number="11.7">
+<h2>
+<span class="header-section-number">11.7</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-8"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li><p>How do SSE, SSR, and SSTO change when variables are added to the model?<br></p></li>
+<li><p>What does <span class="math inline">\(SSR(X_2 | X_1)\)</span> really mean? How is it defined?<br></p></li>
+<li><p>How do we break up SSR in the ANOVA table? Note: the order of variables mattes!<br></p></li>
+<li><p>How do you tests sets of coefficients that aren’t in the right order? Or that equal a constant? Or that equal each other?<br></p></li>
+<li><p>If you are doing a nested F-test by hand, how do you find the <span class="math inline">\(F^*\)</span> critical value? (Hint: use <code><a href="https://rdrr.io/r/stats/Fdist.html">qf()</a></code> in R)</p></li>
+<li><p>What does multicollinearity mean?<br></p></li>
+<li><p>What are the effects of multicollinearity on various aspects of regression analyses?<br></p></li>
+<li><p>What are the effects of correlated predictors on various aspects of regression analyses?<br></p></li>
+<li><p>(More in chapter 10: variance inflation factors, and how to use them to help detect multicollinearity)<br></p></li>
+<li><p>How can you reduce multicollinearity problems in the analysis?<br></p></li>
+<li><p>What are the bigger regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)</p></li>
+<li><p>What is the impact of the four different kinds of models with respect to their “correctness”: correctly specified, underspecified, overspecified, and correct but with extraneous predictors?<br></p></li>
+<li><p>How do you conduct stepwise regression “by hand?” (Using either F tests or one of the other criteria.)<br></p></li>
+<li><p>What are the limitations of stepwise regression?<br></p></li>
+<li><p>How can you choose an optimal model based on the <span class="math inline">\(R^2\)</span> value, the adjusted <span class="math inline">\(R^2\)</span> value, MSE and the <span class="math inline">\(C_p\)</span> criterion?<br></p></li>
+<li><p>What are the seven steps of good model building strategy?</p></li>
+</ol>
+</div>
+<div id="ethics-considerations-7" class="section level2" number="11.8">
+<h2>
+<span class="header-section-number">11.8</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-7"><i class="fas fa-link"></i></a>
+</h2>
 <blockquote>
 <p>Is this the best model to explain variation in tips?</p>
 </blockquote>
 <p><strong>Note:</strong> when a single dataset is used to build and fit the model, we penalize the fitting (think <span class="math inline">\(R^2_{adj}\)</span>). When different data are used, i.e., with CV, there is no need to use a metric with penalization.</p>
-<div id="another-model-summary" class="section level2" number="11.1">
+</div>
+<div id="another-model-summary" class="section level2" number="11.9">
 <h2>
-<span class="header-section-number">11.1</span> Another model summary<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section Mine’s course is at &lt;a href="https://mine-cr.com/teaching/sta210/" class="uri"&gt;https://mine-cr.com/teaching/sta210/&lt;/a&gt;.&lt;/p&gt;'><sup>7</sup></a><a class="anchor" aria-label="anchor" href="#another-model-summary"><i class="fas fa-link"></i></a>
+<span class="header-section-number">11.9</span> Another model summary<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section Mine’s course is at &lt;a href="https://mine-cr.com/teaching/sta210/" class="uri"&gt;https://mine-cr.com/teaching/sta210/&lt;/a&gt;.&lt;/p&gt;'><sup>9</sup></a><a class="anchor" aria-label="anchor" href="#another-model-summary"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb501"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb515"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">tip_fit</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu">kable</span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <div class="inline-table"><table class="table table-sm">
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">df</th>
-<th align="right">sumsq</th>
-<th align="right">meansq</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
+<thead><tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+df
+</th>
+<th style="text-align:right;">
+sumsq
+</th>
+<th style="text-align:right;">
+meansq
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p.value
+</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
-<td align="left">Party</td>
-<td align="right">1</td>
-<td align="right">1189</td>
-<td align="right">1188.64</td>
-<td align="right">285.71</td>
-<td align="right">0.00</td>
+<tr>
+<td style="text-align:left;">
+Party
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1189
+</td>
+<td style="text-align:right;">
+1188.64
+</td>
+<td style="text-align:right;">
+285.71
+</td>
+<td style="text-align:right;">
+0.00
+</td>
 </tr>
-<tr class="even">
-<td align="left">Age</td>
-<td align="right">2</td>
-<td align="right">38</td>
-<td align="right">19.01</td>
-<td align="right">4.57</td>
-<td align="right">0.01</td>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+19.01
+</td>
+<td style="text-align:right;">
+4.57
+</td>
+<td style="text-align:right;">
+0.01
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Residuals</td>
-<td align="right">165</td>
-<td align="right">686</td>
-<td align="right">4.16</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<tr>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:right;">
+165
+</td>
+<td style="text-align:right;">
+686
+</td>
+<td style="text-align:right;">
+4.16
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
 </tr>
 </tbody>
 </table></div>
@@ -144,8 +703,39 @@
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
-<li><a class="nav-link" href="#build"><span class="header-section-number">11</span> Model Building</a></li>
-<li><a class="nav-link" href="#another-model-summary"><span class="header-section-number">11.1</span> Another model summary7</a></li>
+<li><a class="nav-link" href="#build"><span class="header-section-number">11</span> Statistical Model Building</a></li>
+<li>
+<a class="nav-link" href="#nestF"><span class="header-section-number">11.1</span> Testing Sets of Coefficients</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#examples"><span class="header-section-number">11.1.1</span> Examples</a></li>
+<li><a class="nav-link" href="#coefficient-of-partial-determination"><span class="header-section-number">11.1.2</span> Coefficient of Partial Determination</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#multicollinearity"><span class="header-section-number">11.2</span> Multicollinearity</a></li>
+<li>
+<a class="nav-link" href="#model-selection"><span class="header-section-number">11.3</span> Model Selection</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#forward-selection"><span class="header-section-number">11.3.1</span> Forward Selection</a></li>
+<li><a class="nav-link" href="#backward-selection"><span class="header-section-number">11.3.2</span> Backward Selection</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#other-ways-for-comparing-models"><span class="header-section-number">11.4</span> Other ways for comparing models</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#analysis-of-appropriateness-of-model"><span class="header-section-number">11.4.1</span> Analysis of Appropriateness of Model</a></li></ul>
+</li>
+<li><a class="nav-link" href="#getting-the-variables-right"><span class="header-section-number">11.5</span> Getting the Variables Right</a></li>
+<li>
+<a class="nav-link" href="#a-model-building-strategy"><span class="header-section-number">11.6</span> A Model Building Strategy8</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-first-step">The first step</a></li>
+<li><a class="nav-link" href="#the-second-step">The second step</a></li>
+<li><a class="nav-link" href="#the-third-step">The third step</a></li>
+<li><a class="nav-link" href="#the-fourth-step">The fourth step</a></li>
+<li><a class="nav-link" href="#the-fifth-step">The fifth step</a></li>
+<li><a class="nav-link" href="#the-sixth-step">The sixth step</a></li>
+<li><a class="nav-link" href="#the-seventh-and-final-step">The seventh and final step</a></li>
+<li><a class="nav-link" href="#thoughts-on-model-selection"><span class="header-section-number">11.6.1</span> Thoughts on Model Selection…</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#reflection-questions-8"><span class="header-section-number">11.7</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-7"><span class="header-section-number">11.8</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#another-model-summary"><span class="header-section-number">11.9</span> Another model summary9</a></li>
 </ul>
 
       <div class="book-extra">
@@ -163,7 +753,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-04.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-07.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

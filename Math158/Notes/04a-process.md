@@ -1157,6 +1157,82 @@ office_wflow2
 
 
 
+#### Implementing Cross Validation {-}
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-53)[@flach12]</p>
+</div>
+
+Cross validation is typically used in two ways.  
+
+1. To assess a model's accuracy (*model assessment*).  
+2. To build a model (*model selection*).
+
+### Different ways to CV
+
+Suppose that we build a classifier on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
+
+* one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]
+
+* leave one out cross validation (LOOCV)
+1. remove one observation
+2. build the model using the remaining n-1 points
+3. predict class membership for the observation which was removed
+4. repeat by removing each observation one at a time
+
+* $V$-fold cross validation ($V$-fold CV)
+    * like LOOCV except that the algorithm is run $V$ times on each group (of approximately equal size) from a partition of the data set.]
+    * LOOCV is a special case of $V$-fold CV with $V=n$
+    * advantage of $V$-fold is computational
+    * $V$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are basically the same, the variability will be higher (i.e., based on the $n$ data values).  with $V$-fold, prediction is on $n$ values from $V$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]
+
+
+#### CV for **Model assessment** 10-fold {-}
+
+1. assume variables are set
+2. remove 10% of the data
+3. build the model using the remaining 90%
+4. predict response for the 10% of the observations which were removed
+5. repeat by removing each decile one at a time
+6. a good measure of the model's ability to predict is the error rate associated with the predictions on the data which have been independently predicted
+
+
+#### CV for **Model selection** 10-fold {-}
+
+1. set the variables
+2. build the model using the variables set above:
+    a. remove 10% of the data
+    b. build the model using the remaining 90%
+    c. predict response for the 10% of the observations which were removed
+    d. repeat by removing each decile one at a time
+3. measure the CV prediction error for the $k$ value at hand
+4. repeat steps 1-3 and choose the variables for which the prediction error is lowest
+
+
+#### CV for **Model assessment and selection** 10-fold {-}
+
+To do both, one approach is to use test/training data *and* CV in order to both model assessment and selection.   Note that CV could be used in both steps, but the algorithm is slightly more complicated.
+
+1. split the data into training and test observations
+2. set $k$ in $k$-NN
+3. build the model using the $k$ value set above on *only the training data*:
+    a. remove 10% of the training data
+    b. build the model using the remaining 90% of the training data
+    c. predict class membership / continuous response for the 10% of the training observations which were removed
+    d. repeat by removing each decile one at a time from the training data
+4. measure the CV prediction error for the $k$ value at hand on the training data
+5. repeat steps 2-4 and choose the $k$ for which the prediction error is lowest for the training data
+6. using the $k$ value given in step 5, assess the prediction error on the test data
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
+<p class="caption">(\#fig:unnamed-chunk-54)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+</div>
+
+
 
 
 ### Fit the models using cross validation
@@ -1179,7 +1255,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:
 
 <div class="figure" style="text-align: center">
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-53)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-56)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
 </div>
 
 Aside: the "re" in "resamples" is for repeated samples.  Not to be confused where repeated samples are taken in bootstrapping with replacement.  In cross validation, the repeated samples are taken **without** replacement.
@@ -1208,7 +1284,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-54)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-57)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
 </div>
 
 
@@ -1238,7 +1314,7 @@ Note that the three repeated samples ("resamples") are taken without replacement
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-56)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-59)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
 </div>
 
 #### Fit resamples {-}

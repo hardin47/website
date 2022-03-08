@@ -68,7 +68,7 @@
 <li><a class="" href="la.html"><span class="header-section-number">8</span> Regression using Matrices</a></li>
 <li><a class="" href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></li>
 <li><a class="active" href="process.html"><span class="header-section-number">10</span> Modeling as a Process6</a></li>
-<li><a class="" href="build.html"><span class="header-section-number">11</span> Model Building</a></li>
+<li><a class="" href="build.html"><span class="header-section-number">11</span> Statistical Model Building</a></li>
 <li><a class="" href="analysis-of-variance-anova.html"><span class="header-section-number">12</span> Analysis of variance (ANOVA)</a></li>
 <li><a class="" href="diag2.html"><span class="header-section-number">13</span> Diagnostics II</a></li>
 <li><a class="" href="shrink.html"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
@@ -1050,9 +1050,109 @@ The student scores on the second test do not accurately reflect what they know a
 </h4>
 <p><strong>WAIT</strong>, not so fast!</p>
 </div>
-<div id="fit-the-models-using-cross-validation" class="section level3" number="10.3.1">
+<div id="implementing-cross-validation" class="section level4 unnumbered">
+<h4>Implementing Cross Validation<a class="anchor" aria-label="anchor" href="#implementing-cross-validation"><i class="fas fa-link"></i></a>
+</h4>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-53"></span>
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%"><p class="caption">
+Figure 10.1: <span class="citation">(<a href="references.html#ref-flach12" role="doc-biblioref">Flach 2012</a>)</span>
+</p>
+</div>
+<p>Cross validation is typically used in two ways.</p>
+<ol style="list-style-type: decimal">
+<li>To assess a model’s accuracy (<em>model assessment</em>).<br>
+</li>
+<li>To build a model (<em>model selection</em>).</li>
+</ol>
+</div>
+<div id="different-ways-to-cv" class="section level3" number="10.3.1">
 <h3>
-<span class="header-section-number">10.3.1</span> Fit the models using cross validation<a class="anchor" aria-label="anchor" href="#fit-the-models-using-cross-validation"><i class="fas fa-link"></i></a>
+<span class="header-section-number">10.3.1</span> Different ways to CV<a class="anchor" aria-label="anchor" href="#different-ways-to-cv"><i class="fas fa-link"></i></a>
+</h3>
+<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li><p>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</p></li>
+<li><p>leave one out cross validation (LOOCV)</p></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation</li>
+<li>build the model using the remaining n-1 points</li>
+<li>predict class membership for the observation which was removed</li>
+<li>repeat by removing each observation one at a time</li>
+</ol>
+<ul>
+<li>
+<span class="math inline">\(V\)</span>-fold cross validation (<span class="math inline">\(V\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(V\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(V\)</span>-fold CV with <span class="math inline">\(V=n\)</span>
+</li>
+<li>advantage of <span class="math inline">\(V\)</span>-fold is computational</li>
+<li>
+<span class="math inline">\(V\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(V\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(V\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+</ul>
+</li>
+</ul>
+<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model assessment</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>assume variables are set</li>
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
+</ol>
+</div>
+<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model selection</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-selection-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>set the variables</li>
+<li>build the model using the variables set above:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+</ol>
+</li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
+<li>repeat steps 1-3 and choose the variables for which the prediction error is lowest</li>
+</ol>
+</div>
+<div id="cv-for-model-assessment-and-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model assessment and selection</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment-and-selection-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<p>To do both, one approach is to use test/training data <em>and</em> CV in order to both model assessment and selection. Note that CV could be used in both steps, but the algorithm is slightly more complicated.</p>
+<ol style="list-style-type: decimal">
+<li>split the data into training and test observations</li>
+<li>set <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>-NN</li>
+<li>build the model using the <span class="math inline">\(k\)</span> value set above on <em>only the training data</em>:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the training data</li>
+<li>build the model using the remaining 90% of the training data</li>
+<li>predict class membership / continuous response for the 10% of the training observations which were removed</li>
+<li>repeat by removing each decile one at a time from the training data</li>
+</ol>
+</li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand on the training data</li>
+<li>repeat steps 2-4 and choose the <span class="math inline">\(k\)</span> for which the prediction error is lowest for the training data</li>
+<li>using the <span class="math inline">\(k\)</span> value given in step 5, assess the prediction error on the test data</li>
+</ol>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-54"></span>
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%"><p class="caption">
+Figure 10.2: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(<a href="references.html#ref-CVpaper" role="doc-biblioref">Varoquaux et al. 2017</a>)</span>
+</p>
+</div>
+</div>
+</div>
+<div id="fit-the-models-using-cross-validation" class="section level3" number="10.3.2">
+<h3>
+<span class="header-section-number">10.3.2</span> Fit the models using cross validation<a class="anchor" aria-label="anchor" href="#fit-the-models-using-cross-validation"><i class="fas fa-link"></i></a>
 </h3>
 <div id="spending-the-data" class="section level4 unnumbered">
 <h4>“Spending” the data<a class="anchor" aria-label="anchor" href="#spending-the-data"><i class="fas fa-link"></i></a>
@@ -1075,9 +1175,9 @@ For each iteration of resampling, the data are partitioned into two subsamples:<
 <li>The model is evaluated with the <strong>assessment set</strong>.</li>
 </ul>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-53"></span>
+<span style="display:block;" id="fig:unnamed-chunk-56"></span>
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%"><p class="caption">
-Figure 10.1: Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
+Figure 10.3: Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
 </div>
 <p>Aside: the “re” in “resamples” is for repeated samples. Not to be confused where repeated samples are taken in bootstrapping with replacement. In cross validation, the repeated samples are taken <strong>without</strong> replacement.</p>
@@ -1108,9 +1208,9 @@ Figure 10.1: Repeated samples are taken from the training data, and with each re
 </h4>
 <p>Consider the example below where the <strong>training</strong> <strong>data</strong> are randomly split into 3 partitions:</p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-54"></span>
+<span style="display:block;" id="fig:unnamed-chunk-57"></span>
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%"><p class="caption">
-Figure 10.2: Splitting the data into a partition of v=3 groups. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
+Figure 10.4: Splitting the data into a partition of v=3 groups. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
 </div>
 <div class="sourceCode" id="cb451"><pre class="downlit sourceCode r">
@@ -1134,9 +1234,9 @@ Figure 10.2: Splitting the data into a partition of v=3 groups. Source: <span cl
 <li>Repeat v times, updating which partition is used for assessment each time</li>
 </ul>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-56"></span>
+<span style="display:block;" id="fig:unnamed-chunk-59"></span>
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%"><p class="caption">
-Figure 10.3: With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
+Figure 10.5: With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: <span class="citation">(<a href="references.html#ref-tidymodelingR" role="doc-biblioref">Kuhn and Silge 2022</a>)</span>
 </p>
 </div>
 </div>
@@ -1674,7 +1774,7 @@ Fold3
 
   <div class="chapter-nav">
 <div class="prev"><a href="mlr.html"><span class="header-section-number">9</span> Multiple Linear Regression</a></div>
-<div class="next"><a href="build.html"><span class="header-section-number">11</span> Model Building</a></div>
+<div class="next"><a href="build.html"><span class="header-section-number">11</span> Statistical Model Building</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
@@ -1696,7 +1796,10 @@ Fold3
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#cross-validation"><span class="header-section-number">10.3</span> Cross Validation</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#fit-the-models-using-cross-validation"><span class="header-section-number">10.3.1</span> Fit the models using cross validation</a></li></ul>
+<a class="nav-link" href="#cross-validation"><span class="header-section-number">10.3</span> Cross Validation</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#different-ways-to-cv"><span class="header-section-number">10.3.1</span> Different ways to CV</a></li>
+<li><a class="nav-link" href="#fit-the-models-using-cross-validation"><span class="header-section-number">10.3.2</span> Fit the models using cross validation</a></li>
+</ul>
 </li>
 <li><a class="nav-link" href="#final-model-assessment"><span class="header-section-number">10.4</span> Final model assessment</a></li>
 <li><a class="nav-link" href="#reflection-questions-7"><span class="header-section-number">10.5</span>  Reflection Questions</a></li>
@@ -1728,7 +1831,7 @@ Fold3
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-04.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-07.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
