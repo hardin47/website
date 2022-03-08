@@ -38,8 +38,8 @@ A typical ANOVA table for a model with three explanatory variables will look som
 |-------------------------	|------------------------	|:-----:	|---------------------------------------------------------	|
 | Regression              	| $SSR(X_1, X_2, X_3)$   	|   3   	| $MSR (X_1, X_2, X_3) = \frac{SSR(X_1, X_2, X_3)}{3}$    	|
 | \ \ \ $X_1$             	| $SSR(X_1)$             	|   1   	| $MSR(X_1) = \frac{SSR(X_1)}{1}$                         	|
-| \ \ \ $X_2 \| X_1$      	| $SSR(X_2 \| X_1)$      	|   1   	| $MSR(X_2 \| X_1) = \frac{SSR(X_2 \| X_1)}{1}$           	|
-| \ \ \ $X_3 \| X_1, X_2$ 	| $SSR(X_3 \| X_1, X_2)$ 	|   1   	| $MSR(X_3 \| X_1, X_2) = \frac{SSR(X_3 \| X_1, X_2)}{1}$ 	|
+| \ \ \ $X_2 | X_1$      	| $SSR(X_2 | X_1)$      	|   1   	| $MSR(X_2 | X_1) = \frac{SSR(X_2 | X_1)}{1}$           	|
+| \ \ \ $X_3 | X_1, X_2$ 	| $SSR(X_3 | X_1, X_2)$ 	|   1   	| $MSR(X_3 | X_1, X_2) = \frac{SSR(X_3 | X_1, X_2)}{1}$ 	|
 | Error                   	| $SSE(X_1, X_2, X_3)$   	| $n-4$ 	| $MSE(X_1, X_2, X_3) = \frac{SSE(X_1, X_2, X_3)}{n-p}$   	|
 
 
@@ -109,7 +109,7 @@ Because our p-value is so low, we reject $H_0: \beta_2 = \beta_3 = 0$, and we cl
 \mbox{reduced model}: && E[Y] = \beta_0 + \beta_c (X_1 + X_2) + \beta_3 X_3\\
 \end{eqnarray*}
 
-Because the reduced model is simply a specific form of the full model, the two models are nested.  We can reformat the data (i.e., add the first two variables), and run the linear model in R.  We can get SSE from the full model and from the reduced model and calculate the F statistic by hand.
+Because the reduced model is a specific form of the full model, the two models are nested.  We can reformat the data (i.e., add the first two variables), and run the linear model in R.  We can get SSE from the full model and from the reduced model and calculate the F statistic by hand.
 
 * Let's say you want to test $H_0: \beta_3 = 47$.  Again, note the form of your full and reduced models.
 
@@ -117,11 +117,11 @@ Because the reduced model is simply a specific form of the full model, the two m
 \mbox{full model}:&& E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\\
 \mbox{reduced model}: && E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + 47 * X_3\\
 \end{eqnarray*}
-We don't want to find a coefficient for $X_3$, so we simply subtract $47*X_3$ from each Y value:
+We don't want to find a coefficient for $X_3$, so we subtract $47*X_3$ from each Y value:
 \begin{eqnarray*}
 \mbox{reduced model}: && E[Y - 47* X_3] = \beta_0 + \beta_1 X_1 + \beta_2 X_2\\
 \end{eqnarray*}
-Again, the reduced model is simply a specific form of the full model, the two models are nested.  Using the reformatted data, we run linear models on both the full and reduced models and calculate the F statistic by hand.
+Again, the reduced model is a specific form of the full model, the two models are nested.  Using the reformatted data, we run linear models on both the full and reduced models and calculate the F statistic by hand.
 
 
 
@@ -544,16 +544,14 @@ In this case there are two questions of interest; are there differences at all (
 
 
 
+## R: ANOVA decompisition - tips
 
-
+We return to the tips data which was used in Section \@ref(tips)^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.].
 
 > Is this the best model to explain variation in tips?
 
 
 **Note:**  when a single dataset is used to build and fit the model, we penalize the fitting (think $R^2_{adj}$).  When different data are used, i.e., with CV, there is no need to use a metric with penalization.
-
-## Another model summary^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.]
-
 
 
 
@@ -562,53 +560,13 @@ In this case there are two questions of interest; are there differences at all (
 
 
 ```r
-anova(tip_fit$fit) %>%
-  tidy() %>%
-  kable(digits = 2)
+tip_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age, data = tips)
 ```
 
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> term </th>
-   <th style="text-align:right;"> df </th>
-   <th style="text-align:right;"> sumsq </th>
-   <th style="text-align:right;"> meansq </th>
-   <th style="text-align:right;"> statistic </th>
-   <th style="text-align:right;"> p.value </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Party </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1189 </td>
-   <td style="text-align:right;"> 1188.64 </td>
-   <td style="text-align:right;"> 285.71 </td>
-   <td style="text-align:right;"> 0.00 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Age </td>
-   <td style="text-align:right;"> 2 </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:right;"> 19.01 </td>
-   <td style="text-align:right;"> 4.57 </td>
-   <td style="text-align:right;"> 0.01 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Residuals </td>
-   <td style="text-align:right;"> 165 </td>
-   <td style="text-align:right;"> 686 </td>
-   <td style="text-align:right;"> 4.16 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-</tbody>
-</table>
 
-# Analysis of variance (ANOVA)
-
-## Analysis of variance (ANOVA)
+### Analysis of variance (ANOVA)
 
 -   **Main Idea:** Decompose the total variation on the outcome into:
     -   the variation that can be explained by the each of the variables in the model
@@ -616,7 +574,6 @@ anova(tip_fit$fit) %>%
     -   the variation that **can't** be explained by the model (left in the residuals)
 -   If the variation that can be explained by the variables in the model is greater than the variation in the residuals, this signals that the model might be "valuable" (at least one of the $\beta$s not equal to 0)
 
-## ANOVA output
 
 
 ```r
@@ -664,7 +621,7 @@ anova(tip_fit$fit) %>%
 </tbody>
 </table>
 
-## ANOVA output, with totals
+#### ANOVA output, with totals {-}
 
 <table>
  <thead>
@@ -713,7 +670,7 @@ anova(tip_fit$fit) %>%
 </tbody>
 </table>
 
-## Sum of squares
+#### Sum of squares {-}
 
 <table>
  <thead>
@@ -754,7 +711,7 @@ anova(tip_fit$fit) %>%
 
 
 
-## R: example: SAT scores
+## R: model building - SAT scores
 
 These notes belong at the end... I'm putting them here to highlight them before the full analysis.
 
