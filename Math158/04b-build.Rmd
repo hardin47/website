@@ -507,24 +507,29 @@ https://onlinecourses.science.psu.edu/stat501/node/328
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
+### Decomposing sums of squares
+
 1. How do SSE, SSR, and SSTO change when variables are added to the model?  
 2. What does $SSR(X_2 | X_1)$ really mean?  How is it defined?  
-3. How do we break up SSR in the ANOVA table?  Note: the order of variables mattes!   
+3. How do we break up SSR in the ANOVA table?  Note: the order of variables maters!   
 4. How do you tests sets of coefficients that aren't in the right order?  Or that equal a constant?  Or that equal each other?  
-5. If you are doing a nested F-test by hand, how do you find the $F^*$ critical value?  (Hint: use `qf()` in R)
+5. If you are doing a nested F-test without `anova()` output, how do you find the $F^*$ critical value?  (Hint: use `qf()` in R)
 
+### Multicollinearity
 
 1.  What does multicollinearity mean?  
 2.  What are the effects of multicollinearity on various aspects of regression analyses?  
 3.  What are the effects of correlated predictors on various aspects of regression analyses?  
-4.  (More in chapter 10:   variance inflation factors, and how to use them to help detect multicollinearity)  
-5.  How can you reduce multicollinearity problems in the analysis?  
-6.  What are the bigger regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)
+4.  (More in ALSM chapter 10:   variance inflation factors, and how to use them to help detect multicollinearity)  
+5.  How can multicollinearity problems be reduced in the analysis?  
+6.  What are the big regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)
+
+### Building models
 
 1.  What is  the impact of the four different kinds of models with respect to their "correctness": correctly specified, underspecified, overspecified, and correct but with extraneous predictors?  
-2.  How do you conduct stepwise regression "by hand?" (Using either F tests or one of the other criteria.)  
+2.  How do you conduct stepwise regression "by hand" (using either F tests or one of the other criteria)? 
 3.  What are the limitations of stepwise regression?  
-4.  How can you choose an optimal model based on the $R^2$ value, the adjusted $R^2$ value, MSE and the $C_p$ criterion?  
+4.  How can you choose an optimal model based on the $R^2$ value, $R^2_{adj}$, MSE, AIC, BIC, or $C_p$ criterion?  
 5. What are the seven steps of good model building strategy?
 
 
@@ -615,6 +620,111 @@ anova(tip_fit$fit) %>%
 -   $SS_{Error}$: Residual sum of squares, variability of residuals, $\sum_{i = 1}^n (y_i - \hat{y})^2$
 -   $SS_{Model} = SS_{Total} - SS_{Error}$: Variability explained by the model
 
+## R: nested F test - births
+
+Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the data set released in 2014.  [Data description here](https://www.openintro.org/data/index.php?data=births14).
+
+```{r}
+library(openintro)
+data(births14)
+births14 <- births14 %>%
+  select(-fage, -visits) %>%
+  drop_na() %>%
+  mutate(term = case_when(
+    weeks <= 38 ~ "early",
+    weeks <= 40 ~ "full",
+    TRUE ~ "late"
+  ))
+
+names(births14)
+```
+
+Notice that the variable names we'll use are `mage`, `weight`, `gained`, and `habit`.
+
+1. We're interested in predicting a baby's `weight` from the pounds a mother `gained`.
+
+```{r}
+oz_g_lm <- lm(weight ~ gained, data=births14)
+
+oz_g_lm %>% tidy()
+oz_g_lm %>% anova()
+```
+
+
+2. What if we include smoking `habit` as a variable?
+
+```{r}
+oz_gh_lm <- lm(weight ~ gained + habit, data=births14)
+
+oz_gh_lm %>% tidy()
+oz_gh_lm %>% anova()
+```
+
+3. What if we smoking `habit` and weight `gained` *interact*?
+
+```{r}
+oz_gih_lm <- lm(weight ~ gained * habit, data=births14)
+
+oz_gih_lm %>% tidy()
+oz_gih_lm %>% anova()
+```
+
+4. What happens to the model if we add in another quantitative variable, the mother's age `mage`?
+
+```{r}
+oz_ghm_lm <- lm(weight ~ gained + habit + mage, data=births14)
+
+oz_ghm_lm %>% tidy()
+oz_ghm_lm %>% anova()
+```
+
+5. What happens to the model if we add in another quantitative variable with the interaction?
+
+```{r}
+oz_gihm_lm <- lm(weight ~ gained * habit + mage, data=births14)
+
+oz_gihm_lm %>% tidy()
+oz_gihm_lm %>% anova()
+```
+
+6. What is the F-test to see if `mage` should be added to the model with interaction?  (borderline, the p-value on `mage` is 0.0423 for $H_0: \beta_{mage}$)
+
+
+```{r}
+anova(oz_gih_lm, oz_gihm_lm)
+```
+
+
+
+7. Can we drop both the interaction and `mage`?  (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero.  Now the test is $H_0: \beta_{gainxsmk} = \beta_{mage} = 0$.)
+
+```{r}
+anova(oz_gh_lm, oz_gihm_lm)
+```
+
+
+8. Calculate the coefficient of partial determination for `mage` given `gained` and `habit`.
+
+```{r}
+anova(oz_ghm_lm)
+6.42 / (6.42 + 1453.37)
+```
+
+
+The variability (in ounces of baby `weight`) remaining after modeling with `gained` and `habit` is reduced by a further 0.4\% when additionally adding `mage`.
+
+9. On a different note...  the variable `term` has three levels ("early", "full", and "late").  Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses **two** degrees of freedom because there are two coefficients to estimate.  When `term` interacts with `gained` there are an additional two coefficients to estimate (*both* of the interaction coefficients in the model).
+
+```{r}
+oz_gtm_lm <- lm(weight ~ gained + term + mage, data=births14)
+oz_gitm_lm <- lm(weight ~ gained * term + mage, data=births14)
+
+tidy(oz_gtm_lm)
+anova(oz_gtm_lm)
+
+tidy(oz_gitm_lm)
+anova(oz_gitm_lm)
+```
 
 
 ## R: model building - SAT scores

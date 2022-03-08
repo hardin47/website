@@ -512,24 +512,29 @@ In this case there are two questions of interest; are there differences at all (
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
+### Decomposing sums of squares
+
 1. How do SSE, SSR, and SSTO change when variables are added to the model?  
 2. What does $SSR(X_2 | X_1)$ really mean?  How is it defined?  
-3. How do we break up SSR in the ANOVA table?  Note: the order of variables mattes!   
+3. How do we break up SSR in the ANOVA table?  Note: the order of variables maters!   
 4. How do you tests sets of coefficients that aren't in the right order?  Or that equal a constant?  Or that equal each other?  
-5. If you are doing a nested F-test by hand, how do you find the $F^*$ critical value?  (Hint: use `qf()` in R)
+5. If you are doing a nested F-test without `anova()` output, how do you find the $F^*$ critical value?  (Hint: use `qf()` in R)
 
+### Multicollinearity
 
 1.  What does multicollinearity mean?  
 2.  What are the effects of multicollinearity on various aspects of regression analyses?  
 3.  What are the effects of correlated predictors on various aspects of regression analyses?  
-4.  (More in chapter 10:   variance inflation factors, and how to use them to help detect multicollinearity)  
-5.  How can you reduce multicollinearity problems in the analysis?  
-6.  What are the bigger regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)
+4.  (More in ALSM chapter 10:   variance inflation factors, and how to use them to help detect multicollinearity)  
+5.  How can multicollinearity problems be reduced in the analysis?  
+6.  What are the big regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)
+
+### Building models
 
 1.  What is  the impact of the four different kinds of models with respect to their "correctness": correctly specified, underspecified, overspecified, and correct but with extraneous predictors?  
-2.  How do you conduct stepwise regression "by hand?" (Using either F tests or one of the other criteria.)  
+2.  How do you conduct stepwise regression "by hand" (using either F tests or one of the other criteria)? 
 3.  What are the limitations of stepwise regression?  
-4.  How can you choose an optimal model based on the $R^2$ value, the adjusted $R^2$ value, MSE and the $C_p$ criterion?  
+4.  How can you choose an optimal model based on the $R^2$ value, $R^2_{adj}$, MSE, AIC, BIC, or $C_p$ criterion?  
 5. What are the seven steps of good model building strategy?
 
 
@@ -709,6 +714,354 @@ anova(tip_fit$fit) %>%
 -   $SS_{Error}$: Residual sum of squares, variability of residuals, $\sum_{i = 1}^n (y_i - \hat{y})^2$
 -   $SS_{Model} = SS_{Total} - SS_{Error}$: Variability explained by the model
 
+## R: nested F test - births
+
+Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the data set released in 2014.  [Data description here](https://www.openintro.org/data/index.php?data=births14).
+
+
+```r
+library(openintro)
+data(births14)
+births14 <- births14 %>%
+  select(-fage, -visits) %>%
+  drop_na() %>%
+  mutate(term = case_when(
+    weeks <= 38 ~ "early",
+    weeks <= 40 ~ "full",
+    TRUE ~ "late"
+  ))
+
+names(births14)
+```
+
+```
+##  [1] "mage"           "mature"         "weeks"          "premie"        
+##  [5] "gained"         "weight"         "lowbirthweight" "sex"           
+##  [9] "habit"          "marital"        "whitemom"       "term"
+```
+
+Notice that the variable names we'll use are `mage`, `weight`, `gained`, and `habit`.
+
+1. We're interested in predicting a baby's `weight` from the pounds a mother `gained`.
+
+
+```r
+oz_g_lm <- lm(weight ~ gained, data=births14)
+
+oz_g_lm %>% tidy()
+```
+
+```
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic    p.value
+##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
+## 1 (Intercept)   6.83     0.0910      75.1  0         
+## 2 gained        0.0124   0.00267      4.65 0.00000372
+```
+
+```r
+oz_g_lm %>% anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    34.4    21.7 3.7e-06 ***
+## Residuals 956   1520     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+2. What if we include smoking `habit` as a variable?
+
+
+```r
+oz_gh_lm <- lm(weight ~ gained + habit, data=births14)
+
+oz_gh_lm %>% tidy()
+```
+
+```
+## # A tibble: 3 × 5
+##   term        estimate std.error statistic    p.value
+##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
+## 1 (Intercept)   6.91     0.0924      74.8  0         
+## 2 gained        0.0119   0.00266      4.49 0.00000813
+## 3 habitsmoker  -0.507    0.126       -4.03 0.0000598
+```
+
+```r
+oz_gh_lm %>% anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9    21.8 3.5e-06 ***
+## habit       1     25    25.3    16.3 6.0e-05 ***
+## Residuals 938   1460     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+3. What if we smoking `habit` and weight `gained` *interact*?
+
+
+```r
+oz_gih_lm <- lm(weight ~ gained * habit, data=births14)
+
+oz_gih_lm %>% tidy()
+```
+
+```
+## # A tibble: 4 × 5
+##   term               estimate std.error statistic   p.value
+##   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)         6.89      0.0978     70.5   0        
+## 2 gained              0.0124    0.00285     4.35  0.0000153
+## 3 habitsmoker        -0.400     0.259      -1.55  0.123    
+## 4 gained:habitsmoker -0.00368   0.00782    -0.471 0.638
+```
+
+```r
+oz_gih_lm %>% anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##               Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained         1     34    33.9   21.74 3.6e-06 ***
+## habit          1     25    25.3   16.24 6.0e-05 ***
+## gained:habit   1      0     0.3    0.22    0.64    
+## Residuals    937   1459     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+4. What happens to the model if we add in another quantitative variable, the mother's age `mage`?
+
+
+```r
+oz_ghm_lm <- lm(weight ~ gained + habit + mage, data=births14)
+
+oz_ghm_lm %>% tidy()
+```
+
+```
+## # A tibble: 4 × 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   6.49     0.225       28.8  2.94e-131
+## 2 gained        0.0122   0.00265      4.59 5.11e-  6
+## 3 habitsmoker  -0.494    0.126       -3.93 9.07e-  5
+## 4 mage          0.0144   0.00707      2.03 4.22e-  2
+```
+
+```r
+oz_ghm_lm %>% anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9   21.83 3.4e-06 ***
+## habit       1     25    25.3   16.31 5.8e-05 ***
+## mage        1      6     6.4    4.14   0.042 *  
+## Residuals 937   1453     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+5. What happens to the model if we add in another quantitative variable with the interaction?
+
+
+```r
+oz_gihm_lm <- lm(weight ~ gained * habit + mage, data=births14)
+
+oz_gihm_lm %>% tidy()
+```
+
+```
+## # A tibble: 5 × 5
+##   term               estimate std.error statistic   p.value
+##   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)         6.48      0.227      28.5   2.27e-129
+## 2 gained              0.0126    0.00285     4.43  1.07e-  5
+## 3 habitsmoker        -0.397     0.259      -1.54  1.25e-  1
+## 4 mage                0.0143    0.00707     2.02  4.33e-  2
+## 5 gained:habitsmoker -0.00335   0.00781    -0.430 6.68e-  1
+```
+
+```r
+oz_gihm_lm %>% anova()
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##               Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained         1     34    33.9   21.81 3.4e-06 ***
+## habit          1     25    25.3   16.30 5.9e-05 ***
+## mage           1      6     6.4    4.13   0.042 *  
+## gained:habit   1      0     0.3    0.18   0.668    
+## Residuals    936   1453     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+6. What is the F-test to see if `mage` should be added to the model with interaction?  (borderline, the p-value on `mage` is 0.0423 for $H_0: \beta_{mage}$)
+
+
+
+```r
+anova(oz_gih_lm, oz_gihm_lm)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: weight ~ gained * habit
+## Model 2: weight ~ gained * habit + mage
+##   Res.Df  RSS Df Sum of Sq    F Pr(>F)  
+## 1    937 1459                           
+## 2    936 1453  1      6.36 4.09  0.043 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+7. Can we drop both the interaction and `mage`?  (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero.  Now the test is $H_0: \beta_{gainxsmk} = \beta_{mage} = 0$.)
+
+
+```r
+anova(oz_gh_lm, oz_gihm_lm)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: weight ~ gained + habit
+## Model 2: weight ~ gained * habit + mage
+##   Res.Df  RSS Df Sum of Sq    F Pr(>F)
+## 1    938 1460                         
+## 2    936 1453  2       6.7 2.16   0.12
+```
+
+
+8. Calculate the coefficient of partial determination for `mage` given `gained` and `habit`.
+
+
+```r
+anova(oz_ghm_lm)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9   21.83 3.4e-06 ***
+## habit       1     25    25.3   16.31 5.8e-05 ***
+## mage        1      6     6.4    4.14   0.042 *  
+## Residuals 937   1453     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+6.42 / (6.42 + 1453.37)
+```
+
+```
+## [1] 0.0044
+```
+
+
+The variability (in ounces of baby `weight`) remaining after modeling with `gained` and `habit` is reduced by a further 0.4\% when additionally adding `mage`.
+
+9. On a different note...  the variable `term` has three levels ("early", "full", and "late").  Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses **two** degrees of freedom because there are two coefficients to estimate.  When `term` interacts with `gained` there are an additional two coefficients to estimate (*both* of the interaction coefficients in the model).
+
+
+```r
+oz_gtm_lm <- lm(weight ~ gained + term + mage, data=births14)
+oz_gitm_lm <- lm(weight ~ gained * term + mage, data=births14)
+
+tidy(oz_gtm_lm)
+```
+
+```
+## # A tibble: 5 × 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   5.72     0.213       26.9  2.32e-118
+## 2 gained        0.0109   0.00246      4.44 9.93e-  6
+## 3 termfull      1.02     0.0833      12.3  3.99e- 32
+## 4 termlate      1.07     0.113        9.49 1.85e- 20
+## 5 mage          0.0171   0.00654      2.61 9.08e-  3
+```
+
+```r
+anova(oz_gtm_lm)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9   25.40 5.6e-07 ***
+## term        2    228   114.2   85.67 < 2e-16 ***
+## mage        1      9     9.1    6.84  0.0091 ** 
+## Residuals 936   1248     1.3                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+tidy(oz_gitm_lm)
+```
+
+```
+## # A tibble: 7 × 5
+##   term             estimate std.error statistic   p.value
+##   <chr>               <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)      5.77       0.236     24.5    1.26e-102
+## 2 gained           0.00929    0.00430    2.16   3.11e-  2
+## 3 termfull         0.911      0.187      4.88   1.28e-  6
+## 4 termlate         1.09       0.247      4.42   1.08e-  5
+## 5 mage             0.0171     0.00655    2.61   9.27e-  3
+## 6 gained:termfull  0.00365    0.00559    0.652  5.14e-  1
+## 7 gained:termlate -0.000469   0.00703   -0.0667 9.47e-  1
+```
+
+```r
+anova(oz_gitm_lm)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##              Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained        1     34    33.9   25.37 5.7e-07 ***
+## term          2    228   114.2   85.54 < 2e-16 ***
+## mage          1      9     9.1    6.83  0.0091 ** 
+## gained:term   2      1     0.4    0.30  0.7388    
+## Residuals   934   1247     1.3                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 
 ## R: model building - SAT scores
