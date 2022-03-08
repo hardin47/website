@@ -188,15 +188,48 @@ F^* &amp;=&amp; \frac{SSE(X_1) - SSE(X_1, X_2, X_3)}{(n-2) - (n-4)} \div \frac{S
 <li>In considering the output below, let’s say that we’d like to test whether both smoking and mother’s age are needed in the model. The full model is: gained, smoke, mage in the model; the reduced model is the model with gained only.</li>
 </ul>
 <p><span class="math display">\[\begin{eqnarray*}
-F^* &amp;=&amp; \frac{(6241+9629) / 775 - 773)}{346801 / 773} = 17.69
+F &amp;=&amp; \frac{(1485.09 - 1453.37) / (939 - 937)}{1453.37 / 937} = 10.22
 \end{eqnarray*}\]</span></p>
 <div class="sourceCode" id="cb501"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fl">1</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">pf</a></span><span class="op">(</span><span class="fl">17.69</span>,<span class="fl">2</span>,<span class="fl">773</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 3.08e-08</code></pre>
-Alternatively,<br><p>Because our p-value is so low, we reject <span class="math inline">\(H_0: \beta_2 = \beta_3 = 0\)</span>, and we claim that at least one of smoke or mother’s age is needed in the model (possibly both).</p>
+<code class="sourceCode R"><span class="va">oz_g_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span>, data <span class="op">=</span> <span class="va">births14</span><span class="op">)</span>
+<span class="va">oz_ghm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">+</span> <span class="va">habit</span> <span class="op">+</span> <span class="va">mage</span>, data <span class="op">=</span> <span class="va">births14</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_g_lm</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+## gained      1     34    33.9    21.4 4.2e-06 ***
+## Residuals 939   1485     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<div class="sourceCode" id="cb503"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_ghm_lm</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+## gained      1     34    33.9   21.83 3.4e-06 ***
+## habit       1     25    25.3   16.31 5.8e-05 ***
+## mage        1      6     6.4    4.14   0.042 *  
+## Residuals 937   1453     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<div class="sourceCode" id="cb505"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_g_lm</span>, <span class="va">oz_ghm_lm</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: weight ~ gained
+## Model 2: weight ~ gained + habit + mage
+##   Res.Df  RSS Df Sum of Sq    F  Pr(&gt;F)    
+## 1    939 1485                              
+## 2    937 1453  2      31.7 10.2 4.1e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>Because our p-value is so low, we reject <span class="math inline">\(H_0: \beta_2 = \beta_3 = 0\)</span>, and we claim that at least one of smoking <code>habit</code> or mother’s age, <code>mage</code>, is needed in the model (possibly both).</p>
 <ul>
-<li><p>One reason to use a nested F-test (in lieu of a t-test), is for example, if you’d like to know whether race is an important variable in your model (see model 8(b) below). As noted below, race as a factor variable is responsible for 5 separate coefficients. In order to test whether race is significant, you would fit the model with and without race, and your null hypothesis would be testing <span class="math inline">\(H_0: \beta_2 = \beta_3 = \beta_4 = \beta_5 = \beta_6 = 0\)</span>.</p></li>
-<li><p>Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model. You might have 4 explanatory variables, and so you’d have <span class="math inline">\({4\choose2} = 6\)</span> interactions to consider. You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full). By nesting them, you don’t need to test each interaction coefficient one at a time.</p></li>
+<li><p>One reason to use a nested F-test (in lieu of a t-test), is for example, if you’d like to know whether <code>term</code> is an important variable in your model (see model 8 way below with the R code). As noted below, <code>term</code> as a factor variable is responsible for 2 separate coefficients. In order to test whether <code>term</code> is significant, you would fit the model with and without <code>term</code>, and your null hypothesis would be testing <span class="math inline">\(H_0: \beta_2 = \beta_3 = 0\)</span>.</p></li>
+<li><p>Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model. You might have 4 explanatory variables, and so you’d have <span class="math inline">\({4\choose2} = 6\)</span> pairwise interactions to consider. You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full). By nesting them, you don’t need to test each interaction coefficient one at a time.</p></li>
 <li><p>Let’s say you want to test <span class="math inline">\(H_0: \beta_1 = \beta_2\)</span>. Note the form of your full and reduced models.</p></li>
 </ul>
 <p><span class="math display">\[\begin{eqnarray*}
@@ -241,26 +274,26 @@ X_1 &amp;=&amp; \# \mbox{ of coins in pocket}\\
 X_2 &amp;=&amp; \# \mbox{ of pennies, nickels, dimes in pocket}
 \end{eqnarray*}\]</span>
 Using a completely non-random sample, I got the following data:</p>
-<div class="sourceCode" id="cb503"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb507"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">amount</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.37</span>, <span class="fl">1.01</span>, <span class="fl">1.5</span>, <span class="fl">0.56</span>, <span class="fl">0.61</span>, <span class="fl">3.06</span>, <span class="fl">5.42</span>, <span class="fl">1.75</span>, <span class="fl">5.4</span>, <span class="fl">0.56</span>,
                <span class="fl">0.34</span>, <span class="fl">2.33</span>, <span class="fl">3.34</span><span class="op">)</span>
 <span class="va">num.coins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">37</span>,<span class="fl">28</span>,<span class="fl">9</span>,<span class="fl">11</span>,<span class="fl">4</span>,<span class="fl">6</span>,<span class="fl">17</span>,<span class="fl">15</span><span class="op">)</span>
 <span class="va">num.lowcoins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">8</span>,<span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">9</span>,<span class="fl">34</span>,<span class="fl">9</span>,<span class="fl">3</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">12</span>,<span class="fl">11</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb504"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb508"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term        estimate std.error statistic p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 (Intercept)    0.732    0.668       1.10  0.297 
 ## 2 num.coins      0.108    0.0424      2.55  0.0269</code></pre>
-<div class="sourceCode" id="cb506"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb510"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term         estimate std.error statistic p.value
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 (Intercept)    1.73      0.680      2.54   0.0272
 ## 2 num.lowcoins   0.0462    0.0591     0.781  0.451</code></pre>
-<div class="sourceCode" id="cb508"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb512"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span> <span class="op">+</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 3 × 5
 ##   term         estimate std.error statistic  p.value
@@ -268,7 +301,7 @@ Using a completely non-random sample, I got the following data:</p>
 ## 1 (Intercept)     0.307    0.466      0.660 0.524   
 ## 2 num.coins       0.296    0.0578     5.13  0.000443
 ## 3 num.lowcoins   -0.246    0.0656    -3.75  0.00376</code></pre>
-<div class="sourceCode" id="cb510"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb514"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">amount</span> <span class="op">~</span> <span class="va">num.coins</span> <span class="op">+</span> <span class="va">num.lowcoins</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -288,7 +321,7 @@ Using a completely non-random sample, I got the following data:</p>
 <li>
 <span class="math inline">\(R^2_{Y2|1} = 28.208 / (28.208 + 21.366) = 0.569\)</span>. We see that when number of low coins is added to the model that already contains the number of coins, the SSE is reduced by 56.9%. [ <span class="math inline">\(SSR(X_1) = 63.363, SSR(X_2|X_1) = 28.208, SSE(X_1, X_2) = 21.366, SSE(X_1) = SSTO - SSR(X_1) = 28.208 + 21.366\)</span> ]</li>
 </ul>
-<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;"></div>
 <div id="effects-of-multicollinearity" class="section level4 unnumbered">
 <h4>Effects of Multicollinearity<a class="anchor" aria-label="anchor" href="#effects-of-multicollinearity"><i class="fas fa-link"></i></a>
 </h4>
@@ -409,9 +442,9 @@ How do you choose the <span class="math inline">\(\alpha\)</span> values? If you
 <span class="header-section-number">11.4</span> Other ways for comparing models<a class="anchor" aria-label="anchor" href="#other-ways-for-comparing-models"><i class="fas fa-link"></i></a>
 </h2>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-11"></span>
+<span style="display:block;" id="fig:unnamed-chunk-12"></span>
 <img src="figs/sleuthmodelbuild.png" alt="A strategy for data analysis using statistical models. Source: @sleuth" width="100%"><p class="caption">
-Figure 1.7: A strategy for data analysis using statistical models. Source: <span class="citation"><a href="references.html#ref-sleuth" role="doc-biblioref">Ramsey and Schafer</a> (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>
+Figure 11.1: A strategy for data analysis using statistical models. Source: <span class="citation"><a href="references.html#ref-sleuth" role="doc-biblioref">Ramsey and Schafer</a> (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>
 </p>
 </div>
 <div id="analysis-of-appropriateness-of-model" class="section level3" number="11.4.1">
@@ -453,7 +486,7 @@ If there are trends in the residual plots against the variables in the model, yo
 </h4>
 <p>A regression model is underspecified if it is missing one or more important predictor variables. Being underspecified is the worst case scenario because the model ends up being biased and predictions are wrong for virtually every observation. Additionally, the estimate of MSE tends to be big which yields larger confidence intervals for the estimates (less chance for significance).</p>
 <p>Consider another SAT dataset. We see that if we don’t stratify by the fraction of students in the state who took the SAT (0-22%, 22-49%, 49-81%). So much changes! The slopes are negative in the large group and positive in the subgroups. Additionally, the <span class="math inline">\(R^2\)</span> value goes from 0.193 to 0.806!! The model without the fraction of students is underspecified and quite biased. It doesn’t matter how many observations we collect, the model will always be wrong. <strong>Underspecifying the model is the worst of the possible things that can happen.</strong></p>
-<div class="sourceCode" id="cb513"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb517"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ProjectMOSAIC/mosaic">mosaic</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ProjectMOSAIC/mosaicData">mosaicData</a></span><span class="op">)</span>
 
@@ -467,13 +500,13 @@ If there are trends in the residual plots against the variables in the model, yo
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span>, y <span class="op">=</span> <span class="va">sat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">frac_group</span>, color <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;"></div>
-<div class="sourceCode" id="cb514"><pre class="downlit sourceCode r">
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="sourceCode" id="cb518"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">SAT</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">salary</span>, y <span class="op">=</span> <span class="va">sat</span>, group <span class="op">=</span> <span class="va">frac_group</span>, color <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">frac_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">FALSE</span>, fullrange <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="04b-build_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;"></div>
 </div>
 <div id="extraneous" class="section level4 unnumbered">
 <h4>Extraneous<a class="anchor" aria-label="anchor" href="#extraneous"><i class="fas fa-link"></i></a>
@@ -637,7 +670,7 @@ In this case there are two questions of interest; are there differences at all (
 <p>Is this the best model to explain variation in tips?</p>
 </blockquote>
 <p><strong>Note:</strong> when a single dataset is used to build and fit the model, we penalize the fitting (think <span class="math inline">\(R^2_{adj}\)</span>). When different data are used, i.e., with CV, there is no need to use a metric with penalization.</p>
-<div class="sourceCode" id="cb515"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb519"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tip_fit</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu">set_engine</span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu">fit</span><span class="op">(</span><span class="va">Tip</span> <span class="op">~</span> <span class="va">Party</span> <span class="op">+</span> <span class="va">Age</span>, data <span class="op">=</span> <span class="va">tips</span><span class="op">)</span></code></pre></div>
@@ -655,7 +688,7 @@ In this case there are two questions of interest; are there differences at all (
 </li>
 <li>If the variation that can be explained by the variables in the model is greater than the variation in the residuals, this signals that the model might be “valuable” (at least one of the <span class="math inline">\(\beta\)</span>s not equal to 0)</li>
 </ul>
-<div class="sourceCode" id="cb516"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb520"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">tip_fit</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu">kable</span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
@@ -925,8 +958,8 @@ Total
 <h2>
 <span class="header-section-number">11.10</span> R: nested F test - births<a class="anchor" aria-label="anchor" href="#r-nested-f-test---births"><i class="fas fa-link"></i></a>
 </h2>
-<p>Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the data set released in 2014. <a href="https://www.openintro.org/data/index.php?data=births14">Data description here</a>.</p>
-<div class="sourceCode" id="cb517"><pre class="downlit sourceCode r">
+<p>Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the <a href="https://www.icpsr.umich.edu/web/ICPSR/studies/36461">data set released in 2014</a>. <a href="https://www.openintro.org/data/index.php?data=births14">Data description here</a>.</p>
+<div class="sourceCode" id="cb521"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://openintrostat.github.io/openintro/">openintro</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">births14</span><span class="op">)</span>
 <span class="va">births14</span> <span class="op">&lt;-</span> <span class="va">births14</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
@@ -944,31 +977,31 @@ Total
 ##  [9] "habit"          "marital"        "whitemom"       "term"</code></pre>
 <p>Notice that the variable names we’ll use are <code>mage</code>, <code>weight</code>, <code>gained</code>, and <code>habit</code>.</p>
 <ol style="list-style-type: decimal">
-<li>We’re interested in predicting a baby’s <code>weight</code> from the pounds a mother <code>gained</code>.</li>
+<li>Interested is in predicting a baby’s <code>weight</code> from the pounds a mother <code>gained</code>.</li>
 </ol>
-<div class="sourceCode" id="cb519"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb523"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_g_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
 <span class="va">oz_g_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term        estimate std.error statistic    p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 (Intercept)   6.83     0.0910      75.1  0         
-## 2 gained        0.0124   0.00267      4.65 0.00000372</code></pre>
-<div class="sourceCode" id="cb521"><pre class="downlit sourceCode r">
+## 1 (Intercept)   6.83     0.0912      74.9  0         
+## 2 gained        0.0124   0.00267      4.63 0.00000423</code></pre>
+<div class="sourceCode" id="cb525"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_g_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Response: weight
 ##            Df Sum Sq Mean Sq F value  Pr(&gt;F)    
-## gained      1     34    34.4    21.7 3.7e-06 ***
-## Residuals 956   1520     1.6                    
+## gained      1     34    33.9    21.4 4.2e-06 ***
+## Residuals 939   1485     1.6                    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li>What if we include smoking <code>habit</code> as a variable?</li>
+<li>What if smoking <code>habit</code> is included as a variable?</li>
 </ol>
-<div class="sourceCode" id="cb523"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gh_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">+</span> <span class="va">habit</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
 <span class="va">oz_gh_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -978,7 +1011,7 @@ Total
 ## 1 (Intercept)   6.91     0.0924      74.8  0         
 ## 2 gained        0.0119   0.00266      4.49 0.00000813
 ## 3 habitsmoker  -0.507    0.126       -4.03 0.0000598</code></pre>
-<div class="sourceCode" id="cb525"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gh_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -990,9 +1023,9 @@ Total
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li>What if we smoking <code>habit</code> and weight <code>gained</code> <em>interact</em>?</li>
+<li>What if smoking <code>habit</code> and weight <code>gained</code> <em>interact</em>?</li>
 </ol>
-<div class="sourceCode" id="cb527"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb531"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gih_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">*</span> <span class="va">habit</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
 <span class="va">oz_gih_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1003,7 +1036,7 @@ Total
 ## 2 gained              0.0124    0.00285     4.35  0.0000153
 ## 3 habitsmoker        -0.400     0.259      -1.55  0.123    
 ## 4 gained:habitsmoker -0.00368   0.00782    -0.471 0.638</code></pre>
-<div class="sourceCode" id="cb529"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb533"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gih_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1016,9 +1049,9 @@ Total
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="4" style="list-style-type: decimal">
-<li>What happens to the model if we add in another quantitative variable, the mother’s age <code>mage</code>?</li>
+<li>What happens to the model if another quantitative variable, the mother’s age <code>mage</code>, is added?</li>
 </ol>
-<div class="sourceCode" id="cb531"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_ghm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">+</span> <span class="va">habit</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
 <span class="va">oz_ghm_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1029,7 +1062,7 @@ Total
 ## 2 gained        0.0122   0.00265      4.59 5.11e-  6
 ## 3 habitsmoker  -0.494    0.126       -3.93 9.07e-  5
 ## 4 mage          0.0144   0.00707      2.03 4.22e-  2</code></pre>
-<div class="sourceCode" id="cb533"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_ghm_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1042,9 +1075,9 @@ Total
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="5" style="list-style-type: decimal">
-<li>What happens to the model if we add in another quantitative variable with the interaction?</li>
+<li>What happens to the model if another quantitative variable is added with the interaction?</li>
 </ol>
-<div class="sourceCode" id="cb535"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb539"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gihm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">*</span> <span class="va">habit</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
 <span class="va">oz_gihm_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -1056,7 +1089,7 @@ Total
 ## 3 habitsmoker        -0.397     0.259      -1.54  1.25e-  1
 ## 4 mage                0.0143    0.00707     2.02  4.33e-  2
 ## 5 gained:habitsmoker -0.00335   0.00781    -0.430 6.68e-  1</code></pre>
-<div class="sourceCode" id="cb537"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gihm_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1070,9 +1103,9 @@ Total
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="6" style="list-style-type: decimal">
-<li>What is the F-test to see if <code>mage</code> should be added to the model with interaction? (borderline, the p-value on <code>mage</code> is 0.0423 for <span class="math inline">\(H_0: \beta_{mage}\)</span>)</li>
+<li>What is the F-test to see if <code>mage</code> should be added to the model with interaction? (borderline, the p-value on <code>mage</code> is 0.0423 for <span class="math inline">\(H_0: \beta_{mage}=0\)</span>)</li>
 </ol>
-<div class="sourceCode" id="cb539"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gih_lm</span>, <span class="va">oz_gihm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1084,9 +1117,9 @@ Total
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <ol start="7" style="list-style-type: decimal">
-<li>Can we drop both the interaction and <code>mage</code>? (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero. Now the test is <span class="math inline">\(H_0: \beta_{gainxsmk} = \beta_{mage} = 0\)</span>.)</li>
+<li>Can both the interaction and <code>mage</code> be dropped? (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero. Now the test is <span class="math inline">\(H_0: \beta_{gainxsmk} = \beta_{mage} = 0\)</span>.)</li>
 </ol>
-<div class="sourceCode" id="cb541"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gh_lm</span>, <span class="va">oz_gihm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1098,7 +1131,7 @@ Total
 <ol start="8" style="list-style-type: decimal">
 <li>Calculate the coefficient of partial determination for <code>mage</code> given <code>gained</code> and <code>habit</code>.</li>
 </ol>
-<div class="sourceCode" id="cb543"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_ghm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1110,14 +1143,14 @@ Total
 ## Residuals 937   1453     1.6                    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb545"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb549"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fl">6.42</span> <span class="op">/</span> <span class="op">(</span><span class="fl">6.42</span> <span class="op">+</span> <span class="fl">1453.37</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.0044</code></pre>
 <p>The variability (in ounces of baby <code>weight</code>) remaining after modeling with <code>gained</code> and <code>habit</code> is reduced by a further 0.4% when additionally adding <code>mage</code>.</p>
 <ol start="9" style="list-style-type: decimal">
 <li>On a different note… the variable <code>term</code> has three levels (“early,” “full,” and “late”). Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses <strong>two</strong> degrees of freedom because there are two coefficients to estimate. When <code>term</code> interacts with <code>gained</code> there are an additional two coefficients to estimate (<em>both</em> of the interaction coefficients in the model).</li>
 </ol>
-<div class="sourceCode" id="cb547"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gtm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">+</span> <span class="va">term</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 <span class="va">oz_gitm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">*</span> <span class="va">term</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
@@ -1130,7 +1163,7 @@ Total
 ## 3 termfull      1.02     0.0833      12.3  3.99e- 32
 ## 4 termlate      1.07     0.113        9.49 1.85e- 20
 ## 5 mage          0.0171   0.00654      2.61 9.08e-  3</code></pre>
-<div class="sourceCode" id="cb549"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gtm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1142,7 +1175,7 @@ Total
 ## Residuals 936   1248     1.3                    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="va">oz_gitm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 7 × 5
 ##   term             estimate std.error statistic   p.value
@@ -1154,7 +1187,7 @@ Total
 ## 5 mage             0.0171     0.00655    2.61   9.27e-  3
 ## 6 gained:termfull  0.00365    0.00559    0.652  5.14e-  1
 ## 7 gained:termlate -0.000469   0.00703   -0.0667 9.47e-  1</code></pre>
-<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb557"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gitm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1190,7 +1223,7 @@ X_4 &amp;=&amp; \% \mbox{ of test takers who attend public school, } public\\
 X_5 &amp;=&amp; \mbox{total state expenditure on public secondary schools (\$100 /student), } expend \\
 X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their secondary school class, } rank
 \end{eqnarray*}\]</span></p>
-<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb559"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sat_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/readr/man/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math158/sat.csv"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>ltakers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">takers</span><span class="op">)</span><span class="op">)</span>
 
@@ -1201,13 +1234,13 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <ol style="list-style-type: decimal">
 <li>The model with no variables</li>
 </ol>
-<div class="sourceCode" id="cb556"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)     948.      10.2      92.9 7.89e-56</code></pre>
-<div class="sourceCode" id="cb558"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>mse <span class="op">=</span> <span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>, sse <span class="op">=</span> <span class="va">mse</span><span class="op">*</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">sse</span>, <span class="va">AIC</span>, <span class="va">BIC</span>, <span class="va">df.residual</span>, <span class="va">nobs</span><span class="op">)</span></code></pre></div>
@@ -1219,14 +1252,14 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <li>The model on <code>ltakers</code>
 </li>
 </ol>
-<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)   1112.      12.4       89.8 3.11e-54
 ## 2 ltakers        -59.2      4.17     -14.2 1.27e-18</code></pre>
-<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>mse <span class="op">=</span> <span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>, sse <span class="op">=</span> <span class="va">mse</span><span class="op">*</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">sse</span>, <span class="va">AIC</span>, <span class="va">BIC</span>, <span class="va">df.residual</span>, <span class="va">nobs</span><span class="op">)</span></code></pre></div>
@@ -1239,10 +1272,10 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <h3>Best possible subsets<a class="anchor" aria-label="anchor" href="#best-possible-subsets"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that the outcome is the best model with one variable, the best model with two variables, etc. Therefore, the selection is based on SSE only. It is your job as the analyst to differentiate between the models of different sizes. You could use <span class="math inline">\(R_{adj}^2\)</span>, AIC, BIC, etc. Here is seems like the 4 variable model is a good contender for best model.</p>
-<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_lms</span><span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html">regsubsets</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
         data<span class="op">=</span><span class="va">sat_data</span>, nvmax <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb569"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_lms</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 6 × 11
 ##   `(Intercept)` ltakers income years public expend rank  r.squared adj.r.squared
@@ -1258,7 +1291,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="forward-variable-selection-f-tests" class="section level3 unnumbered">
 <h3>Forward Variable Selection: F-tests<a class="anchor" aria-label="anchor" href="#forward-variable-selection-f-tests"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb571"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1275,7 +1308,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank     1    190297  55079 348  162.38 &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb569"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb573"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1291,7 +1324,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank    1       871 45498 341    0.88  0.3529    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb571"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb575"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">expend</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1309,7 +1342,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="backward-variable-selection-f-tests" class="section level3 unnumbered">
 <h3>Backward Variable Selection: F-tests<a class="anchor" aria-label="anchor" href="#backward-variable-selection-f-tests"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb573"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># all the variables</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1327,7 +1360,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank     1      2679 24076 316    5.26   0.027 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb575"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb579"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># less public</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1345,7 +1378,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>If you <code>add1</code> here (to see if it makes sense to add either public or income back), neither is significant.</p>
-<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb581"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># less income</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1365,7 +1398,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="forward-stepwise-aic" class="section level3 unnumbered">
 <h3>Forward Stepwise: AIC<a class="anchor" aria-label="anchor" href="#forward-stepwise-aic"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb579"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># lives in the base R stats package, but can be overwritten by other functions</span>
 <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, 
      <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>,
@@ -1430,7 +1463,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="backward-stepwise-bic" class="section level3 unnumbered">
 <h3>Backward Stepwise: BIC<a class="anchor" aria-label="anchor" href="#backward-stepwise-bic"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb582"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb586"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># lives in the base R stats package, but can be overwritten by other functions</span>
 <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="op">(</span><span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span><span class="op">)</span>, 
         data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>,

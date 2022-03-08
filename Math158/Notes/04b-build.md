@@ -74,33 +74,71 @@ F^* &=& \frac{SSE(X_1) - SSE(X_1, X_2, X_3)}{(n-2) - (n-4)} \div \frac{SSE(X_1, 
 * In considering the output below, let's say that we'd like to test whether both smoking and mother's age are needed in the model.  The full model is: gained, smoke, mage in the model; the reduced model is the model with gained only.
 
 \begin{eqnarray*}
-F^* &=& \frac{(6241+9629) / 775 - 773)}{346801 / 773} = 17.69
+F &=& \frac{(1485.09 - 1453.37) / (939 - 937)}{1453.37 / 937} = 10.22
 \end{eqnarray*}
 
+
+
+
+
 ```r
-1-pf(17.69,2,773)
+oz_g_lm <- lm(weight ~ gained, data = births14)
+oz_ghm_lm <- lm(weight ~ gained + habit + mage, data = births14)
+
+anova(oz_g_lm)
 ```
 
 ```
-## [1] 3.08e-08
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9    21.4 4.2e-06 ***
+## Residuals 939   1485     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Alternatively,   
-\begin{verbatim}
-> anova(oz.g.lm, oz.gsm.lm)
-Analysis of Variance Table
-Model 1: tounces ~ gained
-Model 2: tounces ~ gained + smoke + mage
-  Res.Df    RSS Df Sum of Sq      F    Pr(>F)
-1    775 362671
-2    773 346801  2     15870 17.687 3.085e-08 ***
-\end{verbatim}
+```r
+anova(oz_ghm_lm)
+```
 
-Because our p-value is so low, we reject $H_0: \beta_2 = \beta_3 = 0$, and we claim that at least one of smoke or mother's age is needed in the model (possibly both).
+```
+## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value  Pr(>F)    
+## gained      1     34    33.9   21.83 3.4e-06 ***
+## habit       1     25    25.3   16.31 5.8e-05 ***
+## mage        1      6     6.4    4.14   0.042 *  
+## Residuals 937   1453     1.6                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
-* One reason to use a nested F-test (in lieu of a t-test), is for example, if you'd like to know whether race is an important variable in your model (see model 8(b) below).  As noted below, race as a factor variable is responsible for 5 separate coefficients.  In order to test whether race is significant, you would fit the model with and without race, and your null hypothesis would be testing $H_0: \beta_2 = \beta_3 = \beta_4 = \beta_5 = \beta_6 = 0$.
+```r
+anova(oz_g_lm, oz_ghm_lm)
+```
 
-* Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model.  You might have 4 explanatory variables, and so you'd have ${4\choose2} = 6$ interactions to consider.  You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full).  By nesting them, you don't need to test each interaction coefficient one at a time.
+```
+## Analysis of Variance Table
+## 
+## Model 1: weight ~ gained
+## Model 2: weight ~ gained + habit + mage
+##   Res.Df  RSS Df Sum of Sq    F  Pr(>F)    
+## 1    939 1485                              
+## 2    937 1453  2      31.7 10.2 4.1e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+Because our p-value is so low, we reject $H_0: \beta_2 = \beta_3 = 0$, and we claim that at least one of smoking `habit` or mother's age, `mage`, is needed in the model (possibly both).
+
+* One reason to use a nested F-test (in lieu of a t-test), is for example, if you'd like to know whether `term` is an important variable in your model (see model 8 way below with the R code).  As noted below, `term` as a factor variable is responsible for 2 separate coefficients.  In order to test whether `term` is significant, you would fit the model with and without `term`, and your null hypothesis would be testing $H_0: \beta_2 = \beta_3 = 0$.
+
+* Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model.  You might have 4 explanatory variables, and so you'd have ${4\choose2} = 6$ pairwise interactions to consider.  You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full).  By nesting them, you don't need to test each interaction coefficient one at a time.
 
 * Let's say you want to test $H_0: \beta_1 = \beta_2$.  Note the form of your full and reduced models.
 
@@ -226,7 +264,7 @@ A few things to notice from the output:
 * $R^2_{Y1} = 63.363/(63.363 + 28.208 + 21.366) = 0.561$ 
 * $R^2_{Y2|1} = 28.208 / (28.208 + 21.366) = 0.569$.  We see that when number of low coins is added to the model that already contains the number of coins, the SSE is reduced by 56.9%.  [ $SSR(X_1) = 63.363, SSR(X_2|X_1) = 28.208, SSE(X_1, X_2) = 21.366, SSE(X_1) = SSTO - SSR(X_1) = 28.208 + 21.366$ ] 
 
-<img src="04b-build_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04b-build_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Effects of Multicollinearity {-}
@@ -353,7 +391,7 @@ Do any of the above methods represent a fool-proof strategy for fitting a model?
 
 <div class="figure" style="text-align: center">
 <img src="figs/sleuthmodelbuild.png" alt="A strategy for data analysis using statistical models. Source: @sleuth" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-11)A strategy for data analysis using statistical models. Source: @sleuth</p>
+<p class="caption">(\#fig:unnamed-chunk-12)A strategy for data analysis using statistical models. Source: @sleuth</p>
 </div>
 
 
@@ -407,7 +445,7 @@ SAT %>%
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-<img src="04b-build_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04b-build_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 SAT %>%
@@ -416,7 +454,7 @@ SAT %>%
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE)
 ```
 
-<img src="04b-build_files/figure-html/unnamed-chunk-12-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04b-build_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
 
 #### Extraneous {-}
 
@@ -716,7 +754,7 @@ anova(tip_fit$fit) %>%
 
 ## R: nested F test - births
 
-Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the data set released in 2014.  [Data description here](https://www.openintro.org/data/index.php?data=births14).
+Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the [data set released in 2014](https://www.icpsr.umich.edu/web/ICPSR/studies/36461).  [Data description here](https://www.openintro.org/data/index.php?data=births14).
 
 
 ```r
@@ -742,7 +780,7 @@ names(births14)
 
 Notice that the variable names we'll use are `mage`, `weight`, `gained`, and `habit`.
 
-1. We're interested in predicting a baby's `weight` from the pounds a mother `gained`.
+1. Interested is in predicting a baby's `weight` from the pounds a mother `gained`.
 
 
 ```r
@@ -755,8 +793,8 @@ oz_g_lm %>% tidy()
 ## # A tibble: 2 × 5
 ##   term        estimate std.error statistic    p.value
 ##   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
-## 1 (Intercept)   6.83     0.0910      75.1  0         
-## 2 gained        0.0124   0.00267      4.65 0.00000372
+## 1 (Intercept)   6.83     0.0912      74.9  0         
+## 2 gained        0.0124   0.00267      4.63 0.00000423
 ```
 
 ```r
@@ -768,14 +806,14 @@ oz_g_lm %>% anova()
 ## 
 ## Response: weight
 ##            Df Sum Sq Mean Sq F value  Pr(>F)    
-## gained      1     34    34.4    21.7 3.7e-06 ***
-## Residuals 956   1520     1.6                    
+## gained      1     34    33.9    21.4 4.2e-06 ***
+## Residuals 939   1485     1.6                    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
-2. What if we include smoking `habit` as a variable?
+2. What if smoking `habit` is included as a variable?
 
 
 ```r
@@ -809,7 +847,7 @@ oz_gh_lm %>% anova()
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-3. What if we smoking `habit` and weight `gained` *interact*?
+3. What if smoking `habit` and weight `gained` *interact*?
 
 
 ```r
@@ -845,7 +883,7 @@ oz_gih_lm %>% anova()
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-4. What happens to the model if we add in another quantitative variable, the mother's age `mage`?
+4. What happens to the model if another quantitative variable, the mother's age `mage`, is added?
 
 
 ```r
@@ -881,7 +919,7 @@ oz_ghm_lm %>% anova()
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-5. What happens to the model if we add in another quantitative variable with the interaction?
+5. What happens to the model if another quantitative variable is added with the interaction?
 
 
 ```r
@@ -919,7 +957,7 @@ oz_gihm_lm %>% anova()
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-6. What is the F-test to see if `mage` should be added to the model with interaction?  (borderline, the p-value on `mage` is 0.0423 for $H_0: \beta_{mage}$)
+6. What is the F-test to see if `mage` should be added to the model with interaction?  (borderline, the p-value on `mage` is 0.0423 for $H_0: \beta_{mage}=0$)
 
 
 
@@ -941,7 +979,7 @@ anova(oz_gih_lm, oz_gihm_lm)
 
 
 
-7. Can we drop both the interaction and `mage`?  (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero.  Now the test is $H_0: \beta_{gainxsmk} = \beta_{mage} = 0$.)
+7. Can both the interaction and `mage` be dropped?  (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero.  Now the test is $H_0: \beta_{gainxsmk} = \beta_{mage} = 0$.)
 
 
 ```r
