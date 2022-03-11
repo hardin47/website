@@ -1148,9 +1148,50 @@ Total
 <pre><code>## [1] 0.0044</code></pre>
 <p>The variability (in ounces of baby <code>weight</code>) remaining after modeling with <code>gained</code> and <code>habit</code> is reduced by a further 0.4% when additionally adding <code>mage</code>.</p>
 <ol start="9" style="list-style-type: decimal">
-<li>On a different note… the variable <code>term</code> has three levels (“early,” “full,” and “late”). Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses <strong>two</strong> degrees of freedom because there are two coefficients to estimate. When <code>term</code> interacts with <code>gained</code> there are an additional two coefficients to estimate (<em>both</em> of the interaction coefficients in the model).</li>
+<li>What happens if variables are entered into the model in a different order?</li>
 </ol>
 <div class="sourceCode" id="cb551"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">marital</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term               estimate std.error statistic   p.value
+##   &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)         7.08      0.245      28.9   4.87e-132
+## 2 maritalnot married -0.199     0.0926     -2.15  3.22e-  2
+## 3 mage                0.00725   0.00787     0.920 3.58e-  1</code></pre>
+<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">mage</span> <span class="op">+</span> <span class="va">marital</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 5
+##   term               estimate std.error statistic   p.value
+##   &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)         7.08      0.245      28.9   4.87e-132
+## 2 mage                0.00725   0.00787     0.920 3.58e-  1
+## 3 maritalnot married -0.199     0.0926     -2.15  3.22e-  2</code></pre>
+<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">marital</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value Pr(&gt;F)   
+## marital     1     12   12.33    7.69 0.0057 **
+## mage        1      1    1.36    0.85 0.3576   
+## Residuals 938   1505    1.60                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<div class="sourceCode" id="cb557"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">mage</span> <span class="op">+</span> <span class="va">marital</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: weight
+##            Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## mage        1      6    6.31    3.93  0.048 *
+## marital     1      7    7.38    4.60  0.032 *
+## Residuals 938   1505    1.60                 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<ol start="10" style="list-style-type: decimal">
+<li>On a different note… the variable <code>term</code> has three levels (“early,” “full,” and “late”). Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses <strong>two</strong> degrees of freedom because there are two coefficients to estimate. When <code>term</code> interacts with <code>gained</code> there are an additional two coefficients to estimate (<em>both</em> of the interaction coefficients in the model).</li>
+</ol>
+<div class="sourceCode" id="cb559"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oz_gtm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">+</span> <span class="va">term</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 <span class="va">oz_gitm_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">gained</span> <span class="op">*</span> <span class="va">term</span> <span class="op">+</span> <span class="va">mage</span>, data<span class="op">=</span><span class="va">births14</span><span class="op">)</span>
 
@@ -1163,7 +1204,7 @@ Total
 ## 3 termfull      1.02     0.0833      12.3  3.99e- 32
 ## 4 termlate      1.07     0.113        9.49 1.85e- 20
 ## 5 mage          0.0171   0.00654      2.61 9.08e-  3</code></pre>
-<div class="sourceCode" id="cb553"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb561"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gtm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1175,7 +1216,7 @@ Total
 ## Residuals 936   1248     1.3                    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb555"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb563"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="va">oz_gitm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 7 × 5
 ##   term             estimate std.error statistic   p.value
@@ -1187,7 +1228,7 @@ Total
 ## 5 mage             0.0171     0.00655    2.61   9.27e-  3
 ## 6 gained:termfull  0.00365    0.00559    0.652  5.14e-  1
 ## 7 gained:termlate -0.000469   0.00703   -0.0667 9.47e-  1</code></pre>
-<div class="sourceCode" id="cb557"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb565"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">oz_gitm_lm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -1223,7 +1264,7 @@ X_4 &amp;=&amp; \% \mbox{ of test takers who attend public school, } public\\
 X_5 &amp;=&amp; \mbox{total state expenditure on public secondary schools (\$100 /student), } expend \\
 X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their secondary school class, } rank
 \end{eqnarray*}\]</span></p>
-<div class="sourceCode" id="cb559"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb567"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sat_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/readr/man/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"http://pages.pomona.edu/~jsh04747/courses/math158/sat.csv"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>ltakers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">takers</span><span class="op">)</span><span class="op">)</span>
 
@@ -1234,13 +1275,13 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <ol style="list-style-type: decimal">
 <li>The model with no variables</li>
 </ol>
-<div class="sourceCode" id="cb560"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)     948.      10.2      92.9 7.89e-56</code></pre>
-<div class="sourceCode" id="cb562"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb570"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>mse <span class="op">=</span> <span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>, sse <span class="op">=</span> <span class="va">mse</span><span class="op">*</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">sse</span>, <span class="va">AIC</span>, <span class="va">BIC</span>, <span class="va">df.residual</span>, <span class="va">nobs</span><span class="op">)</span></code></pre></div>
@@ -1252,14 +1293,14 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <li>The model on <code>ltakers</code>
 </li>
 </ol>
-<div class="sourceCode" id="cb564"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb572"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 (Intercept)   1112.      12.4       89.8 3.11e-54
 ## 2 ltakers        -59.2      4.17     -14.2 1.27e-18</code></pre>
-<div class="sourceCode" id="cb566"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb574"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>mse <span class="op">=</span> <span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>, sse <span class="op">=</span> <span class="va">mse</span><span class="op">*</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">sse</span>, <span class="va">AIC</span>, <span class="va">BIC</span>, <span class="va">df.residual</span>, <span class="va">nobs</span><span class="op">)</span></code></pre></div>
@@ -1272,10 +1313,10 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <h3>Best possible subsets<a class="anchor" aria-label="anchor" href="#best-possible-subsets"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that the outcome is the best model with one variable, the best model with two variables, etc. Therefore, the selection is based on SSE only. It is your job as the analyst to differentiate between the models of different sizes. You could use <span class="math inline">\(R_{adj}^2\)</span>, AIC, BIC, etc. Here is seems like the 4 variable model is a good contender for best model.</p>
-<div class="sourceCode" id="cb568"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb576"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_lms</span><span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html">regsubsets</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
         data<span class="op">=</span><span class="va">sat_data</span>, nvmax <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb569"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_lms</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 6 × 11
 ##   `(Intercept)` ltakers income years public expend rank  r.squared adj.r.squared
@@ -1291,7 +1332,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="forward-variable-selection-f-tests" class="section level3 unnumbered">
 <h3>Forward Variable Selection: F-tests<a class="anchor" aria-label="anchor" href="#forward-variable-selection-f-tests"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb571"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb579"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1308,7 +1349,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank     1    190297  55079 348  162.38 &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb573"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb581"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1324,7 +1365,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank    1       871 45498 341    0.88  0.3529    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb575"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/add1.html">add1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">expend</span>, data <span class="op">=</span> <span class="va">sat_data</span><span class="op">)</span>, <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> 
        <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, test <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Single term additions
@@ -1342,7 +1383,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="backward-variable-selection-f-tests" class="section level3 unnumbered">
 <h3>Backward Variable Selection: F-tests<a class="anchor" aria-label="anchor" href="#backward-variable-selection-f-tests"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb577"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb585"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># all the variables</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1360,7 +1401,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## rank     1      2679 24076 316    5.26   0.027 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<div class="sourceCode" id="cb579"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb587"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># less public</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1378,7 +1419,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>If you <code>add1</code> here (to see if it makes sense to add either public or income back), neither is significant.</p>
-<div class="sourceCode" id="cb581"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb589"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># less income</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/add1.html">drop1</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>, 
          data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, test<span class="op">=</span><span class="st">"F"</span><span class="op">)</span></code></pre></div>
@@ -1398,7 +1439,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="forward-stepwise-aic" class="section level3 unnumbered">
 <h3>Forward Stepwise: AIC<a class="anchor" aria-label="anchor" href="#forward-stepwise-aic"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb583"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb591"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># lives in the base R stats package, but can be overwritten by other functions</span>
 <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="fl">1</span>, data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>, 
      <span class="va">sat</span> <span class="op">~</span> <span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span>,
@@ -1463,7 +1504,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <div id="backward-stepwise-bic" class="section level3 unnumbered">
 <h3>Backward Stepwise: BIC<a class="anchor" aria-label="anchor" href="#backward-stepwise-bic"><i class="fas fa-link"></i></a>
 </h3>
-<div class="sourceCode" id="cb586"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb594"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># lives in the base R stats package, but can be overwritten by other functions</span>
 <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/step.html">step</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">sat</span> <span class="op">~</span> <span class="op">(</span><span class="va">ltakers</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">years</span> <span class="op">+</span> <span class="va">public</span> <span class="op">+</span> <span class="va">expend</span> <span class="op">+</span> <span class="va">rank</span><span class="op">)</span>, 
         data<span class="op">=</span><span class="va">sat_data</span><span class="op">)</span>,
@@ -1590,7 +1631,7 @@ X_6 &amp;=&amp; \mbox{median percentile rank of test takers within their seconda
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-08.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-10.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

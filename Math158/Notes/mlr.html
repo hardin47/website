@@ -494,7 +494,7 @@ SSE_{full} &amp;=&amp; SSE \mbox{ from the  model with all possible parameters}
 <td>small</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(SBC_p\)</span></td>
+<td><span class="math inline">\(BIC_p\)</span></td>
 <td>Bayesian Information Criterion</td>
 <td>small</td>
 </tr>
@@ -505,12 +505,14 @@ SSE_{full} &amp;=&amp; SSE \mbox{ from the  model with all possible parameters}
 </tr>
 </tbody>
 </table></div>
-<p><span class="math inline">\(C_p\)</span>: <span class="math display">\[C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)\]</span><br><span class="math inline">\(AIC_p\)</span>: <span class="math display">\[AIC_p = n \ln(SSE_p) - n \ln(n) + 2p\]</span><br><span class="math inline">\(SBC_p = BIC_p\)</span>: <span class="math display">\[SBC_p = n \ln(SSE_p) - n \ln(n) + \ln(n) p\]</span><br>
-Both <span class="math inline">\(AIC_p\)</span> and <span class="math inline">\(SBC_p\)</span> measure the likelihood of the data (<span class="math inline">\(-2 \ln(likelihood)\)</span>) given a particular model with <span class="math inline">\(p-1\)</span> explanatory variables. We choose the model with the smallest <span class="math inline">\(AIC_p\)</span> or <span class="math inline">\(SBC_p\)</span>.<br>
+<p><span class="math inline">\(C_p\)</span>: <span class="math display">\[C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)\]</span></p>
+<p><span class="math inline">\(AIC_p\)</span>: <span class="math display">\[AIC_p = n \ln(SSE_p) - n \ln(n) + 2p\]</span></p>
+<p><span class="math inline">\(SBC_p = BIC_p\)</span>: <span class="math display">\[BIC_p = n \ln(SSE_p) - n \ln(n) + \ln(n) p\]</span></p>
+<p>Both <span class="math inline">\(AIC_p\)</span> and <span class="math inline">\(BIC_p\)</span> measure the likelihood of the data (<span class="math inline">\(-2 \ln(likelihood)\)</span>) given a particular model with <span class="math inline">\(p-1\)</span> explanatory variables. We choose the model with the smallest <span class="math inline">\(AIC_p\)</span> or <span class="math inline">\(BIC_p\)</span>.<br>
 Note that we can use <em>any</em> of the criteria to build a model by either adding one variable at a time; starting with a full model (all the variables) and subtracting one variable at a time; or some combination of adding and subtracting variables.</p>
-<div id="c_p-aic-and-sbc-in-r" class="section level4 unnumbered">
+<div id="c_p-aic-and-bic-in-r" class="section level4 unnumbered">
 <h4>
-<span class="math inline">\(C_p\)</span>, AIC, and SBC in R<a class="anchor" aria-label="anchor" href="#c_p-aic-and-sbc-in-r"><i class="fas fa-link"></i></a>
+<span class="math inline">\(C_p\)</span>, AIC, and BIC in R<a class="anchor" aria-label="anchor" href="#c_p-aic-and-bic-in-r"><i class="fas fa-link"></i></a>
 </h4>
 <p>Ideally, the chosen model would minimize all three criteria. All three are trade-offs between SSE (want small) and <span class="math inline">\(p\)</span> (want small).<br><span class="math inline">\(C_p\)</span> also measures the trade-off between bias and variance.
 <span class="math display">\[\begin{eqnarray*}
@@ -525,9 +527,9 @@ But how do we estimate <span class="math inline">\(\Gamma_p\)</span>? If we know
  \end{eqnarray*}\]</span>
 Estimating <span class="math inline">\(\sigma^2\)</span> using <span class="math inline">\(MSE_{full}\)</span> gives
 <span class="math display">\[\begin{eqnarray*}
- C_p &amp;=&amp; p + \frac{MSE_p - MSE_{full})(n-p)}{ MSE_{full}} = \frac{SSE_p}{MSE_{full}} - (n-2p)\\
+ C_p &amp;=&amp; p + \frac{(MSE_p - MSE_{full})(n-p)}{ MSE_{full}} = \frac{SSE_p}{MSE_{full}} - (n-2p)\\
  \end{eqnarray*}\]</span></p>
-<p><span class="math inline">\(C_p\)</span> estimates the quantity “total MSE divided by <span class="math inline">\(\sigma^2\)</span>.” It can be shown that <span class="math inline">\(\sum_{i=1}^n Var(\hat{Y}_i) = \sigma^2 p\)</span>. We want <span class="math inline">\(C_p\)</span> to be small or <span class="math inline">\(\approx p\)</span>. See the comments on page 359 of Kutner et al.<br>
+<p><span class="math inline">\(C_p\)</span> estimates the quantity “total MSE divided by <span class="math inline">\(\sigma^2\)</span>.” It can be shown that: <span class="math inline">\(\sum_{i=1}^n Var(\hat{Y}_i) = \sigma^2 p\)</span>. We want <span class="math inline">\(C_p\)</span> to be small or <span class="math inline">\(\approx p\)</span>. See the comments on page 359 of Kutner et al.<br>
 Note that when calculating <span class="math inline">\(C_P\)</span> on the full model (with P parameters), we get
 <span class="math display">\[\begin{eqnarray*}
 C_P &amp;=&amp; \frac{SSE_P}{MSE_P} - (n-2P)\\
@@ -535,8 +537,9 @@ C_P &amp;=&amp; \frac{SSE_P}{MSE_P} - (n-2P)\\
 &amp;=&amp; P\\
 \end{eqnarray*}\]</span></p>
 <p>Estimating <span class="math inline">\(\sigma^2\)</span> using <span class="math inline">\(MSE_{full}\)</span> assumes that there are no biases in the full model with all of the predictors, an assumption that may or may not be valid, but can’t be tested without additional information (at the very least you have to have all of the important predictors involved).</p>
-<p>AIC and SBC are based on maximum likelihood estimates of the model parameters. The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data. The likelihood is a number between 0 and 1. For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2. In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical. However, when using least squares versus maximum likelihood, there is a difference in estimating <span class="math inline">\(\sigma^2\)</span>. We have been using the <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span> which is MSE = SSE / (n-p). The maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is SSE/n. The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating <span class="math inline">\(p\)</span> regression coefficients <em>and</em> <span class="math inline">\(\sigma^2\)</span>, we are actually estimating <span class="math inline">\(p+1\)</span> parameters. In short, the full AIC is given by the following.</p>
-<p><span class="math display" id="eq:mse">\[\begin{eqnarray}
+<p>AIC and BIC are based on maximum likelihood estimates of the model parameters. The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data. The likelihood is a number between 0 and 1. For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2. In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical. However, when using least squares versus maximum likelihood, there is a difference in estimating <span class="math inline">\(\sigma^2\)</span>. We have been using the <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span> which is MSE = SSE / (n-p). The maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is SSE/n. The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating <span class="math inline">\(p\)</span> regression coefficients <em>and</em> <span class="math inline">\(\sigma^2\)</span>, we are actually estimating <span class="math inline">\(p+1\)</span> parameters. In short, the full AIC is given by the following.</p>
+<p><span class="math display" id="eq:mse">\[
+\begin{eqnarray}
 E[AIC] &amp;=&amp; -2 \ln(L) + 2(p+1)\\\
 &amp;=&amp; -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) \tag{9.1}\\
 &amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) \tag{9.2}\\
@@ -545,51 +548,47 @@ AIC &amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (
 &amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
 &amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
 &amp;=&amp; n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
-\end{eqnarray}\]</span></p>
+\end{eqnarray}
+\]</span></p>
 <p>To go from <a href="mlr.html#eq:sigi">(9.1)</a> to <a href="mlr.html#eq:sig">(9.2)</a> we assume that <span class="math inline">\(\sigma^2 = \sigma_i^2\)</span>; that is, the variance is constant for all individuals. To go from <a href="mlr.html#eq:sig">(9.2)</a> to <a href="mlr.html#eq:mse">(9.3)</a> we approximate <span class="math inline">\(\sigma^2\)</span> (and <span class="math inline">\(E[Y_i]\)</span>) using the maximum likelihood estimates for <span class="math inline">\(\sigma^2 = SSE / n\)</span> and <span class="math inline">\(\beta_k\)</span>.<br>
-SBC (BIC) uses the posterior likelihood and a similar derivation. SBC can be given as the following.
+BIC (SBC) uses the posterior likelihood and a similar derivation. BIC can be given as the following.
 <span class="math display">\[\begin{eqnarray*}
-SBC &amp;=&amp; -2 \ln(L_{posterior}) + \ln(n) (p+1)\\
-&amp;=&amp; n + n\ln(2\pi) + n \ln(SSE_p / n) + \ln(n)(p+1)\\
+BIC &amp;=&amp; -2 \ln(L_{posterior}) + \ln(n) (p)\\
+&amp;=&amp; n + n\ln(2\pi) + n \ln(SSE_p / n) + \ln(n)(p)\\
 &amp;=&amp; n \ln(SSE_p) - n \ln(n) + \ln(n) p + constant
 \end{eqnarray*}\]</span>
-Note that in both AIC and SBC we don’t consider the constant term because models are compared on the same data (<span class="math inline">\(n\)</span> is the same).</p>
+Note that in both AIC and BIC we don’t consider the constant term because models are compared on the same data (<span class="math inline">\(n\)</span> is the same).</p>
 </div>
 <div id="aic-bic" class="section level4 unnumbered">
 <h4>AIC &amp; BIC<a class="anchor" aria-label="anchor" href="#aic-bic"><i class="fas fa-link"></i></a>
 </h4>
 <p>Estimators of prediction error and <em>relative</em> quality of models:</p>
-<p><strong>Akaike’s Information Criterion (AIC)</strong>: <span class="math display">\[AIC = n\log(SS_\text{Error}) - n \log(n) + 2(p+1)\]</span> <br></p>
-<p><strong>Schwarz’s Bayesian Information Criterion (BIC)</strong>: <span class="math display">\[BIC = n\log(SS_\text{Error}) - n\log(n) + log(n)\times(p+1)\]</span></p>
+<p><strong>Akaike’s Information Criterion (AIC)</strong>: <span class="math display">\[AIC = n\log(SS_\text{Error}) - n \log(n) + 2(p)\]</span> <br></p>
+<p><strong>Schwarz’s Bayesian Information Criterion (BIC)</strong>: <span class="math display">\[BIC = n\log(SS_\text{Error}) - n\log(n) + log(n)\times(p)\]</span></p>
+<p><strong>Comparison of AIC and BIC</strong></p>
 <p><span class="math display">\[
-\begin{aligned} 
-&amp; AIC = \color{blue}{n\log(SS_\text{Error})} - n \log(n) + 2(p+1) \\
-&amp; BIC = \color{blue}{n\log(SS_\text{Error})} - n\log(n) + \log(n)\times(p+1) 
-\end{aligned}
+\begin{eqnarray*} 
+&amp;&amp; AIC = \color{blue}{n\log(SS_\text{Error})} - n \log(n) + 2(p) \\
+&amp;&amp; BIC = \color{blue}{n\log(SS_\text{Error})} - n\log(n) + \log(n)\times(p) 
+\end{eqnarray*}
 \]</span></p>
 <p>First Term: Decreases as <em>p</em> increases</p>
-<p><span class="math display">\[
-\begin{aligned} 
-&amp; AIC = n\log(SS_\text{Error}) - \color{blue}{n \log(n)} + 2(p+1) \\
-&amp; BIC = n\log(SS_\text{Error}) - \color{blue}{n\log(n)} + \log(n)\times(p+1) 
-\end{aligned}
-\]</span></p>
+<p><span class="math display">\[\begin{eqnarray*} 
+&amp;&amp; AIC = n\log(SS_\text{Error}) - \color{blue}{n \log(n)} + 2(p) \\
+&amp;&amp; BIC = n\log(SS_\text{Error}) - \color{blue}{n\log(n)} + \log(n)\times(p) 
+\end{eqnarray*}\]</span></p>
 <p>Second Term: Fixed for a given sample size <em>n</em></p>
-<p><span class="math display">\[
-\begin{aligned} &amp; AIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{2(p+1)} \\
-&amp; BIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{\log(n)\times(p+1)} 
-\end{aligned}
-\]</span></p>
+<p><span class="math display">\[\begin{eqnarray*} &amp;&amp; AIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{2(p)} \\
+&amp;&amp; BIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{\log(n)\times(p)} 
+\end{eqnarray*}\]</span></p>
 <p>Third Term: Increases as <em>p</em> increases</p>
 </div>
 <div id="using-aic-bic" class="section level4 unnumbered">
 <h4>Using AIC &amp; BIC<a class="anchor" aria-label="anchor" href="#using-aic-bic"><i class="fas fa-link"></i></a>
 </h4>
-<p><span class="math display">\[
-\begin{aligned} &amp; AIC = n\log(SS_{Error}) - n \log(n) + \color{red}{2(p+1)} \\
-&amp; BIC = n\log(SS_{Error}) - n\log(n) + \color{red}{\log(n)\times(p+1)} 
-\end{aligned}
-\]</span></p>
+<p><span class="math display">\[\begin{eqnarray*} &amp;&amp; AIC = n\log(SSE) - n \log(n) + \color{red}{2(p)} \\
+&amp;&amp; BIC = n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)} 
+\end{eqnarray*}\]</span></p>
 <ul>
 <li><p>Choose model with the smaller value of AIC or BIC</p></li>
 <li><p>If <span class="math inline">\(n \geq 8\)</span>, the <strong>penalty</strong> for BIC is larger than that of AIC, so BIC tends to favor <em>more parsimonious</em> models (i.e. models with fewer terms)</p></li>
@@ -1089,7 +1088,7 @@ Note that in both AIC and SBC we don’t consider the constant term because mode
 </h4>
 <p><strong>Recall</strong>: <span class="math inline">\(R^2\)</span> is the proportion of the variation in the response variable explained by the regression model.</p>
 <p><span class="math display">\[
-R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}} = 1 - \frac{686.44}{1913.11} = 0.641
+R^2 = \frac{SS_{Model}}{SSTO} = 1 - \frac{SSE}{SSTO} = 1 - \frac{686.44}{1913.11} = 0.641
 \]</span></p>
 <div class="sourceCode" id="cb367"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span><span class="op">(</span><span class="va">tip_fit</span><span class="op">)</span></code></pre></div>
@@ -1123,8 +1122,8 @@ R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}} = 1 - \f
 <li>Similar to <span class="math inline">\(R^2\)</span>, it is a measure of the amount of variation in the response that is explained by the regression model</li>
 <li>Differs from <span class="math inline">\(R^2\)</span> by using the mean squares rather than sums of squares and therefore adjusting for the number of predictor variables</li>
 </ul>
-<p><span class="math display">\[R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}}\]</span></p>
-<p><span class="math display">\[R^2_{adj} = 1 - \frac{SS_{Error}/(n-p-1)}{SS_{Total}/(n-1)}\]</span></p>
+<p><span class="math display">\[R^2 = \frac{SS_{Model}}{SSTO} = 1 - \frac{SSE}{SSTO}\]</span></p>
+<p><span class="math display">\[R^2_{adj} = 1 - \frac{SSE/(n-p-1)}{SSTO/(n-1)}\]</span></p>
 <ul>
 <li>Adjusted <span class="math inline">\(R^2\)</span> can be used as a quick assessment to compare the fit of multiple models; however, it should not be the only assessment!</li>
 <li>Use <span class="math inline">\(R^2\)</span> when describing the relationship between the response and predictor variables</li>
@@ -1229,7 +1228,7 @@ Instead, if a simple model is found that outperforms some particular complex mod
 <h4>Other concerns with the approach<a class="anchor" aria-label="anchor" href="#other-concerns-with-the-approach"><i class="fas fa-link"></i></a>
 </h4>
 <ul>
-<li>All criteria we considered for model comparison require making predictions for our data and then uses the prediction error (<span class="math inline">\(SS_{Error}\)</span>) somewhere in the formula</li>
+<li>All criteria we considered for model comparison require making predictions for our data and then uses the prediction error (<span class="math inline">\(SSE\)</span>) somewhere in the formula</li>
 <li>But we’re making prediction for the data we used to build the model (estimate the coefficients), which can lead to <strong>overfitting</strong>
 </li>
 <li>Instead we should
@@ -1296,7 +1295,7 @@ Instead, if a simple model is found that outperforms some particular complex mod
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-08.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-10.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

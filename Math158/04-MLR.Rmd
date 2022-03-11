@@ -514,16 +514,19 @@ SSE_{full} &=& SSE \mbox{ from the  model with all possible parameters}
 | $R^2_{a,p}$ 	| adjusted $R^2$                    	| big                                                 	|
 | $C_p$       	| trade off between SSE and $p$     	| close to $p$ / small                                	|
 | $AIC_p$     	| Akaike's Information Criterion    	| small                                               	|
-| $SBC_p$     	| Bayesian Information Criterion    	| small                                               	|
+| $BIC_p$     	| Bayesian Information Criterion    	| small                                               	|
 | F*          	| F test statistic                  	| big (for simpler models)  (see section \@ref(sec:nestF) )	|
  
-$C_p$:   $$C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)$$    
+$C_p$:   $$C_p = \frac{SSE_p}{MSE_{full}} - (n-2p)$$   
+
 $AIC_p$: $$AIC_p = n \ln(SSE_p) - n \ln(n) + 2p$$    
-$SBC_p = BIC_p$: $$SBC_p = n \ln(SSE_p) - n \ln(n) + \ln(n) p$$    
-Both $AIC_p$ and $SBC_p$ measure the likelihood of the data ($-2 \ln(likelihood)$) given a particular model with $p-1$ explanatory variables.  We choose the model with the smallest $AIC_p$ or $SBC_p$.  
+
+$SBC_p = BIC_p$: $$BIC_p = n \ln(SSE_p) - n \ln(n) + \ln(n) p$$  
+
+Both $AIC_p$ and $BIC_p$ measure the likelihood of the data ($-2 \ln(likelihood)$) given a particular model with $p-1$ explanatory variables.  We choose the model with the smallest $AIC_p$ or $BIC_p$.  
 Note that we can use *any* of the criteria to build a model by either adding one variable at a time; starting with a full model (all the variables) and subtracting one variable at a time; or some combination of adding and subtracting variables.
 
-#### $C_p$, AIC, and SBC in R {-}
+#### $C_p$, AIC, and BIC in R {-}
 
 
 Ideally, the chosen model would minimize all three criteria.  All three are trade-offs between SSE (want small) and $p$ (want small).  
@@ -540,10 +543,10 @@ But how do we estimate $\Gamma_p$?  If we know the population variance, $\sigma^
  \end{eqnarray*}
  Estimating $\sigma^2$ using $MSE_{full}$ gives
 \begin{eqnarray*}
- C_p &=& p + \frac{MSE_p - MSE_{full})(n-p)}{ MSE_{full}} = \frac{SSE_p}{MSE_{full}} - (n-2p)\\
+ C_p &=& p + \frac{(MSE_p - MSE_{full})(n-p)}{ MSE_{full}} = \frac{SSE_p}{MSE_{full}} - (n-2p)\\
  \end{eqnarray*}
 
-$C_p$ estimates the quantity "total MSE divided by $\sigma^2$".  It can be shown that $\sum_{i=1}^n Var(\hat{Y}_i) = \sigma^2 p$.  We want $C_p$ to be small or $\approx p$.  See the comments on page 359 of Kutner et al.  
+$C_p$ estimates the quantity "total MSE divided by $\sigma^2$".  It can be shown that: $\sum_{i=1}^n Var(\hat{Y}_i) = \sigma^2 p$.  We want $C_p$ to be small or $\approx p$.  See the comments on page 359 of Kutner et al.  
 Note that when calculating $C_P$ on the full model (with P parameters), we get
 \begin{eqnarray*}
 C_P &=& \frac{SSE_P}{MSE_P} - (n-2P)\\
@@ -553,8 +556,9 @@ C_P &=& \frac{SSE_P}{MSE_P} - (n-2P)\\
 
 Estimating $\sigma^2$ using $MSE_{full}$ assumes that there are no biases in the full model with all of the predictors, an assumption that may or may not be valid, but can't be tested without additional information (at the very least you have to have all of the important predictors involved).
 
-AIC and SBC are based on maximum likelihood estimates of the model parameters.  The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data.  The likelihood is a number between 0 and 1.  For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2.  In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical.  However, when using least squares versus maximum likelihood, there is a difference in estimating $\sigma^2$.  We have been using the *unbiased* estimate of $\sigma^2$ which is MSE = SSE / (n-p).  The maximum likelihood estimate of $\sigma^2$ is SSE/n.  The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating $p$ regression coefficients *and* $\sigma^2$, we are actually estimating $p+1$ parameters.  In short, the full AIC is given by the following.
+AIC and BIC are based on maximum likelihood estimates of the model parameters.  The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data.  The likelihood is a number between 0 and 1.  For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2.  In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical.  However, when using least squares versus maximum likelihood, there is a difference in estimating $\sigma^2$.  We have been using the *unbiased* estimate of $\sigma^2$ which is MSE = SSE / (n-p).  The maximum likelihood estimate of $\sigma^2$ is SSE/n.  The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating $p$ regression coefficients *and* $\sigma^2$, we are actually estimating $p+1$ parameters.  In short, the full AIC is given by the following.
 
+$$
 \begin{eqnarray}
 E[AIC] &=& -2 \ln(L) + 2(p+1)\\\
 &=& -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) (\#eq:sigi)\\
@@ -565,15 +569,16 @@ AIC &=& -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/
 &=& n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
 &=& n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
 \end{eqnarray}
+$$
 
 To go from \@ref(eq:sigi) to \@ref(eq:sig) we assume that $\sigma^2 = \sigma_i^2$; that is, the variance is constant for all individuals.  To go from \@ref(eq:sig) to \@ref(eq:mse) we approximate $\sigma^2$ (and $E[Y_i]$) using the maximum likelihood estimates for $\sigma^2 = SSE / n$ and $\beta_k$.  
-SBC (BIC) uses the posterior likelihood and a similar derivation.  SBC can be given as the following.
+BIC (SBC) uses the posterior likelihood and a similar derivation.  BIC can be given as the following.
 \begin{eqnarray*}
-SBC &=& -2 \ln(L_{posterior}) + \ln(n) (p+1)\\
-&=& n + n\ln(2\pi) + n \ln(SSE_p / n) + \ln(n)(p+1)\\
+BIC &=& -2 \ln(L_{posterior}) + \ln(n) (p)\\
+&=& n + n\ln(2\pi) + n \ln(SSE_p / n) + \ln(n)(p)\\
 &=& n \ln(SSE_p) - n \ln(n) + \ln(n) p + constant
 \end{eqnarray*}
-Note that in both AIC and SBC we don't consider the constant term because models are compared on the same data ($n$ is the same).
+Note that in both AIC and BIC we don't consider the constant term because models are compared on the same data ($n$ is the same).
 
 
 #### AIC & BIC {-}
@@ -581,47 +586,42 @@ Note that in both AIC and SBC we don't consider the constant term because models
 Estimators of prediction error and *relative* quality of models:
 
 
-**Akaike's Information Criterion (AIC)**: $$AIC = n\log(SS_\text{Error}) - n \log(n) + 2(p+1)$$ <br>
+**Akaike's Information Criterion (AIC)**: $$AIC = n\log(SS_\text{Error}) - n \log(n) + 2(p)$$ <br>
 
 
-**Schwarz's Bayesian Information Criterion (BIC)**: $$BIC = n\log(SS_\text{Error}) - n\log(n) + log(n)\times(p+1)$$
+**Schwarz's Bayesian Information Criterion (BIC)**: $$BIC = n\log(SS_\text{Error}) - n\log(n) + log(n)\times(p)$$
 
+**Comparison of AIC and BIC**
 
 $$
-\begin{aligned} 
-& AIC = \color{blue}{n\log(SS_\text{Error})} - n \log(n) + 2(p+1) \\
-& BIC = \color{blue}{n\log(SS_\text{Error})} - n\log(n) + \log(n)\times(p+1) 
-\end{aligned}
+\begin{eqnarray*} 
+&& AIC = \color{blue}{n\log(SS_\text{Error})} - n \log(n) + 2(p) \\
+&& BIC = \color{blue}{n\log(SS_\text{Error})} - n\log(n) + \log(n)\times(p) 
+\end{eqnarray*}
 $$
 
 First Term: Decreases as *p* increases
 
 
-$$
-\begin{aligned} 
-& AIC = n\log(SS_\text{Error}) - \color{blue}{n \log(n)} + 2(p+1) \\
-& BIC = n\log(SS_\text{Error}) - \color{blue}{n\log(n)} + \log(n)\times(p+1) 
-\end{aligned}
-$$
+$$\begin{eqnarray*} 
+&& AIC = n\log(SS_\text{Error}) - \color{blue}{n \log(n)} + 2(p) \\
+&& BIC = n\log(SS_\text{Error}) - \color{blue}{n\log(n)} + \log(n)\times(p) 
+\end{eqnarray*}$$
 
 Second Term: Fixed for a given sample size *n*
 
 
-$$
-\begin{aligned} & AIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{2(p+1)} \\
-& BIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{\log(n)\times(p+1)} 
-\end{aligned}
-$$
+$$\begin{eqnarray*} && AIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{2(p)} \\
+&& BIC = n\log(SS_\text{Error}) - n\log(n) + \color{blue}{\log(n)\times(p)} 
+\end{eqnarray*}$$
 
 Third Term: Increases as *p* increases
 
 #### Using AIC & BIC {-}
 
-$$
-\begin{aligned} & AIC = n\log(SS_{Error}) - n \log(n) + \color{red}{2(p+1)} \\
-& BIC = n\log(SS_{Error}) - n\log(n) + \color{red}{\log(n)\times(p+1)} 
-\end{aligned}
-$$
+$$\begin{eqnarray*} && AIC = n\log(SSE) - n \log(n) + \color{red}{2(p)} \\
+&& BIC = n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)} 
+\end{eqnarray*}$$
 
 -   Choose model with the smaller value of AIC or BIC
 
@@ -877,7 +877,7 @@ tidy(tip_fit, conf.int = TRUE) %>%
 **Recall**: $R^2$ is the proportion of the variation in the response variable explained by the regression model.
 
 $$
-R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}} = 1 - \frac{686.44}{1913.11} = 0.641
+R^2 = \frac{SS_{Model}}{SSTO} = 1 - \frac{SSE}{SSTO} = 1 - \frac{686.44}{1913.11} = 0.641
 $$
 
 ```{r}
@@ -898,9 +898,9 @@ glance(tip_fit)
 -   Differs from $R^2$ by using the mean squares rather than sums of squares and therefore adjusting for the number of predictor variables
 
 
-$$R^2 = \frac{SS_{Model}}{SS_{Total}} = 1 - \frac{SS_{Error}}{SS_{Total}}$$
+$$R^2 = \frac{SS_{Model}}{SSTO} = 1 - \frac{SSE}{SSTO}$$
 
-$$R^2_{adj} = 1 - \frac{SS_{Error}/(n-p-1)}{SS_{Total}/(n-1)}$$
+$$R^2_{adj} = 1 - \frac{SSE/(n-p-1)}{SSTO/(n-1)}$$
 
 -   Adjusted $R^2$ can be used as a quick assessment to compare the fit of multiple models; however, it should not be the only assessment!
 -   Use $R^2$ when describing the relationship between the response and predictor variables
@@ -990,7 +990,7 @@ glance(tip_fit_2) %>%
 
 #### Other concerns with the approach {-}
 
--   All criteria we considered for model comparison require making predictions for our data and then uses the prediction error ($SS_{Error}$) somewhere in the formula
+-   All criteria we considered for model comparison require making predictions for our data and then uses the prediction error ($SSE$) somewhere in the formula
 -   But we're making prediction for the data we used to build the model (estimate the coefficients), which can lead to **overfitting**
 -   Instead we should
     -   split our data into testing and training sets
