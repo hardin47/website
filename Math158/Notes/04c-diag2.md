@@ -1,4 +1,4 @@
-# Diagnostics II {#diag2}
+# Diagnostic Measures II {#diag2}
 
 
 

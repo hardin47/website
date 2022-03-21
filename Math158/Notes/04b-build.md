@@ -296,11 +296,12 @@ We can think of this like a tree, we have two choices regarding the first variab
 
 ******  
 **Algorithm: Best subset selection (from ISLR)**  
+
 ******  
 1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.  
 2. For $k = 1, 2, \ldots m$:  
-   (a) Fit all ${m\choose k}$ models that contain exactly $k$ predictors (explanatory variables).  
-   (b) Pick the best among the ${m\choose k}$ models, and call it $M_k$.  Here *best*^[note:  defining by CV is much more computationally complicated, SSE is equivalent to AIC, $C_p$ or BIC if $k$ if fixed] is defined as having the smallest SSE, or equivalently, largest $R^2$.  
+    a. Fit all ${m\choose k}$ models that contain exactly $k$ predictors (explanatory variables).  
+    b. Pick the best among the ${m\choose k}$ models, and call it $M_k$.  Here *best*^[note:  defining by CV is much more computationally complicated, SSE is equivalent to AIC, $C_p$ or BIC if $k$ if fixed] is defined as having the smallest SSE, or equivalently, largest $R^2$.  
 3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.  
 
 
@@ -314,50 +315,60 @@ We start with an empty model and add the best available variable at each iterati
 
 
 ******
-**Algorithm: Forward stepwise subset selection (from ISLR)**
+**Algorithm: Forward stepwise subset selection (from ISLR)**  
+
 ******
-1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.  
-2. For $k = 0, 1, \ldots m-1$:
-   (a) Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.
-   (b) Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having smallest SSE or highest $R^2$.  
+1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.   
+2. For $k = 0, 1, \ldots m-1$:  
+   a. Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.  
+   b. Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having smallest SSE or highest $R^2$.    
 3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.
 
 ******
-**Algorithm: Forward selection with F tests**
+**Algorithm: Forward selection with F tests**  
+
 ******
-1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.
-2. Let $k = 0$:
-  (a) Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.
-  (b) Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having smallest the smallest p-value for including the $(k+1)^{th}$ variable given the $k$ variables are already in the model.
-  (c) If the p-value from step (b) is less than $\alpha_e$, consider $M_{k+1}$ and augment $k$ by 1.  Go back to step (a).  If the p-value from step (b) is larger than $\alpha_e$, report model $M_k$ and stop the algorithm.
+1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.  
+2. Let $k = 0$:  
+   a. Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.  
+   b. Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having smallest the smallest p-value for including the $(k+1)^{th}$ variable given the $k$ variables are already in the model.  
+   c. If the p-value from step b. is less than $\alpha_e$, consider $M_{k+1}$ and augment $k$ by 1.  Go back to step a.  If the p-value from step b. is larger than $\alpha_e$, report model $M_k$ and stop the algorithm.  
 
 
 #### It is doing exactly what we want, right???  {-}
 
-Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Kelly who knows 85 topics.  With two consultants you might choose Kelly first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Jamie, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Jamie knows are already included in the 85 that Kelly knows, and therefore, Jamie does not provide any knowledge beyond that of Kelly.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  %(Example taken from American Statistician article that I refereed, August 2012.)
+Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Kelly who knows 85 topics.  
+
+With two consultants you might choose Kelly first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Jamie, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Jamie knows are already included in the 85 that Kelly knows, and therefore, Jamie does not provide any knowledge beyond that of Kelly.  
+
+A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.^[Example taken from @analogies25.]
+
 
 
 ```
 Consider people A, B, C, D who know the following topics:
 
-A: \{1, 2, 3, 4, 5, 6, 7\}
+A: {1, 2, 3, 4, 5, 6, 7}
 
-B: \{8, 9, 10\}
+B: {8, 9, 10}
 
-C: \{1, 2, 3, 4, 8, 10\}
+C: {1, 2, 3, 4, 8, 10}
 
-D: \{5, 6, 7, 9, 11\}
+D: {5, 6, 7, 9, 11}
 
 
-Forward you would choose A  and then B (and you'd know topics 1-10).  Backward (or best subsets) you'd choose C and D (and you'd know topics 1-11).
+Forward, choose A  and then B (and you'd know topics 1-10).  
+Backward (& best subsets), choose C and D (and you'd know topics 1-11).
 ```
 
 #### Forward *Stepwise* Selection using F-tests {-}
 
 This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l$, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.  
+
 1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e$.  
 2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e$.  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l$, we remove the variable.  
 3. We continue with this process until there are no more variables that meet either requirements.  In many situations, this will help us from stopping at a less than desirable model.  
+
 How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, you might walk away with no variables in your model, or at least not many.  If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren't necessary.
 
 ### Backward Selection
@@ -367,22 +378,24 @@ How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, 
 
 
 ******
-**Algorithm: Backward stepwise selection (from ISLR)**
-******
-1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.
-2. For $k = m, m-1, \ldots, 1$:
-   (a) Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).
-   (b) Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as having smallest SSE or highest $R^2$.
-3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.
+**Algorithm: Backward stepwise selection (from ISLR)**  
+
+******  
+1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.  
+2. For $k = m, m-1, \ldots, 1$:  
+    a. Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).  
+    b. Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as having smallest SSE or highest $R^2$.  
+3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.  
 
 ******
-**Algorithm: Backward selection with F tests**
+**Algorithm: Backward selection with F tests**  
+
 ******
-1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.
-2. Let $k = m$:
-   (a) Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).
-   (b) Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as having smallest the *largest* p-value for including the $(k)^{th}$ variable given the $k-1$ variables are already in the model.
-   (c) If the p-value from step (b) is *larger* than $\alpha_r$, consider $M_{k}$ and decrease $k$ by 1.  Go back to step (a).  If the p-value from step (b) is smaller than $\alpha_r$, report model $M_k$ and stop the algorithm.
+1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.  
+2. Let $k = m$:  
+    a. Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).  
+    b. Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as having smallest the *largest* p-value for including the $(k)^{th}$ variable given the $k-1$ variables are already in the model.
+    c. If the p-value from step b. is *larger* than $\alpha_r$, consider $M_{k}$ and decrease $k$ by 1.  Go back to step a.  If the p-value from step b. is smaller than $\alpha_r$, report model $M_k$ and stop the algorithm.  
 
 
 Do any of the above methods represent a fool-proof strategy for fitting a model?  No, but they are a start.  Remember, it is important to always check the residuals and logical interpretation of the model.
@@ -391,7 +404,7 @@ Do any of the above methods represent a fool-proof strategy for fitting a model?
 
 <div class="figure" style="text-align: center">
 <img src="figs/sleuthmodelbuild.png" alt="A strategy for data analysis using statistical models. Source: @sleuth" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-12)A strategy for data analysis using statistical models. Source: @sleuth</p>
+<p class="caption">(\#fig:unnamed-chunk-13)A strategy for data analysis using statistical models. Source: @sleuth</p>
 </div>
 
 
@@ -445,7 +458,7 @@ SAT %>%
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-<img src="04b-build_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04b-build_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 SAT %>%
@@ -454,7 +467,7 @@ SAT %>%
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE)
 ```
 
-<img src="04b-build_files/figure-html/unnamed-chunk-13-2.png" width="480" style="display: block; margin: auto;" />
+<img src="04b-build_files/figure-html/unnamed-chunk-14-2.png" width="480" style="display: block; margin: auto;" />
 
 #### Extraneous {-}
 
@@ -468,7 +481,7 @@ When a model is overspecified, there are one or more redundant variables.  That 
 Generally:  the idea is to use a model building strategy with some criteria (F-tests, AIC, BIC, Adjusted $R^2$, $C_p$, LASSO, Ridge regression) to find the middle ground between an underspecified model and an overspecified model.
 
 
-## A Model Building Strategy^[Taken from https://onlinecourses.science.psu.edu/stat501/node/332]
+## A Model Building Strategy^[Taken from https://online.stat.psu.edu/stat501/lesson/10/10.7]
 
 Model building is definitely an **art**.  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
 
@@ -531,15 +544,19 @@ And, most of all, don't forget that there is not necessarily only one good model
 
 ### Thoughts on Model Selection...
 
-Question: Did females receive lower starting salaries than males?  [From **The Statistical Sleuth** by Ramsey and Schafer]
+Question: Did females receive lower starting salaries than males?^[from @sleuth]
 
-model:  y = log(salary), x's: seniority, age, experience, education, sex.
+model:    
+y: `log(salary)`  
+x's: `seniority`, `age`, `experience`, `education`, `sex`
 
-In the Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex)  In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in.  What are the pluses/minuses of these approaches?
+In @sleuth, they first find a good model using only `seniority`, `age`, `experience`, and `education` (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + `sex`)  In other regression texts, the models considered would include the `sex` variable from the beginning, and work from there, but always keeping the `sex` variable in.  What are the pluses/minuses of these approaches?
 
-**Response**  It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn't start with sex would be more likely to include those associated covariates to start with.  
-One nice aspect of both methods in that they both end up with sex in the model; one difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn't matter.  However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.  
-In this case there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that's part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one "best" model can be misleading.
+**Response**  It seems possible, and even likely, that `sex` would be associated with some of these other variables, so depending on how the model selection that starts with sex included was done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn't start with sex would be more likely to include those associated covariates to start with.    
+
+One nice aspect of both methods is that they both end up with sex in the model; one **difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn't matter**.  However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.  
+
+In this case there are two questions of interest; are there differences at all (univariate model on `sex`), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that's part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one "best" model can be misleading.
 
 
 
