@@ -269,13 +269,13 @@ A few things to notice from the output:
 
 #### Effects of Multicollinearity {-}
 
-In reality, there is always some degree of correlation between the explanatory variables (pg 283).  for regression models, it is important to understand the entire context of the model, particularly for correlated variables.
+In reality, there is always some degree of correlation between the explanatory variables (pg 283 @kutner).  for regression models, it is important to understand the entire context of the model, particularly for correlated variables.
 
 
 1. Regardless of the degree of multicollinearity, our ability to obtain a good fit and make predictions (mean or individual) is not inhibited. 
 2. If the variables are highly correlated, many different linear combinations of them will produce equally good fits.  That is, different samples from the same population may produce wildly different estimated coefficients.  For this reason, the variability associated with the coefficients can be quite high.  Additionally, the explanatory variables can be statistically not significant even though a definite relationship exists between the response and the set of predictors. 
 3. We can no longer interpret the coefficient to mean "the change in response when this variable increases by one unit and the others are held constant" because it may be impossible to hold the other variables constant.  The regression coefficients do not reflect any inherent effect of the particular predictor variable on the response but rather a marginal or partial effect given whatever other correlated predictor variables are included in the model. 
-4. Recall $s^2\{\underline{b}\} = MSE (X^t X)^{-1}$.  If $X^t X$ has a determinant which is close to zero, taking its inverse is akin to dividing by zero.  That is to say, often the SE for the b coefficients can have large sampling variability.
+4. Recall $SE^2(\underline{b}) = MSE\cdot (X^t X)^{-1}$.  If $X^t X$ has a determinant which is close to zero, taking its inverse is akin to dividing by zero.  That is to say, often the SE for the b coefficients can have large sampling variability.
 5. We will investigate multicollinearity in more depth in Chapter 10 through the Variance Inflation Factor (VIF).
 
 Note:  No section ALSM 7.5 or Chapter 8  [Although there is some good stuff in there!  Section 7.5 discusses when to standardize your variables -- an action that can sometimes be crucially important.]
