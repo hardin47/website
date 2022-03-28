@@ -218,72 +218,42 @@ Note: Added value plots are often a good idea, and you should read through secti
 * Most of the functions are in R under a general heading of `influence.measures`.  The `vif` function is in the **car** package.
 
 
-\begin{center}
-\begin{landscape}
-\begin{table}
-\begin{tabular}{|l|c|l|l|}
-Statistic & Formula & Extreme? & R\\
-\hline
-&&&\\
-Leverage & $h_i = \frac{(X_i - \overline{X})^2}{\sum_{j=1}^{n}(X_j - \overline{X})^2} + \frac{1}{n}$ & $> \frac{2p}{n}$ or .2-.5 = mod leverage & \verb;hatvalues;\\
-& $h_{ii}$ = ${\mathbf X}_i^t ({\mathbf X}^t {\mathbf X})^{-1} {\mathbf X}_i $& $>.5$ high leverage & \\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-DFFITS & $\frac{\hat{Y}_i - \hat{Y}_{i(i)}}{\sqrt{MSE_{(i)} h_{ii}}}$ & $>1$ for med-sized data sets,  & \verb;dffits;\\
-& & $>2\sqrt{\frac{p}{n}}$ for large data sets &  \\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-Cook's Distance & $D_i = \frac{\sum_{j=1}^n (\hat{Y}_{j} - \hat{Y}_{j(i)})^2}{p MSE}$ & $\ge 1$ & \verb;cooks.distance;\\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-DFBETAS & $\frac{b_k - b_{k(i)}}{\sqrt{MSE_{(i)} c_{kk}}}$ & $>1$ for med-sized data sets,  & \verb;dfbetas;\\
-& $c_{kk} = ({\mathbf X}^t {\mathbf X})^{-1}_{kk}$ & $>2 / \sqrt{n}$ for large data sets &  \\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-Resid & $e_i = (Y_i - \hat{Y}_i)$ & & \verb;resid;\\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-Semi-studentized Resid & $\frac{e_i}{\sqrt{MSE}}$ & outside (-2,2) & \verb;rstandard;\\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-(Internally) Studentized Resid & $\frac{e_i}{\sqrt{MSE}\sqrt{1-h_{ii}}}$ & outside (-2,2) & \\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-Deleted Studentized Resid & $\frac{e_i}{\sqrt{MSE_{(i)}}\sqrt{1-h_{ii}}}$ & outside (-2,2) & \verb;rstudent;\\
-&&&\\
-\vspace*{-.8cm}\\
-\hline
-&&&\\
-\vspace*{-.8cm}\\
-VIF & $(1 - R_k^2)^{-1}$ & $\max(VIF) > 10$ & \verb;vif; \\
-& $R_k^2$ from $X_k$ regressed on $(p-2)$ vars & $\mbox{mean}(VIF) > > 1$ & package \verb;car;\\
-&&&\\
-\hline
-\end{tabular}\\
-\end{table}
-\end{landscape}
-\end{center}
+
+| Statistic                      	|                                          Formula                                          	| Extreme?                                   	| R                     	|
+|--------------------------------	|:-----------------------------------------------------------------------------------------:	|--------------------------------------------	|-----------------------	|
+|                                	|                                                                                           	|                                            	|                       	|
+| Leverage                       	| $h_i = \frac{(X_i - \overline{X})^2}{\sum_{j=1}^{n}(X_j - \overline{X})^2} + \frac{1}{n}$ 	| $> \frac{2p}{n}$ or .2-.5 = mod leverage   	| `.hat`      	|
+|                                	|        $h_{ii}$ = ${\mathbf X}_i^t ({\mathbf X}^t {\mathbf X})^{-1} {\mathbf X}_i$       	| $>.5$ high leverage                        	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| DFFITS                         	|                $\frac{\hat{Y}_i - \hat{Y}_{i(i)}}{\sqrt{MSE_{(i)} h_{ii}}}$               	| $>1$ for med-sized data sets,              	| `dffits()`         	|
+|                                	|                                                                                           	| $>2\sqrt{\frac{p}{n}}$ for large data sets 	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| Cook's Distance                	|            $D_i = \frac{\sum_{j=1}^n (\hat{Y}_{j} - \hat{Y}_{j(i)})^2}{p MSE}$            	| $\ge 1$                                    	| `.cooksd` 	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| DFBETAS                        	|                      $\frac{b_k - b_{k(i)}}{\sqrt{MSE_{(i)} c_{kk}}}$                     	| $>1$ for med-sized data sets,              	| `dfbetas()`        	|
+|                                	|                      $c_{kk} = ({\mathbf X}^t {\mathbf X})^{-1}_{kk}$                     	| $>2 / \sqrt{n}$ for large data sets        	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| Resid                          	|                                 $e_i = (Y_i - \hat{Y}_i)$                                 	|                                            	| `.resid`          	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| Semi-studentized Resid         	|                                  $\frac{e_i}{\sqrt{MSE}}$                                 	| outside (-2,2)                             	| `.std.resid`      	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| (Internally) Studentized Resid 	|                          $\frac{e_i}{\sqrt{MSE}\sqrt{1-h_{ii}}}$                          	| outside (-2,2)                             	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| Deleted Studentized Resid      	|                       $\frac{e_i}{\sqrt{MSE_{(i)}}\sqrt{1-h_{ii}}}$                       	| outside (-2,2)                             	| `rstudent()`       	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+| VIF                            	|                                     $(1 - R_k^2)^{-1}$                                    	| $\max(VIF) > 10$                           	| `vif()`            	|
+|                                	|                        $R_k^2$ from $X_k$ regressed on $(p-2)$ vars                       	| $\mbox{mean}(VIF) > > 1$                   	| package **car**    	|
+|                                	|                                                                                           	|                                            	|                       	|
+|                                	|                                                                                           	|                                            	|                       	|
+
 
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
@@ -294,16 +264,92 @@ VIF & $(1 - R_k^2)^{-1}$ & $\max(VIF) > 10$ & \verb;vif; \\
 4.  How can potentially influential data points be detected by way of DFFITS and Cook's distance measure?
 
 
-
-
-
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
 
 
 
 
-## R: 
+## R: Leverage Points + Residuals
+
+Recall that the **broom** package has three important functions:
+
+* `tidy()` reports the information which is based on each explanatory variable
+* `glance()` reports the information which is based on the overall model
+* `augment()` reports the information which is based on each observation
+
+Leverage (`.hat`), DFFITS (`dffits()`), DFBETAS(`dfbetas()`), Cook's distance (`.cooksd`), residuals (`.resid`), semi-studentized residuals (`.std.resid`), and deleted studentized residuals (`rstudent()`) are all measured **per observation**.
+
+VIF (`vif`) is measured **per variable**.
+
+Consider the births data one last time.  Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the [data set released in 2014](https://www.icpsr.umich.edu/web/ICPSR/studies/36461).  [Data description here](https://www.openintro.org/data/index.php?data=births14).
+
+
+
+
+
+
+
+
+
+```r
+oz_lm <- births14 %>%
+  lm(weight ~ weeks + sex + term + gained + premie + 
+       mage + whitemom + habit, data = .)
+```
+
+
+#### Per observation measures: {-}
+Most of the leverage and residual metrics are available directly from `augment()`.  Some of the values come directly from the `lm()` (which would then need to be connected, via `bind_cols()`, to the other output, for example to create a residual plot).
+
+
+```r
+oz_lm %>% augment() %>%
+  select(.resid, .hat, .cooksd, .std.resid) %>%
+  bind_cols(rstudent = oz_lm %>% rstudent())  %>%
+  bind_cols(dffits = oz_lm %>% dffits()) %>%
+  bind_cols(oz_lm %>% dfbetas())
+```
+
+```
+## # A tibble: 941 × 16
+##     .resid    .hat   .cooksd .std.resid rstudent  dffits `(Intercept)`    weeks
+##      <dbl>   <dbl>     <dbl>      <dbl>    <dbl>   <dbl>         <dbl>    <dbl>
+##  1 -0.321  0.00775 0.0000792    -0.318   -0.318  -0.0281     -0.00600   0.00690
+##  2  1.38   0.00916 0.00174       1.37     1.37    0.132       0.0245   -0.0290 
+##  3  0.882  0.0115  0.000891      0.876    0.876   0.0944      0.0195   -0.0182 
+##  4 -1.00   0.0110  0.00110      -0.995   -0.995  -0.105      -0.000473 -0.0127 
+##  5  0.502  0.0159  0.000403      0.500    0.500   0.0635     -0.0312    0.0300 
+##  6 -0.774  0.00490 0.000290     -0.767   -0.767  -0.0538     -0.00937   0.00917
+##  7  0.0901 0.0162  0.0000133     0.0898   0.0897  0.0115     -0.00562   0.00534
+##  8 -1.56   0.00955 0.00232      -1.55    -1.55   -0.152       0.0288   -0.0252 
+##  9  1.58   0.00434 0.00107       1.56     1.56    0.103       0.0169   -0.0205 
+## 10  1.75   0.00776 0.00234       1.73     1.73    0.153       0.0265   -0.0177 
+## # … with 931 more rows, and 8 more variables: sexmale <dbl>, termfull <dbl>,
+## #   termlate <dbl>, gained <dbl>, premiepremie <dbl>, mage <dbl>,
+## #   whitemomwhite <dbl>, habitsmoker <dbl>
+```
+
+#### Per variable measures: {-}
+
+Variance Inflation Factor is measured per variable.  Note that because the tidy output is per **coefficient** and `vif()` is per **variable** the columns won't line up in a tidy way that we'd prefer.
+
+
+```r
+oz_lm %>% car::vif()
+```
+
+```
+##          GVIF Df GVIF^(1/(2*Df))
+## weeks    4.75  1            2.18
+## sex      1.01  1            1.00
+## term     2.95  2            1.31
+## gained   1.01  1            1.01
+## premie   2.59  1            1.61
+## mage     1.01  1            1.01
+## whitemom 1.01  1            1.01
+## habit    1.02  1            1.01
+```
 
 
 # Standardized Multiple Regression
