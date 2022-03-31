@@ -100,8 +100,8 @@ Figure 1.3: The point (a) has very little influence on the model, despite having
 <p>Consider the hat matrix (see Section <a href="la.html#fitted">8.5</a>):
 <span class="math display">\[\begin{eqnarray*}
 H &amp;=&amp; X(X^t X)^{-1} X^t\\
-\hat{Y} &amp;=&amp; HY, \underline{e} = (I-H)\underline{Y}\\
-\sigma^2\{\underline{e}\} &amp;=&amp; \sigma^2 (I-H), s^2\{\underline{e}\} = MSE(I-H) \\
+\underline{\hat{Y}} &amp;=&amp; H\underline{Y}, \underline{e} = (I-H)\underline{Y}\\
+sd^2(\underline{e}) &amp;=&amp; \sigma^2 \cdot (I-H), se^2(\underline{e}) = MSE \cdot (I-H) \\
 \end{eqnarray*}\]</span></p>
 </div>
 <div id="outliers-in-the-y-direction" class="section level2" number="12.1">
@@ -120,14 +120,14 @@ e_i^* &amp;=&amp; \frac{Y_i - \hat{Y}_i}{\sqrt{MSE}} \ \ \ \ \mbox{semi-studenti
 \end{eqnarray*}\]</span>
 The hat matrix is a measure of where the observations fall in the subspace spanned by the explanatory variables. The hat matrix also provides the information about the predictions (which in turn determine the residuals). It turns out that the variance of the residuals can be calculated using the hat matrix:
 <span class="math display">\[\begin{eqnarray*}
-\sigma^2\{\underline{e}\} &amp;=&amp; \sigma^2 (I-H)\\
-\sigma^2\{e_i\} &amp;=&amp; \sigma^2 (1-h_{ii})\\
-s^2\{\underline{e}\} &amp;=&amp; MSE (I-H)\\
-s^2\{e_i\} &amp;=&amp; MSE (1-h_{ii})\\
-s\{ e_i \} &amp;=&amp; \sqrt{MSE(1-h_{ii})}\\
-r_i &amp;=&amp; \frac{e_i}{s\{e_i\}}  \ \ \ \mbox{internally studentized residuals}
+sd^2(\underline{e}) &amp;=&amp; \sigma^2 (I-H)\\
+sd^2(e_i) &amp;=&amp; \sigma^2 (1-h_{ii})\\
+se^2\{\underline{e}\} &amp;=&amp; MSE (I-H)\\
+se^2(e_i) &amp;=&amp; MSE (1-h_{ii})\\
+se(e_i) &amp;=&amp; \sqrt{MSE(1-h_{ii})}\\
+r_i &amp;=&amp; \frac{e_i}{se(e_i)}  \ \ \ \mbox{internally studentized residuals}
 \end{eqnarray*}\]</span>
-Note that studentized residuals will have constant variance (unlike the standard residuals).</p>
+Note that studentized residuals will have constant variance (unlike the standard residuals). Why? It is due to the theory connecting the hat-matrix terms to the variability of the residuals. If <span class="math inline">\(h_{ii}\)</span> is large (the <span class="math inline">\(i^{th}\)</span> point has a lot of leverage), then <span class="math inline">\(se(e_i)\)</span> will be smaller than the corresponding value for points with low leverage.</p>
 </div>
 <div id="deleted-residuals-externally-studentized-residuals" class="section level3" number="12.1.2">
 <h3>
@@ -138,10 +138,10 @@ Let <span class="math inline">\(\hat{Y}_{i(i)}\)</span> represent the predicted 
 <span class="math display">\[\begin{eqnarray*}
 d_i &amp;=&amp; Y_i - \hat{Y}_{i(i)} \ \ \ \ \mbox{ deleted residuals}\\
 &amp;=&amp; \frac{e_i}{(1-h_{ii})} \mbox{,  where  } e_i = Y_i - \hat{Y}_i \ \ \ \ \mbox{ not obvious, see text}\\
-s^2\{d_i\} &amp;=&amp; MSE_{(i)} (1 + X_i^t (X_{(i)}^t X_{(i)})^{-1} X_i) \ \ \ \mbox{recall:} s^2\{\hat{Y}_{h(new)} \} = MSE (1+ X_h^t (X^t X)^{-1} X_h)\\
-&amp;=&amp; \frac{MSE_{(i)}}{(1-h_{ii})} \ \ \ \ \mbox{ not obvious, see text}\\
+se^2(d_i) &amp;=&amp; MSE_{(i)} \cdot (1 + X_i^t (X_{(i)}^t X_{(i)})^{-1} X_i) \ \ \ \mbox{recall:  } se^2(\hat{Y}_{h(new)}) = MSE \cdot (1+ X_h^t (X^t X)^{-1} X_h)\\
+&amp;=&amp; \frac{MSE_{(i)}}\cdot {(1-h_{ii})} \ \ \ \ \mbox{ not obvious, see text}\\
 &amp;&amp;\\
-t_i &amp;=&amp; \frac{d_i}{s\{d_i\}} = \frac{e_i}{\sqrt{MSE_{(i)}(1-h_{ii})}} \sim t_{n-1-p}  \ \ \mbox{ studentized deleted residuals}\\
+t_i &amp;=&amp; \frac{d_i}{se(d_i)} = \frac{e_i}{\sqrt{MSE_{(i)}(1-h_{ii})}} \sim t_{n-1-p}  \ \ \mbox{ studentized deleted residuals}\\
 \end{eqnarray*}\]</span></p>
 <ol style="list-style-type: decimal">
 <li>Now we can legitimately look for deviations outside of the <span class="math inline">\(\pm t_{1 - (\alpha/2n), n-p-1}\)</span> bounds. We use a Bonferroni correction for the level of significance because we are doing <span class="math inline">\(n\)</span> simultaneous tests.<br>
@@ -180,7 +180,7 @@ The diagonal elements of the hat matrix, <span class="math inline">\(h_{ii}\)</s
 <ol style="list-style-type: decimal">
 <li>Recall that <span class="math inline">\(\hat{\underline{Y}} = H \underline{Y}\)</span>. That is, the predicted values are a linear combination of the observed response. <span class="math inline">\(h_{ii}\)</span> is the weight of observation <span class="math inline">\(Y_i\)</span> in determining <span class="math inline">\(\hat{Y}_i\)</span>. The larger <span class="math inline">\(h_{ii}\)</span> is, the more important <span class="math inline">\(Y_i\)</span> is in determining <span class="math inline">\(\hat{Y}_i\)</span>. The hat matrix is a function of <span class="math inline">\(X\)</span> only, so <span class="math inline">\(h_{ii}\)</span> measures the role of the X values in determining how important <span class="math inline">\(Y_i\)</span> is in affecting the fitted value <span class="math inline">\(\hat{Y}_i\)</span>.<br>
 </li>
-<li>The larger <span class="math inline">\(h_{ii}\)</span> is, the smaller the variance of the residual <span class="math inline">\(e_i\)</span>. That is, the larger <span class="math inline">\(h_{ii}\)</span>, the closer <span class="math inline">\(\hat{Y}_i\)</span> will be to <span class="math inline">\(Y_i\)</span>. If <span class="math inline">\(h_{ii} = 1\)</span>, then <span class="math inline">\(\sigma^2{e_i} = 0\)</span> which means the fitted value is forced to equal the observed value.</li>
+<li>The larger <span class="math inline">\(h_{ii}\)</span> is, the smaller the variance of the residual <span class="math inline">\(e_i\)</span>. That is, the larger <span class="math inline">\(h_{ii}\)</span>, the closer <span class="math inline">\(\hat{Y}_i\)</span> will be to <span class="math inline">\(Y_i\)</span>. If <span class="math inline">\(h_{ii} = 1\)</span>, then <span class="math inline">\(sd^2(e_i) = 0\)</span> which means the fitted value is forced to equal the observed value.</li>
 </ol>
 </div>
 </div>
@@ -200,9 +200,9 @@ The diagonal elements of the hat matrix, <span class="math inline">\(h_{ii}\)</s
 To understand the derivation, recall the following about the variability of <span class="math inline">\(\underline{\hat{Y}}\)</span>.
 <span class="math display">\[\begin{eqnarray*}
 \underline{\hat{Y}} &amp;=&amp; H \underline{Y}\\
-\sigma^2\{\underline{\hat{Y}}\} &amp;=&amp; H \sigma^2 \{Y\} H = \sigma^2 H\\
-\sigma^2\{\hat{Y}_i\} &amp;=&amp; \sigma^2 \cdot h_{ii}\\
-s^2\{\hat{Y}_i\} &amp;=&amp; MSE \cdot h_{ii}
+sd^2(\underline{\hat{Y}}) &amp;=&amp; H sd^2(Y) H = \sigma^2 H\\
+sd^2(\hat{Y}_i) &amp;=&amp; \sigma^2 \cdot h_{ii}\\
+se^2(\hat{Y}_i) &amp;=&amp; MSE \cdot h_{ii}
 \end{eqnarray*}\]</span></p>
 </div>
 <div id="cooks-distance" class="section level4 unnumbered">
@@ -223,7 +223,7 @@ Cook’s Distance shows the effect of the <span class="math inline">\(i^{th}\)</
 <li>big <span class="math inline">\(e_i\)</span> and big <span class="math inline">\(h_{ii}\)</span>
 </li>
 </ol>
-<p>The exact way to think about these numbers being large is complicated, but if we see a point that is much larger than others, we should examine that point and try to understand it better. Noting that the above measure squared deviations, a useful comparison is to look at the 10% of 20% cutoff of the <span class="math inline">\(F(p, n-p)\)</span> distribution:
+<p>The exact way to think about these numbers being large is complicated, but if we see a point that is much larger than others, we should examine that point and try to understand it better. Noting that the above measures the squared deviations, a useful comparison is to look at the 10% of 20% cutoff of the <span class="math inline">\(F(p, n-p)\)</span> distribution:
 <span class="math display">\[\begin{eqnarray*}
 \mbox{if } &amp;&amp;D_i &lt; F_{0.1, p, n-p} \mbox{ or } F_{0.2, p, n-p} \rightarrow \mbox{ no influence}\\
 \mbox{if } &amp;&amp;D_i &gt; F_{0.5, p, n-p} \rightarrow \mbox{ big influence}\\
@@ -236,7 +236,7 @@ Cook’s Distance shows the effect of the <span class="math inline">\(i^{th}\)</
 <span class="math display">\[\begin{eqnarray*}
 (DFBETAS)_{k(i)} &amp;=&amp; \frac{b_k - b_{k(i)}}{\sqrt{MSE_{(i)} c_{kk}}}\\
 \mbox{where } c_{kk} &amp;=&amp; (X^t X )^{-1}_{kk}\\
-\mbox{note } \sigma^2\{ b_k \} &amp;=&amp; \sigma^2 c_{kk}
+\mbox{note } sd^2(b_k) &amp;=&amp; \sigma^2 c_{kk}
 \end{eqnarray*}\]</span>
 A large absolute value of <span class="math inline">\((DFBETAS)_{k(i)}\)</span> is indicative of a large impact of the <span class="math inline">\(i^{th}\)</span> case on the <span class="math inline">\(k^{th}\)</span> regression coefficient.</p>
 </div>
@@ -280,14 +280,15 @@ A large absolute value of <span class="math inline">\((DFBETAS)_{k(i)}\)</span> 
 </ul>
 <p>It is also interesting to note that the standard error of the estimated coefficients can be calculated using VIF.
 <span class="math display">\[\begin{eqnarray*}
-s^2\{b_k\} = \frac{MSE}{(n-1) s^2\{X_k\}} (VIF_k)
+se^2(b_k) = \frac{MSE}{(n-1) se^2(X_k)} (VIF_k)
 \end{eqnarray*}\]</span>
-That is, the standard error is a function of MSE (the total variability around the model), <span class="math inline">\(s^2\{X_k\}\)</span> (the variability of the <span class="math inline">\(k^{th}\)</span> variable, and the VIF for the <span class="math inline">\(k^{th}\)</span> variable. Notice that if the <span class="math inline">\(k^{th}\)</span> variable is in the model and another variable is added which is <em>correlated</em> to the <span class="math inline">\(k^{th}\)</span> variable, the SE for the <span class="math inline">\(k^{th}\)</span> coefficient will go up.</p>
+That is, the standard error is a function of MSE (the total variability around the model), <span class="math inline">\(se^2(X_k)\)</span> (the variability of the <span class="math inline">\(k^{th}\)</span> variable, and the VIF for the <span class="math inline">\(k^{th}\)</span> variable. Notice that if the <span class="math inline">\(k^{th}\)</span> variable is in the model and another variable is added which is <em>correlated</em> to the <span class="math inline">\(k^{th}\)</span> variable, the SE for the <span class="math inline">\(k^{th}\)</span> coefficient will go up.</p>
 </div>
-<div id="a-strategy-for-dealing-with-problematic-data-points" class="section level3" number="12.4.1">
-<h3>
-<span class="header-section-number">12.4.1</span> A Strategy for Dealing with Problematic Data Points<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a><a class="anchor" aria-label="anchor" href="#a-strategy-for-dealing-with-problematic-data-points"><i class="fas fa-link"></i></a>
-</h3>
+</div>
+<div id="a-strategy-for-dealing-with-problematic-data-points" class="section level2" number="12.5">
+<h2>
+<span class="header-section-number">12.5</span> A Strategy for Dealing with Problematic Data Points<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a><a class="anchor" aria-label="anchor" href="#a-strategy-for-dealing-with-problematic-data-points"><i class="fas fa-link"></i></a>
+</h2>
 <ol style="list-style-type: decimal">
 <li>
 <p>First, check for obvious data errors:</p>
@@ -545,10 +546,9 @@ That is, the standard error is a function of MSE (the total variability around t
 </tbody>
 </table></div>
 </div>
-</div>
-<div id="reflection-questions-9" class="section level2" number="12.5">
+<div id="reflection-questions-9" class="section level2" number="12.6">
 <h2>
-<span class="header-section-number">12.5</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-9"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.6</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-9"><i class="fas fa-link"></i></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>What is an influential data point?</li>
@@ -557,9 +557,9 @@ That is, the standard error is a function of MSE (the total variability around t
 <li>How can potentially influential data points be detected by way of DFFITS and Cook’s distance measure?</li>
 </ol>
 </div>
-<div id="ethics-considerations-8" class="section level2" number="12.6">
+<div id="ethics-considerations-8" class="section level2" number="12.7">
 <h2>
-<span class="header-section-number">12.6</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-8"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.7</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-8"><i class="fas fa-link"></i></a>
 </h2>
 <p>With all of the modeling tets (e.g., nested F-tests) and now potential tests to discover outliers, it seems that the p-hacking might be getting out of control!</p>
 <p>p-values were first introduced by R.A. Fisher in 1929:</p>
@@ -568,18 +568,16 @@ That is, the standard error is a function of MSE (the total variability around t
 </blockquote>
 <p>In 2014, George Cobb reflected on the following debate <span class="citation">(<a href="references.html#ref-ASApval" role="doc-biblioref">Wasserstein and Lazar 2016</a>)</span>:</p>
 <blockquote>
-<p>Q: Why do so many colleges and grad schools teach p = 0.05?
+<p>Q: Why do so many colleges and grad schools teach p = 0.05?<br>
 A: Because that’s still what the scientific community and journal editors use.</p>
 </blockquote>
 <blockquote>
-<p>Q: Why do so many people still use p = 0.05?
+<p>Q: Why do so many people still use p = 0.05?<br>
 A: Because that’s what they were taught in college or grad school.</p>
 </blockquote>
 <p>Which led to a series of reflections and statements about hypothesis tests and p-values. Indeed, the journal <em>Basic and Applied Social Psychology</em> banned all null hypothesis significance testing procedures (NHSTP) from articles in the journal <span class="citation">(<a href="references.html#ref-basp" role="doc-biblioref">Trafimow and Marks 2015</a>)</span>.</p>
 <blockquote>
-<p>With the banning of the NHSTP (null hypothesis significance testing procedures) from BASP, what are the implications for authors?
-Question 3. Are any inferential statistical procedures required?
-Answer to Question 3. No, because the state of the art remains uncertain. However, BASP will require strong descriptive statistics, including effect sizes. We also encourage the presentation of frequency or distributional data when this is feasible. Finally, we encourage the use of larger sample sizes than is typical in much psychology research, because as the sample size increases, descriptive statistics become increasingly stable and sampling error is less of a problem. However, we will stop short of requiring particular sample sizes, because it is possible to imagine circumstances where more typical sample sizes might be justifiable.</p>
+<p>With the banning of the NHSTP (null hypothesis significance testing procedures) from BASP, what are the implications for authors?<br><strong>Question 3.</strong> Are any inferential statistical procedures required?<br><strong>Answer to Question 3.</strong> No, because the state of the art remains uncertain. However, BASP will require strong descriptive statistics, including effect sizes. We also encourage the presentation of frequency or distributional data when this is feasible. Finally, we encourage the use of larger sample sizes than is typical in much psychology research, because as the sample size increases, descriptive statistics become increasingly stable and sampling error is less of a problem. However, we will stop short of requiring particular sample sizes, because it is possible to imagine circumstances where more typical sample sizes might be justifiable.</p>
 </blockquote>
 <p>The American Statistics Association, in contrast, wrote a statement on both the positive and negative aspects of p-values <span class="citation">(<a href="references.html#ref-ASApval" role="doc-biblioref">Wasserstein and Lazar 2016</a>)</span>. Test yourself using the following TRUE/FALSE questions. The answers are given in the footnote to each questions.</p>
 <ol style="list-style-type: decimal">
@@ -597,9 +595,9 @@ Answer to Question 3. No, because the state of the art remains uncertain. Howeve
 </li>
 </ol>
 </div>
-<div id="r-leverage-points-residuals" class="section level2" number="12.7">
+<div id="r-leverage-points-residuals" class="section level2" number="12.8">
 <h2>
-<span class="header-section-number">12.7</span> R: Leverage Points + Residuals<a class="anchor" aria-label="anchor" href="#r-leverage-points-residuals"><i class="fas fa-link"></i></a>
+<span class="header-section-number">12.8</span> R: Leverage Points + Residuals<a class="anchor" aria-label="anchor" href="#r-leverage-points-residuals"><i class="fas fa-link"></i></a>
 </h2>
 <p>Recall that the <strong>broom</strong> package has three important functions:</p>
 <ul>
@@ -680,12 +678,11 @@ Answer to Question 3. No, because the state of the art remains uncertain. Howeve
 <a class="nav-link" href="#outliers-in-the-x-direction"><span class="header-section-number">12.2</span> Outliers in the X direction</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#leverage"><span class="header-section-number">12.2.1</span> Leverage</a></li></ul>
 </li>
 <li><a class="nav-link" href="#outliers-that-are-influential"><span class="header-section-number">12.3</span> Outliers that are Influential</a></li>
-<li>
-<a class="nav-link" href="#variance-inflation-factor-vif"><span class="header-section-number">12.4</span> Variance Inflation Factor (VIF)</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#a-strategy-for-dealing-with-problematic-data-points"><span class="header-section-number">12.4.1</span> A Strategy for Dealing with Problematic Data Points12</a></li></ul>
-</li>
-<li><a class="nav-link" href="#reflection-questions-9"><span class="header-section-number">12.5</span>  Reflection Questions</a></li>
-<li><a class="nav-link" href="#ethics-considerations-8"><span class="header-section-number">12.6</span>  Ethics Considerations</a></li>
-<li><a class="nav-link" href="#r-leverage-points-residuals"><span class="header-section-number">12.7</span> R: Leverage Points + Residuals</a></li>
+<li><a class="nav-link" href="#variance-inflation-factor-vif"><span class="header-section-number">12.4</span> Variance Inflation Factor (VIF)</a></li>
+<li><a class="nav-link" href="#a-strategy-for-dealing-with-problematic-data-points"><span class="header-section-number">12.5</span> A Strategy for Dealing with Problematic Data Points12</a></li>
+<li><a class="nav-link" href="#reflection-questions-9"><span class="header-section-number">12.6</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-8"><span class="header-section-number">12.7</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-leverage-points-residuals"><span class="header-section-number">12.8</span> R: Leverage Points + Residuals</a></li>
 </ul>
 
       <div class="book-extra">
@@ -703,7 +700,7 @@ Answer to Question 3. No, because the state of the art remains uncertain. Howeve
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-28.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-31.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

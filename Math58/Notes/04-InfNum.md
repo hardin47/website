@@ -84,7 +84,7 @@ But in the more typical situation where $\sigma$ is estimated using $s$: $$\frac
 
 #### Hypothesis Testing (ISRS 4.1) {-}
 
-If $H_0: \mu = \mu_0$ is true, then we know that: $$\frac{\overline{X} - \mu}{s/\sqrt{n}} \sim t_{df = n-1}$$
+If $H_0: \mu = \mu_0$ is true, then we know that: $$\frac{\overline{X} - \mu_0}{s/\sqrt{n}} \sim t_{df = n-1}$$
 
 That is, we can use the $t_{df = n-1}$ distribution to find the p-value for the test.  Note, in R we we use the function `xpt` in the `mosaic` package.
 
