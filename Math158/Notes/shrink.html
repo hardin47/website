@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 14 Shrinkage Methods | Linear Models</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta name="description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 14 Shrinkage Methods | Linear Models">
 <meta property="og:type" content="book">
-<meta property="og:description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta property="og:description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 14 Shrinkage Methods | Linear Models">
-<meta name="twitter:description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta name="twitter:description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -86,14 +86,261 @@
 <h1>
 <span class="header-section-number">14</span> Shrinkage Methods<a class="anchor" aria-label="anchor" href="#shrink"><i class="fas fa-link"></i></a>
 </h1>
+<p>Recall the two methods we’ve used so far to find sets of variable (and their coefficients):</p>
+<ol style="list-style-type: decimal">
+<li>Choose models using domain knowledge and then applying <strong>computational</strong> methods (i.e., cross validation) to decide which model is superior. Apply least squares (i.e., calculus) to find the coefficients.<br>
+</li>
+<li>Adding variables systematically using <strong>statistical</strong> criteria (F-tests, adjusted <span class="math inline">\(R^2\)</span>, <span class="math inline">\(C_p\)</span>, BIC, AIC). Apply least squares (i.e., calculus) to find the coefficients.</li>
+</ol>
+<p>We move to a new model building algorithm that uses all <span class="math inline">\(p-1\)</span> explanatory variables and constrains the coefficient estimates, or equivalently, shrinks the coefficient estimates toward zero. It turns out that shrinking the coefficients toward zero can substantially reduce the variance of the estimates (albeit adding a bit of bias).</p>
+<ol start="3" style="list-style-type: decimal">
+<li>That is, use <strong>mathematical</strong> optimization to shrink (set) some of the coefficients to zero (while simultaneously solving for the other non-zero coefficients).</li>
+</ol>
+<p>The main reason to use shrinkage techniques is when the model has a lot of predictor variables (<span class="math inline">\(p\)</span> big) or when the model has a lot of predictor variables in comparison to the number of observations (<span class="math inline">\(n \approx p\)</span> or <span class="math inline">\(n &lt; p\)</span>) — because that is when we get huge (infinite!) variability associated with the coefficients!</p>
+<div id="on-inverting-matrices" class="section level2" number="14.1">
+<h2>
+<span class="header-section-number">14.1</span> On Inverting Matrices<a class="anchor" aria-label="anchor" href="#on-inverting-matrices"><i class="fas fa-link"></i></a>
+</h2>
+<p><strong><span class="math inline">\(X_{n \times p}\)</span>:</strong> The data matrix is <span class="math inline">\(n \times p\)</span>. We think of the data as being <span class="math inline">\(n\)</span> points in <span class="math inline">\(p\)</span> dimensions. It is important to realize that not only are the points indexed in <span class="math inline">\(p\)</span> dimensions, but the points also take up the entire p-dimensional space. [As an aside: Whether a set of points takes up an entire space does not depend on how the points are indexed. For example, think about a (2-dimensional) piece of paper floating in the sky with many many points on it. You might index the coordinates of points on the paper using three dimensions, however, the paper / points themselves actually live in a 2-dimensional subspace.] To reiterate: in an <strong>ideal</strong> world, the <span class="math inline">\(n\)</span> points live in <span class="math inline">\(p\)</span> space and cannot be considered to live in a smaller dimension than <span class="math inline">\(p\)</span>. Sometimes, the <span class="math inline">\(n\)</span> points are indexed to live in <span class="math inline">\(p\)</span> space, but actually take up a lower dimensional subspace (e.g., if two of the variable columns are perfectly correlated).</p>
+<p><em>However</em>, there are times when an <span class="math inline">\(n \times p\)</span> matrix lives in a space which is smaller than <span class="math inline">\(p\)</span>. For example,</p>
+<ol style="list-style-type: decimal">
+<li>If two of the <span class="math inline">\(p\)</span> columns are exact linear combinations of one another, then the points will actually live in <span class="math inline">\(p-1\)</span> space.</li>
+<li>If the number of points is less than <span class="math inline">\(p\)</span> (<span class="math inline">\(n &lt; p\)</span>) then the points will only live in <span class="math inline">\(n\)</span> space. For example, there is no way for two points take up three dimensions!</li>
+</ol>
+<p><strong><span class="math inline">\(X^t X\)</span>:</strong> The matrix <span class="math inline">\(X^tX\)</span> is a linear transformation of the original <span class="math inline">\(X\)</span> matrix. That is, if <span class="math inline">\(X\)</span> lives in <span class="math inline">\(p\)</span> space, it can’t be linearly transformed into a higher dimension. We could transform <span class="math inline">\(X\)</span> into a higher dimension by using functions or some kind of kernel mapping, but we can’t do it via linear transformations. That is to say, if <span class="math inline">\(X\)</span> has a rank which is lower than <span class="math inline">\(p\)</span>, any linear combination will also, necessarily, transform the data into a space which is lower than <span class="math inline">\(p\)</span>.</p>
+<p><strong><span class="math inline">\((X^tX)^{-1}\)</span>:</strong> The inverse of the matrix also represents a mapping. Recall that if <span class="math inline">\(AX = Y\)</span> then <span class="math inline">\(X= A^{-1}Y\)</span>. But if we are mapping into a smaller space (smaller than <span class="math inline">\(p\)</span>) then we can’t invert back to a larger space (i.e., back to <span class="math inline">\(p\)</span>). And because <span class="math inline">\((X^tX)^{-1}\)</span> is a <span class="math inline">\(p \times p\)</span> matrix, we are trying to invert back to a <span class="math inline">\(p\)</span> dimensional space. Recall the Big Theorem in Linear Algebra that says if a <span class="math inline">\(p \times p\)</span> matrix has rank lower than <span class="math inline">\(p\)</span>, it isn’t invertible (also that it will have determinant zero, will have some eigenvalues that are zero, etc.)</p>
+<p><strong>So…</strong> The point is that if <span class="math inline">\(X\)</span> doesn’t have full rank (that is, if it has dimension less than <span class="math inline">\(p\)</span>), there will be problems with computing <span class="math inline">\((X^tX)^{-1}\)</span>. And the matrix <span class="math inline">\((X^tX)^{-1}\)</span> is vitally important in computing both the least squares coefficients and their standard errors.</p>
+</div>
+<div id="ridge-regression" class="section level2" number="14.2">
+<h2>
+<span class="header-section-number">14.2</span> Ridge Regression<a class="anchor" aria-label="anchor" href="#ridge-regression"><i class="fas fa-link"></i></a>
+</h2>
+<p>Recall that the OLS (ordinary least squares) technique minimizes the distance between the observed and predicted values of the response. That is, we found the <span class="math inline">\(b_0, b_1, \ldots b_{p-1}\)</span> that minimize:
+<span class="math display">\[SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2.\]</span></p>
+<p>Using the OLS algorithm for modeling, the values of <span class="math inline">\(b_i\)</span> give the exact same model as the model built using the standardized variables which produce <span class="math inline">\(b_i^*\)</span>. However, as you will see, it is important to <strong>standardize all variables before running ridge regression</strong>.</p>
+<p>For ease of computation, we will assume from here on that the variables have all been standardized as described above (in a previous section). [Note: ISL describes standardizing by only dividing by the standard deviation and not centering. The two different methods will not produce different models (with respect to significance, etc.), but they will produce different intercept coefficients. Indeed, scale is the important aspect to consider when working with shrinkage models.]</p>
+<p>The ridge regression coefficients are calculated in a similar way to OLS, but the optimization equation seeks to minimize:</p>
+<p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \sum_{j=1}^{p-1} b_j^2 = SSE + \lambda \sum_{j=1}^{p-1} b_j^2\]</span>
+where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parameter</em>, to be determined separately. The ridge regression optimization provides a trade-off between two different criteria: variance and bias. As with OLS, ridge regression seeks to find coefficients that fit the data well (minimize SSE!). Additionally, ridge regression shrinks the coefficients to zero by adding a penalty so that smaller values of <span class="math inline">\(b_j\)</span> are preferred - the shrinkage makes the estimates less variable. It can be proved that there is always a <span class="math inline">\(\lambda \ne 0\)</span> which gives smaller E[MSE] than OLS. Note: the shrinkage does not apply to the intercept!</p>
+<p>Note: the Gauss-Markov theorem says that OLS solutions are the best (i.e., smallest variance) linear unbiased estimates (BLUE). But if we add a bit of bias, we can do better. There is an existence theory that says:
+<span class="math display">\[ \exists \ \  \lambda \mbox{ such that } E[MSE_{RR}] &lt; E[MSE_{OLS}].\]</span></p>
+<div id="the-ridge-regression-solution" class="section level3" number="14.2.1">
+<h3>
+<span class="header-section-number">14.2.1</span> The Ridge Regression Solution<a class="anchor" aria-label="anchor" href="#the-ridge-regression-solution"><i class="fas fa-link"></i></a>
+</h3>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{OLS: } \underline{b} &amp;=&amp; (X^t X)^{-1} X^t \underline{Y}\\
+\mbox{ridge regression: } \underline{b} &amp;=&amp; (X^t X + \lambda \mathtt{I})^{-1} X^t \underline{Y}\\
+\end{eqnarray*}\]</span></p>
+<p><strong>Notes:</strong><br>
+* The tuning parameter <span class="math inline">\(\lambda\)</span> balances the effect of the two different criteria in the optimization equation. When <span class="math inline">\(\lambda=0\)</span>, ridge regression is reduced to OLS. As <span class="math inline">\(\lambda \rightarrow \infty\)</span>, the coefficient estimates will shrink to zero.<br>
+* We have assumed that the variables have been centered to have mean zero before ridge regression is performed. Therefore, the estimated intercept will be <span class="math display">\[b_0 = \overline{Y} = \frac{1}{n} \sum_i Y_i \ \ \ \ \ \ (= 0 \mbox{ if $Y$ is also centered}) \]</span><br>
+* Note that the ridge regression optimization above is a constrained optimization equation, solved by Lagrange multipliers. That is, we minimize <span class="math inline">\(SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2\)</span> subject to <span class="math inline">\(\sum_{j=1}^{p-1} b_j^2 \leq s\)</span> for some value of <span class="math inline">\(s\)</span>. Note that <span class="math inline">\(s\)</span> is inversely related to <span class="math inline">\(\lambda\)</span>.</p>
+</div>
+<div id="ridge-regression-visually" class="section level3" number="14.2.2">
+<h3>
+<span class="header-section-number">14.2.2</span> Ridge Regression visually<a class="anchor" aria-label="anchor" href="#ridge-regression-visually"><i class="fas fa-link"></i></a>
+</h3>
+<p>Ridge regression is typically applied to situations with many many variables. In particular, ridge regression will help us avoid situations of multicollinearity. It doesn’t make sense to apply it to a situation with only one or two variables. However, we will demonstrate the process visually with <span class="math inline">\(p=3\)</span> dimensions because it is difficult to visualize in higher dimensions.</p>
+<p>The ridge regression coefficient estimates solve the following optimization problem:</p>
+<p><span class="math display">\[ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} b_j^2 \leq s\]</span></p>
+</div>
+<div id="why-ridge-regression" class="section level3" number="14.2.3">
+<h3>
+<span class="header-section-number">14.2.3</span> Why Ridge Regression?<a class="anchor" aria-label="anchor" href="#why-ridge-regression"><i class="fas fa-link"></i></a>
+</h3>
+<p>Recall that the main benefit to ridge regression is when <span class="math inline">\(p\)</span> is large (particularly in relation to <span class="math inline">\(n\)</span>). Remember that this (and multicollinearity) leads to instability of <span class="math inline">\((X^tX)^{-1}\)</span>. Which leads to huge variability in the coefficient estimates. A small change in the model or the observations can create wildly different estimates. So the expected value of the MSE can be quite inflated due to the variability of the model. Ridge regression adds a small amount of bias to the model, but it lowers the variance substantially and creates lower (on average) MSE values.</p>
+<p>Additionally, ridge regression has computational advantages over the subset selection models (where all subsets requires searching through <span class="math inline">\(2^{p-1}\)</span> models).</p>
+<div id="why-is-ridge-regression-better-than-least-squares" class="section level4 unnumbered">
+<h4>Why is ridge regression better than least squares?<a class="anchor" aria-label="anchor" href="#why-is-ridge-regression-better-than-least-squares"><i class="fas fa-link"></i></a>
+</h4>
+<p>The advantage is apparent in the bias-variance trade-off. As <span class="math inline">\(\lambda\)</span> increases, the flexibility of the ridge regression fit decreases. This leads to decrease variance, with a smaller increase in bias. Regular OLS regression is fixed with high variance, but no bias. However, the lowest test MSE tends to occur at the intercept between variance and bias. Thus, by properly tuning <span class="math inline">\(\lambda\)</span> and acquiring less variance at the cost of a small amount of bias, we can find a lower potential MSE.</p>
+<blockquote>
+<p>Ridge regression works best in situations for least squares estimates have high variance. Ridge regression is also much more computationally efficient that any subset method, since it is possible to simultaneously solve for all values of <span class="math inline">\(\lambda\)</span>.</p>
+</blockquote>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-5"></span>
+<img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265"><p class="caption">
+Figure 6.1: The red contours represent pairs of <span class="math inline">\(eta\)</span> coefficients that produce constant values for SSE on the data. The blue circle represents the possible values of <span class="math inline">\(eta\)</span> given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR
+</p>
+</div>
+</div>
+</div>
+<div id="inference-on-ridge-regression-coefficients" class="section level3" number="14.2.4">
+<h3>
+<span class="header-section-number">14.2.4</span> Inference on Ridge Regression Coefficients<a class="anchor" aria-label="anchor" href="#inference-on-ridge-regression-coefficients"><i class="fas fa-link"></i></a>
+</h3>
+<p>Note that just like the OLS coefficients, the RR coefficients are a linear combination of the <span class="math inline">\(Y\)</span> values based on the <span class="math inline">\(X\)</span> matrix and (now) <span class="math inline">\(\lambda\)</span>. It is not hard, therefore, to find the variance of the coefficient vector at a particular value of <span class="math inline">\(\lambda\)</span>. Additionally, the same theory that gives normality (and the resulting t-statistics) drives normality for the ridge regression coefficients.</p>
+<p><span class="math display">\[var(b^{RR}) = \sigma^2 W X^t X W \mbox{ where } W = (X^t X + \lambda \mathtt{I})^{-1}\]</span></p>
+<p>However, all the distributional properties above give theoretical results for a fixed value of <span class="math inline">\(\lambda\)</span>. We now discuss estimating <span class="math inline">\(\lambda\)</span>, but as soon as we estimate <span class="math inline">\(\lambda\)</span>, it becomes dependent on the data and thus a random variable. That is, the SE of <span class="math inline">\(b^{RR}\)</span> is a function of not only the variability associated with the data estimating the coefficients but also the variability of the data estimating <span class="math inline">\(\lambda\)</span>.</p>
+<p>An additional problem is that the RR coefficients are known to be biased, and the bias is not easy to estimate. Without a sense of where the variable is centered, the SE isn’t particularly meaningful. For these reasons, functions like <code><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">lm.ridge()</a></code> in R do not include tests / p-values but do approximate the SE of the coefficients (as an estimate).</p>
+</div>
+</div>
+<div id="how-do-you-choose-lambda" class="section level2" number="14.3">
+<h2>
+<span class="header-section-number">14.3</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda"><i class="fas fa-link"></i></a>
+</h2>
+<p>Note that <span class="math inline">\(\lambda\)</span> is a function of the data, and therefore a random variable to estimate (just like estimating the coefficients). However, we can use diagnostic measures to give a sense of <span class="math inline">\(\lambda\)</span> values which will give a good variance-bias trade-off.</p>
+<ol style="list-style-type: decimal">
+<li>Split data into test and training, and plot test MSE as a function of <span class="math inline">\(\lambda\)</span>.<br>
+</li>
+<li>Actually cross validate the data (remove test samples in groups of, say 1/10, to see which <span class="math inline">\(\lambda\)</span> gives the best predictions on “new” data) and find <span class="math inline">\(\lambda\)</span> which gives the smallest MSE for the cross validated data.</li>
+</ol>
+<hr>
+<p><strong>Cross Validating to Find <span class="math inline">\(\lambda\)</span></strong></p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Set <span class="math inline">\(\lambda\)</span> (e.g., try <span class="math inline">\(\lambda\)</span> between <span class="math inline">\(10^{-2}\)</span> and <span class="math inline">\(10^{5}\)</span>: <code>lambda.grid = 10^seq(5,-2, length =100)</code>)</li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>Remove 1/10 of the observations (partition the data into 10 groups).</li>
+<li>Find the RR / Lasso model using the remaining 90% of the observations and the given value of <span class="math inline">\(\lambda\)</span>.</li>
+<li>Predict the response value for the removed points given the 90% training values.</li>
+<li>Repeat (a) - (c) until every point has been predicted as a test value.</li>
+</ol>
+<ol start="2" style="list-style-type: decimal">
+<li>Using the CV predictions, find <span class="math inline">\(MSE_\lambda\)</span> for the <span class="math inline">\(\lambda\)</span> at hand.</li>
+<li>Repeat steps 1 and 2 across the grid of <span class="math inline">\(\lambda\)</span> values.</li>
+<li>Choose the <span class="math inline">\(\lambda\)</span> value that minimizes the CV <span class="math inline">\(MSE_\lambda\)</span>.</li>
+</ol>
+</div>
+<div id="lasso" class="section level2" number="14.4">
+<h2>
+<span class="header-section-number">14.4</span> Lasso<a class="anchor" aria-label="anchor" href="#lasso"><i class="fas fa-link"></i></a>
+</h2>
+<p>Ridge regression had at least one disadvantage; it includes all <span class="math inline">\(p\)</span> predictors in the final model. The penalty term will set many of them close to zero, but never exactly to zero. This isn’t generally a problem for prediction accuracy, but it can make the model more difficult to interpret the results. Lasso overcomes this disadvantage and is capable of forcing some of the coefficients to zero granted that <span class="math inline">\(\lambda\)</span> is big enough. Since <span class="math inline">\(\lambda = 0\)</span> results in regular OLS regression, as <span class="math inline">\(\lambda\)</span> approaches <span class="math inline">\(\infty\)</span> the coefficients shrink towards zero.</p>
+<div id="lasso-coefficients" class="section level3" number="14.4.1">
+<h3>
+<span class="header-section-number">14.4.1</span> Lasso Coefficients<a class="anchor" aria-label="anchor" href="#lasso-coefficients"><i class="fas fa-link"></i></a>
+</h3>
+<p>The lasso (least absolute shrinkage and selection operator) coefficients are calculated from a similar constraint to that of ridge regression, but the calculus is much harder now. The L-1 norm is the only norm that gives sparsity and is convex (so that the optimization problem can be solved). The lasso optimization equation seeks to minimize:</p>
+<p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \sum_{j=1}^{p-1} |b_j| = SSE + \lambda \sum_{j=1}^{p-1} |b_j|\]</span>
+where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parameter</em>, to be determined separately. As with ridge regression lasso optimization provides a trade-off between bias and variance. Lasso seeks to find coefficients that fit the data well (minimize SSE!). Additionally, lasso shrinks the coefficients to zero by adding a penalty so that smaller values of <span class="math inline">\(b_j\)</span> are preferred. Note: the shrinkage does not apply to the intercept! The minimization quantities for ridge regression and lasso are extremely similar: ridge regression constrains the sum of the squared coefficients; lasso constrains the sum of the absolute coefficients. [As with ridge regression, we use standardized variables in modeling.]</p>
+</div>
+<div id="lasso-visually" class="section level3" number="14.4.2">
+<h3>
+<span class="header-section-number">14.4.2</span> Lasso visually<a class="anchor" aria-label="anchor" href="#lasso-visually"><i class="fas fa-link"></i></a>
+</h3>
+<p>As with ridge regression Lasso is also typically applied to situations with many many variables (also to avoid multicollinearity). It doesn’t make sense to apply it to a situation with only one or two variables. However, we will demonstrate the process visually with p=3 dimensions because it is difficult to visualize in higher dimensions. Notice here that there is a very good chance for the red contours to hit the turquoise square at a corner (producing some coefficients to be estimated as zero). The corner effect becomes more extreme in higher dimensions.</p>
+<p>The lasso coefficient estimates solve the following optimization problem:</p>
+<p><span class="math display">\[ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} |b_j| \leq s\]</span></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-8"></span>
+<img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265"><p class="caption">
+Figure 6.3: The red contours represent pairs of <span class="math inline">\(eta\)</span> coefficients that produce constant values for SSE on the data. The blue square represents the possible values of <span class="math inline">\(eta\)</span> given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR
+</p>
+</div>
+<p>The key to lasso (in contrast to ridge regression) is that it does variable selection by shrinking the coefficients all the way to zero. We say that the lasso yields <em>sparse</em> models - that is, only a subset of the original variables will be retained in the final model.</p>
+</div>
+<div id="how-do-you-choose-lambda-1" class="section level3" number="14.4.3">
+<h3>
+<span class="header-section-number">14.4.3</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>Note that <span class="math inline">\(\lambda\)</span> is a function of the data, and therefore a random variable to estimate (just like estimating the coefficients). However, we can use diagnostic measures to give a sense of <span class="math inline">\(\lambda\)</span> values which will give a good variance-bias trade-off.</p>
+<ol style="list-style-type: decimal">
+<li>Split data into test and training, and plot test MSE as a function of <span class="math inline">\(\lambda\)</span>.<br>
+</li>
+<li>Actually cross validate the data (remove test samples in groups of, say 1/10, to see which <span class="math inline">\(\lambda\)</span> gives the best predictions on “new” data) and find <span class="math inline">\(\lambda\)</span> which gives the smallest MSE for the cross validated data.</li>
+</ol>
+</div>
+</div>
+<div id="ridge-regression-vs.-lasso" class="section level2" number="14.5">
+<h2>
+<span class="header-section-number">14.5</span> Ridge Regression vs. Lasso<a class="anchor" aria-label="anchor" href="#ridge-regression-vs.-lasso"><i class="fas fa-link"></i></a>
+</h2>
+<p>Quote from <em>An Introduction to Statistical Learning</em>, V2, page 246.</p>
+<blockquote>
+<p>These two examples illustrate that neither ridge regression nor the lasso will universally dominate the other. In general, one might expect the lasso to perform better in a setting where a relatively small number of predictors have substantial coefficients, and the remaining predictors have coefficients that are very small or that equal zero. Ridge regression will perform better when the response is a function of many predictors, all with coefficients of roughly equal size. However, the number of predictors that is related to the response is never known a priori for real data sets. A technique such as cross-validation can be used in order to determine which approach is better on a particular data set.</p>
+</blockquote>
+<blockquote>
+<p>As with ridge regression, when the least squares estimates have excessively high variance, the lasso solution can yield a reduction in variance at the expense of a small increase in bias, and consequently can generate more accurate predictions. Unlike ridge regression, the lasso performs variable selection, and hence results in models that are easier to interpret.</p>
+</blockquote>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-10-1"></span>
+<img src="figs/fig68RRwins.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="649"><p class="caption">
+Figure 14.1: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-10-2"></span>
+<img src="figs/fig69lassowins.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="652"><p class="caption">
+Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
+</p>
+</div>
+</div>
+<div id="elastic-net" class="section level2" number="14.6">
+<h2>
+<span class="header-section-number">14.6</span> Elastic Net<a class="anchor" aria-label="anchor" href="#elastic-net"><i class="fas fa-link"></i></a>
+</h2>
+<p>It is also possible to combine ridge regression and lasso through what is called <em>elastic net regularization</em>. (The R package <strong>glmnet</strong> allows for the combined elastic net model.) The main idea is that the optimization contains both L-1 and L-2 penalties. The model may produce more stable estimates of the coefficients but requires and additional tuning parameter to estimate. That is, find the coefficients that minimize:</p>
+<p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \bigg[(1-\alpha)(\frac{1}{2})\sum_{j=1}^{p-1} b_j^2  + \alpha \sum_{j=1}^{p-1} |b_j| \bigg].\]</span></p>
+</div>
+<div id="reflection-questions-10" class="section level2" number="14.7">
+<h2>
+<span class="header-section-number">14.7</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-10"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>How do ridge regression coefficient estimates differ from OLS estimates? How are they similar?<br>
+</li>
+<li>How do Lasso coefficient estimates differ from OLS estimates? How are they similar?<br>
+</li>
+<li>What is the difference between ridge regression and Lasso?<br>
+</li>
+<li>What are some of the ways to find a good <span class="math inline">\(\lambda\)</span> for ridge regression?<br>
+</li>
+<li>Why does the 1-norm regularization yield “sparse” solutions? (What does “sparse” mean?)<br>
+</li>
+<li>Give two different situations when ridge regression or Lasso are particularly appropriate.</li>
+</ol>
+</div>
+<div id="ethics-considerations-9" class="section level2" number="14.8">
+<h2>
+<span class="header-section-number">14.8</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-9"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="r-ridge-regression-and-lasso" class="section level2" number="14.9">
+<h2>
+<span class="header-section-number">14.9</span> R: Ridge Regression and Lasso<a class="anchor" aria-label="anchor" href="#r-ridge-regression-and-lasso"><i class="fas fa-link"></i></a>
+</h2>
+<p>% – look at the R plots that help us interpret the model, coefficients, and choice of <span class="math inline">\(\lambda\)</span></p>
+<p>%\begin{verbatim}
+%fit &lt;- lm.ridge(lpsa~.,prostate,lambda=seq(0,50,by=0.1))
+%R (unlike SAS, unfortunately) also provides the GCV criterion for each ?:
+%fit$GCV
+%\end{verbatim}</p>
 
+</div>
 </div>
   <div class="chapter-nav">
 <div class="prev"><a href="standardized-multiple-regression.html"><span class="header-section-number">13</span> Standardized Multiple Regression</a></div>
 <div class="next"><a href="smooth.html"><span class="header-section-number">15</span> Smoothing Methods</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
-      <ul class="nav navbar-nav"><li><a class="nav-link" href="#shrink"><span class="header-section-number">14</span> Shrinkage Methods</a></li></ul>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#shrink"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
+<li><a class="nav-link" href="#on-inverting-matrices"><span class="header-section-number">14.1</span> On Inverting Matrices</a></li>
+<li>
+<a class="nav-link" href="#ridge-regression"><span class="header-section-number">14.2</span> Ridge Regression</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-ridge-regression-solution"><span class="header-section-number">14.2.1</span> The Ridge Regression Solution</a></li>
+<li><a class="nav-link" href="#ridge-regression-visually"><span class="header-section-number">14.2.2</span> Ridge Regression visually</a></li>
+<li><a class="nav-link" href="#why-ridge-regression"><span class="header-section-number">14.2.3</span> Why Ridge Regression?</a></li>
+<li><a class="nav-link" href="#inference-on-ridge-regression-coefficients"><span class="header-section-number">14.2.4</span> Inference on Ridge Regression Coefficients</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#how-do-you-choose-lambda"><span class="header-section-number">14.3</span> How do you choose \(\lambda\)?</a></li>
+<li>
+<a class="nav-link" href="#lasso"><span class="header-section-number">14.4</span> Lasso</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#lasso-coefficients"><span class="header-section-number">14.4.1</span> Lasso Coefficients</a></li>
+<li><a class="nav-link" href="#lasso-visually"><span class="header-section-number">14.4.2</span> Lasso visually</a></li>
+<li><a class="nav-link" href="#how-do-you-choose-lambda-1"><span class="header-section-number">14.4.3</span> How do you choose \(\lambda\)?</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#ridge-regression-vs.-lasso"><span class="header-section-number">14.5</span> Ridge Regression vs. Lasso</a></li>
+<li><a class="nav-link" href="#elastic-net"><span class="header-section-number">14.6</span> Elastic Net</a></li>
+<li><a class="nav-link" href="#reflection-questions-10"><span class="header-section-number">14.7</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-9"><span class="header-section-number">14.8</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-ridge-regression-and-lasso"><span class="header-section-number">14.9</span> R: Ridge Regression and Lasso</a></li>
+</ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
@@ -110,7 +357,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-03-31.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-04.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
