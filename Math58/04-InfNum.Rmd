@@ -209,6 +209,8 @@ It turns out that in *both* the setting where random samples are taken (e.g., NB
 SE_{\overline{X}_1 - \overline{X}_2} &=& ?????
 \end{eqnarray*}
 
+### Using the mathematical derivations
+
 In general, the math is done on the variance (which is just the squared standard deviations).
 \begin{eqnarray*}
 var(A - B) &=& var(A) + var(B)\\
@@ -262,9 +264,92 @@ df &=& n_1 + n_2 - 2
 \end{eqnarray*}
 -->
 
+### Randomization test
+
+Recall that if the observations are randomized we force the null hypothesis to be true and can generate a sampling distribution of the test statistic under $H_0$.  
+
+#### Example: stem cell therapy in sheep {-}
+
+Consider the research done in *The Lancet* ["Transplantation of cardiac-committed mouse embryonic stem cells to infarcted sheep myocardium: a preclinical study"](https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(05)67380-1/fulltext).  Does treatment using embryonic stem cells (ESCs) help improve heart function following a heart attack?  Each of these sheep was randomly assigned to the ESC or control group, and the change in their hearts’ pumping capacity was measured in the study. 
+
+```{r}
+library(openintro)
+data(stem_cell)
+stem_cell <- stem_cell %>%
+  mutate(change = after - before)
+```
+
+
+We can use the tools from the **infer** package to do a *randomization test*.  Note that the null hypothesis here will be that the variables are independent (i.e., knowledge of the treatment group will not change the information on the change in heart pumping capacity).
+
+```{r}
+library(infer)
+
+# calculate the observed statistic
+heart_obs <- stem_cell %>%
+  specify(change ~ trmt) %>%
+  calculate(stat = "diff in means", order = c("esc", "ctrl"))
+heart_obs
+
+# generate the null sampling distribution
+null_dist <- stem_cell %>%
+  specify(change ~ trmt) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("esc", "ctrl"))
+
+# visualize the observed statistic and null distribution
+visualize(null_dist) + 
+  shade_p_value(heart_obs, direction = "greater")
+
+null_dist %>%
+  get_p_value(heart_obs, direction = "greater")
+```
+
+The p-value is virtually zero.  Which is to say that if the null hypothesis is true, we would not have seen data like that which was observed.  The result leads to rejecting the null hypothesis and claiming that there is a difference in average heart pumping capacity in the stem cell group versus the control.
+
+### Bootstrap Confidence Interval
+
+Bootstrapping mimics sampling from the original population, so the null hypothesis is not forced to be true.  Now, for each bootstrap sample (each of the same size as each of the original groups), sample with replacement from each of the original groups.  The resulting distribution gives the shape and spread of the sampling distribution of the statistic (difference in means).
+
+#### Example: stem cell therapy in sheep (cont) {-}
+
+Consider the same stem cell study in sheet.  We can use the tools from the **infer** package to do a *bootstrap confidence interval*.  Note that there is no longer a null hypothesis specified.
+
+```{r}
+library(infer)
+
+# calculate the observed statistic
+heart_obs <- stem_cell %>%
+  specify(change ~ trmt) %>%
+  calculate(stat = "diff in means", order = c("esc", "ctrl"))
+heart_obs
+
+# generate the bootstarp sampling distribution
+boot_dist <- stem_cell %>%
+  specify(change ~ trmt) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "diff in means", order = c("esc", "ctrl"))
+
+heart_ci <- boot_dist %>%
+  get_confidence_interval(point_estimate = heart_obs,
+                          level = 0.95,
+                          type = "percentile")
+heart_ci
+
+# visualize the observed statistic and bootstrap distribution
+visualize(boot_dist) + 
+  shade_ci(heart_ci)
+
+```
+
+We are 95% confident that the change in heart pumping capacity is between 4.3 and 11.9 larger for the stem cell group than the control.  (I think the variable measured is "eft-ventricular ejection fraction deteriorated".)
+
+
+
 ## Comparing two paired means {#mean2infpair}
 
-We won't cover paired means in Spring 2021
+Paired observations (e.g., a "before" and an "after") will be treated as a **single** measurement (i.e., the difference between the two measurements).  As the difference is a single measurement, the analysis tools will be identical to those in Section \@ref(sec:mean1inf), Inference for a Single Mean, $\mu$
 
 ## ANOVA {#ANOVA}
 
