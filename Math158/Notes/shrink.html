@@ -115,6 +115,7 @@
 <h2>
 <span class="header-section-number">14.2</span> Ridge Regression<a class="anchor" aria-label="anchor" href="#ridge-regression"><i class="fas fa-link"></i></a>
 </h2>
+<p>An excellent discussion of Ridge Regression is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
 <p>Recall that the OLS (ordinary least squares) technique minimizes the distance between the observed and predicted values of the response. That is, we found the <span class="math inline">\(b_0, b_1, \ldots b_{p-1}\)</span> that minimize:
 <span class="math display">\[SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2.\]</span></p>
 <p>Using the OLS algorithm for modeling, the values of <span class="math inline">\(b_i\)</span> give the exact same model as the model built using the standardized variables which produce <span class="math inline">\(b_i^*\)</span>. However, as you will see, it is important to <strong>standardize all variables before running ridge regression</strong>.</p>
@@ -122,8 +123,9 @@
 <p>The ridge regression coefficients are calculated in a similar way to OLS, but the optimization equation seeks to minimize:</p>
 <p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \sum_{j=1}^{p-1} b_j^2 = SSE + \lambda \sum_{j=1}^{p-1} b_j^2\]</span>
 where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parameter</em>, to be determined separately. The ridge regression optimization provides a trade-off between two different criteria: variance and bias. As with OLS, ridge regression seeks to find coefficients that fit the data well (minimize SSE!). Additionally, ridge regression shrinks the coefficients to zero by adding a penalty so that smaller values of <span class="math inline">\(b_j\)</span> are preferred - the shrinkage makes the estimates less variable. It can be proved that there is always a <span class="math inline">\(\lambda \ne 0\)</span> which gives smaller E[MSE] than OLS. Note: the shrinkage does not apply to the intercept!</p>
-<p>Note: the Gauss-Markov theorem says that OLS solutions are the best (i.e., smallest variance) linear unbiased estimates (BLUE). But if we add a bit of bias, we can do better. There is an existence theory that says:
-<span class="math display">\[ \exists \ \  \lambda \mbox{ such that } E[MSE_{RR}] &lt; E[MSE_{OLS}].\]</span></p>
+<p>Note: the Gauss-Markov theorem says that OLS solutions are the best (i.e., smallest variance) linear unbiased estimates (BLUE). But if we add a bit of bias, we can do better. There is an existence theorem <span class="citation">(<a href="references.html#ref-rr_wins" role="doc-biblioref">Theobald 1974</a>)</span> that says:
+<span class="math display">\[ \exists \ \  \lambda \mbox{ such that } E[MSE_{RR}] &lt; E[MSE_{OLS}].\]</span>
+Excellent description of the theory is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
 <div id="the-ridge-regression-solution" class="section level3" number="14.2.1">
 <h3>
 <span class="header-section-number">14.2.1</span> The Ridge Regression Solution<a class="anchor" aria-label="anchor" href="#the-ridge-regression-solution"><i class="fas fa-link"></i></a>
@@ -132,10 +134,14 @@ where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parame
 \mbox{OLS: } \underline{b} &amp;=&amp; (X^t X)^{-1} X^t \underline{Y}\\
 \mbox{ridge regression: } \underline{b} &amp;=&amp; (X^t X + \lambda \mathtt{I})^{-1} X^t \underline{Y}\\
 \end{eqnarray*}\]</span></p>
-<p><strong>Notes:</strong><br>
-* The tuning parameter <span class="math inline">\(\lambda\)</span> balances the effect of the two different criteria in the optimization equation. When <span class="math inline">\(\lambda=0\)</span>, ridge regression is reduced to OLS. As <span class="math inline">\(\lambda \rightarrow \infty\)</span>, the coefficient estimates will shrink to zero.<br>
-* We have assumed that the variables have been centered to have mean zero before ridge regression is performed. Therefore, the estimated intercept will be <span class="math display">\[b_0 = \overline{Y} = \frac{1}{n} \sum_i Y_i \ \ \ \ \ \ (= 0 \mbox{ if $Y$ is also centered}) \]</span><br>
-* Note that the ridge regression optimization above is a constrained optimization equation, solved by Lagrange multipliers. That is, we minimize <span class="math inline">\(SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2\)</span> subject to <span class="math inline">\(\sum_{j=1}^{p-1} b_j^2 \leq s\)</span> for some value of <span class="math inline">\(s\)</span>. Note that <span class="math inline">\(s\)</span> is inversely related to <span class="math inline">\(\lambda\)</span>.</p>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>The tuning parameter <span class="math inline">\(\lambda\)</span> balances the effect of the two different criteria in the optimization equation. When <span class="math inline">\(\lambda=0\)</span>, ridge regression is reduced to OLS. As <span class="math inline">\(\lambda \rightarrow \infty\)</span>, the coefficient estimates will shrink to zero.<br>
+</li>
+<li>We have assumed that the variables have been centered to have mean zero before ridge regression is performed. Therefore, the estimated intercept will be <span class="math display">\[b_0 = \overline{Y} = \frac{1}{n} \sum_i Y_i \ \ \ \ \ \ (= 0 \mbox{ if $Y$ is also centered}) \]</span><br>
+</li>
+<li>Note that the ridge regression optimization above is a constrained optimization equation, solved by Lagrange multipliers. That is, we minimize <span class="math inline">\(SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2\)</span> subject to <span class="math inline">\(\sum_{j=1}^{p-1} b_j^2 \leq s\)</span> for some value of <span class="math inline">\(s\)</span>. Note that <span class="math inline">\(s\)</span> is inversely related to <span class="math inline">\(\lambda\)</span>.</li>
+</ul>
 </div>
 <div id="ridge-regression-visually" class="section level3" number="14.2.2">
 <h3>
@@ -144,6 +150,12 @@ where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parame
 <p>Ridge regression is typically applied to situations with many many variables. In particular, ridge regression will help us avoid situations of multicollinearity. It doesn’t make sense to apply it to a situation with only one or two variables. However, we will demonstrate the process visually with <span class="math inline">\(p=3\)</span> dimensions because it is difficult to visualize in higher dimensions.</p>
 <p>The ridge regression coefficient estimates solve the following optimization problem:</p>
 <p><span class="math display">\[ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} b_j^2 \leq s\]</span></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-5"></span>
+<img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265"><p class="caption">
+Figure 6.1: The red contours represent pairs of <span class="math inline">\(eta\)</span> coefficients that produce constant values for SSE on the data. The blue circle represents the possible values of <span class="math inline">\(eta\)</span> given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR
+</p>
+</div>
 </div>
 <div id="why-ridge-regression" class="section level3" number="14.2.3">
 <h3>
@@ -154,16 +166,10 @@ where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parame
 <div id="why-is-ridge-regression-better-than-least-squares" class="section level4 unnumbered">
 <h4>Why is ridge regression better than least squares?<a class="anchor" aria-label="anchor" href="#why-is-ridge-regression-better-than-least-squares"><i class="fas fa-link"></i></a>
 </h4>
-<p>The advantage is apparent in the bias-variance trade-off. As <span class="math inline">\(\lambda\)</span> increases, the flexibility of the ridge regression fit decreases. This leads to decrease variance, with a smaller increase in bias. Regular OLS regression is fixed with high variance, but no bias. However, the lowest test MSE tends to occur at the intercept between variance and bias. Thus, by properly tuning <span class="math inline">\(\lambda\)</span> and acquiring less variance at the cost of a small amount of bias, we can find a lower potential MSE.</p>
+<p>The advantage is apparent in the bias-variance trade-off. As <span class="math inline">\(\lambda\)</span> increases, the flexibility of the ridge regression fit decreases. This leads to decrease variance, with a smaller increase in bias. Regular OLS regression is fixed with high variance, but no bias. However, the lowest test MSE tends to occur at a balance between variance and bias. Thus, by properly tuning <span class="math inline">\(\lambda\)</span> and acquiring less variance at the cost of a small amount of bias, we can find a lower potential MSE.</p>
 <blockquote>
 <p>Ridge regression works best in situations for least squares estimates have high variance. Ridge regression is also much more computationally efficient that any subset method, since it is possible to simultaneously solve for all values of <span class="math inline">\(\lambda\)</span>.</p>
 </blockquote>
-<div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-5"></span>
-<img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265"><p class="caption">
-Figure 6.1: The red contours represent pairs of <span class="math inline">\(eta\)</span> coefficients that produce constant values for SSE on the data. The blue circle represents the possible values of <span class="math inline">\(eta\)</span> given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR
-</p>
-</div>
 </div>
 </div>
 <div id="inference-on-ridge-regression-coefficients" class="section level3" number="14.2.4">
@@ -190,15 +196,14 @@ Figure 6.1: The red contours represent pairs of <span class="math inline">\(eta\
 <p><strong>Cross Validating to Find <span class="math inline">\(\lambda\)</span></strong></p>
 <hr>
 <ol style="list-style-type: decimal">
-<li>Set <span class="math inline">\(\lambda\)</span> (e.g., try <span class="math inline">\(\lambda\)</span> between <span class="math inline">\(10^{-2}\)</span> and <span class="math inline">\(10^{5}\)</span>: <code>lambda.grid = 10^seq(5,-2, length =100)</code>)</li>
-</ol>
+<li>Set <span class="math inline">\(\lambda\)</span> (e.g., try <span class="math inline">\(\lambda\)</span> between <span class="math inline">\(10^{-2}\)</span> and <span class="math inline">\(10^{5}\)</span>: <code>lambda.grid = 10^seq(5,-2, length =100)</code>)
 <ol style="list-style-type: lower-alpha">
 <li>Remove 1/10 of the observations (partition the data into 10 groups).</li>
 <li>Find the RR / Lasso model using the remaining 90% of the observations and the given value of <span class="math inline">\(\lambda\)</span>.</li>
 <li>Predict the response value for the removed points given the 90% training values.</li>
 <li>Repeat (a) - (c) until every point has been predicted as a test value.</li>
 </ol>
-<ol start="2" style="list-style-type: decimal">
+</li>
 <li>Using the CV predictions, find <span class="math inline">\(MSE_\lambda\)</span> for the <span class="math inline">\(\lambda\)</span> at hand.</li>
 <li>Repeat steps 1 and 2 across the grid of <span class="math inline">\(\lambda\)</span> values.</li>
 <li>Choose the <span class="math inline">\(\lambda\)</span> value that minimizes the CV <span class="math inline">\(MSE_\lambda\)</span>.</li>
@@ -257,13 +262,13 @@ Figure 6.3: The red contours represent pairs of <span class="math inline">\(eta\
 </blockquote>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-10-1"></span>
-<img src="figs/fig68RRwins.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="649"><p class="caption">
+<img src="figs/fig68RRwins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="649"><p class="caption">
 Figure 14.1: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
 </p>
 </div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-10-2"></span>
-<img src="figs/fig69lassowins.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="652"><p class="caption">
+<img src="figs/fig69lassowins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="652"><p class="caption">
 Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
 </p>
 </div>
@@ -298,17 +303,366 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <span class="header-section-number">14.8</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-9"><i class="fas fa-link"></i></a>
 </h2>
 </div>
-<div id="r-ridge-regression-and-lasso" class="section level2" number="14.9">
+<div id="r-ridge-regression" class="section level2" number="14.9">
 <h2>
-<span class="header-section-number">14.9</span> R: Ridge Regression and Lasso<a class="anchor" aria-label="anchor" href="#r-ridge-regression-and-lasso"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.9</span> R: Ridge Regression<a class="anchor" aria-label="anchor" href="#r-ridge-regression"><i class="fas fa-link"></i></a>
 </h2>
-<p>% – look at the R plots that help us interpret the model, coefficients, and choice of <span class="math inline">\(\lambda\)</span></p>
-<p>%\begin{verbatim}
-%fit &lt;- lm.ridge(lpsa~.,prostate,lambda=seq(0,50,by=0.1))
-%R (unlike SAS, unfortunately) also provides the GCV criterion for each ?:
-%fit$GCV
-%\end{verbatim}</p>
+<div id="the-data-1" class="section level4 unnumbered">
+<h4>The Data<a class="anchor" aria-label="anchor" href="#the-data-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>The following dataset is from <a href="https://github.com/rfordatascience/tidytuesday">TidyTuesday</a>. Again, we explore the information from <a href="https://www.imdb.com/title/tt0386676/">The Office</a>. The analysis here is taken from <a href="https://juliasilge.com/blog/lasso-the-office/">Julia Silge’s blog</a>. She does a bit of data wrangling that I’m going to hide. Look through her blog, or see the <a href="https://github.com/hardin47/website/tree/gh-pages/Math158">source code</a> for this bookdown file.</p>
+<p>The dataset we will be working with has <code>imdb_rating</code> as the response variable. The predictor (explanatory) variables are: <code>season</code>, <code>episode</code> and 28 columns representing the number of lines of a particular character.</p>
+<div class="sourceCode" id="cb603"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">office</span></code></pre></div>
+<pre><code>## # A tibble: 136 × 32
+##    season episode episode_name       andy angela darryl dwight   jim kelly kevin
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;             &lt;int&gt;  &lt;int&gt;  &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+##  1      1       1 pilot                 0      1      0     29    36     0     1
+##  2      1       2 diversity day         0      4      0     17    25     2     8
+##  3      1       3 health care           0      5      0     62    42     0     6
+##  4      1       5 basketball            0      3     15     25    21     0     1
+##  5      1       6 hot girl              0      3      0     28    55     0     5
+##  6      2       1 dundies               0      1      1     32    32     7     1
+##  7      2       2 sexual harassment     0      2      9     11    16     0     6
+##  8      2       3 office olympics       0      6      0     55    55     0     9
+##  9      2       4 fire                  0     17      0     65    51     4     5
+## 10      2       5 halloween             0     13      0     33    30     3     2
+## # … with 126 more rows, and 22 more variables: michael &lt;int&gt;, oscar &lt;int&gt;,
+## #   pam &lt;int&gt;, phyllis &lt;int&gt;, ryan &lt;int&gt;, toby &lt;int&gt;, erin &lt;int&gt;, jan &lt;int&gt;,
+## #   ken_kwapis &lt;dbl&gt;, greg_daniels &lt;dbl&gt;, b_j_novak &lt;dbl&gt;,
+## #   paul_lieberstein &lt;dbl&gt;, mindy_kaling &lt;dbl&gt;, paul_feig &lt;dbl&gt;,
+## #   gene_stupnitsky &lt;dbl&gt;, lee_eisenberg &lt;dbl&gt;, jennifer_celotta &lt;dbl&gt;,
+## #   randall_einhorn &lt;dbl&gt;, brent_forrester &lt;dbl&gt;, jeffrey_blitz &lt;dbl&gt;,
+## #   justin_spitzer &lt;dbl&gt;, imdb_rating &lt;dbl&gt;</code></pre>
+<div class="sourceCode" id="cb605"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">office_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">office</span>, strata <span class="op">=</span> <span class="va">season</span><span class="op">)</span>
+<span class="va">office_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">office_split</span><span class="op">)</span>
+<span class="va">office_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">office_split</span><span class="op">)</span></code></pre></div>
+<p>The full linear model:</p>
+<div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">office_lm</span> <span class="op">&lt;-</span> <span class="va">office_train</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
 
+<span class="va">office_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 5
+##    term         estimate std.error statistic  p.value
+##    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)  7.18       0.243      29.6   2.66e-41
+##  2 season      -0.00779    0.0323     -0.241 8.10e- 1
+##  3 episode      0.0181     0.00574     3.14  2.44e- 3
+##  4 andy         0.00474    0.00302     1.57  1.21e- 1
+##  5 angela       0.00147    0.00524     0.280 7.81e- 1
+##  6 darryl       0.00538    0.00705     0.763 4.48e- 1
+##  7 dwight      -0.000885   0.00301    -0.294 7.70e- 1
+##  8 jim          0.00775    0.00296     2.61  1.10e- 2
+##  9 kelly       -0.0175     0.00961    -1.82  7.35e- 2
+## 10 kevin       -0.00170    0.00815    -0.209 8.35e- 1
+## # … with 21 more rows</code></pre>
+</div>
+<div id="what-if-n-is-small" class="section level4 unnumbered">
+<h4>What if <span class="math inline">\(n\)</span> is small?<a class="anchor" aria-label="anchor" href="#what-if-n-is-small"><i class="fas fa-link"></i></a>
+</h4>
+<p>No good! The coefficients cannot be estimated! (Here, 5 points were randomly selected, remember <span class="math inline">\(p = 31\)</span>.) The model breaks down because <span class="math inline">\((X^t X)^{-1}\)</span> is not invertible. Notice that only 5 coefficients are estimated and no SEs are estimated.</p>
+<div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
+<span class="va">office_train</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/slice.html">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 5
+##    term        estimate std.error statistic p.value
+##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)  7.64          NaN       NaN     NaN
+##  2 season      -0.116         NaN       NaN     NaN
+##  3 episode      0.0479        NaN       NaN     NaN
+##  4 andy        -0.00932       NaN       NaN     NaN
+##  5 angela       0.0323        NaN       NaN     NaN
+##  6 darryl      NA              NA        NA      NA
+##  7 dwight      NA              NA        NA      NA
+##  8 jim         NA              NA        NA      NA
+##  9 kelly       NA              NA        NA      NA
+## 10 kevin       NA              NA        NA      NA
+## # … with 21 more rows</code></pre>
+</div>
+<div id="ridge-regression-model-building" class="section level4 unnumbered">
+<h4>Ridge Regression model building<a class="anchor" aria-label="anchor" href="#ridge-regression-model-building"><i class="fas fa-link"></i></a>
+</h4>
+<p>The vignette for <strong>glmnet</strong> is at <a href="https://cran.r-project.org/web/packages/glmnet/vignettes/glmnet_beta.pdf" class="uri">https://cran.r-project.org/web/packages/glmnet/vignettes/glmnet_beta.pdf</a> and is very useful. <strong>glmnet</strong> will be used as the engine in the <strong>tidymodels</strong> process.</p>
+<p>By using a generalized <code>linear_reg()</code> function, <code>mixture = 0</code> specifies ridge regression and <code>mixture = 1</code> specifies Lasso regularization. The <code>mixture</code> parameter can be any number between zero and one (and then represents a model referred to as Elastic Net regularization). <code>penalty</code> will be a tuning parameter that is set later.</p>
+<div id="recipe" class="section level5 unnumbered">
+<h5>Recipe<a class="anchor" aria-label="anchor" href="#recipe"><i class="fas fa-link"></i></a>
+</h5>
+<p>First, a recipe needs to be specified. Note that the <code>episode_name</code> is not a predictor variable, and all the variables need to be normalized (particularly important to scale the variables).</p>
+<div class="sourceCode" id="cb610"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">office_rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">update_role</span><span class="op">(</span><span class="va">episode_name</span>, new_role <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">step_zv</span><span class="op">(</span><span class="fu">all_numeric</span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="fu">all_outcomes</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">step_normalize</span><span class="op">(</span><span class="fu">all_numeric</span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="fu">all_outcomes</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="specify-the-engine-fit" class="section level5 unnumbered">
+<h5>Specify the engine + fit<a class="anchor" aria-label="anchor" href="#specify-the-engine-fit"><i class="fas fa-link"></i></a>
+</h5>
+<p>If we set the penalty to be 47, the ridge regression has a straightforward (linear algebra) solution. The coefficients are given for the ridge regression model (and are substantially smaller than the linear regression coefficients, as expected).</p>
+<p><strong>Side note</strong> relevant to the code but not to the main ideas of the ridge regression.</p>
+<p>The constraint part can be specified in two different ways. (Can also be specified as <span class="math inline">\(\sum_{j=1}^{p-1}b_j^2 \leq c\)</span> for some <span class="math inline">\(c\)</span>, but we won’t use that construction here.)</p>
+<ol style="list-style-type: decimal">
+<li><p>Set <code>penalty = P</code> in: <span class="math display">\[\min(SSE + P)\]</span></p></li>
+<li><p>Set <span class="math inline">\(\lambda\)</span> in: <span class="math display">\[\min(SSE + \lambda\sum_{j=1}^{p-1}b_{j}^2)\]</span></p></li>
+</ol>
+<p>If <code>P=0</code> then <span class="math inline">\(\lambda\)</span> will also be zero (and the estimates will be the same as those from OLS). Additionally, <code>P</code> and <span class="math inline">\(\lambda\)</span> will be monotonically related. That is, a large <code>penalty</code> corresponds to a large value of <span class="math inline">\(\lambda.\)</span> That said, they are not functions of one another.</p>
+<div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_spec</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fl">47</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span>
+
+<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
+
+<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span></code></pre></div>
+<p>It turns out that <strong>glmnet</strong> fits the model for <em>all</em> values of <code>penalty</code> at once, so we can see the coefficients for any other value of <code>penalty</code> of interest. Notice that the coefficients are smaller for larger values of the <code>penalty</code>.</p>
+<div class="sourceCode" id="cb612"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 3
+##    term         estimate penalty
+##    &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)  8.37          47
+##  2 season      -0.000837      47
+##  3 episode      0.000915      47
+##  4 andy        -0.000123      47
+##  5 angela       0.00108       47
+##  6 darryl       0.000389      47
+##  7 dwight       0.00113       47
+##  8 jim          0.00189       47
+##  9 kelly        0.000277      47
+## 10 kevin        0.00110       47
+## # … with 21 more rows</code></pre>
+<div class="sourceCode" id="cb614"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 3
+##    term        estimate penalty
+##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)  8.37          0
+##  2 season      -0.0250        0
+##  3 episode      0.128         0
+##  4 andy         0.0811        0
+##  5 angela       0.0120        0
+##  6 darryl       0.0375        0
+##  7 dwight      -0.00887       0
+##  8 jim          0.127         0
+##  9 kelly       -0.0769        0
+## 10 kevin       -0.00452       0
+## # … with 21 more rows</code></pre>
+<p>We can visualize how the magnitude of the coefficients are regularized toward zero as the <code>penalty</code> goes up. (We won’t get into the relationship between <span class="math inline">\(\lambda\)</span> and <code>penalty</code>, they both penalize the magnitude of the coefficients, <code>penalty</code> can be specified <em>per</em> variable.)</p>
+<div class="sourceCode" id="cb616"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">extract_fit_engine</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span>xvar <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;"></div>
+<p>Prediction is done like other linear models. So if <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> is used with no other parameters, it will use <code>penalty = 47</code> as specified above:</p>
+<div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">ridge_fit</span>, new_data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 100 × 1
+##    .pred
+##    &lt;dbl&gt;
+##  1  8.37
+##  2  8.36
+##  3  8.37
+##  4  8.37
+##  5  8.36
+##  6  8.37
+##  7  8.37
+##  8  8.37
+##  9  8.37
+## 10  8.37
+## # … with 90 more rows</code></pre>
+</div>
+</div>
+<div id="normalizing-tuning-whole-process" class="section level4" number="14.9.0.1">
+<h4>
+<span class="header-section-number">14.9.0.1</span> Normalizing + Tuning + Whole Process<a class="anchor" aria-label="anchor" href="#normalizing-tuning-whole-process"><i class="fas fa-link"></i></a>
+</h4>
+<p>To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed.</p>
+<div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span></code></pre></div>
+<p>Next, a new <code>workflow()</code> which includes the new model/engine specification. Notice that we don’t need to set <code>measure = 0</code> here because it was only the <code>penalty</code> term which we designated to <code>tune()</code>.</p>
+<div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span>
+<span class="va">office_fold</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">office_train</span>, strata <span class="op">=</span> <span class="va">season</span><span class="op">)</span>
+  
+<span class="va">ridge_grid</span> <span class="op">&lt;-</span> <span class="fu">grid_regular</span><span class="op">(</span><span class="fu">penalty</span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+
+<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
+
+<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
+
+<span class="co"># this is the line that tunes the model using cross validation</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span>
+<span class="va">ridge_cv</span> <span class="op">&lt;-</span> <span class="fu">tune_grid</span><span class="op">(</span>
+  <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>,
+  resamples <span class="op">=</span> <span class="va">office_fold</span>,
+  grid <span class="op">=</span> <span class="va">ridge_grid</span>
+<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb621"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">ridge_cv</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/desc.html">desc</a></span><span class="op">(</span><span class="va">.metric</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 50 × 7
+##      penalty .metric .estimator  mean     n std_err .config              
+##        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+##  1 0.00001   rmse    standard   0.411    10  0.0294 Preprocessor1_Model01
+##  2 0.0000160 rmse    standard   0.411    10  0.0294 Preprocessor1_Model02
+##  3 0.0000256 rmse    standard   0.411    10  0.0294 Preprocessor1_Model03
+##  4 0.0000409 rmse    standard   0.411    10  0.0294 Preprocessor1_Model04
+##  5 0.0000655 rmse    standard   0.411    10  0.0294 Preprocessor1_Model05
+##  6 0.000105  rmse    standard   0.411    10  0.0294 Preprocessor1_Model06
+##  7 0.000168  rmse    standard   0.411    10  0.0294 Preprocessor1_Model07
+##  8 0.000268  rmse    standard   0.411    10  0.0294 Preprocessor1_Model08
+##  9 0.000429  rmse    standard   0.411    10  0.0294 Preprocessor1_Model09
+## 10 0.000687  rmse    standard   0.411    10  0.0294 Preprocessor1_Model10
+## # … with 40 more rows</code></pre>
+<p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
+<div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ridge_cv</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>
+    ymin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="va">std_err</span>,
+    ymax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="va">std_err</span><span class="op">)</span>,
+    alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"RMSE"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;"></div>
+<p>The best model can be chosen using <code>select_best()</code>.</p>
+<div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">best_rr</span> <span class="op">&lt;-</span> <span class="fu">select_best</span><span class="op">(</span><span class="va">ridge_cv</span>, metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span>
+<span class="va">best_rr</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##   penalty .config              
+##     &lt;dbl&gt; &lt;chr&gt;                
+## 1   0.193 Preprocessor1_Model22</code></pre>
+</div>
+<div id="the-final-ridge-model" class="section level4 unnumbered">
+<h4>The Final Ridge Model<a class="anchor" aria-label="anchor" href="#the-final-ridge-model"><i class="fas fa-link"></i></a>
+</h4>
+<p>Using the <span class="math inline">\(\lambda\)</span> value for the minimum MSE in the cross validation, we output the coefficients / model associated with the best <span class="math inline">\(\lambda\)</span> for the ridge regression model. <strong>Ridge regression does not do variable selection.</strong></p>
+<div class="sourceCode" id="cb626"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>, <span class="va">best_rr</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 3
+##    term        estimate penalty
+##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)   8.38     0.193
+##  2 season       -0.0344   0.193
+##  3 episode       0.0892   0.193
+##  4 andy         -0.0426   0.193
+##  5 angela        0.0787   0.193
+##  6 darryl        0.0220   0.193
+##  7 dwight        0.0141   0.193
+##  8 jim           0.0274   0.193
+##  9 kelly        -0.0730   0.193
+## 10 kevin         0.0389   0.193
+## # … with 21 more rows</code></pre>
+</div>
+</div>
+<div id="r-lasso-regularization" class="section level2" number="14.10">
+<h2>
+<span class="header-section-number">14.10</span> R: Lasso Regularization<a class="anchor" aria-label="anchor" href="#r-lasso-regularization"><i class="fas fa-link"></i></a>
+</h2>
+<p>In this section, we’ll re-run the cross validation to find a value of <span class="math inline">\(\lambda\)</span> which minimizes the cross validated MSE. To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed. Note that with Lasso, <code>mixture = 1</code>.</p>
+<div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lasso_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">1</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span></code></pre></div>
+<p>Next, a new <code>workflow()</code> which includes the new model/engine specification. Notice that we don’t need to set <code>measure = 0</code> here because it was only the <code>penalty</code> term which we designated to <code>tune()</code>.</p>
+<div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lasso_grid</span> <span class="op">&lt;-</span> <span class="fu">grid_regular</span><span class="op">(</span><span class="fu">penalty</span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+
+<span class="va">lasso_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
+
+<span class="va">lasso_fit</span> <span class="op">&lt;-</span> <span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
+
+<span class="co"># this is the line that tunes the model using cross validation</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span>
+<span class="va">lasso_cv</span> <span class="op">&lt;-</span> <span class="fu">tune_grid</span><span class="op">(</span>
+  <span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>,
+  resamples <span class="op">=</span> <span class="va">office_fold</span>,
+  grid <span class="op">=</span> <span class="va">lasso_grid</span>
+<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb630"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">lasso_cv</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/desc.html">desc</a></span><span class="op">(</span><span class="va">.metric</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 50 × 7
+##      penalty .metric .estimator  mean     n std_err .config              
+##        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+##  1 0.00001   rmse    standard   0.423    10  0.0318 Preprocessor1_Model01
+##  2 0.0000160 rmse    standard   0.423    10  0.0318 Preprocessor1_Model02
+##  3 0.0000256 rmse    standard   0.423    10  0.0318 Preprocessor1_Model03
+##  4 0.0000409 rmse    standard   0.423    10  0.0318 Preprocessor1_Model04
+##  5 0.0000655 rmse    standard   0.423    10  0.0318 Preprocessor1_Model05
+##  6 0.000105  rmse    standard   0.423    10  0.0318 Preprocessor1_Model06
+##  7 0.000168  rmse    standard   0.423    10  0.0318 Preprocessor1_Model07
+##  8 0.000268  rmse    standard   0.423    10  0.0318 Preprocessor1_Model08
+##  9 0.000429  rmse    standard   0.422    10  0.0316 Preprocessor1_Model09
+## 10 0.000687  rmse    standard   0.421    10  0.0314 Preprocessor1_Model10
+## # … with 40 more rows</code></pre>
+<p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
+<div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lasso_cv</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>
+    ymin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="va">std_err</span>,
+    ymax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="va">std_err</span><span class="op">)</span>,
+    alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"RMSE"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;"></div>
+<p>The best model can be chosen using <code>select_best()</code>.</p>
+<div class="sourceCode" id="cb633"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">best_lasso</span> <span class="op">&lt;-</span> <span class="fu">select_best</span><span class="op">(</span><span class="va">lasso_cv</span>, metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span>
+<span class="va">best_lasso</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##   penalty .config              
+##     &lt;dbl&gt; &lt;chr&gt;                
+## 1 0.00720 Preprocessor1_Model15</code></pre>
+<div id="the-final-lasso-model" class="section level4 unnumbered">
+<h4>The Final Lasso Model<a class="anchor" aria-label="anchor" href="#the-final-lasso-model"><i class="fas fa-link"></i></a>
+</h4>
+<p>Using the <span class="math inline">\(\lambda\)</span> value for the minimum MSE in the cross validation, we output the coefficients / model associated with the best <span class="math inline">\(\lambda\)</span> for the ridge regression model. <strong>Lasso regularization DOES do variable selection.</strong> Note the large number of coefficients that are set to zero.</p>
+<div class="sourceCode" id="cb635"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>, <span class="va">best_lasso</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 31 × 3
+##    term        estimate penalty
+##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
+##  1 (Intercept)  8.38    0.00720
+##  2 season       0       0.00720
+##  3 episode      0.157   0.00720
+##  4 andy        -0.0739  0.00720
+##  5 angela       0.231   0.00720
+##  6 darryl       0.0663  0.00720
+##  7 dwight      -0.0721  0.00720
+##  8 jim         -0.00866 0.00720
+##  9 kelly       -0.167   0.00720
+## 10 kevin        0       0.00720
+## # … with 21 more rows</code></pre>
+
+</div>
 </div>
 </div>
   <div class="chapter-nav">
@@ -339,7 +693,8 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <li><a class="nav-link" href="#elastic-net"><span class="header-section-number">14.6</span> Elastic Net</a></li>
 <li><a class="nav-link" href="#reflection-questions-10"><span class="header-section-number">14.7</span>  Reflection Questions</a></li>
 <li><a class="nav-link" href="#ethics-considerations-9"><span class="header-section-number">14.8</span>  Ethics Considerations</a></li>
-<li><a class="nav-link" href="#r-ridge-regression-and-lasso"><span class="header-section-number">14.9</span> R: Ridge Regression and Lasso</a></li>
+<li><a class="nav-link" href="#r-ridge-regression"><span class="header-section-number">14.9</span> R: Ridge Regression</a></li>
+<li><a class="nav-link" href="#r-lasso-regularization"><span class="header-section-number">14.10</span> R: Lasso Regularization</a></li>
 </ul>
 
       <div class="book-extra">
@@ -357,7 +712,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-04.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-06.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
