@@ -249,6 +249,7 @@ office
 ```
 
 ```r
+set.seed(47)
 office_split <- initial_split(office, strata = season)
 office_train <- training(office_split)
 office_test <- testing(office_split)
@@ -285,7 +286,7 @@ office_lm %>% tidy()
 ## # … with 21 more rows
 ```
 
-#### What if $n$ is small? {-}
+#### What if $n$ is really small? {-}
 
 
 No good!  The coefficients cannot be estimated!  (Here, 5 points were randomly selected, remember $p = 31$.)  The model breaks down because $(X^t X)^{-1}$ is not invertible.  Notice that only 5 coefficients are estimated and no SEs are estimated.
@@ -488,23 +489,23 @@ ridge_cv <- tune_grid(
 ```r
 collect_metrics(ridge_cv) %>%
   filter(.metric == "rmse") %>%
-  arrange(desc(.metric))
+  arrange(mean)
 ```
 
 ```
 ## # A tibble: 50 × 7
 ##      penalty .metric .estimator  mean     n std_err .config              
 ##        <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-##  1 0.00001   rmse    standard   0.411    10  0.0294 Preprocessor1_Model01
-##  2 0.0000160 rmse    standard   0.411    10  0.0294 Preprocessor1_Model02
-##  3 0.0000256 rmse    standard   0.411    10  0.0294 Preprocessor1_Model03
-##  4 0.0000409 rmse    standard   0.411    10  0.0294 Preprocessor1_Model04
-##  5 0.0000655 rmse    standard   0.411    10  0.0294 Preprocessor1_Model05
-##  6 0.000105  rmse    standard   0.411    10  0.0294 Preprocessor1_Model06
-##  7 0.000168  rmse    standard   0.411    10  0.0294 Preprocessor1_Model07
-##  8 0.000268  rmse    standard   0.411    10  0.0294 Preprocessor1_Model08
-##  9 0.000429  rmse    standard   0.411    10  0.0294 Preprocessor1_Model09
-## 10 0.000687  rmse    standard   0.411    10  0.0294 Preprocessor1_Model10
+##  1 0.193     rmse    standard   0.395    10  0.0236 Preprocessor1_Model22
+##  2 0.121     rmse    standard   0.396    10  0.0245 Preprocessor1_Model21
+##  3 0.309     rmse    standard   0.396    10  0.0235 Preprocessor1_Model23
+##  4 0.0754    rmse    standard   0.399    10  0.0258 Preprocessor1_Model20
+##  5 0.494     rmse    standard   0.400    10  0.0243 Preprocessor1_Model24
+##  6 0.0471    rmse    standard   0.403    10  0.0273 Preprocessor1_Model19
+##  7 0.791     rmse    standard   0.407    10  0.0258 Preprocessor1_Model25
+##  8 0.0295    rmse    standard   0.408    10  0.0286 Preprocessor1_Model18
+##  9 0.00001   rmse    standard   0.411    10  0.0294 Preprocessor1_Model01
+## 10 0.0000160 rmse    standard   0.411    10  0.0294 Preprocessor1_Model02
 ## # … with 40 more rows
 ```
 
@@ -520,8 +521,7 @@ ridge_cv %>%
     ymax = mean + std_err),
     alpha = 0.5) + 
   geom_line(size = 1.5) + 
-  scale_x_log10() +
-  ylab("RMSE")
+  scale_x_log10() 
 ```
 
 <img src="05-shrink_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />

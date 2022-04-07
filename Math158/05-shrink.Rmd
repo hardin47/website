@@ -311,6 +311,7 @@ The dataset we will be working with has `imdb_rating` as the response variable. 
 ```{r}
 office
 
+set.seed(47)
 office_split <- initial_split(office, strata = season)
 office_train <- training(office_split)
 office_test <- testing(office_split)
@@ -329,7 +330,7 @@ office_lm <- office_train %>%
 office_lm %>% tidy()
 ```
 
-#### What if $n$ is small? {-}
+#### What if $n$ is really small? {-}
 
 
 No good!  The coefficients cannot be estimated!  (Here, 5 points were randomly selected, remember $p = 31$.)  The model breaks down because $(X^t X)^{-1}$ is not invertible.  Notice that only 5 coefficients are estimated and no SEs are estimated.
@@ -450,7 +451,7 @@ ridge_cv <- tune_grid(
 ```{r}
 collect_metrics(ridge_cv) %>%
   filter(.metric == "rmse") %>%
-  arrange(desc(.metric))
+  arrange(mean)
 ```
 
 Interestingly, as the penalty grows, the coefficients all get close to zero.  So the prediction will be the same for all observations (prediction will be $\overline{Y}$).  When the predictions are all the same, the computation for $R^2$ is NA.
@@ -464,8 +465,7 @@ ridge_cv %>%
     ymax = mean + std_err),
     alpha = 0.5) + 
   geom_line(size = 1.5) + 
-  scale_x_log10() +
-  ylab("RMSE")
+  scale_x_log10() 
 ```
 
 
