@@ -473,12 +473,12 @@ Cuckoo %>%
 
 The key to understanding ANOVA is to breaking down the variability into two different pieces.  The first is the variability within each separate group.  Sometimes it is referred to as the variability of the residuals (left over after the groups are formed).  The second is the variability across the different groups.
 
-**mean square treatment**
-The mean square treatment of ANOVA represents variation among the means of the treatment groups as compared to the overall mean.  It should be similar to error mean square if the population means are equal.
+**mean square between groups**
+The mean square between groups (sometimes called mean square treatment, MST) of ANOVA represents variation between the means of the treatment groups as compared to the overall mean.  It should be similar to error mean square if the population means are equal.
 
 $$
 \begin{align*}
-MST &= \frac{\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2}{I-1}\\
+MSG &= \frac{\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2}{I-1}\\
 \overline{x} &= \frac{\sum_{i=1}^I n_i \overline{x}_i}{N}\\
 \end{align*}
 $$
@@ -497,9 +497,9 @@ $$
 
 ### ANOVA F-test
 
-Under the null hypothesis that the population means of all the groups are the same, the value for $MST$ should be similar to the value for $MSE$.  Regardless of the null hypothesis, $MSE$ will always be a good measure of the within group variability.  If the groups are really different, $MST$ will overestimate the within group variability.  Under $H_0$:
+Under the null hypothesis that the population means of all the groups are the same, the value for $MSG$ should be similar to the value for $MSE$.  Regardless of the null hypothesis, $MSE$ will always be a good measure of the within group variability.  If the groups are really different, $MSG$ will overestimate the within group variability.  Under $H_0$:
 
-$$F = \frac{MST}{MSE} \sim F_{I-1, N-I}$$
+$$F = \frac{MSG}{MSE} \sim F_{I-1, N-I}$$
 
 If, in fact, the population means are different, $F$ will be much larger than expected from the  null sampling distribution.
 
@@ -514,7 +514,7 @@ An ANOVA table summarizes the F-test above (and more: see Math 158, a whole clas
 
 | Source    | SS                                                   | df    | MS    | F                 | p                          |
 |-----------|------------------------------------------------------|-------|-------|-------------------|----------------------------|
-| treatment | $\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2$ | $I-1$ | $MST$ | $\frac{MST}{MSE}$ | $P(F_{I-1, N-I} \geq F)$ |
+| groups | $\sum_{i=1}^I n_i (\overline{x}_i - \overline{x})^2$ | $I-1$ | $MSG$ | $\frac{MSG}{MSE}$ | $P(F_{I-1, N-I} \geq F)$ |
 | error | $\sum_{i=1}^I s_i^2(n_i -1)$  | $n-I$ | $MSE$ |  | |
 | Total | $\sum_{i=1}^I \sum_{j=1}^{n_i} (x_{ij} - \overline{x})^2$| $n-1$ | | |  |
 
