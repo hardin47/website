@@ -58,7 +58,7 @@ Let $\hat{Y}_{i(i)}$ represent the predicted value for the $i^{th}$ observation 
 d_i &=& Y_i - \hat{Y}_{i(i)} \ \ \ \ \mbox{ deleted residuals}\\
 &=& \frac{e_i}{(1-h_{ii})} \mbox{,  where  } e_i = Y_i - \hat{Y}_i \ \ \ \ \mbox{ not obvious, see text}\\
 se^2(d_i) &=& MSE_{(i)} \cdot (1 + X_i^t (X_{(i)}^t X_{(i)})^{-1} X_i) \ \ \ \mbox{recall:  } se^2(\hat{Y}_{h(new)}) = MSE \cdot (1+ X_h^t (X^t X)^{-1} X_h)\\
-&=& \frac{MSE_{(i)}}\cdot {(1-h_{ii})} \ \ \ \ \mbox{ not obvious, see text}\\
+&=& \frac{MSE_{(i)}}{(1-h_{ii})} \ \ \ \ \mbox{ not obvious, see text}\\
 &&\\
 t_i &=& \frac{d_i}{se(d_i)} = \frac{e_i}{\sqrt{MSE_{(i)}(1-h_{ii})}} \sim t_{n-1-p}  \ \ \mbox{ studentized deleted residuals}\\
 \end{eqnarray*}
@@ -176,8 +176,7 @@ That is, the standard error is a function of MSE (the total variability around t
 
 
 
-## A Strategy for Dealing with Problematic Data Points^[
-Taken from https://online.stat.psu.edu/stat501/lesson/11/11.7]
+## A Strategy for Dealing with Problematic Data Points^[Taken from https://online.stat.psu.edu/stat501/lesson/11/11.7]
 
 
 1. First, check for obvious data errors:
