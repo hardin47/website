@@ -442,7 +442,7 @@ Paired observations (e.g., a "before" and an "after") will be treated as a **sin
 It might seem like a misnomer at first, an **AN**alysis **O**f **VA**riance (ANOVA) test is actually a test of equality of means.  That is, we extend the two sample t-test to more than two samples.  The ANOVA hypotheses will always be of the form:
 
 \begin{eqnarray*}
-H_0:&& \mu_1 = \mu_2 = \cdots = \mu_k\\
+H_0:&& \mu_1 = \mu_2 = \cdots = \mu_I\\
 H_A:&& \mbox{not } H_0
 \end{eqnarray*}
 
