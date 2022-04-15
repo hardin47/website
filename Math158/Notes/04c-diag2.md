@@ -72,7 +72,7 @@ t_i &=& \frac{d_i}{se(d_i)} = \frac{e_i}{\sqrt{MSE_{(i)}(1-h_{ii})}} \sim t_{n-1
 We identify as outlying $Y$ observations those cases whose studentized deleted residuals are large in absolute value. In addition, we can conduct a formal test by means of the Bonferroni test procedure of whether the case with the largest absolute studentized deleted residual is an outlier. Since we do not know in advance which case will have the largest absolute value $|t_i|$, we consider the family of tests to include $n$ tests, one
 for each case.
 
-If the regression model is appropriate, so that no case is outlying because of a change in the model, then each studentized deleted residual will follow the $t-$distribution with $n-p-1$ degrees of freedom. The appropriate Bonferroni critical value therefore is $t(l - \alpha/2n; n - p - 1)$. Note that the test is two-sided since we are not concerned with the direction of the residuals but only with their absolute values.
+If the regression model is appropriate, so that no case is outlying because of a change in the model, then each studentized deleted residual will follow the $t-$distribution with $n-p-1$ degrees of freedom. The appropriate Bonferroni critical value therefore is $t_{(1 - \alpha/2n; n - p - 1)}$. Note that the test is two-sided since we are not concerned with the direction of the residuals but only with their absolute values.
 
 
 
