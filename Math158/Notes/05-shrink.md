@@ -78,7 +78,7 @@ $$ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij
 
 <div class="figure" style="text-align: center">
 <img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265" />
-<p class="caption">(\#fig:unnamed-chunk-5)The red contours represent pairs of $eta$ coefficients that produce constant values for SSE on the data.  The blue circle represents the possible values of $eta$ given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR</p>
+<p class="caption">(\#fig:unnamed-chunk-5)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue circle represents the possible values of $\beta$ given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR</p>
 </div>
 
 ### Why Ridge Regression?
@@ -148,15 +148,15 @@ where $\lambda \geq 0$ is a *tuning parameter*, to be determined separately.  As
 
 ### Lasso visually
 
-As with ridge regression Lasso is also typically applied to situations with many many variables (also to avoid multicollinearity).  It doesn't make sense to apply it to a situation with only one or two variables.  However, we will demonstrate the process visually with p=3 dimensions because it is difficult to visualize in higher dimensions.  Notice here that there is a very good chance for the red contours to hit the turquoise square at a corner (producing some coefficients to be estimated as zero).  The corner effect becomes more extreme in higher dimensions.
+As with ridge regression Lasso is also typically applied to situations with many many variables (also to avoid multicollinearity).  It doesn't make sense to apply it to a situation with only one or two variables.  However, we will demonstrate the process visually with p=3 dimensions because it is difficult to visualize in higher dimensions.  Notice here that there is a very good chance for the red contours to hit the turquoise diamond at a corner (producing some coefficients to be estimated as zero).  The corner effect becomes more extreme in higher dimensions.
 
 The lasso coefficient estimates solve the following optimization problem:
 
 $$ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} |b_j| \leq s$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265" />
-<p class="caption">(\#fig:unnamed-chunk-8)The red contours represent pairs of $eta$ coefficients that produce constant values for SSE on the data.  The blue square represents the possible values of $eta$ given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR</p>
+<img src="figs/lassoContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="277" />
+<p class="caption">(\#fig:unnamed-chunk-8)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue diamond represents the possible values of $\beta$ given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR</p>
 </div>
 
 The key to lasso (in contrast to ridge regression) is that it does variable selection by shrinking the coefficients all the way to zero.  We say that the lasso yields *sparse* models - that is, only a subset of the original variables will be retained in the final model.
