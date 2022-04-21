@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 15 Smoothing Methods | Linear Models</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta name="description" content="There are different names for the smoothing functions: smoothers, loess, lowest (locally weighted scatterplot smoothing). They are all slightly different, and we will investigate some of the...">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="Chapter 15 Smoothing Methods | Linear Models">
 <meta property="og:type" content="book">
-<meta property="og:description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta property="og:description" content="There are different names for the smoothing functions: smoothers, loess, lowest (locally weighted scatterplot smoothing). They are all slightly different, and we will investigate some of the...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 15 Smoothing Methods | Linear Models">
-<meta name="twitter:description" content="Class notes for Math 158 at Pomona College: Linear Models. The notes are based extensively on An Introduction to Statistical Learning by James, Witten, Hastie, and Tibshirani as well as Applied Linear Statistical Models, 5th edition by Kutner, Nachtsheim, Neter, Li.">
+<meta name="twitter:description" content="There are different names for the smoothing functions: smoothers, loess, lowest (locally weighted scatterplot smoothing). They are all slightly different, and we will investigate some of the...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -86,14 +86,300 @@
 <h1>
 <span class="header-section-number">15</span> Smoothing Methods<a class="anchor" aria-label="anchor" href="#smooth"><i class="fas fa-link"></i></a>
 </h1>
+<p>There are different names for the smoothing functions: smoothers, loess, lowest (locally weighted scatterplot smoothing). They are all slightly different, and we will investigate some of the nuanced differences. Note, however, the goal is to fit a model on <span class="math inline">\(X\)</span> that predicts <span class="math inline">\(E[Y | X]\)</span> which is not necessarily linear in <span class="math inline">\(X\)</span>. So far in the course, every model fit has been <em>linear</em> in the parameters (of said differently, the expected response is a linear function of the explanatory variables, which are sometimes transformed).</p>
+<p><span class="math display">\[E[Y | X] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_{p-1} X_{p-1} = f(X)\]</span></p>
+<p>With ridge regression and lasso we were able to improve the model by making it simpler, but it was still linear. Linear models can only go so far, because not all relationships are linear!</p>
+<p>We’ve talked about transformations, and relatedly, polynomial regression. That is, by including powers of the original variable (<span class="math inline">\(X\)</span>, <span class="math inline">\(X^2\)</span>, <span class="math inline">\(X^3\)</span>, etc.), the model can better fit the data.</p>
+<div id="step-functions" class="section level2" number="15.1">
+<h2>
+<span class="header-section-number">15.1</span> Step functions<a class="anchor" aria-label="anchor" href="#step-functions"><i class="fas fa-link"></i></a>
+</h2>
+<blockquote>
+<p><strong>Step functions</strong> cut the range of a variable into K distinct regions in order to produce a qualitative variable. This has the effect of fitting a piecewise constant function.</p>
+</blockquote>
+<p>A similar idea to to polynomial regression is to fit step functions to the data. That is, to fit a flat line for different sets of values of a given explanatory variable. Note that the flat lines don’t have any requirement that they be monotonically increasing. (Just like the polynomial fit allows for many different increasing or decreasing trends.)</p>
+<p>Consider the following cutpoints which partition the range of <span class="math inline">\(X\)</span>: <span class="math inline">\(c_1 &lt; c_2 &lt; \cdots &lt; c_K\)</span>, and create <span class="math inline">\(K+1\)</span> new variables:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+C_0(X) &amp;=&amp; I(X &lt; c_1)\\
+C_1(X) &amp;=&amp; I(c_1 \leq X &lt; c_2)\\
+C_2(X) &amp;=&amp; I(c_2 \leq X &lt; c_3)\\
+&amp;\vdots&amp;\\
+C_{K-1}(X) &amp;=&amp; I(c_{K-1} \leq X &lt; c_K)\\
+C_K(X) &amp;=&amp; I(c_K \leq X)
+\end{eqnarray*}\]</span></p>
+<p>where <span class="math inline">\(I(\cdot)\)</span> is the indicator function which returns a 1 if the condition is true and 0 otherwise. Note that <span class="math inline">\(C_0(X) + C_1(X) + \cdots + C_K(X) =1\)</span>, so only <span class="math inline">\(K\)</span> predictors should be used in the model. That is:</p>
+<p><span class="math display">\[E[Y_i | X_i] = \beta_0 + \beta_1 C_1(X_i) + \beta_2 C_2(X_i )+ \cdots + \beta_K C_K(X_i) \]</span></p>
+<p>Note that at most one of the <span class="math inline">\(C_k\)</span> are non-zero. <span class="math inline">\(\beta_0\)</span> can be interpreted as the mean value of <span class="math inline">\(Y\)</span> given that <span class="math inline">\(X &lt; c_1\)</span>. In contrast, the mean value of<span class="math inline">\(Y\)</span> $c_j X &lt; c_{j+1} $ is <span class="math inline">\(\beta_0 + \beta_j\)</span>. Therefore, <span class="math inline">\(\beta_j\)</span> is interpreted as the increase in expected response for <span class="math inline">\(X\)</span> in $c_j X &lt; c_{j+1} $ as compared to <span class="math inline">\(X &lt; c_1\)</span>.</p>
+<p>Any of the <span class="math inline">\(K\)</span> step functions can be used to create the step function as a model on <span class="math inline">\(X\)</span>. However, it should be noted that using <span class="math inline">\(C_1, \ldots C_K\)</span> is more intuitive than any other set of <span class="math inline">\(K\)</span> indicator functions. Why is that? Consider the following functions and related models:</p>
+<p><span class="math display">\[\begin{eqnarray*} 
+C_0(X) &amp;=&amp; 1 \mbox{ if } X &lt; 4\\
+C_1(X) &amp;=&amp; 1 \mbox{ if } 4 &lt;= X &lt; 10\\
+C_2(X) &amp;=&amp; 1 \mbox{ if } 10 &lt;= X &lt; 50\\
+C_3(X) &amp;=&amp; 1 \mbox{ if } 50 &lt;= X
+\end{eqnarray*}\]</span></p>
+<p>Valid models can be built with any 3 of the above basis functions:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{model1:  } E[Y|X] &amp;=&amp; \beta_0 + \beta_1 C_1(X) + \beta_2 C_2(X) + \beta_3 C_3(X)\\
+\mbox{model2: }  E[Y|X] &amp;=&amp; \beta_0^* + \beta_1^* C_0(X) + \beta_2^* C_1(X) + \beta_3^* C_2(X) \\
+\end{eqnarray*}\]</span>
+n.b. The <span class="math inline">\(*\)</span> indicates that the coefficients will differ across the two models.</p>
+<p>Given the two different models (which lead to the exact same prediction models!), note the following:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{model1:  } E[Y| X=0] &amp;=&amp; \beta_0\\
+\mbox{model2:  } E[Y | X=0] &amp;=&amp; \beta_0^* + \beta_1^*\\
+\mbox{model2: }  E[Y | X=100] &amp;=&amp; \beta_0^*
+\end{eqnarray*}\]</span>
+Which is to say, it is more <strong>intuitive</strong> to have the intercept value match with X=0. But the intercept is given when the <strong>basis functions</strong> equal zero (not necessarily when the X value equals zero).</p>
+<div id="basis-functions" class="section level3" number="15.1.1">
+<h3>
+<span class="header-section-number">15.1.1</span> Basis Functions<a class="anchor" aria-label="anchor" href="#basis-functions"><i class="fas fa-link"></i></a>
+</h3>
+<p>Polynomial and piecewise-constant regression models are both special cases of a <strong>basis function</strong> approach to modeling. The idea is that instead of regressing on a series of different <span class="math inline">\(X\)</span> values, you can regress on different functions of <span class="math inline">\(X\)</span>. We’ve seen this already in the form of transformations on <span class="math inline">\(X\)</span>. The basis function model is:</p>
+<p><span class="math display">\[E[Y_i | X_i] = \beta_0 + \beta_1 bf_1(X_i) + \beta_2 bf_2(X_i) + \cdots + \beta_K bf_K(X_i).\]</span></p>
+<p><em>Remember that there are no assumptions made about the explanatory variables when running the OLS model.</em> Which is to say that functions of <span class="math inline">\(X\)</span> cause no problem in the model as long as the variables are not collinear. Note that with polynomial regression, the basis functions are: <span class="math inline">\(bf_j(X_i) = X_i^j\)</span>. When applying step functions to the model, the basis functions are <span class="math inline">\(bf_j(X_i) = I(c_j \leq X_i &lt; c_{j+1})\)</span>. The basis function model above can be fit using standard OLS techniques.</p>
+<p>One of the big advantages to using OLS with basis functions is that we get to bring along all of the inference tools we covered in the first part of the course. That is, we have estimates for the standard errors of the coefficients as well as an ability to compute p-values associated with nested F-tests. The 2*SE bounds on the estimated curves are from the appropriate errors given by the <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> function on the basis function model(s).</p>
+</div>
+</div>
+<div id="regression-splines" class="section level2" number="15.2">
+<h2>
+<span class="header-section-number">15.2</span> Regression splines<a class="anchor" aria-label="anchor" href="#regression-splines"><i class="fas fa-link"></i></a>
+</h2>
+<blockquote>
+<p><strong>Regression splines</strong> (also called smoothing splines) are more flexible than polynomials and step functions, and in fact are an extension of the two. They involve dividing the range of X into K distinct regions. Within each region, a polynomial function is fit to the data. However, these polynomials are constrained so that they join smoothly at the region boundaries, or knots. Provided that the interval is divided into enough regions, this can produce an extremely flexible fit.</p>
+</blockquote>
+<p>By combining the ideas of polynomial fits and step functions, we can create a model which fits locally but is not required to be a horizontal line. In particular, if cubic functions are fit to each region, the model ends up as something like:</p>
+<p><span class="math display">\[\begin{eqnarray}
+E[Y_i | X_i] =
+\begin{cases}
+\beta_{01} + \beta_{11} X_i + \beta_{21} X_i^2 + \beta_{31}X_i^3  \mbox{  if  } X_i &lt; c\\
+\beta_{02} + \beta_{12} X_i + \beta_{22} X_i^2 + \beta_{32}X_i^3  \mbox{  if  } X_i \geq c
+\end{cases}
+\end{eqnarray}\]</span></p>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Any polynomial can be fit (step functions are polynomials of degree 0!)</li>
+<li>The fit is independent of any normality or independence assumptions. However, those assumptions are important in oder to perform inference.</li>
+<li>If <span class="math inline">\(f(X)\)</span> isn’t linear or polynomial in X, the model can be fit <em>locally</em>. Note: every function can be written as a sum of polynomials.</li>
+<li>Keep in mind that splines computed from truncated polynomials can be numerically unstable because the explanatory variables may be highly correlated.</li>
+</ul>
+<p>Note, however, that the cubic model in the equation above has no requirement of continuity at the value <span class="math inline">\(c\)</span>. The solution is to fit a piecewise polynomial under the constraint that the fitted curve must be continuous. Additionally, in order for the curves to seem smooth} the constraint that both the first and second derivatives are also continuous is added. Generally, for a degree-<span class="math inline">\(d\)</span> spline: fit degree-<span class="math inline">\(d\)</span> polynomials with continuity in derivatives up to degree <span class="math inline">\(d-1\)</span> at each knot.</p>
+<p>One method for fitting continuous cubic models to a partitioned <span class="math inline">\(X\)</span> variable is to create the following function <span class="math inline">\(h(X, \xi)\)</span> at each knot <span class="math inline">\(\xi\)</span>.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+h(X, \xi) = (X - \xi)^3_+ =
+\begin{cases}
+(X-\xi)^3 &amp; \mbox{  if  } X &gt; \xi\\
+0 &amp; \mbox{  otherwise}
+\end{cases}
+\end{eqnarray*}\]</span>
+The following cubic spline with <span class="math inline">\(K\)</span> knots is then modeled as
+<span class="math display">\[\begin{eqnarray}
+E[Y_i | X_i] = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + \beta_3 X_i^3 + \beta_4 h(X_i, \xi_1) + \beta_5 h(X_i, \xi_2) + \cdots + \beta_{K+3} h(X_i, \xi_K). 
+\end{eqnarray}\]</span>
+Note that there are <span class="math inline">\(K+3\)</span> predictors and <span class="math inline">\(K+4\)</span> regression coefficients to model. We are using up <span class="math inline">\(K+4\)</span> degrees of freedom.</p>
+<p>A little bit of work can show that the spline equation will lead to continuity in the first two derivatives and discontinuity in the third derivative (with a continuous function). Proof ideas:</p>
+<ul>
+<li>for the continuity, consider only one knot. As <span class="math inline">\(X\)</span> approaches <span class="math inline">\(\xi\)</span> from the left, we follow the function without the <span class="math inline">\(h\)</span> part of the function. As <span class="math inline">\(X\)</span> approaches <span class="math inline">\(\xi\)</span> from the right, we get arbitrarily close to the function without any <span class="math inline">\(h\)</span>.</li>
+</ul>
+<p>Consider what happens for points before the second knot. That is, <span class="math inline">\(X \leq \xi_2\)</span>:
+<span class="math display">\[\begin{eqnarray*}
+(X - \xi_1)^3 &amp;=&amp; X^3 - 3X^2 \xi_1 + 3X \xi_1^2 - \xi_1^3\\
+E[Y | \xi_1 &lt; X \leq \xi_2] &amp;=&amp; (\beta_0 - \beta_4 \xi_1^3) + (\beta_1 + \beta_4 3 \xi_1^2)X + (\beta_2 - \beta_4 3 \xi_1)X^2 + (\beta_3 + \beta_4)X^3\\
+E[Y | X \leq \xi_1] &amp;=&amp; \beta_0  + \beta_1X + \beta_2X^2 + \beta_3 X^3\\
+lim_{X \rightarrow \xi_1^-} E[Y|X] &amp;=&amp; \beta_0  + \beta_1 \xi_1 + \beta_2\xi_1^2 + \beta_3 \xi_1^3\\
+lim_{X \rightarrow \xi_1^+} E[Y|X] &amp;=&amp; \beta_0  - \beta_4 \xi_1^3 + \beta_1 \xi_1 + \beta_4 3 \xi_1^3 + \beta_2\xi_1^2 - \beta_4 3 \xi_1^3 + \beta_3 \xi_1^3 + \beta_4\xi_1^3\\
+&amp;=&amp;  \beta_0  + \beta_1 \xi_1 + \beta_2\xi_1^2 + \beta_3 \xi_1^3\\
+\end{eqnarray*}\]</span></p>
+<ul>
+<li>for the continuity in the derivatives, recall that the derivatives are with respect to <span class="math inline">\(X\)</span>. By taking the derivatives of <span class="math inline">\(E[Y_i]\)</span> and then the limit as <span class="math inline">\(X \rightarrow \xi\)</span>, the continuity of the first few derivatives and discontinuity of later derivatives can be seen.</li>
+</ul>
+<div id="knots" class="section level4 unnumbered">
+<h4>Knots<a class="anchor" aria-label="anchor" href="#knots"><i class="fas fa-link"></i></a>
+</h4>
+<p>Knots can be placed uniformly or at places where the function is expected to change rapidly. Most often the number of knots is set and the software places them uniformly. The number of knots is directly related to the degrees of freedom of the model, so setting the degrees of freedom also sets the number of knots. Ideally, a method such as dross validation will be used to optimize the number of knots.</p>
+</div>
+<div id="degrees-of-freedom" class="section level4 unnumbered">
+<h4>degrees of freedom<a class="anchor" aria-label="anchor" href="#degrees-of-freedom"><i class="fas fa-link"></i></a>
+</h4>
+<p>Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places df-1 internal knots). Consider the following call to our model. Note that there are at least three different ways to think about “degrees of freedom.”</p>
+<ul>
+<li>
+<code>df</code> = the number in the argument of the function. Here the number is 6 = # coefficients - 1 = # “explanatory variables”</li>
+<li>df as defined in your text = the number of explanatory variables you are estimating. Note that ISLR generally defines <span class="math inline">\(p\)</span> as the number of explanatory variables, ALSM defines <span class="math inline">\(p\)</span> to be the number of parameters.</li>
+<li>The remaining degrees of freedom (n - # coefficients). Here that number is 349 - 7 = 342. (This last version of “df” is how we are used to thinking about degrees of freedom – how much information do you have to estimate variability?)</li>
+<li>Also note that the <code>knots</code> argument overrides the <code>df</code> argument.</li>
+</ul>
+</div>
+</div>
+<div id="local-regression" class="section level2" number="15.3">
+<h2>
+<span class="header-section-number">15.3</span> Local regression<a class="anchor" aria-label="anchor" href="#local-regression"><i class="fas fa-link"></i></a>
+</h2>
+<blockquote>
+<p><strong>Local regression</strong> is similar to splines, but differs in an important way. The regions are allowed to overlap, and indeed they do so in a very smooth way.</p>
+</blockquote>
+<p>Local regression (loess - locally weighted scatterplot smoothing) models fit flexible, non-linear models to a point <span class="math inline">\(x_0\)</span> using only training values that are close to <span class="math inline">\(x_0\)</span>. The distance of the training point from <span class="math inline">\(x_0\)</span> is considered to be a weight and is given by <span class="math inline">\(K_{i0}\)</span>. We fit weighted least squares regression using the weights from the <span class="math inline">\(X\)</span>-direction. The algorithm for local regression is given by (page 282, <span class="citation">(<a href="#ref-ISLR" role="doc-biblioref"><strong>ISLR?</strong></a>)</span>):</p>
+<hr>
+<p><strong>Local Regression at <span class="math inline">\(X=x_0\)</span> (<span class="math inline">\(p=2\)</span>)</strong></p>
+<hr>
+<ol style="list-style-type: decimal">
+<li>Gather the fraction <span class="math inline">\(s=k/n\)</span> of training points whose <span class="math inline">\(X_i\)</span> are closest to <span class="math inline">\(x_0\)</span>.</li>
+<li>Assign a weight <span class="math inline">\(K_{i0} = K(X_i, x_0)\)</span> to each point in the neighborhood, so that the furthest point from <span class="math inline">\(x_0\)</span> has weight zero and the closest point has the highest weight. All but the <span class="math inline">\(k\)</span> closest points get zero weight.</li>
+<li>Fit a weighted least squares regression of the <span class="math inline">\(Y_i\)</span> on the <span class="math inline">\(X_i\)</span> using the <span class="math inline">\(K_{i0}\)</span> weights. Find <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span> that minimize:
+<span class="math display">\[\sum_{i=1}^n K_{i0}(Y_i - b_0 - b_1 X_i)^2.\]</span>
+</li>
+<li>The fitted value at <span class="math inline">\(x_0\)</span> is given by <span class="math inline">\(\hat{f}(x_0) = b_0 + b_1x_0\)</span>.</li>
+<li>Repeat steps 1. - 4. for every point; the coefficients &amp; SE are re-computed each time.</li>
+</ol>
+<p>To create the smooth regression function, the points are connected by drawing a line (or surface) between each predicted value. The fraction of points with non-zero weights is given by the <em>span</em>, <span class="math inline">\(s=k/n\)</span>. The span plays a role similar to other tuning parameters. It can be made to produce a model similar to OLS (large span) or to produce a model which way overfits the data (small span). Cross validation can be used to find <span class="math inline">\(s\)</span>.</p>
+<p>Local Regression can theoretically be expanded to higher dimensions. Weighted least squares (see section 11.1 in <span class="citation"><a href="references.html#ref-kutner" role="doc-biblioref">Kutner et al.</a> (<a href="references.html#ref-kutner" role="doc-biblioref">2004</a>)</span>) is given by minimizing:</p>
+<p><span class="math display">\[\sum_{i=1}^n w_i(Y_i - \beta_0 - \beta_1X_{i1} - \cdots - \beta_{p-1}X_{i,p-1})^2.\]</span></p>
+<p>The normal equations are solved in the same way given coefficient estimates and standard errors as (<span class="math inline">\(W\)</span> is the diagonal matrix of weights):
+<span class="math display">\[\begin{eqnarray*}
+(X^t W X) b_w &amp;=&amp; X^t W Y\\
+b_w &amp;=&amp; (X^t W X)^{-1} X^t W Y\\
+var(b_w) &amp;=&amp; \sigma^2 (X^t W X)^{-1} (X^t W W X) (X^t W X)^{-1}
+\end{eqnarray*}\]</span></p>
+<p>However, in high dimensional settings the <em>distance</em> to <span class="math inline">\(x_0\)</span> might be quite large, and there will be very few points in a high dimensional neighborhood of <span class="math inline">\(x_0\)</span>. The distance problem leads to most points have zero weight (i.e., large distance) from the other points. And the regression estimates become quite variable and hard to estimate.</p>
+<div id="weight-function-for-local-regression" class="section level3" number="15.3.1">
+<h3>
+<span class="header-section-number">15.3.1</span> Weight function for local regression<a class="anchor" aria-label="anchor" href="#weight-function-for-local-regression"><i class="fas fa-link"></i></a>
+</h3>
+<p>The standard weight function used in local regression is called the <em>tricubic weight function</em>.</p>
+<ul>
+<li>For <span class="math inline">\(s &lt; 1\)</span>, the neighborhood includes proportion <span class="math inline">\(s\)</span> of the points, and these have tricubic weighting</li>
+</ul>
+<p><span class="math display">\[K_{i0}  = \Bigg(1 - \bigg(\frac{d(x_i, x_0)}{\max_{i \in S} d(x_i, x_0)} \bigg)^3 \Bigg)^3 I(d(x_i, x_0) &lt; \max_{i \in S} d(x_i, x_0))\]</span>
+where <span class="math inline">\(S\)</span> defines the set of <span class="math inline">\(x_i\)</span> values which are the <span class="math inline">\(k\)</span> closest points to <span class="math inline">\(x_0\)</span>.</p>
+<ul>
+<li>For <span class="math inline">\(s &gt; 1\)</span>, all points are used, with the “maximum distance” (as above) assumed to be <span class="math inline">\(s^{(1/(p-1))}\)</span> times the actual maximum distance for <span class="math inline">\(p\)</span> coefficients (<span class="math inline">\(p-1\)</span> explanatory variables).</li>
+<li>Distance can be defined using any distance function, Euclidean being the default although not resistant to outliers.</li>
+<li>Regression is done by least squares (default) although other regression techniques can be used (e.g., Tukey’s biweight M-estimation regression… we won’t talk about that in class).</li>
+<li>The <code><a href="https://rdrr.io/r/stats/loess.html">loess()</a></code> function in R does the modeling / prediction. In <strong>ggplot2</strong> the default method for <code><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth()</a></code> plot uses <code>loess</code>.</li>
+</ul>
+</div>
+<div id="imputation" class="section level3" number="15.3.2">
+<h3>
+<span class="header-section-number">15.3.2</span> Imputation<a class="anchor" aria-label="anchor" href="#imputation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Imputation is the process of replacing missing data with summary values (i.e., statistics) from the rest of the data. The biggest reason to impute data is so that the complete dataset can be used for an analysis. Notice that within the context of the models throughout the semester, it might make sense to smooth <span class="math inline">\(Y\)</span> on some of the explanatory variables (if <span class="math inline">\(Y\)</span> is missing for some observations), but it also might make sense to smooth <span class="math inline">\(X_1\)</span> on the other explanatory variables (if <span class="math inline">\(X_1\)</span> is missing and should be used in the linear model).</p>
+<p>Keep in mind that the algorithm for creating a smooth prediction at <span class="math inline">\(x_0\)</span> does not depend on <span class="math inline">\(x_0\)</span> being part of the model. That is, the prediction is possible whether or not <span class="math inline">\(x_0\)</span> has a corresponding response value.</p>
+<p>See the R code (posted on website) for an example on imputing data using a loess smoother.</p>
+</div>
+<div id="normalization" class="section level3" number="15.3.3">
+<h3>
+<span class="header-section-number">15.3.3</span> Normalization<a class="anchor" aria-label="anchor" href="#normalization"><i class="fas fa-link"></i></a>
+</h3>
+<p>Microarrays and other high-throughput analysis techniques require normalization in order to create apples to apples comparisons. From Wikipedia, <a href="https://en.wikipedia.org/wiki/Microarray_analysis_techniques" class="uri">https://en.wikipedia.org/wiki/Microarray_analysis_techniques</a></p>
+<blockquote>
+<p>Comparing two different arrays, or two different samples hybridized to the same array generally involves making adjustments for systematic errors introduced by differences in procedures and dye intensity effects. Dye normalization for two color arrays is often achieved by local regression. LIMMA provides a set of tools for background correction and scaling, as well as an option to average on-slide duplicate spots.[8] A common method for evaluating how well normalized an array is, is to plot an MA plot of the data.</p>
+</blockquote>
+</div>
+<div id="prediction" class="section level3" number="15.3.4">
+<h3>
+<span class="header-section-number">15.3.4</span> Prediction<a class="anchor" aria-label="anchor" href="#prediction"><i class="fas fa-link"></i></a>
+</h3>
+<p>After Hurricane Maria devastated Puerto Rico, there was much discussion on how to count the resulting number of deaths. Rafael Irizzary talks about his models on the <a http="https://simplystatistics.org/2018/06/08/a-first-look-at-recently-released-official-puerto-rico-death-count-data/" target="_blank">simplystatistics blog.</a></p>
+</div>
+</div>
+<div id="last-thoughts" class="section level2" number="15.4">
+<h2>
+<span class="header-section-number">15.4</span> Last Thoughts…<a class="anchor" aria-label="anchor" href="#last-thoughts"><i class="fas fa-link"></i></a>
+</h2>
+<div id="why-smooth" class="section level3" number="15.4.1">
+<h3>
+<span class="header-section-number">15.4.1</span> Why smooth?<a class="anchor" aria-label="anchor" href="#why-smooth"><i class="fas fa-link"></i></a>
+</h3>
+<div id="advantages-of-smoothing" class="section level4 unnumbered">
+<h4>Advantages of smoothing<a class="anchor" aria-label="anchor" href="#advantages-of-smoothing"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Smoothing methods do not require a known functional relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.
+<ul>
+<li>Regression splines does provide a functional model</li>
+<li>loess does not provide a functional model</li>
+</ul>
+</li>
+<li>The relationships are easy to fit</li>
+<li>and they retain many of the advantages of weighted least squares (including confidence estimates for the predicted values).</li>
+</ul>
+</div>
+<div id="disadvantages-of-smoothing" class="section level4 unnumbered">
+<h4>Disadvantages of smoothing<a class="anchor" aria-label="anchor" href="#disadvantages-of-smoothing"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Local regression can be computationally intensive, with methods giving unstable estimates in high dimensions due to sparsity of points.</li>
+<li>Regression splines have arbitrary knots which may not fit the model well.</li>
+<li>Although interpolation can be used (and is used in R!) to get predictions (with standard errors), there is no functional form for the relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> with loess. Inference on coefficients is meaningless.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="inference-1" class="section level2" number="15.5">
+<h2>
+<span class="header-section-number">15.5</span> Inference<a class="anchor" aria-label="anchor" href="#inference-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>Keep in mind that in order to have a p-value (which is a probability), there must be a probability model. OLS assumes normal errors, and if basis functions or weighted OLS are applied using standard linear model techniques, then there should be some notion that there is an <em>iid</em> normal error structure. Confidence intervals also require a probability model in order to apply the standard inferential interpretations.</p>
+<p>In particular, the wind temperature observations are <em>not</em> independent. There is a strong dependency between the temperature on any two consecutive days. The data are much better described by an autoregressive model if the goal of inference. (Autoregression is used, e.g., when the x-variable is time and the observations are correlated. The y-variable could be stock price or temperature. We haven’t talked about these types of models in any formal way.) If the goal is more descriptive (or simply predictive for reasons such as normalization or extrapolation), then SE values and CI bounds are not needed, and a smooth curve will probably be effective even if the technical conditions do not hold.</p>
+<div id="dont-forget" class="section level4 unnumbered">
+<h4>Don’t Forget<a class="anchor" aria-label="anchor" href="#dont-forget"><i class="fas fa-link"></i></a>
+</h4>
+<p>There is no substitute for thinking carefully about how you are modeling relationships. Whether it be linear, non-linear, sparse, locally weighted, or optimized. There will not be a model which is the <em>one</em> right model. Instead, your expertise and practice will provide you with strategies to help come up with a model that describes your data well.</p>
+<p>For more on kernel smoothers, see the appendix of <span class="citation"><a href="references.html#ref-sheather" role="doc-biblioref">Sheather</a> (<a href="references.html#ref-sheather" role="doc-biblioref">2009</a>)</span> and chapter 6 of <span class="citation"><a href="references.html#ref-ESL" role="doc-biblioref">Hastie, Tibshirani, and Friedman</a> (<a href="references.html#ref-ESL" role="doc-biblioref">2001</a>)</span>.</p>
+</div>
+</div>
+<div id="reflection-questions-11" class="section level2" number="15.6">
+<h2>
+<span class="header-section-number">15.6</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-11"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>How are the different types of flexible models represented in linear model form? (Step functions, polynomials, regression splines, local regression)</li>
+<li>How are inferential methods applied to the models above? What are the necessary technical assumptions to make inferential claims?</li>
+<li>What is a basis function? How is it used similarly / differently in step functions, polynomials, and regression splines?</li>
+<li>In regression splines, how does the number of knots play a role? How do the different choice for the number of knots change the resulting model? Why would you choose to fit a model that had more or fewer knots?</li>
+<li>For local regression, how do the weights play a role? What different choices could be made with respect to the weight functions?</li>
+<li>For local regression, how does the span play a role? How do the different choices for the span change the resulting model? Why would you choose to fit a model that had more or fewer knots?</li>
+<li>If inference claims are not accessible, what else can smoothing techniques be used for?</li>
+</ol>
+</div>
+<div id="ethics-considerations-10" class="section level2" number="15.7">
+<h2>
+<span class="header-section-number">15.7</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-10"><i class="fas fa-link"></i></a>
+</h2>
+</div>
+<div id="r-smoothing" class="section level2" number="15.8">
+<h2>
+<span class="header-section-number">15.8</span> R: Smoothing<a class="anchor" aria-label="anchor" href="#r-smoothing"><i class="fas fa-link"></i></a>
+</h2>
 
+</div>
 </div>
   <div class="chapter-nav">
 <div class="prev"><a href="shrink.html"><span class="header-section-number">14</span> Shrinkage Methods</a></div>
 <div class="next"><a href="anova.html"><span class="header-section-number">16</span> ANOVA</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
-      <ul class="nav navbar-nav"><li><a class="nav-link" href="#smooth"><span class="header-section-number">15</span> Smoothing Methods</a></li></ul>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#smooth"><span class="header-section-number">15</span> Smoothing Methods</a></li>
+<li>
+<a class="nav-link" href="#step-functions"><span class="header-section-number">15.1</span> Step functions</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#basis-functions"><span class="header-section-number">15.1.1</span> Basis Functions</a></li></ul>
+</li>
+<li><a class="nav-link" href="#regression-splines"><span class="header-section-number">15.2</span> Regression splines</a></li>
+<li>
+<a class="nav-link" href="#local-regression"><span class="header-section-number">15.3</span> Local regression</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#weight-function-for-local-regression"><span class="header-section-number">15.3.1</span> Weight function for local regression</a></li>
+<li><a class="nav-link" href="#imputation"><span class="header-section-number">15.3.2</span> Imputation</a></li>
+<li><a class="nav-link" href="#normalization"><span class="header-section-number">15.3.3</span> Normalization</a></li>
+<li><a class="nav-link" href="#prediction"><span class="header-section-number">15.3.4</span> Prediction</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#last-thoughts"><span class="header-section-number">15.4</span> Last Thoughts…</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#why-smooth"><span class="header-section-number">15.4.1</span> Why smooth?</a></li></ul>
+</li>
+<li><a class="nav-link" href="#inference-1"><span class="header-section-number">15.5</span> Inference</a></li>
+<li><a class="nav-link" href="#reflection-questions-11"><span class="header-section-number">15.6</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-10"><span class="header-section-number">15.7</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-smoothing"><span class="header-section-number">15.8</span> R: Smoothing</a></li>
+</ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
@@ -110,7 +396,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-20.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-21.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
