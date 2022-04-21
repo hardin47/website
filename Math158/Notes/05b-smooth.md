@@ -36,7 +36,7 @@ where $I(\cdot)$ is the indicator function which returns a 1 if the condition is
 $$E[Y_i | X_i] = \beta_0 + \beta_1 C_1(X_i) + \beta_2 C_2(X_i )+ \cdots + \beta_K C_K(X_i) $$
 
 
-Note that at most one of the $C_k$ are non-zero. $\beta_0$ can be interpreted as the mean value of $Y$ given that $X < c_1$.  In contrast, the mean value of$Y$  $c_j \leq X < c_{j+1}$ is $\beta_0 + \beta_j$.  Therefore, $\beta_j$ is interpreted as the increase in expected response for $X$ in $c_j \leq X < c_{j+1}$  as compared to $X < c_1$.
+Note that at most one of the $C_k$ are non-zero. $\beta_0$ can be interpreted as the mean value of $Y$ given that $X < c_1$.  In contrast, the mean value of$Y$  $c_j \leq X < c_{j+1}$ is $\beta_0 + \beta_j$.  Therefore, $\beta_j$ is interpreted as the difference in expected response for $X$ in $c_j \leq X < c_{j+1}$  as compared to $X < c_1$.
 
 
 Any of the $K$ step functions can be used to create the step function as a model on $X$.  However, it should be noted that using $C_1, \ldots C_K$ is more intuitive than any other set of $K$ indicator functions.  Why is that?  Consider the following functions and related models:
@@ -230,7 +230,7 @@ Microarrays and other high-throughput analysis techniques require normalization 
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/19MA.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="578" /><img src="figs/nolow_array_norm.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="800" />
+<img src="figs/19MA.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="47%" /><img src="figs/nolow_array_norm.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="47%" />
 <p class="caption">(\#fig:unnamed-chunk-7)[left] M = ratio of expression, A = product of expression (total amount of expression).  The different smooth curves refer to different locations on the microarray chip.  To normalize, we subtract the line from each corresponding dot which can be thought of as taking the colored lines and pulling them taut. [right] By centering each array's expression values to zero (either across the location on the chip 'print-tip group' or within an array itself), we can do an apples to apples comparison of the expression across different samples.</p>
 </div>
 
