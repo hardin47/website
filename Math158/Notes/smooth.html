@@ -109,7 +109,7 @@ C_K(X) &amp;=&amp; I(c_K \leq X)
 \end{eqnarray*}\]</span></p>
 <p>where <span class="math inline">\(I(\cdot)\)</span> is the indicator function which returns a 1 if the condition is true and 0 otherwise. Note that <span class="math inline">\(C_0(X) + C_1(X) + \cdots + C_K(X) =1\)</span>, so only <span class="math inline">\(K\)</span> predictors should be used in the model. That is:</p>
 <p><span class="math display">\[E[Y_i | X_i] = \beta_0 + \beta_1 C_1(X_i) + \beta_2 C_2(X_i )+ \cdots + \beta_K C_K(X_i) \]</span></p>
-<p>Note that at most one of the <span class="math inline">\(C_k\)</span> are non-zero. <span class="math inline">\(\beta_0\)</span> can be interpreted as the mean value of <span class="math inline">\(Y\)</span> given that <span class="math inline">\(X &lt; c_1\)</span>. In contrast, the mean value of<span class="math inline">\(Y\)</span> $c_j X &lt; c_{j+1} $ is <span class="math inline">\(\beta_0 + \beta_j\)</span>. Therefore, <span class="math inline">\(\beta_j\)</span> is interpreted as the increase in expected response for <span class="math inline">\(X\)</span> in $c_j X &lt; c_{j+1} $ as compared to <span class="math inline">\(X &lt; c_1\)</span>.</p>
+<p>Note that at most one of the <span class="math inline">\(C_k\)</span> are non-zero. <span class="math inline">\(\beta_0\)</span> can be interpreted as the mean value of <span class="math inline">\(Y\)</span> given that <span class="math inline">\(X &lt; c_1\)</span>. In contrast, the mean value of<span class="math inline">\(Y\)</span> <span class="math inline">\(c_j \leq X &lt; c_{j+1}\)</span> is <span class="math inline">\(\beta_0 + \beta_j\)</span>. Therefore, <span class="math inline">\(\beta_j\)</span> is interpreted as the increase in expected response for <span class="math inline">\(X\)</span> in <span class="math inline">\(c_j \leq X &lt; c_{j+1}\)</span> as compared to <span class="math inline">\(X &lt; c_1\)</span>.</p>
 <p>Any of the <span class="math inline">\(K\)</span> step functions can be used to create the step function as a model on <span class="math inline">\(X\)</span>. However, it should be noted that using <span class="math inline">\(C_1, \ldots C_K\)</span> is more intuitive than any other set of <span class="math inline">\(K\)</span> indicator functions. Why is that? Consider the following functions and related models:</p>
 <p><span class="math display">\[\begin{eqnarray*} 
 C_0(X) &amp;=&amp; 1 \mbox{ if } X &lt; 4\\
@@ -134,7 +134,7 @@ Which is to say, it is more <strong>intuitive</strong> to have the intercept val
 <h3>
 <span class="header-section-number">15.1.1</span> Basis Functions<a class="anchor" aria-label="anchor" href="#basis-functions"><i class="fas fa-link"></i></a>
 </h3>
-<p>Polynomial and piecewise-constant regression models are both special cases of a <strong>basis function</strong> approach to modeling. The idea is that instead of regressing on a series of different <span class="math inline">\(X\)</span> values, you can regress on different functions of <span class="math inline">\(X\)</span>. We’ve seen this already in the form of transformations on <span class="math inline">\(X\)</span>. The basis function model is:</p>
+<p>Polynomial and piece-wise-constant regression models are both special cases of a <strong>basis function</strong> approach to modeling. The idea is that instead of regressing on a series of different <span class="math inline">\(X\)</span> values, you can regress on different functions of <span class="math inline">\(X\)</span>. We’ve seen this already in the form of transformations on <span class="math inline">\(X\)</span>. The basis function model is:</p>
 <p><span class="math display">\[E[Y_i | X_i] = \beta_0 + \beta_1 bf_1(X_i) + \beta_2 bf_2(X_i) + \cdots + \beta_K bf_K(X_i).\]</span></p>
 <p><em>Remember that there are no assumptions made about the explanatory variables when running the OLS model.</em> Which is to say that functions of <span class="math inline">\(X\)</span> cause no problem in the model as long as the variables are not collinear. Note that with polynomial regression, the basis functions are: <span class="math inline">\(bf_j(X_i) = X_i^j\)</span>. When applying step functions to the model, the basis functions are <span class="math inline">\(bf_j(X_i) = I(c_j \leq X_i &lt; c_{j+1})\)</span>. The basis function model above can be fit using standard OLS techniques.</p>
 <p>One of the big advantages to using OLS with basis functions is that we get to bring along all of the inference tools we covered in the first part of the course. That is, we have estimates for the standard errors of the coefficients as well as an ability to compute p-values associated with nested F-tests. The 2*SE bounds on the estimated curves are from the appropriate errors given by the <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> function on the basis function model(s).</p>
@@ -158,11 +158,11 @@ E[Y_i | X_i] =
 <p><strong>Notes:</strong></p>
 <ul>
 <li>Any polynomial can be fit (step functions are polynomials of degree 0!)</li>
-<li>The fit is independent of any normality or independence assumptions. However, those assumptions are important in oder to perform inference.</li>
+<li>The fit is independent of any normality or independence assumptions. However, those assumptions are important in order to perform inference.</li>
 <li>If <span class="math inline">\(f(X)\)</span> isn’t linear or polynomial in X, the model can be fit <em>locally</em>. Note: every function can be written as a sum of polynomials.</li>
 <li>Keep in mind that splines computed from truncated polynomials can be numerically unstable because the explanatory variables may be highly correlated.</li>
 </ul>
-<p>Note, however, that the cubic model in the equation above has no requirement of continuity at the value <span class="math inline">\(c\)</span>. The solution is to fit a piecewise polynomial under the constraint that the fitted curve must be continuous. Additionally, in order for the curves to seem smooth} the constraint that both the first and second derivatives are also continuous is added. Generally, for a degree-<span class="math inline">\(d\)</span> spline: fit degree-<span class="math inline">\(d\)</span> polynomials with continuity in derivatives up to degree <span class="math inline">\(d-1\)</span> at each knot.</p>
+<p>Note, however, that the cubic model in the equation above has no requirement of continuity at the value <span class="math inline">\(c\)</span>. The solution is to fit a piece-wise polynomial under the constraint that the fitted curve must be continuous. Additionally, in order for the curves to seem smooth} the constraint that both the first and second derivatives are also continuous is added. Generally, for a degree-<span class="math inline">\(d\)</span> spline: fit degree-<span class="math inline">\(d\)</span> polynomials with continuity in derivatives up to degree <span class="math inline">\(d-1\)</span> at each knot.</p>
 <p>One method for fitting continuous cubic models to a partitioned <span class="math inline">\(X\)</span> variable is to create the following function <span class="math inline">\(h(X, \xi)\)</span> at each knot <span class="math inline">\(\xi\)</span>.</p>
 <p><span class="math display">\[\begin{eqnarray*}
 h(X, \xi) = (X - \xi)^3_+ =
@@ -204,7 +204,7 @@ lim_{X \rightarrow \xi_1^+} E[Y|X] &amp;=&amp; \beta_0  - \beta_4 \xi_1^3 + \bet
 <ul>
 <li>
 <code>df</code> = the number in the argument of the function. Here the number is 6 = # coefficients - 1 = # “explanatory variables”</li>
-<li>df as defined in your text = the number of explanatory variables you are estimating. Note that ISLR generally defines <span class="math inline">\(p\)</span> as the number of explanatory variables, ALSM defines <span class="math inline">\(p\)</span> to be the number of parameters.</li>
+<li>df as defined in your text = the number of explanatory variables you are estimating. Note that <span class="citation"><a href="references.html#ref-ISL" role="doc-biblioref">James et al.</a> (<a href="references.html#ref-ISL" role="doc-biblioref">2021</a>)</span> generally defines <span class="math inline">\(p\)</span> as the number of explanatory variables, <span class="citation"><a href="references.html#ref-kutner" role="doc-biblioref">Kutner et al.</a> (<a href="references.html#ref-kutner" role="doc-biblioref">2004</a>)</span> defines <span class="math inline">\(p\)</span> to be the number of parameters.</li>
 <li>The remaining degrees of freedom (n - # coefficients). Here that number is 349 - 7 = 342. (This last version of “df” is how we are used to thinking about degrees of freedom – how much information do you have to estimate variability?)</li>
 <li>Also note that the <code>knots</code> argument overrides the <code>df</code> argument.</li>
 </ul>
@@ -217,7 +217,7 @@ lim_{X \rightarrow \xi_1^+} E[Y|X] &amp;=&amp; \beta_0  - \beta_4 \xi_1^3 + \bet
 <blockquote>
 <p><strong>Local regression</strong> is similar to splines, but differs in an important way. The regions are allowed to overlap, and indeed they do so in a very smooth way.</p>
 </blockquote>
-<p>Local regression (loess - locally weighted scatterplot smoothing) models fit flexible, non-linear models to a point <span class="math inline">\(x_0\)</span> using only training values that are close to <span class="math inline">\(x_0\)</span>. The distance of the training point from <span class="math inline">\(x_0\)</span> is considered to be a weight and is given by <span class="math inline">\(K_{i0}\)</span>. We fit weighted least squares regression using the weights from the <span class="math inline">\(X\)</span>-direction. The algorithm for local regression is given by (page 282, <span class="citation">(<a href="#ref-ISLR" role="doc-biblioref"><strong>ISLR?</strong></a>)</span>):</p>
+<p>Local regression (loess - locally weighted scatterplot smoothing) models fit flexible, non-linear models to a point <span class="math inline">\(x_0\)</span> using only training values that are close to <span class="math inline">\(x_0\)</span>. The distance of the training point from <span class="math inline">\(x_0\)</span> is considered to be a weight and is given by <span class="math inline">\(K_{i0}\)</span>. We fit weighted least squares regression using the weights from the <span class="math inline">\(X\)</span>-direction. The algorithm for local regression is given by (page 282, <span class="citation"><a href="references.html#ref-ISL" role="doc-biblioref">James et al.</a> (<a href="references.html#ref-ISL" role="doc-biblioref">2021</a>)</span>):</p>
 <hr>
 <p><strong>Local Regression at <span class="math inline">\(X=x_0\)</span> (<span class="math inline">\(p=2\)</span>)</strong></p>
 <hr>
@@ -230,7 +230,7 @@ lim_{X \rightarrow \xi_1^+} E[Y|X] &amp;=&amp; \beta_0  - \beta_4 \xi_1^3 + \bet
 <li>The fitted value at <span class="math inline">\(x_0\)</span> is given by <span class="math inline">\(\hat{f}(x_0) = b_0 + b_1x_0\)</span>.</li>
 <li>Repeat steps 1. - 4. for every point; the coefficients &amp; SE are re-computed each time.</li>
 </ol>
-<p>To create the smooth regression function, the points are connected by drawing a line (or surface) between each predicted value. The fraction of points with non-zero weights is given by the <em>span</em>, <span class="math inline">\(s=k/n\)</span>. The span plays a role similar to other tuning parameters. It can be made to produce a model similar to OLS (large span) or to produce a model which way overfits the data (small span). Cross validation can be used to find <span class="math inline">\(s\)</span>.</p>
+<p>To create the smooth regression function, the points are connected by drawing a line (or surface) between each predicted value. The fraction of points with non-zero weights is given by the <em>span</em>, <span class="math inline">\(s=k/n\)</span>. The span plays a role similar to other tuning parameters. It can be made to produce a model similar to OLS (large span) or to produce a model which way over-fits the data (small span). Cross validation can be used to find <span class="math inline">\(s\)</span>.</p>
 <p>Local Regression can theoretically be expanded to higher dimensions. Weighted least squares (see section 11.1 in <span class="citation"><a href="references.html#ref-kutner" role="doc-biblioref">Kutner et al.</a> (<a href="references.html#ref-kutner" role="doc-biblioref">2004</a>)</span>) is given by minimizing:</p>
 <p><span class="math display">\[\sum_{i=1}^n w_i(Y_i - \beta_0 - \beta_1X_{i1} - \cdots - \beta_{p-1}X_{i,p-1})^2.\]</span></p>
 <p>The normal equations are solved in the same way given coefficient estimates and standard errors as (<span class="math inline">\(W\)</span> is the diagonal matrix of weights):
@@ -273,12 +273,30 @@ where <span class="math inline">\(S\)</span> defines the set of <span class="mat
 <blockquote>
 <p>Comparing two different arrays, or two different samples hybridized to the same array generally involves making adjustments for systematic errors introduced by differences in procedures and dye intensity effects. Dye normalization for two color arrays is often achieved by local regression. LIMMA provides a set of tools for background correction and scaling, as well as an option to average on-slide duplicate spots.[8] A common method for evaluating how well normalized an array is, is to plot an MA plot of the data.</p>
 </blockquote>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-6"></span>
+<img src="figs/LH_microarray.jpg" alt="Image is a grid of red, yellow, and green dots.  Each dot represents a gene, and the color or fluorescence estimates the amount of gene activity." width="926"><p class="caption">
+Figure 15.1: The microarray shows differing amounts of expression across two conditions (here old and young yeast). The expectation is that, on median, the dots (i.e., genes) should be yellow. As can be seen from the image, points on the left side of the microarray are dimmer than the points on the right side. The imbalance is an artifact of the technical limitations of the technique. Image due to Laura Hoopes, Pomona College.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-7"></span>
+<img src="figs/19MA.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="578"><img src="figs/nolow_array_norm.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="800"><p class="caption">
+Figure 6.2: [left] M = ratio of expression, A = product of expression (total amount of expression). The different smooth curves refer to different locations on the microarray chip. To normalize, we subtract the line from each corresponding dot which can be thought of as taking the colored lines and pulling them taut. [right] By centering each array’s expression values to zero (either across the location on the chip ‘print-tip group’ or within an array itself), we can do an apples to apples comparison of the expression across different samples.
+</p>
+</div>
 </div>
 <div id="prediction" class="section level3" number="15.3.4">
 <h3>
 <span class="header-section-number">15.3.4</span> Prediction<a class="anchor" aria-label="anchor" href="#prediction"><i class="fas fa-link"></i></a>
 </h3>
-<p>After Hurricane Maria devastated Puerto Rico, there was much discussion on how to count the resulting number of deaths. Rafael Irizzary talks about his models on the <a http="https://simplystatistics.org/2018/06/08/a-first-look-at-recently-released-official-puerto-rico-death-count-data/" target="_blank">simplystatistics blog.</a></p>
+<p>After Hurricane Maria devastated Puerto Rico in September 2017, there was much discussion on how to count the resulting number of deaths. Rolando Acosta and Rafael Irizzary use loess models to predict excess deaths in <a href="https://www.biorxiv.org/content/10.1101/407874v2.full" target="_blank">Post-Hurricane Vital Statistics Expose Fragility of Puerto Rico’s Health System.</a></p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-8"></span>
+<img src="figs/loess_maria.jpg" alt="Four loess curves which show a spike in mortality in September 2017 as compared to mortality both before and after the hurricane." width="640"><p class="caption">
+Figure 6.3: Increase in death rate as a function of date. Note the y-axis which is observed rate minus expected rate (found by using a trend line given by loess broken down by age group).
+</p>
+</div>
 </div>
 </div>
 <div id="last-thoughts" class="section level2" number="15.4">
