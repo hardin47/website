@@ -146,13 +146,7 @@ Knots can be placed uniformly or at places where the function is expected to cha
 
 #### degrees of freedom {-}
 
-Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places df-1 internal knots).  Consider the following call to our model.  Note that there are at least three different ways to think about "degrees of freedom."
-
-
-* `df` = the number in the argument of the function.  Here the number is 6 = # coefficients - 1 = # "explanatory variables" 
-* df as defined in your text = the number of explanatory variables you are estimating.  Note that @ISL generally defines $p$ as the number of explanatory variables, @kutner defines $p$ to be the number of parameters.
-* The remaining degrees of freedom (n - # coefficients).  Here that number is 349 - 7 = 342.  (This last version of "df" is how we are used to thinking about degrees of freedom -- how much information do you have to estimate variability?)
-* Also note that the `knots` argument overrides the `df` argument.
+Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-1` internal knots). The number of knots will be `df-1`. 
 
 
 
@@ -161,7 +155,7 @@ Note that we can fit the model based on placing the knots or based on the number
 > **Local regression** is similar to splines, but differs in an important way. The regions are allowed to overlap, and indeed they do so in a very smooth way.
 
 
-Local regression (loess - locally weighted scatterplot smoothing) models fit flexible, non-linear models to a point $x_0$ using only training values that are close to $x_0$.  The distance of the training point from $x_0$ is considered to be a weight and is given by $K_{i0}$.   We fit weighted least squares regression using the weights from the $X$-direction.  The algorithm for local regression is given by (page 282, @ISL):
+Local regression (loess - locally weighted scatterplot smoothing) models fit flexible, non-linear models to a point $x_0$ using only training values that are close to $x_0$.  The distance of the training point from $x_0$ is considered to be a weight and is given by $K_{i0}$.   We fit weighted least squares regression using the weights from the $X$-direction.  The algorithm for local regression is given by (section 7.6, @ISL):
 
 ******  
 **Local Regression at $X=x_0$ ($p=2$)**  
@@ -225,7 +219,7 @@ Microarrays and other high-throughput analysis techniques require normalization 
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/LH_microarray.jpg" alt="Image is a grid of red, yellow, and green dots.  Each dot represents a gene, and the color or fluorescence estimates the amount of gene activity." width="926" />
+<img src="figs/LH_microarray.jpg" alt="Image is a grid of red, yellow, and green dots.  Each dot represents a gene, and the color or fluorescence estimates the amount of gene activity." width="75%" />
 <p class="caption">(\#fig:unnamed-chunk-6)The microarray shows differing amounts of expression across two conditions (here old and young yeast).  The expectation is that, on median, the dots (i.e., genes) should be yellow.   As can be seen from the image, points on the left side of the microarray are dimmer than the points on the right side.  The imbalance is an artifact of the technical limitations of the technique.  Image due to Laura Hoopes, Pomona College.</p>
 </div>
 
@@ -243,7 +237,7 @@ After Hurricane Maria devastated Puerto Rico in September 2017, there was much d
 
 
 <div class="figure" style="text-align: center">
-<img src="figs/loess_maria.jpg" alt="Four loess curves which show a spike in mortality in September 2017 as compared to mortality both before and after the hurricane." width="640" />
+<img src="figs/loess_maria.jpg" alt="Four loess curves which show a spike in mortality in September 2017 as compared to mortality both before and after the hurricane." width="75%" />
 <p class="caption">(\#fig:unnamed-chunk-8)Increase in death rate as a function of date.  Note the y-axis which is observed rate minus expected rate (found by using a trend line given by loess broken down by age group).</p>
 </div>
 
@@ -295,5 +289,754 @@ For more on kernel smoothers, see the appendix of @sheather and chapter 6 of @ES
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
+The information presented here comes from a March 2022 blog by Peter Ellis on <a href = "http://freerangestats.info/" target = "_blank">free range statistics</a> called <a href = "http://freerangestats.info/blog/2022/03/26/supreme-court-nominations" target = "_blank">Smoothing charts of Supreme Court Justice nomination results</a>.  But I'll back up a minute to provide some context.
 
-## R: Smoothing
+###  538 politics blog {-}
+
+538 did a story describing how it is <a href = "https://fivethirtyeight.com/features/its-harder-than-ever-to-confirm-a-supreme-court-justice/" target = "_blank">harder than ever to confirm a supreme court justice.</a>
+
+<div class="figure" style="text-align: center">
+<img src="figs/538_supreme_court.png" alt="A scatterplot of the number of Senate votes each supreme court justice has gotten, over time.  The vast majority of candidates have been confirmed.  However, we can see that in the past most candidates got 100% of the vote, in the last 30-40 years, the votes have been more mixed.  A loess smooth gives a sense of the average number of Senate votes over time." width="650" />
+<p class="caption">(\#fig:unnamed-chunk-9)Image credit: https://fivethirtyeight.com/features/its-harder-than-ever-to-confirm-a-supreme-court-justice/</p>
+</div>
+
+###  Modeling {-}
+
+As we know from a semester together, there are many ways to model an x-y relationship.
+
+<div class="figure" style="text-align: center">
+<img src="figs/curve_fitting_2x.png" alt="The same set of 31 points is plotted on 12 different scatterpots.  On each scatterplot a different model fit is given in red.  Some of the models are linear, quadratic, exponential, loess, piecewise, and connect the dots." width="620" />
+<p class="caption">(\#fig:unnamed-chunk-10)Image credit: https://xkcd.com/2048/</p>
+</div>
+
+### Twitter {-}
+
+People on twitter get worked up about things.  The gist of their complaints is that we shouldn't be modeling future votes based on historical trends.
+
+<div class="figure" style="text-align: center">
+<img src="figs/twitter_loess.png" alt="@AlecStapp on Twitter complaining about a loess smooth to describe the trend of average number of Senate votes across time." width="596" />
+<p class="caption">(\#fig:unnamed-chunk-11)Image credit: https://twitter.com/AlecStapp/status/1507542987563323393</p>
+</div>
+
+Five Thirty Eight said that <a href = "https://twitter.com/FiveThirtyEight/status/1488874422337482755" target = "_blank">"Supreme Court confirmations are increasingly likely to resemble party-line votes."</a>  Is that a prediction or not?
+
+<div class="figure" style="text-align: center">
+<img src="figs/538_twitter.png" alt="A tweet from Febuary 2, 2022 by 538 with the words: Supreme Court confirmations are increasingly likely to resemble party-line votes." width="584" />
+<p class="caption">(\#fig:unnamed-chunk-12)Image credit:https://twitter.com/FiveThirtyEight/status/1488874422337482755</p>
+</div>
+
+### Averages
+
+Twitter misses the point that 538 is not predicting anything.  Well, at least the model doesn't predict anything. Instead, they are using a loess smooth as an average over time.  It is a **descriptive** model which does not try to make any inferential claims.
+
+Ellis gives a <a href = "http://freerangestats.info/blog/2022/03/26/supreme-court-nominations" target = "_blank">fantastic discussion</a> including trying different models and providing all of his R code.
+
+<div class="figure" style="text-align: center">
+<img src="figs/ellis_loess.png" alt="The Supreme Court data replotted and modeling using a variety of different smoothing methods.  All methods give very similar results." width="671" />
+<p class="caption">(\#fig:unnamed-chunk-13)Image credit: http://freerangestats.info/blog/2022/03/26/supreme-court-nominations</p>
+</div>
+
+
+## R: Smoothing -- NOAA
+
+First we scrape some weather data from NOAA.  The resulting data we will use is wind temperature at noon across the day of the year (for 2014) measured by a buoy off the coast of Santa Monica.
+
+
+```r
+buoy_url <- "http://www.ndbc.noaa.gov/view_text_file.php?filename=46025h2014.txt.gz&dir=data/historical/stdmet/"
+buoy_data_orig <- read_table(buoy_url, skip=2, col_names=FALSE)
+temp <- read_table(buoy_url, n_max=1, col_names=FALSE)
+temp <- unlist(strsplit(unlist(temp), "\\s+"))
+names(buoy_data_orig) <- temp
+
+buoy_data <- buoy_data_orig %>% 
+  mutate(WVHT = ifelse(WVHT==99, NA, WVHT)) %>%
+  mutate(DPD = ifelse(DPD==99, NA, DPD)) %>%
+  mutate(APD = ifelse(APD==99, NA, APD)) %>%
+  mutate(MWD = ifelse(MWD==999, NA, MWD)) %>%
+  mutate(PRES = ifelse(PRES==9999, NA, PRES)) %>%
+  mutate(DEWP = ifelse(DEWP==99, NA, DEWP)) %>%
+  select(-VIS, -TIDE) %>% filter(`#YY`==2014)  %>% filter(hh=="12") %>%
+  mutate(yearday = yday(mdy(paste(MM,DD,`#YY`, sep="-"))))
+```
+
+
+### Polynomial Regression and Step Functions
+
+#### Cubic Model {-}
+
+
+```r
+# cubic model
+wind_cub <- lm(WTMP ~ poly(yearday,3, raw = TRUE), data=buoy_data)
+wind_cub %>%
+  tidy()
+```
+
+```
+## # A tibble: 4 × 5
+##   term                             estimate    std.error statistic   p.value
+##   <chr>                               <dbl>        <dbl>     <dbl>     <dbl>
+## 1 (Intercept)                   16.2        0.196             82.3 6.55e-229
+## 2 poly(yearday, 3, raw = TRUE)1 -0.0544     0.00470          -11.6 2.16e- 26
+## 3 poly(yearday, 3, raw = TRUE)2  0.000655   0.0000299         21.9 3.17e- 67
+## 4 poly(yearday, 3, raw = TRUE)3 -0.00000140 0.0000000539     -26.0 2.14e- 83
+```
+
+```r
+# cubic predictions
+wind_cub %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Cubic Fit")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+  
+  
+#### Step Functions {-}
+
+
+
+```r
+# cutting the yearday variable
+buoy_data %>%
+  summarize(cut(yearday, 4)) %>% table()
+```
+
+```
+## .
+## (0.636,92]   (92,183]  (183,274]  (274,365] 
+##         90         86         83         90
+```
+
+```r
+lm(WTMP ~ cut(yearday, 4), data=buoy_data) %>%
+  tidy()
+```
+
+```
+## # A tibble: 4 × 5
+##   term                     estimate std.error statistic   p.value
+##   <chr>                       <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)                 15.4      0.153    101.   1.29e-258
+## 2 cut(yearday, 4)(92,183]      1.79     0.218      8.18 5.32e- 15
+## 3 cut(yearday, 4)(183,274]     5.83     0.220     26.5  4.86e- 85
+## 4 cut(yearday, 4)(274,365]     3.95     0.216     18.3  1.12e- 52
+```
+
+
+```r
+# step function model
+wind_step <- lm(WTMP ~ cut(yearday, 4), data=buoy_data)
+wind_step %>%
+  tidy()
+```
+
+```
+## # A tibble: 4 × 5
+##   term                     estimate std.error statistic   p.value
+##   <chr>                       <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)                 15.4      0.153    101.   1.29e-258
+## 2 cut(yearday, 4)(92,183]      1.79     0.218      8.18 5.32e- 15
+## 3 cut(yearday, 4)(183,274]     5.83     0.220     26.5  4.86e- 85
+## 4 cut(yearday, 4)(274,365]     3.95     0.216     18.3  1.12e- 52
+```
+
+```r
+#cubic predictions
+wind_step %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Step Function Fit")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+ 
+  
+### Smooth Curves
+
+#### Regression Spline {-}
+
+Note that the function `bs()` calculates "B-Spline Basis for Polynomial Splines."  You can learn more by `?bs` in the **splines** package.  The `knots` argument gives "the internal breakpoints that define the spline."  The `degree` is the degree of the polynomial.  Here, there are three internal knots.
+
+
+```r
+require(splines)
+year_knot1 <- bs(buoy_data$yearday, knots=c(92,183,274), degree=3)
+
+wind_rs1 <- lm(WTMP ~ year_knot1, data=buoy_data)
+wind_rs1 %>% tidy
+```
+
+```
+## # A tibble: 7 × 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)    14.9      0.261     56.9  1.70e-176
+## 2 year_knot11     1.98     0.488      4.06 6.21e-  5
+## 3 year_knot12    -2.47     0.321     -7.68 1.69e- 13
+## 4 year_knot13     6.44     0.391     16.5  2.59e- 45
+## 5 year_knot14     7.91     0.359     22.0  1.37e- 67
+## 6 year_knot15     3.64     0.406      8.97 2.05e- 17
+## 7 year_knot16     1.82     0.363      5.02 8.37e-  7
+```
+
+```r
+# regression spline predictions
+wind_rs1 %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Regression Spline Fit")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+
+#### degrees of freedom {-}
+
+Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-degree` internal knots).  Consider the following call to our model.  The number of knots will be `df-degree`.  (Here, 7 knots)
+
+
+```r
+year_knot2 <- bs(buoy_data$yearday, df=10, degree=3)
+wind_rs2 <- lm(WTMP ~ year_knot2, data=buoy_data)
+
+# note that the coefficients are very similar
+wind_rs1 %>% tidy()
+```
+
+```
+## # A tibble: 7 × 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)    14.9      0.261     56.9  1.70e-176
+## 2 year_knot11     1.98     0.488      4.06 6.21e-  5
+## 3 year_knot12    -2.47     0.321     -7.68 1.69e- 13
+## 4 year_knot13     6.44     0.391     16.5  2.59e- 45
+## 5 year_knot14     7.91     0.359     22.0  1.37e- 67
+## 6 year_knot15     3.64     0.406      8.97 2.05e- 17
+## 7 year_knot16     1.82     0.363      5.02 8.37e-  7
+```
+
+```r
+wind_rs2 %>% tidy()
+```
+
+```
+## # A tibble: 11 × 5
+##    term         estimate std.error statistic   p.value
+##    <chr>           <dbl>     <dbl>     <dbl>     <dbl>
+##  1 (Intercept)    15.6       0.348    44.9   1.66e-144
+##  2 year_knot21    -0.692     0.642    -1.08  2.82e-  1
+##  3 year_knot22     0.445     0.413     1.08  2.81e-  1
+##  4 year_knot23    -0.865     0.502    -1.72  8.59e-  2
+##  5 year_knot24     0.207     0.412     0.501 6.17e-  1
+##  6 year_knot25     6.04      0.444    13.6   6.14e- 34
+##  7 year_knot26     5.21      0.439    11.9   2.22e- 27
+##  8 year_knot27     7.12      0.450    15.8   1.38e- 42
+##  9 year_knot28     2.98      0.496     6.01  4.73e-  9
+## 10 year_knot29     2.48      0.521     4.77  2.81e-  6
+## 11 year_knot210    0.914     0.489     1.87  6.26e-  2
+```
+
+
+#### Choosing df with CV {-}
+
+Below is code for using CV to determine the optimal number of knots (as a function of df) as well as the polynomial degree.
+
+
+
+```r
+set.seed(4747)
+wind_rec <- recipe(WTMP ~ yearday, data = buoy_data) %>%
+  step_bs(yearday, deg_free = tune(), degree = tune())
+
+wind_cv <- vfold_cv(buoy_data, v = 5)
+
+wind_lm <- linear_reg() %>%
+  set_engine("lm")
+
+wind_df <- grid_regular(deg_free(range = c(5, 15)), 
+                        degree(range = c(1,5)) , levels = 5)
+
+wind_tuned <- wind_lm %>%
+  tune_grid(wind_rec,
+            resamples = wind_cv,
+            grid = wind_df)
+
+collect_metrics(wind_tuned)
+```
+
+```
+## # A tibble: 50 × 8
+##    deg_free degree .metric .estimator  mean     n std_err .config              
+##       <int>  <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+##  1        5      1 rmse    standard   0.874     5 0.0337  Preprocessor01_Model1
+##  2        5      1 rsq     standard   0.887     5 0.00967 Preprocessor01_Model1
+##  3        7      1 rmse    standard   0.771     5 0.0227  Preprocessor02_Model1
+##  4        7      1 rsq     standard   0.913     5 0.00666 Preprocessor02_Model1
+##  5       10      1 rmse    standard   0.711     5 0.0244  Preprocessor03_Model1
+##  6       10      1 rsq     standard   0.925     5 0.00643 Preprocessor03_Model1
+##  7       12      1 rmse    standard   0.722     5 0.0286  Preprocessor04_Model1
+##  8       12      1 rsq     standard   0.922     5 0.00766 Preprocessor04_Model1
+##  9       15      1 rmse    standard   0.683     5 0.0441  Preprocessor05_Model1
+## 10       15      1 rsq     standard   0.930     5 0.00965 Preprocessor05_Model1
+## # … with 40 more rows
+```
+
+```r
+collect_metrics(wind_tuned) %>%
+  ggplot(aes(x = deg_free, y = mean, color = as.factor(degree))) + 
+  geom_line() + 
+  facet_grid(.metric ~ .) + 
+  labs(color = "degree") + 
+  ylab("") + 
+  xlab("degrees of freedom (# coefficients)")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+
+For fun, we've plotted two of the combinations of `df` and `degree`. If `degree` is 1, then the model is piece-wise linear (with 4 knots, so 5 regions).  If the `degree` is 2, the model is piece-wise quadratic. With `df` = 15 there are 15 non-intercept coefficients.  That means linear plus quadratic terms (=2) plus 13 knot terms (giving 14 different quadratic models across 14 different regions).  
+
+
+```r
+# df = 5, degree = 1
+year_knot3 <- bs(buoy_data$yearday, df = 5, degree=1)
+
+wind_rs3 <- lm(WTMP ~ year_knot3, data=buoy_data)
+wind_rs3 %>% tidy
+```
+
+```
+## # A tibble: 6 × 5
+##   term        estimate std.error statistic   p.value
+##   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+## 1 (Intercept)   15.6       0.198     79.0  4.28e-222
+## 2 year_knot31   -0.685     0.286     -2.40 1.71e-  2
+## 3 year_knot32    1.81      0.230      7.87 4.62e- 14
+## 4 year_knot33    6.37      0.250     25.5  2.95e- 81
+## 5 year_knot34    5.54      0.243     22.8  1.03e- 70
+## 6 year_knot35    0.959     0.279      3.44 6.61e-  4
+```
+
+```r
+# regression spline predictions
+wind_rs3 %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Regression Spline Fit (df = 5, degree = 1)")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+
+```r
+# df = 15, degree = 2
+year_knot4 <- bs(buoy_data$yearday, df = 15, degree=2)
+
+wind_rs4 <- lm(WTMP ~ year_knot4, data=buoy_data)
+wind_rs4 %>% tidy
+```
+
+```
+## # A tibble: 16 × 5
+##    term         estimate std.error statistic   p.value
+##    <chr>           <dbl>     <dbl>     <dbl>     <dbl>
+##  1 (Intercept)    15.3       0.328    46.7   3.84e-148
+##  2 year_knot41     0.308     0.551     0.559 5.77e-  1
+##  3 year_knot42    -0.191     0.362    -0.529 5.97e-  1
+##  4 year_knot43     0.314     0.416     0.756 4.50e-  1
+##  5 year_knot44     0.364     0.403     0.904 3.67e-  1
+##  6 year_knot45    -1.08      0.399    -2.70  7.34e-  3
+##  7 year_knot46     3.01      0.397     7.59  3.15e- 13
+##  8 year_knot47     3.87      0.398     9.72  8.20e- 20
+##  9 year_knot48     6.25      0.400    15.6   1.43e- 41
+## 10 year_knot49     4.94      0.412    12.0   8.52e- 28
+## 11 year_knot410    7.58      0.395    19.2   9.34e- 56
+## 12 year_knot411    5.51      0.399    13.8   1.23e- 34
+## 13 year_knot412    5.86      0.401    14.6   9.66e- 38
+## 14 year_knot413    2.89      0.411     7.03  1.14e- 11
+## 15 year_knot414    2.86      0.451     6.35  7.26e- 10
+## 16 year_knot415    1.03      0.463     2.22  2.71e-  2
+```
+
+```r
+# regression spline predictions
+wind_rs4 %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Regression Spline Fit (df = 15, degree = 2)")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-21-2.png" width="480" style="display: block; margin: auto;" />
+
+
+
+#### Local Regression (loess) {-}
+
+
+```r
+wind_lo <- loess(WTMP ~ yearday, span=.3, data=buoy_data)
+
+# loess predictions
+wind_lo %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1, yearday = yearday...2) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point() + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  ggtitle("Loess Fit")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
+
+
+#### Choosing the span with CV (or not) {-}
+
+Like with regression splines, cross validation can be used to set the span for loess.  Unfortunately, there is not an easy **tidymodels** way to cross validate to find the span (although the logic for doing so is the same).  
+
+Instead, in the plots below, a loess model is fit for a series of different span values.  Notice, however, that for the NOAA observations, the span doesn't change the fit very much.  That is because the large dataset covers the changes in the response variable.  That is, the signal is quite strong.
+
+One interesting aspect of `loess()` is that it does not support extrapolation, so we cannot predict for the smallest and largest points in the dataset if they are left out.  
+
+
+```r
+span_vals <- seq(0.05, 1, .1)
+wind_full <- data.frame()
+
+for(i in 1:length(span_vals)){
+  
+wind_rec_lo <- loess(WTMP ~ yearday, 
+                     span = span_vals[i],
+                     data = buoy_data)
+
+wind_lo_output <- wind_lo %>% 
+  augment(se_fit = TRUE) %>% 
+  bind_cols(buoy_data) %>%
+  rename(WTMP = WTMP...1, yearday = yearday...2) %>%
+  mutate(upper = .fitted + 2*.se.fit,
+         lower = .fitted - 2*.se.fit) %>%
+  mutate(span = span_vals[i]) %>%
+  select(WTMP, yearday, .fitted, upper, lower, span)
+
+# each time we go through the loop and change the span
+# the new predictions get concatenated onto the full dataset
+wind_full <- wind_full %>% bind_rows(wind_lo_output)
+
+}
+
+wind_full %>%
+  ggplot(aes(x = yearday, y = WTMP)) + 
+  geom_point(alpha = .1) + 
+  geom_line(aes(y = .fitted), color = "blue") + 
+  geom_line(aes(y = upper), lty = 3, color = "blue") + 
+  geom_line(aes(y = lower), lty = 3, color = "blue") + 
+  facet_wrap(~span) + 
+  ggtitle("Loess Fit (changing span)")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
+
+
+
+
+
+
+#### Imputing using Local Regression (loess) {-}
+
+The following TechNote^[From http://research.stowers-institute.org/efg/R/Statistics/loess.htm] shows examples of loess (local polynomial regression fitting) smoothing for various "span" values. The online R documentation (`?loess`) says the default span value is 0.75, but doesn't give much guidance, nor visual examples, of how the span value affects smoothing.  In addition to simply smoothing a curve, the R `loess()` function can be used to impute missing data points. An example of data imputation with `loess()` is shown.
+
+Let's take a sine curve, add some "noise" to it, and then see how the loess "span" parameter affects the look of the smoothed curve.
+
+
+1. Create a sine curve and add some noise:
+
+
+```r
+set.seed(47)
+period <- 120
+x <- 1:120
+y <- sin(2*pi*x/period) + runif(length(x),-1,1)
+
+sine_unif_data <- data.frame(x = x, y = y)
+```
+
+2. Plot the points on this noisy sine curve:
+
+
+```r
+sine_unif_data %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() + 
+  ggtitle("Sine Curve + Uniform Noise")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+
+3. Apply loess smoothing using the default span value of 0.75.
+
+
+```r
+y_loess <- loess(y ~ x, span=0.2, data = sine_unif_data)
+```
+
+
+4. Compute loess smoothed values for all points along the curve using `augment().
+
+
+```r
+y_loess %>% augment()
+```
+
+```
+## # A tibble: 120 × 4
+##         y     x .fitted  .resid
+##     <dbl> <int>   <dbl>   <dbl>
+##  1  1.01      1   0.558  0.448 
+##  2 -0.148     2   0.550 -0.697 
+##  3  0.679     3   0.543  0.136 
+##  4  0.853     4   0.540  0.312 
+##  5  0.406     5   0.542 -0.136 
+##  6  0.692     6   0.547  0.144 
+##  7  0.136     7   0.554 -0.417 
+##  8  0.345     8   0.560 -0.215 
+##  9  0.541     9   0.571 -0.0303
+## 10  1.35     10   0.589  0.761 
+## # … with 110 more rows
+```
+
+5. Plot the loess smoothed curve along with the points that were already plotted:
+
+
+```r
+y_loess %>% augment() %>%
+  mutate(truth = sin(2*pi*x/period)) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_point() + 
+  geom_line(aes(x = x, y = .fitted)) + 
+  geom_line(aes(x = x, y = truth), color = "purple") +
+  ggtitle("Sine Curve + Uniform Noise")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+
+6. Repeat steps 1-5 above for various span values. 
+
+
+```r
+loess_unif <- data.frame()
+spanlist <- c(0.10, 0.25, 0.50, 0.75, 1.00, 2.00)
+for (i in 1:length(spanlist))
+{
+  loess_unif_pred <- loess(y ~ x, span = spanlist[i], 
+                           data = sine_unif_data) %>%
+    augment() %>%
+    mutate(span = spanlist[i])
+  
+  loess_unif <- loess_unif %>% bind_rows(loess_unif_pred)
+  
+}
+    loess_unif %>%
+      mutate(truth = sin(2*pi*x/period)) %>%
+      ggplot(aes(x = x, y = y)) + 
+      geom_point() + 
+      geom_line(aes(x = x, y = .fitted, color = as.factor(span))) + 
+      geom_line(aes(x = x, y = truth), color = "black") +
+      labs(color = "span") + 
+      ggtitle("Sine Curve + Uniform Noise")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+
+7. Compare "noise" from a uniform distribution from -1 to 1 (above) to Gaussian noise, with mean 0 and standard deviation 1.0 (below).
+
+
+```r
+set.seed(47)
+period <- 120
+x <- 1:120
+y <- sin(2*pi*x/period) + rnorm(length(x), 0, 1)
+
+sine_norm_data <- data.frame(x = x, y = y)
+```
+
+
+
+```r
+loess_unif <- data.frame()
+spanlist <- c(0.10, 0.25, 0.50, 0.75, 1.00, 2.00)
+for (i in 1:length(spanlist))
+{
+  loess_unif_pred <- loess(y ~ x, span = spanlist[i], 
+                           data = sine_norm_data) %>%
+    augment() %>%
+    mutate(span = spanlist[i])
+  
+  loess_unif <- loess_unif %>% bind_rows(loess_unif_pred)
+  
+}
+    loess_unif %>%
+      mutate(truth = sin(2*pi*x/period)) %>%
+      ggplot(aes(x = x, y = y)) + 
+      geom_point() + 
+      geom_line(aes(x = x, y = .fitted, color = as.factor(span))) + 
+      geom_line(aes(x = x, y = truth), color = "black") +
+      labs(color = "span") + 
+      ggtitle("Sine Curve + Normal Noise")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+
+
+8. Let's use `loess()` to impute data points. Start by taking a sine curve with noise, like computed above, but leave out 15 of the 120 data points using R's "sample" function.  Note the gaps in the (true) sine function superimposed on the points.
+
+
+```r
+set.seed(47)
+period <- 120
+missing_pts <- sample(1:period, 15)
+missing_pts
+```
+
+```
+##  [1]  27  57 114  15  84   1  26  13  23  70   9  54   6  12 104
+```
+
+```r
+ # Create sine curve with noise
+x <- 1:period
+y <- sin(2*pi*x/period) + runif(length(x),-1,1) 
+sine_miss_data <- data.frame(x = x, y = y) %>%
+  slice(-missing_pts)
+
+
+sine_miss_data %>%
+  mutate(truth = sin(2*pi*x/period)) %>% 
+  bind_rows(data.frame(x = missing_pts, y = NA)) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_line(aes(y = truth, group = 1), color = "purple") + 
+  geom_point() + 
+  ggtitle("Missing data gone from model")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
+
+9. As before, use the `loess()` and `augment()` functions to get smoothed values at the defined points:
+
+
+```r
+y_miss_loess <- loess(y ~ x, span=0.75, data = sine_miss_data)
+
+y_miss_pred <- y_miss_loess %>% 
+  augment(newdata = data.frame(x = missing_pts))
+```
+
+10. Use the loess and predict functions to also impute the values at the missing points:
+
+
+```r
+sine_miss_data %>%
+  mutate(truth = sin(2*pi*x/period)) %>% 
+  bind_rows(data.frame(x = missing_pts, y = NA)) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_line(aes(y = truth, group = 1), color = "purple") + 
+  geom_point() +
+  geom_point(data = y_miss_pred, aes(x = x, y = .fitted),
+             color = "purple", size = 4) +
+  ggtitle("Missing data imputed")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+
+11. Compare the loess smoothed fit and imputed points for various span values.
+
+
+```r
+y_miss_loess_75 <- loess(y ~ x, span=0.75, data = sine_miss_data)
+y_miss_pred_75 <- y_miss_loess_75 %>% 
+  augment(newdata = data.frame(x = missing_pts))
+
+y_miss_loess_50 <- loess(y ~ x, span=0.5, data = sine_miss_data)
+y_miss_pred_50 <- y_miss_loess_50 %>% 
+  augment(newdata = data.frame(x = missing_pts))
+
+y_miss_loess_1 <- loess(y ~ x, span = 1, data = sine_miss_data)
+y_miss_pred_1 <- y_miss_loess_1 %>% 
+  augment(newdata = data.frame(x = missing_pts))
+
+sine_miss_data %>%
+  mutate(truth = sin(2*pi*x/period)) %>% 
+  bind_rows(data.frame(x = missing_pts, y = NA)) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_line(aes(y = truth, group = 1), color = "black") + 
+  geom_point() +
+  geom_point(data = y_miss_pred_75, aes(x = x, y = .fitted),
+             color = "purple", size = 4) +
+  geom_point(data = y_miss_pred_50, aes(x = x, y = .fitted),
+             color = "green", size = 4) +
+  geom_point(data = y_miss_pred_1, aes(x = x, y = .fitted),
+             color = "red", size = 4) +
+  geom_line(data = y_miss_loess_75 %>% augment(), 
+            aes(x = x, y = .fitted),
+             color = "purple", linetype = 2) +
+  geom_line(data = y_miss_loess_50 %>% augment(), 
+            aes(x = x, y = .fitted),
+             color = "green", linetype = 2) +
+  geom_line(data = y_miss_loess_1 %>% augment(), 
+            aes(x = x, y = .fitted),
+             color = "red", linetype = 2) +  
+  labs(title = "Missing data imputed",
+       subtitle = "purple: 0.75; green = 0.5; red = 1.0")
+```
+
+<img src="05b-smooth_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
+#### Discussion/Conclusion {-}
+
+Given the sine data, span values as small as 0.10 do not provide much smoothing and can result in a "jerky" curve. Span values as large as 2.0 provide perhaps too much smoothing, at least in the cases shown above. Overall, the default value of 0.75 worked fairly well in "finding" the sine curve.
+
+
+
