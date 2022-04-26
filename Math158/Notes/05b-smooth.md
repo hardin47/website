@@ -6,7 +6,7 @@
 
 
 
-There are different names for the smoothing functions:  smoothers, loess, lowest (locally weighted scatterplot smoothing).  They are all slightly different, and we will investigate some of the nuanced differences.  Note, however, the goal is to fit a model on $X$ that predicts $E[Y | X]$ which is not necessarily linear in $X$.  So far in the course, every model fit has been *linear* in the parameters (of said differently, the expected response is a linear function of the explanatory variables, which are sometimes transformed).
+There are different names for the smoothing functions:  smoothers, loess, lowess (locally weighted scatterplot smoothing).  They are all slightly different, and we will investigate some of the nuanced differences.  Note, however, the goal is to fit a model on $X$ that predicts $E[Y | X]$ which is not necessarily linear in $X$.  So far in the course, every model fit has been *linear* in the parameters (of said differently, the expected response is a linear function of the explanatory variables, which are sometimes transformed).
 
 $$E[Y | X] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_{p-1} X_{p-1} = f(X)$$
 
@@ -142,11 +142,11 @@ lim_{X \rightarrow \xi_1^+} E[Y|X] &=& \beta_0  - \beta_4 \xi_1^3 + \beta_1 \xi_
 
 #### Knots {-}
 
-Knots can be placed uniformly or at places where the function is expected to change rapidly.   Most often the number of knots is set and the software places them uniformly.  The number of knots is directly related to the degrees of freedom of the model, so setting the degrees of freedom also sets the number of knots.  Ideally, a method such as dross validation will be used to optimize the number of knots.
+Knots can be placed uniformly or at places where the function is expected to change rapidly.   Most often the number of knots is set and the software places them uniformly.  The number of knots is directly related to the degrees of freedom of the model, so setting the degrees of freedom also sets the number of knots.  Ideally, a method such as cross validation will be used to optimize the number of knots.
 
 #### degrees of freedom {-}
 
-Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-1` internal knots). The number of knots will be `df-1`. 
+Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-degree` internal knots).  Consider the following call to our model.  The number of knots will be `df-degree`, here, 7 knots.  In the `bs()` function, `df+1` is the number of coefficients in the model.
 
 
 
@@ -161,7 +161,7 @@ Local regression (loess - locally weighted scatterplot smoothing) models fit fle
 **Local Regression at $X=x_0$ ($p=2$)**  
 
 ******  
-1. Gather the fraction $s=k/n$ of training points whose $X_i$ are closest to $x_0$. 
+1. Gather the fraction $s=k/n$ of training points whose $X_i$ are closest to $x_0$. $s$ is called the span.
 2. Assign a weight $K_{i0} = K(X_i, x_0)$ to each point in the neighborhood, so that the furthest point from $x_0$ has weight zero and the closest point has the highest weight.  All but the $k$ closest points get zero weight. 
 3. Fit a weighted least squares regression of the $Y_i$ on the $X_i$ using the $K_{i0}$ weights.  Find $b_0$ and $b_1$ that minimize: 
 $$\sum_{i=1}^n K_{i0}(Y_i - b_0 - b_1 X_i)^2.$$
@@ -171,9 +171,15 @@ $$\sum_{i=1}^n K_{i0}(Y_i - b_0 - b_1 X_i)^2.$$
 To create the smooth regression function, the points are connected by drawing a line (or surface) between each predicted value.  The fraction of points with non-zero weights is given by the *span*, $s=k/n$.  The span plays a role similar to other tuning parameters.  It can be made to produce a model similar to OLS (large span) or to produce a model which way over-fits the data (small span).  Cross validation can be used to find $s$.
 
 
+
+<div class="figure" style="text-align: center">
+<img src="figs/local_reg_islr.png" alt="An x-y scatterplot is shown where the relationship looks quadratic.  A small fraction of the observations are colored orange indicating the observations close to the target point which are used to fit a single value.  A weight function is superimposed indciating that points far from the target point are not included and points close to the target point are given a high weight in calculating the prediction." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-5)Figure 7.9 from @ISL shows weighted local regression.</p>
+</div>
+
 Local Regression can theoretically be expanded to higher dimensions.  Weighted least squares (see section 11.1 in @kutner) is given by minimizing:
 
-$$\sum_{i=1}^n w_i(Y_i - \beta_0 - \beta_1X_{i1} - \cdots - \beta_{p-1}X_{i,p-1})^2.$$
+$$\sum_{i=1}^n w_i(Y_i - b_0 - b_1X_{i1} - \cdots - b_{p-1}X_{i,p-1})^2.$$
 
 The normal equations are solved in the same way given coefficient estimates and standard errors as ($W$ is the diagonal matrix of weights):
 \begin{eqnarray*}
@@ -183,19 +189,19 @@ var(b_w) &=& \sigma^2 (X^t W X)^{-1} (X^t W W X) (X^t W X)^{-1}
 \end{eqnarray*}
 
 
-However, in high dimensional settings the *distance* to $x_0$ might be quite large, and there will be very few points in a high dimensional neighborhood of $x_0$.  The distance problem leads to most points have zero weight (i.e., large distance) from the other points.  And the regression estimates become quite variable and hard to estimate.
+However, in high dimensional settings the *distance* to $x_0$ might be quite large, and there will be very few points in a high dimensional neighborhood of $x_0$.  The distance problem leads to most points having zero weight (i.e., large distance) from the other points.  And the regression estimates become quite variable and hard to estimate.
 
 ### Weight function for local regression
 
 The standard weight function used in local regression is called the *tricubic weight function*.
 
 
-* For $s < 1$, the neighborhood includes proportion $s$ of the points, and these have tricubic weighting
+* For $s < 1$, the neighborhood includes the proportion $s$ of the points, and these have tricubic weighting
 
-$$K_{i0}  = \Bigg(1 - \bigg(\frac{d(x_i, x_0)}{\max_{i \in S} d(x_i, x_0)} \bigg)^3 \Bigg)^3 I(d(x_i, x_0) < \max_{i \in S} d(x_i, x_0))$$
+$$K_{i0}  = \Bigg(1 - \bigg(\frac{d(x_i, x_0)}{\max_{i \in S} d(x_i, x_0)} \bigg)^3 \Bigg)^3 I\bigg[d(x_i, x_0) < \max_{i \in S} d(x_i, x_0)\bigg]$$
 where $S$ defines the set of $x_i$ values which are the $k$ closest points to $x_0$.
 
-* For $s > 1$, all points are used, with the "maximum distance" (as above) assumed to be $s^{(1/(p-1))}$ times the actual maximum distance for $p$ coefficients ($p-1$ explanatory variables). 
+* For $s > 1$, all points are used, with the "maximum distance" (as above) assumed to be $s^{(1/(p-1))}$ times the actual maximum distance for $p$ coefficients ($p-1$ explanatory variables).  $s > 1$ means that the weights ($K_{i0}$) increase for larger and larger $s$.
 * Distance can be defined using any distance function, Euclidean being the default although not resistant to outliers. 
 * Regression is done by least squares (default) although other regression techniques can be used (e.g., Tukey's biweight M-estimation regression...  we won't talk about that in class).
 * The `loess()` function in R does the modeling / prediction.  In **ggplot2** the default method for `geom_smooth()` plot uses `loess`.
@@ -208,8 +214,6 @@ Imputation is the process of replacing missing data with summary values (i.e., s
 
 Keep in mind that the algorithm for creating a smooth prediction at $x_0$ does not depend on $x_0$ being part of the model.  That is, the prediction is possible whether or not $x_0$ has a corresponding response value.
 
-See the R code (posted on website) for an example on imputing data using a loess smoother.
-
 
 ### Normalization
 
@@ -220,12 +224,12 @@ Microarrays and other high-throughput analysis techniques require normalization 
 
 <div class="figure" style="text-align: center">
 <img src="figs/LH_microarray.jpg" alt="Image is a grid of red, yellow, and green dots.  Each dot represents a gene, and the color or fluorescence estimates the amount of gene activity." width="75%" />
-<p class="caption">(\#fig:unnamed-chunk-6)The microarray shows differing amounts of expression across two conditions (here old and young yeast).  The expectation is that, on median, the dots (i.e., genes) should be yellow.   As can be seen from the image, points on the left side of the microarray are dimmer than the points on the right side.  The imbalance is an artifact of the technical limitations of the technique.  Image due to Laura Hoopes, Pomona College.</p>
+<p class="caption">(\#fig:unnamed-chunk-7)The microarray shows differing amounts of expression across two conditions (here old and young yeast).  The expectation is that, on median, the dots (i.e., genes) should be yellow.   As can be seen from the image, points on the left side of the microarray are dimmer than the points on the right side.  The imbalance is an artifact of the technical limitations of the technique.  Image due to Laura Hoopes, Pomona College.</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/19MA.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="47%" /><img src="figs/nolow_array_norm.jpg" alt="The left image shows a scatter plot with total expression on the x-axis and relative expression on the y-axis.  Loess smoothed curves are superimposed to show technical artifacts.  The right image shows how the expression values are distributed after they have been standardized by subtracting the associated loess curve." width="47%" />
-<p class="caption">(\#fig:unnamed-chunk-7)[left] M = ratio of expression, A = product of expression (total amount of expression).  The different smooth curves refer to different locations on the microarray chip.  To normalize, we subtract the line from each corresponding dot which can be thought of as taking the colored lines and pulling them taut. [right] By centering each array's expression values to zero (either across the location on the chip 'print-tip group' or within an array itself), we can do an apples to apples comparison of the expression across different samples.</p>
+<p class="caption">(\#fig:unnamed-chunk-8)[left] M = ratio of expression, A = product of expression (total amount of expression).  The different smooth curves refer to different locations on the microarray chip.  To normalize, we subtract the line from each corresponding dot which can be thought of as taking the colored lines and pulling them taut. [right] By centering each array's expression values to zero (either across the location on the chip 'print-tip group' or within an array itself), we can do an apples to apples comparison of the expression across different samples.</p>
 </div>
 
 
@@ -238,7 +242,7 @@ After Hurricane Maria devastated Puerto Rico in September 2017, there was much d
 
 <div class="figure" style="text-align: center">
 <img src="figs/loess_maria.jpg" alt="Four loess curves which show a spike in mortality in September 2017 as compared to mortality both before and after the hurricane." width="75%" />
-<p class="caption">(\#fig:unnamed-chunk-8)Increase in death rate as a function of date.  Note the y-axis which is observed rate minus expected rate (found by using a trend line given by loess broken down by age group).</p>
+<p class="caption">(\#fig:unnamed-chunk-9)Increase in death rate as a function of date.  Note the y-axis which is observed rate minus expected rate (found by using a trend line given by loess broken down by age group).</p>
 </div>
 
 
@@ -250,7 +254,7 @@ After Hurricane Maria devastated Puerto Rico in September 2017, there was much d
 #### Advantages of smoothing {-}
 
 * Smoothing methods do not require a known functional relationship between $X$ and $Y$. 
-   - Regression splines does provide a functional model 
+   - Regression splines do provide a functional model 
    - loess does not provide a functional model 
 * The relationships are easy to fit 
 * and they retain many of the advantages of weighted least squares (including confidence estimates for the predicted values). 
@@ -258,19 +262,19 @@ After Hurricane Maria devastated Puerto Rico in September 2017, there was much d
 
 #### Disadvantages of smoothing {-}
 
-* Local regression can be computationally intensive, with methods giving unstable estimates in high dimensions due to sparsity of points. 
+* Local regression can be computationally intensive, with methods giving unstable estimates in high dimensions (and at the outer range of X) due to sparsity of points. 
 * Regression splines have arbitrary knots which may not fit the model well. 
-* Although interpolation can be used (and is used in R!) to get predictions (with standard errors), there is no functional form for the relationship between $X$ and $Y$ with loess.  Inference on coefficients is meaningless. 
+* Although interpolation can be used to get predictions (with standard errors), there is no functional form for the relationship between $X$ and $Y$ with loess.  Inference on coefficients is meaningless. 
 
 ## Inference
 
 Keep in mind that in order to have a p-value (which is a probability), there must be a probability model.   OLS assumes normal errors, and if basis functions or weighted OLS are applied using standard linear model techniques, then there should be some notion that there is an *iid* normal error structure.  Confidence intervals also require a probability model in order to apply the standard inferential interpretations.
 
-In particular, the wind temperature observations are *not* independent.  There is a strong dependency between the temperature on any two consecutive days.  The data are much better described by an autoregressive model if the goal of inference.  (Autoregression is used, e.g., when the x-variable is time and the observations are correlated.  The y-variable could be stock price or temperature.  We haven't talked about these types of models in any formal way.)  If the goal is more descriptive (or simply predictive for reasons such as normalization or extrapolation), then SE values and CI bounds are not needed, and a smooth curve will probably be effective even if the technical conditions do not hold.
+In particular, the wind temperature observations are *not* independent.  There is a strong dependency between the temperature on any two consecutive days.  The data are much better described by an autoregressive model if the goal is inference.  (Autoregression is used, e.g., when the x-variable is time and the observations are correlated.  The y-variable could be stock price or temperature.  We haven't talked about these types of models in any formal way.)  If the goal is more descriptive (or simply predictive for reasons such as normalization or extrapolation), then SE values and CI bounds are not needed, and a smooth curve will probably be effective even if the technical conditions do not hold.
 
 
 #### Don't Forget {-}
-There is no substitute for thinking carefully about how you are modeling relationships.  Whether it be linear, non-linear, sparse, locally weighted, or optimized.   There will not be a model which is the *one* right model.  Instead, your expertise and practice will provide you with strategies to help come up with a model that describes your data well.
+There is no substitute for thinking carefully about how you are modeling relationships.  Whether it be linear, non-linear, sparse, locally weighted, or optimized.   There will almost never be a single model which is the *one* right model.  Instead, your expertise and practice will provide you with strategies to help come up with a model that describes your data well.
 
 
 For more on kernel smoothers, see the appendix of @sheather and chapter 6 of @ESL.
@@ -296,8 +300,8 @@ The information presented here comes from a March 2022 blog by Peter Ellis on <a
 538 did a story describing how it is <a href = "https://fivethirtyeight.com/features/its-harder-than-ever-to-confirm-a-supreme-court-justice/" target = "_blank">harder than ever to confirm a supreme court justice.</a>
 
 <div class="figure" style="text-align: center">
-<img src="figs/538_supreme_court.png" alt="A scatterplot of the number of Senate votes each supreme court justice has gotten, over time.  The vast majority of candidates have been confirmed.  However, we can see that in the past most candidates got 100% of the vote, in the last 30-40 years, the votes have been more mixed.  A loess smooth gives a sense of the average number of Senate votes over time." width="650" />
-<p class="caption">(\#fig:unnamed-chunk-9)Image credit: https://fivethirtyeight.com/features/its-harder-than-ever-to-confirm-a-supreme-court-justice/</p>
+<img src="figs/538_supreme_court.png" alt="A scatterplot of the number of Senate votes each supreme court justice has gotten, over time.  The vast majority of candidates have been confirmed.  However, we can see that in the past most candidates got 100% of the vote, in the last 30-40 years, the votes have been more mixed.  A loess smooth gives a sense of the average number of Senate votes over time." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-10)Image credit: https://fivethirtyeight.com/features/its-harder-than-ever-to-confirm-a-supreme-court-justice/</p>
 </div>
 
 ###  Modeling {-}
@@ -305,8 +309,8 @@ The information presented here comes from a March 2022 blog by Peter Ellis on <a
 As we know from a semester together, there are many ways to model an x-y relationship.
 
 <div class="figure" style="text-align: center">
-<img src="figs/curve_fitting_2x.png" alt="The same set of 31 points is plotted on 12 different scatterpots.  On each scatterplot a different model fit is given in red.  Some of the models are linear, quadratic, exponential, loess, piecewise, and connect the dots." width="620" />
-<p class="caption">(\#fig:unnamed-chunk-10)Image credit: https://xkcd.com/2048/</p>
+<img src="figs/curve_fitting_2x.png" alt="The same set of 31 points is plotted on 12 different scatterpots.  On each scatterplot a different model fit is given in red.  Some of the models are linear, quadratic, exponential, loess, piecewise, and connect the dots." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-11)Image credit: https://xkcd.com/2048/</p>
 </div>
 
 ### Twitter {-}
@@ -314,15 +318,15 @@ As we know from a semester together, there are many ways to model an x-y relatio
 People on twitter get worked up about things.  The gist of their complaints is that we shouldn't be modeling future votes based on historical trends.
 
 <div class="figure" style="text-align: center">
-<img src="figs/twitter_loess.png" alt="@AlecStapp on Twitter complaining about a loess smooth to describe the trend of average number of Senate votes across time." width="596" />
-<p class="caption">(\#fig:unnamed-chunk-11)Image credit: https://twitter.com/AlecStapp/status/1507542987563323393</p>
+<img src="figs/twitter_loess.png" alt="@AlecStapp on Twitter complaining about a loess smooth to describe the trend of average number of Senate votes across time." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-12)Image credit: https://twitter.com/AlecStapp/status/1507542987563323393</p>
 </div>
 
 Five Thirty Eight said that <a href = "https://twitter.com/FiveThirtyEight/status/1488874422337482755" target = "_blank">"Supreme Court confirmations are increasingly likely to resemble party-line votes."</a>  Is that a prediction or not?
 
 <div class="figure" style="text-align: center">
-<img src="figs/538_twitter.png" alt="A tweet from Febuary 2, 2022 by 538 with the words: Supreme Court confirmations are increasingly likely to resemble party-line votes." width="584" />
-<p class="caption">(\#fig:unnamed-chunk-12)Image credit:https://twitter.com/FiveThirtyEight/status/1488874422337482755</p>
+<img src="figs/538_twitter.png" alt="A tweet from Febuary 2, 2022 by 538 with the words: Supreme Court confirmations are increasingly likely to resemble party-line votes." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-13)Image credit:https://twitter.com/FiveThirtyEight/status/1488874422337482755</p>
 </div>
 
 ### Averages
@@ -332,8 +336,8 @@ Twitter misses the point that 538 is not predicting anything.  Well, at least th
 Ellis gives a <a href = "http://freerangestats.info/blog/2022/03/26/supreme-court-nominations" target = "_blank">fantastic discussion</a> including trying different models and providing all of his R code.
 
 <div class="figure" style="text-align: center">
-<img src="figs/ellis_loess.png" alt="The Supreme Court data replotted and modeling using a variety of different smoothing methods.  All methods give very similar results." width="671" />
-<p class="caption">(\#fig:unnamed-chunk-13)Image credit: http://freerangestats.info/blog/2022/03/26/supreme-court-nominations</p>
+<img src="figs/ellis_loess.png" alt="The Supreme Court data replotted and modeling using a variety of different smoothing methods.  All methods give very similar results." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-14)Image credit: http://freerangestats.info/blog/2022/03/26/supreme-court-nominations</p>
 </div>
 
 
@@ -399,7 +403,7 @@ wind_cub %>%
   ggtitle("Cubic Fit")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" />
   
   
 #### Step Functions {-}
@@ -467,7 +471,7 @@ wind_step %>%
   ggtitle("Step Function Fit")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-17-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
  
   
 ### Smooth Curves
@@ -514,11 +518,11 @@ wind_rs1 %>%
   ggtitle("Regression Spline Fit")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 #### degrees of freedom {-}
 
-Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-degree` internal knots).  Consider the following call to our model.  The number of knots will be `df-degree`.  (Here, 7 knots)
+Note that we can fit the model based on placing the knots or based on the number of knots (specified by degrees of freedom which places `df-degree` internal knots).  Consider the following call to our model.  The number of knots will be `df-degree`, here, 7 knots.  In the `bs()` function, `df+1` is the number of coefficients in the model.  The `knots` argument supersedes the `df` argument in the function.
 
 
 ```r
@@ -618,7 +622,7 @@ collect_metrics(wind_tuned) %>%
   xlab("degrees of freedom (# coefficients)")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
 
 For fun, we've plotted two of the combinations of `df` and `degree`. If `degree` is 1, then the model is piece-wise linear (with 4 knots, so 5 regions).  If the `degree` is 2, the model is piece-wise quadratic. With `df` = 15 there are 15 non-intercept coefficients.  That means linear plus quadratic terms (=2) plus 13 knot terms (giving 14 different quadratic models across 14 different regions).  
 
@@ -659,7 +663,7 @@ wind_rs3 %>%
   ggtitle("Regression Spline Fit (df = 5, degree = 1)")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-21-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 # df = 15, degree = 2
@@ -707,7 +711,7 @@ wind_rs4 %>%
   ggtitle("Regression Spline Fit (df = 15, degree = 2)")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-21-2.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-22-2.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -732,7 +736,7 @@ wind_lo %>%
   ggtitle("Loess Fit")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-22-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
 
 
 #### Choosing the span with CV (or not) {-}
@@ -779,7 +783,7 @@ wind_full %>%
   ggtitle("Loess Fit (changing span)")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -815,7 +819,7 @@ sine_unif_data %>%
   ggtitle("Sine Curve + Uniform Noise")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-26-1.png" width="480" style="display: block; margin: auto;" />
 
 3. Apply loess smoothing using the default span value of 0.75.
 
@@ -862,7 +866,7 @@ y_loess %>% augment() %>%
   ggtitle("Sine Curve + Uniform Noise")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-28-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
 
 6. Repeat steps 1-5 above for various span values. 
 
@@ -890,7 +894,7 @@ for (i in 1:length(spanlist))
       ggtitle("Sine Curve + Uniform Noise")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
 
 7. Compare "noise" from a uniform distribution from -1 to 1 (above) to Gaussian noise, with mean 0 and standard deviation 1.0 (below).
 
@@ -929,7 +933,7 @@ for (i in 1:length(spanlist))
       ggtitle("Sine Curve + Normal Noise")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-31-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
 
 
 8. Let's use `loess()` to impute data points. Start by taking a sine curve with noise, like computed above, but leave out 15 of the 120 data points using R's "sample" function.  Note the gaps in the (true) sine function superimposed on the points.
@@ -963,7 +967,7 @@ sine_miss_data %>%
   ggtitle("Missing data gone from model")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-32-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-33-1.png" width="480" style="display: block; margin: auto;" />
 
 9. As before, use the `loess()` and `augment()` functions to get smoothed values at the defined points:
 
@@ -990,7 +994,7 @@ sine_miss_data %>%
   ggtitle("Missing data imputed")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-34-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
 
 11. Compare the loess smoothed fit and imputed points for various span values.
 
@@ -1033,7 +1037,7 @@ sine_miss_data %>%
        subtitle = "purple: 0.75; green = 0.5; red = 1.0")
 ```
 
-<img src="05b-smooth_files/figure-html/unnamed-chunk-35-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05b-smooth_files/figure-html/unnamed-chunk-36-1.png" width="480" style="display: block; margin: auto;" />
 #### Discussion/Conclusion {-}
 
 Given the sine data, span values as small as 0.10 do not provide much smoothing and can result in a "jerky" curve. Span values as large as 2.0 provide perhaps too much smoothing, at least in the cases shown above. Overall, the default value of 0.75 worked fairly well in "finding" the sine curve.
