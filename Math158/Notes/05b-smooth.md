@@ -474,9 +474,9 @@ wind_step %>%
 <img src="05b-smooth_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
  
   
-### Smooth Curves
 
-#### Regression Spline {-}
+
+### Regression Spline
 
 Note that the function `bs()` calculates "B-Spline Basis for Polynomial Splines."  You can learn more by `?bs` in the **splines** package.  The `knots` argument gives "the internal breakpoints that define the spline."  The `degree` is the degree of the polynomial.  Here, there are three internal knots.
 
@@ -715,7 +715,7 @@ wind_rs4 %>%
 
 
 
-#### Local Regression (loess) {-}
+### Local Regression (loess)
 
 
 ```r
@@ -754,7 +754,7 @@ wind_full <- data.frame()
 
 for(i in 1:length(span_vals)){
   
-wind_rec_lo <- loess(WTMP ~ yearday, 
+wind_lo <- loess(WTMP ~ yearday, 
                      span = span_vals[i],
                      data = buoy_data)
 
@@ -765,7 +765,7 @@ wind_lo_output <- wind_lo %>%
   mutate(upper = .fitted + 2*.se.fit,
          lower = .fitted - 2*.se.fit) %>%
   mutate(span = span_vals[i]) %>%
-  select(WTMP, yearday, .fitted, upper, lower, span)
+  dplyr::select(WTMP, yearday, .fitted, upper, lower, span)
 
 # each time we go through the loop and change the span
 # the new predictions get concatenated onto the full dataset
