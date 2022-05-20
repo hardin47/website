@@ -320,10 +320,36 @@ $$\mbox{risk} = \frac{\mbox{number of successes}}{\mbox{total number}}$$
 
 $$\mbox{odds} = \frac{\mbox{number of successes}}{\mbox{number of failures}}$$
 
+
+
+
 $$\mbox{Odds Ratio (OR)} = \frac{\mbox{odds of success in group 1}}{\mbox{odds of success in group 2}}$$
 
 
 \BeginKnitrBlock{definition}<div class="definition"><span class="definition" id="def:unnamed-chunk-6"><strong>(\#def:unnamed-chunk-6) </strong></span>**Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."</div>\EndKnitrBlock{definition}
+
+## Are odds difficult to understand?
+
+If you, like me, grew up in a world of proportions and percentages, the first time you encounter odds, it might seem like an *odd* statistic. 
+However, I'd like to argue that, fundamentally, the idea of odds is no different from the idea of risk (or proportion). 
+The cognitive difficulty in remembering and communicating about odds comes with the fact that we've wired our brains so completely to think primarily about proportions.  
+
+But what if you had grown up thinking about odds? 
+What if you had had a placement at your kitchen table describing the odds of an event (instead of the proportion of the event)? 
+You might find that the odds are actually easier to interpret than a proportion.
+
+I posit that if you (or your students) had grown up with a kitchen table placemat as seen in Figure \@ref(fig:oddspm), you would find risk to be the *odd* concept and odds to be the intuitive idea.
+
+<div class="figure" style="text-align: center">
+<img src="figs/riskplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/5 = 0.6 which is the risk or the proportion of blue pie pieces." width="1041" />
+<p class="caption">(\#fig:riskpm)A child's kitchen placemat designed to teach proportions, often called risk in medical studies.</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="figs/oddsplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/2 = 1.5 which is the odds of the blue pie pieces." width="1043" />
+<p class="caption">(\#fig:oddspm)An alternative child's kitchen placemat designed to teach odds.</p>
+</div>
+
 
 
 ### Example: Smoking and Lung Cancer^[Inv 3.10, Chance & Rossman, ISCAM] 
