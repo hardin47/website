@@ -341,12 +341,12 @@ You might find that the odds are actually easier to interpret than a proportion.
 I posit that if you (or your students) had grown up with a kitchen table placemat as seen in Figure \@ref(fig:oddspm), you would find risk to be the *odd* concept and odds to be the intuitive idea.
 
 <div class="figure" style="text-align: center">
-<img src="figs/riskplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/5 = 0.6 which is the risk or the proportion of blue pie pieces." width="1041" />
+<img src="figs/riskplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/5 = 0.6 which is the risk or the proportion of blue pie pieces." width="90%" />
 <p class="caption">(\#fig:riskpm)A child's kitchen placemat designed to teach proportions, often called risk in medical studies.</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/oddsplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/2 = 1.5 which is the odds of the blue pie pieces." width="1043" />
+<img src="figs/oddsplacemat.png" alt="Six different pie charts are shown, each with a different number of equivalently sized pie pieces colored either blue or orange.  For example, one pie has three blue and two orange pieces.  Below that particular pie is written 3/2 = 1.5 which is the odds of the blue pie pieces." width="90%" />
 <p class="caption">(\#fig:oddspm)An alternative child's kitchen placemat designed to teach odds.</p>
 </div>
 
