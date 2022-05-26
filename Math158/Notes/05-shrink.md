@@ -30,12 +30,12 @@ There are many other models, and you can see the flexibility scale of models fro
 Note that for Lasso and Ridge Regression, the models are less flexible because they constrain the coefficient estimates.  The constraints increase the bias and decrease the variability.  
 
   * increases in bias: the constrained coefficients won't fit the observations as well as OLS.  That is, the trend is different from what the data are presenting.  
-  * decrease in variability:  the constrained coefficients attenuate to zero which means that a different dataset will also have coefficients close to zero.  By forcing the coefficients to be small, there is a sense that different datasets will have similar coefficients (and therefore similar predictions).  
+  * decrease in variability:  the constrained coefficients attenuate to zero which means that a different dataset will also have coefficients close to zero.  By forcing the coefficients to be small and closer to one another across different datasets, the predictions will then me more similar (and less variable).
 
 
 <div class="figure" style="text-align: center">
 <img src="figs/flexibility.png" alt="A coordinate plane with individual models at particular coordinate points.  Linear models are less flexible but easy to interpret; neural networks are very flexible and hard to interpret." width="786" />
-<p class="caption">(\#fig:unnamed-chunk-4)The  Image credit: Figure 2.7 of ISLR</p>
+<p class="caption">(\#fig:unnamed-chunk-4)Image credit: Figure 2.7 of ISLR</p>
 </div>
 
 
@@ -209,6 +209,16 @@ Quote from *An Introduction to Statistical Learning*, V2, page 246.
 <p class="caption">(\#fig:unnamed-chunk-11-2)From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.</p>
 </div>
 
+
+@subforlasso comment on the theoretical literature as well as perform extensive simulations to compare best subsets, forward stepwise, and the Lasso.  Their summary is:
+
+> * neither best subset nor the lasso uniformly dominate the other, with best subset generally performing better in very high signal-to-noise (SNR) ratio regimes, and the lasso better in low SNR regimes;
+
+> * for a large proportion of the settings considered, best subset and forward stepwise perform similarly, but in certain cases in the high SNR regime, best subset performs better;
+
+> * forward stepwise and best subsets tend to yield sparser models (when tuned on a validation set), especially in the high SNR regime;
+
+> * the relaxed lasso (actually, a simplified version of the original relaxed estimator defined in Meinshausen (Comput. Statist. Data Anal. 52 (2007) 374–393)) is the overall winner, performing just about as well as the lasso in low SNR scenarios, and nearly as well as best subset in high SNR scenarios.
 
 
 ## Elastic Net
