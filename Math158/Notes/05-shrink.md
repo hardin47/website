@@ -17,6 +17,28 @@ The main reason to use shrinkage techniques is when the model has a lot of predi
 
 
 
+## Model Complexity / Flexibility
+
+
+The words **complexity** and **flexibility** can be thought of as synonyms. They both refer to how (not) simple a model is.  However, their use is slightly different.  A polynomial with 20 degrees is very flexible, but might not be described as complex (because it isn't too hard to write down).  A piecewise cubic model with dozens of pieces might not be overly flexible but would be complicated to write down.  Or maybe both of the examples just given would be thought of as complex and flexible.
+
+
+In the models we've been discussing, flexibility refers to the number of curves in a "linear" model.  The more curve-y (think: polynomial with degree of many dozens), the more the model will (over-)fit the observations.
+
+There are many other models, and you can see the flexibility scale of models from this class and of models not covered in this class.  In non-linear models, flexibility refers to whether the model is fitting high level functions of the data.  Sometimes that means over-fitting.  But sometimes a lot of flexibility can capture true but complicated relationships among the variables.  Note that flexibility is often at the expense of interpretability.
+
+Note that for Lasso and Ridge Regression, the models are less flexible because they constrain the coefficient estimates.  The constraints increase the bias and decrease the variability.  
+
+  * increases in bias: the constrained coefficients won't fit the observations as well as OLS.  That is, the trend is different from what the data are presenting.  
+  * decrease in variability:  the constrained coefficients attenuate to zero which means that a different dataset will also have coefficients close to zero.  By forcing the coefficients to be small, there is a sense that different datasets will have similar coefficients (and therefore similar predictions).  
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/flexibility.png" alt="A coordinate plane with individual models at particular coordinate points.  Linear models are less flexible but easy to interpret; neural networks are very flexible and hard to interpret." width="786" />
+<p class="caption">(\#fig:unnamed-chunk-4)The  Image credit: Figure 2.7 of ISLR</p>
+</div>
+
+
 ## On Inverting Matrices
 
 **$X_{n \times p}$:**  The data matrix is $n \times p$.  We think of the data as being $n$ points in $p$ dimensions.  It is important to realize that not only are the points indexed in $p$ dimensions, but the points also take up the entire p-dimensional space.  [As an aside:  Whether a set of points takes up an entire space does not depend on how the points are indexed.  For example, think about a (2-dimensional) piece of paper floating in the sky with many many points on it.  You might index the coordinates of points on the paper using three dimensions, however, the paper / points  themselves actually live in a 2-dimensional subspace.]  To reiterate:  in an **ideal** world, the $n$ points live in $p$ space and cannot be considered to live in a smaller dimension than $p$.  Sometimes, the $n$ points are indexed to live in $p$ space, but actually take up a lower dimensional subspace (e.g., if two of the variable columns are perfectly correlated).
@@ -32,7 +54,7 @@ The main reason to use shrinkage techniques is when the model has a lot of predi
 
 **So...**  The point is that if $X$ doesn't have full rank (that is, if it has dimension less than $p$), there will be problems with computing $(X^tX)^{-1}$.  And the matrix $(X^tX)^{-1}$ is vitally important in computing both the least squares coefficients and their standard errors.
 
-## Ridge Regression
+## Ridge Regression 
 
 An excellent discussion of Ridge Regression is given by @rr_theory.
 
@@ -78,7 +100,7 @@ $$ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij
 
 <div class="figure" style="text-align: center">
 <img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265" />
-<p class="caption">(\#fig:unnamed-chunk-5)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue circle represents the possible values of $\beta$ given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR</p>
+<p class="caption">(\#fig:unnamed-chunk-6)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue circle represents the possible values of $\beta$ given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR</p>
 </div>
 
 ### Why Ridge Regression?
@@ -156,7 +178,7 @@ $$ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij
 
 <div class="figure" style="text-align: center">
 <img src="figs/lassoContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="277" />
-<p class="caption">(\#fig:unnamed-chunk-8)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue diamond represents the possible values of $\beta$ given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR</p>
+<p class="caption">(\#fig:unnamed-chunk-9)The red contours represent pairs of $\beta$ coefficients that produce constant values for SSE on the data.  The blue diamond represents the possible values of $\beta$ given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR</p>
 </div>
 
 The key to lasso (in contrast to ridge regression) is that it does variable selection by shrinking the coefficients all the way to zero.  We say that the lasso yields *sparse* models - that is, only a subset of the original variables will be retained in the final model.
@@ -181,10 +203,10 @@ Quote from *An Introduction to Statistical Learning*, V2, page 246.
 
 <div class="figure" style="text-align: center">
 <img src="figs/fig68RRwins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="649" />
-<p class="caption">(\#fig:unnamed-chunk-10-1)From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.</p>
+<p class="caption">(\#fig:unnamed-chunk-11-1)From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.</p>
 </div><div class="figure" style="text-align: center">
 <img src="figs/fig69lassowins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="652" />
-<p class="caption">(\#fig:unnamed-chunk-10-2)From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.</p>
+<p class="caption">(\#fig:unnamed-chunk-11-2)From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.</p>
 </div>
 
 
@@ -273,16 +295,16 @@ office_lm %>% tidy()
 ## # A tibble: 31 × 5
 ##    term         estimate std.error statistic  p.value
 ##    <chr>           <dbl>     <dbl>     <dbl>    <dbl>
-##  1 (Intercept)  7.18       0.243      29.6   2.66e-41
-##  2 season      -0.00779    0.0323     -0.241 8.10e- 1
-##  3 episode      0.0181     0.00574     3.14  2.44e- 3
-##  4 andy         0.00474    0.00302     1.57  1.21e- 1
-##  5 angela       0.00147    0.00524     0.280 7.81e- 1
-##  6 darryl       0.00538    0.00705     0.763 4.48e- 1
-##  7 dwight      -0.000885   0.00301    -0.294 7.70e- 1
-##  8 jim          0.00775    0.00296     2.61  1.10e- 2
-##  9 kelly       -0.0175     0.00961    -1.82  7.35e- 2
-## 10 kevin       -0.00170    0.00815    -0.209 8.35e- 1
+##  1 (Intercept)  7.19       0.315     22.8    3.83e-34
+##  2 season      -0.00222    0.0366    -0.0607 9.52e- 1
+##  3 episode      0.0145     0.00730    1.98   5.15e- 2
+##  4 andy         0.00215    0.00424    0.507  6.14e- 1
+##  5 angela       0.00307    0.00865    0.354  7.24e- 1
+##  6 darryl       0.000932   0.00783    0.119  9.06e- 1
+##  7 dwight      -0.00172    0.00380   -0.452  6.53e- 1
+##  8 jim          0.00541    0.00375    1.44   1.54e- 1
+##  9 kelly       -0.0129     0.0101    -1.28   2.05e- 1
+## 10 kevin        0.00279    0.0114     0.244  8.08e- 1
 ## # … with 21 more rows
 ```
 
@@ -306,16 +328,16 @@ office_train %>%
 ## # A tibble: 31 × 5
 ##    term        estimate std.error statistic p.value
 ##    <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-##  1 (Intercept)  7.64          NaN       NaN     NaN
-##  2 season      -0.116         NaN       NaN     NaN
-##  3 episode      0.0479        NaN       NaN     NaN
-##  4 andy        -0.00932       NaN       NaN     NaN
-##  5 angela       0.0323        NaN       NaN     NaN
-##  6 darryl      NA              NA        NA      NA
-##  7 dwight      NA              NA        NA      NA
-##  8 jim         NA              NA        NA      NA
-##  9 kelly       NA              NA        NA      NA
-## 10 kevin       NA              NA        NA      NA
+##  1 (Intercept)   7.30         NaN       NaN     NaN
+##  2 season        0.228        NaN       NaN     NaN
+##  3 episode       0.0264       NaN       NaN     NaN
+##  4 andy         -0.0197       NaN       NaN     NaN
+##  5 angela        0.0499       NaN       NaN     NaN
+##  6 darryl       NA             NA        NA      NA
+##  7 dwight       NA             NA        NA      NA
+##  8 jim          NA             NA        NA      NA
+##  9 kelly        NA             NA        NA      NA
+## 10 kevin        NA             NA        NA      NA
 ## # … with 21 more rows
 ```
 
@@ -379,16 +401,16 @@ ridge_fit %>% tidy()
 ## # A tibble: 31 × 3
 ##    term         estimate penalty
 ##    <chr>           <dbl>   <dbl>
-##  1 (Intercept)  8.37          47
-##  2 season      -0.000837      47
-##  3 episode      0.000915      47
-##  4 andy        -0.000123      47
-##  5 angela       0.00108       47
-##  6 darryl       0.000389      47
-##  7 dwight       0.00113       47
-##  8 jim          0.00189       47
-##  9 kelly        0.000277      47
-## 10 kevin        0.00110       47
+##  1 (Intercept)  8.36          47
+##  2 season      -0.00110       47
+##  3 episode      0.00107       47
+##  4 andy        -0.000546      47
+##  5 angela       0.00106       47
+##  6 darryl       0.000434      47
+##  7 dwight       0.000952      47
+##  8 jim          0.00150       47
+##  9 kelly        0.000112      47
+## 10 kevin        0.000600      47
 ## # … with 21 more rows
 ```
 
@@ -400,16 +422,16 @@ ridge_fit %>% tidy(penalty = 0)
 ## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    <chr>          <dbl>   <dbl>
-##  1 (Intercept)  8.37          0
-##  2 season      -0.0250        0
-##  3 episode      0.128         0
-##  4 andy         0.0811        0
-##  5 angela       0.0120        0
-##  6 darryl       0.0375        0
-##  7 dwight      -0.00887       0
-##  8 jim          0.127         0
-##  9 kelly       -0.0769        0
-## 10 kevin       -0.00452       0
+##  1 (Intercept)   8.36         0
+##  2 season       -0.0114       0
+##  3 episode       0.107        0
+##  4 andy          0.0351       0
+##  5 angela        0.0235       0
+##  6 darryl        0.0103       0
+##  7 dwight       -0.0200       0
+##  8 jim           0.0895       0
+##  9 kelly        -0.0700       0
+## 10 kevin         0.0129       0
 ## # … with 21 more rows
 ```
 
@@ -422,7 +444,7 @@ ridge_fit %>%
   plot(xvar = "lambda")
 ```
 
-<img src="05-shrink_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-shrink_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;" />
 
 Prediction is done like other linear models.  So if `predict()` is used with no other parameters, it will use `penalty = 47` as specified above:
 
@@ -435,16 +457,16 @@ predict(ridge_fit, new_data = office_train)
 ## # A tibble: 100 × 1
 ##    .pred
 ##    <dbl>
-##  1  8.37
+##  1  8.36
 ##  2  8.36
-##  3  8.37
-##  4  8.37
+##  3  8.36
+##  4  8.36
 ##  5  8.36
-##  6  8.37
-##  7  8.37
-##  8  8.37
-##  9  8.37
-## 10  8.37
+##  6  8.36
+##  7  8.36
+##  8  8.36
+##  9  8.36
+## 10  8.36
 ## # … with 90 more rows
 ```
 
@@ -494,18 +516,18 @@ collect_metrics(ridge_cv) %>%
 
 ```
 ## # A tibble: 50 × 7
-##      penalty .metric .estimator  mean     n std_err .config              
-##        <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-##  1 0.193     rmse    standard   0.395    10  0.0236 Preprocessor1_Model22
-##  2 0.121     rmse    standard   0.396    10  0.0245 Preprocessor1_Model21
-##  3 0.309     rmse    standard   0.396    10  0.0235 Preprocessor1_Model23
-##  4 0.0754    rmse    standard   0.399    10  0.0258 Preprocessor1_Model20
-##  5 0.494     rmse    standard   0.400    10  0.0243 Preprocessor1_Model24
-##  6 0.0471    rmse    standard   0.403    10  0.0273 Preprocessor1_Model19
-##  7 0.791     rmse    standard   0.407    10  0.0258 Preprocessor1_Model25
-##  8 0.0295    rmse    standard   0.408    10  0.0286 Preprocessor1_Model18
-##  9 0.00001   rmse    standard   0.411    10  0.0294 Preprocessor1_Model01
-## 10 0.0000160 rmse    standard   0.411    10  0.0294 Preprocessor1_Model02
+##    penalty .metric .estimator  mean     n std_err .config              
+##      <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
+##  1   0.791 rmse    standard   0.465    10  0.0369 Preprocessor1_Model25
+##  2   0.494 rmse    standard   0.466    10  0.0385 Preprocessor1_Model24
+##  3   1.26  rmse    standard   0.467    10  0.0357 Preprocessor1_Model26
+##  4   0.309 rmse    standard   0.470    10  0.0406 Preprocessor1_Model23
+##  5   2.02  rmse    standard   0.472    10  0.0349 Preprocessor1_Model27
+##  6   0.193 rmse    standard   0.476    10  0.0427 Preprocessor1_Model22
+##  7   3.24  rmse    standard   0.477    10  0.0344 Preprocessor1_Model28
+##  8   5.18  rmse    standard   0.483    10  0.0341 Preprocessor1_Model29
+##  9   0.121 rmse    standard   0.484    10  0.0447 Preprocessor1_Model21
+## 10   8.29  rmse    standard   0.488    10  0.0339 Preprocessor1_Model30
 ## # … with 40 more rows
 ```
 
@@ -524,7 +546,7 @@ ridge_cv %>%
   scale_x_log10() 
 ```
 
-<img src="05-shrink_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-shrink_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" />
 
 
 The best model can be chosen using `select_best()`.
@@ -539,7 +561,7 @@ best_rr
 ## # A tibble: 1 × 2
 ##   penalty .config              
 ##     <dbl> <chr>                
-## 1   0.193 Preprocessor1_Model22
+## 1   0.791 Preprocessor1_Model25
 ```
 
 
@@ -559,16 +581,16 @@ finalize_workflow(ridge_wf %>% add_model(ridge_spec_tune), best_rr) %>%
 ## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    <chr>          <dbl>   <dbl>
-##  1 (Intercept)   8.38     0.193
-##  2 season       -0.0344   0.193
-##  3 episode       0.0892   0.193
-##  4 andy         -0.0426   0.193
-##  5 angela        0.0787   0.193
-##  6 darryl        0.0220   0.193
-##  7 dwight        0.0141   0.193
-##  8 jim           0.0274   0.193
-##  9 kelly        -0.0730   0.193
-## 10 kevin         0.0389   0.193
+##  1 (Intercept)  8.42      0.791
+##  2 season      -0.0327    0.791
+##  3 episode      0.0383    0.791
+##  4 andy         0.00211   0.791
+##  5 angela       0.0233    0.791
+##  6 darryl       0.0264    0.791
+##  7 dwight       0.0523    0.791
+##  8 jim          0.0407    0.791
+##  9 kelly       -0.0347    0.791
+## 10 kevin        0.0371    0.791
 ## # … with 21 more rows
 ```
 
@@ -617,16 +639,16 @@ collect_metrics(lasso_cv) %>%
 ## # A tibble: 50 × 7
 ##      penalty .metric .estimator  mean     n std_err .config              
 ##        <dbl> <chr>   <chr>      <dbl> <int>   <dbl> <chr>                
-##  1 0.00001   rmse    standard   0.423    10  0.0318 Preprocessor1_Model01
-##  2 0.0000160 rmse    standard   0.423    10  0.0318 Preprocessor1_Model02
-##  3 0.0000256 rmse    standard   0.423    10  0.0318 Preprocessor1_Model03
-##  4 0.0000409 rmse    standard   0.423    10  0.0318 Preprocessor1_Model04
-##  5 0.0000655 rmse    standard   0.423    10  0.0318 Preprocessor1_Model05
-##  6 0.000105  rmse    standard   0.423    10  0.0318 Preprocessor1_Model06
-##  7 0.000168  rmse    standard   0.423    10  0.0318 Preprocessor1_Model07
-##  8 0.000268  rmse    standard   0.423    10  0.0318 Preprocessor1_Model08
-##  9 0.000429  rmse    standard   0.422    10  0.0316 Preprocessor1_Model09
-## 10 0.000687  rmse    standard   0.421    10  0.0314 Preprocessor1_Model10
+##  1 0.00001   rmse    standard   0.531    10  0.0497 Preprocessor1_Model01
+##  2 0.0000160 rmse    standard   0.531    10  0.0497 Preprocessor1_Model02
+##  3 0.0000256 rmse    standard   0.531    10  0.0497 Preprocessor1_Model03
+##  4 0.0000409 rmse    standard   0.531    10  0.0497 Preprocessor1_Model04
+##  5 0.0000655 rmse    standard   0.531    10  0.0497 Preprocessor1_Model05
+##  6 0.000105  rmse    standard   0.531    10  0.0497 Preprocessor1_Model06
+##  7 0.000168  rmse    standard   0.531    10  0.0497 Preprocessor1_Model07
+##  8 0.000268  rmse    standard   0.530    10  0.0497 Preprocessor1_Model08
+##  9 0.000429  rmse    standard   0.529    10  0.0497 Preprocessor1_Model09
+## 10 0.000687  rmse    standard   0.528    10  0.0496 Preprocessor1_Model10
 ## # … with 40 more rows
 ```
 
@@ -646,7 +668,7 @@ lasso_cv %>%
   ylab("RMSE")
 ```
 
-<img src="05-shrink_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;" />
+<img src="05-shrink_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;" />
 
 
 The best model can be chosen using `select_best()`.
@@ -661,7 +683,7 @@ best_lasso
 ## # A tibble: 1 × 2
 ##   penalty .config              
 ##     <dbl> <chr>                
-## 1 0.00720 Preprocessor1_Model15
+## 1  0.0295 Preprocessor1_Model18
 ```
 
 
@@ -681,16 +703,16 @@ finalize_workflow(lasso_wf %>% add_model(lasso_spec_tune), best_lasso) %>%
 ## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    <chr>          <dbl>   <dbl>
-##  1 (Intercept)  8.38    0.00720
-##  2 season       0       0.00720
-##  3 episode      0.157   0.00720
-##  4 andy        -0.0739  0.00720
-##  5 angela       0.231   0.00720
-##  6 darryl       0.0663  0.00720
-##  7 dwight      -0.0721  0.00720
-##  8 jim         -0.00866 0.00720
-##  9 kelly       -0.167   0.00720
-## 10 kevin        0       0.00720
+##  1 (Intercept)  8.42     0.0295
+##  2 season      -0.112    0.0295
+##  3 episode      0.115    0.0295
+##  4 andy         0        0.0295
+##  5 angela       0.00412  0.0295
+##  6 darryl       0.0195   0.0295
+##  7 dwight       0.0665   0.0295
+##  8 jim          0.0902   0.0295
+##  9 kelly       -0.0518   0.0295
+## 10 kevin        0.125    0.0295
 ## # … with 21 more rows
 ```
 

@@ -97,9 +97,29 @@
 <li>That is, use <strong>mathematical</strong> optimization to shrink (set) some of the coefficients to zero (while simultaneously solving for the other non-zero coefficients).</li>
 </ol>
 <p>The main reason to use shrinkage techniques is when the model has a lot of predictor variables (<span class="math inline">\(p\)</span> big) or when the model has a lot of predictor variables in comparison to the number of observations (<span class="math inline">\(n \approx p\)</span> or <span class="math inline">\(n &lt; p\)</span>) — because that is when we get huge (infinite!) variability associated with the coefficients!</p>
-<div id="on-inverting-matrices" class="section level2" number="14.1">
+<div id="model-complexity-flexibility" class="section level2" number="14.1">
 <h2>
-<span class="header-section-number">14.1</span> On Inverting Matrices<a class="anchor" aria-label="anchor" href="#on-inverting-matrices"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.1</span> Model Complexity / Flexibility<a class="anchor" aria-label="anchor" href="#model-complexity-flexibility"><i class="fas fa-link"></i></a>
+</h2>
+<p>The words <strong>complexity</strong> and <strong>flexibility</strong> can be thought of as synonyms. They both refer to how (not) simple a model is. However, their use is slightly different. A polynomial with 20 degrees is very flexible, but might not be described as complex (because it isn’t too hard to write down). A piecewise cubic model with dozens of pieces might not be overly flexible but would be complicated to write down. Or maybe both of the examples just given would be thought of as complex and flexible.</p>
+<p>In the models we’ve been discussing, flexibility refers to the number of curves in a “linear” model. The more curve-y (think: polynomial with degree of many dozens), the more the model will (over-)fit the observations.</p>
+<p>There are many other models, and you can see the flexibility scale of models from this class and of models not covered in this class. In non-linear models, flexibility refers to whether the model is fitting high level functions of the data. Sometimes that means over-fitting. But sometimes a lot of flexibility can capture true but complicated relationships among the variables. Note that flexibility is often at the expense of interpretability.</p>
+<p>Note that for Lasso and Ridge Regression, the models are less flexible because they constrain the coefficient estimates. The constraints increase the bias and decrease the variability.</p>
+<ul>
+<li>increases in bias: the constrained coefficients won’t fit the observations as well as OLS. That is, the trend is different from what the data are presenting.<br>
+</li>
+<li>decrease in variability: the constrained coefficients attenuate to zero which means that a different dataset will also have coefficients close to zero. By forcing the coefficients to be small, there is a sense that different datasets will have similar coefficients (and therefore similar predictions).</li>
+</ul>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-4"></span>
+<img src="figs/flexibility.png" alt="A coordinate plane with individual models at particular coordinate points.  Linear models are less flexible but easy to interpret; neural networks are very flexible and hard to interpret." width="786"><p class="caption">
+Figure 1.4: The Image credit: Figure 2.7 of ISLR
+</p>
+</div>
+</div>
+<div id="on-inverting-matrices" class="section level2" number="14.2">
+<h2>
+<span class="header-section-number">14.2</span> On Inverting Matrices<a class="anchor" aria-label="anchor" href="#on-inverting-matrices"><i class="fas fa-link"></i></a>
 </h2>
 <p><strong><span class="math inline">\(X_{n \times p}\)</span>:</strong> The data matrix is <span class="math inline">\(n \times p\)</span>. We think of the data as being <span class="math inline">\(n\)</span> points in <span class="math inline">\(p\)</span> dimensions. It is important to realize that not only are the points indexed in <span class="math inline">\(p\)</span> dimensions, but the points also take up the entire p-dimensional space. [As an aside: Whether a set of points takes up an entire space does not depend on how the points are indexed. For example, think about a (2-dimensional) piece of paper floating in the sky with many many points on it. You might index the coordinates of points on the paper using three dimensions, however, the paper / points themselves actually live in a 2-dimensional subspace.] To reiterate: in an <strong>ideal</strong> world, the <span class="math inline">\(n\)</span> points live in <span class="math inline">\(p\)</span> space and cannot be considered to live in a smaller dimension than <span class="math inline">\(p\)</span>. Sometimes, the <span class="math inline">\(n\)</span> points are indexed to live in <span class="math inline">\(p\)</span> space, but actually take up a lower dimensional subspace (e.g., if two of the variable columns are perfectly correlated).</p>
 <p><em>However</em>, there are times when an <span class="math inline">\(n \times p\)</span> matrix lives in a space which is smaller than <span class="math inline">\(p\)</span>. For example,</p>
@@ -111,9 +131,9 @@
 <p><strong><span class="math inline">\((X^tX)^{-1}\)</span>:</strong> The inverse of the matrix also represents a mapping. Recall that if <span class="math inline">\(AX = Y\)</span> then <span class="math inline">\(X= A^{-1}Y\)</span>. But if we are mapping into a smaller space (smaller than <span class="math inline">\(p\)</span>) then we can’t invert back to a larger space (i.e., back to <span class="math inline">\(p\)</span>). And because <span class="math inline">\((X^tX)^{-1}\)</span> is a <span class="math inline">\(p \times p\)</span> matrix, we are trying to invert back to a <span class="math inline">\(p\)</span> dimensional space. Recall the Big Theorem in Linear Algebra that says if a <span class="math inline">\(p \times p\)</span> matrix has rank lower than <span class="math inline">\(p\)</span>, it isn’t invertible (also that it will have determinant zero, will have some eigenvalues that are zero, etc.)</p>
 <p><strong>So…</strong> The point is that if <span class="math inline">\(X\)</span> doesn’t have full rank (that is, if it has dimension less than <span class="math inline">\(p\)</span>), there will be problems with computing <span class="math inline">\((X^tX)^{-1}\)</span>. And the matrix <span class="math inline">\((X^tX)^{-1}\)</span> is vitally important in computing both the least squares coefficients and their standard errors.</p>
 </div>
-<div id="ridge-regression" class="section level2" number="14.2">
+<div id="ridge-regression" class="section level2" number="14.3">
 <h2>
-<span class="header-section-number">14.2</span> Ridge Regression<a class="anchor" aria-label="anchor" href="#ridge-regression"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.3</span> Ridge Regression<a class="anchor" aria-label="anchor" href="#ridge-regression"><i class="fas fa-link"></i></a>
 </h2>
 <p>An excellent discussion of Ridge Regression is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
 <p>Recall that the OLS (ordinary least squares) technique minimizes the distance between the observed and predicted values of the response. That is, we found the <span class="math inline">\(b_0, b_1, \ldots b_{p-1}\)</span> that minimize:
@@ -126,9 +146,9 @@ where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parame
 <p>Note: the Gauss-Markov theorem says that OLS solutions are the best (i.e., smallest variance) linear unbiased estimates (BLUE). But if we add a bit of bias, we can do better. There is an existence theorem <span class="citation">(<a href="references.html#ref-rr_wins" role="doc-biblioref">Theobald 1974</a>)</span> that says:
 <span class="math display">\[ \exists \ \  \lambda \mbox{ such that } E[MSE_{RR}] &lt; E[MSE_{OLS}].\]</span>
 Excellent description of the theory is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
-<div id="the-ridge-regression-solution" class="section level3" number="14.2.1">
+<div id="the-ridge-regression-solution" class="section level3" number="14.3.1">
 <h3>
-<span class="header-section-number">14.2.1</span> The Ridge Regression Solution<a class="anchor" aria-label="anchor" href="#the-ridge-regression-solution"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.3.1</span> The Ridge Regression Solution<a class="anchor" aria-label="anchor" href="#the-ridge-regression-solution"><i class="fas fa-link"></i></a>
 </h3>
 <p><span class="math display">\[\begin{eqnarray*}
 \mbox{OLS: } \underline{b} &amp;=&amp; (X^t X)^{-1} X^t \underline{Y}\\
@@ -143,23 +163,23 @@ Excellent description of the theory is given by <span class="citation"><a href="
 <li>Note that the ridge regression optimization above is a constrained optimization equation, solved by Lagrange multipliers. That is, we minimize <span class="math inline">\(SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2\)</span> subject to <span class="math inline">\(\sum_{j=1}^{p-1} b_j^2 \leq s\)</span> for some value of <span class="math inline">\(s\)</span>. Note that <span class="math inline">\(s\)</span> is inversely related to <span class="math inline">\(\lambda\)</span>.</li>
 </ul>
 </div>
-<div id="ridge-regression-visually" class="section level3" number="14.2.2">
+<div id="ridge-regression-visually" class="section level3" number="14.3.2">
 <h3>
-<span class="header-section-number">14.2.2</span> Ridge Regression visually<a class="anchor" aria-label="anchor" href="#ridge-regression-visually"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.3.2</span> Ridge Regression visually<a class="anchor" aria-label="anchor" href="#ridge-regression-visually"><i class="fas fa-link"></i></a>
 </h3>
 <p>Ridge regression is typically applied to situations with many many variables. In particular, ridge regression will help us avoid situations of multicollinearity. It doesn’t make sense to apply it to a situation with only one or two variables. However, we will demonstrate the process visually with <span class="math inline">\(p=3\)</span> dimensions because it is difficult to visualize in higher dimensions.</p>
 <p>The ridge regression coefficient estimates solve the following optimization problem:</p>
 <p><span class="math display">\[ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} b_j^2 \leq s\]</span></p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-5"></span>
+<span style="display:block;" id="fig:unnamed-chunk-6"></span>
 <img src="figs/rrContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue disk around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="265"><p class="caption">
-Figure 6.1: The red contours represent pairs of <span class="math inline">\(\beta\)</span> coefficients that produce constant values for SSE on the data. The blue circle represents the possible values of <span class="math inline">\(\beta\)</span> given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR
+Figure 14.1: The red contours represent pairs of <span class="math inline">\(\beta\)</span> coefficients that produce constant values for SSE on the data. The blue circle represents the possible values of <span class="math inline">\(\beta\)</span> given the constraint (that the squared magnitude is less than some cutoff). Image credit: ISLR
 </p>
 </div>
 </div>
-<div id="why-ridge-regression" class="section level3" number="14.2.3">
+<div id="why-ridge-regression" class="section level3" number="14.3.3">
 <h3>
-<span class="header-section-number">14.2.3</span> Why Ridge Regression?<a class="anchor" aria-label="anchor" href="#why-ridge-regression"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.3.3</span> Why Ridge Regression?<a class="anchor" aria-label="anchor" href="#why-ridge-regression"><i class="fas fa-link"></i></a>
 </h3>
 <p>Recall that the main benefit to ridge regression is when <span class="math inline">\(p\)</span> is large (particularly in relation to <span class="math inline">\(n\)</span>). Remember that this (and multicollinearity) leads to instability of <span class="math inline">\((X^tX)^{-1}\)</span>. Which leads to huge variability in the coefficient estimates. A small change in the model or the observations can create wildly different estimates. So the expected value of the MSE can be quite inflated due to the variability of the model. Ridge regression adds a small amount of bias to the model, but it lowers the variance substantially and creates lower (on average) MSE values.</p>
 <p>Additionally, ridge regression has computational advantages over the subset selection models (where all subsets requires searching through <span class="math inline">\(2^{p-1}\)</span> models).</p>
@@ -172,9 +192,9 @@ Figure 6.1: The red contours represent pairs of <span class="math inline">\(\bet
 </blockquote>
 </div>
 </div>
-<div id="inference-on-ridge-regression-coefficients" class="section level3" number="14.2.4">
+<div id="inference-on-ridge-regression-coefficients" class="section level3" number="14.3.4">
 <h3>
-<span class="header-section-number">14.2.4</span> Inference on Ridge Regression Coefficients<a class="anchor" aria-label="anchor" href="#inference-on-ridge-regression-coefficients"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.3.4</span> Inference on Ridge Regression Coefficients<a class="anchor" aria-label="anchor" href="#inference-on-ridge-regression-coefficients"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that just like the OLS coefficients, the RR coefficients are a linear combination of the <span class="math inline">\(Y\)</span> values based on the <span class="math inline">\(X\)</span> matrix and (now) <span class="math inline">\(\lambda\)</span>. It is not hard, therefore, to find the variance of the coefficient vector at a particular value of <span class="math inline">\(\lambda\)</span>. Additionally, the same theory that gives normality (and the resulting t-statistics) drives normality for the ridge regression coefficients.</p>
 <p><span class="math display">\[var(b^{RR}) = \sigma^2 W X^t X W \mbox{ where } W = (X^t X + \lambda \mathtt{I})^{-1}\]</span></p>
@@ -182,9 +202,9 @@ Figure 6.1: The red contours represent pairs of <span class="math inline">\(\bet
 <p>An additional problem is that the RR coefficients are known to be biased, and the bias is not easy to estimate. Without a sense of where the variable is centered, the SE isn’t particularly meaningful. For these reasons, functions like <code><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">lm.ridge()</a></code> in R do not include tests / p-values but do approximate the SE of the coefficients (as an estimate).</p>
 </div>
 </div>
-<div id="how-do-you-choose-lambda" class="section level2" number="14.3">
+<div id="how-do-you-choose-lambda" class="section level2" number="14.4">
 <h2>
-<span class="header-section-number">14.3</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.4</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda"><i class="fas fa-link"></i></a>
 </h2>
 <p>Note that <span class="math inline">\(\lambda\)</span> is a function of the data, and therefore a random variable to estimate (just like estimating the coefficients). However, we can use diagnostic measures to give a sense of <span class="math inline">\(\lambda\)</span> values which will give a good variance-bias trade-off.</p>
 <ol style="list-style-type: decimal">
@@ -209,37 +229,37 @@ Figure 6.1: The red contours represent pairs of <span class="math inline">\(\bet
 <li>Choose the <span class="math inline">\(\lambda\)</span> value that minimizes the CV <span class="math inline">\(MSE_\lambda\)</span>.</li>
 </ol>
 </div>
-<div id="lasso" class="section level2" number="14.4">
+<div id="lasso" class="section level2" number="14.5">
 <h2>
-<span class="header-section-number">14.4</span> Lasso<a class="anchor" aria-label="anchor" href="#lasso"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.5</span> Lasso<a class="anchor" aria-label="anchor" href="#lasso"><i class="fas fa-link"></i></a>
 </h2>
 <p>Ridge regression had at least one disadvantage; it includes all <span class="math inline">\(p\)</span> predictors in the final model. The penalty term will set many of them close to zero, but never exactly to zero. This isn’t generally a problem for prediction accuracy, but it can make the model more difficult to interpret the results. Lasso overcomes this disadvantage and is capable of forcing some of the coefficients to zero granted that <span class="math inline">\(\lambda\)</span> is big enough. Since <span class="math inline">\(\lambda = 0\)</span> results in regular OLS regression, as <span class="math inline">\(\lambda\)</span> approaches <span class="math inline">\(\infty\)</span> the coefficients shrink towards zero.</p>
-<div id="lasso-coefficients" class="section level3" number="14.4.1">
+<div id="lasso-coefficients" class="section level3" number="14.5.1">
 <h3>
-<span class="header-section-number">14.4.1</span> Lasso Coefficients<a class="anchor" aria-label="anchor" href="#lasso-coefficients"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.5.1</span> Lasso Coefficients<a class="anchor" aria-label="anchor" href="#lasso-coefficients"><i class="fas fa-link"></i></a>
 </h3>
 <p>The lasso (least absolute shrinkage and selection operator) coefficients are calculated from a similar constraint to that of ridge regression, but the calculus is much harder now. The L-1 norm is the only norm that gives sparsity and is convex (so that the optimization problem can be solved). The lasso optimization equation seeks to minimize:</p>
 <p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \sum_{j=1}^{p-1} |b_j| = SSE + \lambda \sum_{j=1}^{p-1} |b_j|\]</span>
 where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parameter</em>, to be determined separately. As with ridge regression lasso optimization provides a trade-off between bias and variance. Lasso seeks to find coefficients that fit the data well (minimize SSE!). Additionally, lasso shrinks the coefficients to zero by adding a penalty so that smaller values of <span class="math inline">\(b_j\)</span> are preferred. Note: the shrinkage does not apply to the intercept! The minimization quantities for ridge regression and lasso are extremely similar: ridge regression constrains the sum of the squared coefficients; lasso constrains the sum of the absolute coefficients. [As with ridge regression, we use standardized variables in modeling.]</p>
 </div>
-<div id="lasso-visually" class="section level3" number="14.4.2">
+<div id="lasso-visually" class="section level3" number="14.5.2">
 <h3>
-<span class="header-section-number">14.4.2</span> Lasso visually<a class="anchor" aria-label="anchor" href="#lasso-visually"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.5.2</span> Lasso visually<a class="anchor" aria-label="anchor" href="#lasso-visually"><i class="fas fa-link"></i></a>
 </h3>
 <p>As with ridge regression Lasso is also typically applied to situations with many many variables (also to avoid multicollinearity). It doesn’t make sense to apply it to a situation with only one or two variables. However, we will demonstrate the process visually with p=3 dimensions because it is difficult to visualize in higher dimensions. Notice here that there is a very good chance for the red contours to hit the turquoise diamond at a corner (producing some coefficients to be estimated as zero). The corner effect becomes more extreme in higher dimensions.</p>
 <p>The lasso coefficient estimates solve the following optimization problem:</p>
 <p><span class="math display">\[ \min_\beta \Bigg\{ \sum_{i=1}^n \Bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \Bigg)^2 \Bigg\} \mbox{  subject to  } \sum_{j=1}^{p-1} |b_j| \leq s\]</span></p>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-8"></span>
+<span style="display:block;" id="fig:unnamed-chunk-9"></span>
 <img src="figs/lassoContours.jpg" alt="A coordinate plane with beta 1 on the x-axis and beta 2 on the y-axis.  A blue diamond around the origin represents the contraint region.  Red elipses show regions of constant SSE that are hoped to be minimized." width="277"><p class="caption">
-Figure 6.3: The red contours represent pairs of <span class="math inline">\(\beta\)</span> coefficients that produce constant values for SSE on the data. The blue diamond represents the possible values of <span class="math inline">\(\beta\)</span> given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR
+Figure 1.5: The red contours represent pairs of <span class="math inline">\(\beta\)</span> coefficients that produce constant values for SSE on the data. The blue diamond represents the possible values of <span class="math inline">\(\beta\)</span> given the constraint (that the absolute magnitude is less than some cutoff). Image credit: ISLR
 </p>
 </div>
 <p>The key to lasso (in contrast to ridge regression) is that it does variable selection by shrinking the coefficients all the way to zero. We say that the lasso yields <em>sparse</em> models - that is, only a subset of the original variables will be retained in the final model.</p>
 </div>
-<div id="how-do-you-choose-lambda-1" class="section level3" number="14.4.3">
+<div id="how-do-you-choose-lambda-1" class="section level3" number="14.5.3">
 <h3>
-<span class="header-section-number">14.4.3</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda-1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.5.3</span> How do you choose <span class="math inline">\(\lambda\)</span>?<a class="anchor" aria-label="anchor" href="#how-do-you-choose-lambda-1"><i class="fas fa-link"></i></a>
 </h3>
 <p>Note that <span class="math inline">\(\lambda\)</span> is a function of the data, and therefore a random variable to estimate (just like estimating the coefficients). However, we can use diagnostic measures to give a sense of <span class="math inline">\(\lambda\)</span> values which will give a good variance-bias trade-off.</p>
 <ol style="list-style-type: decimal">
@@ -249,9 +269,9 @@ Figure 6.3: The red contours represent pairs of <span class="math inline">\(\bet
 </ol>
 </div>
 </div>
-<div id="ridge-regression-vs.-lasso" class="section level2" number="14.5">
+<div id="ridge-regression-vs.-lasso" class="section level2" number="14.6">
 <h2>
-<span class="header-section-number">14.5</span> Ridge Regression vs. Lasso<a class="anchor" aria-label="anchor" href="#ridge-regression-vs.-lasso"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.6</span> Ridge Regression vs. Lasso<a class="anchor" aria-label="anchor" href="#ridge-regression-vs.-lasso"><i class="fas fa-link"></i></a>
 </h2>
 <p>Quote from <em>An Introduction to Statistical Learning</em>, V2, page 246.</p>
 <blockquote>
@@ -261,28 +281,28 @@ Figure 6.3: The red contours represent pairs of <span class="math inline">\(\bet
 <p>As with ridge regression, when the least squares estimates have excessively high variance, the lasso solution can yield a reduction in variance at the expense of a small increase in bias, and consequently can generate more accurate predictions. Unlike ridge regression, the lasso performs variable selection, and hence results in models that are easier to interpret.</p>
 </blockquote>
 <div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-10-1"></span>
+<span style="display:block;" id="fig:unnamed-chunk-11-1"></span>
 <img src="figs/fig68RRwins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="649"><p class="caption">
-Figure 14.1: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<span style="display:block;" id="fig:unnamed-chunk-10-2"></span>
-<img src="figs/fig69lassowins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="652"><p class="caption">
 Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
 </p>
 </div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-11-2"></span>
+<img src="figs/fig69lassowins.jpg" alt="From ISLR, pgs 245-246.  The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response.  That is, none of the true coefficients beta1,... , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE." width="652"><p class="caption">
+Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
+</p>
 </div>
-<div id="elastic-net" class="section level2" number="14.6">
+</div>
+<div id="elastic-net" class="section level2" number="14.7">
 <h2>
-<span class="header-section-number">14.6</span> Elastic Net<a class="anchor" aria-label="anchor" href="#elastic-net"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.7</span> Elastic Net<a class="anchor" aria-label="anchor" href="#elastic-net"><i class="fas fa-link"></i></a>
 </h2>
 <p>It is also possible to combine ridge regression and lasso through what is called <em>elastic net regularization</em>. (The R package <strong>glmnet</strong> allows for the combined elastic net model.) The main idea is that the optimization contains both L-1 and L-2 penalties. The model may produce more stable estimates of the coefficients but requires and additional tuning parameter to estimate. That is, find the coefficients that minimize:</p>
 <p><span class="math display">\[\sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2 + \lambda \bigg[(1-\alpha)(\frac{1}{2})\sum_{j=1}^{p-1} b_j^2  + \alpha \sum_{j=1}^{p-1} |b_j| \bigg].\]</span></p>
 </div>
-<div id="reflection-questions-10" class="section level2" number="14.7">
+<div id="reflection-questions-10" class="section level2" number="14.8">
 <h2>
-<span class="header-section-number">14.7</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-10"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.8</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-10"><i class="fas fa-link"></i></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>How do ridge regression coefficient estimates differ from OLS estimates? How are they similar?<br>
@@ -298,14 +318,14 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <li>Give two different situations when ridge regression or Lasso are particularly appropriate.</li>
 </ol>
 </div>
-<div id="ethics-considerations-9" class="section level2" number="14.8">
+<div id="ethics-considerations-9" class="section level2" number="14.9">
 <h2>
-<span class="header-section-number">14.8</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-9"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.9</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-9"><i class="fas fa-link"></i></a>
 </h2>
 </div>
-<div id="r-ridge-regression" class="section level2" number="14.9">
+<div id="r-ridge-regression" class="section level2" number="14.10">
 <h2>
-<span class="header-section-number">14.9</span> R: Ridge Regression<a class="anchor" aria-label="anchor" href="#r-ridge-regression"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.10</span> R: Ridge Regression<a class="anchor" aria-label="anchor" href="#r-ridge-regression"><i class="fas fa-link"></i></a>
 </h2>
 <div id="the-data-1" class="section level4 unnumbered">
 <h4>The Data<a class="anchor" aria-label="anchor" href="#the-data-1"><i class="fas fa-link"></i></a>
@@ -349,16 +369,16 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 31 × 5
 ##    term         estimate std.error statistic  p.value
 ##    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 (Intercept)  7.18       0.243      29.6   2.66e-41
-##  2 season      -0.00779    0.0323     -0.241 8.10e- 1
-##  3 episode      0.0181     0.00574     3.14  2.44e- 3
-##  4 andy         0.00474    0.00302     1.57  1.21e- 1
-##  5 angela       0.00147    0.00524     0.280 7.81e- 1
-##  6 darryl       0.00538    0.00705     0.763 4.48e- 1
-##  7 dwight      -0.000885   0.00301    -0.294 7.70e- 1
-##  8 jim          0.00775    0.00296     2.61  1.10e- 2
-##  9 kelly       -0.0175     0.00961    -1.82  7.35e- 2
-## 10 kevin       -0.00170    0.00815    -0.209 8.35e- 1
+##  1 (Intercept)  7.19       0.315     22.8    3.83e-34
+##  2 season      -0.00222    0.0366    -0.0607 9.52e- 1
+##  3 episode      0.0145     0.00730    1.98   5.15e- 2
+##  4 andy         0.00215    0.00424    0.507  6.14e- 1
+##  5 angela       0.00307    0.00865    0.354  7.24e- 1
+##  6 darryl       0.000932   0.00783    0.119  9.06e- 1
+##  7 dwight      -0.00172    0.00380   -0.452  6.53e- 1
+##  8 jim          0.00541    0.00375    1.44   1.54e- 1
+##  9 kelly       -0.0129     0.0101    -1.28   2.05e- 1
+## 10 kevin        0.00279    0.0114     0.244  8.08e- 1
 ## # … with 21 more rows</code></pre>
 </div>
 <div id="what-if-n-is-really-small" class="section level4 unnumbered">
@@ -375,16 +395,16 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 31 × 5
 ##    term        estimate std.error statistic p.value
 ##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)  7.64          NaN       NaN     NaN
-##  2 season      -0.116         NaN       NaN     NaN
-##  3 episode      0.0479        NaN       NaN     NaN
-##  4 andy        -0.00932       NaN       NaN     NaN
-##  5 angela       0.0323        NaN       NaN     NaN
-##  6 darryl      NA              NA        NA      NA
-##  7 dwight      NA              NA        NA      NA
-##  8 jim         NA              NA        NA      NA
-##  9 kelly       NA              NA        NA      NA
-## 10 kevin       NA              NA        NA      NA
+##  1 (Intercept)   7.30         NaN       NaN     NaN
+##  2 season        0.228        NaN       NaN     NaN
+##  3 episode       0.0264       NaN       NaN     NaN
+##  4 andy         -0.0197       NaN       NaN     NaN
+##  5 angela        0.0499       NaN       NaN     NaN
+##  6 darryl       NA             NA        NA      NA
+##  7 dwight       NA             NA        NA      NA
+##  8 jim          NA             NA        NA      NA
+##  9 kelly        NA             NA        NA      NA
+## 10 kevin        NA             NA        NA      NA
 ## # … with 21 more rows</code></pre>
 </div>
 <div id="ridge-regression-model-building" class="section level4 unnumbered">
@@ -430,61 +450,61 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 31 × 3
 ##    term         estimate penalty
 ##    &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)  8.37          47
-##  2 season      -0.000837      47
-##  3 episode      0.000915      47
-##  4 andy        -0.000123      47
-##  5 angela       0.00108       47
-##  6 darryl       0.000389      47
-##  7 dwight       0.00113       47
-##  8 jim          0.00189       47
-##  9 kelly        0.000277      47
-## 10 kevin        0.00110       47
+##  1 (Intercept)  8.36          47
+##  2 season      -0.00110       47
+##  3 episode      0.00107       47
+##  4 andy        -0.000546      47
+##  5 angela       0.00106       47
+##  6 darryl       0.000434      47
+##  7 dwight       0.000952      47
+##  8 jim          0.00150       47
+##  9 kelly        0.000112      47
+## 10 kevin        0.000600      47
 ## # … with 21 more rows</code></pre>
 <div class="sourceCode" id="cb614"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)  8.37          0
-##  2 season      -0.0250        0
-##  3 episode      0.128         0
-##  4 andy         0.0811        0
-##  5 angela       0.0120        0
-##  6 darryl       0.0375        0
-##  7 dwight      -0.00887       0
-##  8 jim          0.127         0
-##  9 kelly       -0.0769        0
-## 10 kevin       -0.00452       0
+##  1 (Intercept)   8.36         0
+##  2 season       -0.0114       0
+##  3 episode       0.107        0
+##  4 andy          0.0351       0
+##  5 angela        0.0235       0
+##  6 darryl        0.0103       0
+##  7 dwight       -0.0200       0
+##  8 jim           0.0895       0
+##  9 kelly        -0.0700       0
+## 10 kevin         0.0129       0
 ## # … with 21 more rows</code></pre>
 <p>We can visualize how the magnitude of the coefficients are regularized toward zero as the <code>penalty</code> goes up. (We won’t get into the relationship between <span class="math inline">\(\lambda\)</span> and <code>penalty</code>, they both penalize the magnitude of the coefficients, <code>penalty</code> can be specified <em>per</em> variable.)</p>
 <div class="sourceCode" id="cb616"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu">extract_fit_engine</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span>xvar <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-18-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>Prediction is done like other linear models. So if <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> is used with no other parameters, it will use <code>penalty = 47</code> as specified above:</p>
 <div class="sourceCode" id="cb617"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">ridge_fit</span>, new_data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 100 × 1
 ##    .pred
 ##    &lt;dbl&gt;
-##  1  8.37
+##  1  8.36
 ##  2  8.36
-##  3  8.37
-##  4  8.37
+##  3  8.36
+##  4  8.36
 ##  5  8.36
-##  6  8.37
-##  7  8.37
-##  8  8.37
-##  9  8.37
-## 10  8.37
+##  6  8.36
+##  7  8.36
+##  8  8.36
+##  9  8.36
+## 10  8.36
 ## # … with 90 more rows</code></pre>
 </div>
 </div>
-<div id="normalizing-tuning-whole-process" class="section level4" number="14.9.0.1">
+<div id="normalizing-tuning-whole-process" class="section level4" number="14.10.0.1">
 <h4>
-<span class="header-section-number">14.9.0.1</span> Normalizing + Tuning + Whole Process<a class="anchor" aria-label="anchor" href="#normalizing-tuning-whole-process"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.10.0.1</span> Normalizing + Tuning + Whole Process<a class="anchor" aria-label="anchor" href="#normalizing-tuning-whole-process"><i class="fas fa-link"></i></a>
 </h4>
 <p>To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed.</p>
 <div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
@@ -517,18 +537,18 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html">arrange</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 50 × 7
-##      penalty .metric .estimator  mean     n std_err .config              
-##        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-##  1 0.193     rmse    standard   0.395    10  0.0236 Preprocessor1_Model22
-##  2 0.121     rmse    standard   0.396    10  0.0245 Preprocessor1_Model21
-##  3 0.309     rmse    standard   0.396    10  0.0235 Preprocessor1_Model23
-##  4 0.0754    rmse    standard   0.399    10  0.0258 Preprocessor1_Model20
-##  5 0.494     rmse    standard   0.400    10  0.0243 Preprocessor1_Model24
-##  6 0.0471    rmse    standard   0.403    10  0.0273 Preprocessor1_Model19
-##  7 0.791     rmse    standard   0.407    10  0.0258 Preprocessor1_Model25
-##  8 0.0295    rmse    standard   0.408    10  0.0286 Preprocessor1_Model18
-##  9 0.00001   rmse    standard   0.411    10  0.0294 Preprocessor1_Model01
-## 10 0.0000160 rmse    standard   0.411    10  0.0294 Preprocessor1_Model02
+##    penalty .metric .estimator  mean     n std_err .config              
+##      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+##  1   0.791 rmse    standard   0.465    10  0.0369 Preprocessor1_Model25
+##  2   0.494 rmse    standard   0.466    10  0.0385 Preprocessor1_Model24
+##  3   1.26  rmse    standard   0.467    10  0.0357 Preprocessor1_Model26
+##  4   0.309 rmse    standard   0.470    10  0.0406 Preprocessor1_Model23
+##  5   2.02  rmse    standard   0.472    10  0.0349 Preprocessor1_Model27
+##  6   0.193 rmse    standard   0.476    10  0.0427 Preprocessor1_Model22
+##  7   3.24  rmse    standard   0.477    10  0.0344 Preprocessor1_Model28
+##  8   5.18  rmse    standard   0.483    10  0.0341 Preprocessor1_Model29
+##  9   0.121 rmse    standard   0.484    10  0.0447 Preprocessor1_Model21
+## 10   8.29  rmse    standard   0.488    10  0.0339 Preprocessor1_Model30
 ## # … with 40 more rows</code></pre>
 <p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
 <div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
@@ -541,7 +561,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
     alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
-<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-23-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>The best model can be chosen using <code>select_best()</code>.</p>
 <div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_rr</span> <span class="op">&lt;-</span> <span class="fu">select_best</span><span class="op">(</span><span class="va">ridge_cv</span>, metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span>
@@ -549,7 +569,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 1 × 2
 ##   penalty .config              
 ##     &lt;dbl&gt; &lt;chr&gt;                
-## 1   0.193 Preprocessor1_Model22</code></pre>
+## 1   0.791 Preprocessor1_Model25</code></pre>
 </div>
 <div id="the-final-ridge-model" class="section level4 unnumbered">
 <h4>The Final Ridge Model<a class="anchor" aria-label="anchor" href="#the-final-ridge-model"><i class="fas fa-link"></i></a>
@@ -561,22 +581,22 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)   8.38     0.193
-##  2 season       -0.0344   0.193
-##  3 episode       0.0892   0.193
-##  4 andy         -0.0426   0.193
-##  5 angela        0.0787   0.193
-##  6 darryl        0.0220   0.193
-##  7 dwight        0.0141   0.193
-##  8 jim           0.0274   0.193
-##  9 kelly        -0.0730   0.193
-## 10 kevin         0.0389   0.193
+##  1 (Intercept)  8.42      0.791
+##  2 season      -0.0327    0.791
+##  3 episode      0.0383    0.791
+##  4 andy         0.00211   0.791
+##  5 angela       0.0233    0.791
+##  6 darryl       0.0264    0.791
+##  7 dwight       0.0523    0.791
+##  8 jim          0.0407    0.791
+##  9 kelly       -0.0347    0.791
+## 10 kevin        0.0371    0.791
 ## # … with 21 more rows</code></pre>
 </div>
 </div>
-<div id="r-lasso-regularization" class="section level2" number="14.10">
+<div id="r-lasso-regularization" class="section level2" number="14.11">
 <h2>
-<span class="header-section-number">14.10</span> R: Lasso Regularization<a class="anchor" aria-label="anchor" href="#r-lasso-regularization"><i class="fas fa-link"></i></a>
+<span class="header-section-number">14.11</span> R: Lasso Regularization<a class="anchor" aria-label="anchor" href="#r-lasso-regularization"><i class="fas fa-link"></i></a>
 </h2>
 <p>In this section, we’ll re-run the cross validation to find a value of <span class="math inline">\(\lambda\)</span> which minimizes the cross validated MSE. To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed. Note that with Lasso, <code>mixture = 1</code>.</p>
 <div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
@@ -608,16 +628,16 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 50 × 7
 ##      penalty .metric .estimator  mean     n std_err .config              
 ##        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-##  1 0.00001   rmse    standard   0.423    10  0.0318 Preprocessor1_Model01
-##  2 0.0000160 rmse    standard   0.423    10  0.0318 Preprocessor1_Model02
-##  3 0.0000256 rmse    standard   0.423    10  0.0318 Preprocessor1_Model03
-##  4 0.0000409 rmse    standard   0.423    10  0.0318 Preprocessor1_Model04
-##  5 0.0000655 rmse    standard   0.423    10  0.0318 Preprocessor1_Model05
-##  6 0.000105  rmse    standard   0.423    10  0.0318 Preprocessor1_Model06
-##  7 0.000168  rmse    standard   0.423    10  0.0318 Preprocessor1_Model07
-##  8 0.000268  rmse    standard   0.423    10  0.0318 Preprocessor1_Model08
-##  9 0.000429  rmse    standard   0.422    10  0.0316 Preprocessor1_Model09
-## 10 0.000687  rmse    standard   0.421    10  0.0314 Preprocessor1_Model10
+##  1 0.00001   rmse    standard   0.531    10  0.0497 Preprocessor1_Model01
+##  2 0.0000160 rmse    standard   0.531    10  0.0497 Preprocessor1_Model02
+##  3 0.0000256 rmse    standard   0.531    10  0.0497 Preprocessor1_Model03
+##  4 0.0000409 rmse    standard   0.531    10  0.0497 Preprocessor1_Model04
+##  5 0.0000655 rmse    standard   0.531    10  0.0497 Preprocessor1_Model05
+##  6 0.000105  rmse    standard   0.531    10  0.0497 Preprocessor1_Model06
+##  7 0.000168  rmse    standard   0.531    10  0.0497 Preprocessor1_Model07
+##  8 0.000268  rmse    standard   0.530    10  0.0497 Preprocessor1_Model08
+##  9 0.000429  rmse    standard   0.529    10  0.0497 Preprocessor1_Model09
+## 10 0.000687  rmse    standard   0.528    10  0.0496 Preprocessor1_Model10
 ## # … with 40 more rows</code></pre>
 <p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
 <div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
@@ -631,7 +651,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"RMSE"</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-29-1.png" width="480" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>The best model can be chosen using <code>select_best()</code>.</p>
 <div class="sourceCode" id="cb633"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">best_lasso</span> <span class="op">&lt;-</span> <span class="fu">select_best</span><span class="op">(</span><span class="va">lasso_cv</span>, metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span>
@@ -639,7 +659,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 1 × 2
 ##   penalty .config              
 ##     &lt;dbl&gt; &lt;chr&gt;                
-## 1 0.00720 Preprocessor1_Model15</code></pre>
+## 1  0.0295 Preprocessor1_Model18</code></pre>
 <div id="the-final-lasso-model" class="section level4 unnumbered">
 <h4>The Final Lasso Model<a class="anchor" aria-label="anchor" href="#the-final-lasso-model"><i class="fas fa-link"></i></a>
 </h4>
@@ -650,16 +670,16 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)  8.38    0.00720
-##  2 season       0       0.00720
-##  3 episode      0.157   0.00720
-##  4 andy        -0.0739  0.00720
-##  5 angela       0.231   0.00720
-##  6 darryl       0.0663  0.00720
-##  7 dwight      -0.0721  0.00720
-##  8 jim         -0.00866 0.00720
-##  9 kelly       -0.167   0.00720
-## 10 kevin        0       0.00720
+##  1 (Intercept)  8.42     0.0295
+##  2 season      -0.112    0.0295
+##  3 episode      0.115    0.0295
+##  4 andy         0        0.0295
+##  5 angela       0.00412  0.0295
+##  6 darryl       0.0195   0.0295
+##  7 dwight       0.0665   0.0295
+##  8 jim          0.0902   0.0295
+##  9 kelly       -0.0518   0.0295
+## 10 kevin        0.125    0.0295
 ## # … with 21 more rows</code></pre>
 
 </div>
@@ -672,29 +692,30 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#shrink"><span class="header-section-number">14</span> Shrinkage Methods</a></li>
-<li><a class="nav-link" href="#on-inverting-matrices"><span class="header-section-number">14.1</span> On Inverting Matrices</a></li>
+<li><a class="nav-link" href="#model-complexity-flexibility"><span class="header-section-number">14.1</span> Model Complexity / Flexibility</a></li>
+<li><a class="nav-link" href="#on-inverting-matrices"><span class="header-section-number">14.2</span> On Inverting Matrices</a></li>
 <li>
-<a class="nav-link" href="#ridge-regression"><span class="header-section-number">14.2</span> Ridge Regression</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#the-ridge-regression-solution"><span class="header-section-number">14.2.1</span> The Ridge Regression Solution</a></li>
-<li><a class="nav-link" href="#ridge-regression-visually"><span class="header-section-number">14.2.2</span> Ridge Regression visually</a></li>
-<li><a class="nav-link" href="#why-ridge-regression"><span class="header-section-number">14.2.3</span> Why Ridge Regression?</a></li>
-<li><a class="nav-link" href="#inference-on-ridge-regression-coefficients"><span class="header-section-number">14.2.4</span> Inference on Ridge Regression Coefficients</a></li>
+<a class="nav-link" href="#ridge-regression"><span class="header-section-number">14.3</span> Ridge Regression</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-ridge-regression-solution"><span class="header-section-number">14.3.1</span> The Ridge Regression Solution</a></li>
+<li><a class="nav-link" href="#ridge-regression-visually"><span class="header-section-number">14.3.2</span> Ridge Regression visually</a></li>
+<li><a class="nav-link" href="#why-ridge-regression"><span class="header-section-number">14.3.3</span> Why Ridge Regression?</a></li>
+<li><a class="nav-link" href="#inference-on-ridge-regression-coefficients"><span class="header-section-number">14.3.4</span> Inference on Ridge Regression Coefficients</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#how-do-you-choose-lambda"><span class="header-section-number">14.3</span> How do you choose \(\lambda\)?</a></li>
+<li><a class="nav-link" href="#how-do-you-choose-lambda"><span class="header-section-number">14.4</span> How do you choose \(\lambda\)?</a></li>
 <li>
-<a class="nav-link" href="#lasso"><span class="header-section-number">14.4</span> Lasso</a><ul class="nav navbar-nav">
-<li><a class="nav-link" href="#lasso-coefficients"><span class="header-section-number">14.4.1</span> Lasso Coefficients</a></li>
-<li><a class="nav-link" href="#lasso-visually"><span class="header-section-number">14.4.2</span> Lasso visually</a></li>
-<li><a class="nav-link" href="#how-do-you-choose-lambda-1"><span class="header-section-number">14.4.3</span> How do you choose \(\lambda\)?</a></li>
+<a class="nav-link" href="#lasso"><span class="header-section-number">14.5</span> Lasso</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#lasso-coefficients"><span class="header-section-number">14.5.1</span> Lasso Coefficients</a></li>
+<li><a class="nav-link" href="#lasso-visually"><span class="header-section-number">14.5.2</span> Lasso visually</a></li>
+<li><a class="nav-link" href="#how-do-you-choose-lambda-1"><span class="header-section-number">14.5.3</span> How do you choose \(\lambda\)?</a></li>
 </ul>
 </li>
-<li><a class="nav-link" href="#ridge-regression-vs.-lasso"><span class="header-section-number">14.5</span> Ridge Regression vs. Lasso</a></li>
-<li><a class="nav-link" href="#elastic-net"><span class="header-section-number">14.6</span> Elastic Net</a></li>
-<li><a class="nav-link" href="#reflection-questions-10"><span class="header-section-number">14.7</span>  Reflection Questions</a></li>
-<li><a class="nav-link" href="#ethics-considerations-9"><span class="header-section-number">14.8</span>  Ethics Considerations</a></li>
-<li><a class="nav-link" href="#r-ridge-regression"><span class="header-section-number">14.9</span> R: Ridge Regression</a></li>
-<li><a class="nav-link" href="#r-lasso-regularization"><span class="header-section-number">14.10</span> R: Lasso Regularization</a></li>
+<li><a class="nav-link" href="#ridge-regression-vs.-lasso"><span class="header-section-number">14.6</span> Ridge Regression vs. Lasso</a></li>
+<li><a class="nav-link" href="#elastic-net"><span class="header-section-number">14.7</span> Elastic Net</a></li>
+<li><a class="nav-link" href="#reflection-questions-10"><span class="header-section-number">14.8</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-9"><span class="header-section-number">14.9</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-ridge-regression"><span class="header-section-number">14.10</span> R: Ridge Regression</a></li>
+<li><a class="nav-link" href="#r-lasso-regularization"><span class="header-section-number">14.11</span> R: Lasso Regularization</a></li>
 </ul>
 
       <div class="book-extra">
@@ -712,7 +733,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-04-27.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-05-26.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
