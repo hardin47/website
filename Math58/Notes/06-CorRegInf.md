@@ -1206,32 +1206,35 @@ Gilead, a large pharmaceutical company, issued a press release describing result
 
 ### Correlation & Simple Linear Regression: IMS Sections 8.1 & 8.2
 
-* Describe the linear model with multiple variables.
-* Describe the error / residual term and how it is calculated with multiple variables.
-* What are the (three-ish) statistics of interest in this chapter?  What are the parameters of interest?
-* What does correlation measure?
-* How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
-* Why is it dangerous to extrapolate?
-* How do we interpret $R^2$?  Why is that? 
-* What does it mean to say that $b_1$ has a sampling distribution?  Why is it that we would never talk about the sampling distribution of $\beta_1$?
-* Why do we need the LINE technical conditions for the inference parts of the analysis but not for the estimation parts of the analysis?
-* Is linear regression always appropriate when comparing two continuous variables?
-* What are the LINE technical conditions?  How are the conditions assessed?
-* What are the three factors that influence the $SE(b_1)$?  (Note:  when something influences $SE(b_1)$, that means the inference is also effected.  If you have a huge $SE(b_1)$, it will be hard to tell if the slope is significant because the t value will be small.)
-* What does it mean to do a randomization test for the slope?  That is, explain the process of doing a randomization test here. (See shuffle options in the Analyzing Two Quantitative Variables applet.)
-* Why would someone transform either of the variables?
-* What is the difference between a confidence interval and a prediction interval?  Which is bigger?  Why does that make sense?  How do the centers of the intervals differ?  (They don't.  Why not?)
+1. Describe the linear model with a single explanatory variable.
+2. Describe the error / residual term and how it is calculated with multiple variables.
+3. What are the (three-ish) statistics of interest in this chapter?  What are the parameters of interest?
+4. What does correlation measure?
+5. How do we find the values of $b_0$ and $b_1$ for estimating the least squares line?
+6. How do we interpret $R^2$?  Why is that? 
+7. What does it mean to say that $b_1$ has a sampling distribution?  Why is it that we would never talk about the sampling distribution of $\beta_1$?
+8. What are the LINE technical conditions?  How are the conditions assessed?
+9. What are the three factors that influence the $SE(b_1)$?  (Note:  when something influences $SE(b_1)$, that means the inference is also effected.  If you have a huge $SE(b_1)$, it will be hard to tell if the slope is significant because the t value will be small.)
+10. What does it mean to do a randomization test for the slope?  That is, explain the process of doing a randomization test here. (See shuffle options in the Analyzing Two Quantitative Variables applet.)
+11. Why would someone transform either of the variables?
+12. What is the difference between a confidence interval and a prediction interval?  Which is bigger?  Why does that make sense?  How do the centers of the intervals differ?  (They don't.  Why not?)
 
 
 ### Multiple Linear Regression: IMS Chapter 4 & Section 8.4
 
-* Describe the linear model with multiple variables.
-* Describe the error / residual term and how it is calculated with multiple variables.
-* How does the model change when multiple variables are included?
-* How are p-values interpreted now that there are multiple variables?
-* How is $R^2$ interpreted?  What is the difference between $R^2$ and $R^2_{adj}$?
-* How are variables chosen for the final model?
-* How are the model conditions assessed?
-
+1. Describe the linear model with multiple variables.
+2. Describe the error / residual term and how it is calculated with multiple variables.
+3. How does the model change when multiple variables are included?
+4. How are p-values interpreted now that there are multiple variables?
+5. How is $R^2$ interpreted?  What is the difference between $R^2$ and $R^2_{adj}$?
+6. How are variables chosen for the final model?
+7. How are the model conditions assessed?
+8. How can you use a linear model to include binary or categorical explanatory variables?
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. Why is it dangerous to extrapolate?
+2. Why do we need the LINE technical conditions for the inference parts of the analysis but not for the estimation parts of the analysis?
+3. Is linear regression always appropriate when comparing two continuous variables?
+4. Why is it important to avoid causal language when interpreting the slope coefficient?
+

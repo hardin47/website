@@ -1059,8 +1059,6 @@ t_salaries %>%
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 
-The reflection questions below that we will not cover are marked with an asterisk *.
-
 ### 1 quantitative variable: IMS Section 7.1
 
 1. What changed about the studies (data structure) from Chapters 2 & 3?
@@ -1068,8 +1066,8 @@ The reflection questions below that we will not cover are marked with an asteris
 3. What is the difference between the distribution of the data and the distribution of the statistic?  There is a theoretical difference as well as a computational difference.
 4. What is the limiting sampling distribution of the statistic?  (Note, the answer here is for big samples, that is the Central **Limit** Theorem works only where there is a limit... i.e., the sample size is big.)
 5. If interest is in a statistics other than the sample mean, what is a tool we can use for finding the alternative statistic's sampling distribution?
-6. * Explain the intuition behind bootstrapping.
-7. * Explain how the SE for the statistic is calculated using bootstrapping.
+6. Explain the intuition behind bootstrapping.
+7. Explain how the SE for the statistic is calculated using bootstrapping.
 8. What is the difference between a normal distribution and a t distribution?
 9. When do we use a z and when do we use a t?
 10. When would you use a confidence interval and when would you use a hypothesis test?
@@ -1084,7 +1082,7 @@ The reflection questions below that we will not cover are marked with an asteris
 3. What is the sampling distribution for the statistic of interest?
 4. How is the t-distribution become relevant?
 5. What are degrees of freedom in general?  What are the actual degrees of freedom for the test in section 4.3?
-6. * How is the null mechanism different across the three analysis methods in section 3.2:  randomization test, two-sample t-test, random sampling test (n.b. this is also called the parametric bootstrap)?
+6. How is the null mechanism different across the three analysis methods in section 3.2:  randomization test, two-sample t-test, random sampling test (n.b. this is also called the parametric bootstrap)?
 7. How do you create a CI?  How do you interpret the CI?
 8. What if your data are NOT normal?  What strategies can you try out?
 
@@ -1108,4 +1106,7 @@ The reflection questions below that we will not cover are marked with an asteris
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-
+1. Why would you perform a power analysis before collecting the full dataset? 
+2. How do you choose which method to apply to the dataset at hand?
+3. How do you decide whether to perform a hypothesis test or compute a confidence interval?
+4. How are all the methods in this chapter related?  What would happen if you applied the methods to a dataset with a binary response variable?

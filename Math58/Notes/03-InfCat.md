@@ -1310,4 +1310,7 @@ Spring Break 1 !
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
 1. Why shouldn't we calculate a difference in proportions or a relative risk if the data come from a case-control study?
-2. 
+2. With really small datasets, would you be better off using the mathematical formula or the bootstrap approximation to calculate the SE for your statistic of interest?
+3. When is the bootstrap estimate of the SE most useful?
+4. Why are technical conditions important to assess before making inferential conclusions?
+5. How are all the methods in this chapter related?  What would happen if you tried to apply the methods to a dataset with a continuous (numeric) response variable?
