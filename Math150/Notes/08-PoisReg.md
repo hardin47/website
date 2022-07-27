@@ -122,7 +122,7 @@ Likely, it makes more sense to look at the distribution of the response variable
 
 
 ```
-#> # A tibble: 3 x 5
+#> # A tibble: 3 × 5
 #>   AGEgroups  mean variance stdev     n
 #>   <chr>     <dbl>    <dbl> <dbl> <int>
 #> 1 (20,30]    1.08    0.992 0.996    12
@@ -268,7 +268,7 @@ The R example is taken from data given in the textbook.  The scientific question
 ```r
 galap <- readr::read_csv("Galapagos.csv")
 head(galap)
-#> # A tibble: 6 x 8
+#> # A tibble: 6 × 8
 #>   island      species endemics  area elevation nearest scruz adjacent
 #>   <chr>         <dbl>    <dbl> <dbl>     <dbl>   <dbl> <dbl>    <dbl>
 #> 1 Baltra           58       23 25.1        346     0.6   0.6     1.84
@@ -293,7 +293,7 @@ ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
 ```r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
     data= galap, family="poisson") %>% tidy()
-#> # A tibble: 6 x 5
+#> # A tibble: 6 × 5
 #>   term            estimate std.error statistic  p.value
 #>   <chr>              <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)     3.02     0.303         9.96  2.28e-23
@@ -312,14 +312,14 @@ It seems like we might not need either `log(elevation)` or `nearest`.  A drop in
 ```r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
     data= galap, family="poisson") %>% glance()
-#> # A tibble: 1 x 8
+#> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1         3511.      29  -294.  600.  609.     427.          24    30
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") %>% glance()
-#> # A tibble: 1 x 8
+#> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1         3511.      29  -296.  600.  606.     431.          26    30
@@ -340,16 +340,16 @@ Keep in mind that the expectation of a Poisson model is that the residuals will 
 ```r
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") %>% augment() %>% head()
-#> # A tibble: 6 x 10
-#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
-#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
-#> 1      58       3.22    0.6     1.84    4.61 -4.57      -4.83  0.105    4.04
-#> 2      31       0.215  26.3   572.      3.36  0.414      0.427 0.0605   4.15
-#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -4.05  0.0417   4.07
-#> 4      25      -2.30   47.4     0.18    2.55  3.01       3.08  0.0413   4.11
-#> 5       2      -3.00    1.9   904.      2.27 -3.01      -3.10  0.0559   4.11
-#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.986 0.0661   4.15
-#> # … with 1 more variable: .cooksd <dbl>
+#> # A tibble: 6 × 10
+#>   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd
+#>     <dbl>       <dbl> <dbl>   <dbl>   <dbl>  <dbl>   <dbl>  <dbl>  <dbl>   <dbl>
+#> 1      58       3.22    0.6    1.84    4.61 -4.57   -4.83  0.105    4.04 0.581  
+#> 2      31       0.215  26.3  572.      3.36  0.414   0.427 0.0605   4.15 0.00301
+#> 3       3      -1.56   58.7    0.78    2.76 -3.96   -4.05  0.0417   4.07 0.118  
+#> 4      25      -2.30   47.4    0.18    2.55  3.01    3.08  0.0413   4.11 0.131  
+#> 5       2      -3.00    1.9  904.      2.27 -3.01   -3.10  0.0559   4.11 0.0959 
+#> 6      18      -1.08    8      1.84    3.11 -0.953  -0.986 0.0661   4.15 0.0161 
+#> # … with abbreviated variable names ¹​adjacent, ²​.std.resid
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") %>% augment() %>%
@@ -371,7 +371,7 @@ Note that all of the above analyses can be done using the overdispersed quasiPoi
 ```r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% tidy()
-#> # A tibble: 6 x 5
+#> # A tibble: 6 × 5
 #>   term            estimate std.error statistic  p.value
 #>   <chr>              <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)     3.02      1.29         2.34  0.0278  
@@ -383,7 +383,7 @@ glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent,
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% tidy()
-#> # A tibble: 4 x 5
+#> # A tibble: 4 × 5
 #>   term         estimate std.error statistic  p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)  3.50      0.203        17.3  8.76e-16
@@ -397,16 +397,16 @@ glm(species ~ log(area) + scruz + adjacent,
 ```r
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% augment() %>% head()
-#> # A tibble: 6 x 10
-#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
-#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
-#> 1      58       3.22    0.6     1.84    4.61 -4.57      -1.18  0.105    4.04
-#> 2      31       0.215  26.3   572.      3.36  0.414      0.104 0.0605   4.15
-#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -0.989 0.0417   4.07
-#> 4      25      -2.30   47.4     0.18    2.55  3.01       0.752 0.0413   4.11
-#> 5       2      -3.00    1.9   904.      2.27 -3.01      -0.758 0.0559   4.11
-#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.241 0.0661   4.15
-#> # … with 1 more variable: .cooksd <dbl>
+#> # A tibble: 6 × 10
+#>   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd
+#>     <dbl>       <dbl> <dbl>   <dbl>   <dbl>  <dbl>   <dbl>  <dbl>  <dbl>   <dbl>
+#> 1      58       3.22    0.6    1.84    4.61 -4.57   -1.18  0.105    4.04 3.47e-2
+#> 2      31       0.215  26.3  572.      3.36  0.414   0.104 0.0605   4.15 1.80e-4
+#> 3       3      -1.56   58.7    0.78    2.76 -3.96   -0.989 0.0417   4.07 7.05e-3
+#> 4      25      -2.30   47.4    0.18    2.55  3.01    0.752 0.0413   4.11 7.81e-3
+#> 5       2      -3.00    1.9  904.      2.27 -3.01   -0.758 0.0559   4.11 5.72e-3
+#> 6      18      -1.08    8      1.84    3.11 -0.953  -0.241 0.0661   4.15 9.58e-4
+#> # … with abbreviated variable names ¹​adjacent, ²​.std.resid
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% augment() %>%

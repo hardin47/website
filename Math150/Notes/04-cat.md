@@ -141,7 +141,9 @@ diff_props <- backpain %>%
   calculate(stat = "diff in props")
 
 diff_props  # print to screen to see the observed difference
-#> # A tibble: 1 x 1
+#> Response: outcome (factor)
+#> Explanatory: treatment (factor)
+#> # A tibble: 1 × 1
 #>    stat
 #>   <dbl>
 #> 1 0.475
@@ -160,7 +162,7 @@ visualize(nulldist) +
 # Step 4.
 nulldist %>%
   get_p_value(obs_stat = diff_props, direction = "greater")
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   p_value
 #>     <dbl>
 #> 1   0.007

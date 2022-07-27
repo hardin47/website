@@ -8,11 +8,12 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE,
 
 library(tidyverse)
 library(broom)
-library(flair)
-library(permuter)
+#library(permuter)
 library(knitr)
 library(NHANES)
+library(flair)
 options(digits=3)
+#devtools::install_github("statlab/permuter")
 #devtools::install_github("kbodwin/demoR")
 #I can't figure out why we need demoR (replaced by flair)
 ```
@@ -484,9 +485,10 @@ knitr::include_graphics(c("figs/genderbias3a.png", "figs/genderbias3b.png"))
 #####  R code
 
 ```{r}
-#macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
-library(permuter)
-data(macnell)
+# The data come from `permuter` which is no longer kept up as a package
+macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+#library(permuter)
+#data(macnell)
 ```
 
 
@@ -505,8 +507,8 @@ ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID),
                size=5, aes(color = TAID),
                position=position_dodge(width=0.4)) +
   coord_flip() +
-  xlab("") + ggtitle("Overall teaching effectiveness score")
-
+  xlab("") + 
+  ggtitle("Overall teaching effectiveness score")
 ```
 
 
@@ -546,21 +548,20 @@ macnell %>%
 * Use difference in mean ratings for female-identified vs male-identified instructors.
 
 
-```{r mac1, eval=FALSE, include = FALSE}
+```{r mac1, eval=TRUE, include = TRUE}
 macnell %>% 
   group_by(tagender) %>%
   mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
   select(overall, tagender, taidgender, permTAID) 
 ```
 
-```{r echo = FALSE}
-decorate("mac1") %>%
-  flair("group_by(tagender)") %>%
-  knit_print.with_flair()
+```{r echo = FALSE, eval = FALSE}
+flair::decorate("mac1") %>%
+  flair::flair("group_by(tagender)") 
 ```
 
 
-```{r mac2, eval=FALSE, include = FALSE}
+```{r mac2, eval=TRUE, include = TRUE}
 macnell %>% 
   group_by(tagender) %>%
   mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
@@ -570,7 +571,7 @@ macnell %>%
   summarize(diff(pmeans))
 ```
 
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE}
 decorate("mac2") %>%  
   flair("group_by(tagender)") %>%
   flair("group_by(permTAID)") %>%

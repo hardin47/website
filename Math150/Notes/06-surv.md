@@ -478,7 +478,7 @@ Consider the following data from a prostate cancer study. The study was performe
 library(survival)
 prostate <- readr::read_csv("PROSTATE.csv")
 head(prostate)
-#> # A tibble: 6 x 7
+#> # A tibble: 6 × 7
 #>   Treatment  Time Status   Age  Haem  Size Gleason
 #>       <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl>
 #> 1         1    65      0    67  13.4    34       8
@@ -499,19 +499,21 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate)
 #> n= 38, number of events= 6
 
 coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% tidy()
-#> # A tibble: 1 x 5
+#> # A tibble: 1 × 5
 #>   term      estimate std.error statistic p.value
 #>   <chr>        <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 Treatment    -1.98      1.10     -1.80  0.0717
 coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1    38      6          4.55      0.0329         4.42     0.0355           3.24
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> # A tibble: 1 × 18
+#>       n nevent statist…¹ p.val…² stati…³ p.val…⁴ stati…⁵ p.val…⁶ stati…⁷ p.val…⁸
+#>   <int>  <dbl>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+#> 1    38      6      4.55  0.0329    4.42  0.0355    3.24  0.0717      NA      NA
+#> # … with 8 more variables: r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> #   BIC <dbl>, nobs <int>, and abbreviated variable names ¹​statistic.log,
+#> #   ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc, ⁵​statistic.wald, ⁶​p.value.wald,
+#> #   ⁷​statistic.robust, ⁸​p.value.robust
+#> # ℹ Use `colnames()` to see all variable names
 ```
 
 -   **Note 1**: There is no intercept in the linear component of the model (i.e., there is no $\beta_0$ or $b_0).$ The baseline estimate (usually the role of the "intercept") is contained within the $h_0(t)$ parameter.\
@@ -1622,14 +1624,16 @@ The GitHub repo with data and code is here: <https://github.com/propublica/compa
 library(survival)
 recid <- readr::read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv")
 
-recid <- dplyr::select(recid, age, c_charge_degree, race, age_cat, score_text, sex, priors_count, 
-                    days_b_screening_arrest, decile_score, is_recid, two_year_recid, 
+recid <- recid %>%
+  dplyr::select(age, c_charge_degree, race, age_cat, score_text, sex, `priors_count...15`,
+                days_b_screening_arrest, `decile_score...12`, is_recid, two_year_recid, 
                     c_jail_in, c_jail_out) %>% 
-        filter(days_b_screening_arrest <= 30) %>%
-        filter(days_b_screening_arrest >= -30) %>%
-        filter(is_recid != -1) %>%
-        filter(c_charge_degree != "O") %>%
-        filter(score_text != 'N/A')
+  dplyr::rename(priors_count = `priors_count...15`, decile_score = `decile_score...12`) %>%
+        dplyr::filter(days_b_screening_arrest <= 30) %>%
+        dplyr::filter(days_b_screening_arrest >= -30) %>%
+        dplyr::filter(is_recid != -1) %>%
+        dplyr::filter(c_charge_degree != "O") %>%
+        dplyr::filter(score_text != 'N/A')
         
 recid <- recid %>% mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) %>%
       mutate(crime_factor = factor(c_charge_degree)) %>%
@@ -1826,26 +1830,28 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
 # Just score_factor
 coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
   tidy()
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 score_factorHigh      1.08     0.0446      24.1 7.67e-129
 #> 2 score_factorMedium    0.704    0.0439      16.0 9.78e- 58
 coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
   glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1 11426   3058          617.   9.39e-135         654.  1.15e-142           609.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> # A tibble: 1 × 18
+#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
+#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
+#> 1 11426   3058        617. 9.39e-135    654. 1.15e-142    609. 5.57e-133      NA
+#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
+#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
+#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
+#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
+#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#> # ℹ Use `colnames()` to see all variable names
 
 # score_factor and race
 coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
   tidy()
-#> # A tibble: 3 x 5
+#> # A tibble: 3 × 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 score_factorHigh      1.03     0.0460     22.3  3.96e-110
@@ -1853,19 +1859,21 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>%
 #> 3 raceCaucasian        -0.170    0.0396     -4.29 1.78e-  5
 coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
   glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1 11426   3058          636.   1.65e-137         671.  3.72e-145           626.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> # A tibble: 1 × 18
+#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
+#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
+#> 1 11426   3058        636. 1.65e-137    671. 3.72e-145    626. 2.10e-135      NA
+#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
+#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
+#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
+#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
+#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#> # ℹ Use `colnames()` to see all variable names
 
 # score_factor, race, age, sex
 coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
   tidy()
-#> # A tibble: 5 x 5
+#> # A tibble: 5 × 5
 #>   term               estimate std.error statistic  p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 score_factorHigh     0.926    0.0471      19.6  7.63e-86
@@ -1875,14 +1883,16 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> 5 sexMale              0.411    0.0502       8.19 2.53e-16
 coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
   glance()
-#> # A tibble: 1 x 18
-#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
-#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
-#> 1 11426   3058          768.   8.91e-164         787.  7.45e-168           739.
-#> # … with 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
-#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
-#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> # A tibble: 1 × 18
+#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
+#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
+#> 1 11426   3058        768. 8.91e-164    787. 7.45e-168    739. 2.07e-157      NA
+#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
+#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
+#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
+#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
+#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#> # ℹ Use `colnames()` to see all variable names
 ```
 
 Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:
@@ -1903,10 +1913,9 @@ The survminer packages also has the `ggforest()` function which makes a fantasti
 
 
 ```r
-ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
+#broken right now
+#survminer::ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
 ```
-
-<img src="06-surv_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 

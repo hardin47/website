@@ -293,7 +293,7 @@ glimpse(happy)
 happy.lm = lm(LifeExpectancy ~ Happiness, data=happy) 
 
 happy.lm %>% tidy()
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)    28.2      2.28       12.4 2.76e-24
@@ -306,7 +306,7 @@ Some analyses will need the residuals, fitted values, or coefficients individual
 
 ```r
 happy.lm %>% augment()
-#> # A tibble: 143 x 8
+#> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
 #> 1           76.2       5.5    65.0  11.2   0.00765   6.09 0.0128        1.83  
@@ -316,6 +316,7 @@ happy.lm %>% augment()
 #> 5           71.7       5      61.7  10.0   0.0101    6.10 0.0138        1.64  
 #> 6           80.9       7.9    81.1  -0.198 0.0216    6.16 0.0000118    -0.0326
 #> # … with 137 more rows
+#> # ℹ Use `print(n = ...)` to see more rows
 ```
 
 
@@ -349,7 +350,7 @@ predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("pred"), level=.9
 #> 2 75.1 62.9 87.3
 
 happy.lm %>% tidy(conf.int = TRUE)
-#> # A tibble: 2 x 7
+#> # A tibble: 2 × 7
 #>   term        estimate std.error statistic  p.value conf.low conf.high
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
 #> 1 (Intercept)    28.2      2.28       12.4 2.76e-24    23.7      32.7 
@@ -365,7 +366,7 @@ We skipped the residuals section, so you are not responsible for finding residua
 
 ```r
 happy.lm %>% augment()
-#> # A tibble: 143 x 8
+#> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
 #> 1           76.2       5.5    65.0  11.2   0.00765   6.09 0.0128        1.83  
@@ -375,6 +376,7 @@ happy.lm %>% augment()
 #> 5           71.7       5      61.7  10.0   0.0101    6.10 0.0138        1.64  
 #> 6           80.9       7.9    81.1  -0.198 0.0216    6.16 0.0000118    -0.0326
 #> # … with 137 more rows
+#> # ℹ Use `print(n = ...)` to see more rows
 ```
 
 

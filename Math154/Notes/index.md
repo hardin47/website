@@ -1,7 +1,7 @@
 --- 
 title: "Computational Statistics"
 author: "Jo Hardin"
-date: "2022-03-03"
+date: "2022-07-27"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:

@@ -7,16 +7,16 @@
 <title>Chapter 14 Shrinkage Methods | Linear Models</title>
 <meta name="author" content="Jo Hardin">
 <meta name="description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
-<meta name="generator" content="bookdown 0.24 with bs4_book()">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
 <meta property="og:title" content="Chapter 14 Shrinkage Methods | Linear Models">
 <meta property="og:type" content="book">
 <meta property="og:description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 14 Shrinkage Methods | Linear Models">
 <meta name="twitter:description" content="Recall the two methods we’ve used so far to find sets of variable (and their coefficients): Choose models using domain knowledge and then applying computational methods (i.e., cross validation) to...">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.1/transition.js"></script><script src="libs/bs3compat-0.3.1/tabs.js"></script><script src="libs/bs3compat-0.3.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <script type="text/x-mathjax-config">
     const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
@@ -35,7 +35,33 @@
       	})
       }
     }
-    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="style.css">
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -135,7 +161,7 @@ Figure 1.4: Image credit: Figure 2.7 of ISLR
 <h2>
 <span class="header-section-number">14.3</span> Ridge Regression<a class="anchor" aria-label="anchor" href="#ridge-regression"><i class="fas fa-link"></i></a>
 </h2>
-<p>An excellent discussion of Ridge Regression is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
+<p>An excellent discussion of Ridge Regression is given by <span class="citation">Wieringen (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
 <p>Recall that the OLS (ordinary least squares) technique minimizes the distance between the observed and predicted values of the response. That is, we found the <span class="math inline">\(b_0, b_1, \ldots b_{p-1}\)</span> that minimize:
 <span class="math display">\[SSE = \sum_{i=1}^n \bigg( Y_i - b_0 - \sum_{j=1}^{p-1} b_j X_{ij} \bigg)^2.\]</span></p>
 <p>Using the OLS algorithm for modeling, the values of <span class="math inline">\(b_i\)</span> give the exact same model as the model built using the standardized variables which produce <span class="math inline">\(b_i^*\)</span>. However, as you will see, it is important to <strong>standardize all variables before running ridge regression</strong>.</p>
@@ -145,7 +171,7 @@ Figure 1.4: Image credit: Figure 2.7 of ISLR
 where <span class="math inline">\(\lambda \geq 0\)</span> is a <em>tuning parameter</em>, to be determined separately. The ridge regression optimization provides a trade-off between two different criteria: variance and bias. As with OLS, ridge regression seeks to find coefficients that fit the data well (minimize SSE!). Additionally, ridge regression shrinks the coefficients to zero by adding a penalty so that smaller values of <span class="math inline">\(b_j\)</span> are preferred - the shrinkage makes the estimates less variable. It can be proved that there is always a <span class="math inline">\(\lambda \ne 0\)</span> which gives smaller E[MSE] than OLS. Note: the shrinkage does not apply to the intercept!</p>
 <p>Note: the Gauss-Markov theorem says that OLS solutions are the best (i.e., smallest variance) linear unbiased estimates (BLUE). But if we add a bit of bias, we can do better. There is an existence theorem <span class="citation">(<a href="references.html#ref-rr_wins" role="doc-biblioref">Theobald 1974</a>)</span> that says:
 <span class="math display">\[ \exists \ \  \lambda \mbox{ such that } E[MSE_{RR}] &lt; E[MSE_{OLS}].\]</span>
-Excellent description of the theory is given by <span class="citation"><a href="references.html#ref-rr_theory" role="doc-biblioref">Wieringen</a> (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
+Excellent description of the theory is given by <span class="citation">Wieringen (<a href="references.html#ref-rr_theory" role="doc-biblioref">2021</a>)</span>.</p>
 <div id="the-ridge-regression-solution" class="section level3" number="14.3.1">
 <h3>
 <span class="header-section-number">14.3.1</span> The Ridge Regression Solution<a class="anchor" aria-label="anchor" href="#the-ridge-regression-solution"><i class="fas fa-link"></i></a>
@@ -292,7 +318,7 @@ Figure 14.2: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in such a way that all 45 predictors were related to the response. That is, none of the true coefficients beta1,… , beta45 equaled zero. The lasso implicitly assumes that a number of the coefficients truly equal zero. Consequently, it is not surprising that ridge regression outperforms the lasso in terms of prediction error in this setting. Figure 6.9 illustrates a similar situation, except that now the response is a function of only 2 out of 45 predictors. Now the lasso tends to outperform ridge regression in terms of bias, variance, and MSE.
 </p>
 </div>
-<p><span class="citation"><a href="references.html#ref-subforlasso" role="doc-biblioref">Trevor Hastie, Tibshirani, and Tibshirani</a> (<a href="references.html#ref-subforlasso" role="doc-biblioref">2020</a>)</span> comment on the theoretical literature as well as perform extensive simulations to compare best subsets, forward stepwise, and the Lasso. The paper is particularly interesting in their comparison of best subsets and Lasso.</p>
+<p><span class="citation">Trevor Hastie, Tibshirani, and Tibshirani (<a href="references.html#ref-subforlasso" role="doc-biblioref">2020</a>)</span> comment on the theoretical literature as well as perform extensive simulations to compare best subsets, forward stepwise, and the Lasso. The paper is particularly interesting in their comparison of best subsets and Lasso.</p>
 <blockquote>
 <p>Generally speaking, the lasso and best subset selection differ in terms of their “aggressiveness” in selecting and estimating the coefficients in a linear model, with the lasso being less aggressive than best subset selection; meanwhile, forward stepwise lands somewhere in the middle, in terms of its aggressiveness.</p>
 </blockquote>
@@ -386,11 +412,11 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <span class="va">office_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">office_split</span><span class="op">)</span></code></pre></div>
 <p>The full linear model:</p>
 <div class="sourceCode" id="cb606"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">office_lm</span> <span class="op">&lt;-</span> <span class="va">office_train</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">office_lm</span> <span class="op">&lt;-</span> <span class="va">office_train</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span>
 
-<span class="va">office_lm</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="va">office_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 5
 ##    term         estimate std.error statistic  p.value
 ##    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -412,11 +438,11 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <p>No good! The coefficients cannot be estimated! (Here, 5 points were randomly selected, remember <span class="math inline">\(p = 31\)</span>.) The model breaks down because <span class="math inline">\((X^t X)^{-1}\)</span> is not invertible. Notice that only 5 coefficients are estimated and no SEs are estimated.</p>
 <div class="sourceCode" id="cb608"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
-<span class="va">office_train</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/slice.html">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="va">office_train</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">episode_name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 5
 ##    term        estimate std.error statistic p.value
 ##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
@@ -442,9 +468,9 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </h5>
 <p>First, a recipe needs to be specified. Note that the <code>episode_name</code> is not a predictor variable, and all the variables need to be normalized (particularly important to scale the variables).</p>
 <div class="sourceCode" id="cb610"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">office_rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">update_role</span><span class="op">(</span><span class="va">episode_name</span>, new_role <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">step_zv</span><span class="op">(</span><span class="fu">all_numeric</span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="fu">all_outcomes</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">office_rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">imdb_rating</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">update_role</span><span class="op">(</span><span class="va">episode_name</span>, new_role <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">step_zv</span><span class="op">(</span><span class="fu">all_numeric</span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="fu">all_outcomes</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">step_normalize</span><span class="op">(</span><span class="fu">all_numeric</span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="fu">all_outcomes</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="specify-the-engine-fit" class="section level5 unnumbered">
@@ -459,19 +485,19 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </ol>
 <p>If <code>P=0</code> then <span class="math inline">\(\lambda\)</span> will also be zero (and the estimates will be the same as those from OLS). Additionally, <code>P</code> and <span class="math inline">\(\lambda\)</span> will be monotonically related. That is, a large <code>penalty</code> corresponds to a large value of <span class="math inline">\(\lambda.\)</span> That said, they are not functions of one another.</p>
 <div class="sourceCode" id="cb611"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_spec</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fl">47</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">ridge_spec</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fl">47</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span>
 
-<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
 
-<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span></code></pre></div>
+<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span></code></pre></div>
 <p>It turns out that <strong>glmnet</strong> fits the model for <em>all</em> values of <code>penalty</code> at once, so we can see the coefficients for any other value of <code>penalty</code> of interest. Notice that the coefficients are smaller for larger values of the <code>penalty</code>.</p>
 <div class="sourceCode" id="cb612"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 3
 ##    term         estimate penalty
 ##    &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;
@@ -487,7 +513,7 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 ## 10 kevin        0.000600      47
 ## # … with 21 more rows</code></pre>
 <div class="sourceCode" id="cb614"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
@@ -504,8 +530,8 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 ## # … with 21 more rows</code></pre>
 <p>We can visualize how the magnitude of the coefficients are regularized toward zero as the <code>penalty</code> goes up. (We won’t get into the relationship between <span class="math inline">\(\lambda\)</span> and <code>penalty</code>, they both penalize the magnitude of the coefficients, <code>penalty</code> can be specified <em>per</em> variable.)</p>
 <div class="sourceCode" id="cb616"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">extract_fit_engine</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">ridge_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">extract_fit_engine</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span>xvar <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-19-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>Prediction is done like other linear models. So if <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> is used with no other parameters, it will use <code>penalty = 47</code> as specified above:</p>
@@ -533,8 +559,8 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </h4>
 <p>To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed.</p>
 <div class="sourceCode" id="cb619"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">ridge_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">0</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span></code></pre></div>
 <p>Next, a new <code>workflow()</code> which includes the new model/engine specification. Notice that we don’t need to set <code>measure = 0</code> here because it was only the <code>penalty</code> term which we designated to <code>tune()</code>.</p>
 <div class="sourceCode" id="cb620"><pre class="downlit sourceCode r">
@@ -543,24 +569,24 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
   
 <span class="va">ridge_grid</span> <span class="op">&lt;-</span> <span class="fu">grid_regular</span><span class="op">(</span><span class="fu">penalty</span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 
-<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">ridge_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
 
-<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
+<span class="va">ridge_fit</span> <span class="op">&lt;-</span> <span class="va">ridge_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
 
 <span class="co"># this is the line that tunes the model using cross validation</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span>
 <span class="va">ridge_cv</span> <span class="op">&lt;-</span> <span class="fu">tune_grid</span><span class="op">(</span>
-  <span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>,
+  <span class="va">ridge_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>,
   resamples <span class="op">=</span> <span class="va">office_fold</span>,
   grid <span class="op">=</span> <span class="va">ridge_grid</span>
 <span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb621"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">ridge_cv</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html">arrange</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">ridge_cv</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 50 × 7
 ##    penalty .metric .estimator  mean     n std_err .config              
 ##      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
@@ -577,15 +603,15 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 ## # … with 40 more rows</code></pre>
 <p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
 <div class="sourceCode" id="cb623"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ridge_cv</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">ridge_cv</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
     ymin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="va">std_err</span>,
     ymax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="va">std_err</span><span class="op">)</span>,
     alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
 <div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>The best model can be chosen using <code>select_best()</code>.</p>
 <div class="sourceCode" id="cb624"><pre class="downlit sourceCode r">
@@ -601,8 +627,8 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </h4>
 <p>Using the <span class="math inline">\(\lambda\)</span> value for the minimum MSE in the cross validation, we output the coefficients / model associated with the best <span class="math inline">\(\lambda\)</span> for the ridge regression model. <strong>Ridge regression does not do variable selection.</strong></p>
 <div class="sourceCode" id="cb626"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">ridge_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>, <span class="va">best_rr</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">ridge_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">ridge_spec_tune</span><span class="op">)</span>, <span class="va">best_rr</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
@@ -625,31 +651,31 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </h2>
 <p>In this section, we’ll re-run the cross validation to find a value of <span class="math inline">\(\lambda\)</span> which minimizes the cross validated MSE. To tune the lambda parameter, we need to start over with the model/engine specification so that the <code>penalty</code> is not fixed. Note that with Lasso, <code>mixture = 1</code>.</p>
 <div class="sourceCode" id="cb628"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">lasso_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">1</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<code class="sourceCode R"><span class="va">lasso_spec_tune</span> <span class="op">&lt;-</span> <span class="fu">linear_reg</span><span class="op">(</span>mixture <span class="op">=</span> <span class="fl">1</span>, penalty <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span></code></pre></div>
 <p>Next, a new <code>workflow()</code> which includes the new model/engine specification. Notice that we don’t need to set <code>measure = 0</code> here because it was only the <code>penalty</code> term which we designated to <code>tune()</code>.</p>
 <div class="sourceCode" id="cb629"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lasso_grid</span> <span class="op">&lt;-</span> <span class="fu">grid_regular</span><span class="op">(</span><span class="fu">penalty</span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 
-<span class="va">lasso_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
+<span class="va">lasso_wf</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu">add_recipe</span><span class="op">(</span><span class="va">office_rec</span><span class="op">)</span>
 
-<span class="va">lasso_fit</span> <span class="op">&lt;-</span> <span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
+<span class="va">lasso_fit</span> <span class="op">&lt;-</span> <span class="va">lasso_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_train</span><span class="op">)</span>
 
 <span class="co"># this is the line that tunes the model using cross validation</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2020</span><span class="op">)</span>
 <span class="va">lasso_cv</span> <span class="op">&lt;-</span> <span class="fu">tune_grid</span><span class="op">(</span>
-  <span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>,
+  <span class="va">lasso_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>,
   resamples <span class="op">=</span> <span class="va">office_fold</span>,
   grid <span class="op">=</span> <span class="va">lasso_grid</span>
 <span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb630"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">lasso_cv</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/desc.html">desc</a></span><span class="op">(</span><span class="va">.metric</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">lasso_cv</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">.metric</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 50 × 7
 ##      penalty .metric .estimator  mean     n std_err .config              
 ##        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
@@ -666,16 +692,16 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 ## # … with 40 more rows</code></pre>
 <p>Interestingly, as the penalty grows, the coefficients all get close to zero. So the prediction will be the same for all observations (prediction will be <span class="math inline">\(\overline{Y}\)</span>). When the predictions are all the same, the computation for <span class="math inline">\(R^2\)</span> is NA.</p>
 <div class="sourceCode" id="cb632"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">lasso_cv</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">lasso_cv</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">penalty</span>, y <span class="op">=</span> <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
     ymin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="va">std_err</span>,
     ymax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="va">std_err</span><span class="op">)</span>,
     alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span><span class="op">(</span><span class="st">"RMSE"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"RMSE"</span><span class="op">)</span></code></pre></div>
 <div class="inline-figure"><img src="05-shrink_files/figure-html/unnamed-chunk-30-1.png" width="480" style="display: block; margin: auto;"></div>
 <p>The best model can be chosen using <code>select_best()</code>.</p>
 <div class="sourceCode" id="cb633"><pre class="downlit sourceCode r">
@@ -690,8 +716,8 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 </h4>
 <p>Using the <span class="math inline">\(\lambda\)</span> value for the minimum MSE in the cross validation, we output the coefficients / model associated with the best <span class="math inline">\(\lambda\)</span> for the ridge regression model. <strong>Lasso regularization DOES do variable selection.</strong> Note the large number of coefficients that are set to zero.</p>
 <div class="sourceCode" id="cb635"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">lasso_wf</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>, <span class="va">best_lasso</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span>
-  <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">lasso_wf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">add_model</span><span class="op">(</span><span class="va">lasso_spec_tune</span><span class="op">)</span>, <span class="va">best_lasso</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">office_test</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 31 × 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
@@ -758,7 +784,7 @@ Figure 14.3: From ISLR, pgs 245-246. The data in Figure 6.8 were generated in su
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-05-26.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-07-27.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

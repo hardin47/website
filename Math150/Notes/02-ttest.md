@@ -226,7 +226,7 @@ surgery %>%
  dplyr::filter(month %in% c("Jul", "Aug")) %>%
  dplyr::group_by(month) %>%
  dplyr::summarize(agemean = mean(age, na.rm=TRUE), agesd = sd(age, na.rm=TRUE), agen = sum(!is.na(age)))
-#> # A tibble: 2 x 4
+#> # A tibble: 2 × 4
 #>   month agemean agesd  agen
 #>   <chr>   <dbl> <dbl> <int>
 #> 1 Aug      58.1  15.2  3176
@@ -292,7 +292,7 @@ surgery %>%
 #> 
 #> data:  age by month
 #> t = 1, df = 4954, p-value = 0.2
-#> alternative hypothesis: true difference in means is not equal to 0
+#> alternative hypothesis: true difference in means between group Aug and group Jul is not equal to 0
 #> 95 percent confidence interval:
 #>  -0.337  1.309
 #> sample estimates:
@@ -303,11 +303,12 @@ surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   t.test(age ~ month, data = .) %>%
   tidy()
-#> # A tibble: 1 x 10
-#>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
-#>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
-#> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
-#> # … with 2 more variables: method <chr>, alternative <chr>
+#> # A tibble: 1 × 10
+#>   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸
+#>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>  <chr>  
+#> 1   0.486    58.1    57.6    1.16   0.247   4954.  -0.337    1.31 Welch… two.si…
+#> # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,
+#> #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative
 ```
   
 * Look at SD and SEM
@@ -409,17 +410,18 @@ surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   t.test(age ~ month, data = .) %>%
   tidy()
-#> # A tibble: 1 x 10
-#>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
-#>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
-#> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
-#> # … with 2 more variables: method <chr>, alternative <chr>
+#> # A tibble: 1 × 10
+#>   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸
+#>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>  <chr>  
+#> 1   0.486    58.1    57.6    1.16   0.247   4954.  -0.337    1.31 Welch… two.si…
+#> # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,
+#> #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative
 
 surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   lm(age ~ month, data = .) %>%
   tidy()
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   58.1       0.272    213.     0    

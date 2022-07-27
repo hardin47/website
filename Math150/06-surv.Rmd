@@ -1041,14 +1041,16 @@ The GitHub repo with data and code is here: <https://github.com/propublica/compa
 library(survival)
 recid <- readr::read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv")
 
-recid <- dplyr::select(recid, age, c_charge_degree, race, age_cat, score_text, sex, priors_count, 
-                    days_b_screening_arrest, decile_score, is_recid, two_year_recid, 
+recid <- recid %>%
+  dplyr::select(age, c_charge_degree, race, age_cat, score_text, sex, `priors_count...15`,
+                days_b_screening_arrest, `decile_score...12`, is_recid, two_year_recid, 
                     c_jail_in, c_jail_out) %>% 
-        filter(days_b_screening_arrest <= 30) %>%
-        filter(days_b_screening_arrest >= -30) %>%
-        filter(is_recid != -1) %>%
-        filter(c_charge_degree != "O") %>%
-        filter(score_text != 'N/A')
+  dplyr::rename(priors_count = `priors_count...15`, decile_score = `decile_score...12`) %>%
+        dplyr::filter(days_b_screening_arrest <= 30) %>%
+        dplyr::filter(days_b_screening_arrest >= -30) %>%
+        dplyr::filter(is_recid != -1) %>%
+        dplyr::filter(c_charge_degree != "O") %>%
+        dplyr::filter(score_text != 'N/A')
         
 recid <- recid %>% mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) %>%
       mutate(crime_factor = factor(c_charge_degree)) %>%
@@ -1210,7 +1212,8 @@ plot(summary(recid.final), log = TRUE)
 The survminer packages also has the `ggforest()` function which makes a fantastic data viz.
 
 ```{r}
-ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
+#broken right now
+#survminer::ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
 ```
 
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
