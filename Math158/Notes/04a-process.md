@@ -236,6 +236,15 @@ Ideally, the feature engineering happens as part of the workflow.  That is, part
 
 -   Evaluate the performance of the model on the test data
 
+
+The process is synthesized in the following graphic from a course at Johns Hopkins, <a href = "https://jhudatascience.org/tidyversecourse/" target = "_blank">Tidyverse Skills for Data Science</a>.
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/tidypackages.png" alt="Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/" width="80%" />
+<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/</p>
+</div>
+
 ### Specifying a model
 
 Instead of using the `lm()` command, we're going to use the **tidymodels** framework to specify a model.  In Math 158 we will *always* use "lm" as the engine, but if you take other applied statistics classes, you'll use different model specifications with the same feature engineering and modeling fitting steps.
@@ -275,7 +284,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -299,7 +308,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -344,7 +353,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -399,7 +408,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -453,7 +462,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -508,7 +517,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -586,7 +595,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -671,7 +680,7 @@ office_rec
 ```
 
 ```
-## Data Recipe
+## Recipe
 ## 
 ## Inputs:
 ## 
@@ -699,35 +708,52 @@ ls(pattern = '^step_', env = as.environment('package:recipes'))
 ```
 
 ```
-##  [1] "step_arrange"       "step_bagimpute"     "step_bin2factor"   
-##  [4] "step_BoxCox"        "step_bs"            "step_center"       
-##  [7] "step_classdist"     "step_corr"          "step_count"        
-## [10] "step_cut"           "step_date"          "step_depth"        
-## [13] "step_discretize"    "step_downsample"    "step_dummy"        
-## [16] "step_factor2string" "step_filter"        "step_geodist"      
-## [19] "step_holiday"       "step_hyperbolic"    "step_ica"          
-## [22] "step_impute_bag"    "step_impute_knn"    "step_impute_linear"
-## [25] "step_impute_lower"  "step_impute_mean"   "step_impute_median"
-## [28] "step_impute_mode"   "step_impute_roll"   "step_indicate_na"  
-## [31] "step_integer"       "step_interact"      "step_intercept"    
-## [34] "step_inverse"       "step_invlogit"      "step_isomap"       
-## [37] "step_knnimpute"     "step_kpca"          "step_kpca_poly"    
-## [40] "step_kpca_rbf"      "step_lag"           "step_lincomb"      
-## [43] "step_log"           "step_logit"         "step_lowerimpute"  
-## [46] "step_meanimpute"    "step_medianimpute"  "step_modeimpute"   
-## [49] "step_mutate"        "step_mutate_at"     "step_naomit"       
-## [52] "step_nnmf"          "step_normalize"     "step_novel"        
-## [55] "step_ns"            "step_num2factor"    "step_nzv"          
-## [58] "step_ordinalscore"  "step_other"         "step_pca"          
-## [61] "step_pls"           "step_poly"          "step_profile"      
-## [64] "step_range"         "step_ratio"         "step_regex"        
-## [67] "step_relevel"       "step_relu"          "step_rename"       
-## [70] "step_rename_at"     "step_rm"            "step_rollimpute"   
-## [73] "step_sample"        "step_scale"         "step_select"       
-## [76] "step_shuffle"       "step_slice"         "step_spatialsign"  
-## [79] "step_sqrt"          "step_string2factor" "step_unknown"      
-## [82] "step_unorder"       "step_upsample"      "step_window"       
-## [85] "step_YeoJohnson"    "step_zv"
+##  [1] "step_arrange"            "step_bagimpute"         
+##  [3] "step_bin2factor"         "step_BoxCox"            
+##  [5] "step_bs"                 "step_center"            
+##  [7] "step_classdist"          "step_corr"              
+##  [9] "step_count"              "step_cut"               
+## [11] "step_date"               "step_depth"             
+## [13] "step_discretize"         "step_downsample"        
+## [15] "step_dummy"              "step_dummy_extract"     
+## [17] "step_dummy_multi_choice" "step_factor2string"     
+## [19] "step_filter"             "step_filter_missing"    
+## [21] "step_geodist"            "step_harmonic"          
+## [23] "step_holiday"            "step_hyperbolic"        
+## [25] "step_ica"                "step_impute_bag"        
+## [27] "step_impute_knn"         "step_impute_linear"     
+## [29] "step_impute_lower"       "step_impute_mean"       
+## [31] "step_impute_median"      "step_impute_mode"       
+## [33] "step_impute_roll"        "step_indicate_na"       
+## [35] "step_integer"            "step_interact"          
+## [37] "step_intercept"          "step_inverse"           
+## [39] "step_invlogit"           "step_isomap"            
+## [41] "step_knnimpute"          "step_kpca"              
+## [43] "step_kpca_poly"          "step_kpca_rbf"          
+## [45] "step_lag"                "step_lincomb"           
+## [47] "step_log"                "step_logit"             
+## [49] "step_lowerimpute"        "step_meanimpute"        
+## [51] "step_medianimpute"       "step_modeimpute"        
+## [53] "step_mutate"             "step_mutate_at"         
+## [55] "step_naomit"             "step_nnmf"              
+## [57] "step_nnmf_sparse"        "step_normalize"         
+## [59] "step_novel"              "step_ns"                
+## [61] "step_num2factor"         "step_nzv"               
+## [63] "step_ordinalscore"       "step_other"             
+## [65] "step_pca"                "step_percentile"        
+## [67] "step_pls"                "step_poly"              
+## [69] "step_profile"            "step_range"             
+## [71] "step_ratio"              "step_regex"             
+## [73] "step_relevel"            "step_relu"              
+## [75] "step_rename"             "step_rename_at"         
+## [77] "step_rm"                 "step_rollimpute"        
+## [79] "step_sample"             "step_scale"             
+## [81] "step_select"             "step_shuffle"           
+## [83] "step_slice"              "step_spatialsign"       
+## [85] "step_sqrt"               "step_string2factor"     
+## [87] "step_unknown"            "step_unorder"           
+## [89] "step_upsample"           "step_window"            
+## [91] "step_YeoJohnson"         "step_zv"
 ```
 
 ### Building workflows
@@ -851,6 +877,7 @@ office_train_pred
 ##  9  7.87         8   Promos             
 ## 10  7.74         8   Pool Party         
 ## # … with 131 more rows
+## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 ### R-squared {-}
@@ -942,6 +969,7 @@ office_test_pred
 ##  9  8.80         8.9 Gay Witch Hunt     
 ## 10  8.37         8.2 Initiation         
 ## # … with 37 more rows
+## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 #### Evaluate performance for testing data {-}
@@ -1162,7 +1190,7 @@ office_wflow2
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-53)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-54)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -1229,7 +1257,7 @@ To do both, one approach is to use test/training data *and* CV in order to both 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-54)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-55)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
 
 
@@ -1255,7 +1283,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:
 
 <div class="figure" style="text-align: center">
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-56)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-57)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
 </div>
 
 Aside: the "re" in "resamples" is for repeated samples.  Not to be confused where repeated samples are taken in bootstrapping with replacement.  In cross validation, the repeated samples are taken **without** replacement.
@@ -1284,7 +1312,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-57)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-58)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
 </div>
 
 
@@ -1314,7 +1342,7 @@ Note that the three repeated samples ("resamples") are taken without replacement
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-59)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-60)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
 </div>
 
 #### Fit resamples {-}
@@ -1338,9 +1366,9 @@ office_fit_rs1
 ## # A tibble: 3 × 4
 ##   splits          id    .metrics         .notes          
 ##   <list>          <chr> <list>           <list>          
-## 1 <split [94/47]> Fold1 <tibble [2 × 4]> <tibble [0 × 1]>
-## 2 <split [94/47]> Fold2 <tibble [2 × 4]> <tibble [0 × 1]>
-## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [0 × 1]>
+## 1 <split [94/47]> Fold1 <tibble [2 × 4]> <tibble [0 × 3]>
+## 2 <split [94/47]> Fold2 <tibble [2 × 4]> <tibble [0 × 3]>
+## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [0 × 3]>
 ```
 
 
@@ -1361,9 +1389,9 @@ office_fit_rs2
 ## # A tibble: 3 × 4
 ##   splits          id    .metrics         .notes          
 ##   <list>          <chr> <list>           <list>          
-## 1 <split [94/47]> Fold1 <tibble [2 × 4]> <tibble [0 × 1]>
-## 2 <split [94/47]> Fold2 <tibble [2 × 4]> <tibble [0 × 1]>
-## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [0 × 1]>
+## 1 <split [94/47]> Fold1 <tibble [2 × 4]> <tibble [0 × 3]>
+## 2 <split [94/47]> Fold2 <tibble [2 × 4]> <tibble [0 × 3]>
+## 3 <split [94/47]> Fold3 <tibble [2 × 4]> <tibble [0 × 3]>
 ```
 
 #### Cross validation, now what? {-}
@@ -1760,6 +1788,7 @@ office_fit %>% tidy()
 ##  9 season_X7    1.02     0.352         2.89  4.52e- 3
 ## 10 season_X8    0.497    0.348         1.43  1.55e- 1
 ## # … with 11 more rows
+## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 ```r
@@ -1768,10 +1797,12 @@ office_fit %>% glance()
 
 ```
 ## # A tibble: 1 × 12
-##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-##       <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
-## 1     0.670         0.615 0.327      12.2 2.10e-20    20  -31.2  106.  171.
-## # … with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
+##   r.squared adj.r.squa…¹ sigma stati…²  p.value    df logLik   AIC   BIC devia…³
+##       <dbl>        <dbl> <dbl>   <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>   <dbl>
+## 1     0.670        0.615 0.327    12.2 2.10e-20    20  -31.2  106.  171.    12.9
+## # … with 2 more variables: df.residual <int>, nobs <int>, and abbreviated
+## #   variable names ¹​adj.r.squared, ²​statistic, ³​deviance
+## # ℹ Use `colnames()` to see all variable names
 ```
 
 #### Cross validate to choose between models {-}

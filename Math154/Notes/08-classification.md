@@ -189,6 +189,12 @@ The **tidymodels** framework provides a series of steps that allow for systemati
 5. fit the model  
 6. validate the model
 
+The process is synthesized in the following graphic from a course at Johns Hopkins, <a href = "https://jhudatascience.org/tidyversecourse/" target = "_blank">Tidyverse Skills for Data Science</a>.
+
+<div class="figure" style="text-align: center">
+<img src="figs/tidypackages.png" alt="Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/" width="80%" />
+<p class="caption">(\#fig:unnamed-chunk-8)Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/</p>
+</div>
 
 #### 1. Partition the data {-}
 
@@ -196,7 +202,7 @@ Put the testing data in your pocket (keep it secret from R!!)
 
 <div class="figure" style="text-align: center">
 <img src="figs/testtrain.png" alt="Image credit: Julia Silge" width="1066" />
-<p class="caption">(\#fig:unnamed-chunk-8)Image credit: Julia Silge</p>
+<p class="caption">(\#fig:unnamed-chunk-9)Image credit: Julia Silge</p>
 </div>
 
 #### 2. build a recipe {-}
@@ -231,35 +237,52 @@ ls(pattern = '^step_', env = as.environment('package:recipes'))
 ```
 
 ```
-##  [1] "step_arrange"       "step_bagimpute"     "step_bin2factor"   
-##  [4] "step_BoxCox"        "step_bs"            "step_center"       
-##  [7] "step_classdist"     "step_corr"          "step_count"        
-## [10] "step_cut"           "step_date"          "step_depth"        
-## [13] "step_discretize"    "step_downsample"    "step_dummy"        
-## [16] "step_factor2string" "step_filter"        "step_geodist"      
-## [19] "step_holiday"       "step_hyperbolic"    "step_ica"          
-## [22] "step_impute_bag"    "step_impute_knn"    "step_impute_linear"
-## [25] "step_impute_lower"  "step_impute_mean"   "step_impute_median"
-## [28] "step_impute_mode"   "step_impute_roll"   "step_indicate_na"  
-## [31] "step_integer"       "step_interact"      "step_intercept"    
-## [34] "step_inverse"       "step_invlogit"      "step_isomap"       
-## [37] "step_knnimpute"     "step_kpca"          "step_kpca_poly"    
-## [40] "step_kpca_rbf"      "step_lag"           "step_lincomb"      
-## [43] "step_log"           "step_logit"         "step_lowerimpute"  
-## [46] "step_meanimpute"    "step_medianimpute"  "step_modeimpute"   
-## [49] "step_mutate"        "step_mutate_at"     "step_naomit"       
-## [52] "step_nnmf"          "step_normalize"     "step_novel"        
-## [55] "step_ns"            "step_num2factor"    "step_nzv"          
-## [58] "step_ordinalscore"  "step_other"         "step_pca"          
-## [61] "step_pls"           "step_poly"          "step_profile"      
-## [64] "step_range"         "step_ratio"         "step_regex"        
-## [67] "step_relevel"       "step_relu"          "step_rename"       
-## [70] "step_rename_at"     "step_rm"            "step_rollimpute"   
-## [73] "step_sample"        "step_scale"         "step_select"       
-## [76] "step_shuffle"       "step_slice"         "step_spatialsign"  
-## [79] "step_sqrt"          "step_string2factor" "step_unknown"      
-## [82] "step_unorder"       "step_upsample"      "step_window"       
-## [85] "step_YeoJohnson"    "step_zv"
+##  [1] "step_arrange"            "step_bagimpute"         
+##  [3] "step_bin2factor"         "step_BoxCox"            
+##  [5] "step_bs"                 "step_center"            
+##  [7] "step_classdist"          "step_corr"              
+##  [9] "step_count"              "step_cut"               
+## [11] "step_date"               "step_depth"             
+## [13] "step_discretize"         "step_downsample"        
+## [15] "step_dummy"              "step_dummy_extract"     
+## [17] "step_dummy_multi_choice" "step_factor2string"     
+## [19] "step_filter"             "step_filter_missing"    
+## [21] "step_geodist"            "step_harmonic"          
+## [23] "step_holiday"            "step_hyperbolic"        
+## [25] "step_ica"                "step_impute_bag"        
+## [27] "step_impute_knn"         "step_impute_linear"     
+## [29] "step_impute_lower"       "step_impute_mean"       
+## [31] "step_impute_median"      "step_impute_mode"       
+## [33] "step_impute_roll"        "step_indicate_na"       
+## [35] "step_integer"            "step_interact"          
+## [37] "step_intercept"          "step_inverse"           
+## [39] "step_invlogit"           "step_isomap"            
+## [41] "step_knnimpute"          "step_kpca"              
+## [43] "step_kpca_poly"          "step_kpca_rbf"          
+## [45] "step_lag"                "step_lincomb"           
+## [47] "step_log"                "step_logit"             
+## [49] "step_lowerimpute"        "step_meanimpute"        
+## [51] "step_medianimpute"       "step_modeimpute"        
+## [53] "step_mutate"             "step_mutate_at"         
+## [55] "step_naomit"             "step_nnmf"              
+## [57] "step_nnmf_sparse"        "step_normalize"         
+## [59] "step_novel"              "step_ns"                
+## [61] "step_num2factor"         "step_nzv"               
+## [63] "step_ordinalscore"       "step_other"             
+## [65] "step_pca"                "step_percentile"        
+## [67] "step_pls"                "step_poly"              
+## [69] "step_profile"            "step_range"             
+## [71] "step_ratio"              "step_regex"             
+## [73] "step_relevel"            "step_relu"              
+## [75] "step_rename"             "step_rename_at"         
+## [77] "step_rm"                 "step_rollimpute"        
+## [79] "step_sample"             "step_scale"             
+## [81] "step_select"             "step_shuffle"           
+## [83] "step_slice"              "step_spatialsign"       
+## [85] "step_sqrt"               "step_string2factor"     
+## [87] "step_unknown"            "step_unorder"           
+## [89] "step_upsample"           "step_window"            
+## [91] "step_YeoJohnson"         "step_zv"
 ```
 
 #### 3. select a model {-}
@@ -348,14 +371,16 @@ show_engines("linear_reg")
 ```
 
 ```
-## # A tibble: 5 × 2
+## # A tibble: 7 × 2
 ##   engine mode      
 ##   <chr>  <chr>     
 ## 1 lm     regression
-## 2 glmnet regression
-## 3 stan   regression
-## 4 spark  regression
-## 5 keras  regression
+## 2 glm    regression
+## 3 glmnet regression
+## 4 stan   regression
+## 5 spark  regression
+## 6 keras  regression
+## 7 brulee regression
 ```
 
 #### 4. Create a workflow {-}
@@ -385,70 +410,70 @@ Putting it all together, the `fit()` will give the model specifications.
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide2.png" alt="Image credit: Alison Hill" width="20%" />
-<p class="caption">(\#fig:unnamed-chunk-11)Image credit: Alison Hill</p>
-</div>
-
-$$\bigg\Downarrow$$
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-12)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide3.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-13)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide4.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-14)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide5.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-15)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide6.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-16)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide7.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-17)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide8.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-18)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide9.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-19)Image credit: Alison Hill</p>
 </div>
 
 $$\bigg\Downarrow$$
 
 <div class="figure" style="text-align: center">
-<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
+<img src="figs/CV/Slide10.png" alt="Image credit: Alison Hill" width="20%" />
 <p class="caption">(\#fig:unnamed-chunk-20)Image credit: Alison Hill</p>
+</div>
+
+$$\bigg\Downarrow$$
+
+<div class="figure" style="text-align: center">
+<img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="20%" />
+<p class="caption">(\#fig:unnamed-chunk-21)Image credit: Alison Hill</p>
 </div>
 
 #### Reflecting on Model Building {-}
@@ -457,18 +482,18 @@ In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>,
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild1.png" alt="Image credit: https://www.tmwr.org/" width="816" />
-<p class="caption">(\#fig:unnamed-chunk-21)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild2.png" alt="Image credit: https://www.tmwr.org/" width="775" />
-<p class="caption">(\#fig:unnamed-chunk-22)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-23)Image credit: https://www.tmwr.org/</p>
 </div>
 
 
 <div class="figure" style="text-align: center">
 <img src="figs/modelbuild3.png" alt="Image credit: https://www.tmwr.org/" width="796" />
-<p class="caption">(\#fig:unnamed-chunk-23)Image credit: https://www.tmwr.org/</p>
+<p class="caption">(\#fig:unnamed-chunk-24)Image credit: https://www.tmwr.org/</p>
 </div>
 
 
@@ -477,7 +502,7 @@ In <a href = "https://www.tmwr.org/" target = "_blank">Tidy Modeling with R</a>,
 
 <div class="figure" style="text-align: right">
 <img src="figs/penguins.png" alt="Image credit: Alison Hill" width="30%" />
-<p class="caption">(\#fig:unnamed-chunk-24)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-25)Image credit: Alison Hill</p>
 </div>
 
 
@@ -487,19 +512,21 @@ penguins
 
 ```
 ## # A tibble: 344 × 8
-##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
-##    <fct>   <fct>              <dbl>         <dbl>             <int>       <int>
-##  1 Adelie  Torgersen           39.1          18.7               181        3750
-##  2 Adelie  Torgersen           39.5          17.4               186        3800
-##  3 Adelie  Torgersen           40.3          18                 195        3250
-##  4 Adelie  Torgersen           NA            NA                  NA          NA
-##  5 Adelie  Torgersen           36.7          19.3               193        3450
-##  6 Adelie  Torgersen           39.3          20.6               190        3650
-##  7 Adelie  Torgersen           38.9          17.8               181        3625
-##  8 Adelie  Torgersen           39.2          19.6               195        4675
-##  9 Adelie  Torgersen           34.1          18.1               193        3475
-## 10 Adelie  Torgersen           42            20.2               190        4250
-## # … with 334 more rows, and 2 more variables: sex <fct>, year <int>
+##    species island    bill_length_mm bill_depth_mm flipper_…¹ body_…² sex    year
+##    <fct>   <fct>              <dbl>         <dbl>      <int>   <int> <fct> <int>
+##  1 Adelie  Torgersen           39.1          18.7        181    3750 male   2007
+##  2 Adelie  Torgersen           39.5          17.4        186    3800 fema…  2007
+##  3 Adelie  Torgersen           40.3          18          195    3250 fema…  2007
+##  4 Adelie  Torgersen           NA            NA           NA      NA <NA>   2007
+##  5 Adelie  Torgersen           36.7          19.3        193    3450 fema…  2007
+##  6 Adelie  Torgersen           39.3          20.6        190    3650 male   2007
+##  7 Adelie  Torgersen           38.9          17.8        181    3625 fema…  2007
+##  8 Adelie  Torgersen           39.2          19.6        195    4675 male   2007
+##  9 Adelie  Torgersen           34.1          18.1        193    3475 <NA>   2007
+## 10 Adelie  Torgersen           42            20.2        190    4250 <NA>   2007
+## # … with 334 more rows, and abbreviated variable names ¹​flipper_length_mm,
+## #   ²​body_mass_g
+## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 #### 1. Partition the data {-}
@@ -706,7 +733,7 @@ data(penguins)
 ggpairs(penguins, mapping = ggplot2::aes(color = species), alpha=.4)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-37-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-38-1.png" width="480" style="display: block; margin: auto;" />
 
 #### $k$-NN to predict penguin species {-}
 
@@ -821,7 +848,7 @@ The red observations are used to fit the model, the black observations are used 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV/Slide11.png" alt="Image credit: Alison Hill" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-44)Image credit: Alison Hill</p>
+<p class="caption">(\#fig:unnamed-chunk-45)Image credit: Alison Hill</p>
 </div>
 
 
@@ -1004,14 +1031,14 @@ Stephanie Yee and Tony Chu created the following (amazing!) demonstration for tr
 
 <div class="figure" style="text-align: center">
 <img src="figs/sfnyc.png" alt="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-53)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
+<p class="caption">(\#fig:unnamed-chunk-54)http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ A visual introduction to machine learning.</p>
 </div>
 
 Decision trees are used for all sorts of predictive and descriptive models.  The NYT created a recursive binary decision tree to show patterns in identity and political affiliation.   
 
 <div class="figure" style="text-align: center">
 <img src="figs/partyaffiliation.png" alt="https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-54)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
+<p class="caption">(\#fig:unnamed-chunk-55)https://www.nytimes.com/interactive/2019/08/08/opinion/sunday/party-polarization-quiz.html Quiz: Let Us Predict Whether You're a Democrat or a Republican NYT, Aug 8, 2019.  Note that race is the first and dominant node, followed by religion.</p>
 </div>
 
 
@@ -1320,7 +1347,7 @@ house_train %>%
   geom_point(aes(color = MedianHouseValue)) 
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-59-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1337,7 +1364,7 @@ house_cart_fit %>%
   geom_point(aes(x = logValue, y = .pred), alpha = 0.1)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-60-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-61-1.png" width="480" style="display: block; margin: auto;" />
 
 
 
@@ -1398,7 +1425,7 @@ house_cart_full_fit %>%
   geom_point(aes(x = logValue, y = .pred), alpha = 0.01)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-62-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-63-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Cross Validation (model building!)  {-}
 
@@ -1482,7 +1509,7 @@ house_tuned %>%
   autoplot(metric = "rmse")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-64-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-65-1.png" width="480" style="display: block; margin: auto;" />
 
 ```r
 house_tuned %>% 
@@ -1587,7 +1614,7 @@ house_final %>%
   ylab("predicted value of log Median House")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-67-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-68-1.png" width="480" style="display: block; margin: auto;" />
 
 
 <!---
@@ -1721,7 +1748,7 @@ Typically $m = \sqrt{p}$ or $\log_2 p$, where $p$ is the number of features.  Ra
 
 <div class="figure" style="text-align: center">
 <img src="figs/zissermanRF.jpg" alt="Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-68)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-69)Building multiple trees and then combining the outputs (predictions).  Note that this image makes the choice to average the tree probabilities instead of using majority vote.  Both are valid methods for creating a Random Forest prediction model.  http://www.robots.ox.ac.uk/~az/lectures/ml/lect4.pdf</p>
 </div>
 
 **Shortcomings of Random Forests:**
@@ -1854,7 +1881,7 @@ penguin_rf_tune %>%
   geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-70-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-71-1.png" width="480" style="display: block; margin: auto;" />
 
 
 Get the final model:
@@ -1933,7 +1960,7 @@ penguin_rf_final %>%
   geom_abline(intercept = 0, slope = 1)
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-72-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ####  Variable Importance {-}
@@ -1949,7 +1976,7 @@ penguin_rf_final %>%
   vip(geom = "point")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-73-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-74-1.png" width="480" style="display: block; margin: auto;" />
 
 ## Model Choices
 
@@ -2015,7 +2042,7 @@ But today's decision boundary is going to be based on a hyperplane which separat
 
 <div class="figure" style="text-align: center">
 <img src="figs/histproj.jpg" alt="The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-75)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
+<p class="caption">(\#fig:unnamed-chunk-76)The correct project of the observations can often produce a perfect one dimensional (i.e., linear) classifier.  http://www.rmki.kfki.hu/~banmi/elte/Bishop - Pattern Recognition and Machine Learning.pdf</p>
 </div>
 
 
@@ -2029,7 +2056,7 @@ Let ${\bf x} = (x_1, x_2, \ldots, x_p)^t$ and ${\bf y} = (y_1, y_2, \ldots, y_p)
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_linear.jpeg" alt="If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-76)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
+<p class="caption">(\#fig:unnamed-chunk-77)If **w** is known, then the projection of any new observation onto **w** will lead to a linear partition of the space.</p>
 </div>
 
 How can the street be used to get a decision rule?  All that is known is that ${\bf w}$ is perpendicular to the street.  We don't yet know ${\bf w}$ or $b$.
@@ -2218,7 +2245,7 @@ The take home message here is that a wiggly boundary is really best, and the val
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx1.jpg" alt="Extremely complicated decision boundary" width="45%" /><img src="figs/SVMEx1g100.jpg" alt="Extremely complicated decision boundary" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-78)Extremely complicated decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-79)Extremely complicated decision boundary</p>
 </div>
 
 ##### What if the boundary isn't wiggly? {-}
@@ -2227,17 +2254,17 @@ But if the boundary has low complexity, then the best value of $\gamma$ is proba
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2.jpg" alt="Simple decision boundary" width="60%" />
-<p class="caption">(\#fig:unnamed-chunk-79)Simple decision boundary</p>
+<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g1.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" /><img src="figs/SVMEx2g10.jpg" alt="Simple decision boundary -- reasonable gamma" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-80)Simple decision boundary -- reasonable gamma</p>
+<p class="caption">(\#fig:unnamed-chunk-81)Simple decision boundary -- reasonable gamma</p>
 </div>
 
 <div class="figure" style="text-align: center">
 <img src="figs/SVMEx2g100.jpg" alt="Simple decision boundary -- gamma too big" width="45%" /><img src="figs/SVMEx2g1000.jpg" alt="Simple decision boundary -- gamma too big" width="45%" />
-<p class="caption">(\#fig:unnamed-chunk-81)Simple decision boundary -- gamma too big</p>
+<p class="caption">(\#fig:unnamed-chunk-82)Simple decision boundary -- gamma too big</p>
 </div>
 
 
@@ -2282,7 +2309,7 @@ $$y_i({\bf w} \cdot {\bf x}_i + b) \geq 1 - \xi_i  \ \ \ \ \ \ 1 \leq i \leq n, 
 
 <div class="figure" style="text-align: center">
 <img src="figs/svm_slack.jpeg" alt="Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-82)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
+<p class="caption">(\#fig:unnamed-chunk-83)Note that now the problem is set up such that points are allowed to cross the boundary.  Slack variables (the xi_i) allow for every point to be classified correctly up to the slack.  Note that xi_i=0 for any point that is actually calculated correctly.</p>
 </div>
 
 The optimization problem gets slightly more complicated in two ways, first, the minimization piece includes a penalty parameter, $C$  (how much misclassification is allowed - the value of $C$ is set/tuned not optimized), and second, the constraint now allows for points to be misclassified.
@@ -2313,7 +2340,7 @@ $$C>>> \rightarrow \mbox{ can lead to classification rule which does not general
 
 <div class="figure" style="text-align: center">
 <img src="figs/CvsM1.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM2.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" /><img src="figs/CvsM3.jpg" alt="In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-83)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
+<p class="caption">(\#fig:unnamed-chunk-84)In the first figure, the low C value gives a large margin.  On the right, the high C value gives a small margin.  Which classifier is better?  Well, it depends on what the actual data (test, population, etc.) look like!  In the second row the large C classifier is better; in the third row, the small C classifier is better.  photo credit: http://stats.stackexchange.com/questions/31066/what-is-the-influence-of-c-in-svms-with-linear-kernel</p>
 </div>
 
 
@@ -2596,6 +2623,7 @@ penguin_grid
 ##  9  0.000977 0.00000000268
 ## 10  0.00431  0.00000000268
 ## # … with 54 more rows
+## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 ```r
@@ -2615,10 +2643,10 @@ penguin_svm_rbf_tune
 ## # A tibble: 4 × 4
 ##   splits           id    .metrics           .notes          
 ##   <list>           <chr> <list>             <list>          
-## 1 <split [186/63]> Fold1 <tibble [128 × 6]> <tibble [0 × 1]>
-## 2 <split [187/62]> Fold2 <tibble [128 × 6]> <tibble [0 × 1]>
-## 3 <split [187/62]> Fold3 <tibble [128 × 6]> <tibble [0 × 1]>
-## 4 <split [187/62]> Fold4 <tibble [128 × 6]> <tibble [0 × 1]>
+## 1 <split [186/63]> Fold1 <tibble [128 × 6]> <tibble [0 × 3]>
+## 2 <split [187/62]> Fold2 <tibble [128 × 6]> <tibble [0 × 3]>
+## 3 <split [187/62]> Fold3 <tibble [128 × 6]> <tibble [0 × 3]>
+## 4 <split [187/62]> Fold4 <tibble [128 × 6]> <tibble [0 × 3]>
 ```
 
 ##### What is best? {-}
@@ -2633,7 +2661,7 @@ penguin_svm_rbf_tune %>%
   labs(color = "Cost")
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-87-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-88-1.png" width="480" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2641,7 +2669,7 @@ penguin_svm_rbf_tune %>%
   autoplot()
 ```
 
-<img src="08-classification_files/figure-html/unnamed-chunk-88-1.png" width="480" style="display: block; margin: auto;" />
+<img src="08-classification_files/figure-html/unnamed-chunk-89-1.png" width="480" style="display: block; margin: auto;" />
 
 ##### RBF SVM final model {-}
 
