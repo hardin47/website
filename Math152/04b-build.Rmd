@@ -1,0 +1,936 @@
+# Statistical Model Building {#build}
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
+                      fig.height=3, fig.width=5,  
+                      cache=TRUE, fig.align = "center")
+
+library(tidyverse)
+library(tidymodels)
+library(kableExtra)
+library(broom)
+#library(boot)
+library(knitr)
+library(NHANES)
+library(skimr)
+options(digits=3)
+```
+
+
+```{r eval = FALSE, echo = FALSE}
+\paragraph{Agenda}
+\begin{enumerate}
+  \itemsep0em
+%  \item statistical thinking review
+  \item decomposition of sums of squares / ANOVA table
+  \item nested F-tests
+  \item examples
+\end{enumerate}
+```
+
+One of the main tools for statistical building multiple regression models is a nested F test.  Two models are *nested* if the parameters in the smaller model are a subset of the parameters in the larger model.  AND the two models must contain the exact same observations  (be careful of missing values for some variables and not for others!).
+
+\begin{eqnarray*}
+SSR &=& \sum (\hat{Y}_i - \overline{Y})^2 \\
+SSE &=& \sum (Y_i - \hat{Y}_i)^2 \\
+SSTO &=& \sum (Y_i - \overline{Y})^2 \\
+SSTO &=& SSE + SSR
+\end{eqnarray*}
+Convince yourself that $SSE(X_1) > SSE(X_1, X_2)$ (where the variables in parentheses indicate which variables are included in the model). It is because the calculus in least squares says that more variables will produce smaller SSE (otherwise $b_2$ would be estimated to be zero). 
+
+Let $$SSR(X_2 | X_1 ) = SSE(X_1) - SSE(X_1, X_2).$$  We call $SSR(X_2 | X_1 )$ the **extra sum of squares**.  It is the marginal reduction in the error sum of squares when one (or more) explanatory variable(s) is added to the model (given that the other explanatory variables are already in the model).  Because we know that SSTO does not change for any number of variables (make sure the sample size $n$ doesn't change due to missing observations!), we can write SSR in a variety of ways.
+\begin{eqnarray*}
+SSR(X_3| X_1, X_2) &=& SSE(X_1, X_2) - SSE(X_1, X_2, X_3)\\
+&=& SSR(X_1, X_2, X_3) - SSR(X_1, X_2)\\
+SSR(X_1, X_2 | X_3 ) &=& SSE(X_3) - SSE(X_1, X_2, X_3)\\
+&=& SSR(X_1, X_2, X_3) - SSR(X_3)\\
+\end{eqnarray*}
+Consider two nested models:  
+Model 1: $E[Y] = \beta_0 + \beta_1 X_1$ $$SSTO = SSR(X_1) + SSE(X_1)$$ 
+Model 2: $E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2$  
+\begin{eqnarray*}
+SSTO &=& SSR(X_1, X_2) + SSE(X_1, X_2)\\
+SSR(X_1, X_2) &=& SSR(X_1) + SSR(X_2 | X_1) \\
+SSTO &=& SSR(X_1) + SSR(X_2 | X_1) + SSE(X_1, X_2)\\
+\end{eqnarray*}
+(a) $SSR(X_1)$ measures the contribution of $X_1$ alone.    
+(b) $SSR(X_2 | X_1)$ measures the contribution of $X_2$ given $X_1$ is in the model.  
+A typical ANOVA table for a model with three explanatory variables will look something like the table below.  Note the hierarchical structure to adding variables:
+
+| Source                  	| SS                     	|   df  	| MS                                                      	|
+|-------------------------	|------------------------	|:-----:	|---------------------------------------------------------	|
+| Regression              	| $SSR(X_1, X_2, X_3)$   	|   3   	| $MSR (X_1, X_2, X_3) = \frac{SSR(X_1, X_2, X_3)}{3}$    	|
+| \ \ \ $X_1$             	| $SSR(X_1)$             	|   1   	| $MSR(X_1) = \frac{SSR(X_1)}{1}$                         	|
+| \ \ \ $X_2 | X_1$      	| $SSR(X_2 | X_1)$      	|   1   	| $MSR(X_2 | X_1) = \frac{SSR(X_2 | X_1)}{1}$           	|
+| \ \ \ $X_3 | X_1, X_2$ 	| $SSR(X_3 | X_1, X_2)$ 	|   1   	| $MSR(X_3 | X_1, X_2) = \frac{SSR(X_3 | X_1, X_2)}{1}$ 	|
+| Error                   	| $SSE(X_1, X_2, X_3)$   	| $n-4$ 	| $MSE(X_1, X_2, X_3) = \frac{SSE(X_1, X_2, X_3)}{n-p}$   	|
+
+
+## Testing Sets of Coefficients {#nestF}
+
+Previously, we have covered both t-tests for $H_0: \beta_k = 0$ and using the full model F-test to test whether all coefficients are non-significant.  In fact, we can also use full and reduced models to compare mean squares to test any nested models.  Recall:  
+1. Fit full model and obtain SSE(full model)  
+2. Fit reduced model under $H_0$ to get SSE(reduced)  
+3. Use $F^* = \frac{SSE(reduced) - SSE(full)}{df_{reduced} - df_{full}} \div \frac{SSE(full)}{df_{full}}$  
+Note 1: Our best estimate of $\sigma^2$ will come from the MSE on the full model.  MSE is an unbiased estimate of $\sigma^2$, so we will always use it as the denominator in the F test-statistic.  
+Note 2: The previous F test we learned ($H_0: \beta_k = 0 \ \ \forall \ \  k \ne 0$) is the same as above because SSTO = SSE(reduced) for all $\beta_k=0$, SSR(reduced) = 0.  So, when testing if $\beta_k = 0 \ \ \forall \ \  k \ne 0$: SSE(reduced) - SSE(full) = SSR(full).
+
+
+
+Consider testing the following hypotheses  
+$H_0: \beta_2 = \beta_3 = 0$  
+$H_a:$ not both zero  
+Full model: $E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3$  
+Reduced model: $E[Y] = \beta_0 + \beta_1 X_1$  
+\begin{eqnarray*}
+SSE(full) &=& SSE(X_1, X_2, X_3)\\
+SSE(reduced) &=& SSE(X_1)\\
+F^* &=& \frac{SSE(X_1) - SSE(X_1, X_2, X_3)}{(n-2) - (n-4)} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&=& \frac{SSR(X_1, X_2, X_3) - SSR(X_1)}{(n-2) - (n-4)} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&=& \frac{SSR(X_2 | X_1) + SSR(X_3 | X_1, X_2)}{2} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&=& \frac{SSR(X_2, X_3 | X_1)}{2} \div \frac{SSE(X_1, X_2, X_3)}{n-4}\\
+&=& \frac{MSR(X_2, X_3 | X_1)}{MSE(X_1, X_2, X_3)}
+\end{eqnarray*}
+
+### Examples
+
+* In considering the output below, let's say that we'd like to test whether both smoking and mother's age are needed in the model.  The full model is: gained, smoke, mage in the model; the reduced model is the model with gained only.
+
+\begin{eqnarray*}
+F &=& \frac{(1485.09 - 1453.37) / (939 - 937)}{1453.37 / 937} = 10.22
+\end{eqnarray*}
+
+
+```{r echo = FALSE}
+library(openintro)
+data(births14)
+births14 <- births14 %>%
+  select(-fage, -visits) %>%
+  drop_na() %>%
+  mutate(term = case_when(
+    weeks <= 38 ~ "early",
+    weeks <= 40 ~ "full",
+    TRUE ~ "late"
+  ))
+```
+
+```{r}
+oz_g_lm <- lm(weight ~ gained, data = births14)
+oz_ghm_lm <- lm(weight ~ gained + habit + mage, data = births14)
+
+anova(oz_g_lm)
+anova(oz_ghm_lm)
+anova(oz_g_lm, oz_ghm_lm)
+```
+
+
+
+Because our p-value is so low, we reject $H_0: \beta_2 = \beta_3 = 0$, and we claim that at least one of smoking `habit` or mother's age, `mage`, is needed in the model (possibly both).
+
+* One reason to use a nested F-test (in lieu of a t-test), is for example, if you'd like to know whether `term` is an important variable in your model (see model 8 way below with the R code).  As noted below, `term` as a factor variable is responsible for 2 separate coefficients.  In order to test whether `term` is significant, you would fit the model with and without `term`, and your null hypothesis would be testing $H_0: \beta_2 = \beta_3 = 0$.
+
+* Another reason to use a nested F-test is if you want to simultaneously determine if interaction is needed in your model.  You might have 4 explanatory variables, and so you'd have ${4\choose2} = 6$ pairwise interactions to consider.  You could test all interaction coefficients simultaneously by fitting a model with only additive effects (reduced) and a model with all the interaction effects (full).  By nesting them, you don't need to test each interaction coefficient one at a time.
+
+* Let's say you want to test $H_0: \beta_1 = \beta_2$.  Note the form of your full and reduced models.
+
+\begin{eqnarray*}
+\mbox{full model}:&& E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\\
+\mbox{reduced model}: && E[Y] = \beta_0 + \beta_c (X_1 + X_2) + \beta_3 X_3\\
+\end{eqnarray*}
+
+Because the reduced model is a specific form of the full model, the two models are nested.  We can reformat the data (i.e., add the first two variables), and run the linear model in R.  We can get SSE from the full model and from the reduced model and calculate the F statistic by hand.
+
+* Let's say you want to test $H_0: \beta_3 = 47$.  Again, note the form of your full and reduced models.
+
+\begin{eqnarray*}
+\mbox{full model}:&& E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3\\
+\mbox{reduced model}: && E[Y] = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + 47 * X_3\\
+\end{eqnarray*}
+We don't want to find a coefficient for $X_3$, so we subtract $47*X_3$ from each Y value:
+\begin{eqnarray*}
+\mbox{reduced model}: && E[Y - 47* X_3] = \beta_0 + \beta_1 X_1 + \beta_2 X_2\\
+\end{eqnarray*}
+Again, the reduced model is a specific form of the full model, the two models are nested.  Using the reformatted data, we run linear models on both the full and reduced models and calculate the F statistic by hand.
+
+
+
+```{r echo = FALSE, eval=FALSE}
+\paragraph{Agenda}
+\begin{enumerate}
+  \itemsep0em
+  \item coefficient of partial determination
+  \item multicollinearity
+\end{enumerate}
+```
+
+### Coefficient of Partial Determination
+
+Just as $R^2$ measures the proportion of reduction in the variation of $Y$ achieved by the set of explanatory variables, a *coefficient of partial determination* measures the marginal contribution of one X variable (or a set of X variables) when there are already others in the model.
+
+\begin{eqnarray*}
+R^2_{Y 2|1} = \frac{SSE(X_1) - SSE(X_1, X_2)}{SSE(X_1)} = \frac{SSR(X_2|X_1)}{SSE(X_1)}
+\end{eqnarray*}
+
+The coefficient of partial determination measures the marginal contribution of one X variable when all others are already included in the model.
+
+$R^2_{Y2|1}$ measures the proportionate reduction in "the variation in $Y$ remaining after $X_1$ is included in the model" that is gained by also including $X_2$ in the model.
+
+
+## Multicollinearity
+
+Consider the multiple regression model:
+\begin{eqnarray*}
+E[Y] &=& \beta_0 + \beta_1 X_1 + \beta_2 X_2\\
+Y &=& \mbox{amount of money in pocket}\\
+X_1 &=& \# \mbox{ of coins in pocket}\\
+X_2 &=& \# \mbox{ of pennies, nickels, dimes in pocket}
+\end{eqnarray*}
+Using a completely non-random sample, I got the following data:
+
+```{r}
+amount <- c(1.37, 1.01, 1.5, 0.56, 0.61, 3.06, 5.42, 1.75, 5.4, 0.56,
+               0.34, 2.33, 3.34)
+num.coins <- c(9,10,3,5,10,37,28,9,11,4,6,17,15)
+num.lowcoins <- c(4,8,0,4,9,34,9,3,2,2,5,12,11)
+```
+
+```{r}
+lm(amount ~ num.coins) %>% tidy()
+```
+
+```{r}
+lm(amount ~ num.lowcoins) %>% tidy()
+```
+
+
+
+```{r}
+lm(amount ~ num.coins + num.lowcoins) %>% tidy()
+
+lm(amount ~ num.coins + num.lowcoins) %>% anova()
+```
+
+
+A few things to notice from the output:
+
+* all 3 of the variables are positively (pairwise correlated). 
+* the effect of the number of low coins is positive on amount by itself, but negative on amount when the number of coins is in the model. 
+* the number of low coins is not significant on its own, but it is significant when the number of coins is in the model. 
+* $R^2_{Y1} = 63.363/(63.363 + 28.208 + 21.366) = 0.561$ 
+* $R^2_{Y2|1} = 28.208 / (28.208 + 21.366) = 0.569$.  We see that when number of low coins is added to the model that already contains the number of coins, the SSE is reduced by 56.9%.  [ $SSR(X_1) = 63.363, SSR(X_2|X_1) = 28.208, SSE(X_1, X_2) = 21.366, SSE(X_1) = SSTO - SSR(X_1) = 28.208 + 21.366$ ] 
+
+```{r echo = FALSE}
+library(GGally)
+ggpairs(data.frame(amount, num.coins, num.lowcoins), lower = list(continuous = GGally::wrap("points", size = 0.1))) + 
+  theme_grey(base_size = 9)
+```
+
+
+#### Effects of Multicollinearity {-}
+
+In reality, there is always some degree of correlation between the explanatory variables (pg 283 @kutner).  for regression models, it is important to understand the entire context of the model, particularly for correlated variables.
+
+
+1. Regardless of the degree of multicollinearity, our ability to obtain a good fit and make predictions (mean or individual) is not inhibited. 
+2. If the variables are highly correlated, many different linear combinations of them will produce equally good fits.  That is, different samples from the same population may produce wildly different estimated coefficients.  For this reason, the variability associated with the coefficients can be quite high.  Additionally, the explanatory variables can be statistically not significant even though a definite relationship exists between the response and the set of predictors. 
+3. We can no longer interpret the coefficient to mean "the change in response when this variable increases by one unit and the others are held constant" because it may be impossible to hold the other variables constant.  The regression coefficients do not reflect any inherent effect of the particular predictor variable on the response but rather a marginal or partial effect given whatever other correlated predictor variables are included in the model. 
+4. Recall $SE^2(\underline{b}) = MSE\cdot (X^t X)^{-1}$.  If $X^t X$ has a determinant which is close to zero, taking its inverse is akin to dividing by zero.  That is to say, often the SE for the b coefficients can have large sampling variability.
+5. We will investigate multicollinearity in more depth in Chapter 10 through the Variance Inflation Factor (VIF).
+
+Note:  No section ALSM 7.5 or Chapter 8  [Although there is some good stuff in there!  Section 7.5 discusses when to standardize your variables -- an action that can sometimes be crucially important.]
+
+
+
+## Model Selection
+
+```{r echo=FALSE, eval=FALSE}
+\paragraph{Agenda}
+\begin{enumerate}
+  \itemsep0em
+  \item best subset selection
+  \item stepwise regression
+  \item examples
+  \item model building strategies
+%  \item p-values (more on statistical thinking)
+\end{enumerate}
+```
+
+We need to come up with something clever to find the model we are going to use.  We need to figure out which variables are going to enter into the model, how they are going to appear in the model (transformations, polynomials, interaction terms, etc), and whether we need to also transform our response variable.  Why is this such a hard problem?  
+Suppose we could first agree on a criterion for the "best model". Maybe we think the best model is that which has the lowest adjusted $R^2$.  
+(Recall $R_a^2=1-\frac{n-1}{n-p}\frac{SSE}{SSTO}$).  Suppose we could also agree on a set of variables that could enter the model, and suppose there are $m$ of them.  How many models do we need to look through?  
+The smallest model has no predictors in it, i.e. $$E[Y]=\beta_0+\epsilon$$
+The largest model has all $m$ of them in there, i.e. $$E[Y]=\beta_0+\sum_{j=1}^m \beta_jX_j+\epsilon$$
+and everything in between.  
+We can think of this like a tree, we have two choices regarding the first variable, either include it or not, then for each of those, we have two choices for the second, and so forth.  There are $2^m$ possible models we have to look at. Suppose $m=20$, which isn't unusual.  With 20 variables, there are about 1.05 million different possible models. With 30 variables, there are about 1.07 billion models.  Are we going to search through them all?  We might if $m$ is particularly small.  $m=3$ gives 8 possible models, this is quite feasible.  Such a search is called *all subsets*. But otherwise, we need to do something clever.
+
+******  
+**Algorithm: Best subset selection (from ISLR)**  
+
+******  
+1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.  
+2. For $k = 1, 2, \ldots m$:  
+    a. Fit all ${m\choose k}$ models that contain exactly $k$ predictors (explanatory variables).  
+    b. Pick the best among the ${m\choose k}$ models, and call it $M_k$.  Here *best*^[note:  defining by CV is much more computationally complicated, SSE is equivalent to AIC, $C_p$ or BIC if $k$ if fixed] is defined as having the smallest SSE, or equivalently, largest $R^2$.  
+3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.  
+
+
+### Forward Selection
+
+We start with an empty model and add the best available variable at each iteration, checking for needed transformations. (We should also look at interactions which we might suspect.  However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.)  Generally for forward selection:  
+1. We start with the response variable versus all variables and find the best predictor.  If there are too many, we might just look at the correlation matrix.  However, we may miss out of variables that are good predictors but aren't linearly related.  Therefore, if its possible, a scatter plot matrix would be best.    
+2. We locate the best variable, and regress the response variable on it.   
+3. If the variable seems to be useful, we keep it and move on to looking for a second.   
+4. If not, we stop.  
+
+
+******
+**Algorithm: Forward stepwise subset selection (from ISLR)**  
+
+******
+1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.   
+2. For $k = 0, 1, \ldots m-1$:  
+   a. Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.  
+   b. Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having smallest SSE or highest $R^2$.    
+3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.
+
+******
+**Algorithm: Forward selection with F tests**  
+
+******
+1.  Let $M_0$ denote the null model, which contains no predictors. The null model predicts the sample mean of the response variable for each observation.  
+2. Let $k = 0$:  
+   a. Consider all $m - k$ models that augment the predictors in $M_k$ with one additional predictor.  
+   b. Choose the best among these $m - k$ models, and call it $M_{k+1}$.  Here *best* is defined as having the smallest p-value for including the $(k+1)^{th}$ variable given the $k$ variables are already in the model.  
+   c. If the p-value from step b. is less than $\alpha_e$, consider $M_{k+1}$ and augment $k$ by 1.  Go back to step a.  If the p-value from step b. is larger than $\alpha_e$, report model $M_k$ and stop the algorithm.  
+
+
+#### It is doing exactly what we want, right???  {-}
+
+Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Kelly who knows 85 topics.  
+
+With two consultants you might choose Kelly first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Jamie, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Jamie knows are already included in the 85 that Kelly knows, and therefore, Jamie does not provide any knowledge beyond that of Kelly.  
+
+A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.^[Example taken from @analogies25.]
+
+```{r echo = FALSE, eval = FALSE}
+(Example taken from American Statistician article that I refereed, August 2012.)
+```
+
+```
+Consider people A, B, C, D who know the following topics:
+
+A: {1, 2, 3, 4, 5, 6, 7}
+
+B: {8, 9, 10}
+
+C: {1, 2, 3, 4, 8, 10}
+
+D: {5, 6, 7, 9, 11}
+
+
+Forward, choose A  and then B (and you'd know topics 1-10).  
+Backward (& best subsets), choose C and D (and you'd know topics 1-11).
+```
+
+#### Forward *Stepwise* Selection using F-tests {-}
+
+This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l$, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.  
+
+1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e$.  
+2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e$.  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l$, we remove the variable.  
+3. We continue with this process until there are no more variables that meet either requirements.  In many situations, this will help us from stopping at a less than desirable model.  
+
+How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, you might walk away with no variables in your model, or at least not many.  If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren't necessary.
+
+### Backward Selection
+1. Start with the full model including every term (and possibly every interaction, etc.).  
+2. Remove the variable that is *least* significant (biggest p-value) in the model.  
+3. Continue removing variables until all variables are significant at the chosen $\alpha$ level.  
+
+
+******
+**Algorithm: Backward stepwise selection (from ISLR)**  
+
+******  
+1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.  
+2. For $k = m, m-1, \ldots, 1$:  
+    a. Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).  
+    b. Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as having the smallest SSE or highest $R^2$.  
+3. Select a single best model from among $M_0, \ldots ,M_{m}$ using cross-validated prediction error, $C_p$, AIC, BIC, or adjusted $R^2$.  
+
+******
+**Algorithm: Backward selection with F tests**  
+
+******
+1.  Let $M_{full}$ denote the *full* model, which contains all $m$ predictors.  
+2. Let $k = m$:  
+    a. Consider all k models that contain all but one of the predictors in $M_k$ (including a total of $k - 1$ predictors).  
+    b. Choose the best among these $k$ models, and call it $M_{k-1}$.  Here *best* is defined as removing the *largest* p-value for including the $(k)^{th}$ variable given the $k-1$ variables are already in the model.
+    c. If the p-value from step b. is *larger* than $\alpha_r$, consider $M_{k}$ and decrease $k$ by 1.  Go back to step a.  If the p-value from step b. is smaller than $\alpha_r$, report model $M_k$ and stop the algorithm.  
+
+
+Do any of the above methods represent a fool-proof strategy for fitting a model?  No, but they are a start.  Remember, it is important to always check the residuals and logical interpretation of the model.
+
+## Other ways for comparing models
+
+```{r fig.cap = "A strategy for data analysis using statistical models. Source: @sleuth", out.width='100%', fig.align='center', echo=FALSE}
+knitr::include_graphics("figs/sleuthmodelbuild.png")
+```
+
+
+### Analysis of Appropriateness of Model
+
+#### Scatter Plot Matrix {-}
+Plots all variables against all others.  Gives indications of need to consider transformations of predictors. Also shows predictors that are highly correlated with other predictors, thus possibly not needing to be included in the model. 
+
+#### Correlation Matrix {-}
+A numerical version of the scatterplot matrix, the correlation matrix computes the correlations between groups of variables.  We want predictor variables that are highly correlated with the response, but we need to be careful about predictor variables that are highly correlated with each other.  
+
+#### Residual Plot {-} 
+Plots fitted values against residuals. As before, we should see no trend and constant variance.  
+Residuals should also be plotted against variables individually, including variables that were left out of the model, as well as possible interactions.  
+If there are trends in the residual plots against the variables in the model, you might consider a transformation or adding a polynomial term.  If there are trends in the residual plots against variables left out of the model, you might consider adding those variables to the model.  If there are trends in the residual plot against interaction terms (like $X_1X_2$), then you might consider adding that interaction term to the model.
+
+
+
+
+## Getting the Variables Right
+
+
+In terms of selecting the variables to model a particular response, four things can happen:
+
+* The regression model is correct!
+* The regression model is underspecified.
+* The regression model contains extraneous variables.
+* The regression model is overspecified.
+
+#### Underspecified {-}
+
+A regression model is underspecified if it is missing one or more important predictor variables.  Being underspecified is the worst case scenario because the model ends up being biased and predictions are wrong for virtually every observation.    Additionally, the estimate of MSE tends to be big which yields larger confidence intervals for the estimates (less chance for significance).
+
+Consider another SAT dataset.  We see that if we don't stratify by the fraction of students in the state who took the SAT (0-22%, 22-49%, 49-81%).  So much changes!  The slopes are negative in the large group and positive in the subgroups.  Additionally, the $R^2$ value goes from 0.193 to 0.806!!  The model without the fraction of students is underspecified and quite biased.  It doesn't matter how many observations we collect, the model will always be wrong.  **Underspecifying the model is the worst of the possible things that can happen.**
+
+
+```{r}
+library(mosaic)
+library(mosaicData)
+
+SAT <- SAT %>%
+  mutate(SAT, frac_group = cut(frac, breaks=c(0, 22, 49, 81),
+                            labels=c("low fraction", 
+                                     "medium fraction", 
+                                     "high fraction")))
+
+SAT %>%
+  ggplot(aes(x = salary, y = sat)) + 
+  geom_point(aes(shape = frac_group, color = frac_group)) +
+  geom_smooth(method = "lm", se = FALSE)
+
+SAT %>%
+  ggplot(aes(x = salary, y = sat, group = frac_group, color = frac_group)) + 
+  geom_point(aes(shape = frac_group)) +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE)
+
+```
+
+#### Extraneous {-}
+
+The third type of variable situation comes when extra variables are included in the model but the variables are neither related to the response nor are they correlated with the other explanatory variables.  Generally, extraneous variables are not so problematic because they produce models with unbiased coefficient estimators, unbiased predictions, and unbiased MSE.  The worst thing that happens is that the error degrees of freedom is lowered which makes confidence intervals wider and p-values bigger (lower power).  Also problematic is that the model becomes unnecessarily complicated and harder to interpret.
+
+#### Overspecified {-}
+
+When a model is overspecified, there are one or more redundant variables.  That is, the variables contain the same information as other variables (i.e., are correlated!).  As we've seen, correlated variables cause trouble because they inflate the variance of the coefficient estimates.  With correlated variables it is still possible to get unbiased prediction estimates, but the coefficients themselves are so variable that they cannot be interpreted (nor can inference be easily performed).
+
+
+Generally:  the idea is to use a model building strategy with some criteria (F-tests, AIC, BIC, Adjusted $R^2$, $C_p$, LASSO, Ridge regression) to find the middle ground between an underspecified model and an overspecified model.
+
+
+## A Model Building Strategy^[Taken from https://online.stat.psu.edu/stat501/lesson/10/10.7]
+
+Model building is definitely an **art**.  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
+
+### The first step {-}
+
+Decide on the type of model that is needed in order to achieve the goals of the study. In general, there are five reasons one might want to build a regression model. They are:
+
+*  For predictive reasons - that is, the model will be used to predict the response variable from a chosen set of predictors.
+*  For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors.
+*  For control purposes - that is, the model will be used to control a response variable by manipulating the values of the predictor variables.
+*  For inferential reasons - that is, the model will be used to explore the strength of the relationships between the response and the predictors.
+*  For data summary reasons - that is, the model will be used merely as a way to summarize a large set of data by a single equation.
+
+
+### The second step {-}
+
+Decide which explanatory variables and response variable on which to collect the data. Collect the data.
+
+### The third step {-}
+
+Explore the data. That is:
+
+* On a univariate basis, check for outliers, gross data errors, and missing values.
+* Study bivariate relationships to reveal other outliers, to suggest possible transformations, and to identify possible multicollinearities.
+
+
+I can't possibly over-emphasize the data exploration step. There's not a data analyst out there who hasn't made the mistake of skipping this step and later regretting it when a data point was found in error, thereby nullifying hours of work.
+
+### The fourth step {-}
+
+(The fourth step is very good modeling practice.  It gives you a sense of whether or not you've overfit the model in the building process.) Randomly divide the data into a training set and a validation set:
+
+* The training set, with at least 15-20 error degrees of freedom, is used to estimate the model.
+* The validation set is used for cross-validation of the fitted model.
+
+
+### The fifth step {-}
+
+Using the training set, identify several candidate models:
+
+* Use best subsets regression.
+* Use all subsets, stepwise, forward, or backward selection regression.  Using different alpha-to-remove and alpha-to-enter values can lead to a variety of models.
+
+### The sixth step {-}
+
+Select and evaluate a few "good" models:
+
+* Select the models based on the criteria we learned, as well as the number and nature of the predictors.
+* Evaluate the selected models for violation of the model conditions.
+* If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.
+
+### The seventh and final step {-}
+
+Select the final model:
+
+* A small mean square prediction error (or larger cross-validation $R^2$) on the validation data is a good predictive model (for your population of interest).
+* Consider residual plots, outliers, parsimony, relevance, and ease of measurement of predictors.
+
+And, most of all, don't forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.
+
+### Thoughts on Model Selection...
+
+Question: Did females receive lower starting salaries than males?^[from @sleuth]
+
+model:    
+y: `log(salary)`  
+x's: `seniority`, `age`, `experience`, `education`, `sex`
+
+In @sleuth, they first find a good model using only `seniority`, `age`, `experience`, and `education` (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + `sex`)  In other regression texts, the models considered would include the `sex` variable from the beginning, and work from there, but always keeping the `sex` variable in.  What are the pluses/minuses of these approaches?
+
+**Response**  It seems possible, and even likely, that `sex` would be associated with some of these other variables, so depending on how the model selection that starts with sex included was done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn't start with sex would be more likely to include those associated covariates to start with.    
+
+One nice aspect of both methods is that they both end up with sex in the model; one **difficulty is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn't matter**.  However, it is often advantageous to avoid model selection as much as possible. Each model answers a different question, and so ideally it would be good to decide ahead of time what the question of interest is.  
+
+In this case there are two questions of interest; are there differences at all (univariate model on `sex`), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. Consider the explanation that the wage gap between men and women is due to men in higher-paying jobs, when really, that's part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one "best" model can be misleading.
+
+```{r eval = FALSE, echo = FALSE}
+* **Response 2** If you know (or are willing to assume) the covariates that you want to adjust for and their form in the model (non-linearity, interactions) and you have enough data relative to the number of covariates, then you should not do any model selection, just compare the model with the variable of interest to the model without.  Which covariates are significant or not does not matter in this case.
+
+See here: https://stats.stackexchange.com/questions/37564/r-code-question-model-selection-based-on-individual-significance-in-regression/37609#37609 for simulation examples where screening/model selection can either include meaningless variables, or leave out important ones.
+
+unrelated:
+https://onlinecourses.science.psu.edu/stat501/node/328
+```
+
+
+
+
+
+
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
+
+### Decomposing sums of squares
+
+1. How do SSE, SSR, and SSTO change when variables are added to the model?  
+2. What does $SSR(X_2 | X_1)$ really mean?  How is it defined?  
+3. How do we break up SSR in the ANOVA table?  Note: the order of variables maters!   
+4. How do you tests sets of coefficients that aren't in the right order?  Or that equal a constant?  Or that equal each other?  
+5. If you are doing a nested F-test without `anova()` output, how do you find the $F^*$ critical value?  (Hint: use `qf()` in R)
+
+### Multicollinearity
+
+1.  What does multicollinearity mean?  
+2.  What are the effects of multicollinearity on various aspects of regression analyses?  
+3.  What are the effects of correlated predictors on various aspects of regression analyses?  
+4.  (More in ALSM chapter 10:   variance inflation factors, and how to use them to help detect multicollinearity)  
+5.  How can multicollinearity problems be reduced in the analysis?  
+6.  What are the big regression pitfalls? (including extrapolation, non-constant variance, autocorrelation (e.g., time series), overfitting, excluding important predictor variables, missing data, and power and sample size.)
+
+### Building models
+
+1.  What is  the impact of the four different kinds of models with respect to their "correctness": correctly specified, underspecified, overspecified, and correct but with extraneous predictors?  
+2.  How do you conduct stepwise regression "by hand" (using either F tests or one of the other criteria)? 
+3.  What are the limitations of stepwise regression?  
+4.  How can you choose an optimal model based on the $R^2$ value, $R^2_{adj}$, MSE, AIC, BIC, or $C_p$ criterion?  
+5. What are the seven steps of good model building strategy?
+
+
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+Consider the following example on <a href = "https://weallcount.com/2022/03/25/building-compassion-into-your-modelling-variables/" target = "_blank">Building Compassion into Your Modelling Variables</a> by Heather Krause at We All Count.
+
+The example describes a hypothetical budget app whose goal is to help the user save money.  The explanatory variable is whether or not the app is used; the response variable is the amount of money saved. 
+
+Heather suggests that there are three strategies to model the variables of interest and that each of the three strategies privilege different groups of people.  In all three strategies, we randomly assign the budgeting app to the individuals in the study in order to determine a causal mechanism between the budgeting app and the amount of money saved.
+
+Of additional interest is the variable which describes the proportion of an individual's income which is disposable income (the amount left over after paying for food, shelter, heat, etc.).
+
+The key to the blog is not to define the technical details of how to work with different types of variables (**confounder**, **moderator**, or **mediator**).  The point of the blog is to recognize that there **are** different ways to model covariates, and how you model them will change who the results privilege.
+
+#### Strategy 1: fix disposable income proportion (confounder) {-}
+
+In the first strategy you include the proportion of disposable income of the individuals in the model as a covariate.  Here, the interpretation of the budgeting app coefficient is given as "while all other variables are constant."  The model can be something as straightforward as a linear model,
+
+But maybe that doesn't make sense because the whole point of the app is that it will **change** the proportion of disposable income, which in turn affects the amount of savings.
+
+Using the example in the blog, if we:
+
+> isolate the effect that the budgeting app is having regardless of what portion of their income is disposable. I run this model and it turns out that their app isn’t having much of an effect at all on whether or not people saved at least $175 extra dollars. Sorry guys, I say in the meeting.
+
+
+#### Strategy 2: disposable income proportion interacting (moderator) {-}
+
+If the amount of disposable income changes the impact of the budgeting app on the amount of money saved, we say that disposable income and the budgeting app **interact**.  That is, if you are reasonably flush, maybe the app can really help you save a lot of money.  If your finances are already very tight, you probably aren't spending a lot of money on non-essentials.  So the budgeting app may not help at all for those with low disposable income proportion.
+
+> If you use this model, you are assuming that the success of the app depends entirely on whether or not you can adjust your disposable income, giving voice to people across the spectrum of that experience, both positive and negative. That’s really important if you care about helping people already budgeted to within an inch of their life.
+
+> Sure your app might be a prettier, faster way to do that, but it might not be worth the 175 dollars to someone who is counting all of theirs.
+
+#### Strategy 3: disposable income proportion as a mediator {-}
+
+A mediator variable is one which is on the causal pathway from $X$ to $Y$.  The modeling strategy involves causal inference, possibly modeling with a directed acyclic graph (DAG).  Alternatively, first model whether $X$ predicts the mediator and whether the mediator predicts $Y$ [@baron-kenny]. Lots more <a href = "http://davidakenny.net/cm/mediate.htm" target = "_blank">information here</a>.
+
+> This model shows how the app performs assuming you are in a position to adjust expenses, that is the expected mechanism of change. If you say “the app works” based on this model you are privileging those in a position to benefit from how it works. Which in this case is people who have the financial leeway to do so.
+
+## R: ANOVA decompisition - tips
+
+We return to the tips data which was used in Section \@ref(tips)^[Thanks to Mine Çentinkaya-Rundel for the majority of the content in this section  Mine's course is at https://mine-cr.com/teaching/sta210/.].
+
+> Is this the best model to explain variation in tips?
+
+
+**Note:**  when a single dataset is used to build and fit the model, we penalize the fitting (think $R^2_{adj}$).  When different data are used, i.e., with CV, there is no need to use a metric with penalization.
+
+
+```{r echo = FALSE}
+tips <- read_csv("tip-data.csv") %>%
+  filter(!is.na(Party))
+```
+
+```{r echo = FALSE}
+tips <- tips %>%
+  mutate(
+    Meal = fct_relevel(Meal, "Lunch", "Dinner", "Late Night"),
+    Age  = fct_relevel(Age, "Yadult", "Middle", "SenCit")
+  )
+```
+
+```{r}
+tip_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(Tip ~ Party + Age, data = tips)
+```
+
+
+### Analysis of variance (ANOVA)
+
+-   **Main Idea:** Decompose the total variation on the outcome into:
+    -   the variation that can be explained by the each of the variables in the model
+
+    -   the variation that **can't** be explained by the model (left in the residuals)
+-   If the variation that can be explained by the variables in the model is greater than the variation in the residuals, this signals that the model might be "valuable" (at least one of the $\beta$s not equal to 0)
+
+
+```{r}
+anova(tip_fit$fit) %>%
+  tidy() %>%
+  kable(digits = 2)
+```
+
+#### ANOVA output, with totals {-}
+
+```{r echo = FALSE}
+anova(tip_fit$fit) %>%
+  tidy() %>%
+  mutate(across(where(is.numeric), round, 2)) %>%
+  janitor::adorn_totals(where = "row", cols = 1:3, fill = "") %>%
+  mutate(
+    statistic = if_else(is.na(statistic), "", statistic),
+    p.value = if_else(is.na(p.value), "", p.value)
+    ) %>%
+  kable()
+```
+
+#### Sum of squares {-}
+
+```{r echo = FALSE}
+anova(tip_fit$fit) %>%
+  tidy() %>%
+  mutate(across(where(is.numeric), round, 2)) %>%
+  select(term, df, sumsq) %>%
+  janitor::adorn_totals(where = "row", cols = 1:3, fill = "") %>%
+  kable() %>%
+  column_spec(3, background = "#D9E3E4")
+```
+
+
+-   $SS_{Total}$: Total sum of squares, variability of outcome, $\sum_{i = 1}^n (y_i - \bar{y})^2$
+-   $SS_{Error}$: Residual sum of squares, variability of residuals, $\sum_{i = 1}^n (y_i - \hat{y})^2$
+-   $SS_{Model} = SS_{Total} - SS_{Error}$: Variability explained by the model
+
+## R: nested F test - births
+
+Every year, the US releases to the public a large data set containing information on births recorded in the country. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. This is a random sample of 1,000 cases from the [data set released in 2014](https://www.icpsr.umich.edu/web/ICPSR/studies/36461).  [Data description here](https://www.openintro.org/data/index.php?data=births14).
+
+```{r}
+library(openintro)
+data(births14)
+births14 <- births14 %>%
+  select(-fage, -visits) %>%
+  drop_na() %>%
+  mutate(term = case_when(
+    weeks <= 38 ~ "early",
+    weeks <= 40 ~ "full",
+    TRUE ~ "late"
+  ))
+
+names(births14)
+```
+
+Notice that the variable names we'll use are `mage`, `weight`, `gained`, and `habit`.
+
+1. Interested is in predicting a baby's `weight` from the pounds a mother `gained`.
+
+```{r}
+oz_g_lm <- lm(weight ~ gained, data=births14)
+
+oz_g_lm %>% tidy()
+oz_g_lm %>% anova()
+```
+
+
+2. What if smoking `habit` is included as a variable?
+
+```{r}
+oz_gh_lm <- lm(weight ~ gained + habit, data=births14)
+
+oz_gh_lm %>% tidy()
+oz_gh_lm %>% anova()
+```
+
+
+
+3. What if smoking `habit` and weight `gained` *interact*?
+
+```{r}
+oz_gih_lm <- lm(weight ~ gained * habit, data=births14)
+
+oz_gih_lm %>% tidy()
+oz_gih_lm %>% anova()
+```
+
+4. What happens to the model if another quantitative variable, the mother's age `mage`, is added?
+
+```{r}
+oz_ghm_lm <- lm(weight ~ gained + habit + mage, data=births14)
+
+oz_ghm_lm %>% tidy()
+oz_ghm_lm %>% anova()
+```
+
+5. What happens to the model if another quantitative variable is added with the interaction?
+
+```{r}
+oz_gihm_lm <- lm(weight ~ gained * habit + mage, data=births14)
+
+oz_gihm_lm %>% tidy()
+oz_gihm_lm %>% anova()
+```
+
+6. What is the F-test to see if `mage` should be added to the model with interaction?  (borderline, the p-value on `mage` is 0.0423 for $H_0: \beta_{mage}=0$)
+
+
+```{r}
+anova(oz_gih_lm, oz_gihm_lm)
+```
+
+
+
+7. Can both the interaction and `mage` be dropped?  (Yes, the p-value is reasonably large indicating that there is no evidence that either of the coefficients is different from zero.  Now the test is $H_0: \beta_{gainxsmk} = \beta_{mage} = 0$.)
+
+```{r}
+anova(oz_gh_lm, oz_gihm_lm)
+```
+
+
+8. Calculate the coefficient of partial determination for `mage` given `gained` and `habit`.
+
+```{r}
+anova(oz_ghm_lm)
+6.42 / (6.42 + 1453.37)
+```
+
+
+The variability (in ounces of baby `weight`) remaining after modeling with `gained` and `habit` is reduced by a further 0.4% when additionally adding `mage`.
+
+9. What happens if variables are entered into the model in a different order?
+```{r}
+lm(weight ~ marital + mage, data=births14) %>% tidy()
+
+lm(weight ~ mage + marital, data=births14) %>% tidy()
+
+lm(weight ~ marital + mage, data=births14) %>% anova()
+
+lm(weight ~ mage + marital, data=births14) %>% anova()
+```
+
+
+10. On a different note...  the variable `term` has three levels ("early", "full", and "late").  Notice how the variable itself can be in the model or out of the model but that when it is in the model it uses **two** degrees of freedom because there are two coefficients to estimate.  When `term` interacts with `gained` there are an additional two coefficients to estimate (*both* of the interaction coefficients in the model).
+
+```{r}
+oz_gtm_lm <- lm(weight ~ gained + term + mage, data=births14)
+oz_gitm_lm <- lm(weight ~ gained * term + mage, data=births14)
+
+tidy(oz_gtm_lm)
+anova(oz_gtm_lm)
+
+tidy(oz_gitm_lm)
+anova(oz_gitm_lm)
+```
+
+
+## R: model building - SAT scores
+
+These notes belong at the end... I'm putting them here to highlight them before the full analysis.
+
+* Notice that $C_p$ and F-tests use a "full" model MSE.  Typically, the MSE will only be an unbiased predictor of $\sigma^2$ in backwards variable selection.
+* BIC usually results in fewer parameters in the model than AIC.
+* Using different selection criteria may lead to different models (there is no one best model).
+* The order in which variables are entered does not necessarily represent their importance.  As a variable entered early on can be dropped at a later stage because it is predicted well from the other explanatory variables that have been subsequently added to the model.
+
+
+Consider the multiple regression model:
+\begin{eqnarray*}
+E[Y] &=& \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \beta_4 X_4 + \beta_5 X_5 + \beta_6 X_6\\
+Y &=& \mbox{state ave SAT score}\\
+X_1 &=& \% \mbox{ of eligible seniors who took the exam, } takers\\
+X_2 &=& \mbox{median income of families of test takers, } income\\
+X_3 &=& \mbox{ave number of years of formal eduction, } years\\
+X_4 &=& \% \mbox{ of test takers who attend public school, } public\\
+X_5 &=& \mbox{total state expenditure on public secondary schools (\$100 /student), } expend \\
+X_6 &=& \mbox{median percentile rank of test takers within their secondary school class, } rank
+\end{eqnarray*}
+
+```{r}
+sat_data <- read_csv("http://pages.pomona.edu/~jsh04747/courses/math158/sat.csv") %>%
+  mutate(ltakers = log(takers))
+
+sat_n <- nrow(sat_data)  # always be wary of missing rows, though!
+```
+
+
+### AIC and BIC in R {-}
+
+1. The model with no variables
+```{r}
+lm(sat ~ 1, data = sat_data) %>% tidy()
+lm(sat ~ 1, data = sat_data) %>% glance() %>%
+  mutate(mse = sigma^2, sse = mse*df.residual) %>%
+  select(mse, sse, AIC, BIC, df.residual, nobs)
+```
+
+2. The model on `ltakers`
+```{r}
+lm(sat ~ ltakers, data = sat_data) %>% tidy()
+lm(sat ~ ltakers, data = sat_data) %>% glance() %>%
+  mutate(mse = sigma^2, sse = mse*df.residual) %>%
+  select(mse, sse, AIC, BIC, df.residual, nobs)
+```
+
+
+### Best possible subsets {-}
+
+Note that the outcome is the best model with one variable, the best model with two variables, etc.  Therefore, the selection is based on SSE only.  It is your job as the analyst to differentiate between the models of different sizes.  You could use $R_{adj}^2$, AIC, BIC, etc.  Here is seems like the 4 variable model is a good contender for best model.
+
+```{r}
+best_lms<- leaps::regsubsets(sat ~ ltakers + income + years + public + expend + rank, 
+        data=sat_data, nvmax = 6)
+```
+
+```{r}
+best_lms %>% tidy()
+```
+
+
+### Forward Variable Selection: F-tests {-}
+
+```{r}
+add1(lm(sat ~ 1, data = sat_data), sat ~ ltakers + income + years + 
+       public + expend + rank, test = "F")
+```
+
+```{r}
+add1(lm(sat ~ ltakers, data = sat_data), sat ~ ltakers + income + years + 
+       public + expend + rank, test = "F")
+```
+
+```{r}
+add1(lm(sat ~ ltakers + expend, data = sat_data), sat ~ ltakers + income + years + 
+       public + expend + rank, test = "F")
+```
+
+
+Note:  `Sum of Sq` refers to the SSR(new variable $|$ current model) (additional reduction in SSE).  `RSS` is the SSE for the model that contains the current variables and the new variable.
+
+### Backward Variable Selection: F-tests {-}
+
+```{r}
+# all the variables
+drop1(lm(sat ~ ltakers + income + years + public + expend + rank, 
+         data=sat_data), test="F")
+```
+
+
+```{r}
+# less public
+drop1(lm(sat ~ ltakers + income + years + expend + rank, 
+         data=sat_data), test="F")
+```
+
+If you `add1` here (to see if it makes sense to add either public or income back), neither is significant.
+
+```{r}
+# less income
+drop1(lm(sat ~ ltakers + years + expend + rank, 
+         data=sat_data), test="F")
+```
+
+
+### Forward Stepwise: AIC {-}
+
+```{r}
+# lives in the base R stats package, but can be overwritten by other functions
+stats::step(lm(sat ~ 1, data=sat_data), 
+     sat ~ ltakers + income + years + public + expend + rank,
+     direction = "forward")
+```
+
+
+### Backward Stepwise: BIC {-}
+
+```{r}
+# lives in the base R stats package, but can be overwritten by other functions
+stats::step(lm(sat ~ (ltakers + income + years + public + expend + rank), 
+        data=sat_data),
+     direction = "backward", k=log(sat_n))
+```
+To get an idea of how complicated your models can get, try this:
+
+```
+step(lm(sat ~ (ltakers + income + years + public + expend + rank)^2),
+            direction = "backward")
+```
+
+
+
+

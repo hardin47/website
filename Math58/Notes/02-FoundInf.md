@@ -6,7 +6,7 @@
 <!--
 ## 1/23/20 Agenda {#Jan23}
 1. Example: gender discrimination
-2. **infer** again
+2. randomizition tests using **infer**
 3. Hypothesis testing structure
 -->
 
