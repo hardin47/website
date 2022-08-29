@@ -13,7 +13,7 @@
 
 ## Bayes' Rule
 
-```{theorem}
+::: {.theorem #unnamed-chunk-1}
 **Bayes' Rule**  
 
 Given events $A$ and $B$,
@@ -21,12 +21,12 @@ Given events $A$ and $B$,
 P(A|B) &=& \frac{P(AB)}{P(B)} = \frac{P(B|A) P(A)}{P(AB) + P(A^cB)} \nonumber \\
 &=& \frac{P(B|A)P(A)}{ \sum_i P(B|A_i) P(A_i)}
 \end{eqnarray*}
-```
+:::
 
 
 Many of the following examples may be familiar to you.  When reading them, work to understand both the intuition (the **denominator** changes when we condition!) as well as the mathematical connection to Bayes' Rule.
 
-```{example}
+::: {.example #unnamed-chunk-2}
 Suppose the rate of infection with TB is 1 in 1000 (about 0.1 percent = 0.001).  Suppose a TB test is used which is 90% accurate: it gives a positive result for 10 percent of people who do not actually have TB, but do have a reaction to the skin test. Also, 10% of the people who actually have TB fail to react to the test.^[Example taken from *A Course in Probability* by Neil Weiss.]
 
 * What's the chance that someone has TB if they test positive?
@@ -41,9 +41,9 @@ Suppose the rate of infection with TB is 1 in 1000 (about 0.1 percent = 0.001). 
 * Not necessarily, since it's much worse to have a false negative than a false positive.  People who test positive are then given another test with fewer false positives.
 * 0.001
 * 0.009
-```
+:::
 
-```{example}
+::: {.example #unnamed-chunk-3}
 A cab was involved in a hit and run accident at night.  Two cab companies, the Green and the Blue, operate in the city.  Suppose you are told the following:
 
 * 85 percent of the cabs in the city are Green, and the remaining 15 percent are Blue.
@@ -66,9 +66,9 @@ The probability of interest is:
 P(B | said B) &=& \frac{P(said B | B) P(B)}{P(said B | G) P(G) + P(said B | B) P(B)}\\
 &=& \frac{0.8*0.15}{0.2*0.85 + 0.8*0.15} = 0.41
 \end{eqnarray*}
-```
+:::
 
-```{example}
+::: {.example #unnamed-chunk-4}
 Consider the famous Monte Hall problem based on a game show, *Let's Make a Deal*.   As part of the show, the contestant is asked to pick one of three doors.  Two of the doors have nothing behind them, and the third door has a car as a prize.  Monte Hall (the host) opens a non-prize door that the contestant hadn't chosen (there is always such a door available to open because there is only one prize).  Monte then offers the contestant the opportunity to switch from the original door to the remaining door.  Should she switch?  Stay?  Or it doesn't matter?  What is the probability of winning under each of the situations?
 
 
@@ -109,7 +109,7 @@ P(C_1 | H_{23} ) &=& 1 - P(C_2 | H_{23}) - P(C_3 | H_{23})\\
 
 
 So.... the probability that the car is behind Door 1 is 2/3 where the probability that it's behind Door 2 is 1/3 $\rightarrow$ you should switch doors!
-```
+:::
 
 
 The previous situations have all been based on discrete values for both the parameter and the data (neither of which are typically true).  If we think of {\bf A = parameter} and {\bf B = data}, we want to find the value of {\bf A} such that $P(A|B)$ is maximized.  We are going to use probability distribution functions (pdfs) instead of discrete probabilities, so we need more notation.
@@ -123,7 +123,7 @@ A **prior distribution** is the distribution of a parameter (e.g., $\theta$) bef
 * **Bayesians** believe we should use prior distributions for all our modeling because we always know *something* about the situation at hand.
 * **Frequentists** believe we should only use the data collected in the experiment or sample (and no prior information).
 
-```{example}
+::: {.example #unnamed-chunk-5}
 We want to predict the high temperature on a given day in October.
 \begin{align*}
 \Omega = \{ (\theta, \sigma^2) &: \theta \in I\!\!R, \sigma^2 \in I\!\!R^+\}\\
@@ -135,7 +135,7 @@ Suppose we know the variance $\sigma^2 = 12^2$.  The mean, $\theta$ is unknown. 
 \xi (\theta) &\rightarrow& \theta \sim N(\mu, \nu^2)\\
 && \mu =78^\circ, \nu^2 = (2.5^\circ)^2\\
 \end{eqnarray*}
-```
+:::
 
 
 The value for $\nu$ is a measure of the uncertainty of our **prior beliefs**.  That is, we have estimated $\theta$ to be $78^\circ$, but we aren't sure of that value, so we add some uncertainty on to our belief ($\nu$).  $\mu$ and $\nu$ are called **hyper-parameters**.
@@ -149,7 +149,7 @@ A **posterior distribution** is the conditional distribution of the parameter (e
 Aside, a little probability review:
 
 
-```{example}
+::: {.example #unnamed-chunk-6}
 Suppose you are interested in rolling two dice.  Let $X$ be the larger value; let $Y$ be the sum of the two dice.  Find the **joint** and **marginal** distributions of $X$ and $Y$.  The solution is a table of **probabilities**:
 
 | $X \backslash Y$ |        2       |        3       |        4       |        5       |        6       |        7       |        8       |        9       |       10       |       11       |       12       |       P(X)      |
@@ -161,7 +161,7 @@ Suppose you are interested in rolling two dice.  Let $X$ be the larger value; le
 |         5        |                |                |                |                | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{1}{36}$ |                |                |  $\frac{9}{36}$ |
 |         6        |                |                |                |                |                | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{2}{36}$ | $\frac{1}{36}$ | $\frac{11}{36}$ |
 | P(Y) | $\frac{1}{36}$ |  $\frac{2}{36}$ |  $\frac{3}{36}$ |  $\frac{4}{36}$ |  $\frac{5}{36}$ |  $\frac{6}{36}$ |  $\frac{5}{36}$ |  $\frac{4}{36}$ |  $\frac{3}{36}$ |  $\frac{2}{36}$ |  $\frac{1}{36}$ |
-```
+:::
 
 
 **More notation review**.  Suppose we have $n$ data points from $f(x| \theta)$.  We'll assume it's a simple random sample (SRS), and therefore the observations are independent.
@@ -209,7 +209,7 @@ So, the posterior is proportional to the product of the likelihood and the prior
 \end{eqnarray*}
 
 
-```{example}
+::: {.example #unnamed-chunk-7}
 Suppose the true proportion of freethrows that Steph Curry is able to make successfully is unknown.  We assume that his freethrows are **distributed** according to a Bernoulli process.
 
 \begin{displaymath}
@@ -265,7 +265,7 @@ g(\underline{x}) &=& \frac{\Gamma(y+1)\Gamma(n-y+1)}{\Gamma(n+2)}\\
 \end{eqnarray*}
 
 Note, however, we didn't actually need to integrate to find $g(\underline{x})$.  We simply needed to note that $\theta$ takes the place of $w$ in the above Beta distribution, and we would automatically know the appropriate constant value.
-```
+:::
 
 What if we do have some information about the prior distribution on $\theta$?  Suppose we believe it is Beta(a,b). \Big(Note: $E[\theta] = \frac{a}{a+b}$, Var$(\theta) = \frac{ab}{(a+b)^2 (a+b+1)}$, SD$(\theta) = \sqrt{\frac{ab}{(a+b)^2 (a+b+1) }} $ \Big).
 
@@ -290,7 +290,7 @@ What if we do have some information about the prior distribution on $\theta$?  S
 
 A **conjugate prior distribution** is one where the prior distribution is in the same family as the posterior distribution.  The Beta distribution is conjugate to the Binomial distribution (note, the $U[0,1]$ distribution is Beta($\alpha$=1,$\beta$=1)).
 
-```{example}
+::: {.example #unnamed-chunk-8}
 Continuing the example on temperature, $X \sim N(\theta, \sigma^2$ (known)) with a normal prior, $\theta \sim N(\mu, \nu^2)$.  Remember that typically, a prior is completely specified.  In our example $\mu=78$ and $\nu=2.5$.  We have:\\
 \begin{eqnarray*}
 f(\underline{x} | \theta) &\propto& \exp \bigg[ - \frac{1}{2 \sigma^2} \sum_{i=1}^n (x_i - \theta)^2 \bigg]\\
@@ -306,7 +306,7 @@ f(\underline{x} | \theta) &\propto& \exp \bigg[ - \frac{1}{2 \sigma^2} \sum_{i=1
 \theta | \underline{x} &\sim& N (\mu_1, \nu_1^2)\\
 \mbox{where: } && \mu_1 = \frac{\sigma^2 \mu + n \nu^2 \overline{x}}{\sigma^2 + n \nu^2} \ \ \ \ \nu_1^2 = \frac{\sigma^2 \nu^2}{\sigma^2 + n \nu^2}
 \end{eqnarray*}
-```
+:::
 
 
 Remember, when we are computing the posterior for $\theta$, we can ignore anything that doesn't depend on $\theta$ (other "known" parameters, data, constants,...)
@@ -410,7 +410,7 @@ a &=& E[\theta | \underline{X}] = \delta^*(\underline{X}) !!!\\
 
 
 
-```{example, tape}
+::: {.example #tape}
 Let $\theta$ denote the average number of defects per 100 feet of tape.  $\theta$ is unknown, but the prior on $\theta$ is a gamma distribution with $E[\theta] = \alpha / \beta = 2/10, \alpha= 2, \beta = 10$. When a 1200 foot roll of tape is inspected, exactly 4 defects are found.
 
 What is the Bayes' estimate of the average number of defects per 100 feet?
@@ -432,7 +432,7 @@ f(\underline{x} | \theta) &=& \prod_{i=1}^n \frac{e^{-\theta} \theta^{x_i}}{x_i!
 
 \noindent
 Note: The Gamma distribution is parameterized slightly differently in DeGroot and on your sheet (as is the exponential).  Make sure the expected value matches what you've been given in the problem.
-```
+:::
 
 #### Absolute Loss
 
@@ -506,7 +506,7 @@ MSE_B(\delta(X)) &=& \frac{(X+a)(n+a+b)}{(n+a+b)^2(n+a+b+1)}\\
 Note that the Bayesian MSE is simply the posterior variance of the parameter of interest.  This is because we've used the expected value as our estimate, so there is no bias.  Note that the Bayesian MSE is a function of the data (and **not** $\theta$), so we cannot compare the Bayesian MSE and the Frequentist MSE directly.
 
 
-```{example}
+::: {.example #unnamed-chunk-9}
 Recall the tape example, Example \@ref(exm:tape).  
 
 * Prior: Gamma(2, 10)  (or (2, 1/10) depending on how you parametrize))
@@ -542,7 +542,7 @@ MSE_F(\delta(\underline{X})) &= \frac{n}{(n+10)^2} \theta + \frac{(2-n\theta)^2}
 &= \frac{n \theta+ (2-n\theta)^2}{(n+10)^2}
 \end{align*}
 Note that we couldn't directly compare $MSE_F$ and $MSE_B$ (they are functions of different variables!).  Because we'd have to come up with a prior to think about $MSE_B(\hat{\theta})$, it seems like we can't calculate that quantity.  Instead, we take the easier route, and find $MSE_F(\delta(\underline{X}))$ in order to have a reasonable comparison of estimators.
-```
+:::
 
 
 
@@ -550,7 +550,7 @@ Note that we couldn't directly compare $MSE_F$ and $MSE_B$ (they are functions o
 
 How sensitive are our results to different priors?
 
-```{example}
+::: {.example #unnamed-chunk-10}
 Continuing with the tape example, Example \@ref(exm:tape), below are different values for the estimate of theta depending on different priors and data values:
 
 |                 | $\alpha = 2, \beta = 10$ | $\alpha = 8, \beta = 10$ | $\alpha = 2, \beta = 20$ |
@@ -564,7 +564,7 @@ Note:  $E[ \theta | \underline{x} ] = \frac{\sum x_i + \alpha}{ n + \beta} = w_1
 \noindent
 
 As $n \rightarrow \infty, \hat{\theta} \rightarrow \frac{\sum x_i}{n}$, as $n \rightarrow 0, \hat{\theta} \rightarrow \frac{\alpha}{\beta}$.
-```
+:::
 
 ### Consistency of Estimators
 
@@ -579,7 +579,7 @@ Note, an estimator $Y_n$ converges to $\theta$ in probability if:
 
 (You saw this idea in the weak and strong laws of large numbers: $\overline{X} \stackrel{P}{\rightarrow} \mu$ as $n \rightarrow \infty$ is the Weak Law of Large Numbers.) [n.b.  In case you are curious, the strong law of large numbers says that $\overline{X} \stackrel{a.s.}{\rightarrow} \mu$ (almost surely).  That means $\lim_{n \rightarrow \infty} P [ \overline{X} = \mu ] = 1$
 
-```{example}
+::: {.example #unnamed-chunk-11}
 Continuing with the tape example, Example \@ref(exm:tape):
 \begin{eqnarray*}
 \delta^*(\underline{X}) &=& \frac{\sum X_i + \alpha}{n+\beta}\\
@@ -591,7 +591,7 @@ Continuing with the tape example, Example \@ref(exm:tape):
 \end{eqnarray*}
 
 $\delta^*(\underline{X})$ is a consistent estimator of $\theta$.
-```
+:::
 
 
 ## Benefits and Limitations of Bayes' Estimators
@@ -609,11 +609,11 @@ $\delta^*(\underline{X})$ is a consistent estimator of $\theta$.
 
 ## Additional Examples
 
-```{example}
+::: {.example #unnamed-chunk-12}
 Suppose there is a Beta(4,4) prior distribution on the probability $\theta$ that a coin will yield a `head` when spun in a specified manner.  The coin is independently spun ten times, and `heads` appears fewer than 3 times.  You are not told how many heads were seen, only that the number is less than 3.  Calculate your exact posterior density for $\theta$.^[Problem taken from *Bayesian Data Analysis* by Gelman, Carlin, Stern, and Rubin.]
-```
+:::
 
-```{example, baseball}
+::: {.example #baseball}
 **Baseball and Bayes**^[Example taken from *The Practice of Statistics: Putting the Pieces Together* by Spurrier.]
 
 You are a statistician employed by On The Ball Consulting.  Veteran major-league baseball scout Rocky Chew seeks your advice regarding estimating the probability that amateur baseball player John Spurrier will get a base hit against a major-league pitcher.  Rocky has arranged for Spurrier to have ten at bats against a major-league pitcher.
@@ -669,7 +669,7 @@ MSE(\hat{\theta}) = E[(\hat{\theta} - \theta)^2] = Var(\hat{\theta}) + bias^2(\h
 * Do you recommend using $\hat{\theta}_f$ or $\hat{\theta}_b$?  Explain.
 * If John Spurrier gets three hits in ten at bats, what is your estimate of $\theta$?
 * Show that $\hat{\theta}_b$ is a weighted average of $\hat{\theta}_f$ and the prior mean, $\frac{\alpha}{\alpha + \beta}$.
-```
+:::
 
 
 
@@ -679,9 +679,10 @@ MSE(\hat{\theta}) = E[(\hat{\theta} - \theta)^2] = Var(\hat{\theta}) + bias^2(\h
 * What patterns do you see in figures 2.3 & 2.4?  Can you give plausible reasons for the patterns you see? 
 * What if a county only had 100 people?  Small counties are more variable.  Keep in mind that the rates are age-adjusted.
 
-```{r fig.cap = "Figure 2.3 from Teaching Statistics, a bag of tricks by Gelman and Nolan.", fig.alt = "The caption reads: the counties of the United States with the highest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989.", preview = TRUE, out.extra="style='transform:rotate(270deg);'", out.width="75%", echo = FALSE}
-knitr::include_graphics("figs/highkidney.jpeg")
-```
+<div class="figure">
+<img src="figs/highkidney.jpeg" alt="The caption reads: the counties of the United States with the highest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989." width="75%" style='transform:rotate(270deg);' />
+<p class="caption">(\#fig:unnamed-chunk-13)Figure 2.3 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
+</div>
 
 * Consider figure 13.4, the highest 10% of Bayes-estimated kidney cancer death rates in the US (white men, 1980-1989).  Let's assume that number of deaths is distributed Poisson($n_j \theta_j$) where $n_j$ is the number of people in the county, and $\theta_j$ is the true kidney cancer death rate in that county.  Further, we will assume that there are no outside influences on kidney cancer (e.g., pollution) and that each county's cancer rate comes from a Gamma distribution with parameters ($\alpha = 61, \beta = 47000$).  That is,
 
@@ -731,9 +732,10 @@ We know that $E[\theta | y] = \frac{\alpha + y}{m + \beta}$.  How does this esti
 | Yellow Medicine County, MN |          10,128 |
 
 
-```{r fig.cap = "Figure 2.4 from Teaching Statistics, a bag of tricks by Gelman and Nolan.", fig.alt = "The caption reads: the counties of the United States with the lowest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989.  Surprisingly, the pattern is somewhat similar to the map of the highest rates, show in Figure 2.3.", preview = TRUE, out.width="75%", echo = FALSE}
-knitr::include_graphics("figs/lowkidney.jpeg")
-```
+<div class="figure">
+<img src="figs/lowkidney.jpeg" alt="The caption reads: the counties of the United States with the lowest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989.  Surprisingly, the pattern is somewhat similar to the map of the highest rates, show in Figure 2.3." width="75%" />
+<p class="caption">(\#fig:unnamed-chunk-14)Figure 2.4 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
+</div>
 
 :::
 

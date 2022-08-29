@@ -1,7 +1,7 @@
 --- 
 title: "Statistical Theory"
 author: "Jo Hardin"
-date: "2022-08-14"
+date: "2022-08-28"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -19,7 +19,7 @@ description: "Class notes for Math 152 at Pomona College: Statistical Theory.  T
 
 # Class Information {-}
 
-Class notes for Math 152 at Pomona College: Computational Statistics.  The notes are based extensively on Probability & Statistics by DeGroot and Schervish [@degroot].
+Class notes for Math 152 at Pomona College: Computational Statistics.  The notes are based extensively on Probability & Statistics [@degroot].
 
 
 You are responsible for reading the relevant chapters in the text.  The text is very good & readable, so you should use it.   You should make sure you are coming to class and also re-visiting the warm-ups after feedback is provided.
