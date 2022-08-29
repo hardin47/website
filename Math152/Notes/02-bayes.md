@@ -11,9 +11,12 @@
 % John Kruschke
 -->
 
+
+
+
 ## Bayes' Rule
 
-::: {.theorem #unnamed-chunk-1}
+::: {.theorem #unnamed-chunk-2}
 **Bayes' Rule**  
 
 Given events $A$ and $B$,
@@ -26,7 +29,7 @@ P(A|B) &=& \frac{P(AB)}{P(B)} = \frac{P(B|A) P(A)}{P(AB) + P(A^cB)} \nonumber \\
 
 Many of the following examples may be familiar to you.  When reading them, work to understand both the intuition (the **denominator** changes when we condition!) as well as the mathematical connection to Bayes' Rule.
 
-::: {.example #unnamed-chunk-2}
+::: {.example #unnamed-chunk-3}
 Suppose the rate of infection with TB is 1 in 1000 (about 0.1 percent = 0.001).  Suppose a TB test is used which is 90% accurate: it gives a positive result for 10 percent of people who do not actually have TB, but do have a reaction to the skin test. Also, 10% of the people who actually have TB fail to react to the test.^[Example taken from *A Course in Probability* by Neil Weiss.]
 
 * What's the chance that someone has TB if they test positive?
@@ -43,7 +46,7 @@ Suppose the rate of infection with TB is 1 in 1000 (about 0.1 percent = 0.001). 
 * 0.009
 :::
 
-::: {.example #unnamed-chunk-3}
+::: {.example #unnamed-chunk-4}
 A cab was involved in a hit and run accident at night.  Two cab companies, the Green and the Blue, operate in the city.  Suppose you are told the following:
 
 * 85 percent of the cabs in the city are Green, and the remaining 15 percent are Blue.
@@ -68,7 +71,7 @@ P(B | said B) &=& \frac{P(said B | B) P(B)}{P(said B | G) P(G) + P(said B | B) P
 \end{eqnarray*}
 :::
 
-::: {.example #unnamed-chunk-4}
+::: {.example #unnamed-chunk-5}
 Consider the famous Monte Hall problem based on a game show, *Let's Make a Deal*.   As part of the show, the contestant is asked to pick one of three doors.  Two of the doors have nothing behind them, and the third door has a car as a prize.  Monte Hall (the host) opens a non-prize door that the contestant hadn't chosen (there is always such a door available to open because there is only one prize).  Monte then offers the contestant the opportunity to switch from the original door to the remaining door.  Should she switch?  Stay?  Or it doesn't matter?  What is the probability of winning under each of the situations?
 
 
@@ -123,7 +126,7 @@ A **prior distribution** is the distribution of a parameter (e.g., $\theta$) bef
 * **Bayesians** believe we should use prior distributions for all our modeling because we always know *something* about the situation at hand.
 * **Frequentists** believe we should only use the data collected in the experiment or sample (and no prior information).
 
-::: {.example #unnamed-chunk-5}
+::: {.example #unnamed-chunk-6}
 We want to predict the high temperature on a given day in October.
 \begin{align*}
 \Omega = \{ (\theta, \sigma^2) &: \theta \in I\!\!R, \sigma^2 \in I\!\!R^+\}\\
@@ -149,7 +152,7 @@ A **posterior distribution** is the conditional distribution of the parameter (e
 Aside, a little probability review:
 
 
-::: {.example #unnamed-chunk-6}
+::: {.example #unnamed-chunk-7}
 Suppose you are interested in rolling two dice.  Let $X$ be the larger value; let $Y$ be the sum of the two dice.  Find the **joint** and **marginal** distributions of $X$ and $Y$.  The solution is a table of **probabilities**:
 
 | $X \backslash Y$ |        2       |        3       |        4       |        5       |        6       |        7       |        8       |        9       |       10       |       11       |       12       |       P(X)      |
@@ -209,7 +212,7 @@ So, the posterior is proportional to the product of the likelihood and the prior
 \end{eqnarray*}
 
 
-::: {.example #unnamed-chunk-7}
+::: {.example #unnamed-chunk-8}
 Suppose the true proportion of freethrows that Steph Curry is able to make successfully is unknown.  We assume that his freethrows are **distributed** according to a Bernoulli process.
 
 \begin{displaymath}
@@ -290,7 +293,7 @@ What if we do have some information about the prior distribution on $\theta$?  S
 
 A **conjugate prior distribution** is one where the prior distribution is in the same family as the posterior distribution.  The Beta distribution is conjugate to the Binomial distribution (note, the $U[0,1]$ distribution is Beta($\alpha$=1,$\beta$=1)).
 
-::: {.example #unnamed-chunk-8}
+::: {.example #unnamed-chunk-9}
 Continuing the example on temperature, $X \sim N(\theta, \sigma^2$ (known)) with a normal prior, $\theta \sim N(\mu, \nu^2)$.  Remember that typically, a prior is completely specified.  In our example $\mu=78$ and $\nu=2.5$.  We have:\\
 \begin{eqnarray*}
 f(\underline{x} | \theta) &\propto& \exp \bigg[ - \frac{1}{2 \sigma^2} \sum_{i=1}^n (x_i - \theta)^2 \bigg]\\
@@ -373,7 +376,7 @@ We want an estimator of $\theta$ that leads to an estimate which is close to the
 We want the loss to be small (minimized).
 
 
-#### Squared Error Loss
+#### Squared Error Loss {-}
 
 **Without data**, find $a$ that minimizes:
 \begin{eqnarray*}
@@ -434,7 +437,7 @@ f(\underline{x} | \theta) &=& \prod_{i=1}^n \frac{e^{-\theta} \theta^{x_i}}{x_i!
 Note: The Gamma distribution is parameterized slightly differently in DeGroot and on your sheet (as is the exponential).  Make sure the expected value matches what you've been given in the problem.
 :::
 
-#### Absolute Loss
+#### Absolute Loss {-}
 
 How do we minimize $E[ | \theta - a |  | \underline{X}]$ ?  $ \rightarrow \ \ \ \delta^*(\underline{X}) = \mbox{median} (\theta | \underline{X})$ (see Theorem 4.5.1).  However, it isn't always obvious how to compute the median for non-symmetric distributions.  And for symmetric distributions median = mean.
 
@@ -455,7 +458,7 @@ bias(\tilde{p}) &=& \frac{n\theta+2}{n+4} - \theta\\
 \end{eqnarray*}
 
 
-#### MSE in general ("Frequentist")
+#### MSE in general ("Frequentist") {-}
 
 The Mean Squared Error (MSE) is the expected squared difference between a parameter ($\theta$) and its estimate ($\hat{\theta}$), where, typically, $\hat{\theta}$ is a function of the data.
 
@@ -481,7 +484,7 @@ bias(\hat{\theta}) &=& E(\hat{\theta}) - \theta = 0\\
 MSE_F(\hat{\theta}) &=& \frac{\theta}{n}\\
 \end{eqnarray*}
 
-#### Bayesian MSE
+#### Bayesian MSE {-}
 
 For Bayesians, the MSE is simply the expected squared error loss conditional on the data (that is, the expected value is taken on the posterior, $\theta | \underline{X}$.)  
 
@@ -506,7 +509,7 @@ MSE_B(\delta(X)) &=& \frac{(X+a)(n+a+b)}{(n+a+b)^2(n+a+b+1)}\\
 Note that the Bayesian MSE is simply the posterior variance of the parameter of interest.  This is because we've used the expected value as our estimate, so there is no bias.  Note that the Bayesian MSE is a function of the data (and **not** $\theta$), so we cannot compare the Bayesian MSE and the Frequentist MSE directly.
 
 
-::: {.example #unnamed-chunk-9}
+::: {.example #unnamed-chunk-10}
 Recall the tape example, Example \@ref(exm:tape).  
 
 * Prior: Gamma(2, 10)  (or (2, 1/10) depending on how you parametrize))
@@ -550,7 +553,7 @@ Note that we couldn't directly compare $MSE_F$ and $MSE_B$ (they are functions o
 
 How sensitive are our results to different priors?
 
-::: {.example #unnamed-chunk-10}
+::: {.example #unnamed-chunk-11}
 Continuing with the tape example, Example \@ref(exm:tape), below are different values for the estimate of theta depending on different priors and data values:
 
 |                 | $\alpha = 2, \beta = 10$ | $\alpha = 8, \beta = 10$ | $\alpha = 2, \beta = 20$ |
@@ -579,7 +582,7 @@ Note, an estimator $Y_n$ converges to $\theta$ in probability if:
 
 (You saw this idea in the weak and strong laws of large numbers: $\overline{X} \stackrel{P}{\rightarrow} \mu$ as $n \rightarrow \infty$ is the Weak Law of Large Numbers.) [n.b.  In case you are curious, the strong law of large numbers says that $\overline{X} \stackrel{a.s.}{\rightarrow} \mu$ (almost surely).  That means $\lim_{n \rightarrow \infty} P [ \overline{X} = \mu ] = 1$
 
-::: {.example #unnamed-chunk-11}
+::: {.example #unnamed-chunk-12}
 Continuing with the tape example, Example \@ref(exm:tape):
 \begin{eqnarray*}
 \delta^*(\underline{X}) &=& \frac{\sum X_i + \alpha}{n+\beta}\\
@@ -609,7 +612,7 @@ $\delta^*(\underline{X})$ is a consistent estimator of $\theta$.
 
 ## Additional Examples
 
-::: {.example #unnamed-chunk-12}
+::: {.example #unnamed-chunk-13}
 Suppose there is a Beta(4,4) prior distribution on the probability $\theta$ that a coin will yield a `head` when spun in a specified manner.  The coin is independently spun ten times, and `heads` appears fewer than 3 times.  You are not told how many heads were seen, only that the number is less than 3.  Calculate your exact posterior density for $\theta$.^[Problem taken from *Bayesian Data Analysis* by Gelman, Carlin, Stern, and Rubin.]
 :::
 
@@ -681,7 +684,7 @@ MSE(\hat{\theta}) = E[(\hat{\theta} - \theta)^2] = Var(\hat{\theta}) + bias^2(\h
 
 <div class="figure">
 <img src="figs/highkidney.jpeg" alt="The caption reads: the counties of the United States with the highest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989." width="75%" style='transform:rotate(270deg);' />
-<p class="caption">(\#fig:unnamed-chunk-13)Figure 2.3 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
+<p class="caption">(\#fig:unnamed-chunk-14)Figure 2.3 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
 </div>
 
 * Consider figure 13.4, the highest 10% of Bayes-estimated kidney cancer death rates in the US (white men, 1980-1989).  Let's assume that number of deaths is distributed Poisson($n_j \theta_j$) where $n_j$ is the number of people in the county, and $\theta_j$ is the true kidney cancer death rate in that county.  Further, we will assume that there are no outside influences on kidney cancer (e.g., pollution) and that each county's cancer rate comes from a Gamma distribution with parameters ($\alpha = 61, \beta = 47000$).  That is,
@@ -734,7 +737,7 @@ We know that $E[\theta | y] = \frac{\alpha + y}{m + \beta}$.  How does this esti
 
 <div class="figure">
 <img src="figs/lowkidney.jpeg" alt="The caption reads: the counties of the United States with the lowest 10% age-standardized death rates for cancer of kidney/ureter for U.S. white males, 1980-1989.  Surprisingly, the pattern is somewhat similar to the map of the highest rates, show in Figure 2.3." width="75%" />
-<p class="caption">(\#fig:unnamed-chunk-14)Figure 2.4 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
+<p class="caption">(\#fig:unnamed-chunk-15)Figure 2.4 from Teaching Statistics, a bag of tricks by Gelman and Nolan.</p>
 </div>
 
 :::
@@ -743,17 +746,158 @@ We know that $E[\theta | y] = \frac{\alpha + y}{m + \beta}$.  How does this esti
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-1. 
+1. What is a prior distribution?  What is the random variable described by a prior?
+2. What is a likelihood?  What is the random variable described by a likelihood?
+3. What is a posterior distribution?  What is the random variable described by a posterior?
+4. What is a conjugate prior?  What is the benefit of a conjugate prior?
+5. Is all hope lost if the prior is not conjugate?  If it is not, how would we approach the problem of coming up with a posterior?
+
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. When does it make sense to incorporate prior information?  When doesn't it make sense to incorporate prior information?
+2. What are some legitimate ways to calculate a prior?  What are some illegitimate ways to calculate a prior?
+3. How is an analyst able to come up with a prior or a likelihood?  
 
 
 ## R code: Bayesian Examples
 
 ::: {.example}
 
-Recall the Baseball and Bayes example, Example \@ref(exm:baseball).  
+Recall the Baseball and Bayes example, Example \@ref(exm:baseball).
+
+The functions allow us to label each plot with the parameter information.
+
+
+```r
+library(tidyverse)
+library(glue)
+
+ex <- function(a,b) {round(a / (a+b), 2)}
+sdx <- function(a,b) {round(sqrt(a*b/((a+b)^2 * (a+b+1))),3)}
+
+beta_legend <- function(a,b) {
+  glue::glue('a = {a}, ',
+             'b = {b}, ',
+             'EX = {ex(a,b)}, ',
+             'SDX = {sdx(a,b)}')}
+
+# see it in action:
+ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3,17), n = 100) + 
+  ggtitle(beta_legend(3,17)) + ylab("y") + xlab("theta")
+```
+
+<img src="02-bayes_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+
+#### Priors: {-}
+
+By trying out a variety of different values for $a$ and $b$, the prior distributions can be visualized.
+
+
+```r
+library(patchwork)
+
+p1 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3,17), n = 100) + 
+  ggtitle(beta_legend(3,17)) + ylab("y") + xlab("theta")
+p2 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(2,15), n = 100) + 
+  ggtitle(beta_legend(2,15)) + ylab("y") + xlab("theta") 
+p3 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(1,8), n = 100) + 
+  ggtitle(beta_legend(1,8)) + ylab("y") + xlab("theta")
+p4 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(12,68), n = 100) + 
+  ggtitle(beta_legend(12,68)) + ylab("y") + xlab("theta") 
+p5 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(1, 17), n = 100) + 
+  ggtitle(beta_legend(1, 17)) + ylab("y") + xlab("theta") 
+p6 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3, 47), n = 100) + 
+  ggtitle(beta_legend(3, 47)) + ylab("y") + xlab("theta") 
+p7 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(2, 36), n = 100) + 
+  ggtitle(beta_legend(2, 36)) + ylab("y") + xlab("theta") 
+p8 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(9, 162), n = 100) + 
+  ggtitle(beta_legend(9, 162)) + ylab("y") + xlab("theta") 
+
+
+(p1 + p2) / (p3 + p4) + 
+  plot_annotation(
+    title = "Possible Prior Distributions I")
+```
+
+<img src="02-bayes_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+
+```r
+(p5 + p6) / (p7 + p8) + 
+  plot_annotation(
+    title = "Possible Prior Distributions II")
+```
+
+<img src="02-bayes_files/figure-html/unnamed-chunk-17-2.png" width="672" />
+
+
+#### MSE: {-}
+
+Which prior distribution should be used?  The answer is that it depends!  Of course, if we have a lot of information about the situation, we should use a steep prior that contains the known information.  If our information is weak, we should use a flat prior.
+
+Mean Squared Error can be used to determine if the prior was the correct one to use, but only if we know the true value of $\theta$!!  In this case, we'll compare the MSE of the Bayesian estimator with the MSE of the frequentist estimator under various *truth* conditions.  Because we are comparing apples to oranges (Bayesian vs. frequentist), we are forced to use the frequentist formulation of the MSE (there is no way to find an expected value or variance of the $\theta$ random variable under the frequentist paradigm).
+
+Consider $X$ to be the random variable with a Binomial(n=10, $\theta$) distribution. In the Bayesian setting, $\hat{\theta} = (x+\alpha) / (n+\alpha+\beta)$.  Deriving the $MSE$ (as a function of $\theta$) below is given as a homework problem. 
+
+\begin{eqnarray*}
+\mbox{MSE}_F(\hat{\theta}) &=& \mbox{var}(\hat{\theta}) + (\mbox{bias}(\hat{\theta}))^2\\
+&=& \frac{(\alpha-\alpha\theta-\beta\theta)^2+n\theta(1-\theta)}{(n+\alpha+\beta)^2} 
+\end{eqnarray*}
+
+
+```r
+# frequentist MSE for Bayesian estimator
+mse_b <- function(t,a,b,n) {
+  ( (a - a*t - b*t)^2 + n*t*(1-t) ) / (n + a + b)^2
+}
+
+# frequentist MSE for frequentist estimator
+mse_f <- function(t, n){
+  t*(1-t) / n
+}
+```
+
+
+Now the MSE functions can be used to plot different error rates.  Note that the value on the x-axis is thought of to be the **truth**, and the value on the y-axis is how bad the estimator is (as measured by mean squared error).
+
+
+```r
+t <- data.frame(theta = seq(0, 1, by = 0.01))
+
+ggplot(t) + 
+  geom_line(aes(x = theta, y = mse_f(theta, 10), color = "frequentist est")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 1, 17, 10), color = "beta(1,17) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 3, 47, 10), color = "beta(3,47) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 2, 36, 10), color = "beta(2,36) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 9, 162, 10), color = "beta(9,162) prior")) +
+  ylab("MSE") + 
+  ggtitle("MSE for frequentist and different beta priors")
+```
+
+<img src="02-bayes_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+
+```r
+ggplot(t) + 
+  geom_line(aes(x = theta, y = mse_f(theta, 10), color = "frequentist est")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 1, 17, 10), color = "beta(1,17) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 3, 47, 10), color = "beta(3,47) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 2, 36, 10), color = "beta(2,36) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 9, 162, 10), color = "beta(9,162) prior")) +
+  ylab("MSE") + 
+  ggtitle("MSE zoomed in") +
+  ylim(c(0, 0.05))
+```
+
+<img src="02-bayes_files/figure-html/unnamed-chunk-19-2.png" width="672" />
+
 
 :::

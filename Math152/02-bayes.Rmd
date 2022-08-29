@@ -11,6 +11,11 @@
 % John Kruschke
 -->
 
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
 ## Bayes' Rule
 
 ```{theorem}
@@ -373,7 +378,7 @@ We want an estimator of $\theta$ that leads to an estimate which is close to the
 We want the loss to be small (minimized).
 
 
-#### Squared Error Loss
+#### Squared Error Loss {-}
 
 **Without data**, find $a$ that minimizes:
 \begin{eqnarray*}
@@ -434,7 +439,7 @@ f(\underline{x} | \theta) &=& \prod_{i=1}^n \frac{e^{-\theta} \theta^{x_i}}{x_i!
 Note: The Gamma distribution is parameterized slightly differently in DeGroot and on your sheet (as is the exponential).  Make sure the expected value matches what you've been given in the problem.
 ```
 
-#### Absolute Loss
+#### Absolute Loss {-}
 
 How do we minimize $E[ | \theta - a |  | \underline{X}]$ ?  $ \rightarrow \ \ \ \delta^*(\underline{X}) = \mbox{median} (\theta | \underline{X})$ (see Theorem 4.5.1).  However, it isn't always obvious how to compute the median for non-symmetric distributions.  And for symmetric distributions median = mean.
 
@@ -455,7 +460,7 @@ bias(\tilde{p}) &=& \frac{n\theta+2}{n+4} - \theta\\
 \end{eqnarray*}
 
 
-#### MSE in general ("Frequentist")
+#### MSE in general ("Frequentist") {-}
 
 The Mean Squared Error (MSE) is the expected squared difference between a parameter ($\theta$) and its estimate ($\hat{\theta}$), where, typically, $\hat{\theta}$ is a function of the data.
 
@@ -481,7 +486,7 @@ bias(\hat{\theta}) &=& E(\hat{\theta}) - \theta = 0\\
 MSE_F(\hat{\theta}) &=& \frac{\theta}{n}\\
 \end{eqnarray*}
 
-#### Bayesian MSE
+#### Bayesian MSE {-}
 
 For Bayesians, the MSE is simply the expected squared error loss conditional on the data (that is, the expected value is taken on the posterior, $\theta | \underline{X}$.)  
 
@@ -741,17 +746,141 @@ knitr::include_graphics("figs/lowkidney.jpeg")
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-1. 
+1. What is a prior distribution?  What is the random variable described by a prior?
+2. What is a likelihood?  What is the random variable described by a likelihood?
+3. What is a posterior distribution?  What is the random variable described by a posterior?
+4. What is a conjugate prior?  What is the benefit of a conjugate prior?
+5. Is all hope lost if the prior is not conjugate?  If it is not, how would we approach the problem of coming up with a posterior?
+
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. When does it make sense to incorporate prior information?  When doesn't it make sense to incorporate prior information?
+2. What are some legitimate ways to calculate a prior?  What are some illegitimate ways to calculate a prior?
+3. How is an analyst able to come up with a prior or a likelihood?  
 
 
 ## R code: Bayesian Examples
 
 ::: {.example}
 
-Recall the Baseball and Bayes example, Example \@ref(exm:baseball).  
+Recall the Baseball and Bayes example, Example \@ref(exm:baseball).
+
+The functions allow us to label each plot with the parameter information.
+
+```{r}
+library(tidyverse)
+library(glue)
+
+ex <- function(a,b) {round(a / (a+b), 2)}
+sdx <- function(a,b) {round(sqrt(a*b/((a+b)^2 * (a+b+1))),3)}
+
+beta_legend <- function(a,b) {
+  glue::glue('a = {a}, ',
+             'b = {b}, ',
+             'EX = {ex(a,b)}, ',
+             'SDX = {sdx(a,b)}')}
+
+# see it in action:
+ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3,17), n = 100) + 
+  ggtitle(beta_legend(3,17)) + ylab("y") + xlab("theta")
+```
+
+#### Priors: {-}
+
+By trying out a variety of different values for $a$ and $b$, the prior distributions can be visualized.
+
+```{r}
+library(patchwork)
+
+p1 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3,17), n = 100) + 
+  ggtitle(beta_legend(3,17)) + ylab("y") + xlab("theta")
+p2 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(2,15), n = 100) + 
+  ggtitle(beta_legend(2,15)) + ylab("y") + xlab("theta") 
+p3 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(1,8), n = 100) + 
+  ggtitle(beta_legend(1,8)) + ylab("y") + xlab("theta")
+p4 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(12,68), n = 100) + 
+  ggtitle(beta_legend(12,68)) + ylab("y") + xlab("theta") 
+p5 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(1, 17), n = 100) + 
+  ggtitle(beta_legend(1, 17)) + ylab("y") + xlab("theta") 
+p6 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(3, 47), n = 100) + 
+  ggtitle(beta_legend(3, 47)) + ylab("y") + xlab("theta") 
+p7 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(2, 36), n = 100) + 
+  ggtitle(beta_legend(2, 36)) + ylab("y") + xlab("theta") 
+p8 <- ggplot(data = data.frame(x = c(0, 1)), mapping = aes(x = x)) +
+  stat_function(fun = dbeta, args = c(9, 162), n = 100) + 
+  ggtitle(beta_legend(9, 162)) + ylab("y") + xlab("theta") 
+
+
+(p1 + p2) / (p3 + p4) + 
+  plot_annotation(
+    title = "Possible Prior Distributions I")
+  
+(p5 + p6) / (p7 + p8) + 
+  plot_annotation(
+    title = "Possible Prior Distributions II")
+```
+
+
+#### MSE: {-}
+
+Which prior distribution should be used?  The answer is that it depends!  Of course, if we have a lot of information about the situation, we should use a steep prior that contains the known information.  If our information is weak, we should use a flat prior.
+
+Mean Squared Error can be used to determine if the prior was the correct one to use, but only if we know the true value of $\theta$!!  In this case, we'll compare the MSE of the Bayesian estimator with the MSE of the frequentist estimator under various *truth* conditions.  Because we are comparing apples to oranges (Bayesian vs. frequentist), we are forced to use the frequentist formulation of the MSE (there is no way to find an expected value or variance of the $\theta$ random variable under the frequentist paradigm).
+
+Consider $X$ to be the random variable with a Binomial(n=10, $\theta$) distribution. In the Bayesian setting, $\hat{\theta} = (x+\alpha) / (n+\alpha+\beta)$.  Deriving the $MSE$ (as a function of $\theta$) below is given as a homework problem. 
+
+\begin{eqnarray*}
+\mbox{MSE}_F(\hat{\theta}) &=& \mbox{var}(\hat{\theta}) + (\mbox{bias}(\hat{\theta}))^2\\
+&=& \frac{(\alpha-\alpha\theta-\beta\theta)^2+n\theta(1-\theta)}{(n+\alpha+\beta)^2} 
+\end{eqnarray*}
+
+```{r}
+# frequentist MSE for Bayesian estimator
+mse_b <- function(t,a,b,n) {
+  ( (a - a*t - b*t)^2 + n*t*(1-t) ) / (n + a + b)^2
+}
+
+# frequentist MSE for frequentist estimator
+mse_f <- function(t, n){
+  t*(1-t) / n
+}
+```
+
+
+Now the MSE functions can be used to plot different error rates.  Note that the value on the x-axis is thought of to be the **truth**, and the value on the y-axis is how bad the estimator is (as measured by mean squared error).
+
+```{r}
+t <- data.frame(theta = seq(0, 1, by = 0.01))
+
+ggplot(t) + 
+  geom_line(aes(x = theta, y = mse_f(theta, 10), color = "frequentist est")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 1, 17, 10), color = "beta(1,17) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 3, 47, 10), color = "beta(3,47) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 2, 36, 10), color = "beta(2,36) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 9, 162, 10), color = "beta(9,162) prior")) +
+  ylab("MSE") + 
+  ggtitle("MSE for frequentist and different beta priors")
+ 
+
+ggplot(t) + 
+  geom_line(aes(x = theta, y = mse_f(theta, 10), color = "frequentist est")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 1, 17, 10), color = "beta(1,17) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 3, 47, 10), color = "beta(3,47) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 2, 36, 10), color = "beta(2,36) prior")) + 
+  geom_line(aes(x = theta, y = mse_b(theta, 9, 162, 10), color = "beta(9,162) prior")) +
+  ylab("MSE") + 
+  ggtitle("MSE zoomed in") +
+  ylim(c(0, 0.05))
+```
+
 
 :::
