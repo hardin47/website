@@ -350,10 +350,10 @@ Remember, when we are computing the posterior for $\theta$, we can ignore anythi
 
 | Prior  | Likelihood                    | Posterior |
 |--------|-------------------------------|-----------|
-| Beta   | Geometric, Negative Binomial  | Beta      |
-| Gamma  | first parameter), exponential | Gamma     |
-| Normal | Normal (with known second     | Normal    |
-
+| Beta   | Bernoulli, Binomial, Geometric, Negative Binomial  | Beta      |
+| Gamma  | Poisson, Gamma (with known first parameter), exponential | Gamma     |
+| Normal | Normal (with known second parameter)    | Normal    |
+: Some of the conjugate families.  Note that to be conjugate, the prior distribution will be of the *same* family as the posterior distribution.
 
 ## Improper Priors
 
