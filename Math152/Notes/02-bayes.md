@@ -249,13 +249,13 @@ So, the posterior is proportional to the product of the likelihood and the prior
 ::: {.example #unnamed-chunk-5}
 Suppose the true proportion of freethrows that Steph Curry is able to make successfully is unknown.  We assume that his freethrows are **distributed** according to a Bernoulli process.
 
-\begin{displaymath}
+\begin{eqnarray*}
 X = \left\{ \begin{array}{ll}
     1 & \mbox{Curry makes the shot}\\
     0 & \mbox{Curry misses the shot}\\
     \end{array} \right.
-    \end{displaymath}
-
+\end{eqnarray*}
+    
 We say,
 \begin{eqnarray*}
 X &\sim& \mbox{Bernoulli}(\theta)\\
@@ -269,12 +269,12 @@ Note: here $\underline{x} = \{x_1, x_2, \ldots, x_n\}$ is a specific ordering of
 
 If we have **no prior** information about Curry's abilities, we put a uniform prior on $\theta$.
 
-\begin{displaymath}
+\begin{eqnarray*}
 \xi(\theta) = \left\{ \begin{array}{ll}
     1 & 0 \leq \theta \leq 1\\
     0 & \mbox{else}\\
     \end{array} \right.
-    \end{displaymath}
+\end{eqnarray*}
 
 \begin{eqnarray*}
 \xi(\theta | \underline{x}) \propto \theta^y (1-\theta)^{n-y} I_{[0,1]}(\theta)
@@ -359,12 +359,12 @@ Remember, when we are computing the posterior for $\theta$, we can ignore anythi
 
 Improper prior distributions are not actually probability functions, yet they lead to posterior distributions that are probability functions (that is, they integrate to 1).   Improper priors capture the idea that the data are worth more than the prior belief.  Often, an improper prior will lead to a Frequentist result.  For example, a Beta(0,0) prior with a Bernoulli likelihood leads to:
 
-\begin{displaymath}
+\begin{eqnarray*}
 \xi(\theta) = \left\{ \begin{array}{ll}
     \theta^{-1}(1-\theta)^{-1} & 0 \leq \theta \leq 1\\
     0 & \mbox{else}\\
     \end{array} \right.
-    \end{displaymath}
+\end{eqnarray*}
 
 Where $\xi(\theta)$ does not integrate to 1, so is not a proper pdf.  However the posterior is a proper pdf,
 
