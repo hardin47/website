@@ -328,7 +328,7 @@ What if we do have some information about the prior distribution on $\theta$?  S
 A **conjugate prior distribution** is one where the prior distribution is in the same family as the posterior distribution.  The Beta distribution is conjugate to the Binomial distribution (note, the $U[0,1]$ distribution is Beta($\alpha$=1,$\beta$=1)).
 
 ::: {.example #unnamed-chunk-6}
-Continuing the example on temperature, $X \sim N(\theta, \sigma^2$ (known)) with a normal prior, $\theta \sim N(\mu, \nu^2)$.  Remember that typically, a prior is completely specified.  In our example $\mu=78$ and $\nu=2.5$.  We have:\\
+Continuing the example on temperature, $X \sim N(\theta, \sigma^2$ (known)) with a normal prior, $\theta \sim N(\mu, \nu^2)$.  Remember that typically, a prior is completely specified.  In our example $\mu=78$ and $\nu=2.5$.  We have:
 \begin{eqnarray*}
 f(\underline{x} | \theta) &\propto& \exp \bigg[ - \frac{1}{2 \sigma^2} \sum_{i=1}^n (x_i - \theta)^2 \bigg]\\
 &\propto& \exp \Bigg[ - \frac{1}{2 \sigma^2} \bigg(n (\theta-\overline{x})^2 + \sum_{i=1}^n (x_i - \overline{x})^2 \bigg) \Bigg]\\
@@ -473,7 +473,7 @@ Note: The Gamma distribution is parameterized slightly differently in DeGroot an
 
 #### Absolute Loss {-}
 
-How do we minimize $E[ | \theta - a |  | \underline{X}]$ ?  $ \rightarrow \ \ \ \delta^*(\underline{X}) = \mbox{median} (\theta | \underline{X})$ (see Theorem 4.5.1).  However, it isn't always obvious how to compute the median for non-symmetric distributions.  And for symmetric distributions median = mean.
+How do we minimize $E[ | \theta - a |  | \underline{X}]$ ?  $\rightarrow \ \ \ \delta^*(\underline{X}) = \mbox{median} (\theta | \underline{X})$ (see Theorem 4.5.1 in @degroot).  However, it isn't always obvious how to compute the median for non-symmetric distributions.  And for symmetric distributions median = mean.
 
 ## Evaluating Bayes Estimators
 
@@ -522,7 +522,7 @@ MSE_F(\hat{\theta}) &=& \frac{\theta}{n}\\
 
 For Bayesians, the MSE is simply the expected squared error loss conditional on the data (that is, the expected value is taken on the posterior, $\theta | \underline{X}$.)  
 
-> The Bayesian MSE is based on expected values taken with the posterior pdf ($\theta | \underline{X}$).
+> The Bayesian MSE is based on expected values taken with the posterior pdf ($\theta | \underline{X}).$
 
 
 If we let $\delta = \delta(\underline{X}) = E(\theta | \underline{X})$ be our estimator, the MSE is:
@@ -901,7 +901,7 @@ mse_f <- function(t, n){
 ```
 
 
-Now the MSE functions can be used to plot different error rates.  Note that the value on the x-axis is thought of to be the **truth**, and the value on the y-axis is how bad the estimator is (as measured by mean squared error).
+The MSE can be used to assess the estimator (which may or may not be a function of the prior information).  Note that the value on the x-axis is the **truth**, and the value on the y-axis is how good / bad the estimator is (as measured by mean squared error).
 
 
 ```r
