@@ -1,0 +1,423 @@
+
+
+# Maximum Likelihood Estimation {#MLE}
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
+Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions.  MLE chooses $\hat{\theta}$ as the estimate of $\theta$ that **maximizes** the likelihood function (easily the most widely used estimation method in statistics).
+
+Let's say $X \sim U[0, \theta].$  We collect $X=47.$  Would you ever pick $\theta=10?$  No!  $10 \notin \Omega!$
+
+
+Let's say that $X \sim$ Bin($\theta,$n=4).  If we have 4 independent trials, and X=1, would you chose $\theta=0.99?$  But $0.99 \in \Omega???$  You would choose $\theta = 0.25.$  Why?  Because you maximized the likelihood.
+
+\begin{eqnarray*}
+P(X=1 | \theta = 0.25) &=& 0.422\\
+P(X=1 | \theta = 0.5) &=& 0.25\\
+P(X=1 | \theta = 0.05)  &=& 0.171\\
+P(X=1 | \theta = 0.15) &=& 0.368\\
+\end{eqnarray*}
+You maximized the probability of seeing your data!
+
+::: {.example}
+Let's say that houses on a block have their electricity connected in such a way that it only works for house #47 if all the neighbor's electricity works (in sequence).  Sometimes a house's electricity will fail (w/prob p).  To how many houses can we expect to provide electricity?  What is our best guess of p? 
+
+Data:  let's say we have $n$ neighborhoods with information on which house lost electricity. [What is the distribution of $X?$  $X \sim geometric(p),$ which means $E[X] = 1/p.]$
+
+\begin{eqnarray*}
+f(x_i | p) &=& p (1-p)^{x_i -1}\\
+f(\underline{x} | p) &=& \prod_{i=1}^n p (1-p)^{x_i -1}\\
+&=& p^n (1-p)^{\sum x_i -n}\\
+&& \mbox{we want to maximize wrt } p
+\end{eqnarray*}
+
+
+Often, the log-likelihood is easier to maximize than the likelihood.  We define the log likelihood as
+\begin{eqnarray*}
+L(\theta) = \ln f(\underline{X} | \theta).
+\end{eqnarray*}
+
+For example,
+\begin{eqnarray*}
+L(p) &=& \ln f(\underline{x} | p) = n \ln(p) + (\sum x_i -n) \ln(1-p)\\
+\frac{\partial L(p)}{\partial p} &=& \frac{n}{p} + \frac{(\sum x_i -n)(-1)}{(1-p)} = 0\\
+\hat{p} &=& \frac{1}{\overline{X}}
+\end{eqnarray*}
+
+
+If $\overline{x} = 10$, $\hat{p} = 1/10$ (1 failure at 10 homes).  E[X] = 1/p.  (If we let $\theta = E[X] -1$, then a good estimate of the expected (average) number of homes to which we can provide electricity is $1/\hat{p} -1 = 10 - 1$.  It turns out that the MLE has the invariance property which says that a function of the MLE is the MLE of that function of the parameter.)
+
+
+Note that we've found a maximum:
+\begin{eqnarray*}
+\frac{\partial^2 L(p)}{\partial p^2} &=& \frac{2np -n -p^2\sum x_i}{p^2 (1-p)^2}\\
+&\leq& \frac{2p n - n -p^2n}{p^2 (1-p)^2}\\
+(\mbox{because } n &\leq& \sum x_i)\\
+&=& \frac{n ( -2p + 1 +p^2}{p^2 (1-p)^2}\\
+&=& \frac{-n}{p^2} < 0\\
+\end{eqnarray*}
+
+:::
+
+
+::: {.definition}
+Maximum Likelihood Estimator (Def 7.5.2).  
+For each possible observed vector $\underline{x}$, let $\delta(\underline{x}) \in \Omega$ denote a value of $\theta \in \Omega$ for which the likelihood function, $f(\underline{x}|\theta)$ is a maximum, and let $\hat{\theta} = \delta(\underline{X})$ be the estimator of $\theta$ defined in this way.  The estimator for $\hat{\theta}$ is called a **maximum likelihood estimator** of $\theta.$  After $\underline{X} = \underline{x}$ is observed, the value $\delta(\underline{x})$ is called a *maximum likelihood estimate* of $\theta.$
+:::
+
+#### Sampling from a Normal Distribution {-}
+
+\begin{eqnarray*}
+X_1, X_2, \ldots X_n &\sim& N(\mu, \sigma^2)  \ \ \ \mu \ \& \ \sigma^2 \mbox{ are fixed but unknown}\\
+f(x_i | \mu, \sigma^2) &=& \frac{1}{\sqrt{2 \pi \sigma^2}} \exp [ \frac{-1}{2\sigma^2}(x_i - \mu)^2 ]\\
+f(\underline{x} | \mu, \sigma^2) &=& \frac{1}{(2 \pi \sigma^2)^{n/2}} \exp [ \frac{-1}{2\sigma^2}\sum_{i=1}^n(x_i - \mu)^2 ]\\
+L(\mu, \sigma^2) &=& \frac{-n}{2}\ln(2\pi\sigma^2) - \frac{1}{2 \sigma^2} \sum(x_i - \mu)^2\\
+\end{eqnarray*}
+
+
+We want to maximize $f(\underline{x}|\mu, \sigma^2)$ with respect to $\mu;$ equivalently, we can minimize $\sum (x_i - \mu)^2.$
+
+\begin{eqnarray*}
+\mbox{Let } Q(\mu) &=& \sum(x_i - \mu)^2\\
+\frac{\partial Q(\mu)}{\partial \mu} &=& -2 \sum(x_i - \mu) = 0\\
+-2 \sum x_i &=& -2 n \mu\\
+\hat{\mu} &=& \overline{x}
+\end{eqnarray*}
+
+
+Because the MLE for $\mu$ doesn't depend on $\sigma^2$, we know that the joint MLE, $\hat{\theta} = (\mu, \sigma^2)$, will be $\hat{\theta}$ such that $\hat{\sigma}^2$ maximizes (where $\theta' = (\overline{x}, \sigma^2) ):$
+\begin{eqnarray*}
+L(\theta') &=& \frac{-n}{2} \ln (2 \pi) - \frac{n}{2} \ln(\sigma^2) - \frac{1}{2\sigma^2} \sum(x_i - \overline{x})^2\\
+\frac{\partial L(\theta')}{\partial \sigma^2} &=& \frac{-n}{2 \sigma^2} - \frac{1(-1)}{2 (\sigma^2)^2} \sum(x_i - \overline{x}) = 0\\
+\sum (x_i - \overline{x})^2 &=& \frac{n(\sigma^2)^2}{\sigma^2}\\
+\hat{\sigma^2} &=& \frac{\sum(x_i - \overline{x})^2}{n}\\
+\hat{\theta} &=& (\overline{x}, \frac{\sum(x_i - \overline{x})^2}{n})
+\end{eqnarray*}
+
+
+::: {.example}
+Non-existence of the MLE
+
+```{r echo = FALSE}
+library(tidyverse)
+theta <- seq(-2,2,by=.1)
+fx <- exp(theta - 1)
+data <- data.frame(theta, fx)
+
+data %>%
+  ggplot(aes(x = theta, y = fx)) + 
+  geom_line() + 
+  ggtitle("f(x | theta)") + 
+  ylab("")
+```
+
+Suppose $X_1, X_2, \ldots X_n \sim f(x | \theta)$ where:
+\begin{eqnarray*}
+f(x) = \left\{ \begin{array}{ll}
+    e^{\theta - x} & x > \theta\\
+    0 & x \leq \theta \\
+    \end{array} \right.
+    \end{eqnarray*}
+
+$\theta$ is unknown, but $-\infty < \theta < \infty$.  Does the MLE exist?
+\begin{eqnarray*}
+f(\underline{x}|\theta) &=& e^{n \theta - \sum x_i} \ \ \ \ \ \forall x_i > \theta\\
+L(\theta) &=& n \theta - \sum x_i \ \ \ \ \ \forall x_i > \theta\\
+\frac{\partial L(\theta)}{\partial \theta} &=& n = 0 ?!?!?!\\
+\end{eqnarray*}
+
+
+
+We want to find the largest $\theta$ such that $\theta < x_i \ \ \forall x_i$.  Is $\hat{\theta} = \min x_i$?  No, because $\theta < \min x_i!$  If, instead,
+\begin{eqnarray*}
+f(x) = \left\{ \begin{array}{ll}
+    e^{\theta - x} & x \geq \theta\\
+    0 & x < \theta \\
+    \end{array} \right.
+    \end{eqnarray*}
+
+MLE of $\theta$ is $\hat{\theta} = \min x_i$.
+:::
+
+## Qualities of the MLE
+### Invariance of the MLE
+
+
+::: {.theorem}
+(D&S Theorem 6.6.1) Let $\hat{\theta}$ be the MLE of $\theta$, and let $g(\theta)$ be a function of $\theta$.  Then an MLE of $g(\theta)$ is $g(\hat{\theta})$.  (Proof: see page 427 in DeGroot & Schervish)
+:::
+
+::: {.proof}
+Let $\hat{\theta}$ be the MLE of $\theta$.  Then we know that $$L(\hat{\theta}) = \max_{\theta \in \Omega} L(\theta).$$
+
+We let $g$ be a one-to-one function such that $\psi = g(\theta) \in \Gamma$ (the image of $\Omega$ under g).  Then we can denote the inverse function of $g$ as $$\theta = h(\psi).$$
+
+We know that the MLE of $\psi$ is $\hat{\psi}$ where $$L(h(\hat{\psi})) = \max_{\psi \in \Gamma} L(h(\psi)).$$
+
+But we know that $L(\theta)$ is maximized at $\hat{\theta}$.  So $L(h(\psi))$ must also be maximized at $h(\psi) = \hat{\theta}$.  $$\therefore h(\hat{\psi}) = \hat{\theta} \ \ \ \mbox{ or } \ \ \ \hat{\psi} = g(\hat{\theta}).$$
+
+If $g$ is not one-to-one, however, we need to redefine what we mean by likelihood.  If $g(\theta)$ is not one-to-one there may be many values of $\psi$ that satisfy $$g(\theta) = \psi.$$  (For example, the square function.  n.b.  $g$ still has to be a function, so it can't map to multiple values.)
+
+In that case, the correspondence between the maximum over $\psi$ and the maximum over $\theta$ breaks down.  E.g., if $\hat{\theta}$ is the MLE for $\theta$, there may be another value of $\theta$, say $\theta_0$ for which $g(\hat{\theta}) = g(\theta_0).$
+
+We define the induced log likelihood function:  $$L^*(t) = \max_{\theta \in G_t} \ln f(\underline{x} | \theta).$$
+
+Let $G$ be the image of $\Omega$ under g, then $$G_t = \{ \theta: g(\theta) = t\} \ \ \forall t \in G.$$
+
+We define the MLE of $g(\theta)$ to be $\hat{t}$ where $$L^*(\hat{t}) = \max_{t \in G} L^* (t).$$
+
+The proof follows (page 427).  [Note that above there are *two* maximizations.  That is, the first maximization created the log likelihood function.  The second maximization found the maximum of the function over the parameter space.]
+:::
+
+
+::: {.example}
+Functions of MLEs are MLEs also!
+
+1. standard deviation of a normal:
+\begin{eqnarray*}
+\sigma &=& \sqrt{\sigma^2}\\
+\hat{\sigma} &=& \mbox{MLE}(\sigma) = \sqrt{\frac{\sum (x_i - \overline{x})^2}{n}}
+\end{eqnarray*}
+2. mean of a uniform: 
+\begin{eqnarray*}
+X &\sim& U [\theta_1, \theta_2]\\
+\mu &=& \frac{\theta_1 + \theta_2}{2}\\
+\hat{\mu} &=& \mbox{MLE}(\mu) = \frac{\max(x_i) + \min(x_i)}{2}
+\end{eqnarray*}
+:::
+
+### Consistency of the MLE
+Under certain regularity conditions, the MLE of $\theta$ is consistent for $\theta$.  That is,
+\begin{eqnarray*}
+\hat{\theta} \stackrel{P}{\rightarrow} \theta\\
+\stackrel{\lim}{ n \rightarrow \infty} P [ | \hat{\theta} - \theta | > \epsilon ] = 0
+\end{eqnarray*}
+
+where $\hat{\theta}$ is a function of $X$.
+
+### Bias of the MLE (section 7.7)
+
+Previously, we discussed briefly the concept of bias:
+
+::: {.definition}
+Unbiased (page 428 of DeGroot & Schervish):  Let $\delta(X_1, X_2, \ldots, X_n)$ be an estimator of $g(\theta)$.  We say $\delta(X_1, X_2, \ldots, X_n)$ is **unbiased** if:
+\begin{eqnarray*}
+E[ \delta(X_1, X_2, \ldots, X_n)] = g(\theta)
+\end{eqnarray*}
+:::
+
+Note: bias $(\delta(\underline{X}) ) = E[ \delta(\underline{X})] - g(\theta)$.
+
+::: {.example}
+Let $X_1, X_2, \ldots, X_n \sim N(\mu, \sigma^2)$.  Recall, $\hat{\sigma^2} = \frac{\sum(X_i - \overline{X})^2}{n}$ is the MLE.
+\begin{eqnarray*}
+E[\hat{\sigma^2}] &=& E \bigg[ \frac{\sum(X_i - \overline{X})^2}{n}\bigg]\\
+&=& \frac{1}{n} E\bigg[ \sum (X_i - \mu + \mu - \overline{X})^2 \bigg]\\
+&=& \frac{1}{n} E\bigg[ \sum (X_i - \mu)^2 + 2 \sum (X_i - \mu)(\mu - \overline{X}) + n(\mu - \overline{X})^2 \bigg]\\
+&=& \frac{1}{n}\bigg\{ E\bigg[ \sum (X_i - \mu)^2 -  n [(\overline{X} - \mu)^2 ] \bigg] \bigg\}\\
+&=& \frac{1}{n} \bigg\{  \sum E (X_i - \mu)^2 -  n E [(\overline{X} - \mu)^2 ] \bigg\}\\
+&=& \frac{1}{n}\{ n \sigma^2 - n \frac{\sigma^2}{n}  \}\\
+&=& \frac{n-1}{n} \sigma^2 \Rightarrow \mbox{Biased!}
+\end{eqnarray*}
+
+#### But consistent? Yes. {-}
+\begin{eqnarray*}
+\frac{\sum(X_i - \overline{X})^2}{n} &=& \frac{1}{n}\bigg[ \sum (X_i - \mu)^2 -  n [(\overline{X} - \mu)^2] \bigg] \\
+&=& \frac{\sum(X_i - \mu)^2}{n} - \frac{1}{n} \frac{\sum n (\overline{X} - \mu)^2}{n}\\
+&=& \stackrel{P}{\rightarrow} \sigma^2   \ \ \ \ \ \ \ \ \ \ \ \rightarrow 0 \ \ \ \stackrel{P}{\rightarrow} \sigma^2\\
+&\stackrel{P}{\rightarrow}& \sigma^2\\
+\end{eqnarray*}
+<!--
+%The above limits are due to the WLLN.  The sample average of a random variable will converge in probability to its expected value. $$ Var(\overline{X}) = E[(\overline{X} - \mu)^2] = \frac{\sigma^2}{n}.$$  If we let $Y_n$ be the value of the sum minus the mean squared, then $Y_n$ changes as the sample size changes, specifically
+%\begin{eqnarray*}
+%Y_n &= (\overline{X}_n - \mu)^2\\
+%E [Y_n] &= E[ (\overline{X}_n - \mu)^2 ] = \frac{\sigma^2}{n}\\
+%n \frac{\sum(Y_n)}{n} &\stackrel{P}{\rightarrow} \sigma^2
+%\end{eqnarray*}-->
+:::
+
+
+### Benefits and Limitations of Maximum Likelihood Estimation
+
+#### Benefits {-}
+* functions of MLEs are MLEs (invariance of the MLE)
+* under certain regularity conditions, MLEs are asymptotically distributed normally.
+
+#### Limitations {-}
+* MLE does not always exist
+* MLE is not always unique
+* MLE is the value of the parameter $\theta$ that maximizes the distribution of $X|\theta$ (most likely to have produced the observed data).  The MLE is **not** the most likely parameter given the data: $E[ \theta | X]$ (that's the Bayesian estimator!).
+
+## Method of Moments
+
+
+Method of Moments (MOM) is another parameter estimation technique.  To find the MOM estimate, set the expected moment equal to the sample moment and solve for the parameter value of interest.
+
+\begin{eqnarray*}
+E[X^k] &=& k^{th} \mbox{ expected moment}\\
+\frac{1}{n} X_i^k &=& k^{th} \mbox{ sample moment}\\
+\end{eqnarray*}
+
+::: {.example}
+Find the MOM for both parameters using a random sample, $X_1, X_2, \ldots, X_n \sim N(\mu, \sigma^2)$.
+\begin{eqnarray*}
+\tilde{\mu} &=& \overline{X}\\
+\tilde{\sigma^2} &=& \frac{\sum X_i^2}{n} - \overline{X}^2\\
+&=& \frac{1}{n} \sum(X_i - \overline{X})^2 \mbox{   MLE!!}
+\end{eqnarray*}
+:::
+
+::: {.example}
+Find the MOM for both parameters using a random sample, $X_1, X_2, \ldots, X_n \sim Gamma(\alpha,\beta)$.
+\begin{eqnarray*}
+\alpha / \beta &=& \overline{X}\\
+\alpha / \beta^2 &=& \sum X_i^2 /n - \overline{X}^2\\
+\alpha &=& \overline{X} \beta\\
+\frac{\overline{X} \beta}{\beta^2} &=& \sum X_i^2 /n - \overline{X}^2\\
+\tilde{\beta} &=& \frac{\overline{X}}{(\sum X_i^2 / n - \overline{X}^2)}\\
+&=& \overline{X} / \hat{\sigma^2}\\
+\tilde{\alpha} &=& \overline{X}^2 / \hat{\sigma^2}
+\end{eqnarray*}
+:::
+
+
+### Benefits and Limitations of Method of Moments Estimation
+
+#### Benefits {-}
+* Often easier to compute than MLEs  (e.g., MLE for $\alpha$ in the Gamma distribution is intractable).
+* Estimates by MOM can be used as first approximations of the likelihood.
+* Can easily estimate multiple parameter families.
+
+#### Limitations {-}
+* Can sometimes (usually in cases of small sample sizes) produce estimates outside the parameter space.
+* Doesn't work if the moments don't exist (e.g., Cauchy distribution)
+* MLEs are typically closer to the quantity being estimated.
+
+::: {.example}
+Tank Estimators
+
+How can a random sample of integers between 1 and N (with N unknown to the researcher) be used to estimate N?
+
+1. The tanks are numbered from 1 to N.  Working with your group, randomly select five tanks, without replacement, from the bowl.  The tanks are numbered:
+2. Think about how you would use your data to estimate N.  (Come up with at least 3 estimators.)  Come to a consensus within the group as to how this should be done.
+3. Our estimates of N are:
+4. Our rules or formulas for the estimators of N based on a sample of n (in your case 5) integers are:
+5. Assuming the random variables are distributed according to a discrete uniform:
+\begin{eqnarray*}
+X_i \sim P(X=x | N) = \frac{1}{N} \ \ \ \ \ x = 1,2,\ldots, N \ \ \ \ i=1,2,\ldots, n
+\end{eqnarray*}
+  a. What is the method of moments estimator of N?
+  b. What is the maximum likelihood estimator of N?
+
+
+#### Mean Squared Error {-}
+
+Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max.  Fortunately, we know something about the moments of these functions:
+
+| g($\underline{X}$)                              |    E[ g($\underline{X}$) ]    |       Var( g($\underline{X}$) )       |
+|-------------------------------------------------|:-----------------------------:|:-------------------------------------:|
+                |
+| $\overline{X}$                    |        $\frac{N+1}{2}$        |  $\frac{(N+1)(N-1)}{12 n}$  |
+                |
+| median($\underline{X}$) = M  |        $\frac{N+1}{2}$        |         $\frac{(N-1)^2}{4 n}$         |
+                |
+| min($\underline{X}$)              | $\frac{(N-1)}{n} + 1$  |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+                |
+| max($\underline{X}$)              |     $N - \frac{(N-1)}{n}$     |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+
+
+
+Using this information, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
+
+\begin{eqnarray}
+\mbox{MSE } ( 2 \cdot \overline{X} - 1) &=& \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&=& \frac{4 (N+1) (N-1)}{12n} \\
+\nonumber \\
+\mbox{MSE } ( 2 \cdot M - 1) &=& \frac{4 (N-1)^2}{4n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&=& \frac{4 (N-1)^2}{4n} \\
+\nonumber \\
+\mbox{MSE } ( \max(\underline{X})) &=& \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(N - \frac{(N-1)}{n} - N\Bigg)^2 \nonumber\\
+&=& \bigg(\frac{N-1}{n}\bigg)^2 + \bigg(\frac{N-1}{n} \bigg)^2  = 2*\bigg(\frac{N-1}{n} \bigg)^2 \\
+\nonumber \\
+\mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &=& \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
+\end{eqnarray}
+:::
+
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
+
+1. What is a prior distribution?  What is the random variable described by a prior?
+2. What is a likelihood?  What is the random variable described by a likelihood?
+3. What is a posterior distribution?  What is the random variable described by a posterior?
+4. What is a conjugate prior?  What is the benefit of a conjugate prior?
+5. Is all hope lost if the prior is not conjugate?  If it is not, how would we approach the problem of coming up with a posterior?
+
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. When does it make sense to incorporate prior information?  When doesn't it make sense to incorporate prior information?
+2. What are some legitimate ways to calculate a prior?  What are some illegitimate ways to calculate a prior?
+3. How is an analyst able to come up with a prior or a likelihood?  
+
+
+## R code: MLE Example
+
+
+Example 7.6.5 in the text looks at the MLE for the center of of a Cauchy distribution. 
+The Cauchy distribution is interesting because the tails decay at a rate of $1/x^2$, so that when you try to take the expected value, you end up integrating something that looks like $1/x$ over the real line. 
+Hence, the expected value does not exist. 
+Thus, method of moments estimators are of no use. 
+The MLE is still useful, though not easy to find. As stated in the text, the likelihood is proportional to
+$$\prod_{i=1}^n [1 + (x_i - \theta)^2]^{-1}$$
+
+
+   a. Compute the first and second derivative of the log likelihood.
+   b.  Consider trying to find the root of a function f(x). Suppose your current
+guess is some value $x_0$. We might approximate the function by the tangent line (first order Taylor approximation) at x0 and take our next guess as the root of that line. Use the Taylor expansion to find the next guess of $x_1$ as
+
+$$x_1 = x_0 - \frac{f(x_0)}{f'(x_0)}$$
+
+Continually updating our guesses via this method is known as Newton's Method
+or the Newton-Raphson Method.
+
+   c. Generate 50 observations from a Cauchy distribution centered at $\theta = 10$.  Based on these 50 observations, use parts (a) and (b) to estimate $\theta$. Remember, we're trying to maximize the likelihood, so the function that we are trying to find the root of is derivative of the log-likelihood. The R code might look something like this:
+
+
+```{r eval = FALSE}
+x=rt(50,1)+10  # 50 random Cauchy variables centered at 10
+vect.theta = c()  # placeholder
+theta.guess=((pick a starting value, you might try different ones))  # just a number
+theta.gues = 10  # what happens when your initial guess is far from 10?
+
+for (i in 1:50) {  # play around with how many times you loop through.  10 is likely too small.
+
+    f1=((compute first derivative of log-likelihood evaluated at theta.guess))
+    f2=((compute second derivative at theta.guess))
+
+    f1= 2*sum((x-theta.guess)/(1+(x-theta.guess)^2))
+    f2= 2*sum(((-1)/(1+(x-theta.guess)^2))+((2*(x-theta.guess)^2)/((1+(x-theta.guess)^2)^2)))
+
+
+# f1 and f2 need to be written as R functions of theta.guess
+
+    theta.guess=theta.guess - f1/f2
+    print(theta.guess)
+    vect.theta = c(vect.theta, theta.guess) # keeping track of all your guesses
+}
+
+plot(vect.theta)
+```
+
+where the actual formulas for f1 and f2 will come from part (a). Everything in
+double parentheses needs to be replaced by proper R syntax. The rest of it will
+run in R. In case you are curious, `sum()` is the R function for summing a vector.
+
+Indeed, if your initial guess is far from 10, the Newton-Raphson procedure won't converge to the MLE (it is a first approximation).  Consider the following figure that describes the behavior of the derivative of the log-likelihood function.  Note that the N-R procedure will go off to infinity or negative infinity if it starts at a value far from 10 (see purple line). If the initial value is close to 10, it will converge to the MLE (see red line).
+
+
+
+
+
+
