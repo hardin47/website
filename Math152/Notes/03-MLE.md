@@ -69,7 +69,7 @@ For each possible observed vector $\underline{x}$, let $\delta(\underline{x}) \i
 #### Sampling from a Normal Distribution {-}
 
 \begin{eqnarray*}
-X_1, X_2, \ldots X_n &\sim& N(\mu, \sigma^2)  \ \ \ \mu \ \& \ \sigma^2 \mbox{ are fixed but unknown}\\
+X_1, X_2, \ldots X_n &\stackrel{iid}{\sim}& N(\mu, \sigma^2)  \ \ \ \mu \ \& \ \sigma^2 \mbox{ are fixed but unknown}\\
 f(x_i | \mu, \sigma^2) &=& \frac{1}{\sqrt{2 \pi \sigma^2}} \exp [ \frac{-1}{2\sigma^2}(x_i - \mu)^2 ]\\
 f(\underline{x} | \mu, \sigma^2) &=& \frac{1}{(2 \pi \sigma^2)^{n/2}} \exp [ \frac{-1}{2\sigma^2}\sum_{i=1}^n(x_i - \mu)^2 ]\\
 L(\mu, \sigma^2) &=& \frac{-n}{2}\ln(2\pi\sigma^2) - \frac{1}{2 \sigma^2} \sum(x_i - \mu)^2\\
@@ -101,9 +101,9 @@ Non-existence of the MLE
 
 <img src="03-MLE_files/figure-html/unnamed-chunk-2-1.png" width="672" />
 
-Suppose $X_1, X_2, \ldots X_n \sim f(x | \theta)$ where:
+Suppose $X_1, X_2, \ldots X_n \stackrel{iid}{\sim} f(x | \theta)$ where:
 \begin{eqnarray*}
-f(x) = \left\{ \begin{array}{ll}
+f(x | \theta) = \left\{ \begin{array}{ll}
     e^{\theta - x} & x > \theta\\
     0 & x \leq \theta \\
     \end{array} \right.
@@ -120,7 +120,7 @@ L(\theta) &=& n \theta - \sum x_i \ \ \ \ \ \forall x_i > \theta\\
 
 We want to find the largest $\theta$ such that $\theta < x_i \ \ \forall x_i$.  Is $\hat{\theta} = \min x_i$?  No, because $\theta < \min x_i!$  If, instead,
 \begin{eqnarray*}
-f(x) = \left\{ \begin{array}{ll}
+f (x | \theta) = \left\{ \begin{array}{ll}
     e^{\theta - x} & x \geq \theta\\
     0 & x < \theta \\
     \end{array} \right.
