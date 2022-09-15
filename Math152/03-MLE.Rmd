@@ -348,18 +348,20 @@ Using this information, we can calculate the MSE for 4 of the estimators that we
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-1. What is a prior distribution?  What is the random variable described by a prior?
-2. What is a likelihood?  What is the random variable described by a likelihood?
-3. What is a posterior distribution?  What is the random variable described by a posterior?
-4. What is a conjugate prior?  What is the benefit of a conjugate prior?
-5. Is all hope lost if the prior is not conjugate?  If it is not, how would we approach the problem of coming up with a posterior?
-
+1. What function is being maximized when an MLE is found?  Derivative with respect to what?  That is, explain the intuition behind why the MLE is a good estimator for $\theta.$
+2. How is the MOM estimator found?  Explain why the MOM is a good estimator for $\theta.$
+3. What are the asymptotic properties of the MLE that make it nice to work with?
+4. What are the benefits and limitations of the MLE?
+5. What are the benefits and limitations of MOM?
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. When does it make sense to incorporate prior information?  When doesn't it make sense to incorporate prior information?
-2. What are some legitimate ways to calculate a prior?  What are some illegitimate ways to calculate a prior?
-3. How is an analyst able to come up with a prior or a likelihood?  
+1. Does the derivative always work to find the MLE?  If not, what other ways can we find a maximum?
+2. Is the MLE always the best estimator for $\theta$?  
+3. Is the MOM always the best estimator for $\theta$?
+4. What makes a good estimator?
+5. You are consulting, you are given a dataset, you are asked to find $\theta$, is there a single right answer?  How do you know what to give your boss?
+6. What do you do if you have a dataset but you don't know the likelihood?
 
 
 ## R code: MLE Example
@@ -374,50 +376,200 @@ $$\prod_{i=1}^n [1 + (x_i - \theta)^2]^{-1}$$
 
 
    a. Compute the first and second derivative of the log likelihood.
-   b.  Consider trying to find the root of a function f(x). Suppose your current
-guess is some value $x_0$. We might approximate the function by the tangent line (first order Taylor approximation) at x0 and take our next guess as the root of that line. Use the Taylor expansion to find the next guess of $x_1$ as
+   b. Consider trying to find the root of a function $h(x)$. Suppose your current
+guess is some value $x_0$. We might approximate the function by the tangent line (first order Taylor approximation) at $x_0$ and take our next guess as the root of that line. Use the Taylor expansion to find the next guess of $x_1$ as
 
-$$x_1 = x_0 - \frac{f(x_0)}{f'(x_0)}$$
+$$x_1 = x_0 - \frac{h(x_0)}{h'(x_0)}$$
 
-Continually updating our guesses via this method is known as Newton's Method
-or the Newton-Raphson Method.
+Continually updating the guess via this method is known as Newton's Method or the Newton-Raphson Method. 
 
    c. Generate 50 observations from a Cauchy distribution centered at $\theta = 10$.  Based on these 50 observations, use parts (a) and (b) to estimate $\theta$. Remember, we're trying to maximize the likelihood, so the function that we are trying to find the root of is derivative of the log-likelihood. The R code might look something like this:
 
+The Cauchy distribution is very sensitive to the initial value used in Newton's method, so if your `theta_guess` is not very close to 10, probably the MLE estimate will be infinite.
+
 
 ```{r eval = FALSE}
-x=rt(50,1)+10  # 50 random Cauchy variables centered at 10
-vect.theta = c()  # placeholder
-theta.guess=((pick a starting value, you might try different ones))  # just a number
-theta.gues = 10  # what happens when your initial guess is far from 10?
+library(tidyverse)
 
-for (i in 1:50) {  # play around with how many times you loop through.  10 is likely too small.
-
-    f1=((compute first derivative of log-likelihood evaluated at theta.guess))
-    f2=((compute second derivative at theta.guess))
-
-    f1= 2*sum((x-theta.guess)/(1+(x-theta.guess)^2))
-    f2= 2*sum(((-1)/(1+(x-theta.guess)^2))+((2*(x-theta.guess)^2)/((1+(x-theta.guess)^2)^2)))
-
-
-# f1 and f2 need to be written as R functions of theta.guess
-
-    theta.guess=theta.guess - f1/f2
-    print(theta.guess)
-    vect.theta = c(vect.theta, theta.guess) # keeping track of all your guesses
+# Use Newton's method to find the MLE for a Cauchy distribution
+cauchy_mle <- function(guess, data){
+    l1 <- ((compute 1st derivative of log-likelihood evaluated at "guess")) # 1st deriv
+    l2 <- ((compute 2nd derivative of log-likelihood evaluated at "guess")) # 2nd deriv
+    guess <- guess - l1/l2
+    guess
 }
 
-plot(vect.theta)
+# set up the initial conditions (including the dataset to use)
+set.seed(54321)  # to get the same answer each time the .Rmd is knit
+
+n_obs <- 50
+observations <- rcauchy(n_obs, location = 10)  # 50 random Cauchy, centered at 10
+theta_guess <- ((pick a starting value, you might try different ones)) # just a number
+
 ```
 
-where the actual formulas for f1 and f2 will come from part (a). Everything in
-double parentheses needs to be replaced by proper R syntax. The rest of it will
-run in R. In case you are curious, `sum()` is the R function for summing a vector.
+##### Running `cauchy_mle` recursively {-}
 
-Indeed, if your initial guess is far from 10, the Newton-Raphson procedure won't converge to the MLE (it is a first approximation).  Consider the following figure that describes the behavior of the derivative of the log-likelihood function.  Note that the N-R procedure will go off to infinity or negative infinity if it starts at a value far from 10 (see purple line). If the initial value is close to 10, it will converge to the MLE (see red line).
+```{r eval = FALSE}
+theta_guess <- 10
+guess_vec <- numeric()
+reps <- 10  # play around with how many times you loop through. 
+# you probably don't need very many times through to see what happens.
+# what happens might seem unsettling!
+
+for(i in 1:reps){
+  theta_guess <- cauchy_mle(___, ___)  # what changes for each rep?
+  guess_vec[i] <- theta_guess
+}
+guess_vec
+
+data.frame(guess_vec) %>%  # ggplot needs a data frame instead of a vector
+  ggplot(aes(y = guess_vec, x = 1:reps)) + 
+  geom_line()  # line plot connecting the guesses for each rep
+```
+
+
+#####  Reflection {-}
+
+Just for kicks, I've plotted the derivative of the log-likelihood (red, trying to find the zero of the derivative of the log-likelihood) as well as two different guess trajectories (green from start of 10 and blue from a start of 3).
+The green line (hard to see, look right at theta = 10) indicates that we get to the maximum if we are very close to 10 as a start.  The blue line indicates what happens if the initial value is far from 10 (the MLE is estimated to be infinite).
+
+I've left in the R code, but don't worry about understanding the specific lines of code.  Instead focus on understanding the image itself.  It should tell you that the function *does* have a maximum (i.e., the derivative goes through zero!), but that the x-value for which the derivative equals zero is difficult to find.  Using the Newton-Raphson method requires that the initial guess is quite close to the truth, otherwise, the estimate will go to positive or negative infinity.
+
+```{r}
+set.seed(470)
+n_obs <- 50
+observations <- rcauchy(n_obs, location = 10)  # 50 random Cauchy, centered at 10
+
+
+# print the derivative of the log likelihood function
+# this is what you're trying to find the zero of
+thetas <-  seq(-100,50,by = .01)
+llfun <-  c()
+for (k in 1:length(thetas))
+{
+llfun[k] <- 2*sum((observations-thetas[k])/(1+(observations-thetas[k])^2))
+}
+
+
+# draw on top two instances of Newton's method:
+# starting at theta_guess = 10  (RED)
+theta_guess <- 10
+theta_10 <- 10
+l1_vals_10 <- c(0)
+for (i in 1:5)
+    {
+    l1 <- 2*sum((observations-theta_guess)/(1+(observations-theta_guess)^2))
+    l2 <- 2*sum((-1+(observations-theta_guess)^2)/(1+(observations-theta_guess)^2)^2)
+    theta_next <- theta_guess - l1/l2
+    theta_guess <- theta_next
+    theta_10[i + 1] <- theta_guess
+    l1_vals_10 <- c(l1_vals_10, l1, 0)
+    }
+
+
+# then starting at theta_guess = 3 (PURPLE)
+theta_guess <- 3
+theta_3 <- 3
+l1_vals_3 <- c(0)
+for (i in 1:5)
+  {
+    l1 <- 2*sum((observations-theta_guess)/(1+(observations-theta_guess)^2))
+    l2 <- 2*sum((-1+(observations-theta_guess)^2)/(1+(observations-theta_guess)^2)^2)
+    theta_next <- theta_guess - l1/l2
+    theta_guess <- theta_next
+    theta_3[i + 1] <- theta_guess
+    l1_vals_3 <- c(l1_vals_3, l1, 0)
+}
+
+
+guesses_10 <- data.frame(thetas = rep(theta_10, each = 2),
+                        guess = c(l1_vals_10,0))
+guesses_3 <- data.frame(thetas = rep(theta_3, each = 2),
+                        guess = c(l1_vals_3,0))
+cauchy_data <- data.frame(thetas, llfun)
 
 
 
+cauchy_data %>%
+  ggplot() + 
+  geom_hline(yintercept = 0) +
+  geom_line(aes(x = thetas, y = llfun, color = "deriv loglik")) +
+  geom_line(data = guesses_3, aes(x = thetas, y = guess, color = "guesses, init is 3")) +
+  geom_line(data = guesses_10, aes(x = thetas, y = guess, color = "guesses, init is 10")) +
+  xlim(c(-100, 50))
+```
+
+
+
+#####  Odd things happen sometimes {-}
+
+I've run this code many many many times over the years.  And every time, if the initial guess is not super close to 10, the estimate doesn't converge.  But just once, I set the seed in a particular way, and the start value of 3 actually converged to the answer!  Randomness in the wild.
+
+
+```{r}
+set.seed(4747)
+n_obs <- 50
+observations <- rcauchy(n_obs, location = 10)  # 50 random Cauchy, centered at 10
+
+
+# print the derivative of the log likelihood function
+# this is what you're trying to find the zero of
+thetas <-  seq(-100,50,by = .01)
+llfun <-  c()
+for (k in 1:length(thetas))
+{
+llfun[k] <- 2*sum((observations-thetas[k])/(1+(observations-thetas[k])^2))
+}
+
+
+# draw on top two instances of Newton's method:
+# starting at theta_guess = 10  (RED)
+theta_guess <- 10
+theta_10 <- 10
+l1_vals_10 <- c(0)
+for (i in 1:5)
+    {
+    l1 <- 2*sum((observations-theta_guess)/(1+(observations-theta_guess)^2))
+    l2 <- 2*sum((-1+(observations-theta_guess)^2)/(1+(observations-theta_guess)^2)^2)
+    theta_next <- theta_guess - l1/l2
+    theta_guess <- theta_next
+    theta_10[i + 1] <- theta_guess
+    l1_vals_10 <- c(l1_vals_10, l1, 0)
+    }
+
+
+# then starting at theta_guess = 3 (PURPLE)
+theta_guess <- 3
+theta_3 <- 3
+l1_vals_3 <- c(0)
+for (i in 1:5)
+  {
+    l1 <- 2*sum((observations-theta_guess)/(1+(observations-theta_guess)^2))
+    l2 <- 2*sum((-1+(observations-theta_guess)^2)/(1+(observations-theta_guess)^2)^2)
+    theta_next <- theta_guess - l1/l2
+    theta_guess <- theta_next
+    theta_3[i + 1] <- theta_guess
+    l1_vals_3 <- c(l1_vals_3, l1, 0)
+}
+
+
+guesses_10 <- data.frame(thetas = rep(theta_10, each = 2),
+                        guess = c(l1_vals_10,0))
+guesses_3 <- data.frame(thetas = rep(theta_3, each = 2),
+                        guess = c(l1_vals_3,0))
+cauchy_data <- data.frame(thetas, llfun)
+
+
+
+cauchy_data %>%
+  ggplot() + 
+  geom_hline(yintercept = 0) +
+  geom_line(aes(x = thetas, y = llfun, color = "deriv loglik")) +
+  geom_line(data = guesses_3, aes(x = thetas, y = guess, color = "guesses, init is 3")) +
+  geom_line(data = guesses_10, aes(x = thetas, y = guess, color = "guesses, init is 10")) +
+  xlim(c(-100, 50))
+```
 
 
 
