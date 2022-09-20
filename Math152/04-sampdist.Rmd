@@ -24,10 +24,10 @@ Var[X] &=& 2n\\
 ( &=&  E[e^{tX}] )\\
 \end{eqnarray*}
 
-Recall Moment Generating Functions $(\psi_X(t))$, page 205.
+Recall Moment Generating Functions $(\psi_X(t))$, @degroot page 205.
 
 ::: {.theorem}
-D & S 7.2.1
+@degroot 7.2.1
 
 Let $X_1, X_2, \ldots X_k \sim \chi^2_{n_i}, \ \ i=1, \ldots, k$, independently.  Then, $X_1 + X_2 + \cdots + X_k = \sum_{i=1}^k X_i \sim \chi^2_{n_1+n_2 +\cdots+n_k}$.
 
@@ -51,7 +51,7 @@ See theorem 4.4.3, pg 207.
 
 
 ::: {.theorem}
-D & S 7.2.1 1/2
+@degroot 7.2.1 1/2
 
 If $Z \sim N(0,1), Y=Z^2,$ then $Y \sim \chi^2_1$.
 
@@ -86,7 +86,7 @@ note: $\Gamma(1/2) = \sqrt{\pi}$.
 By combining Theorems 7.2.1 and 7.2.1 1/2, we get:
 
 ::: {.theorem}
-D & S 7.2.2
+@degroot 7.2.2
 
 If $X_1, X_2, \ldots, X_k \stackrel{iid}{\sim} N(0,1)$,
 \begin{eqnarray*}
@@ -107,7 +107,7 @@ If the data are $iid$ normal, the sum of their squared values has a sampling dis
 
 
 ::: {.theorem}
-D & S 8.3.1
+@degroot 8.3.1
 
 Let $X_1, X_2, \ldots, X_n \stackrel{iid}{\sim} N(\mu, \sigma^2)$.
 
