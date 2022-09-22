@@ -185,84 +185,49 @@ How would this problem have been different if we had known $\sigma$?  Or even if
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
 1. What does it mean for a statistic to have a sampling distribution? 
-2. 
+2. What is the difference between the theoretical MSE and the empirical MSE (e.g., in the tank example below)?
+3. Why can't a standard normal distribution be used when the statistic of interest is $\frac{\overline{X} - \mu}{s / \sqrt{n}}?$
+4. What different tools are used to determine the distribution of a random variable?  (Note, in this chapter, the majority of the random variables of interest are functions of data, also called statistics.)
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. How do you know which estimator to use in a consulting situation?
+2. How do you respond to someone who tells you "there isn't one right answer" to the previous question?
+3. What are the technical conditions for running a t-test?  That is, what are the conditions on the data that give rise to the t-distribution?  What happens if the technical conditions are violated and the t-test is run anyway?
 
 
 ## R code: Tanks Example
 
 How can a random sample of integers between 1 and $N$ (with $N$ unknown to the researcher) be used to estimate $N$?  This problem is known as the German tank problem and is derived directly from a situation where the Allies used maximum likelihood estimation to determine how many tanks the Axes had produced.  See \url{https://en.wikipedia.org/wiki/German_tank_problem}.
 
-1. The tanks are numbered from 1 to $N$.  Working with your group, randomly select five tanks, without replacement, from the bowl.  The tanks are numbered:
+The tanks are numbered from 1 to $N$.  
+Think about how you would use your data to estimate $N$. 
 
-\vspace{4cm}
-
-\item
-Think about how you would use your data to estimate $N$.  (Come up with at least 3 estimators.)  Come to a consensus within the group as to how this should be done.  One person from your group will report out after the warm-up is over.  Ideally, the person to report out will be someone who has not yet spoken in class this semester.  Step-up if you haven't yet spoken.  Step back if you speak regularly.
-
-Our estimates of $N$ are:
-
-\vspace{3cm}
-
-Our rules or formulas for the estimators of $N$ based on a sample of n (in your case 5) integers are:
-
-
-\pagebreak
-
-\normalsize
-\noindent
-Assuming the random variables are distributed according to a discrete uniform.   (Tbh, this model is with replacement, but the answers you get aren't much different than without replacement if $n < < N$.)
+Some possible estimators of $N$ are:[^5]  
 \begin{eqnarray*}
-X_i \sim P(X=x | N) = \frac{1}{N} \ \ \ \ \ x = 1,2,\ldots, N \ \ \ \ i=1,2,\ldots, n
+\hat{N}_1 &=& 2\cdot\overline{X} - 1 \ \ \ \mbox{the MOM}\\
+\hat{N}_2 &=& 2\cdot \mbox{median}(\underline{X}) - 1 \\
+\hat{N}_3 &=& \max(\underline{X})  \ \ \ \mbox{the MLE}\\
+\hat{N}_4 &=& \frac{n+1}{n} \max(\underline{X})  \ \ \ \mbox{unbiased version of the MLE}\\
+\hat{N}_5 &=& \max(\underline{X}) + \min(\underline{X}) \\
+\hat{N}_6 &=& \frac{n+1}{n-1}[\max(\underline{X}) - \min(\underline{X})] \\
 \end{eqnarray*}
 
-\item
-What is the method of moments estimator of N?
+[^5]: Note that the MOM and MLE estimators were derived under the assumption that the data are *iid* from a population of discrete uniform values.  Because our data is sampled without replacement, we don't have an *iid* model.  However, if $n < < < N$, the *iid* discrete uniform is a reasonable model for the situation at hand.
 
-\vspace{7cm}
-
-\item
-What is the maximum likelihood estimator of N?
-\vspace{4cm}
+### Theoretical Mean Squared Error
 
 
-\end{enumerate}
-
-
-\pagebreak
-
-
-\subsection*{Theoretical Mean Squared Error}
-
-\noindent
 Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max.  Fortunately, we know something about the moments of these functions:
-\begin{center}
-\large
-\begin{tabular}{l|c|c}
-g($\underline{X}$) & E[ g($\underline{X}$) ] & Var( g($\underline{X}$) )\\
-\hline
-& &\\
-\vspace{-.3cm}
-$\overline{X}$ & $\frac{N+1}{2}$ & \ \ \ $\frac{(N+1)(N-1)}{12 n}$ \ \ \ \\
-& &\\
-\vspace{-.3cm}
-median($\underline{X}$) = M \ \ \ & $\frac{N+1}{2}$ & $\frac{(N-1)^2}{4 n}$\\
-& &\\
-\vspace{-.3cm}
-min($\underline{X}$) & \ \ $\frac{(N-1)}{n} + 1$ \ \  & $\bigg(\frac{N-1}{n}\bigg)^2$\\
-& &\\
-\vspace{-.3cm}
-max($\underline{X}$) & $N - \frac{(N-1)}{n}$ & $\bigg(\frac{N-1}{n}\bigg)^2$\\
-\end{tabular}
-\end{center}
 
-\vspace{1cm}
 
-\normalsize
-\noindent
+| g($\underline{X}$)                              |    E( g($\underline{X}$) )    |       Var( g($\underline{X}$) )       |
+|-------------------------------------------------|:-----------------------------:|:-------------------------------------:|
+| \vspace{-.3cm}$\overline{X}$                    |        $\frac{N+1}{2}$        |  $\frac{(N+1)(N-1)}{12 n}$  |
+| \vspace{-.3cm}median($\underline{X}$) = M |        $\frac{N+1}{2}$        |         $\frac{(N-1)^2}{4 n}$         |
+| \vspace{-.3cm}min($\underline{X}$)              | $\frac{(N-1)}{n} + 1$  |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+| \vspace{-.3cm}max($\underline{X}$)              |     $N - \frac{(N-1)}{n}$     |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+
 Using this information, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
 
 \begin{eqnarray}
@@ -278,109 +243,128 @@ Using this information, we can calculate the MSE for 4 of the estimators that we
 \mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &=& \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
 \end{eqnarray}
 
-Our rules or formulas for the estimators of N based on a sample of n (in your case 5) integers are:
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+nsamp <- 5
+npop <- seq(nsamp, 500, 1)
+ntheta <- length(npop)
+mse.2xbar <- (4*(npop+1)*(npop-1))/(12*nsamp)
+mse.2med <- 4*(npop-1)^2 / (4*nsamp)
+mse.max <- 2*((npop-1)/nsamp)^2
+mse.adjmax <- ((nsamp+1)/nsamp)^2 * ((npop -1)/nsamp)^2 + (((nsamp+1)/nsamp)*(npop - (npop-1)/nsamp) - npop)^2
+
+mse_data <- data.frame(mse = c(mse.2xbar, mse.2med, mse.max, mse.adjmax),
+                       estimator = c(rep("twice xbar -1", ntheta), 
+                                     rep("twice median -1", ntheta),
+                                     rep("max", ntheta),
+                                     rep("(n+1)/n * max", ntheta)),
+                       samp_size = rep(nsamp, 4*ntheta),
+                       true_N = npop)
+
+nsamp <- 10
+npop <- seq(nsamp, 500, 1)
+ntheta <- length(npop)
+mse.2xbar <- (4*(npop+1)*(npop-1))/(12*nsamp)
+mse.2med <- 4*(npop-1)^2 / (4*nsamp)
+mse.max <- 2*((npop-1)/nsamp)^2
+mse.adjmax <- ((nsamp+1)/nsamp)^2 * ((npop -1)/nsamp)^2 + (((nsamp+1)/nsamp)*(npop - (npop-1)/nsamp) - npop)^2
 
 
-\pagebreak
+mse_data <- rbind(mse_data, data.frame(mse = c(mse.2xbar, mse.2med, mse.max, mse.adjmax),
+                       estimator = c(rep("twice xbar -1", ntheta), 
+                                     rep("twice median -1", ntheta),
+                                     rep("max", ntheta),
+                                     rep("(n+1)/n * max", ntheta)),
+                       samp_size = rep(nsamp, 4*ntheta),
+                       true_N = npop))
 
-\normalsize
-\noindent
-Assuming the random variables are distributed according to a discrete uniform.   (Tbh, this model is with replacement, but the answers you get aren't much different than without replacement if $n < < N$.)
-\begin{eqnarray*}
-X_i \sim P(X=x | N) = \frac{1}{N} \ \ \ \ \ x = 1,2,\ldots, N \ \ \ \ i=1,2,\ldots, n
-\end{eqnarray*}
+nsamp <- 25
+npop <- seq(nsamp, 500, 1)
+ntheta <- length(npop)
+mse.2xbar <- (4*(npop+1)*(npop-1))/(12*nsamp)
+mse.2med <- 4*(npop-1)^2 / (4*nsamp)
+mse.max <- 2*((npop-1)/nsamp)^2
+mse.adjmax <- ((nsamp+1)/nsamp)^2 * ((npop -1)/nsamp)^2 + (((nsamp+1)/nsamp)*(npop - (npop-1)/nsamp) - npop)^2
 
-\item
-What is the method of moments estimator of N?
+mse_data <- rbind(mse_data, data.frame(mse = c(mse.2xbar, mse.2med, mse.max, mse.adjmax),
+                       estimator = c(rep("twice xbar -1", ntheta), 
+                                     rep("twice median -1", ntheta),
+                                     rep("max", ntheta),
+                                     rep("(n+1)/n * max", ntheta)),
+                       samp_size = rep(nsamp, 4*ntheta),
+                       true_N = npop))
 
-\vspace{7cm}
+nsamp <- 50
+npop <- seq(nsamp, 500, 1)
+ntheta <- length(npop)
+mse.2xbar <- (4*(npop+1)*(npop-1))/(12*nsamp)
+mse.2med <- 4*(npop-1)^2 / (4*nsamp)
+mse.max <- 2*((npop-1)/nsamp)^2
+mse.adjmax <- ((nsamp+1)/nsamp)^2 * ((npop -1)/nsamp)^2 + (((nsamp+1)/nsamp)*(npop - (npop-1)/nsamp) - npop)^2
 
-\item
-What is the maximum likelihood estimator of N?
-\vspace{4cm}
+mse_data <- rbind(mse_data, data.frame(mse = c(mse.2xbar, mse.2med, mse.max, mse.adjmax),
+                       estimator = c(rep("twice xbar -1", ntheta), 
+                                     rep("twice median -1", ntheta),
+                                     rep("max", ntheta),
+                                     rep("(n+1)/n * max", ntheta)),
+                       samp_size = rep(nsamp, 4*ntheta),
+                       true_N = npop))
+
+mse_data %>%
+  ggplot(aes(x = true_N, y = mse)) + 
+  geom_line(aes(color = estimator, linetype = estimator)) + 
+  facet_wrap(~samp_size) + 
+  labs(title = "Theoretical MSE for different estimates of the population size, \nfacet by sample size",
+       x = "true population size")
+```
+
+### Empirical MSE
+
+We don't need to know the theoretical expected value or variance of the functions to approximate the MSE.  We can visualize the sampling distributions and also calculate the actual empirical MSE for any estimator we come up with.
+
+By changing the population size and the sample size, we can assess how the estimators compare and whether one is particularly better under a given setting.
+
+```{r warning = FALSE, message = FALSE}
+npop = 447  # population size
+nsamp = 10  # sample size
+reps = 10000
+
+  xbar.2 = c()  # placeholder for repeated sample statistics
+  median.2 = c()
+  samp.max = c()
+  mod.max = c()
+  sum.min.max = c()
+  diff.min.max = c()
+
+for (i in 1:reps){
+  mysample =  sample(1:npop,nsamp,replace=F)  # sample some tanks from the population
+    xbar.2 = c(xbar.2, (2 * mean(mysample) - 1))
+    median.2 = c(median.2, (2 * median(mysample) - 1))
+    samp.max = c(samp.max, max(mysample))
+    mod.max = c(mod.max, ((nsamp+1)/nsamp)*max(mysample))
+    sum.min.max = c(sum.min.max, (min(mysample)+max(mysample)))
+    diff.min.max = c(diff.min.max, ((nsamp+1)/(nsamp-1))*(max(mysample) - min(mysample)))
+}
 
 
-\end{enumerate}
+estimate <- c(xbar.2, median.2, samp.max, mod.max, sum.min.max, diff.min.max)
+method <- c(rep("2 xbars", reps), rep("2 medians", reps), rep("sample max", reps),
+            rep("modified max", reps), rep("sum min max", reps), rep("diff max min", reps))
+all.estimates <- data.frame(estimate, method)
 
 
-\pagebreak
+all.estimates %>%
+  group_by(method) %>%
+  summarize(mean = mean(estimate), median = median(estimate), bias = mean(estimate) - npop,
+            var = var(estimate), mse = (mean(estimate) - npop)^2 + var(estimate))
+```
 
-\begin{flushright}
-Math 152 \\
-Jo Hardin \\
-\end{flushright}
+```{r warning = FALSE, message = FALSE}
+ggplot(all.estimates, aes(x = estimate)) +
+  geom_histogram() +
+  geom_vline(xintercept = npop) +
+  facet_wrap(~method)
+```
 
-\begin{center}
-{\bf Mean Squared Error}
-\end{center}
-
-\noindent
-Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max.  Fortunately, we know something about the moments of these functions:
-\begin{center}
-\large
-\begin{tabular}{l|c|c}
-g($\underline{X}$) & E[ g($\underline{X}$) ] & Var( g($\underline{X}$) )\\
-\hline
-& &\\
-\vspace{-.3cm}
-$\overline{X}$ & $\frac{N+1}{2}$ & \ \ \ $\frac{(N+1)(N-1)}{12 n}$ \ \ \ \\
-& &\\
-\vspace{-.3cm}
-median($\underline{X}$) = M \ \ \ & $\frac{N+1}{2}$ & $\frac{(N-1)^2}{4 n}$\\
-& &\\
-\vspace{-.3cm}
-min($\underline{X}$) & \ \ $\frac{(N-1)}{n} + 1$ \ \  & $\bigg(\frac{N-1}{n}\bigg)^2$\\
-& &\\
-\vspace{-.3cm}
-max($\underline{X}$) & $N - \frac{(N-1)}{n}$ & $\bigg(\frac{N-1}{n}\bigg)^2$\\
-\end{tabular}
-\end{center}
-
-\vspace{1cm}
-
-\normalsize
-\noindent
-Using this information, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
-
-\begin{eqnarray}
-\mbox{MSE } ( 2 \cdot \overline{X} - 1) &=& \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
-&=& \frac{4 (N+1) (N-1)}{12n} \\
-\nonumber \\
-\mbox{MSE } ( 2 \cdot M - 1) &=& \frac{4 (N-1)^2}{4n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
-&=& \frac{4 (N-1)^2}{4n} \\
-\nonumber \\
-\mbox{MSE } ( \max(\underline{X})) &=& \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(N - \frac{(N-1)}{n} - N\Bigg)^2 \nonumber\\
-&=& \bigg(\frac{N-1}{n}\bigg)^2 + \bigg(\frac{N-1}{n} \bigg)^2  = 2*\bigg(\frac{N-1}{n} \bigg)^2 \\
-\nonumber \\
-\mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &=& \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
-\end{eqnarray}
-
-\begin{table}
-\begin{center}
-\begin{tabular}{l|cccccccc}
-&       xbar2 & med2 &xbarmed & iqr2 &  max &adjmax &max.min& maxmax\\
-\hline
-mean &  244.6 &244.1&   244.3 &215.5& 230.6  &247.1&   244.9  &251.7\\
-median& 244.5 &245.0 &  244.0 &215.0 &235.0  &251.8 &  245.0  &245.0\\
-sd     & 35.8  &58.4  &  45.6  &53.5  &13.9  & 14.8  &  20.2  & 28.2\\
-min   & 111.3 & 53.0   & 92.1 & 47.0 &139.0 & 148.9   &147.0 & 148.3\\
-max   & 378.2 &429.0   &400.8& 401.0 &245.0&  262.5   &359.0&  378.2\\
-\end{tabular}
-\caption{Sample statistics for 10,000 reps taken from a population with $N=245$ and $n=15$.}
-\end{center}
-\end{table}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=.5,angle=90]{tankhist245.pdf}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=.6,angle=90]{tankmse.pdf}
-\end{center}
-\end{figure}
-
-\end{document}
 

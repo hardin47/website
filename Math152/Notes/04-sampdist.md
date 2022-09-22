@@ -184,12 +184,130 @@ How would this problem have been different if we had known $\sigma$?  Or even if
 
 ## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
 
-1. 
+1. What does it mean for a statistic to have a sampling distribution? 
+2. What is the difference between the theoretical MSE and the empirical MSE (e.g., in the tank example below)?
+3. Why can't a standard normal distribution be used when the statistic of interest is $\frac{\overline{X} - \mu}{s / \sqrt{n}}?$
+4. What different tools are used to determine the distribution of a random variable?  (Note, in this chapter, the majority of the random variables of interest are functions of data, also called statistics.)
 
 ## <i class="fas fa-balance-scale"></i> Ethics Considerations
 
-1. 
+1. How do you know which estimator to use in a consulting situation?
+2. How do you respond to someone who tells you "there isn't one right answer" to the previous question?
+3. What are the technical conditions for running a t-test?  That is, what are the conditions on the data that give rise to the t-distribution?  What happens if the technical conditions are violated and the t-test is run anyway?
 
 
 ## R code: Tanks Example
+
+How can a random sample of integers between 1 and $N$ (with $N$ unknown to the researcher) be used to estimate $N$?  This problem is known as the German tank problem and is derived directly from a situation where the Allies used maximum likelihood estimation to determine how many tanks the Axes had produced.  See \url{https://en.wikipedia.org/wiki/German_tank_problem}.
+
+The tanks are numbered from 1 to $N$.  
+Think about how you would use your data to estimate $N$. 
+
+Some possible estimators of $N$ are:[^5]  
+\begin{eqnarray*}
+\hat{N}_1 &=& 2\cdot\overline{X} - 1 \ \ \ \mbox{the MOM}\\
+\hat{N}_2 &=& 2\cdot \mbox{median}(\underline{X}) - 1 \\
+\hat{N}_3 &=& \max(\underline{X})  \ \ \ \mbox{the MLE}\\
+\hat{N}_4 &=& \frac{n+1}{n} \max(\underline{X})  \ \ \ \mbox{unbiased version of the MLE}\\
+\hat{N}_5 &=& \max(\underline{X}) + \min(\underline{X}) \\
+\hat{N}_6 &=& \frac{n+1}{n-1}[\max(\underline{X}) - \min(\underline{X})] \\
+\end{eqnarray*}
+
+[^5]: Note that the MOM and MLE estimators were derived under the assumption that the data are *iid* from a population of discrete uniform values.  Because our data is sampled without replacement, we don't have an *iid* model.  However, if $n < < < N$, the *iid* discrete uniform is a reasonable model for the situation at hand.
+
+### Theoretical Mean Squared Error
+
+
+Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max.  Fortunately, we know something about the moments of these functions:
+
+
+| g($\underline{X}$)                              |    E( g($\underline{X}$) )    |       Var( g($\underline{X}$) )       |
+|-------------------------------------------------|:-----------------------------:|:-------------------------------------:|
+| \vspace{-.3cm}$\overline{X}$                    |        $\frac{N+1}{2}$        |  $\frac{(N+1)(N-1)}{12 n}$  |
+| \vspace{-.3cm}median($\underline{X}$) = M |        $\frac{N+1}{2}$        |         $\frac{(N-1)^2}{4 n}$         |
+| \vspace{-.3cm}min($\underline{X}$)              | $\frac{(N-1)}{n} + 1$  |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+| \vspace{-.3cm}max($\underline{X}$)              |     $N - \frac{(N-1)}{n}$     |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
+
+Using this information, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
+
+\begin{eqnarray}
+\mbox{MSE } ( 2 \cdot \overline{X} - 1) &=& \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&=& \frac{4 (N+1) (N-1)}{12n} \\
+\nonumber \\
+\mbox{MSE } ( 2 \cdot M - 1) &=& \frac{4 (N-1)^2}{4n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&=& \frac{4 (N-1)^2}{4n} \\
+\nonumber \\
+\mbox{MSE } ( \max(\underline{X})) &=& \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(N - \frac{(N-1)}{n} - N\Bigg)^2 \nonumber\\
+&=& \bigg(\frac{N-1}{n}\bigg)^2 + \bigg(\frac{N-1}{n} \bigg)^2  = 2*\bigg(\frac{N-1}{n} \bigg)^2 \\
+\nonumber \\
+\mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &=& \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
+\end{eqnarray}
+
+
+<img src="04-sampdist_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+### Empirical MSE
+
+We don't need to know the theoretical expected value or variance of the functions to approximate the MSE.  We can visualize the sampling distributions and also calculate the actual empirical MSE for any estimator we come up with.
+
+By changing the population size and the sample size, we can assess how the estimators compare and whether one is particularly better under a given setting.
+
+
+```r
+npop = 447  # population size
+nsamp = 10  # sample size
+reps = 10000
+
+  xbar.2 = c()  # placeholder for repeated sample statistics
+  median.2 = c()
+  samp.max = c()
+  mod.max = c()
+  sum.min.max = c()
+  diff.min.max = c()
+
+for (i in 1:reps){
+  mysample =  sample(1:npop,nsamp,replace=F)  # sample some tanks from the population
+    xbar.2 = c(xbar.2, (2 * mean(mysample) - 1))
+    median.2 = c(median.2, (2 * median(mysample) - 1))
+    samp.max = c(samp.max, max(mysample))
+    mod.max = c(mod.max, ((nsamp+1)/nsamp)*max(mysample))
+    sum.min.max = c(sum.min.max, (min(mysample)+max(mysample)))
+    diff.min.max = c(diff.min.max, ((nsamp+1)/(nsamp-1))*(max(mysample) - min(mysample)))
+}
+
+
+estimate <- c(xbar.2, median.2, samp.max, mod.max, sum.min.max, diff.min.max)
+method <- c(rep("2 xbars", reps), rep("2 medians", reps), rep("sample max", reps),
+            rep("modified max", reps), rep("sum min max", reps), rep("diff max min", reps))
+all.estimates <- data.frame(estimate, method)
+
+
+all.estimates %>%
+  group_by(method) %>%
+  summarize(mean = mean(estimate), median = median(estimate), bias = mean(estimate) - npop,
+            var = var(estimate), mse = (mean(estimate) - npop)^2 + var(estimate))
+```
+
+```
+## # A tibble: 6 × 6
+##   method        mean median     bias    var    mse
+##   <chr>        <dbl>  <dbl>    <dbl>  <dbl>  <dbl>
+## 1 2 medians     448.   448.   1.12   15023. 15024.
+## 2 2 xbars       447.   447.   0.0459  6561.  6561.
+## 3 diff max min  449.   460.   1.94    3683.  3686.
+## 4 modified max  448.   461.   1.14    1654.  1655.
+## 5 sample max    407.   419  -39.6     1367.  2935.
+## 6 sum min max   447.   448    0.488   2919.  2919.
+```
+
+
+```r
+ggplot(all.estimates, aes(x = estimate)) +
+  geom_histogram() +
+  geom_vline(xintercept = npop) +
+  facet_wrap(~method)
+```
+
+<img src="04-sampdist_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+
 

@@ -253,7 +253,11 @@ k &amp;=&amp; \frac{1.383}{\sqrt{10}} = 0.437\\
 <span class="header-section-number">4.4</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-3"><i class="fas fa-link"></i></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>
+<li>What does it mean for a statistic to have a sampling distribution?</li>
+<li>What is the difference between the theoretical MSE and the empirical MSE (e.g., in the tank example below)?</li>
+<li>Why can’t a standard normal distribution be used when the statistic of interest is <span class="math inline">\(\frac{\overline{X} - \mu}{s / \sqrt{n}}?\)</span>
+</li>
+<li>What different tools are used to determine the distribution of a random variable? (Note, in this chapter, the majority of the random variables of interest are functions of data, also called statistics.)</li>
 </ol>
 </div>
 <div id="ethics-considerations-3" class="section level2" number="4.5">
@@ -261,16 +265,139 @@ k &amp;=&amp; \frac{1.383}{\sqrt{10}} = 0.437\\
 <span class="header-section-number">4.5</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-3"><i class="fas fa-link"></i></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>
+<li>How do you know which estimator to use in a consulting situation?</li>
+<li>How do you respond to someone who tells you “there isn’t one right answer” to the previous question?</li>
+<li>What are the technical conditions for running a t-test? That is, what are the conditions on the data that give rise to the t-distribution? What happens if the technical conditions are violated and the t-test is run anyway?</li>
 </ol>
 </div>
 <div id="r-code-tanks-example" class="section level2" number="4.6">
 <h2>
 <span class="header-section-number">4.6</span> R code: Tanks Example<a class="anchor" aria-label="anchor" href="#r-code-tanks-example"><i class="fas fa-link"></i></a>
 </h2>
+<p>How can a random sample of integers between 1 and <span class="math inline">\(N\)</span> (with <span class="math inline">\(N\)</span> unknown to the researcher) be used to estimate <span class="math inline">\(N\)</span>? This problem is known as the German tank problem and is derived directly from a situation where the Allies used maximum likelihood estimation to determine how many tanks the Axes had produced. See .</p>
+<p>The tanks are numbered from 1 to <span class="math inline">\(N\)</span>.<br>
+Think about how you would use your data to estimate <span class="math inline">\(N\)</span>.</p>
+<p>Some possible estimators of <span class="math inline">\(N\)</span> are:<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Note that the MOM and MLE estimators were derived under the assumption that the data are &lt;em&gt;iid&lt;/em&gt; from a population of discrete uniform values. Because our data is sampled without replacement, we don’t have an &lt;em&gt;iid&lt;/em&gt; model. However, if &lt;span class="math inline"&gt;\(n &amp;lt; &amp;lt; &amp;lt; N\)&lt;/span&gt;, the &lt;em&gt;iid&lt;/em&gt; discrete uniform is a reasonable model for the situation at hand.&lt;/p&gt;'><sup>7</sup></a><br><span class="math display">\[\begin{eqnarray*}
+\hat{N}_1 &amp;=&amp; 2\cdot\overline{X} - 1 \ \ \ \mbox{the MOM}\\
+\hat{N}_2 &amp;=&amp; 2\cdot \mbox{median}(\underline{X}) - 1 \\
+\hat{N}_3 &amp;=&amp; \max(\underline{X})  \ \ \ \mbox{the MLE}\\
+\hat{N}_4 &amp;=&amp; \frac{n+1}{n} \max(\underline{X})  \ \ \ \mbox{unbiased version of the MLE}\\
+\hat{N}_5 &amp;=&amp; \max(\underline{X}) + \min(\underline{X}) \\
+\hat{N}_6 &amp;=&amp; \frac{n+1}{n-1}[\max(\underline{X}) - \min(\underline{X})] \\
+\end{eqnarray*}\]</span></p>
+<div id="theoretical-mean-squared-error" class="section level3" number="4.6.1">
+<h3>
+<span class="header-section-number">4.6.1</span> Theoretical Mean Squared Error<a class="anchor" aria-label="anchor" href="#theoretical-mean-squared-error"><i class="fas fa-link"></i></a>
+</h3>
+<p>Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max. Fortunately, we know something about the moments of these functions:</p>
+<div class="inline-table"><table class="table table-sm">
+<colgroup>
+<col width="41%">
+<col width="26%">
+<col width="32%">
+</colgroup>
+<thead><tr class="header">
+<th>g(<span class="math inline">\(\underline{X}\)</span>)</th>
+<th align="center">E( g(<span class="math inline">\(\underline{X}\)</span>) )</th>
+<th align="center">Var( g(<span class="math inline">\(\underline{X}\)</span>) )</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\overline{X}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{N+1}{2}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{(N+1)(N-1)}{12 n}\)</span></td>
+</tr>
+<tr class="even">
+<td>median(<span class="math inline">\(\underline{X}\)</span>) = M</td>
+<td align="center"><span class="math inline">\(\frac{N+1}{2}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{(N-1)^2}{4 n}\)</span></td>
+</tr>
+<tr class="odd">
+<td>min(<span class="math inline">\(\underline{X}\)</span>)</td>
+<td align="center"><span class="math inline">\(\frac{(N-1)}{n} + 1\)</span></td>
+<td align="center"><span class="math inline">\(\bigg(\frac{N-1}{n}\bigg)^2\)</span></td>
+</tr>
+<tr class="even">
+<td>max(<span class="math inline">\(\underline{X}\)</span>)</td>
+<td align="center"><span class="math inline">\(N - \frac{(N-1)}{n}\)</span></td>
+<td align="center"><span class="math inline">\(\bigg(\frac{N-1}{n}\bigg)^2\)</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>Using this information, we can calculate the MSE for 4 of the estimators that we have derived. (Remember that MSE = Variance + Bias<span class="math inline">\(^2\)</span>.)</p>
+<p><span class="math display">\[\begin{eqnarray}
+\mbox{MSE } ( 2 \cdot \overline{X} - 1) &amp;=&amp; \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&amp;=&amp; \frac{4 (N+1) (N-1)}{12n} \\
+\nonumber \\
+\mbox{MSE } ( 2 \cdot M - 1) &amp;=&amp; \frac{4 (N-1)^2}{4n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&amp;=&amp; \frac{4 (N-1)^2}{4n} \\
+\nonumber \\
+\mbox{MSE } ( \max(\underline{X})) &amp;=&amp; \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(N - \frac{(N-1)}{n} - N\Bigg)^2 \nonumber\\
+&amp;=&amp; \bigg(\frac{N-1}{n}\bigg)^2 + \bigg(\frac{N-1}{n} \bigg)^2  = 2*\bigg(\frac{N-1}{n} \bigg)^2 \\
+\nonumber \\
+\mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &amp;=&amp; \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
+\end{eqnarray}\]</span></p>
+<div class="inline-figure"><img src="04-sampdist_files/figure-html/unnamed-chunk-1-1.png" width="672"></div>
+</div>
+<div id="empirical-mse" class="section level3" number="4.6.2">
+<h3>
+<span class="header-section-number">4.6.2</span> Empirical MSE<a class="anchor" aria-label="anchor" href="#empirical-mse"><i class="fas fa-link"></i></a>
+</h3>
+<p>We don’t need to know the theoretical expected value or variance of the functions to approximate the MSE. We can visualize the sampling distributions and also calculate the actual empirical MSE for any estimator we come up with.</p>
+<p>By changing the population size and the sample size, we can assess how the estimators compare and whether one is particularly better under a given setting.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">npop</span> <span class="op">=</span> <span class="fl">447</span>  <span class="co"># population size</span>
+<span class="va">nsamp</span> <span class="op">=</span> <span class="fl">10</span>  <span class="co"># sample size</span>
+<span class="va">reps</span> <span class="op">=</span> <span class="fl">10000</span>
+
+  <span class="va">xbar.2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># placeholder for repeated sample statistics</span>
+  <span class="va">median.2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">samp.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">mod.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">sum.min.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">diff.min.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">reps</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">mysample</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">npop</span>,<span class="va">nsamp</span>,replace<span class="op">=</span><span class="cn">F</span><span class="op">)</span>  <span class="co"># sample some tanks from the population</span>
+    <span class="va">xbar.2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">xbar.2</span>, <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">median.2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">median.2</span>, <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">samp.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">samp.max</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">mod.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">mod.max</span>, <span class="op">(</span><span class="op">(</span><span class="va">nsamp</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">nsamp</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">sum.min.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sum.min.max</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">diff.min.max</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">diff.min.max</span>, <span class="op">(</span><span class="op">(</span><span class="va">nsamp</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="va">nsamp</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">mysample</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="va">estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">xbar.2</span>, <span class="va">median.2</span>, <span class="va">samp.max</span>, <span class="va">mod.max</span>, <span class="va">sum.min.max</span>, <span class="va">diff.min.max</span><span class="op">)</span>
+<span class="va">method</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"2 xbars"</span>, <span class="va">reps</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"2 medians"</span>, <span class="va">reps</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"sample max"</span>, <span class="va">reps</span><span class="op">)</span>,
+            <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"modified max"</span>, <span class="va">reps</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"sum min max"</span>, <span class="va">reps</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"diff max min"</span>, <span class="va">reps</span><span class="op">)</span><span class="op">)</span>
+<span class="va">all.estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">estimate</span>, <span class="va">method</span><span class="op">)</span>
+
+
+<span class="va">all.estimates</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">method</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span>, median <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span>, bias <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span> <span class="op">-</span> <span class="va">npop</span>,
+            var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span>, mse <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span> <span class="op">-</span> <span class="va">npop</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">estimate</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 6
+##   method        mean median     bias    var    mse
+##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 2 medians     448.   448.   1.12   15023. 15024.
+## 2 2 xbars       447.   447.   0.0459  6561.  6561.
+## 3 diff max min  449.   460.   1.94    3683.  3686.
+## 4 modified max  448.   461.   1.14    1654.  1655.
+## 5 sample max    407.   419  -39.6     1367.  2935.
+## 6 sum min max   447.   448    0.488   2919.  2919.</code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">all.estimates</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">npop</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">method</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="04-sampdist_files/figure-html/unnamed-chunk-3-1.png" width="672"></div>
 
 </div>
 </div>
+</div>
+
   <div class="chapter-nav">
 <div class="prev"><a href="MLE.html"><span class="header-section-number">3</span> Maximum Likelihood Estimation</a></div>
 <div class="next"><a href="references.html">References</a></div>
@@ -283,7 +410,12 @@ k &amp;=&amp; \frac{1.383}{\sqrt{10}} = 0.437\\
 <li><a class="nav-link" href="#the-t-distribution"><span class="header-section-number">4.3</span> The t-distribution</a></li>
 <li><a class="nav-link" href="#reflection-questions-3"><span class="header-section-number">4.4</span>  Reflection Questions</a></li>
 <li><a class="nav-link" href="#ethics-considerations-3"><span class="header-section-number">4.5</span>  Ethics Considerations</a></li>
-<li><a class="nav-link" href="#r-code-tanks-example"><span class="header-section-number">4.6</span> R code: Tanks Example</a></li>
+<li>
+<a class="nav-link" href="#r-code-tanks-example"><span class="header-section-number">4.6</span> R code: Tanks Example</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#theoretical-mean-squared-error"><span class="header-section-number">4.6.1</span> Theoretical Mean Squared Error</a></li>
+<li><a class="nav-link" href="#empirical-mse"><span class="header-section-number">4.6.2</span> Empirical MSE</a></li>
+</ul>
+</li>
 </ul>
 
       <div class="book-extra">
