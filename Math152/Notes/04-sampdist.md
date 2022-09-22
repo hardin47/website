@@ -55,26 +55,26 @@ See theorem 4.4.3, pg 207.
 
 If $Z \sim N(0,1), Y=Z^2,$ then $Y \sim \chi^2_1$.
 
-Note that the result here is to provide the distribution of a transformation of a random variable.  There is a single data value $(Z)$, and the result provides the distribution of another single value, $(Y).$  The value $Y$ would typically not be referred to as a statistic because it is not a summary of observations.
+Note that the result here is to provide the distribution of a transformation of a random variable.  There is a single data value $(Z),$ and the result provides the distribution of another single value, $(Y).$  The value $Y$ would typically not be referred to as a statistic because it is not a summary of observations.
 
 That said, just below, $Z$ itself will be a statistic (instead of a single value) and then both $Z$ and $Y$ will have sampling distributions!
 :::
 
 ::: {.proof}
-Let $\Phi$ and $\phi$ be the cdf and pdf of Z.\\
-Let F and f be the cdf and pdf of Y.\\
+Let $\Phi$ and $\phi$ be the cdf and pdf of Z.  
+Let F and f be the cdf and pdf of Y.  
 \begin{eqnarray*}
-F(y) &=& P(Y \leq y) = P(Z^2 \leq y)\\
+F_Y(y) &=& P(Y \leq y) = P(Z^2 \leq y)\\
 &=& P(-y^{1/2} \leq Z \leq y^{1/2})\\
 &=& \Phi(y^{1/2}) -  \Phi(- y^{1/2})  \ \ \ \ \ y > 0\\
 \end{eqnarray*}
 \smallskip
 \begin{eqnarray*}
-f(y) &=& \frac{\partial F(y)}{\partial y} = \phi(y^{1/2}) \cdot \frac{1}{2} y^{-1/2} - \phi(-y^{1/2}) \cdot \frac{1}{2} -y^{-1/2}\\
+f_Y(y) &=& \frac{\partial F_Y(y)}{\partial y} = \phi(y^{1/2}) \cdot \frac{1}{2} y^{-1/2} - \phi(-y^{1/2}) \cdot \frac{1}{2} -y^{-1/2}\\
 &=& \frac{1}{2} y^{-1/2} ( \phi(y^{1/2}) + \phi(-y^{1/2})) \ \ \ \ \ \ y > 0\\
 \mbox{we know} && \phi(y^{1/2}) = \phi(-y^{1/2}) = \frac{1}{\sqrt{2 \pi}} e^{-y/2}\\
 %\therefore
-f(y) &=& y^{-1/2} \frac{1}{\sqrt{2 \pi}} e^{-y/2} \ \ \ \ \ \ y > 0 \\
+f_Y(y) &=& y^{-1/2} \frac{1}{\sqrt{2 \pi}} e^{-y/2} \ \ \ \ \ \ y > 0 \\
 &=& \frac{1}{2^{1/2}\pi^{1/2}} y^{1/2 - 1} e^{-y/2} \ \ \ \ \ \ y >0\\
 Y &\sim& \chi^2_1\\
 \end{eqnarray*}
@@ -129,7 +129,7 @@ X = \frac{Z}{\sqrt{Y/n}} \sim t_n \mbox{  by definition}
 :::
 
 \begin{eqnarray*}
-f(x) &=& \frac{\Gamma(\frac{n+1}{2})}{(n \pi)^{1/2} \Gamma(\frac{n}{2})} (1 + \frac{x^2}{n})^{-(n+1)/2} \ \ \ \ n > 2\\
+f_X(x) &=& \frac{\Gamma(\frac{n+1}{2})}{(n \pi)^{1/2} \Gamma(\frac{n}{2})} (1 + \frac{x^2}{n})^{-(n+1)/2} \ \ \ \ n > 2\\
 E[X] &=&0\\
 Var(X) &=& \frac{n}{n-2}
 \end{eqnarray*}
@@ -208,7 +208,7 @@ Some possible estimators of $N$ are:[^5]
 \hat{N}_1 &=& 2\cdot\overline{X} - 1 \ \ \ \mbox{the MOM}\\
 \hat{N}_2 &=& 2\cdot \mbox{median}(\underline{X}) - 1 \\
 \hat{N}_3 &=& \max(\underline{X})  \ \ \ \mbox{the MLE}\\
-\hat{N}_4 &=& \frac{n+1}{n} \max(\underline{X})  \ \ \ \mbox{unbiased version of the MLE}\\
+\hat{N}_4 &=& \frac{n+1}{n} \max(\underline{X})  \ \ \ \mbox{less biased version of the MLE}\\
 \hat{N}_5 &=& \max(\underline{X}) + \min(\underline{X}) \\
 \hat{N}_6 &=& \frac{n+1}{n-1}[\max(\underline{X}) - \min(\underline{X})] \\
 \end{eqnarray*}
@@ -228,7 +228,7 @@ Most of our estimators are made up of four basic functions of the data: the mean
 | \vspace{-.3cm}min($\underline{X}$)              | $\frac{(N-1)}{n} + 1$  |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
 | \vspace{-.3cm}max($\underline{X}$)              |     $N - \frac{(N-1)}{n}$     |     $\bigg(\frac{N-1}{n}\bigg)^2$     |
 
-Using this information, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
+Using the information on expected value and variance, we can calculate the MSE for 4 of the estimators that we have derived.  (Remember that MSE = Variance + Bias$^2$.)
 
 \begin{eqnarray}
 \mbox{MSE } ( 2 \cdot \overline{X} - 1) &=& \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
@@ -254,60 +254,124 @@ By changing the population size and the sample size, we can assess how the estim
 
 
 ```r
-npop = 447  # population size
-nsamp = 10  # sample size
-reps = 10000
-
-  xbar.2 = c()  # placeholder for repeated sample statistics
-  median.2 = c()
-  samp.max = c()
-  mod.max = c()
-  sum.min.max = c()
-  diff.min.max = c()
-
-for (i in 1:reps){
-  mysample =  sample(1:npop,nsamp,replace=F)  # sample some tanks from the population
-    xbar.2 = c(xbar.2, (2 * mean(mysample) - 1))
-    median.2 = c(median.2, (2 * median(mysample) - 1))
-    samp.max = c(samp.max, max(mysample))
-    mod.max = c(mod.max, ((nsamp+1)/nsamp)*max(mysample))
-    sum.min.max = c(sum.min.max, (min(mysample)+max(mysample)))
-    diff.min.max = c(diff.min.max, ((nsamp+1)/(nsamp-1))*(max(mysample) - min(mysample)))
+calculate_N <- function(nsamp,npop){
+  mysample =  sample(1:npop,nsamp,replace=F)  # what does this line do?
+  xbar2 <- 2 * mean(mysample) - 1
+  median2 <- 2 * median(mysample) - 1
+  samp.max <- max(mysample)
+  mod.max <- ((nsamp + 1)/nsamp) * max(mysample)
+  sum.min.max <- min(mysample) + max(mysample)
+  diff.min.max <- ((nsamp + 1)/(nsamp - 1)* (max(mysample) - min(mysample)))
+  data.frame(xbar2, median2, samp.max, mod.max, sum.min.max, diff.min.max,nsamp,npop)
 }
 
-
-estimate <- c(xbar.2, median.2, samp.max, mod.max, sum.min.max, diff.min.max)
-method <- c(rep("2 xbars", reps), rep("2 medians", reps), rep("sample max", reps),
-            rep("modified max", reps), rep("sum min max", reps), rep("diff max min", reps))
-all.estimates <- data.frame(estimate, method)
-
-
-all.estimates %>%
-  group_by(method) %>%
-  summarize(mean = mean(estimate), median = median(estimate), bias = mean(estimate) - npop,
-            var = var(estimate), mse = (mean(estimate) - npop)^2 + var(estimate))
+reps <- 2
+nsamp_try <- c(10,100, 10, 100)
+npop_try <- c(147, 147, 447, 447)
+map_df(1:reps, ~map2(nsamp_try, npop_try, calculate_N))
 ```
 
 ```
-## # A tibble: 6 × 6
-##   method        mean median     bias    var    mse
-##   <chr>        <dbl>  <dbl>    <dbl>  <dbl>  <dbl>
-## 1 2 medians     448.   448.   1.12   15023. 15024.
-## 2 2 xbars       447.   447.   0.0459  6561.  6561.
-## 3 diff max min  449.   460.   1.94    3683.  3686.
-## 4 modified max  448.   461.   1.14    1654.  1655.
-## 5 sample max    407.   419  -39.6     1367.  2935.
-## 6 sum min max   447.   448    0.488   2919.  2919.
+##    xbar2 median2 samp.max mod.max sum.min.max diff.min.max nsamp npop
+## 1  80.00      48      141  155.10         148     163.7778    10  147
+## 2 148.44     141      147  148.47         148     148.9495   100  147
+## 3 410.20     425      442  486.20         487     485.2222    10  447
+## 4 418.86     386      445  449.45         450     448.8889   100  447
+## 5 110.20      61      147  161.70         148     178.4444    10  147
+## 6 150.98     156      146  147.46         147     147.9293   100  147
+## 7 429.80     283      415  456.50         470     440.0000    10  447
+## 8 426.20     390      447  451.47         449     453.9899   100  447
 ```
+
 
 
 ```r
-ggplot(all.estimates, aes(x = estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = npop) +
-  facet_wrap(~method)
+reps <- 1000
+results <- map_df(1:reps, ~map2(nsamp_try, npop_try, calculate_N))
+
+# making the results long instead of wide:
+results_long <- results %>%
+  pivot_longer(cols = xbar2:diff.min.max, names_to = "estimator", values_to = "estimate")
+
+# how is results different from results_long?  let's look at it:
+results_long
 ```
 
-<img src="04-sampdist_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+```
+## # A tibble: 24,000 × 4
+##    nsamp  npop estimator    estimate
+##    <dbl> <dbl> <chr>           <dbl>
+##  1    10   147 xbar2            114.
+##  2    10   147 median2          114 
+##  3    10   147 samp.max         115 
+##  4    10   147 mod.max          127.
+##  5    10   147 sum.min.max      116 
+##  6    10   147 diff.min.max     139.
+##  7   100   147 xbar2            143.
+##  8   100   147 median2          139 
+##  9   100   147 samp.max         146 
+## 10   100   147 mod.max          147.
+## # … with 23,990 more rows
+## # ℹ Use `print(n = ...)` to see more rows
+```
+
+
+
+```r
+results_long %>%
+  group_by(nsamp, npop, estimator) %>%
+  summarize(mean = mean(estimate), median = median(estimate), bias = mean(estimate - npop),
+            var = var(estimate), mse = (mean(estimate - npop))^2 + var(estimate))
+```
+
+```
+## `summarise()` has grouped output by 'nsamp', 'npop'. You can override using the
+## `.groups` argument.
+```
+
+```
+## # A tibble: 24 × 8
+## # Groups:   nsamp, npop [4]
+##    nsamp  npop estimator     mean median    bias    var    mse
+##    <dbl> <dbl> <chr>        <dbl>  <dbl>   <dbl>  <dbl>  <dbl>
+##  1    10   147 diff.min.max  148.   152.   1.18    387.   388.
+##  2    10   147 median2       149.   151    1.76   1612.  1615.
+##  3    10   147 mod.max       149.   153.   1.91    159.   162.
+##  4    10   147 samp.max      135.   139  -11.6     131.   266.
+##  5    10   147 sum.min.max   150.   149    2.50    317.   324.
+##  6    10   147 xbar2         149.   149.   1.80    717.   721.
+##  7    10   447 diff.min.max  448.   460.   1.37   3601.  3603.
+##  8    10   447 median2       443.   445   -3.74  14980. 14994.
+##  9    10   447 mod.max       448.   460.   0.821  1599.  1600.
+## 10    10   447 samp.max      407.   418  -39.9    1322.  2913.
+## # … with 14 more rows
+## # ℹ Use `print(n = ...)` to see more rows
+```
+
+
+
+```r
+results_long %>%
+  filter(npop == 147) %>%
+  ggplot(aes(x = estimate)) +
+  geom_histogram() +
+  geom_vline(aes(xintercept = npop), color = "red") +
+  facet_grid(nsamp ~ estimator) + 
+  ggtitle("sampling distributions of estimators of N, pop size = 147")
+```
+
+<img src="04-sampdist_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+
+```r
+results_long %>%
+  filter(npop == 447) %>%
+  ggplot(aes(x = estimate)) +
+  geom_histogram() +
+  geom_vline(aes(xintercept = npop), color = "red") +
+  facet_grid(nsamp ~ estimator) + 
+  ggtitle("sampling distributions of estimators of N, pop size = 447")
+```
+
+<img src="04-sampdist_files/figure-html/unnamed-chunk-5-2.png" width="672" />
 
 
