@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 5 Bootstrap Distributions | Statistical Theory</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="5.1 Bootstrap Sampling Distributions Before introducing the bootstrap, let’s reflect on the work we’ve done so far. Note that one of the big goals has been to understand how variability in data...">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
+<meta property="og:title" content="Chapter 5 Bootstrap Distributions | Statistical Theory">
+<meta property="og:type" content="book">
+<meta property="og:description" content="5.1 Bootstrap Sampling Distributions Before introducing the bootstrap, let’s reflect on the work we’ve done so far. Note that one of the big goals has been to understand how variability in data...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 5 Bootstrap Distributions | Statistical Theory">
+<meta name="twitter:description" content="5.1 Bootstrap Sampling Distributions Before introducing the bootstrap, let’s reflect on the work we’ve done so far. Note that one of the big goals has been to understand how variability in data...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Statistical Theory</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="bayes.html"><span class="header-section-number">2</span> Bayesian Estimation</a></li>
+<li><a class="" href="MLE.html"><span class="header-section-number">3</span> Maximum Likelihood Estimation</a></li>
+<li><a class="" href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></li>
+<li><a class="active" href="bootdist.html"><span class="header-section-number">5</span> Bootstrap Distributions</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="bootdist" class="section level1" number="5">
+<h1>
+<span class="header-section-number">5</span> Bootstrap Distributions<a class="anchor" aria-label="anchor" href="#bootdist"><i class="fas fa-link"></i></a>
+</h1>
+<div id="bootstrap-sampling-distributions" class="section level2" number="5.1">
+<h2>
+<span class="header-section-number">5.1</span> Bootstrap Sampling Distributions<a class="anchor" aria-label="anchor" href="#bootstrap-sampling-distributions"><i class="fas fa-link"></i></a>
+</h2>
+<p>Before introducing the bootstrap, let’s reflect on the work we’ve done so far. Note that one of the big goals has been to understand how variability in data (samples) affects the estimation. Consider the different approaches we’ve taken to understanding that variability:</p>
+<ol style="list-style-type: decimal">
+<li>As a Bayesian, <span class="math inline">\(\theta | \underline{X} \sim\)</span> according to a posterior distribution which describes the variability of <span class="math inline">\(\theta\)</span> conditional on the data.<br>
+</li>
+<li>As a Frequentist, the focus was on the variability of the statistic instead of the variability of the parameter.
+<ol style="list-style-type: lower-alpha">
+<li>When <span class="math inline">\(f(x|\theta)\)</span> is known, we can simulate data from the population and use the empirical sampling distribution to see how the estimates vary from sample to sample. For example, consider the work we did with the tanks.</li>
+<li>When <span class="math inline">\(f(x|\theta)\)</span> and the statistic are lovely, we can use mathematical theory. Mostly (so far) “lovely” meant that the data were normal and the statistic was one of those that produced either a <span class="math inline">\(\chi^2\)</span> or <span class="math inline">\(t\)</span> distribution.<br>
+</li>
+<li>When <span class="math inline">\(f(x|\theta)\)</span> is unknown but <span class="math inline">\(n\)</span> is large and the statistic of interest is the sample mean (note: a proportion is a sample mean!), we can use the Central Limit Theorem.</li>
+<li>When <span class="math inline">\(f(x|\theta)\)</span> is <strong>unknown</strong> and the statistic is <strong>arbitrary</strong>, we use the Bootstrap.</li>
+</ol>
+</li>
+</ol>
+<div id="introduction" class="section level3" number="5.1.1">
+<h3>
+<span class="header-section-number">5.1.1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"><i class="fas fa-link"></i></a>
+</h3>
+<p>Main idea: we will be able to estimate the <strong>variability</strong> or our estimator, by using a single random sample to describe the population (hey, that’s what we always do because we usually only have one sample to use!).</p>
+<ul>
+<li>It’s not so strange to get <span class="math inline">\(\hat{\theta}\)</span> and SE(<span class="math inline">\(\hat{\theta}\)</span>) from the data (consider <span class="math inline">\(\hat{p}\)</span> &amp; <span class="math inline">\(\sqrt{\hat{p}(1-\hat{p})/n}\)</span> and <span class="math inline">\(\overline{X}\)</span> &amp; <span class="math inline">\(s/\sqrt{n}\)</span>).</li>
+<li>We’ll only consider confidence intervals for now.</li>
+<li>Bootstrapping doesn’t help get around small samples.</li>
+</ul>
+<p>The following applets may be helpful:</p>
+<ul>
+<li>Bootstrapping from actual datasets: <a href="http://lock5stat.com/statkey/index.html" class="uri">http://lock5stat.com/statkey/index.html</a>
+</li>
+<li>Bootstrapping in contrast to sampling from a population: <a href="https://www.rossmanchance.com/applets/OneSample.html?population=bootstrap" class="uri">https://www.rossmanchance.com/applets/OneSample.html?population=bootstrap</a>
+</li>
+<li>The logic of confidence intervals: <a href="http://www.rossmanchance.com/applets/ConfSim.html" class="uri">http://www.rossmanchance.com/applets/ConfSim.html</a>
+</li>
+</ul>
+</div>
+<div id="basics-notation" class="section level3" number="5.1.2">
+<h3>
+<span class="header-section-number">5.1.2</span> Basics &amp; Notation<a class="anchor" aria-label="anchor" href="#basics-notation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Let <span class="math inline">\(\theta\)</span> be the parameter of interest, and let <span class="math inline">\(\hat{\theta}\)</span> be the estimate of <span class="math inline">\(\theta\)</span>. If we could, we’d take lots of samples of size <span class="math inline">\(n\)</span> from the population to create a for <span class="math inline">\(\hat{\theta}\)</span>. Consider taking <span class="math inline">\(B\)</span> random samples from <span class="math inline">\(F\)</span>:
+<span class="math display">\[\begin{eqnarray*}
+\hat{\theta}(\cdot) = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_b
+\end{eqnarray*}\]</span>
+is our best guess for <span class="math inline">\(\theta\)</span>. If <span class="math inline">\(\hat{\theta}\)</span> is very different from <span class="math inline">\(\theta\)</span>, we would call it .
+<span class="math display">\[\begin{eqnarray*}
+SE(\hat{\theta}) &amp;=&amp; \bigg[ \frac{1}{B-1} \sum_{b=1}^B(\hat{\theta}_b - \hat{\theta}(\cdot))^2 \bigg]^{1/2}\\
+q_1 &amp;=&amp; [0.25 n] \ \ \ \ \hat{\theta}^{(q_1)} = \mbox{25}\% \mbox{ cutoff}\\
+q_3 &amp;=&amp; [0.75 n] \ \ \ \ \hat{\theta}^{(q_3)} = \mbox{75}\% \mbox{ cutoff}\\
+\end{eqnarray*}\]</span></p>
+<p>If we could, we would completely characterize the sampling distribution (as a function of <span class="math inline">\(\theta\)</span>) which would allow us to make inference on <span class="math inline">\(\theta\)</span> when we only had <span class="math inline">\(\hat{\theta}\)</span>.</p>
+<div class="figure">
+<span style="display:block;" id="fig:unnamed-chunk-1"></span>
+<img src="figs/BSlogic.png" alt="Image credit: Hesterberg: supplemental chapter for Introduction to the Practice of Statistics, 5th Edition by Moore and McCabe.  https://www.timhesterberg.net/bootstrap-and-resampling" width="80%"><p class="caption">
+Figure 1.1: Image credit: Hesterberg: supplemental chapter for Introduction to the Practice of Statistics, 5th Edition by Moore and McCabe. <a href="https://www.timhesterberg.net/bootstrap-and-resampling" class="uri">https://www.timhesterberg.net/bootstrap-and-resampling</a>
+</p>
+</div>
+<div id="the-plug-in-principle" class="section level4 unnumbered">
+<h4>The Plug-in Principle<a class="anchor" aria-label="anchor" href="#the-plug-in-principle"><i class="fas fa-link"></i></a>
+</h4>
+<p>Recall
+<span class="math display">\[\begin{eqnarray*}
+F(x) &amp;=&amp; P(X \leq x)\\
+\hat{F}(x) &amp;=&amp; S(x) = \frac{\# X_i \leq x}{n}
+\end{eqnarray*}\]</span>
+<span class="math inline">\(\hat{F}(x)\)</span> is a sufficient statistic for <span class="math inline">\(F(x)\)</span>. That is, all the information about <span class="math inline">\(F\)</span> that is in the data is contained in <span class="math inline">\(\hat{F}(x)\)</span>. Additionally, <span class="math inline">\(\hat{F}(x)\)</span> is the MLE of <span class="math inline">\(F(x)\)</span>. (They are both probabilities, so it’s a multinomial argument. Very similar to a binomial argument, but the maximization happens with the additional constraint that the probabilities have to sum to one, so Lagrangian multipliers are used.)</p>
+<p>Note that, in general, we are interested in a parameter, <span class="math inline">\(\theta\)</span> which is a functional of <span class="math inline">\(F\)</span> (functional means that the is a function).
+<span class="math display">\[\begin{eqnarray*}
+t(F) = \theta \ \ \ \ \Bigg[\mbox{e.g., } \int x f(x) dx = \mu \Bigg]
+\end{eqnarray*}\]</span></p>
+<p>The <em>plug-in estimate</em> of <span class="math inline">\(\theta\)</span> is:
+<span class="math display">\[\begin{eqnarray*}
+t(\hat{F}) = \hat{\theta}  \ \ \ \ \Bigg[\mbox{e.g., }  \sum_x x \hat{f}(x) = \sum_{i=1}^n x_i \bigg(\frac{1}{n}\bigg) =  \frac{1}{n} \sum x_i  = \overline{x} \Bigg]
+\end{eqnarray*}\]</span></p>
+<p>That is: <em>to estimate a parameter, use the statistic that is the corresponding quantity for the sample.</em></p>
+<p>The idea of boostrapping (and in fact, the bootstrap samples themselves), depends on the double arrow below. We must have a random sample: that is, <span class="math inline">\(\hat{F}\)</span> must do a good job of estimating <span class="math inline">\(F\)</span> in order for bootstrap concepts to be meaningful.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\underline{\mbox{Real World}} &amp;&amp; \underline{\mbox{Boostrap World}}\\
+F \rightarrow x &amp;\Rightarrow&amp; \hat{F} \rightarrow x^*\\
+\downarrow &amp; &amp; \ \ \ \ \ \ \ \ \ \ \downarrow\\
+\hat{\theta} &amp; &amp; \hat{\theta}^*
+\end{eqnarray*}\]</span></p>
+<p>Note that you’ve seen the plug-in principle before:
+<span class="math display">\[\begin{eqnarray*}
+\sqrt{\frac{p(1-p)}{n}} &amp;\approx&amp; \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\\
+\mbox{Fisher's Information: } I(\theta) &amp;\approx&amp; I(\hat{\theta})
+\end{eqnarray*}\]</span></p>
+<p>Okay, okay, you haven’t seen Fisher’s Information yet, but you’ll see it in a few weeks, and the plug-in principle will apply.</p>
+</div>
+<div id="the-bootstrap-idea" class="section level4 unnumbered">
+<h4>The Bootstrap Idea<a class="anchor" aria-label="anchor" href="#the-bootstrap-idea"><i class="fas fa-link"></i></a>
+</h4>
+<p>We can <em>resample</em> from the <em>sample</em> to represent samples from the actual population! The <em>boostrap distribution</em> of a statistic, based on many resamples, represents the <strong>sampling distribution</strong> of the statistic based on many samples. Is this okay?? What are we assuming?</p>
+<ol style="list-style-type: decimal">
+<li>As <span class="math inline">\(n \rightarrow \infty\)</span>, <span class="math inline">\(\hat{F}(x) \rightarrow F(x)\)</span>
+</li>
+<li>As <span class="math inline">\(B \rightarrow \infty\)</span>, <span class="math inline">\(\hat{F}(\hat{\theta}^*) \rightarrow F(\hat{\theta})\)</span> (with large <span class="math inline">\(n\)</span>). Or really, what we typically see is <span class="math inline">\(\hat{F}(\hat{\theta}^* / \hat{\theta}) \rightarrow F(\hat{\theta} / \theta)\)</span> or <span class="math inline">\(\hat{F}(\hat{\theta}^* - \hat{\theta}) \rightarrow F(\hat{\theta} - \theta)\)</span>
+</li>
+</ol>
+</div>
+<div id="bootstrap-procedure" class="section level4 unnumbered">
+<h4>Bootstrap Procedure<a class="anchor" aria-label="anchor" href="#bootstrap-procedure"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>Resample data <em>with replacement</em>.</li>
+<li>Calculate the statistic of interest for each resample.</li>
+<li>Repeat 1. and 2. <span class="math inline">\(B\)</span> times.</li>
+<li>Use the bootstrap distribution for inference.</li>
+</ol>
+</div>
+<div id="bootstrap-notation" class="section level4 unnumbered">
+<h4>Bootstrap Notation<a class="anchor" aria-label="anchor" href="#bootstrap-notation"><i class="fas fa-link"></i></a>
+</h4>
+<p>Take lots (<span class="math inline">\(B\)</span>) resamples of sample of size n from the sample, <span class="math inline">\(\hat{F}(x)\)</span> (instead of from the population, <span class="math inline">\(F(x)\)</span> ) to create a bootstrap distribution for <span class="math inline">\(\hat{\theta}^*\)</span> (instead of the sampling distribution for <span class="math inline">\(\hat{\theta}\)</span>).</p>
+<p>Let <span class="math inline">\(\hat{\theta}^*_b\)</span> be the calculated statistic of interest for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. Our best guess for <span class="math inline">\(\theta\)</span> is:
+<span class="math display">\[\begin{eqnarray*}
+\hat{\theta}^* = \frac{1}{B} \sum_{b=1}^B \hat{\theta}^*_b
+\end{eqnarray*}\]</span>
+(if <span class="math inline">\(\hat{\theta}^*\)</span> is very different from <span class="math inline">\(\hat{\theta}\)</span>, we call it biased.) And the estimated value for the standard error of our estimate is
+<span class="math display">\[\begin{eqnarray*}
+\hat{SE}^*_B = \bigg[ \frac{1}{B-1} \sum_{b=1}^B ( \hat{\theta}^*_b - \hat{\theta}^*)^2 \bigg]^{1/2}
+\end{eqnarray*}\]</span></p>
+<p>Just like repeatedly taking samples from the population, taking resamples from the sample allows us to characterize the bootstrap distribution which approximates the sampling distribution. The bootstrap distribution approximates the <strong>shape, spread, &amp; bias</strong> of the actual sampling distribution. The bootstrap sampling distribution does not estimate the center of the true sampling distribution.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-2"></span>
+<img src="figs/BShesterberg1.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%"><img src="figs/BShesterberg2.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%"><img src="figs/BShesterberg3.png" alt="From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by  Moore, McCabe, and Craig.  The left image represents the mean with n=50.  The center image represents the mean with n=9.  The right image represents the median with n=15." width="30%"><p class="caption">
+Figure 1.2: From Hesterberg et al., Chapter 16 of Introduction to the Practice of Statistics by Moore, McCabe, and Craig. The left image represents the mean with n=50. The center image represents the mean with n=9. The right image represents the median with n=15.
+</p>
+</div>
+<!--
+#### How accurate is a bootstrap distribution? {-}
+\begin{itemize}
+\item
+\underline{Almost all} of the variation in a bootstrap distribution comes from the selection of the original sample.  (That is,  boostrapping does not overcome issues associated with small sample or non-random samples.)
+\item
+Resampling $B>1000$ does not typically reduce variability more.
+\end{itemize}
+
+Again,
+\begin{enumerate}
+\item
+As $n \rightarrow \infty$, $\hat{F}(x) \rightarrow F(x)$
+\item
+As $B \rightarrow \infty$, $\hat{F^*}(\hat{\theta}^*) \rightarrow F(\hat{\theta})$  (with large $n$)
+\end{enumerate}
+
+
+#### When does the bootstrap not work? {-}
+
+Consider $X \sim U[0,1]$ (note this would also work with $U[a,b]$).  Let $Y = \max(X_i)$.
+\begin{eqnarray*}
+F_Y(y) = P(Y \leq y) &=& P( \mbox{ all } X_i \leq y)\\
+&=& P(X_i \leq y ) ^n\\
+&=& y^n\\
+f_Y(y) &=& \frac{\partial F_Y(y)}{\partial y}\\
+&=& n y^{n-1} \\
+\end{eqnarray*}
+
+Note that the Bootstrap sampling distribution for the sample maximum is a poor approximation to the true sampling distribution.  The problem is that $\hat{F}$ is not a good estimate of the true distribution $F$ in the extreme tail.  Options to fix this problem include using a parametric bootstrap (with knowledge of the population distribution) or smoothing $\hat{F}$ to approximate $F$ better.
+
+However, we can estimate the bias of the sample max:
+
+\begin{eqnarray*}
+bias_F &=& E[\hat{\theta}] - \theta\\
+E[\hat{\theta}] &=& E [\max(X_i)] \\
+&=& \int_0^1 y n y^{n-1} dy\\
+&=& \frac{n}{n+1} y^{n+1} \bigg|_0^1\\
+&=& \frac{n}{n+1}\\
+bias_F &=& \frac{n}{n+1} -1 = \frac{-1}{n+1}
+\end{eqnarray*}
+
+We can think about the bootstrap bias in the same way:
+\begin{eqnarray*}
+bias_{\hat{F}} &=& E[\theta^*]- \hat{\theta}\\
+&\approx& \hat{\theta}^* - \hat{\theta}\\
+\hat{\theta} &=& 0.9997507\\
+\hat{\theta}^* &=& 0.9805526\\
+\hat{bias}_{\hat{F}} &=&  0.01919808\\
+1/51 &=&  0.01960784\\
+\end{eqnarray*}
+-->
+<!--
+%\begin{examp}
+%Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times (in days) that heroin addicts remained in a clinic for methadone maintenance treatment.  The data in \verb;heroin.txt; include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).  For about 37\% of the subjects, the study ended while they were still the in clinic (status=0).  Thus, their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  We explore using the median as well as the 25\% trimmed mean.  We treat the group of 238 patients as representative of the population.
+%% From ISCAM Chance & Rossman, Investigation 4.5.3
+%\end{examp}
+%
+-->
+</div>
+</div>
+<div id="improving-the-bootstrap-distribution" class="section level3" number="5.1.3">
+<h3>
+<span class="header-section-number">5.1.3</span> Improving the Bootstrap Distribution<a class="anchor" aria-label="anchor" href="#improving-the-bootstrap-distribution"><i class="fas fa-link"></i></a>
+</h3>
+<p>Consider using the bootstrap to estimate the distribution for <span class="math inline">\(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\)</span>.
+<span class="math display">\[\begin{eqnarray*}
+T^*(b) &amp;=&amp; \frac{\hat{\theta}^*_b - \hat{\theta}}{\hat{SE}^*(b)}
+\end{eqnarray*}\]</span>
+where <span class="math inline">\(\hat{\theta}^*_b\)</span> is the value of <span class="math inline">\(\hat{\theta}\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample, and <span class="math inline">\(\hat{SE}^*(b)\)</span> is the estimated standard error of <span class="math inline">\(\hat{\theta}^*_b\)</span> for the <span class="math inline">\(b^{th}\)</span> bootstrap sample. The <span class="math inline">\(\alpha/2^{th}\)</span> percentile of <span class="math inline">\(T^*(b)\)</span> is estimated by the value of <span class="math inline">\(\hat{q}^*_{\alpha/2}\)</span> such that
+<span class="math display">\[\begin{eqnarray*}
+\frac{\# \{T^*(b) \leq \hat{q}^*_{\alpha/2} \} }{B} = \alpha/2
+\end{eqnarray*}\]</span>
+For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the 5% point is the <span class="math inline">\(50^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s, and the estimate of the 95% point is the <span class="math inline">\(950^{th}\)</span> smallest value of the <span class="math inline">\(T^*(b)\)</span>s.</p>
+<p>To find a different SE for each bootstrapped dataset, we have to bootstrap twice. The algorithm is as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Generate <span class="math inline">\(B_1\)</span> bootstrap samples, and for each sample <span class="math inline">\(\underline{X}^{*b}\)</span> compute the bootstrap estimate <span class="math inline">\(\hat{\theta}^*_b\)</span>.</li>
+<li>Take <span class="math inline">\(B_2\)</span> bootstrap samples from <span class="math inline">\(\underline{X}^{*b}\)</span>, and estimate the standard error, <span class="math inline">\(\hat{SE}^*(b)\)</span>.</li>
+<li>Find <span class="math inline">\(B_1\)</span> values for <span class="math inline">\(T^*(b)\)</span>. Calculate <span class="math inline">\(\hat{q}^*_\alpha\)</span> and <span class="math inline">\(\hat{q}^*_{1-\alpha}\)</span> (or <span class="math inline">\(\alpha/2\)</span>).</li>
+</ol>
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></div>
+<div class="next"><a href="references.html">References</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#bootdist"><span class="header-section-number">5</span> Bootstrap Distributions</a></li>
+<li>
+<a class="nav-link" href="#bootstrap-sampling-distributions"><span class="header-section-number">5.1</span> Bootstrap Sampling Distributions</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#introduction"><span class="header-section-number">5.1.1</span> Introduction</a></li>
+<li><a class="nav-link" href="#basics-notation"><span class="header-section-number">5.1.2</span> Basics &amp; Notation</a></li>
+<li><a class="nav-link" href="#improving-the-bootstrap-distribution"><span class="header-section-number">5.1.3</span> Improving the Bootstrap Distribution</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/05-bootdist.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/05-bootdist.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-09-27.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
