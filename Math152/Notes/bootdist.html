@@ -313,6 +313,186 @@ For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the
 </ol>
 </div>
 </div>
+<div id="reflection-questions-4" class="section level2" number="5.2">
+<h2>
+<span class="header-section-number">5.2</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-4"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>Why do we bootstrap? That is, what does bootstrapping provide?</li>
+<li>What are the technical conditions for bootstrapping?</li>
+<li>What is a bootstrap sampling distribution?</li>
+<li>What is a bootstrap standard error?</li>
+<li>What does it mean for a statistic to have a sampling distribution? And how can we <strong>conceptualize</strong> the sampling distribution when we only (always!) have one sample? How can we <strong>approximate</strong> the sampling distribution when we only (always!) have one sample?</li>
+</ol>
+</div>
+<div id="ethics-considerations-4" class="section level2" number="5.3">
+<h2>
+<span class="header-section-number">5.3</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-4"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>A friend tells you that they are planning to bootstrap because they don’t have enough data for the central limit theorem to kick in. Explain what is wrong with their logic.</li>
+<li>What are the different methods we’ve used to develop sampling distributions? Which one should you use in which setting?</li>
+<li>When is the SE of the statistic most valuable: with a skewed or a symmetric sampling distribution? Why?</li>
+</ol>
+</div>
+<div id="r-code-bootstrapping-survival-example" class="section level2" number="5.4">
+<h2>
+<span class="header-section-number">5.4</span> R code: Bootstrapping Survival Example<a class="anchor" aria-label="anchor" href="#r-code-bootstrapping-survival-example"><i class="fas fa-link"></i></a>
+</h2>
+<p>There are many built in functions in R (and Python, Matlab, Stata, etc. for that matter) which will bootstrap a dataset and create any of a number of standard bootstrap intervals. However, in order to understand the bootstrap process, the example below uses for loops to repeated resample and calculate the statistics of interest.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-28" class="example"><strong>Example 5.1  </strong></span>heroin survival time</p>
+<ul>
+<li><p>Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times that heroin addicts remained in a clinic for methadone maintenance treatment.</p></li>
+<li><p>The data include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4).</p></li>
+<li><p>For about 37% of the subjects, the study ended while they were still the in clinic (status=0).</p></li>
+<li><p>Their survival time has been truncated. For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time. Below we explore using the 25% trimmed mean. (From ISCAM Chance &amp; Rossman, Investigation 4.5.3)</p></li>
+</ul>
+</div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="va">heroin</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_table.html">read_table</a></span><span class="op">(</span><span class="st">"http://www.rossmanchance.com/iscam2/data/heroin.txt"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">)</span></code></pre></div>
+<pre><code>## [1] "id"     "clinic" "status" "times"  "prison" "dose"</code></pre>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">heroin</span><span class="op">)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 6
+##      id clinic status times prison  dose
+##   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1     1      1      1   428      0    50
+## 2     2      1      1   275      1    55
+## 3     3      1      1   262      0    55
+## 4     4      1      1   183      0    30
+## 5     5      1      1   259      1    65
+## 6     6      1      1   714      0    55</code></pre>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">obs.stat</span> <span class="op">&lt;-</span> <span class="va">heroin</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">obs.stat</span></code></pre></div>
+<pre><code>## [1] 378.3</code></pre>
+<div id="bootstrapping-the-data" class="section level4 unnumbered">
+<h4>Bootstrapping the data<a class="anchor" aria-label="anchor" href="#bootstrapping-the-data"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">heroin.bs</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="va">heroin.bs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## [1] 372.2583</code></pre>
+</div>
+<div id="creating-a-bootstrap-sampling-distribution-for-the-trimmed-mean" class="section level4 unnumbered">
+<h4>Creating a bootstrap sampling distribution for the trimmed mean<a class="anchor" aria-label="anchor" href="#creating-a-bootstrap-sampling-distribution-for-the-trimmed-mean"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bs.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>    <span class="co"># placeholder, eventually B long, check after running!</span>
+<span class="va">bs.sd.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># placeholder, eventually B long, check after running!</span>
+
+<span class="va">B</span> <span class="op">&lt;-</span> <span class="fl">500</span>
+<span class="va">M</span> <span class="op">&lt;-</span> <span class="fl">100</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">for</span><span class="op">(</span><span class="va">b</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">B</span><span class="op">)</span><span class="op">{</span> 
+  <span class="va">heroin.bs</span><span class="op">&lt;-</span><span class="va">heroin</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># BS sample</span>
+  <span class="va">bs.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">bs.test.stat</span>, <span class="co"># concatenate each trimmed mean each time go through loop</span>
+                  <span class="va">heroin.bs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+                    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+  
+  <span class="va">bsbs.test.stat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># refresh the vector of double BS test statistics</span>
+  
+  <span class="kw">for</span><span class="op">(</span><span class="va">m</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">M</span><span class="op">)</span><span class="op">{</span>
+    <span class="va">heroin.bsbs</span><span class="op">&lt;-</span><span class="va">heroin.bs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html">sample_frac</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="co"># BS of the BS!</span>
+    <span class="va">bsbs.test.stat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">bsbs.test.stat</span>, <span class="co"># concatenate the trimmed mean of the double BS</span>
+                        <span class="va">heroin.bsbs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+                          <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>tmeantime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">times</span>, trim <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+  <span class="op">}</span>
+  <span class="va">bs.sd.test.stat</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">bs.sd.test.stat</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">bsbs.test.stat</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+</div>
+<div id="what-do-the-data-distributions-look-like" class="section level4 unnumbered">
+<h4>What do the <strong>data</strong> distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-data-distributions-look-like"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">heroin</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">30</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"original sample (n=238)"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-7-1.png" width="672"></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">heroin.bs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">30</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"one bootstrap sample (n=238)"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-7-2.png" width="672"></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">heroin.bsbs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">30</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"a bootstrap sample of the one bootstrap sample (n=238)"</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-7-3.png" width="672"></div>
+</div>
+<div id="what-do-the-sampling-distributions-look-like" class="section level4 unnumbered">
+<h4>What do the <strong>sampling</strong> distributions look like?<a class="anchor" aria-label="anchor" href="#what-do-the-sampling-distributions-look-like"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bs.stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">bs.test.stat</span><span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">bs.stats</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">bs.test.stat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"dist of trimmed mean"</span><span class="op">)</span> <span class="op">+</span>  
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"trimmed.mean="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bs.test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span>,<span class="st">"; SE="</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">bs.test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-8-1.png" width="672"></div>
+</div>
+<div id="what-is-the-distribution-of-the-se-of-the-statistic" class="section level4 unnumbered">
+<h4>What is the distribution of the SE of the statistic?<a class="anchor" aria-label="anchor" href="#what-is-the-distribution-of-the-se-of-the-statistic"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bs.SE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">bs.sd.test.stat</span><span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">bs.SE</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">bs.sd.test.stat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"dist of SE of trimmed means"</span><span class="op">)</span> <span class="op">+</span>  
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"average SE="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bs.sd.test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-9-1.png" width="672"></div>
+</div>
+<div id="what-is-the-distribution-of-the-t-statistics" class="section level4 unnumbered">
+<h4>What is the distribution of the T statistics?<a class="anchor" aria-label="anchor" href="#what-is-the-distribution-of-the-t-statistics"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bs.T</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>T.test.stat <span class="op">=</span> <span class="op">(</span><span class="va">bs.test.stat</span> <span class="op">-</span> <span class="va">obs.stat</span><span class="op">)</span> <span class="op">/</span> <span class="va">bs.sd.test.stat</span><span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">bs.T</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">T.test.stat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>bins<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"dist of T statistics of trimmed means"</span><span class="op">)</span> <span class="op">+</span>  
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"average T="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bs.T</span><span class="op">$</span><span class="va">T.test.stat</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="05-bootdist_files/figure-html/unnamed-chunk-10-1.png" width="672"></div>
+</div>
+<div id="normal-ci-with-bs-se" class="section level4 unnumbered">
+<h4>95% normal CI with BS SE<a class="anchor" aria-label="anchor" href="#normal-ci-with-bs-se"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">obs.stat</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>,<span class="fl">.975</span><span class="op">)</span><span class="op">)</span><span class="op">*</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">bs.test.stat</span><span class="op">)</span></code></pre></div>
+<pre><code>## [1] 334.0961 422.5039</code></pre>
+</div>
+<div id="bootstrap-t-ci" class="section level4 unnumbered">
+<h4>95% Bootstrap-t CI<a class="anchor" aria-label="anchor" href="#bootstrap-t-ci"><i class="fas fa-link"></i></a>
+</h4>
+<p>Note that the t-value is needed (which requires a different SE for each bootstrap sample).</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bs.t.hat</span><span class="op">&lt;-</span><span class="op">(</span><span class="va">bs.test.stat</span> <span class="op">-</span> <span class="va">obs.stat</span><span class="op">)</span><span class="op">/</span><span class="va">bs.sd.test.stat</span>
+
+<span class="va">bs.t.hat.95</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">bs.t.hat</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.975</span>,<span class="fl">.025</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">obs.stat</span> <span class="op">-</span> <span class="va">bs.t.hat.95</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">bs.test.stat</span><span class="op">)</span></code></pre></div>
+<pre><code>##    97.5%     2.5% 
+## 336.5108 426.8502</code></pre>
+</div>
+<div id="percentile-ci" class="section level4 unnumbered">
+<h4>95% Percentile CI<a class="anchor" aria-label="anchor" href="#percentile-ci"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">bs.test.stat</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.025</span>, <span class="fl">.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code>##     2.5%    97.5% 
+## 332.2373 422.3135</code></pre>
+
+</div>
+</div>
 </div>
   <div class="chapter-nav">
 <div class="prev"><a href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></div>
@@ -328,6 +508,9 @@ For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the
 <li><a class="nav-link" href="#improving-the-bootstrap-distribution"><span class="header-section-number">5.1.3</span> Improving the Bootstrap Distribution</a></li>
 </ul>
 </li>
+<li><a class="nav-link" href="#reflection-questions-4"><span class="header-section-number">5.2</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-4"><span class="header-section-number">5.3</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-code-bootstrapping-survival-example"><span class="header-section-number">5.4</span> R code: Bootstrapping Survival Example</a></li>
 </ul>
 
       <div class="book-extra">
@@ -345,7 +528,7 @@ For example, if <span class="math inline">\(B=1000\)</span>, the estimate of the
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-09-27.</p>
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-09-29.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
