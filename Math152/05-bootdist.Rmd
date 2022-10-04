@@ -188,7 +188,7 @@ bias_{\hat{F}} &=& E[\theta^*]- \hat{\theta}\\
 %
 -->
 
-### Improving the Bootstrap Distribution 
+### Finding the Bootstrap Distribution 
 
  Consider using the bootstrap to estimate the distribution for $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$.
 \begin{eqnarray*}
@@ -225,6 +225,7 @@ To find a different SE for each bootstrapped dataset, we have to bootstrap twice
 1. A friend tells you that they are planning to bootstrap because they don't have enough data for the central limit theorem to kick in.  Explain what is wrong with their logic.
 2. What are the different methods we've used to develop sampling distributions?  Which one should you use in which setting?
 3. When is the SE of the statistic most valuable: with a skewed or a symmetric sampling distribution?  Why?
+4. If the dataset at hand has missing observations, should you remove the missing data and then bootstrap or bootstrap with the missing observations?  What if the answer is "it depends"?  And what does one do with missing data anyway????
 
 
 ## R code: Bootstrapping Survival Example
