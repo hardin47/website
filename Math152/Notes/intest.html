@@ -115,7 +115,7 @@
 <span class="math display">\[\begin{eqnarray*}
 \frac{\overline{X} - \mu}{s / \sqrt{n}} \sim t_{n-1}
 \end{eqnarray*}\]</span></p>
-<p>n.b., Your text uses <span class="math inline">\(\sigma' = s = \sqrt{\frac{\sum_{i=1}{n}(X_i - \overline{X})^2}{n-1}}.\)</span> So whenever you see <span class="math inline">\(\sigma'\)</span>, think <span class="math inline">\(s.\)</span></p>
+<p>n.b., Your text uses <span class="math inline">\(\sigma' = s = \sqrt{\frac{\sum_{i=1}^{n}(X_i - \overline{X})^2}{n-1}}.\)</span> So whenever you see <span class="math inline">\(\sigma'\)</span>, think <span class="math inline">\(s.\)</span></p>
 <p>Let <span class="math inline">\(c\)</span> be some constant such that <span class="math inline">\(\int_{-c}^c f_{t_{n-1}}(x) dx = \gamma\)</span> (e.g., = 0.95). Or:</p>
 <p><span class="math display">\[\begin{eqnarray*}
 P(-c \leq \frac{\overline{X} - \mu}{s/\sqrt{n}} \leq c) &amp;=&amp; 0.95\\
@@ -161,6 +161,26 @@ We are 98% confident that the true average studying time (in the population) is 
 <p>We’d like to say “the probability that <span class="math inline">\(\theta\)</span> is in the interval is…” As a Bayesian we can do that because Bayesians think about <span class="math inline">\(\theta\)</span> as random, and they put a distribution on <span class="math inline">\(\theta | \underline{x}\)</span>.</p>
 <p>A Bayesian <em>posterior</em> or <em>credible</em> interval is given by the posterior distribution. That is, a (<span class="math inline">\(1-\alpha\)</span>)% posterior interval for <span class="math inline">\(\theta\)</span> is <span class="math display">\[\Xi^{-1}_{\alpha/2} (\theta | \underline{X}), \Xi^{-1}_{1-\alpha/2} (\theta | \underline{X})\]</span>
 where <span class="math inline">\(\Xi(\theta | \underline{X})\)</span> is the posterior cumulative distribution function of <span class="math inline">\(\theta\)</span> (but maybe we should use better notation). Do not focus on the <span class="math inline">\(\Xi\)</span> cdf notation. Instead, keep in mind that the inverse cdf defines the tail probabilities associated with the posterior distribution.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-30" class="example"><strong>Example 6.2  </strong></span>Recall the Beta-Binomial example which aims to model the true probability that Steph Curry can make a free throw, <span class="math inline">\(\theta.\)</span> Let’s say we’ll have him shoot 25 times and record the number of times he makes the shot. Also, let’s say we have a Beta(10,2) prior which induces a prior mean of 10/12 and is quite wide.</p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/plotDist.html">plotDist</a></span><span class="op">(</span><span class="st">'beta'</span>, params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Beta(10,2) pdf"</span><span class="op">)</span></code></pre></div>
+<p><img src="06-intest_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;">
+Construct a 90% posterior interval for <span class="math inline">\(\theta.\)</span></p>
+<p><span class="math display">\[\begin{eqnarray*}
+X &amp;\sim&amp; \mbox{Bin}(25, \theta)\\
+\theta &amp;\sim&amp; \mbox{Beta}(10, 2)\\
+\theta | \underline{X} &amp;\sim&amp; \mbox{Beta}(31, 6)
+\end{eqnarray*}\]</span></p>
+<p>(n.b., look back to Section <a href="bayes.html#bayes">2</a> for a refresher on how to get a posterior distribution from the prior and the likelihood.)</p>
+<p>To build a posterior interval, we need to solve the following equation:</p>
+<p><span class="math display">\[P( \_\_\_\_\_\_\_\_\_ \leq \theta \leq \_\_\_\_\_\_\_\_\_ \ | \ \underline{X}) = 0.9\]</span></p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqbeta</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.95</span><span class="op">)</span>, <span class="fl">31</span>, <span class="fl">6</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></div>
+<pre><code>## [1] 0.730 0.925</code></pre>
+<p>We say: there is a 0.9 probability that the true value of <span class="math inline">\(\theta\)</span> is between (0.73, 0.92).</p>
+</div>
 <div id="joint-posterior-distribution-for-mu-and-sigma-in-a-normal-distribution" class="section level3" number="6.2.1">
 <h3>
 <span class="header-section-number">6.2.1</span> Joint Posterior Distribution for <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> in a Normal Distribution<a class="anchor" aria-label="anchor" href="#joint-posterior-distribution-for-mu-and-sigma-in-a-normal-distribution"><i class="fas fa-link"></i></a>
@@ -172,7 +192,7 @@ f(x | \mu, \tau) &amp;=&amp; \Bigg( \frac{\tau}{2 \pi} \Bigg) ^{1/2} exp \bigg[ 
 f(\underline{x} | \mu, \tau) &amp;=&amp; \Bigg( \frac{\tau}{2 \pi} \Bigg) ^{n/2} exp \bigg[ \frac{-1}{2} \tau \sum_{i=1}^n (x_i-\mu)^2 \bigg]\\
 \end{eqnarray*}\]</span></p>
 <div class="theorem">
-<p><span id="thm:unlabeled-div-30" class="theorem"><strong>Theorem 6.1  </strong></span>(<span class="citation">DeGroot and Schervish (<a href="references.html#ref-degroot" role="doc-biblioref">2011</a>)</span> Theorem 7.6.1)
+<p><span id="thm:unlabeled-div-31" class="theorem"><strong>Theorem 6.1  </strong></span>(<span class="citation">DeGroot and Schervish (<a href="references.html#ref-degroot" role="doc-biblioref">2011</a>)</span> Theorem 7.6.1)
 Let <span class="math inline">\(X_1, X_2, \ldots X_n \sim N(\mu, 1/\tau)\)</span> and suppose you have <strong>priors</strong> on <span class="math inline">\(\mu|\tau\)</span> and <span class="math inline">\(\tau\)</span>,
 <span class="math display">\[\begin{eqnarray*}
 \mu|\tau &amp;\sim&amp; N(\mu_0, 1/(\lambda_0 \tau) )\\
@@ -183,38 +203,38 @@ Let <span class="math inline">\(X_1, X_2, \ldots X_n \sim N(\mu, 1/\tau)\)</span
 \mu | \tau, \underline{x} &amp;\sim&amp; N(\mu_1, 1/(\lambda_1 \tau) )\\
 \tau \  | \ \underline{x}  &amp;\sim&amp; \mbox{ Gamma} (\alpha_1, \beta_1)
 \end{eqnarray*}\]</span>
-where  <span class="math inline">\(\mu_1 = \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n}, \ \ \ \ \lambda_1 = \lambda_0 + n, \ \ \ \ \alpha_1 = \alpha_0 + \frac{n}{2}, \ \ \ \ \ \beta_1 = \beta_0 + \frac{1}{2} \sum_{i=1}^n (x_i - \overline{x})^2 + \frac{n \lambda_0 (\overline{x} - \mu_0)^2}{2(\lambda_0 +n)}.\)</span></p>
+where <span class="math inline">\(\mu_1 = \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n}, \ \ \ \ \lambda_1 = \lambda_0 + n, \ \ \ \ \alpha_1 = \alpha_0 + \frac{n}{2}, \ \ \ \ \ \beta_1 = \beta_0 + \frac{1}{2} \sum_{i=1}^n (x_i - \overline{x})^2 + \frac{n \lambda_0 (\overline{x} - \mu_0)^2}{2(\lambda_0 +n)}.\)</span></p>
 <p>Note that the prior is a joint conjugate family of distributions. <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\tau\)</span> have a normal-gamma distribution. Note also that <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\tau\)</span> are <strong>not</strong> independent.</p>
 </div>
 <div class="proof">
-<span id="unlabeled-div-31" class="proof"><em>Proof</em>. </span><span class="math display">\[\begin{align}
+<p><span id="unlabeled-div-32" class="proof"><em>Proof</em>. </span><span class="math display">\[\begin{align}
 f(\underline{x} | \mu, \tau) &amp;= \Bigg( \frac{\tau}{2\pi}\Bigg)^{n/2} exp \Bigg[ -\frac{1}{2} \tau \sum_{i=1}^n (x_i - \mu)^2 \Bigg] \nonumber \\
 \xi_1(\mu|\tau) &amp;= \Bigg( \frac{\lambda_0 \tau}{2\pi}\Bigg)^{1/2} exp \Bigg[ -\frac{1}{2} \lambda_0 \tau (\mu - \mu_0)^2 \Bigg]  \nonumber \\
 \xi_2(\tau) &amp;= \frac{\beta_0^{\alpha_0}}{\Gamma(\alpha_0)} \tau^{\alpha_0 - 1}e^{-\beta_0 \tau} \nonumber \\
 \mbox{Note, } &amp; \mu  \mbox{ and $\tau$ are not independent, and } \xi(\mu, \tau) = \xi_1(\mu|\tau) \ \xi_2(\tau) \nonumber \\
 \nonumber \\
 \xi(\mu,\tau|\underline{x}) &amp;\propto f(\underline{x} | \mu, \tau) \ \xi_1(\mu|\tau) \ \xi_2(\tau) \nonumber \\
-&amp;\propto \tau^{\alpha_0 + (n+1)/2 -1} \exp \Bigg[-\frac{\tau}{2} \Bigg(\lambda_0 [\mu-\mu_0]^2 + \sum_{i=1}^{n}(x_i -\mu)^2 \Bigg) - \beta_0 \tau \Bigg] (\#eq:one) \end{align}\]</span>
-Add and subtract <span class="math inline">\(\overline{x}\)</span> inside <span class="math inline">\((x_i -\mu)^2\)</span> to get:
-<span class="math display" id="eq:two">\[\begin{align}
-\sum_{i=1}^n(x_i -\mu)^2 &amp;= \sum_{i=1}^n(x_i - \overline{x})^2 + n(\overline{x} -\mu)^2
-\tag{6.1} \end{align}\]</span>
-By adding and subtracting <span class="math inline">\(\mu_1\)</span>:
-<span class="math display" id="eq:three">\[\begin{align}
+&amp;\propto \tau^{\alpha_0 + (n+1)/2 -1} \exp \Bigg[-\frac{\tau}{2} \Bigg(\lambda_0 [\mu-\mu_0]^2 + \sum_{i=1}^{n}(x_i -\mu)^2 \Bigg) - \beta_0 \tau \Bigg]    (\#eq:one) \end{align}\]</span></p>
+<p>Add and subtract <span class="math inline">\(\overline{x}\)</span> inside <span class="math inline">\((x_i -\mu)^2\)</span> to get:</p>
+<p><span class="math display" id="eq:two">\[\begin{align}
+\sum_{i=1}^n(x_i -\mu)^2 &amp;= \sum_{i=1}^n(x_i - \overline{x})^2 + n(\overline{x} -\mu)^2 \tag{6.1}
+\end{align}\]</span></p>
+<p>By adding and subtracting <span class="math inline">\(\mu_1\)</span>:</p>
+<p><span class="math display" id="eq:three">\[\begin{align}
 n(\overline{x} -\mu)^2 + \lambda_0 (\mu - \mu_0)^2 &amp;= (\lambda_0 + n)(\mu - \mu_1)^2 + \frac{n\lambda_0(\overline{x} - \mu_0)^2}{\lambda_0 + n} \tag{6.2}
-\end{align}\]</span>
-Combining (@ref{eq:two}) and (@ref{eq:three}) we get:
-<span class="math display" id="eq:four">\[\begin{align}
+\end{align}\]</span></p>
+<p>Combining <a href="intest.html#eq:two">(6.1)</a> and <a href="intest.html#eq:three">(6.2)</a> we get:</p>
+<p><span class="math display" id="eq:four">\[\begin{align}
 \sum_{i=1}^n(x_i -\mu)^2 + \lambda_0 (\mu - \mu_0)^2 = (\lambda_0 + n)(\mu - \mu_1)^2 + \sum_{i=1}^n(x_i - \overline{x})^2 + \frac{n\lambda_0(\overline{x} - \mu_0)^2}{\lambda_0 + n} \tag{6.3}
-\end{align}\]</span>
-By plugging (@ref{eq:four}) into (@ref{eq:one}) we get:
+\end{align}\]</span></p>
+<p>By plugging <a href="intest.html#eq:four">(6.3)</a> into <a href="#eq:one">(<strong>??</strong>)</a> we get:</p>
 <span class="math display">\[\begin{eqnarray}
 \xi(\mu, \tau | \underline{x}) &amp;\propto&amp; \Bigg\{ \tau^{1/2} exp \Bigg[ -\frac{1}{2} \lambda_1 \tau (\mu - \mu_1)^2 \Bigg] \Bigg\} (\tau^{\alpha_1 -1} e^{-\beta_1 \tau})\\
 \xi(\mu, \tau | \underline{x}) &amp;=&amp; \xi_1(\mu | \tau, \underline{x}) \xi_2(\tau | \underline{x})
 \end{eqnarray}\]</span>
 </div>
 <div class="theorem">
-<p><span id="thm:unlabeled-div-32" class="theorem"><strong>Theorem 6.2  </strong></span>Let <span class="math inline">\(X_1, X_2, \ldots X_n \sim N(\mu, 1/\tau)\)</span> and suppose you have priors on <span class="math inline">\(\mu|\tau\)</span> and <span class="math inline">\(\tau\)</span>,
+<p><span id="thm:unlabeled-div-33" class="theorem"><strong>Theorem 6.2  </strong></span>Let <span class="math inline">\(X_1, X_2, \ldots X_n \sim N(\mu, 1/\tau)\)</span> and suppose you have priors on <span class="math inline">\(\mu|\tau\)</span> and <span class="math inline">\(\tau\)</span>,
 <span class="math display">\[\begin{eqnarray*}
 \mu|\tau &amp;\sim&amp; N(\mu_0, 1/(\lambda_0 \tau) )\\
 \tau &amp;\sim&amp; \mbox{ Gamma} (\alpha_0, \beta_0)
@@ -226,7 +246,7 @@ By plugging (@ref{eq:four}) into (@ref{eq:one}) we get:
 where <span class="math inline">\(\mu_1, \lambda_1, \alpha_1,\)</span> and <span class="math inline">\(\beta_1\)</span> are given in the previous theorem.</p>
 </div>
 <div class="proof">
-<span id="unlabeled-div-33" class="proof"><em>Proof</em>. </span>First, let
+<span id="unlabeled-div-34" class="proof"><em>Proof</em>. </span>First, let
 <span class="math display">\[\begin{eqnarray*}
 z &amp;=&amp; (\lambda_1 \tau)^{1/2} (\mu-\mu_1) = u(\mu)\\
 \mu &amp;=&amp; z (\lambda_1 \tau)^{-1/2} + \mu_1 = w(z)
@@ -254,14 +274,14 @@ Which gives:
 \Bigg(\frac{\lambda_1 \alpha_1}{\beta_1} \Bigg)^{1/2}(\mu-\mu_1) \  | \ \underline{x}  \sim t_{2\alpha_1}
 \end{eqnarray}\]</span>
 </div>
-<p>Note: <span class="math inline">\(E[ U | \underline{x} ] = 0\)</span> and <span class="math inline">\(Var(U | \underline{x}) = \frac{2 \alpha_1}{2 \alpha_1 - 2} = \frac{ \alpha_1}{\alpha_1 -1}\)</span>\
-<span class="math inline">\(\rightarrow E[\mu| \underline{x}] = \mu_1\)</span> and <span class="math inline">\(Var(\mu | \underline{x}) = \frac{\beta_1}{\lambda_1 \alpha_1} \frac{\alpha_1}{\alpha_1 -1} = \frac{\beta_1}{\lambda_1(\alpha_1 -1)}\)</span></p>
+<p>Note: <span class="math inline">\(E[ U | \underline{x} ] = 0\)</span> and <span class="math inline">\(Var(U | \underline{x}) = \frac{2 \alpha_1}{2 \alpha_1 - 2} = \frac{ \alpha_1}{\alpha_1 -1}\)</span></p>
+<p><span class="math inline">\(\rightarrow E[\mu| \underline{x}] = \mu_1\)</span> and <span class="math inline">\(Var(\mu | \underline{x}) = \frac{\beta_1}{\lambda_1 \alpha_1} \frac{\alpha_1}{\alpha_1 -1} = \frac{\beta_1}{\lambda_1(\alpha_1 -1)}\)</span></p>
 </div>
 <div id="posterior-interval-for-the-mean-mu-in-a-normal-random-sample" class="section level3" number="6.2.2">
 <h3>
 <span class="header-section-number">6.2.2</span> Posterior Interval for the mean, <span class="math inline">\(\mu\)</span> in a normal random sample<a class="anchor" aria-label="anchor" href="#posterior-interval-for-the-mean-mu-in-a-normal-random-sample"><i class="fas fa-link"></i></a>
 </h3>
-<p>Just like with frequentist CI:
+<p>Let the confidence level be <span class="math inline">\(1-\alpha\)</span>. As with frequentist CI, the interval can be built by pivoting around the value of interest, <span class="math inline">\(\mu\)</span>.
 <span class="math display">\[\begin{eqnarray*}
 P( -c \leq U \leq c \  | \ \underline{x} ) &amp;=&amp; 1 - \alpha\\
 P( -c \leq \Bigg( \frac{\lambda_1 \alpha_1}{\beta_1} \Bigg)^{1/2} (\mu - \mu_1) \leq c \  | \ \underline{x} ) &amp;=&amp; 1 - \alpha\\
@@ -269,14 +289,14 @@ P( \mu_1 - c \Bigg(\frac{\beta_1}{\lambda_1 \alpha_1} \Bigg)^{1/2} \leq \mu \leq
 \end{eqnarray*}\]</span></p>
 <p><span class="math inline">\(\Rightarrow\)</span>    <span class="math inline">\(\mu_1 \pm c \Bigg(\frac{\beta_1}{\lambda_1 \alpha_1} \Bigg)^{1/2}\)</span> is a <span class="math inline">\((1 - \alpha)100\%\)</span> posterior interval for <span class="math inline">\(\mu\)</span>.</p>
 <div class="example">
-<p><span id="exm:unlabeled-div-34" class="example"><strong>Example 6.2  </strong></span>Let’s say we are trying to estimate the total number of soft drinks a particular vending machine will sell in a typical week. We want to find a 90% posterior interval for <span class="math inline">\(\mu\)</span>. Our prior information (e.g., from past weeks) tells us:
+<p><span id="exm:unlabeled-div-35" class="example"><strong>Example 6.3  </strong></span>Let’s say we are trying to estimate the total number of soft drinks a particular vending machine will sell in a typical week. We want to find a 90% posterior interval for <span class="math inline">\(\mu\)</span>. Our prior information (e.g., from past weeks) tells us:
 <span class="math display">\[\begin{eqnarray*}
 \mu | \tau &amp;\sim&amp; N(750, 5 / \tau = \frac{1}{(1/5)\tau} )\\
 \tau &amp;\sim&amp; gamma(1, 45)
 \end{eqnarray*}\]</span>
-<span class="math inline">\(\mu_0 = 750\)</span>, <span class="math inline">\(\lambda_0 = 1/5\)</span>, <span class="math inline">\(\alpha_0 = 1\)</span>, <span class="math inline">\(\beta_0=45\)</span>\
-Our random sample of 10 weeks gives <span class="math inline">\(\overline{x} = 692\)</span> and <span class="math inline">\(s^2 = \frac{14400}{9} = 1600\)</span>.\
-Our posterior parameters are:
+<span class="math inline">\(\mu_0 = 750\)</span>, <span class="math inline">\(\lambda_0 = 1/5\)</span>, <span class="math inline">\(\alpha_0 = 1\)</span>, <span class="math inline">\(\beta_0=45\)</span></p>
+<p>Our random sample of 10 weeks gives <span class="math inline">\(\overline{x} = 692\)</span> and <span class="math inline">\(s^2 = \frac{14400}{9} = 1600\)</span>.</p>
+<p>Our posterior parameters are:
 <span class="math display">\[\begin{eqnarray*}
 \mu_1 &amp;=&amp; \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n} = \frac{(1/5)750 + 6920}{(1/5) + 10} = 693.14\\
 \lambda_1 &amp;=&amp; \lambda_0 + n = 10.2\\
@@ -330,28 +350,28 @@ P(673.31 \leq \mu \leq 712.97 \  | \ \underline{x} ) &amp;=&amp; 0.9
 <p>Recall that the <code>q</code> in the distributional functions (e.g., <code><a href="https://rdrr.io/r/stats/Normal.html">qnorm()</a></code>, <code><a href="https://rdrr.io/r/stats/Binomial.html">qbinom()</a></code>, <code><a href="https://rdrr.io/r/stats/Uniform.html">qunif()</a></code>, <code><a href="https://rdrr.io/r/stats/Chisquare.html">qchisq()</a></code>, <code><a href="https://rdrr.io/r/stats/TDist.html">qt()</a></code>) indicates that the output is a <strong>quantile</strong>.</p>
 <p>The <strong>mosiac</strong> package adds an <code>x</code> to the front of the function name which allows a figure to accompany the numerical value of the quantile. I highly recommend drawing pictures when finding quantiles or percentages.</p>
 <p>One-sided 98% t-interval <span class="math inline">\((df = 24)\)</span> where 98% of the probability is to the left of the quantile of interest. Note that the t-distribution is symmetric.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqt</a></span><span class="op">(</span><span class="fl">.98</span>, <span class="fl">24</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></div>
 <pre><code>## [1] 2.17</code></pre>
 <p>Two-sided 98% t-interval <span class="math inline">\((df = 24)\)</span> where 98% of the area is in the center, so 99% of the area is to the left. Note that the code can be written in two different ways and provides the same quantile values. Note also that the t-distribution is symmetric.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqt</a></span><span class="op">(</span><span class="fl">.99</span>, <span class="fl">24</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></div>
 <pre><code>## [1] 2.49</code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.99</span><span class="op">)</span>, <span class="fl">24</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;"></div>
 <pre><code>## [1] -2.49  2.49</code></pre>
 <p>Two-sided 95% chi-square interval <span class="math inline">\((df = 9)\)</span>. Note that the chi-square distribution is not symmetric.</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqchisq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>, <span class="fl">9</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></div>
 <pre><code>## [1]  2.7 19.0</code></pre>
 <p>To find a 90% prediction inteval cutoff, the same R code is used:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">mosaic</span><span class="fu">::</span><span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/qdist.html">xqt</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">12</span><span class="op">)</span></code></pre></div>
-<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></div>
+<div class="inline-figure"><img src="06-intest_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></div>
 <pre><code>## [1] 1.78</code></pre>
 
 </div>
@@ -395,7 +415,7 @@ P(673.31 \leq \mu \leq 712.97 \  | \ \underline{x} ) &amp;=&amp; 0.9
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-10-05.</p>
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-10-06.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

@@ -1,7 +1,7 @@
 --- 
 title: "Linear Models"
 author: "Jo Hardin"
-date: "2022-07-29"
+date: "2022-10-06"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -19,7 +19,7 @@ description: "Class notes for Math 158 at Pomona College: Linear Models.  The no
 
 # Class Information {-}
 
-Class notes for Math 158 at Pomona College: Computational Statistics.  The notes are based extensively on An Introduction to Statistical Learning [@ISL];  Applied Linear Statistical Models [@kutner].  The computing part of the class will be taken from R for Data Science [@r4ds] by Wickham and Grolemund as well as Tidy Modeling with R [@tidymodels] by Kuhn and Silge.
+Class notes for Math 158 at Pomona College: Linear Models.  The notes are based extensively on An Introduction to Statistical Learning [@ISL];  Applied Linear Statistical Models [@kutner].  The computing part of the class will be taken from R for Data Science [@r4ds] by Wickham and Grolemund as well as Tidy Modeling with R [@tidymodels] by Kuhn and Silge.
 
 
 You are responsible for reading the relevant chapters in the texts.  The texts are very good & readable, so you should use them.   You should make sure you are coming to class and also reading the materials associated with the activities. 

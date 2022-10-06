@@ -14,7 +14,7 @@ We know,
 \frac{\overline{X} - \mu}{s / \sqrt{n}} \sim t_{n-1}
 \end{eqnarray*}
 
-n.b., Your text uses $\sigma' = s = \sqrt{\frac{\sum_{i=1}{n}(X_i - \overline{X})^2}{n-1}}.$  So whenever you see $\sigma'$, think $s.$
+n.b., Your text uses $\sigma' = s = \sqrt{\frac{\sum_{i=1}^{n}(X_i - \overline{X})^2}{n-1}}.$  So whenever you see $\sigma'$, think $s.$
 
 
 Let $c$ be some constant such that $\int_{-c}^c f_{t_{n-1}}(x) dx = \gamma$ (e.g., = 0.95).  Or:
@@ -78,6 +78,42 @@ We'd like to say "the probability that $\theta$ is in the interval is..."  As a 
 A Bayesian *posterior* or *credible* interval is given by the posterior distribution.  That is, a ($1-\alpha$)% posterior interval for $\theta$ is $$\Xi^{-1}_{\alpha/2} (\theta | \underline{X}), \Xi^{-1}_{1-\alpha/2} (\theta | \underline{X})$$
 where $\Xi(\theta | \underline{X})$ is the posterior cumulative distribution function of $\theta$ (but maybe we should use better notation).  Do not focus on the $\Xi$ cdf notation.  Instead, keep in mind that the inverse cdf defines the tail probabilities associated with the posterior distribution.
 
+::: {.example}
+Recall the Beta-Binomial example which aims to model the true probability that Steph Curry can make a free throw, $\theta.$  Let's say we'll have him shoot 25 times and record the number of times he makes the shot.  Also, let's say we have a Beta(10,2) prior which induces a prior mean of 10/12 and is quite wide.
+
+
+```r
+mosaic::plotDist('beta', params = list(10, 2), main = "Beta(10,2) pdf")
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" />
+Construct a 90% posterior interval for $\theta.$
+
+\begin{eqnarray*}
+X &\sim& \mbox{Bin}(25, \theta)\\
+\theta &\sim& \mbox{Beta}(10, 2)\\
+\theta | \underline{X} &\sim& \mbox{Beta}(31, 6)
+\end{eqnarray*}
+
+(n.b., look back to Section \@ref(bayes) for a refresher on how to get a posterior distribution from the prior and the likelihood.)
+
+To build a posterior interval, we need to solve the following equation:
+
+$$P( \_\_\_\_\_\_\_\_\_ \leq \theta \leq \_\_\_\_\_\_\_\_\_ \ | \ \underline{X}) = 0.9$$
+
+```r
+mosaic::xqbeta(c(0.05, 0.95), 31, 6)
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" />
+
+```
+## [1] 0.730 0.925
+```
+
+We say:  there is a 0.9 probability that the true value of $\theta$ is between (0.73, 0.92).
+:::
+
 ### Joint Posterior Distribution for $\mu$ and $\sigma$ in a Normal Distribution
 Remember, we found the posterior distribution of $\mu | \underline{x}$ with *known* $\sigma$.  But we don't really ever know $\sigma$.  To find a joint posterior on $\mu, \sigma | \underline{x}$, we need two priors.
 
@@ -105,13 +141,14 @@ Then, the **posteriors** on $\mu|\tau$ and $\tau$ are,
 \mu | \tau, \underline{x} &\sim& N(\mu_1, 1/(\lambda_1 \tau) )\\
 \tau \  | \ \underline{x}  &\sim& \mbox{ Gamma} (\alpha_1, \beta_1)
 \end{eqnarray*}
-where \ $\mu_1 = \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n}, \ \ \ \ \lambda_1 = \lambda_0 + n, \ \ \ \ \alpha_1 = \alpha_0 + \frac{n}{2}, \ \ \ \ \ \beta_1 = \beta_0 + \frac{1}{2} \sum_{i=1}^n (x_i - \overline{x})^2 + \frac{n \lambda_0 (\overline{x} - \mu_0)^2}{2(\lambda_0 +n)}.$
+where $\mu_1 = \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n}, \ \ \ \ \lambda_1 = \lambda_0 + n, \ \ \ \ \alpha_1 = \alpha_0 + \frac{n}{2}, \ \ \ \ \ \beta_1 = \beta_0 + \frac{1}{2} \sum_{i=1}^n (x_i - \overline{x})^2 + \frac{n \lambda_0 (\overline{x} - \mu_0)^2}{2(\lambda_0 +n)}.$
 
 
 Note that the prior is a joint conjugate family of distributions.  $\mu$ and $\tau$ have a normal-gamma distribution.  Note also that $\mu$ and $\tau$ are **not** independent.
 :::
 
 ::: {.proof}
+
 \begin{align}
 f(\underline{x} | \mu, \tau) &= \Bigg( \frac{\tau}{2\pi}\Bigg)^{n/2} exp \Bigg[ -\frac{1}{2} \tau \sum_{i=1}^n (x_i - \mu)^2 \Bigg] \nonumber \\
 \xi_1(\mu|\tau) &= \Bigg( \frac{\lambda_0 \tau}{2\pi}\Bigg)^{1/2} exp \Bigg[ -\frac{1}{2} \lambda_0 \tau (\mu - \mu_0)^2 \Bigg]  \nonumber \\
@@ -119,20 +156,28 @@ f(\underline{x} | \mu, \tau) &= \Bigg( \frac{\tau}{2\pi}\Bigg)^{n/2} exp \Bigg[ 
 \mbox{Note, } & \mu  \mbox{ and $\tau$ are not independent, and } \xi(\mu, \tau) = \xi_1(\mu|\tau) \ \xi_2(\tau) \nonumber \\
  \nonumber \\
 \xi(\mu,\tau|\underline{x}) &\propto f(\underline{x} | \mu, \tau) \ \xi_1(\mu|\tau) \ \xi_2(\tau) \nonumber \\
-&\propto \tau^{\alpha_0 + (n+1)/2 -1} \exp \Bigg[-\frac{\tau}{2} \Bigg(\lambda_0 [\mu-\mu_0]^2 + \sum_{i=1}^{n}(x_i -\mu)^2 \Bigg) - \beta_0 \tau \Bigg] (\#eq:one) \end{align}
+&\propto \tau^{\alpha_0 + (n+1)/2 -1} \exp \Bigg[-\frac{\tau}{2} \Bigg(\lambda_0 [\mu-\mu_0]^2 + \sum_{i=1}^{n}(x_i -\mu)^2 \Bigg) - \beta_0 \tau \Bigg]    (\#eq:one) \end{align}
+
 Add and subtract $\overline{x}$ inside $(x_i -\mu)^2$ to get:
+
 \begin{align}
-\sum_{i=1}^n(x_i -\mu)^2 &= \sum_{i=1}^n(x_i - \overline{x})^2 + n(\overline{x} -\mu)^2
-(\#eq:two) \end{align}
+\sum_{i=1}^n(x_i -\mu)^2 &= \sum_{i=1}^n(x_i - \overline{x})^2 + n(\overline{x} -\mu)^2 (\#eq:two) 
+\end{align}
+
 By adding and subtracting $\mu_1$:
+
 \begin{align}
 n(\overline{x} -\mu)^2 + \lambda_0 (\mu - \mu_0)^2 &= (\lambda_0 + n)(\mu - \mu_1)^2 + \frac{n\lambda_0(\overline{x} - \mu_0)^2}{\lambda_0 + n} (\#eq:three)
 \end{align}
-Combining (\@ref{eq:two}) and (\@ref{eq:three}) we get:
+
+Combining \@ref(eq:two) and \@ref(eq:three) we get:
+
 \begin{align}
 \sum_{i=1}^n(x_i -\mu)^2 + \lambda_0 (\mu - \mu_0)^2 = (\lambda_0 + n)(\mu - \mu_1)^2 + \sum_{i=1}^n(x_i - \overline{x})^2 + \frac{n\lambda_0(\overline{x} - \mu_0)^2}{\lambda_0 + n} (\#eq:four)
 \end{align}
-By plugging (\@ref{eq:four}) into (\@ref{eq:one}) we get:
+
+By plugging \@ref(eq:four) into \@ref(eq:one) we get:
+
 \begin{eqnarray}
 \xi(\mu, \tau | \underline{x}) &\propto& \Bigg\{ \tau^{1/2} exp \Bigg[ -\frac{1}{2} \lambda_1 \tau (\mu - \mu_1)^2 \Bigg] \Bigg\} (\tau^{\alpha_1 -1} e^{-\beta_1 \tau})\\
 \xi(\mu, \tau | \underline{x}) &=& \xi_1(\mu | \tau, \underline{x}) \xi_2(\tau | \underline{x})
@@ -193,13 +238,14 @@ $\sqcap \! \! \! \! \sqcup$
 :::
 
 
-Note: $E[ U | \underline{x} ] = 0$ and $Var(U | \underline{x}) = \frac{2 \alpha_1}{2 \alpha_1 - 2} = \frac{ \alpha_1}{\alpha_1 -1}$\\
+Note: $E[ U | \underline{x} ] = 0$ and $Var(U | \underline{x}) = \frac{2 \alpha_1}{2 \alpha_1 - 2} = \frac{ \alpha_1}{\alpha_1 -1}$
+
 $\rightarrow E[\mu| \underline{x}] = \mu_1$ and $Var(\mu | \underline{x}) = \frac{\beta_1}{\lambda_1 \alpha_1} \frac{\alpha_1}{\alpha_1 -1} = \frac{\beta_1}{\lambda_1(\alpha_1 -1)}$
 
 
 ### Posterior Interval for the mean, $\mu$ in a normal random sample
 
-Just like with frequentist CI:
+Let the confidence level be $1-\alpha$.  As with frequentist CI, the interval can be built by pivoting around the value of interest, $\mu$.
 \begin{eqnarray*}
 P( -c \leq U \leq c \  | \ \underline{x} ) &=& 1 - \alpha\\
 P( -c \leq \Bigg( \frac{\lambda_1 \alpha_1}{\beta_1} \Bigg)^{1/2} (\mu - \mu_1) \leq c \  | \ \underline{x} ) &=& 1 - \alpha\\
@@ -214,8 +260,10 @@ Let's say we are trying to estimate the total number of soft drinks a particular
 \mu | \tau &\sim& N(750, 5 / \tau = \frac{1}{(1/5)\tau} )\\
 \tau &\sim& gamma(1, 45)
 \end{eqnarray*}
-$\mu_0 = 750$, $\lambda_0 = 1/5$, $\alpha_0 = 1$, $\beta_0=45$\\
-Our random sample of 10 weeks gives $\overline{x} = 692$ and $s^2 = \frac{14400}{9} = 1600$.\\
+$\mu_0 = 750$, $\lambda_0 = 1/5$, $\alpha_0 = 1$, $\beta_0=45$
+
+Our random sample of 10 weeks gives $\overline{x} = 692$ and $s^2 = \frac{14400}{9} = 1600$.
+
 Our posterior parameters are:
 \begin{eqnarray*}
 \mu_1 &=& \frac{\lambda_0 \mu_0 + n \overline{x}}{\lambda_0 + n} = \frac{(1/5)750 + 6920}{(1/5) + 10} = 693.14\\
@@ -271,7 +319,7 @@ One-sided 98% t-interval $(df = 24)$ where 98% of the probability is to the left
 mosaic::xqt(.98, 24)
 ```
 
-<img src="06-intest_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-intest_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" />
 
 ```
 ## [1] 2.17
@@ -284,7 +332,7 @@ Two-sided 98% t-interval $(df = 24)$ where 98% of the area is in the center, so 
 mosaic::xqt(.99, 24)
 ```
 
-<img src="06-intest_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-intest_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
 
 ```
 ## [1] 2.49
@@ -294,7 +342,7 @@ mosaic::xqt(.99, 24)
 mosaic::xqt(c(0.01, 0.99), 24)
 ```
 
-<img src="06-intest_files/figure-html/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" />
+<img src="06-intest_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" />
 
 ```
 ## [1] -2.49  2.49
@@ -307,7 +355,7 @@ Two-sided 95% chi-square interval $(df = 9)$.  Note that the chi-square distribu
 mosaic::xqchisq(c(0.025, 0.975), 9)
 ```
 
-<img src="06-intest_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-intest_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
 
 ```
 ## [1]  2.7 19.0
@@ -320,7 +368,7 @@ To find a 90% prediction inteval cutoff, the same R code is used:
 mosaic::xqt(0.95, 12)
 ```
 
-<img src="06-intest_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
+<img src="06-intest_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
 
 ```
 ## [1] 1.78

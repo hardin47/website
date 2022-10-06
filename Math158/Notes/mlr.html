@@ -566,16 +566,16 @@ C_P &amp;=&amp; \frac{SSE_P}{MSE_P} - (n-2P)\\
 <p>Estimating <span class="math inline">\(\sigma^2\)</span> using <span class="math inline">\(MSE_{full}\)</span> assumes that there are no biases in the full model with all of the predictors, an assumption that may or may not be valid, but can’t be tested without additional information (at the very least you have to have all of the important predictors involved).</p>
 <p>AIC and BIC are based on maximum likelihood estimates of the model parameters. The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data. The likelihood is a number between 0 and 1. For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2. In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical. However, when using least squares versus maximum likelihood, there is a difference in estimating <span class="math inline">\(\sigma^2\)</span>. We have been using the <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span> which is MSE = SSE / (n-p). The maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is SSE/n. The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating <span class="math inline">\(p\)</span> regression coefficients <em>and</em> <span class="math inline">\(\sigma^2\)</span>, we are actually estimating <span class="math inline">\(p+1\)</span> parameters. In short, the full AIC is given by the following.</p>
 <p><span class="math display" id="eq:mse">\[
-\begin{eqnarray}
-E[AIC] &amp;=&amp; -2 \ln(L) + 2(p+1)\\\
-&amp;=&amp; -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) \tag{9.1}\\
-&amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) \tag{9.2}\\
-AIC &amp;=&amp; -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) \tag{9.3}\\
-&amp;=&amp; 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
-&amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
-&amp;=&amp; n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
-&amp;=&amp; n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
-\end{eqnarray}
+\begin{align}
+E[AIC] &amp;= -2 \ln(L) + 2(p+1)\\\
+&amp;= -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) \tag{9.1}\\
+&amp;= -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) \tag{9.2}\\
+AIC &amp;= -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) \tag{9.3}\\
+&amp;= 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&amp;= n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&amp;= n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
+&amp;= n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
+\end{align}
 \]</span></p>
 <p>To go from <a href="mlr.html#eq:sigi">(9.1)</a> to <a href="mlr.html#eq:sig">(9.2)</a> we assume that <span class="math inline">\(\sigma^2 = \sigma_i^2\)</span>; that is, the variance is constant for all individuals. To go from <a href="mlr.html#eq:sig">(9.2)</a> to <a href="mlr.html#eq:mse">(9.3)</a> we approximate <span class="math inline">\(\sigma^2\)</span> (and <span class="math inline">\(E[Y_i]\)</span>) using the maximum likelihood estimates for <span class="math inline">\(\sigma^2 = SSE / n\)</span> and <span class="math inline">\(\beta_k\)</span>.<br>
 BIC (SBC) uses the posterior likelihood and a similar derivation. BIC can be given as the following.
@@ -594,28 +594,30 @@ Note that in both AIC and BIC we don’t consider the constant term because mode
 <p><strong>Schwarz’s Bayesian Information Criterion (BIC)</strong>: <span class="math display">\[BIC = n\log(SSE) - n\log(n) + log(n)\times(p)\]</span></p>
 <p><strong>Comparison of AIC and BIC</strong></p>
 <p><span class="math display">\[
-\begin{eqnarray*}
-&amp;&amp; AIC = \color{blue}{n\log(SSE)} - n \log(n) + 2(p) \\
-&amp;&amp; BIC = \color{blue}{n\log(SSE)} - n\log(n) + \log(n)\times(p)
-\end{eqnarray*}
+\begin{align}
+AIC &amp;= \color{blue}{n\log(SSE)} - n \log(n) + 2(p) \nonumber \\
+BIC &amp;= \color{blue}{n\log(SSE)} - n\log(n) + \log(n)\times(p) \nonumber
+\end{align}
 \]</span></p>
 <p>First Term: Decreases as <em>p</em> increases</p>
-<p><span class="math display">\[\begin{eqnarray*}
-&amp;&amp; AIC = n\log(SSE) - \color{blue}{n \log(n)} + 2(p) \\
-&amp;&amp; BIC = n\log(SSE) - \color{blue}{n\log(n)} + \log(n)\times(p)
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+AIC &amp;= n\log(SSE) - \color{blue}{n \log(n)} + 2(p) \nonumber \\
+BIC &amp;= n\log(SSE) - \color{blue}{n\log(n)} + \log(n)\times(p) \nonumber
+\end{align}\]</span></p>
 <p>Second Term: Fixed for a given sample size <em>n</em></p>
-<p><span class="math display">\[\begin{eqnarray*} &amp;&amp; AIC = n\log(SSE) - n\log(n) + \color{blue}{2(p)} \\
-&amp;&amp; BIC = n\log(SSE) - n\log(n) + \color{blue}{\log(n)\times(p)}
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+AIC &amp;= n\log(SSE) - n\log(n) + \color{blue}{2(p)} \nonumber \\
+BIC &amp;= n\log(SSE) - n\log(n) + \color{blue}{\log(n)\times(p)} \nonumber
+\end{align}\]</span></p>
 <p>Third Term: Increases as <em>p</em> increases</p>
 </div>
 <div id="using-aic-bic" class="section level4 unnumbered">
 <h4>Using AIC &amp; BIC<a class="anchor" aria-label="anchor" href="#using-aic-bic"><i class="fas fa-link"></i></a>
 </h4>
-<p><span class="math display">\[\begin{eqnarray*} &amp;&amp; AIC = n\log(SSE) - n \log(n) + \color{red}{2(p)} \\
-&amp;&amp; BIC = n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)}
-\end{eqnarray*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+AIC &amp;= n\log(SSE) - n \log(n) + \color{red}{2(p)} \nonumber \\
+BIC &amp;= n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)} \nonumber
+\end{align}\]</span></p>
 <ul>
 <li><p>Choose model with the smaller value of AIC or BIC</p></li>
 <li><p>If <span class="math inline">\(n \geq 8\)</span>, the <strong>penalty</strong> for BIC is larger than that of AIC, so BIC tends to favor <em>more parsimonious</em> models (i.e. models with fewer terms)</p></li>
@@ -1353,7 +1355,7 @@ Instead, if a simple model is found that outperforms some particular complex mod
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-07-29.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-10-06.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

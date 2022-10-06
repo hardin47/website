@@ -468,16 +468,16 @@ Estimating $\sigma^2$ using $MSE_{full}$ assumes that there are no biases in the
 AIC and BIC are based on maximum likelihood estimates of the model parameters.  The idea of maximum likelihood is to find the parameters that produce the largest likelihood function given the available data.  The likelihood is a number between 0 and 1.  For a variety of reasons, unimportant here, it is common to take the log of the likelihood (an action which does not change where the function is maximized) and to multiply the likelihood by -2.  In linear regression, the parameter estimates found by least squares and by maximum likelihood are identical.  However, when using least squares versus maximum likelihood, there is a difference in estimating $\sigma^2$.  We have been using the *unbiased* estimate of $\sigma^2$ which is MSE = SSE / (n-p).  The maximum likelihood estimate of $\sigma^2$ is SSE/n.  The MLE has a slight negative bias, but is also has a smaller variance. Note that if we are estimating $p$ regression coefficients *and* $\sigma^2$, we are actually estimating $p+1$ parameters.  In short, the full AIC is given by the following.
 
 $$
-\begin{eqnarray}
-E[AIC] &=& -2 \ln(L) + 2(p+1)\\\
-&=& -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) (\#eq:sigi)\\
-&=& -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) (\#eq:sig)\\
-AIC &=& -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) (\#eq:mse)\\
-&=& 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
-&=& n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
-&=& n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
-&=& n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
-\end{eqnarray}
+\begin{align}
+E[AIC] &= -2 \ln(L) + 2(p+1)\\\
+&= -2 \ln \bigg[ \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma_i^2}} \exp( -(Y_i - E[Y_i])^2/ 2\sigma_i^2) \bigg] + 2(p+1) (\#eq:sigi)\\
+&= -2 \ln \bigg[ (2\pi)^{-(n/2)} \sigma^{-(2n/2)} \exp(-\sum_{i=1}^n (Y_i - E[Y_i])^2 / 2 \sigma^2) \bigg] + 2(p+1) (\#eq:sig)\\
+AIC &= -2 \ln \bigg[ (2\pi)^{-(n/2)} (SSE_p/n)^{-(n/2)} \exp(-SSE_p / (2 SSE_p/n)) \bigg] + 2(p+1) (\#eq:mse)\\
+&= 2 (n/2) \ln(2 \pi) - 2(-n/2) \ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&= n \ln(2 \pi) + n\ln(SSE_p/n) + n + 2(p+1) \nonumber \\
+&= n \ln(2 \pi) + n\ln(SSE_p)  - n\ln(n) + n + 2(p+1) \nonumber \\
+&= n\ln(SSE_p) - n\ln(n) + 2p + constant \nonumber
+\end{align}
 $$
 
 To go from \@ref(eq:sigi) to \@ref(eq:sig) we assume that $\sigma^2 = \sigma_i^2$; that is, the variance is constant for all individuals.  To go from \@ref(eq:sig) to \@ref(eq:mse) we approximate $\sigma^2$ (and $E[Y_i]$) using the maximum likelihood estimates for $\sigma^2 = SSE / n$ and $\beta_k$.  
@@ -503,34 +503,36 @@ Estimators of prediction error and *relative* quality of models:
 **Comparison of AIC and BIC**
 
 $$
-\begin{eqnarray*} 
-&& AIC = \color{blue}{n\log(SSE)} - n \log(n) + 2(p) \\
-&& BIC = \color{blue}{n\log(SSE)} - n\log(n) + \log(n)\times(p) 
-\end{eqnarray*}
+\begin{align} 
+AIC &= \color{blue}{n\log(SSE)} - n \log(n) + 2(p) \nonumber \\
+BIC &= \color{blue}{n\log(SSE)} - n\log(n) + \log(n)\times(p) \nonumber
+\end{align}
 $$
 
 First Term: Decreases as *p* increases
 
 
-$$\begin{eqnarray*} 
-&& AIC = n\log(SSE) - \color{blue}{n \log(n)} + 2(p) \\
-&& BIC = n\log(SSE) - \color{blue}{n\log(n)} + \log(n)\times(p) 
-\end{eqnarray*}$$
+$$\begin{align} 
+AIC &= n\log(SSE) - \color{blue}{n \log(n)} + 2(p) \nonumber \\
+BIC &= n\log(SSE) - \color{blue}{n\log(n)} + \log(n)\times(p) \nonumber
+\end{align}$$
 
 Second Term: Fixed for a given sample size *n*
 
 
-$$\begin{eqnarray*} && AIC = n\log(SSE) - n\log(n) + \color{blue}{2(p)} \\
-&& BIC = n\log(SSE) - n\log(n) + \color{blue}{\log(n)\times(p)} 
-\end{eqnarray*}$$
+$$\begin{align} 
+AIC &= n\log(SSE) - n\log(n) + \color{blue}{2(p)} \nonumber \\
+BIC &= n\log(SSE) - n\log(n) + \color{blue}{\log(n)\times(p)} \nonumber
+\end{align}$$
 
 Third Term: Increases as *p* increases
 
 #### Using AIC & BIC {-}
 
-$$\begin{eqnarray*} && AIC = n\log(SSE) - n \log(n) + \color{red}{2(p)} \\
-&& BIC = n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)} 
-\end{eqnarray*}$$
+$$\begin{align} 
+AIC &= n\log(SSE) - n \log(n) + \color{red}{2(p)} \nonumber \\
+BIC &= n\log(SSE) - n\log(n) + \color{red}{\log(n)\times(p)} \nonumber
+\end{align}$$
 
 -   Choose model with the smaller value of AIC or BIC
 
