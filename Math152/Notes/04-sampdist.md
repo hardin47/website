@@ -193,7 +193,7 @@ How would this problem have been different if we had known $\sigma$?  Or even if
 
 1. How do you know which estimator to use in a consulting situation?
 2. How do you respond to someone who tells you "there isn't one right answer" to the previous question?
-3. What are the technical conditions for running a t-test?  That is, what are the conditions on the data that give rise to the t-distribution?  What happens if the technical conditions are violated and the t-test is run anyway?
+3. What are the technical conditions for doing inference using a t-distribution?  That is, what are the conditions on the data that give rise to the t-distribution?  What happens if the technical conditions are violated and the inference is done anyway?  [Here, inference means confidence intervals and hypothesis testing.]
 
 
 ## R code: Tanks Example
@@ -273,14 +273,14 @@ map_df(1:reps, ~map2(nsamp_try, npop_try, calculate_N))
 
 ```
 ##    xbar2 median2 samp.max mod.max sum.min.max diff.min.max nsamp npop
-## 1 183.60     190      142  156.20         155     157.6667    10  147
-## 2 139.76     144      147  148.47         148     148.9495   100  147
-## 3 286.40     139      388  426.80         402     457.1111    10  447
-## 4 506.18     528      447  451.47         449     453.9899   100  447
-## 5 118.60      95      134  147.40         145     150.3333    10  147
-## 6 150.60     154      146  147.46         147     147.9293   100  147
-## 7 563.00     644      440  484.00         519     441.2222    10  447
-## 8 418.60     442      439  443.39         440     446.8485   100  447
+## 1 134.20     155      114  125.40         117     135.6667    10  147
+## 2 150.52     156      146  147.46         150     144.8687   100  147
+## 3 303.60     259      342  376.20         377     375.2222    10  447
+## 4 436.36     456      446  450.46         448     452.9697   100  447
+## 5 152.60     150      144  158.40         150     168.6667    10  147
+## 6 136.18     136      144  145.44         145     145.8889   100  147
+## 7 545.00     540      446  490.60         493     487.6667    10  447
+## 8 466.28     487      445  449.45         449     449.9091   100  447
 ```
 
 
@@ -301,14 +301,14 @@ results_long
 ## # A tibble: 24,000 × 4
 ##    nsamp  npop estimator    estimate
 ##    <dbl> <dbl> <chr>           <dbl>
-##  1    10   147 xbar2            146.
-##  2    10   147 median2          187 
-##  3    10   147 samp.max         121 
-##  4    10   147 mod.max          133.
-##  5    10   147 sum.min.max      134 
-##  6    10   147 diff.min.max     132 
-##  7   100   147 xbar2            147.
-##  8   100   147 median2          154 
+##  1    10   147 xbar2            180 
+##  2    10   147 median2          174 
+##  3    10   147 samp.max         143 
+##  4    10   147 mod.max          157.
+##  5    10   147 sum.min.max      145 
+##  6    10   147 diff.min.max     172.
+##  7   100   147 xbar2            146.
+##  8   100   147 median2          149 
 ##  9   100   147 samp.max         147 
 ## 10   100   147 mod.max          148.
 ## # … with 23,990 more rows
@@ -332,18 +332,18 @@ results_long %>%
 ```
 ## # A tibble: 24 × 8
 ## # Groups:   nsamp, npop [4]
-##    nsamp  npop estimator     mean median     bias    var    mse
-##    <dbl> <dbl> <chr>        <dbl>  <dbl>    <dbl>  <dbl>  <dbl>
-##  1    10   147 diff.min.max  148.   152.   0.896    376.   377.
-##  2    10   147 median2       147.   147   -0.088   1497.  1497.
-##  3    10   147 mod.max       147.   152.   0.499    192.   192.
-##  4    10   147 samp.max      134.   138  -12.9      159.   325.
-##  5    10   147 sum.min.max   147.   148    0.174    308.   308.
-##  6    10   147 xbar2         147.   146.  -0.301    664.   664.
-##  7    10   447 diff.min.max  445.   458.  -2.12    3926.  3931.
-##  8    10   447 median2       443.   446   -4.07   15732. 15749.
-##  9    10   447 mod.max       447.   457.  -0.0304  1628.  1628.
-## 10    10   447 samp.max      406.   415  -40.7     1346.  2999.
+##    nsamp  npop estimator     mean median    bias    var    mse
+##    <dbl> <dbl> <chr>        <dbl>  <dbl>   <dbl>  <dbl>  <dbl>
+##  1    10   147 diff.min.max  148.   150.   0.827   356.   356.
+##  2    10   147 median2       148.   148    0.543  1556.  1556.
+##  3    10   147 mod.max       148.   151.   0.525   168.   168.
+##  4    10   147 samp.max      134.   138. -12.9     139.   305.
+##  5    10   147 sum.min.max   147.   147    0.279   298.   298.
+##  6    10   147 xbar2         147.   147.   0.269   692.   692.
+##  7    10   447 diff.min.max  448.   460.   0.579  3795.  3795.
+##  8    10   447 median2       447.   448.   0.022 16030. 16030.
+##  9    10   447 mod.max       448.   461.   1.18   1826.  1828.
+## 10    10   447 samp.max      407.   419  -39.6    1509.  3074.
 ## # … with 14 more rows
 ## # ℹ Use `print(n = ...)` to see more rows
 ```
