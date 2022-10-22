@@ -311,7 +311,7 @@ Keep in mind that what we are trying to do is approximate the sampling distribut
 \hat{F}\bigg(\frac{\hat{\theta}^*_b - \hat{\theta}}{\hat{SE}^*_B} \bigg) \rightarrow F\bigg(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\bigg)
 \end{eqnarray*}
 
-Recall the derivation of conventional confidence intervals (for a location parameter, like $\mu$).  We somehow know the distribution of $ \frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$ (which gives the cutoff vales of $q$), and then we isolate $\theta$ in the middle of the probability statement.  Keeping in mind that the randomness in the probability statement comes from the **endpoints** not the parameter.
+Recall the derivation of conventional confidence intervals (for a location parameter, like $\mu$).  We somehow know the distribution of $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$ (which gives the cutoff vales of $q$), and then we isolate $\theta$ in the middle of the probability statement.  Keeping in mind that the randomness in the probability statement comes from the **endpoints**, not the parameter.
 \begin{eqnarray*}
 P\bigg(q_{(\alpha/2)} \leq \frac{\hat{\theta} - \theta}{SE(\hat{\theta})} \leq q_{(1-\alpha/2)}\bigg)&=& 1 - \alpha\\
 P\bigg(\hat{\theta} - q_{(1-\alpha/2)} SE(\hat{\theta}) \leq \theta \leq \hat{\theta} - q_{(\alpha/2)} SE(\hat{\theta})\bigg) &=& 1 - \alpha\\
@@ -325,25 +325,37 @@ We could use the BS SE within the CI formula (with standard normal values like 1
 95% BS SE CI for $\theta$: $$\hat{\theta} \pm 1.96 \cdot \hat{SE}^*_B$$
 
 #### BS-t Confidence Interval
-Now consider using the bootstrap to estimate the **distribution** for $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$ (and not just the SE of $\hat{\theta}$).
+
+(note: the BS-t is so-named because of the process by which we create the intervals -- just like t-intervals!  We do not use the t-distribution at all in the BS-t intervals.)
+
+Previously, the bootstrap was used to estimate the (unknown) SE.
+Now consider using the bootstrap to estimate the **distribution** for $\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}$ (and not just the SE of $\hat{\theta}).$
 \begin{eqnarray*}
 T^*(b) &=& \frac{\hat{\theta}^*_b - \hat{\theta}}{\hat{SE}^*(b)}
 \end{eqnarray*}
-\noindent
+
 where $\hat{\theta}^*_b$ is the value of $\hat{\theta}$ for the $b^{th}$ bootstrap sample, and $\hat{SE}^*(b)$ is the estimated standard error of $\hat{\theta}^*_b$ for the $b^{th}$ bootstrap sample.  The $\alpha/2^{th}$ percentile of $T^*(b)$ is estimated by the value of $\hat{q}^*_{\alpha/2}$ such that
 \begin{eqnarray*}
-\frac{\# \{T^*(b) \leq \hat{q}^*_{\alpha/2} \} }{B} = \alpha/2
+\frac{\# \{T^*(b) \leq \hat{q}^*_{\gamma} \} }{B} = \gamma 
 \end{eqnarray*}
-\noindent
+
 For example, if $B=1000$, the estimate of the 5% point is the $50^{th}$ smallest value of the $T^*(b)$s, and the estimate of the 95% point is the $950^{th}$ smallest value of the $T^*(b)$s (two values that would be used to create a 90% interval).
 
-Finally, the boostrap-t confidence interval is:
+Why does it make sense to estimate $q_\gamma$ using $\hat{q}^*_{\gamma}?$  Recall that the main condition of bootstrapping is: 
+
+\begin{eqnarray*}
+\hat{F}\bigg(\frac{\hat{\theta}^*_b - \hat{\theta}}{\hat{SE}^*_B} \bigg) \rightarrow F\bigg(\frac{\hat{\theta} - \theta}{SE(\hat{\theta})}\bigg)
+\end{eqnarray*}
+
+That is, the needed distribution can be approximated by the bootstrap distribution.  The remaining steps include the algebra which put the parameter in the center and the functions of the data as the endpoints of the interval.
+
+Finally, the bootstrap-t confidence interval is:
 \begin{align} 
 (\hat{\theta} - \hat{q}^*_{1-\alpha/2}\hat{SE}^*_B,  \hat{\theta} - \hat{q}^*_{\alpha/2}\hat{SE}^*_B) (\#eq:BSt)
 \end{align}
 
 
-Note that the multiplier $(q^*)$ is given by $T^*(b)$ which requires a separate estimate of the SE for each bootstrap sample.  Accordingly, to find a bootstrap-t interval, we have to bootstrap twice, see Figure \@ref(BSt). The algorithm is as follows:
+Note that the multiplier $(q^*)$ is given by $T^*(b)$ which requires a separate estimate of the SE for each bootstrap sample.  Accordingly, to find a bootstrap-t interval, we have to bootstrap twice, see Figure \@ref(fig:BSt). The algorithm is as follows:
 
 1. Generate $B$ bootstrap samples, and for each sample $\underline{X}^{*b}$ compute the bootstrap estimate $\hat{\theta}^*_b$. 
 2. $\rightarrow$ Take $M$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$. 
@@ -377,7 +389,7 @@ The interval between the $\alpha/2$ and $1-\alpha/2$ quantiles of the bootstrap 
 Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (@hall refers to these as Efron's "backwards" intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
 
 
-To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where $g$ is a monotonic function (assume wlog that $g$ is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
+To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where $g$ is a monotonic function (assume without loss of generality that $g$ is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
 \begin{eqnarray}
  \hat{\phi}^* - \hat{\phi} \sim \hat{\phi} - \phi \sim N(0, \sigma^2). (\#eq:phidist)
  \end{eqnarray}
@@ -391,8 +403,8 @@ P( \hat{\phi} - z_\alpha \sigma > \phi) &=& 1 - \alpha \nonumber\\
 where $z_{1-\alpha}$ is the $100(1-\alpha)$ percent point of the standard normal distribution.   Note that the interval for $\theta$ in equation \@ref(eq:phiint) is problematic in that it requires knowledge of $g.$  (Also, it doesn't use any of the power of the bootstrap.)
 
 
-Equation \@ref(eq:phidist) implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.  [A picture goes a long way here:  draw two normal curves, one describing the sampling distribution of $\hat{\phi} - \phi $, and the other describing the sampling distribution of $\hat{\phi}^* - \hat{\phi}$.   Because of the assumption in equation \@ref(eq:phidist), the two sketched out normal curves should be the same, which implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.]  Further, since $g$ is monotonically increasing, $F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).$
-Substituting in \@ref(eq:phiint), gives the percentile interval for $\theta$^[Proof from Carpenter and Bithell, *Statistics in Medicine*, 2000],
+Equation \@ref(eq:phidist) implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.  [A picture goes a long way here:  draw two normal curves, one describing the sampling distribution of $\hat{\phi} - \phi$, and the other describing the sampling distribution of $\hat{\phi}^* - \hat{\phi}$.   Because of the assumption in equation \@ref(eq:phidist), the two sketched out normal curves should be the same, which implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.]  Further, since $g$ is monotonically increasing, $F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).$
+Substituting in \@ref(eq:phiint), gives the percentile interval for $\theta$^[Proof from @carpenter2000],
 \begin{eqnarray}
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
 \end{eqnarray}
@@ -431,7 +443,34 @@ SE(r) = \frac{(1-\rho^2)}{\sqrt{n-2}}
 \begin{eqnarray*}
 Z = \frac{1}{2} \ln \Big[\frac{1+r}{1-r}\Big]
 \end{eqnarray*}
-We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is an inverse hyperbolic tangent function.)
+We think of this as the non-linear transformation that normalizes the sampling distribution of r.  (Note: it is an inverse hyperbolic tangent function.)  
+
+
+What do we see from Fisher?  That (if the data are normal), there exists a transformation that normalizes the sampling distribution of the correlation!!
+
+
+**Percentile interval lemma** [@efrontibs, pg 173]  Suppose the transformation for $\hat{\phi} = m(\hat{\theta})$ perfectly normalizes the distribution of $\hat{\theta}$:
+\begin{eqnarray*}
+\hat{\phi} \sim N (\phi, 1)
+\end{eqnarray*}
+Then the percentile interval based on $\hat{\theta}$ equals $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$.
+
+And we can approximate $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$ using $[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]$
+
+In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
+
+::: {.example}
+From Charlotte Chang's (Prof Chang in Bio!) example on bootstrapping a loess smooth for her thesis data. <!--(carryingcap.r)-->  The idea was this:  Prof Chang had some data that she wanted to model (using differential equations, DE).  She asked me how to tell whether or not her new model was reflective of the data / population.  The model was applied in repeated simulations and can be seen with the black / red lines.  Additionally, we fit a loess spline to see the shape of the data (blue line).  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit (green lines).  The DE model  (confidence within the red bounds) doesn't seem to be a terrible fit, but it definitely seems to say something different about the relationship between year and pipits than the data / bootstrapping (confidence within the green bounds).
+
+
+<div class="figure" style="text-align: center">
+<img src="figs/carrycap.png" alt="Model of number of birds per route as a function of time.  Blue line is loess fit; green lines are bootstrap CI for the loess fit.  The differential expression model is given by the red CI bounds under model simulation (not bootstrapping)." width="80%" />
+<p class="caption">(\#fig:unnamed-chunk-4)Model of number of birds per route as a function of time.  Blue line is loess fit; green lines are bootstrap CI for the loess fit.  The differential expression model is given by the red CI bounds under model simulation (not bootstrapping).</p>
+</div>
+
+:::
+
+Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  To do a more precise analysis, we need to be careful about multiple comparisons and non-independent data values.
 
 
 <!--
@@ -503,7 +542,7 @@ P\bigg( \phi(\hat{\theta}^*) &\leq& \frac{\phi(\hat{\theta}) - (z_{1-\alpha/2} -
  &=& \verb;pnorm; \bigg(\frac{ (z_{\alpha/2} + z_0) }{(1 - a (z_{\alpha/2} + z_0))} + z_0 \bigg)
 \end{eqnarray*}
 
-What we've shown is that the $\gamma_1$ quantile of the $\phi(\hat{\theta}^*)$ sampling distribution will be a good estimate for the lower bound of the confidence interval for $\phi(\theta)$.  Using the same argument on the upper bound, we find a $(1-\alpha)$100% confidence interval for $\phi(\theta)$ to be:
+What we've shown is that the $\gamma_1$ quantile of the $\phi(\hat{\theta}^*)$ sampling distribution will be a good estimate for the lower bound of the confidence interval for $\phi(\theta)$.  Using the same argument on the upper bound, we find a $(1-\alpha)$ 100% confidence interval for $\phi(\theta)$ to be:
 
 \begin{eqnarray*}
 &&[\phi(\hat{\theta}^*)_{\gamma_1}, \phi(\hat{\theta}^*)_{\gamma_2}]\\
@@ -512,7 +551,7 @@ What we've shown is that the $\gamma_1$ quantile of the $\phi(\hat{\theta}^*)$ s
  \gamma_2 &=& \Phi \bigg(\frac{ (z_{1-\alpha/2} + z_0) }{(1 - a (z_{1-\alpha/2} + z_0))} + z_0 \bigg)\\
 \end{eqnarray*}
 
-Using the transformation respecting property of percentile intervals, we know that a $(1-\alpha)$100% confidence interval for $\theta$ is:
+Using the transformation respecting property of percentile intervals, we know that a $(1-\alpha)$ 100% confidence interval for $\theta$ is:
 
 \begin{eqnarray*}
 &&[\hat{\theta}^*_{\gamma_1}, \hat{\theta}^*_{\gamma_2}]
@@ -565,32 +604,10 @@ Let
 r &=&\frac{e^{2\phi}+1}{e^{2\phi}-1}\\
 \end{eqnarray*}
 
-We know that $\hat{\phi}$ does have an approximate normal distribution.  So, the percentile CI for $\phi$ will approximate the normal theory CI which we know to be correct (for a given $\alpha$).  But once we have a CI for $\phi$ we can find the CI for $\rho$ by taking the inverse monotonic transformation; or rather... we can just use the r percentile CI to start with!
+We know that $\hat{\phi}$ does have an approximate normal distribution.  So, the percentile CI for $\phi$ will approximate the normal theory CI which we know to be correct (for a given $\alpha).$  But once we have a CI for $\phi$ we can find the CI for $\rho$ by taking the inverse monotonic transformation; or rather... we can just use the r percentile CI to start with!
 
 
 
-**Percentile interval lemma** [@efrontibs, pg 173]  Suppose the transformation for $\hat{\phi} = m(\hat{\theta})$ perfectly normalizes the distribution of $\hat{\theta}$:
-\begin{eqnarray*}
-\hat{\phi} \sim N (\phi, 1)
-\end{eqnarray*}
-Then the percentile interval based on $\hat{\theta}$ equals $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$.
-
-And we can approximate $[m^{-1}(\hat{\phi} - z_{1-\alpha/2} ), m^{-1}(\hat{\phi} - z_{\alpha/2} )]$ using $[\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]$
-
-In order for a percentile interval to be appropriate, we simply need to know that a normalizing transformation exists.  We do not need to actually find the transformation! [In complete disclosure, the transformation doesn't have to be to a normal distribution.  But it must be a monotonic transformation to a distribution which is symmetric about zero.]
-
-::: {.example}
-From Charlotte Chang's (Prof Chang in Bio!) example on bootstrapping a loess smooth for her thesis data. <!--(carryingcap.r)-->  The idea was this:  Prof Chang had some data that she wanted to model (using differential equations, DE).  She asked me how to tell whether or not her new model was reflective of the data / population.  The model was applied in repeated simulations and can be seen with the black / red lines.  Additionally, we fit a loess spline to see the shape of the data (blue line).  Then we bootstrapped the data and fit 1000 more loess splines.  Using the percentile CI method, we created a CI for a population loess spline fit (green lines).  The DE model  (confidence within the red bounds) doesn't seem to be a terrible fit, but it definitely seems to say something different about the relationship between year and pipits than the data / bootstrapping (confidence within the green bounds).
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/carrycap.png" alt="Model of number of birds per route as a function of time.  Blue line is loess fit; green lines are bootstrap CI for the loess fit.  The differential expression model is given by the red CI bounds under model simulation (not bootstrapping)." width="80%" />
-<p class="caption">(\#fig:unnamed-chunk-4)Model of number of birds per route as a function of time.  Blue line is loess fit; green lines are bootstrap CI for the loess fit.  The differential expression model is given by the red CI bounds under model simulation (not bootstrapping).</p>
-</div>
-
-:::
-
-Keeping in mind that the theory we've covered here doesn't exactly work for this situation (our work has been on simple parameter estimation), you can imagine that many of the ideas we've talked about do apply to Charlotte's situation.  To do a more precise analysis, we need to be careful about multiple comparisons and non-independent data values.
 
 **The range preserving property**  Another advantage of the percentile interval is that it is range preserving.  That is, the CI always produces endpoints that fall within the allowable range of the parameter.
 
@@ -617,7 +634,7 @@ P(\theta > \hat{\theta}_{(hi)})&=&\alpha/2\\
 \end{eqnarray*}
 
 
-Note:  all of the bootstrap intervals are approximate.  We judge them based on how accurately they cover $\theta$.
+Note:  all of the bootstrap intervals are approximate.  We judge them based on how accurately they cover $\theta$.  ($const_{lo}$ and $const_{hi}$ are constant values that will vary depending on the data, statistic, and method.  The constants will not necessarily be the same for the upper miss-rate and the lower miss-rate.)  The point is whether the coverage rate converges at a rate of $1/n$ or a rate of $1/\sqrt{n}.$
 
 
 A CI is **first order accurate** if:
@@ -648,28 +665,28 @@ BS SE Interval
 * **Advantages**
 similar to the familiar parametric approach; useful with a normally distributed $\hat{\theta}$; requires the least computation ($B=50-200$)
 * **Disadvantages**
-fails to use the entire $\hat{F}^*(\hat{\theta}^*)$
+fails to use the entire $\hat{F}^*(\hat{\theta}^*)$  
 
 Bootstrap-t Confidence Interval
 
 * **Advantages**
 highly accurate CI in many cases; handles skewed $F(\hat{\theta})$ better than the percentile method;
 * **Disadvantages**
-not invariant to transformations; computationally expensive with the double bootstrap
+not invariant to transformations; computationally expensive with the double bootstrap  
 
 Percentile Interval
 
 * **Advantages**
 uses the entire $\hat{F}^*(\hat{\theta}^*)$; allows $F(\hat{\theta})$ to be asymmetrical; invariant to transformations; range respecting; simple to execute
 * **Disadvantages**
-small samples may result in low accuracy (because of the dependence on the tail behavior); assumes $\hat{F}^*(\hat{\theta}^*)$ to be unbiased
+small samples may result in low accuracy (because of the dependence on the tail behavior); assumes $\hat{F}^*(\hat{\theta}^*)$ to be unbiased  
 
 BCa Interval
 
 * **Advantages**
 all of those of the percentile method; allows for bias in $\hat{F}^*(\hat{\theta}^*)$; $z_0$ can be calculated easily from $\hat{F}^*(\hat{\theta}^*)$ 
 * **Disadvantages**
-requires a limited parametric assumption; can be complicated to compute
+requires a limited parametric assumption; can be complicated to compute   
 
 ### Bootstrap CI and Hypothesis Testing
 
