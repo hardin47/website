@@ -798,3 +798,222 @@ mosaic::xqt(0.95, 12)
 ```
 
 
+### Bootstrapping Survival Example
+
+There are many built in functions in R (and Python, Matlab, Stata, etc. for that matter) which will bootstrap a dataset and create any of a number of standard bootstrap intervals.  However, in order to understand the bootstrap process, the example below uses for loops to repeated resample and calculate the statistics of interest.
+
+::: {.example}
+heroin survival time
+
+- Hesketh and Everitt (2000) report on a study by Caplehorn and Bell (1991) that investigated the times that heroin addicts remained in a clinic for methadone maintenance treatment.  
+
+- The data include the amount of time that the subjects stayed in the facility until treatment was terminated (column 4). 
+
+- For about 37% of the subjects, the study ended while they were still the in clinic (status=0).  
+
+- Their survival time has been truncated.  For this reason we might not want to estimate the mean survival time, but rather some other measure of typical survival time.  Below we explore using the 25% trimmed mean.   (From ISCAM Chance & Rossman, Investigation 4.5.3)
+:::
+
+
+```r
+library(tidyverse)
+heroin <- readr::read_table("http://www.rossmanchance.com/iscam2/data/heroin.txt")
+names(heroin)
+```
+
+```
+## [1] "id"     "clinic" "status" "times"  "prison" "dose"
+```
+
+```r
+head(heroin)
+```
+
+```
+## # A tibble: 6 × 6
+##      id clinic status times prison  dose
+##   <dbl>  <dbl>  <dbl> <dbl>  <dbl> <dbl>
+## 1     1      1      1   428      0    50
+## 2     2      1      1   275      1    55
+## 3     3      1      1   262      0    55
+## 4     4      1      1   183      0    30
+## 5     5      1      1   259      1    65
+## 6     6      1      1   714      0    55
+```
+
+```r
+obs.stat <- heroin %>% 
+  summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
+obs.stat
+```
+
+```
+## [1] 378
+```
+
+
+#### Bootstrapping the data {-}
+
+
+```r
+set.seed(4747)
+heroin.bs<-heroin %>% sample_frac(size=1, replace=TRUE)
+
+heroin.bs %>% 
+  summarize(tmeantime = mean(times, trim=0.25)) %>% pull()
+```
+
+```
+## [1] 372
+```
+
+
+####  Creating a bootstrap sampling distribution for the trimmed mean {-}
+
+
+```r
+bs.test.stat<-c()    # placeholder, eventually B long, check after running!
+bs.sd.test.stat<-c() # placeholder, eventually B long, check after running!
+
+B <- 500
+M <- 100
+set.seed(4747)
+```
+
+
+```r
+for(b in 1:B){ 
+  heroin.bs<-heroin %>% sample_frac(size=1, replace=TRUE)  # BS sample
+  bs.test.stat<-c(bs.test.stat, # concatenate each trimmed mean each time go through loop
+                  heroin.bs %>% 
+                    summarize(tmeantime = mean(times, trim = 0.25)) %>% pull())
+  
+  bsbs.test.stat <- c() # refresh the vector of double BS test statistics
+  
+  for(m in 1:M){
+    heroin.bsbs<-heroin.bs %>% sample_frac(size=1, replace=TRUE) # BS of the BS!
+    bsbs.test.stat <- c(bsbs.test.stat, # concatenate the trimmed mean of the double BS
+                        heroin.bsbs %>% 
+                          summarize(tmeantime = mean(times, trim = 0.25)) %>% pull())
+  }
+  bs.sd.test.stat<-c(bs.sd.test.stat, sd(bsbs.test.stat))
+}
+```
+
+
+#### What do the **data** distributions look like? {-}
+
+
+```r
+ggplot(heroin, aes(x=times)) + 
+  geom_histogram(bins=30) + 
+  ggtitle("original sample (n=238)")
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" />
+
+```r
+ggplot(heroin.bs, aes(x=times)) + 
+  geom_histogram(bins=30) + 
+  ggtitle("one bootstrap sample (n=238)")
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" />
+
+```r
+ggplot(heroin.bsbs, aes(x=times)) + 
+  geom_histogram(bins=30) + 
+  ggtitle("a bootstrap sample of the one bootstrap sample (n=238)")
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-13-3.png" width="672" style="display: block; margin: auto;" />
+
+
+#### What do the **sampling** distributions look like? {-}
+
+
+
+```r
+bs.stats <- data.frame(bs.test.stat)
+ggplot(bs.stats, aes(x=bs.test.stat)) + 
+  geom_histogram(bins=20) + 
+  ggtitle("dist of trimmed mean") +  
+  xlab(paste("trimmed.mean=",round(mean(bs.test.stat),2),"; SE=", round(sd(bs.test.stat),2)))
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+
+
+#### What is the distribution of the SE of the statistic? {-}
+
+
+```r
+bs.SE <- data.frame(bs.sd.test.stat)
+ggplot(bs.SE, aes(x=bs.sd.test.stat)) + 
+  geom_histogram(bins=20) + 
+  ggtitle("dist of SE of trimmed means") +  
+  xlab(paste("average SE=",round(mean(bs.sd.test.stat),2)))
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
+
+#### What is the distribution of the T statistics? {-}
+
+
+```r
+bs.T <- data.frame(T.test.stat = (bs.test.stat - obs.stat) / bs.sd.test.stat)
+ggplot(bs.T, aes(x=T.test.stat)) + 
+  geom_histogram(bins=20) + 
+  ggtitle("dist of T statistics of trimmed means") +  
+  xlab(paste("average T=",round(mean(bs.T$T.test.stat),2)))
+```
+
+<img src="06-intest_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+
+
+#### 95% normal CI with BS SE {-}
+
+
+```r
+obs.stat + 
+  qnorm(c(.025,.975))*
+  sd(bs.test.stat)
+```
+
+```
+## [1] 334 423
+```
+
+
+#### 95% Bootstrap-t CI {-}
+
+Note that the t-value is needed (which requires a different SE for each bootstrap sample).
+
+
+```r
+bs.t.hat<-(bs.test.stat - obs.stat)/bs.sd.test.stat
+
+bs.t.hat.95 = quantile(bs.t.hat, c(.975,.025))
+
+obs.stat - bs.t.hat.95*sd(bs.test.stat)
+```
+
+```
+## 97.5%  2.5% 
+##   337   427
+```
+
+#### 95% Percentile CI {-}
+
+
+```r
+quantile(bs.test.stat, c(.025, .975))
+```
+
+```
+##  2.5% 97.5% 
+##   332   422
+```
+
+
+

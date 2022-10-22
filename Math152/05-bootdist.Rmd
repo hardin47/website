@@ -205,9 +205,9 @@ For example, if $B=1000$, the estimate of the 5\% point is the $50^{th}$ smalles
 
 To find a different SE for each bootstrapped dataset, we have to bootstrap twice. The algorithm is as follows:
 
-1. Generate $B_1$ bootstrap samples, and for each sample $\underline{X}^{*b}$ compute the bootstrap estimate $\hat{\theta}^*_b$.
-2. Take $B_2$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$.
-3. Find $B_1$ values for $T^*(b)$.  Calculate $\hat{q}^*_\alpha$ and $\hat{q}^*_{1-\alpha}$ (or $\alpha/2$).
+1. Generate $B$ bootstrap samples, and for each sample $\underline{X}^{*b}$ compute the bootstrap estimate $\hat{\theta}^*_b$.
+2. Take $M$ bootstrap samples from $\underline{X}^{*b}$, and estimate the standard error, $\hat{SE}^*(b)$.
+3. Find $B$ values for $T^*(b)$.  Calculate $\hat{q}^*_\alpha$ and $\hat{q}^*_{1-\alpha}$ (or $\alpha/2$).
 
 
 
