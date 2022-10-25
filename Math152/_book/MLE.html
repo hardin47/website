@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 3 Maximum Likelihood Estimation | Statistical Theory</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses \(\hat{\theta}\) as the estimate of \(\theta\)...">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
+<meta property="og:title" content="Chapter 3 Maximum Likelihood Estimation | Statistical Theory">
+<meta property="og:type" content="book">
+<meta property="og:description" content="Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses \(\hat{\theta}\) as the estimate of \(\theta\)...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 3 Maximum Likelihood Estimation | Statistical Theory">
+<meta name="twitter:description" content="Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses \(\hat{\theta}\) as the estimate of \(\theta\)...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Statistical Theory</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="bayes.html"><span class="header-section-number">2</span> Bayesian Estimation</a></li>
+<li><a class="active" href="MLE.html"><span class="header-section-number">3</span> Maximum Likelihood Estimation</a></li>
+<li><a class="" href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></li>
+<li><a class="" href="bootdist.html"><span class="header-section-number">5</span> Bootstrap Distributions</a></li>
+<li><a class="" href="intest.html"><span class="header-section-number">6</span> Interval Estimates</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="MLE" class="section level1" number="3">
+<h1>
+<span class="header-section-number">3</span> Maximum Likelihood Estimation<a class="anchor" aria-label="anchor" href="#MLE"><i class="fas fa-link"></i></a>
+</h1>
+<p>Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses <span class="math inline">\(\hat{\theta}\)</span> as the estimate of <span class="math inline">\(\theta\)</span> that <strong>maximizes</strong> the likelihood function (easily the most widely used estimation method in statistics).</p>
+<p>Let’s say <span class="math inline">\(X \sim U[0, \theta].\)</span> We collect <span class="math inline">\(X=47.\)</span> Would you ever pick <span class="math inline">\(\theta=10?\)</span> No! <span class="math inline">\(10 \notin \Omega!\)</span></p>
+<p>Let’s say that <span class="math inline">\(X \sim\)</span> Bin(<span class="math inline">\(\theta,\)</span>n=4). If we have 4 independent trials, and X=1, would you chose <span class="math inline">\(\theta=0.99?\)</span> But <span class="math inline">\(0.99 \in \Omega???\)</span> You would choose <span class="math inline">\(\theta = 0.25.\)</span> Why? Because you maximized the likelihood.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+P(X=1 | \theta = 0.25) &amp;=&amp; 0.422\\
+P(X=1 | \theta = 0.5) &amp;=&amp; 0.25\\
+P(X=1 | \theta = 0.05)  &amp;=&amp; 0.171\\
+P(X=1 | \theta = 0.15) &amp;=&amp; 0.368\\
+\end{eqnarray*}\]</span>
+You maximized the probability of seeing your data!</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-7" class="example"><strong>Example 3.1  </strong></span>Let’s say that houses on a block have their electricity connected in such a way that it only works for house #47 if all the neighbor’s electricity works (in sequence). Sometimes a house’s electricity will fail (w/prob p). To how many houses can we expect to provide electricity? What is our best guess of p?</p>
+<p>Data: let’s say we have <span class="math inline">\(n\)</span> neighborhoods with information on which house lost electricity. [What is the distribution of <span class="math inline">\(X?\)</span> <span class="math inline">\(X \sim geometric(p),\)</span> which means <span class="math inline">\(E[X] = 1/p.]\)</span></p>
+<p><span class="math display">\[\begin{eqnarray*}
+f(x_i | p) &amp;=&amp; p (1-p)^{x_i -1}\\
+f(\underline{x} | p) &amp;=&amp; \prod_{i=1}^n p (1-p)^{x_i -1}\\
+&amp;=&amp; p^n (1-p)^{\sum x_i -n}\\
+&amp;&amp; \mbox{we want to maximize wrt } p
+\end{eqnarray*}\]</span></p>
+<p>Often, the log-likelihood is easier to maximize than the likelihood. We define the log likelihood as
+<span class="math display">\[\begin{eqnarray*}
+L(\theta) = \ln f(\underline{X} | \theta).
+\end{eqnarray*}\]</span></p>
+<p>For example,
+<span class="math display">\[\begin{eqnarray*}
+L(p) &amp;=&amp; \ln f(\underline{x} | p) = n \ln(p) + (\sum x_i -n) \ln(1-p)\\
+\frac{\partial L(p)}{\partial p} &amp;=&amp; \frac{n}{p} + \frac{(\sum x_i -n)(-1)}{(1-p)} = 0\\
+\hat{p} &amp;=&amp; \frac{1}{\overline{X}}
+\end{eqnarray*}\]</span></p>
+<p>If <span class="math inline">\(\overline{x} = 10\)</span>, <span class="math inline">\(\hat{p} = 1/10\)</span> (1 failure at 10 homes). E[X] = 1/p. (If we let <span class="math inline">\(\theta = E[X] -1\)</span>, then a good estimate of the expected (average) number of homes to which we can provide electricity is <span class="math inline">\(1/\hat{p} -1 = 10 - 1\)</span>. It turns out that the MLE has the invariance property which says that a function of the MLE is the MLE of that function of the parameter.)</p>
+<p>Note that we’ve found a maximum:
+<span class="math display">\[\begin{eqnarray*}
+\frac{\partial^2 L(p)}{\partial p^2} &amp;=&amp; \frac{2np -n -p^2\sum x_i}{p^2 (1-p)^2}\\
+&amp;\leq&amp; \frac{2p n - n -p^2n}{p^2 (1-p)^2}\\
+(\mbox{because } n &amp;\leq&amp; \sum x_i)\\
+&amp;=&amp; \frac{n ( -2p + 1 +p^2}{p^2 (1-p)^2}\\
+&amp;=&amp; \frac{-n}{p^2} &lt; 0\\
+\end{eqnarray*}\]</span></p>
+</div>
+<div class="definition">
+<p><span id="def:unlabeled-div-8" class="definition"><strong>Definition 3.1  </strong></span>Maximum Likelihood Estimator (Def 7.5.2).<br>
+For each possible observed vector <span class="math inline">\(\underline{x}\)</span>, let <span class="math inline">\(\delta(\underline{x}) \in \Omega\)</span> denote a value of <span class="math inline">\(\theta \in \Omega\)</span> for which the likelihood function, <span class="math inline">\(f(\underline{x}|\theta)\)</span> is a maximum, and let <span class="math inline">\(\hat{\theta} = \delta(\underline{X})\)</span> be the estimator of <span class="math inline">\(\theta\)</span> defined in this way. The estimator for <span class="math inline">\(\hat{\theta}\)</span> is called a <strong>maximum likelihood estimator</strong> of <span class="math inline">\(\theta.\)</span> After <span class="math inline">\(\underline{X} = \underline{x}\)</span> is observed, the value <span class="math inline">\(\delta(\underline{x})\)</span> is called a <em>maximum likelihood estimate</em> of <span class="math inline">\(\theta.\)</span></p>
+</div>
+<div id="sampling-from-a-normal-distribution" class="section level4 unnumbered">
+<h4>Sampling from a Normal Distribution<a class="anchor" aria-label="anchor" href="#sampling-from-a-normal-distribution"><i class="fas fa-link"></i></a>
+</h4>
+<p><span class="math display">\[\begin{eqnarray*}
+X_1, X_2, \ldots X_n &amp;\stackrel{iid}{\sim}&amp; N(\mu, \sigma^2)  \ \ \ \mu \ \&amp; \ \sigma^2 \mbox{ are fixed but unknown}\\
+f(x_i | \mu, \sigma^2) &amp;=&amp; \frac{1}{\sqrt{2 \pi \sigma^2}} \exp [ \frac{-1}{2\sigma^2}(x_i - \mu)^2 ]\\
+f(\underline{x} | \mu, \sigma^2) &amp;=&amp; \frac{1}{(2 \pi \sigma^2)^{n/2}} \exp [ \frac{-1}{2\sigma^2}\sum_{i=1}^n(x_i - \mu)^2 ]\\
+L(\mu, \sigma^2) &amp;=&amp; \frac{-n}{2}\ln(2\pi\sigma^2) - \frac{1}{2 \sigma^2} \sum(x_i - \mu)^2\\
+\end{eqnarray*}\]</span></p>
+<p>We want to maximize <span class="math inline">\(f(\underline{x}|\mu, \sigma^2)\)</span> with respect to <span class="math inline">\(\mu;\)</span> equivalently, we can minimize <span class="math inline">\(\sum (x_i - \mu)^2.\)</span></p>
+<p><span class="math display">\[\begin{eqnarray*}
+\mbox{Let } Q(\mu) &amp;=&amp; \sum(x_i - \mu)^2\\
+\frac{\partial Q(\mu)}{\partial \mu} &amp;=&amp; -2 \sum(x_i - \mu) = 0\\
+-2 \sum x_i &amp;=&amp; -2 n \mu\\
+\hat{\mu} &amp;=&amp; \overline{x}
+\end{eqnarray*}\]</span></p>
+<p>Because the MLE for <span class="math inline">\(\mu\)</span> doesn’t depend on <span class="math inline">\(\sigma^2\)</span>, we know that the joint MLE, <span class="math inline">\(\hat{\theta} = (\mu, \sigma^2)\)</span>, will be <span class="math inline">\(\hat{\theta}\)</span> such that <span class="math inline">\(\hat{\sigma}^2\)</span> maximizes (where <span class="math inline">\(\theta' = (\overline{x}, \sigma^2) ):\)</span>
+<span class="math display">\[\begin{eqnarray*}
+L(\theta') &amp;=&amp; \frac{-n}{2} \ln (2 \pi) - \frac{n}{2} \ln(\sigma^2) - \frac{1}{2\sigma^2} \sum(x_i - \overline{x})^2\\
+\frac{\partial L(\theta')}{\partial \sigma^2} &amp;=&amp; \frac{-n}{2 \sigma^2} - \frac{1(-1)}{2 (\sigma^2)^2} \sum(x_i - \overline{x}) = 0\\
+\sum (x_i - \overline{x})^2 &amp;=&amp; \frac{n(\sigma^2)^2}{\sigma^2}\\
+\hat{\sigma^2} &amp;=&amp; \frac{\sum(x_i - \overline{x})^2}{n}\\
+\hat{\theta} &amp;=&amp; (\overline{x}, \frac{\sum(x_i - \overline{x})^2}{n})
+\end{eqnarray*}\]</span></p>
+<div class="example">
+<p><span id="exm:unlabeled-div-9" class="example"><strong>Example 3.2  </strong></span>Non-existence of the MLE</p>
+<div class="inline-figure"><img src="03-MLE_files/figure-html/unnamed-chunk-2-1.png" width="672"></div>
+<p>Suppose <span class="math inline">\(X_1, X_2, \ldots X_n \stackrel{iid}{\sim} f(x | \theta)\)</span> where:
+<span class="math display">\[\begin{eqnarray*}
+f(x | \theta) = \left\{ \begin{array}{ll}
+    e^{\theta - x} &amp; x &gt; \theta\\
+    0 &amp; x \leq \theta \\
+    \end{array} \right.
+    \end{eqnarray*}\]</span></p>
+<p><span class="math inline">\(\theta\)</span> is unknown, but <span class="math inline">\(-\infty &lt; \theta &lt; \infty\)</span>. Does the MLE exist?
+<span class="math display">\[\begin{eqnarray*}
+f(\underline{x}|\theta) &amp;=&amp; e^{n \theta - \sum x_i} \ \ \ \ \ \forall x_i &gt; \theta\\
+L(\theta) &amp;=&amp; n \theta - \sum x_i \ \ \ \ \ \forall x_i &gt; \theta\\
+\frac{\partial L(\theta)}{\partial \theta} &amp;=&amp; n = 0 ?!?!?!\\
+\end{eqnarray*}\]</span></p>
+<p>We want to find the largest <span class="math inline">\(\theta\)</span> such that <span class="math inline">\(\theta &lt; x_i \ \ \forall x_i\)</span>. Is <span class="math inline">\(\hat{\theta} = \min x_i\)</span>? No, because <span class="math inline">\(\theta &lt; \min x_i!\)</span> If, instead,
+<span class="math display">\[\begin{eqnarray*}
+f (x | \theta) = \left\{ \begin{array}{ll}
+    e^{\theta - x} &amp; x \geq \theta\\
+    0 &amp; x &lt; \theta \\
+    \end{array} \right.
+    \end{eqnarray*}\]</span></p>
+<p>MLE of <span class="math inline">\(\theta\)</span> is <span class="math inline">\(\hat{\theta} = \min x_i\)</span>.</p>
+</div>
+</div>
+<div id="qualities-of-the-mle" class="section level2" number="3.1">
+<h2>
+<span class="header-section-number">3.1</span> Qualities of the MLE<a class="anchor" aria-label="anchor" href="#qualities-of-the-mle"><i class="fas fa-link"></i></a>
+</h2>
+<div id="invariance-of-the-mle" class="section level3" number="3.1.1">
+<h3>
+<span class="header-section-number">3.1.1</span> Invariance of the MLE<a class="anchor" aria-label="anchor" href="#invariance-of-the-mle"><i class="fas fa-link"></i></a>
+</h3>
+<div class="theorem">
+<p><span id="thm:unlabeled-div-10" class="theorem"><strong>Theorem 3.1  </strong></span>(<span class="citation">DeGroot and Schervish (<a href="references.html#ref-degroot" role="doc-biblioref">2011</a>)</span> Theorem 6.6.1) Let <span class="math inline">\(\hat{\theta}\)</span> be the MLE of <span class="math inline">\(\theta\)</span>, and let <span class="math inline">\(g(\theta)\)</span> be a function of <span class="math inline">\(\theta\)</span>. Then an MLE of <span class="math inline">\(g(\theta)\)</span> is <span class="math inline">\(g(\hat{\theta})\)</span>. (Proof: see page 427 in DeGroot &amp; Schervish)</p>
+</div>
+<div class="proof">
+<p><span id="unlabeled-div-11" class="proof"><em>Proof</em>. </span>Let <span class="math inline">\(\hat{\theta}\)</span> be the MLE of <span class="math inline">\(\theta\)</span>. Then we know that <span class="math display">\[L(\hat{\theta}) = \max_{\theta \in \Omega} L(\theta).\]</span></p>
+<p>We let <span class="math inline">\(g\)</span> be a one-to-one function such that <span class="math inline">\(\psi = g(\theta) \in \Gamma\)</span> (the image of <span class="math inline">\(\Omega\)</span> under g). Then we can denote the inverse function of <span class="math inline">\(g\)</span> as <span class="math display">\[\theta = h(\psi).\]</span></p>
+<p>We know that the MLE of <span class="math inline">\(\psi\)</span> is <span class="math inline">\(\hat{\psi}\)</span> where <span class="math display">\[L(h(\hat{\psi})) = \max_{\psi \in \Gamma} L(h(\psi)).\]</span></p>
+<p>But we know that <span class="math inline">\(L(\theta)\)</span> is maximized at <span class="math inline">\(\hat{\theta}\)</span>. So <span class="math inline">\(L(h(\psi))\)</span> must also be maximized at <span class="math inline">\(h(\psi) = \hat{\theta}\)</span>. <span class="math display">\[\therefore h(\hat{\psi}) = \hat{\theta} \ \ \ \mbox{ or } \ \ \ \hat{\psi} = g(\hat{\theta}).\]</span></p>
+<p>If <span class="math inline">\(g\)</span> is not one-to-one, however, we need to redefine what we mean by likelihood. If <span class="math inline">\(g(\theta)\)</span> is not one-to-one there may be many values of <span class="math inline">\(\psi\)</span> that satisfy <span class="math display">\[g(\theta) = \psi.\]</span> (For example, the square function. n.b. <span class="math inline">\(g\)</span> still has to be a function, so it can’t map to multiple values.)</p>
+<p>In that case, the correspondence between the maximum over <span class="math inline">\(\psi\)</span> and the maximum over <span class="math inline">\(\theta\)</span> breaks down. E.g., if <span class="math inline">\(\hat{\theta}\)</span> is the MLE for <span class="math inline">\(\theta\)</span>, there may be another value of <span class="math inline">\(\theta\)</span>, say <span class="math inline">\(\theta_0\)</span> for which <span class="math inline">\(g(\hat{\theta}) = g(\theta_0).\)</span></p>
+<p>We define the induced log likelihood function: <span class="math display">\[L^*(t) = \max_{\theta \in G_t} \ln f(\underline{x} | \theta).\]</span></p>
+<p>Let <span class="math inline">\(G\)</span> be the image of <span class="math inline">\(\Omega\)</span> under g, then <span class="math display">\[G_t = \{ \theta: g(\theta) = t\} \ \ \forall t \in G.\]</span></p>
+<p>We define the MLE of <span class="math inline">\(g(\theta)\)</span> to be <span class="math inline">\(\hat{t}\)</span> where <span class="math display">\[L^*(\hat{t}) = \max_{t \in G} L^* (t).\]</span></p>
+<p>The proof follows (page 427). [Note that above there are <em>two</em> maximizations. That is, the first maximization created the log likelihood function. The second maximization found the maximum of the function over the parameter space.]</p>
+</div>
+<div class="example">
+<p><span id="exm:unlabeled-div-12" class="example"><strong>Example 3.3  </strong></span>Functions of MLEs are MLEs also!</p>
+<ol style="list-style-type: decimal">
+<li>standard deviation of a normal:
+<span class="math display">\[\begin{eqnarray*}
+\sigma &amp;=&amp; \sqrt{\sigma^2}\\
+\hat{\sigma} &amp;=&amp; \mbox{MLE}(\sigma) = \sqrt{\frac{\sum (x_i - \overline{x})^2}{n}}
+\end{eqnarray*}\]</span>
+</li>
+<li>mean of a uniform:
+<span class="math display">\[\begin{eqnarray*}
+X &amp;\sim&amp; U [\theta_1, \theta_2]\\
+\mu &amp;=&amp; \frac{\theta_1 + \theta_2}{2}\\
+\hat{\mu} &amp;=&amp; \mbox{MLE}(\mu) = \frac{\max(x_i) + \min(x_i)}{2}
+\end{eqnarray*}\]</span>
+</li>
+</ol>
+</div>
+</div>
+<div id="consistency-of-the-mle" class="section level3" number="3.1.2">
+<h3>
+<span class="header-section-number">3.1.2</span> Consistency of the MLE<a class="anchor" aria-label="anchor" href="#consistency-of-the-mle"><i class="fas fa-link"></i></a>
+</h3>
+<p>Under certain regularity conditions, the MLE of <span class="math inline">\(\theta\)</span> is consistent for <span class="math inline">\(\theta\)</span>. That is,
+<span class="math display">\[\begin{eqnarray*}
+\hat{\theta} \stackrel{P}{\rightarrow} \theta\\
+\stackrel{\lim}{ n \rightarrow \infty} P [ | \hat{\theta} - \theta | &gt; \epsilon ] = 0
+\end{eqnarray*}\]</span></p>
+<p>where <span class="math inline">\(\hat{\theta}\)</span> is a function of <span class="math inline">\(X\)</span>.</p>
+</div>
+<div id="bias-of-the-mle-section-7.7" class="section level3" number="3.1.3">
+<h3>
+<span class="header-section-number">3.1.3</span> Bias of the MLE (section 7.7)<a class="anchor" aria-label="anchor" href="#bias-of-the-mle-section-7.7"><i class="fas fa-link"></i></a>
+</h3>
+<p>Previously, we discussed briefly the concept of bias:</p>
+<div class="definition">
+<p><span id="def:unlabeled-div-13" class="definition"><strong>Definition 3.2  </strong></span>Unbiased (page 428 of DeGroot &amp; Schervish): Let <span class="math inline">\(\delta(X_1, X_2, \ldots, X_n)\)</span> be an estimator of <span class="math inline">\(g(\theta)\)</span>. We say <span class="math inline">\(\delta(X_1, X_2, \ldots, X_n)\)</span> is <strong>unbiased</strong> if:
+<span class="math display">\[\begin{eqnarray*}
+E[ \delta(X_1, X_2, \ldots, X_n)] = g(\theta)
+\end{eqnarray*}\]</span></p>
+</div>
+<p>Note: bias <span class="math inline">\((\delta(\underline{X}) ) = E[ \delta(\underline{X})] - g(\theta)\)</span>.</p>
+<div class="example">
+<p><span id="exm:unlabeled-div-14" class="example"><strong>Example 3.4  </strong></span>Let <span class="math inline">\(X_1, X_2, \ldots, X_n \sim N(\mu, \sigma^2)\)</span>. Recall, <span class="math inline">\(\hat{\sigma^2} = \frac{\sum(X_i - \overline{X})^2}{n}\)</span> is the MLE.
+<span class="math display">\[\begin{eqnarray*}
+E[\hat{\sigma^2}] &amp;=&amp; E \bigg[ \frac{\sum(X_i - \overline{X})^2}{n}\bigg]\\
+&amp;=&amp; \frac{1}{n} E\bigg[ \sum (X_i - \mu + \mu - \overline{X})^2 \bigg]\\
+&amp;=&amp; \frac{1}{n} E\bigg[ \sum (X_i - \mu)^2 + 2 \sum (X_i - \mu)(\mu - \overline{X}) + n(\mu - \overline{X})^2 \bigg]\\
+&amp;=&amp; \frac{1}{n}\bigg\{ E\bigg[ \sum (X_i - \mu)^2 -  n [(\overline{X} - \mu)^2 ] \bigg] \bigg\}\\
+&amp;=&amp; \frac{1}{n} \bigg\{  \sum E (X_i - \mu)^2 -  n E [(\overline{X} - \mu)^2 ] \bigg\}\\
+&amp;=&amp; \frac{1}{n}\{ n \sigma^2 - n \frac{\sigma^2}{n}  \}\\
+&amp;=&amp; \frac{n-1}{n} \sigma^2 \Rightarrow \mbox{Biased!}
+\end{eqnarray*}\]</span></p>
+<div id="but-consistent-yes." class="section level4 unnumbered">
+<h4>But consistent? Yes.<a class="anchor" aria-label="anchor" href="#but-consistent-yes."><i class="fas fa-link"></i></a>
+</h4>
+<p><span class="math display">\[\begin{eqnarray*}
+\frac{\sum(X_i - \overline{X})^2}{n} &amp;=&amp; \frac{1}{n}\bigg[ \sum (X_i - \mu)^2 -  n [(\overline{X} - \mu)^2] \bigg] \\
+&amp;=&amp; \frac{\sum(X_i - \mu)^2}{n} - \frac{1}{n} \frac{\sum n (\overline{X} - \mu)^2}{n}\\
+&amp;=&amp; \stackrel{P}{\rightarrow} \sigma^2   \ \ \ \ \ \ \ \ \ \ \ \rightarrow 0 \ \ \ \stackrel{P}{\rightarrow} \sigma^2\\
+&amp;\stackrel{P}{\rightarrow}&amp; \sigma^2\\
+\end{eqnarray*}\]</span>
+<!--
+%The above limits are due to the WLLN.  The sample average of a random variable will converge in probability to its expected value. $$ Var(\overline{X}) = E[(\overline{X} - \mu)^2] = \frac{\sigma^2}{n}.$$  If we let $Y_n$ be the value of the sum minus the mean squared, then $Y_n$ changes as the sample size changes, specifically
+%\begin{eqnarray*}
+%Y_n &= (\overline{X}_n - \mu)^2\\
+%E [Y_n] &= E[ (\overline{X}_n - \mu)^2 ] = \frac{\sigma^2}{n}\\
+%n \frac{\sum(Y_n)}{n} &\stackrel{P}{\rightarrow} \sigma^2
+%\end{eqnarray*}--></p>
+</div>
+</div>
+</div>
+<div id="benefits-and-limitations-of-maximum-likelihood-estimation" class="section level3" number="3.1.4">
+<h3>
+<span class="header-section-number">3.1.4</span> Benefits and Limitations of Maximum Likelihood Estimation<a class="anchor" aria-label="anchor" href="#benefits-and-limitations-of-maximum-likelihood-estimation"><i class="fas fa-link"></i></a>
+</h3>
+<div id="benefits-1" class="section level4 unnumbered">
+<h4>Benefits<a class="anchor" aria-label="anchor" href="#benefits-1"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>functions of MLEs are MLEs (invariance of the MLE)</li>
+<li>under certain regularity conditions, MLEs are asymptotically distributed normally.</li>
+</ul>
+</div>
+<div id="limitations-1" class="section level4 unnumbered">
+<h4>Limitations<a class="anchor" aria-label="anchor" href="#limitations-1"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>MLE does not always exist</li>
+<li>MLE is not always unique</li>
+<li>MLE is the value of the parameter <span class="math inline">\(\theta\)</span> that maximizes the distribution of <span class="math inline">\(X|\theta\)</span> (most likely to have produced the observed data). The MLE is <strong>not</strong> the most likely parameter given the data: <span class="math inline">\(E[ \theta | X]\)</span> (that’s the Bayesian estimator!).</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="method-of-moments" class="section level2" number="3.2">
+<h2>
+<span class="header-section-number">3.2</span> Method of Moments<a class="anchor" aria-label="anchor" href="#method-of-moments"><i class="fas fa-link"></i></a>
+</h2>
+<p>Method of Moments (MOM) is another parameter estimation technique. To find the MOM estimate, set the expected moment equal to the sample moment and solve for the parameter value of interest.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+E[X^k] &amp;=&amp; k^{th} \mbox{ expected moment}\\
+\frac{1}{n} X_i^k &amp;=&amp; k^{th} \mbox{ sample moment}\\
+\end{eqnarray*}\]</span></p>
+<div class="example">
+<p><span id="exm:unlabeled-div-15" class="example"><strong>Example 3.5  </strong></span>Find the MOM for both parameters using a random sample, <span class="math inline">\(X_1, X_2, \ldots, X_n \sim N(\mu, \sigma^2)\)</span>.
+<span class="math display">\[\begin{eqnarray*}
+\tilde{\mu} &amp;=&amp; \overline{X}\\
+\tilde{\sigma^2} &amp;=&amp; \frac{\sum X_i^2}{n} - \overline{X}^2\\
+&amp;=&amp; \frac{1}{n} \sum(X_i - \overline{X})^2 \mbox{   MLE!!}
+\end{eqnarray*}\]</span></p>
+</div>
+<div class="example">
+<p><span id="exm:unlabeled-div-16" class="example"><strong>Example 3.6  </strong></span>Find the MOM for both parameters using a random sample, <span class="math inline">\(X_1, X_2, \ldots, X_n \sim Gamma(\alpha,\beta)\)</span>.
+<span class="math display">\[\begin{eqnarray*}
+\alpha / \beta &amp;=&amp; \overline{X}\\
+\alpha / \beta^2 &amp;=&amp; \sum X_i^2 /n - \overline{X}^2\\
+\alpha &amp;=&amp; \overline{X} \beta\\
+\frac{\overline{X} \beta}{\beta^2} &amp;=&amp; \sum X_i^2 /n - \overline{X}^2\\
+\tilde{\beta} &amp;=&amp; \frac{\overline{X}}{(\sum X_i^2 / n - \overline{X}^2)}\\
+&amp;=&amp; \overline{X} / \hat{\sigma^2}\\
+\tilde{\alpha} &amp;=&amp; \overline{X}^2 / \hat{\sigma^2}
+\end{eqnarray*}\]</span></p>
+</div>
+<div id="benefits-and-limitations-of-method-of-moments-estimation" class="section level3" number="3.2.1">
+<h3>
+<span class="header-section-number">3.2.1</span> Benefits and Limitations of Method of Moments Estimation<a class="anchor" aria-label="anchor" href="#benefits-and-limitations-of-method-of-moments-estimation"><i class="fas fa-link"></i></a>
+</h3>
+<div id="benefits-2" class="section level4 unnumbered">
+<h4>Benefits<a class="anchor" aria-label="anchor" href="#benefits-2"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Often easier to compute than MLEs (e.g., MLE for <span class="math inline">\(\alpha\)</span> in the Gamma distribution is intractable).</li>
+<li>Estimates by MOM can be used as first approximations of the likelihood.</li>
+<li>Can easily estimate multiple parameter families.</li>
+</ul>
+</div>
+<div id="limitations-2" class="section level4 unnumbered">
+<h4>Limitations<a class="anchor" aria-label="anchor" href="#limitations-2"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Can sometimes (usually in cases of small sample sizes) produce estimates outside the parameter space.</li>
+<li>Doesn’t work if the moments don’t exist (e.g., Cauchy distribution)</li>
+<li>MLEs are typically closer to the quantity being estimated.</li>
+</ul>
+<div class="example">
+<p><span id="exm:unlabeled-div-17" class="example"><strong>Example 3.7  </strong></span>Tank Estimators</p>
+<p>How can a random sample of integers between 1 and N (with N unknown to the researcher) be used to estimate N?</p>
+<ol style="list-style-type: decimal">
+<li>The tanks are numbered from 1 to N. Working with your group, randomly select five tanks, without replacement, from the bowl. The tanks are numbered:</li>
+<li>Think about how you would use your data to estimate N. (Come up with at least 3 estimators.) Come to a consensus within the group as to how this should be done.</li>
+<li>Our estimates of N are:</li>
+<li>Our rules or formulas for the estimators of N based on a sample of n (in your case 5) integers are:</li>
+<li>Assuming the random variables are distributed according to a discrete uniform:
+<span class="math display">\[\begin{eqnarray*}
+X_i \sim P(X=x | N) = \frac{1}{N} \ \ \ \ \ x = 1,2,\ldots, N \ \ \ \ i=1,2,\ldots, n
+\end{eqnarray*}\]</span>
+</li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>What is the method of moments estimator of N?</li>
+<li>What is the maximum likelihood estimator of N?</li>
+</ol>
+<div id="mean-squared-error-1" class="section level4 unnumbered">
+<h4>Mean Squared Error<a class="anchor" aria-label="anchor" href="#mean-squared-error-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>Most of our estimators are made up of four basic functions of the data: the mean, the median, the min, and the max. Fortunately, we know something about the moments of these functions:</p>
+<div class="inline-table"><table class="table table-sm">
+<colgroup>
+<col width="41%">
+<col width="26%">
+<col width="32%">
+</colgroup>
+<thead><tr class="header">
+<th>g(<span class="math inline">\(\underline{X}\)</span>)</th>
+<th align="center">E[ g(<span class="math inline">\(\underline{X}\)</span>) ]</th>
+<th align="center">Var( g(<span class="math inline">\(\underline{X}\)</span>) )</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\overline{X}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{N+1}{2}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{(N+1)(N-1)}{12 n}\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td>median(<span class="math inline">\(\underline{X}\)</span>) = M</td>
+<td align="center"><span class="math inline">\(\frac{N+1}{2}\)</span></td>
+<td align="center"><span class="math inline">\(\frac{(N-1)^2}{4 n}\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td>min(<span class="math inline">\(\underline{X}\)</span>)</td>
+<td align="center"><span class="math inline">\(\frac{(N-1)}{n} + 1\)</span></td>
+<td align="center"><span class="math inline">\(\bigg(\frac{N-1}{n}\bigg)^2\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td>max(<span class="math inline">\(\underline{X}\)</span>)</td>
+<td align="center"><span class="math inline">\(N - \frac{(N-1)}{n}\)</span></td>
+<td align="center"><span class="math inline">\(\bigg(\frac{N-1}{n}\bigg)^2\)</span></td>
+</tr>
+</tbody>
+</table></div>
+<p>Using this information, we can calculate the MSE for 4 of the estimators that we have derived. (Remember that MSE = Variance + Bias<span class="math inline">\(^2\)</span>.)</p>
+<p><span class="math display">\[\begin{eqnarray}
+\mbox{MSE } ( 2 \cdot \overline{X} - 1) &amp;=&amp; \frac{4 (N+1) (N-1)}{12n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&amp;=&amp; \frac{4 (N+1) (N-1)}{12n} \\
+\nonumber \\
+\mbox{MSE } ( 2 \cdot M - 1) &amp;=&amp; \frac{4 (N-1)^2}{4n} + \Bigg(2 \bigg(\frac{N+1}{2}\bigg) - 1 - N\Bigg)^2 \nonumber \\
+&amp;=&amp; \frac{4 (N-1)^2}{4n} \\
+\nonumber \\
+\mbox{MSE } ( \max(\underline{X})) &amp;=&amp; \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(N - \frac{(N-1)}{n} - N\Bigg)^2 \nonumber\\
+&amp;=&amp; \bigg(\frac{N-1}{n}\bigg)^2 + \bigg(\frac{N-1}{n} \bigg)^2  = 2*\bigg(\frac{N-1}{n} \bigg)^2 \\
+\nonumber \\
+\mbox{MSE } \Bigg( \bigg( \frac{n+1}{n} \bigg) \max(\underline{X})\Bigg) &amp;=&amp; \bigg(\frac{n+1}{n}\bigg)^2 \bigg(\frac{N-1}{n}\bigg)^2 + \Bigg(\bigg(\frac{n+1}{n}\bigg) \bigg(N - \frac{N-1}{n} \bigg) - N \Bigg)^2
+\end{eqnarray}\]</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="reflection-questions-2" class="section level2" number="3.3">
+<h2>
+<span class="header-section-number">3.3</span> <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions<a class="anchor" aria-label="anchor" href="#reflection-questions-2"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>What function is being maximized when an MLE is found? Derivative with respect to what? That is, explain the intuition behind why the MLE is a good estimator for <span class="math inline">\(\theta.\)</span>
+</li>
+<li>How is the MOM estimator found? Explain why the MOM is a good estimator for <span class="math inline">\(\theta.\)</span>
+</li>
+<li>What are the asymptotic properties of the MLE that make it nice to work with?</li>
+<li>What are the benefits and limitations of the MLE?</li>
+<li>What are the benefits and limitations of MOM?</li>
+</ol>
+</div>
+<div id="ethics-considerations-2" class="section level2" number="3.4">
+<h2>
+<span class="header-section-number">3.4</span> <i class="fas fa-balance-scale"></i> Ethics Considerations<a class="anchor" aria-label="anchor" href="#ethics-considerations-2"><i class="fas fa-link"></i></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>Does the derivative always work to find the MLE? If not, what other ways can we find a maximum?</li>
+<li>Is the MLE always the best estimator for <span class="math inline">\(\theta\)</span>?<br>
+</li>
+<li>Is the MOM always the best estimator for <span class="math inline">\(\theta\)</span>?</li>
+<li>What makes a good estimator?</li>
+<li>You are consulting, you are given a dataset, you are asked to find <span class="math inline">\(\theta\)</span>, is there a single right answer? How do you know what to give your boss?</li>
+<li>What do you do if you have a dataset but you don’t know the likelihood?</li>
+</ol>
+</div>
+<div id="r-code-mle-example" class="section level2" number="3.5">
+<h2>
+<span class="header-section-number">3.5</span> R code: MLE Example<a class="anchor" aria-label="anchor" href="#r-code-mle-example"><i class="fas fa-link"></i></a>
+</h2>
+<p>Example 7.6.5 in the text looks at the MLE for the center of of a Cauchy distribution.
+The Cauchy distribution is interesting because the tails decay at a rate of <span class="math inline">\(1/x^2\)</span>, so that when you try to take the expected value, you end up integrating something that looks like <span class="math inline">\(1/x\)</span> over the real line.
+Hence, the expected value does not exist.
+Thus, method of moments estimators are of no use.
+The MLE is still useful, though not easy to find. As stated in the text, the likelihood is proportional to
+<span class="math display">\[\prod_{i=1}^n [1 + (x_i - \theta)^2]^{-1}\]</span></p>
+<ol style="list-style-type: lower-alpha">
+<li>Compute the first and second derivative of the log likelihood.</li>
+<li>Consider trying to find the root of a function <span class="math inline">\(h(x)\)</span>. Suppose your current
+guess is some value <span class="math inline">\(x_0\)</span>. We might approximate the function by the tangent line (first order Taylor approximation) at <span class="math inline">\(x_0\)</span> and take our next guess as the root of that line. Use the Taylor expansion to find the next guess of <span class="math inline">\(x_1\)</span> as</li>
+</ol>
+<p><span class="math display">\[x_1 = x_0 - \frac{h(x_0)}{h'(x_0)}\]</span></p>
+<p>Continually updating the guess via this method is known as Newton’s Method or the Newton-Raphson Method.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Generate 50 observations from a Cauchy distribution centered at <span class="math inline">\(\theta = 10\)</span>. Based on these 50 observations, use parts (a) and (b) to estimate <span class="math inline">\(\theta\)</span>. Remember, we’re trying to maximize the likelihood, so the function that we are trying to find the root of is derivative of the log-likelihood. The R code might look something like this:</li>
+</ol>
+<p>The Cauchy distribution is very sensitive to the initial value used in Newton’s method, so if your <code>theta_guess</code> is not very close to 10, probably the MLE estimate will be infinite.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="MLE.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb7-2"><a href="MLE.html#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="MLE.html#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use Newton's method to find the MLE for a Cauchy distribution</span></span>
+<span id="cb7-4"><a href="MLE.html#cb7-4" aria-hidden="true" tabindex="-1"></a>cauchy_mle <span class="ot">&lt;-</span> <span class="cf">function</span>(guess, data){</span>
+<span id="cb7-5"><a href="MLE.html#cb7-5" aria-hidden="true" tabindex="-1"></a>    l1 <span class="ot">&lt;-</span> ((compute 1st derivative of log<span class="sc">-</span>likelihood evaluated at <span class="st">"guess"</span>)) <span class="co"># 1st deriv</span></span>
+<span id="cb7-6"><a href="MLE.html#cb7-6" aria-hidden="true" tabindex="-1"></a>    l2 <span class="ot">&lt;-</span> ((compute 2nd derivative of log<span class="sc">-</span>likelihood evaluated at <span class="st">"guess"</span>)) <span class="co"># 2nd deriv</span></span>
+<span id="cb7-7"><a href="MLE.html#cb7-7" aria-hidden="true" tabindex="-1"></a>    guess <span class="ot">&lt;-</span> guess <span class="sc">-</span> l1<span class="sc">/</span>l2</span>
+<span id="cb7-8"><a href="MLE.html#cb7-8" aria-hidden="true" tabindex="-1"></a>    guess</span>
+<span id="cb7-9"><a href="MLE.html#cb7-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-10"><a href="MLE.html#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="MLE.html#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the initial conditions (including the dataset to use)</span></span>
+<span id="cb7-12"><a href="MLE.html#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">54321</span>)  <span class="co"># to get the same answer each time the .Rmd is knit</span></span>
+<span id="cb7-13"><a href="MLE.html#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="MLE.html#cb7-14" aria-hidden="true" tabindex="-1"></a>n_obs <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb7-15"><a href="MLE.html#cb7-15" aria-hidden="true" tabindex="-1"></a>observations <span class="ot">&lt;-</span> <span class="fu">rcauchy</span>(n_obs, <span class="at">location =</span> <span class="dv">10</span>)  <span class="co"># 50 random Cauchy, centered at 10</span></span>
+<span id="cb7-16"><a href="MLE.html#cb7-16" aria-hidden="true" tabindex="-1"></a>theta_guess <span class="ot">&lt;-</span> ((pick a starting value, you might try different ones)) <span class="co"># just a number</span></span></code></pre></div>
+<div id="running-cauchy_mle-recursively" class="section level5 unnumbered">
+<h5>Running <code>cauchy_mle</code> recursively<a class="anchor" aria-label="anchor" href="#running-cauchy_mle-recursively"><i class="fas fa-link"></i></a>
+</h5>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="MLE.html#cb8-1" aria-hidden="true" tabindex="-1"></a>theta_guess <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb8-2"><a href="MLE.html#cb8-2" aria-hidden="true" tabindex="-1"></a>guess_vec <span class="ot">&lt;-</span> <span class="fu">numeric</span>()</span>
+<span id="cb8-3"><a href="MLE.html#cb8-3" aria-hidden="true" tabindex="-1"></a>reps <span class="ot">&lt;-</span> <span class="dv">10</span>  <span class="co"># play around with how many times you loop through. </span></span>
+<span id="cb8-4"><a href="MLE.html#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># you probably don't need very many times through to see what happens.</span></span>
+<span id="cb8-5"><a href="MLE.html#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># what happens might seem unsettling!</span></span>
+<span id="cb8-6"><a href="MLE.html#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="MLE.html#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>reps){</span>
+<span id="cb8-8"><a href="MLE.html#cb8-8" aria-hidden="true" tabindex="-1"></a>  theta_guess <span class="ot">&lt;-</span> <span class="fu">cauchy_mle</span>(___, ___)  <span class="co"># what changes for each rep?</span></span>
+<span id="cb8-9"><a href="MLE.html#cb8-9" aria-hidden="true" tabindex="-1"></a>  guess_vec[i] <span class="ot">&lt;-</span> theta_guess</span>
+<span id="cb8-10"><a href="MLE.html#cb8-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-11"><a href="MLE.html#cb8-11" aria-hidden="true" tabindex="-1"></a>guess_vec</span>
+<span id="cb8-12"><a href="MLE.html#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="MLE.html#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(guess_vec) <span class="sc">%&gt;%</span>  <span class="co"># ggplot needs a data frame instead of a vector</span></span>
+<span id="cb8-14"><a href="MLE.html#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> guess_vec, <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span>reps)) <span class="sc">+</span> </span>
+<span id="cb8-15"><a href="MLE.html#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()  <span class="co"># line plot connecting the guesses for each rep</span></span></code></pre></div>
+</div>
+<div id="reflection" class="section level5 unnumbered">
+<h5>Reflection<a class="anchor" aria-label="anchor" href="#reflection"><i class="fas fa-link"></i></a>
+</h5>
+<p>Just for kicks, I’ve plotted the derivative of the log-likelihood (red, trying to find the zero of the derivative of the log-likelihood) as well as two different guess trajectories (green from start of 10 and blue from a start of 3).
+The green line (hard to see, look right at theta = 10) indicates that we get to the maximum if we are very close to 10 as a start. The blue line indicates what happens if the initial value is far from 10 (the MLE is estimated to be infinite).</p>
+<p>I’ve left in the R code, but don’t worry about understanding the specific lines of code. Instead focus on understanding the image itself. It should tell you that the function <em>does</em> have a maximum (i.e., the derivative goes through zero!), but that the x-value for which the derivative equals zero is difficult to find. Using the Newton-Raphson method requires that the initial guess is quite close to the truth, otherwise, the estimate will go to positive or negative infinity.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">470</span><span class="op">)</span>
+<span class="va">n_obs</span> <span class="op">&lt;-</span> <span class="fl">50</span>
+<span class="va">observations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="va">n_obs</span>, location <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>  <span class="co"># 50 random Cauchy, centered at 10</span>
+
+
+<span class="co"># print the derivative of the log likelihood function</span>
+<span class="co"># this is what you're trying to find the zero of</span>
+<span class="va">thetas</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>,<span class="fl">50</span>,by <span class="op">=</span> <span class="fl">.01</span><span class="op">)</span>
+<span class="va">llfun</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">thetas</span><span class="op">)</span><span class="op">)</span>
+<span class="op">{</span>
+<span class="va">llfun</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">thetas</span><span class="op">[</span><span class="va">k</span><span class="op">]</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">thetas</span><span class="op">[</span><span class="va">k</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="co"># draw on top two instances of Newton's method:</span>
+<span class="co"># starting at theta_guess = 10  (RED)</span>
+<span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="fl">10</span>
+<span class="va">theta_10</span> <span class="op">&lt;-</span> <span class="fl">10</span>
+<span class="va">l1_vals_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+    <span class="op">{</span>
+    <span class="va">l1</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">l2</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+    <span class="va">theta_next</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span> <span class="op">-</span> <span class="va">l1</span><span class="op">/</span><span class="va">l2</span>
+    <span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="va">theta_next</span>
+    <span class="va">theta_10</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span>
+    <span class="va">l1_vals_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_10</span>, <span class="va">l1</span>, <span class="fl">0</span><span class="op">)</span>
+    <span class="op">}</span>
+
+
+<span class="co"># then starting at theta_guess = 3 (PURPLE)</span>
+<span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+<span class="va">theta_3</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+<span class="va">l1_vals_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+  <span class="op">{</span>
+    <span class="va">l1</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">l2</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+    <span class="va">theta_next</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span> <span class="op">-</span> <span class="va">l1</span><span class="op">/</span><span class="va">l2</span>
+    <span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="va">theta_next</span>
+    <span class="va">theta_3</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span>
+    <span class="va">l1_vals_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_3</span>, <span class="va">l1</span>, <span class="fl">0</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="va">guesses_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>thetas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">theta_10</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,
+                        guess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_10</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<span class="va">guesses_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>thetas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">theta_3</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,
+                        guess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_3</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<span class="va">cauchy_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">thetas</span>, <span class="va">llfun</span><span class="op">)</span>
+
+
+
+<span class="va">cauchy_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">llfun</span>, color <span class="op">=</span> <span class="st">"deriv loglik"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">guesses_3</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">guess</span>, color <span class="op">=</span> <span class="st">"guesses, init is 3"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">guesses_10</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">guess</span>, color <span class="op">=</span> <span class="st">"guesses, init is 10"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">xlim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="03-MLE_files/figure-html/unnamed-chunk-5-1.png" width="672"></div>
+</div>
+<div id="odd-things-happen-sometimes" class="section level5 unnumbered">
+<h5>Odd things happen sometimes<a class="anchor" aria-label="anchor" href="#odd-things-happen-sometimes"><i class="fas fa-link"></i></a>
+</h5>
+<p>I’ve run this code many many many times over the years. And every time, if the initial guess is not super close to 10, the estimate doesn’t converge. But just once, I set the seed in a particular way, and the start value of 3 actually converged to the answer! Randomness in the wild.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span>
+<span class="va">n_obs</span> <span class="op">&lt;-</span> <span class="fl">50</span>
+<span class="va">observations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="va">n_obs</span>, location <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>  <span class="co"># 50 random Cauchy, centered at 10</span>
+
+
+<span class="co"># print the derivative of the log likelihood function</span>
+<span class="co"># this is what you're trying to find the zero of</span>
+<span class="va">thetas</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>,<span class="fl">50</span>,by <span class="op">=</span> <span class="fl">.01</span><span class="op">)</span>
+<span class="va">llfun</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">thetas</span><span class="op">)</span><span class="op">)</span>
+<span class="op">{</span>
+<span class="va">llfun</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">thetas</span><span class="op">[</span><span class="va">k</span><span class="op">]</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">thetas</span><span class="op">[</span><span class="va">k</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="co"># draw on top two instances of Newton's method:</span>
+<span class="co"># starting at theta_guess = 10  (RED)</span>
+<span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="fl">10</span>
+<span class="va">theta_10</span> <span class="op">&lt;-</span> <span class="fl">10</span>
+<span class="va">l1_vals_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+    <span class="op">{</span>
+    <span class="va">l1</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">l2</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+    <span class="va">theta_next</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span> <span class="op">-</span> <span class="va">l1</span><span class="op">/</span><span class="va">l2</span>
+    <span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="va">theta_next</span>
+    <span class="va">theta_10</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span>
+    <span class="va">l1_vals_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_10</span>, <span class="va">l1</span>, <span class="fl">0</span><span class="op">)</span>
+    <span class="op">}</span>
+
+
+<span class="co"># then starting at theta_guess = 3 (PURPLE)</span>
+<span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+<span class="va">theta_3</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+<span class="va">l1_vals_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+  <span class="op">{</span>
+    <span class="va">l1</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">l2</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="op">(</span><span class="va">observations</span><span class="op">-</span><span class="va">theta_guess</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
+    <span class="va">theta_next</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span> <span class="op">-</span> <span class="va">l1</span><span class="op">/</span><span class="va">l2</span>
+    <span class="va">theta_guess</span> <span class="op">&lt;-</span> <span class="va">theta_next</span>
+    <span class="va">theta_3</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_guess</span>
+    <span class="va">l1_vals_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_3</span>, <span class="va">l1</span>, <span class="fl">0</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="va">guesses_10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>thetas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">theta_10</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,
+                        guess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_10</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<span class="va">guesses_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>thetas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">theta_3</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,
+                        guess <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">l1_vals_3</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<span class="va">cauchy_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">thetas</span>, <span class="va">llfun</span><span class="op">)</span>
+
+
+
+<span class="va">cauchy_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">llfun</span>, color <span class="op">=</span> <span class="st">"deriv loglik"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">guesses_3</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">guess</span>, color <span class="op">=</span> <span class="st">"guesses, init is 3"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">guesses_10</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">thetas</span>, y <span class="op">=</span> <span class="va">guess</span>, color <span class="op">=</span> <span class="st">"guesses, init is 10"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">xlim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="inline-figure"><img src="03-MLE_files/figure-html/unnamed-chunk-6-1.png" width="672"></div>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="bayes.html"><span class="header-section-number">2</span> Bayesian Estimation</a></div>
+<div class="next"><a href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#MLE"><span class="header-section-number">3</span> Maximum Likelihood Estimation</a></li>
+<li>
+<a class="nav-link" href="#qualities-of-the-mle"><span class="header-section-number">3.1</span> Qualities of the MLE</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#invariance-of-the-mle"><span class="header-section-number">3.1.1</span> Invariance of the MLE</a></li>
+<li><a class="nav-link" href="#consistency-of-the-mle"><span class="header-section-number">3.1.2</span> Consistency of the MLE</a></li>
+<li><a class="nav-link" href="#bias-of-the-mle-section-7.7"><span class="header-section-number">3.1.3</span> Bias of the MLE (section 7.7)</a></li>
+<li><a class="nav-link" href="#benefits-and-limitations-of-maximum-likelihood-estimation"><span class="header-section-number">3.1.4</span> Benefits and Limitations of Maximum Likelihood Estimation</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#method-of-moments"><span class="header-section-number">3.2</span> Method of Moments</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#benefits-and-limitations-of-method-of-moments-estimation"><span class="header-section-number">3.2.1</span> Benefits and Limitations of Method of Moments Estimation</a></li></ul>
+</li>
+<li><a class="nav-link" href="#reflection-questions-2"><span class="header-section-number">3.3</span>  Reflection Questions</a></li>
+<li><a class="nav-link" href="#ethics-considerations-2"><span class="header-section-number">3.4</span>  Ethics Considerations</a></li>
+<li><a class="nav-link" href="#r-code-mle-example"><span class="header-section-number">3.5</span> R code: MLE Example</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/03-MLE.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/03-MLE.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-10-25.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

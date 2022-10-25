@@ -386,7 +386,7 @@ The interval between the $\alpha/2$ and $1-\alpha/2$ quantiles of the bootstrap 
 [\hat{\theta}^*_{\alpha/2}, \hat{\theta}^*_{1-\alpha/2}]  = [F^{-1}_{\hat{\theta}^*} (\alpha/2), F^{-1}_{\hat{\theta}^*} (1 - \alpha/2)]
 \end{eqnarray*}
 
-Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (@hall refers to these as Efron's "backwards" intervals.) Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.
+Why does it work? It isn't immediately obvious that the interval above will capture the true parameter, $\theta$, at a rate or 95%.  Consider a skewed sampling distribution.  If your $\hat{\theta}$ comes from the long tail, is it obvious that the short tail side of your CI will get up to the true parameter value at the correct rate?  (@hall refers to these as Efron's "backwards" intervals.) <!-- Or, if your sampling distribution is biased, the percentiles of the bootstrap interval won't capture the parameter with the correct rate.-->
 
 
 To see how / why percentiles intervals work, we first start by considering normal sampling distributions for a function of our statistic. Let $\phi = g(\theta), \hat{\phi} = g(\hat{\theta}), \hat{\phi}^* = g(\hat{\theta}^*)$, where $g$ is a monotonic function (assume without loss of generality that $g$ is increasing).  The point is to choose (if possible) $g(\cdot)$ such that
@@ -400,11 +400,27 @@ P( \hat{\phi} - z_\alpha \sigma > \phi) &=& 1 - \alpha \nonumber\\
 \mbox{Interval for } \phi && (-\infty, \hat{\phi} + \sigma z_{1-\alpha}) \nonumber \\
 \mbox{Interval for } \theta && (-\infty, g^{-1}(\hat{\phi} + \sigma z_{1-\alpha})) (\#eq:phiint)
 \end{eqnarray}
-where $z_{1-\alpha}$ is the $100(1-\alpha)$ percent point of the standard normal distribution.   Note that the interval for $\theta$ in equation \@ref(eq:phiint) is problematic in that it requires knowledge of $g.$  (Also, it doesn't use any of the power of the bootstrap.)
+where $z_{1-\alpha}$ is the $100(1-\alpha)$ percent point of the standard normal distribution.   Note that the interval for $\theta$ in equation \@ref(eq:phiint) is problematic in that it requires knowledge of $g$ and $\sigma.$  (Also, it doesn't use any of the power of the bootstrap.)
 
 
-Equation \@ref(eq:phidist) implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.  [A picture goes a long way here:  draw two normal curves, one describing the sampling distribution of $\hat{\phi} - \phi$, and the other describing the sampling distribution of $\hat{\phi}^* - \hat{\phi}$.   Because of the assumption in equation \@ref(eq:phidist), the two sketched out normal curves should be the same, which implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.]  Further, since $g$ is monotonically increasing, $F^{-1}_{\hat{\phi}^*}(1-\alpha) = g(F^{-1}_{\hat{\theta}^*}(1-\alpha)).$
-Substituting in \@ref(eq:phiint), gives the percentile interval for $\theta$^[Proof from @carpenter2000],
+Equation \@ref(eq:phidist) implies that $\hat{\phi} + \sigma z_{1-\alpha} = F^{-1}_{\hat{\phi}^*}(1-\alpha)$.  [Why? A picture goes a long way here:  draw a normal curve describing the sampling distribution of $\hat{\phi}^* - \hat{\phi}$.]   Because of the assumption in equation \@ref(eq:phidist), we know the following:
+
+* $95^{th}$ percentile of $\hat{\phi}^*- \hat{\phi}$ is $\sigma \cdot z_{1-\alpha}$ 
+* $95^{th}$ percentile of $\hat{\phi}^*$ is $\hat{\phi} + \sigma \cdot z_{1-\alpha}$ 
+* $95^{th}$ percentile of $g(\hat{\theta}^*)$ is $\hat{\phi} + \sigma \cdot z_{1-\alpha}$ 
+* $95^{th}$ percentile of $\hat{\theta}^*$ is $g^{-1}(\hat{\phi} + \sigma \cdot z_{1-\alpha})$ 
+
+Using probability statements instead of percentiles, we get the following.  Note that the key here is that we want $\theta$ in the middle of the probability statement (not $\hat{\theta}),$ and that happens through leveraging the normal distribution and condition of the distribution (equation \@ref(eq:phidist)). Note that $z_\alpha = - z_{1-\alpha}.$
+
+\begin{align}
+1-\alpha &= P( z_\alpha <(\hat{\phi} - \phi ) / \sigma  ) \\
+&= P(\phi < \hat{\phi} - z_\alpha \sigma  ) \\
+&= P( \phi <F^{-1}_{\hat{\phi}^*}(1-\alpha) ) \\
+&= P(g^{-1}(\phi)  <g^{-1}(F^{-1}_{\hat{\phi}^*}(1-\alpha))  ) \\
+&= P(\theta < F^{-1}_{\hat{\theta}^*}(1-\alpha) ) \\
+\end{align}
+
+which results in the percentile interval for $\theta$^[Proof from @carpenter2000],
 \begin{eqnarray}
 (-\infty, F^{-1}_{\hat{\theta}^*}(1-\alpha)).
 \end{eqnarray}
