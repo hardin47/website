@@ -464,7 +464,7 @@ We think of this as the non-linear transformation that normalizes the sampling d
 
 What do we see from Fisher?  That (if the data are normal), there exists a transformation that normalizes the sampling distribution of the correlation!!
 
-
+The formal proof which derives the percentile intervals is given in:  
 **Percentile interval lemma** [@efrontibs, pg 173]  Suppose the transformation for $\hat{\phi} = m(\hat{\theta})$ perfectly normalizes the distribution of $\hat{\theta}$:
 \begin{eqnarray*}
 \hat{\phi} \sim N (\phi, 1)

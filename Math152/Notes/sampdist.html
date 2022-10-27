@@ -89,6 +89,7 @@
 <li><a class="active" href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></li>
 <li><a class="" href="bootdist.html"><span class="header-section-number">5</span> Bootstrap Distributions</a></li>
 <li><a class="" href="intest.html"><span class="header-section-number">6</span> Interval Estimates</a></li>
+<li><a class="" href="fisher-information.html"><span class="header-section-number">7</span> Fisher Information</a></li>
 <li><a class="" href="references.html">References</a></li>
 </ul>
 
@@ -363,14 +364,14 @@ Think about how you would use your data to estimate <span class="math inline">\(
 <span class="va">npop_try</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">147</span>, <span class="fl">147</span>, <span class="fl">447</span>, <span class="fl">447</span><span class="op">)</span>
 <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_df</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">reps</span>, <span class="op">~</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2</a></span><span class="op">(</span><span class="va">nsamp_try</span>, <span class="va">npop_try</span>, <span class="va">calculate_N</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##    xbar2 median2 samp.max mod.max sum.min.max diff.min.max nsamp npop
-## 1 167.40     170      126  138.60         128     151.5556    10  147
-## 2 152.72     148      147  148.47         148     148.9495   100  147
-## 3 341.80     301      398  437.80         401     482.7778    10  447
-## 4 427.98     409      445  449.45         448     450.9293   100  447
-## 5 103.40      83      102  112.20         108     117.3333    10  147
-## 6 147.18     148      147  148.47         148     148.9495   100  147
-## 7 410.20     342      437  480.70         469     495.0000    10  447
-## 8 421.44     385      441  445.41         442     448.8889   100  447</code></pre>
+## 1 148.20     171      130  143.00         132     156.4444    10  147
+## 2 145.14     144      147  148.47         148     148.9495   100  147
+## 3 500.80     543      392  431.20         480     371.5556    10  447
+## 4 503.36     520      444  448.44         447     449.9091   100  447
+## 5 104.40      71      112  123.20         122     124.6667    10  147
+## 6 141.36     135      146  147.46         147     147.9293   100  147
+## 7 419.60     331      422  464.20         439     495.0000    10  447
+## 8 400.30     356      442  446.42         444     448.8889   100  447</code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">1000</span>
 <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_df</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">reps</span>, <span class="op">~</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2</a></span><span class="op">(</span><span class="va">nsamp_try</span>, <span class="va">npop_try</span>, <span class="va">calculate_N</span><span class="op">)</span><span class="op">)</span>
@@ -384,16 +385,16 @@ Think about how you would use your data to estimate <span class="math inline">\(
 <pre><code>## # A tibble: 24,000 × 4
 ##    nsamp  npop estimator    estimate
 ##    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
-##  1    10   147 xbar2            130.
-##  2    10   147 median2          154 
-##  3    10   147 samp.max         121 
-##  4    10   147 mod.max          133.
-##  5    10   147 sum.min.max      124 
-##  6    10   147 diff.min.max     144.
-##  7   100   147 xbar2            150.
-##  8   100   147 median2          154 
-##  9   100   147 samp.max         147 
-## 10   100   147 mod.max          148.
+##  1    10   147 xbar2            145.
+##  2    10   147 median2          143 
+##  3    10   147 samp.max         134 
+##  4    10   147 mod.max          147.
+##  5    10   147 sum.min.max      140 
+##  6    10   147 diff.min.max     156.
+##  7   100   147 xbar2            139.
+##  8   100   147 median2          132 
+##  9   100   147 samp.max         146 
+## 10   100   147 mod.max          147.
 ## # … with 23,990 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -407,16 +408,16 @@ Think about how you would use your data to estimate <span class="math inline">\(
 ## # Groups:   nsamp, npop [4]
 ##    nsamp  npop estimator     mean median    bias    var    mse
 ##    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1    10   147 diff.min.max  149.   152.   1.70    365.   368.
-##  2    10   147 median2       146.   146   -1.08   1562.  1563.
-##  3    10   147 mod.max       148.   152.   1.04    174.   175.
-##  4    10   147 samp.max      135.   138  -12.4     144.   298.
-##  5    10   147 sum.min.max   147.   148    0.499   299.   300.
-##  6    10   147 xbar2         146.   146.  -0.663   696.   697.
-##  7    10   447 diff.min.max  449.   460.   1.56   3646.  3649.
-##  8    10   447 median2       448.   443    0.996 14717. 14718.
-##  9    10   447 mod.max       450.   461.   2.90   1535.  1543.
-## 10    10   447 samp.max      409.   419  -38.0    1268.  2712.
+##  1    10   147 diff.min.max  148.   150.   0.677   364.   364.
+##  2    10   147 median2       144.   142   -2.63   1588.  1595.
+##  3    10   147 mod.max       148.   152.   0.719   176.   177.
+##  4    10   147 samp.max      134.   138  -12.7     145.   307.
+##  5    10   147 sum.min.max   148.   148    0.753   317.   318.
+##  6    10   147 xbar2         145.   145   -1.80    684.   687.
+##  7    10   447 diff.min.max  449.   460.   2.42   3528.  3534.
+##  8    10   447 median2       447.   444   -0.019 14013. 14013.
+##  9    10   447 mod.max       447.   459.  -0.487  1768.  1769.
+## 10    10   447 samp.max      406.   417  -41.1    1462.  3149.
 ## # … with 14 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -477,7 +478,7 @@ Think about how you would use your data to estimate <span class="math inline">\(
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-10-25.</p>
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-10-27.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
