@@ -1,4 +1,4 @@
-# Fisher Information
+# Fisher Information {#fisher}
 
 Fisher Information is a method for measuring the amount of information a sample of data contains about an unknown parameter.  We are going to use Fisher Information to approximate the variance of estimators obtained from large samples (specifically, it will give us info about the variance of MLEs).  Note, we're back to thinking like Frequentists (the hint is that Information is given about the MLEs).
 
@@ -338,3 +338,14 @@ The Cramér-Rao Lower Bound (seen previously in these notes) and the Rao-Blackwe
 <p class="caption">(\#fig:unnamed-chunk-3)C.R. Rao. Image credit: https://pib.gov.in/PressReleseDetail.aspx?PRID=1653064</p>
 </div>
 
+
+## <i class="fas fa-lightbulb" target="_blank"></i> Reflection Questions
+
+1. 
+
+## <i class="fas fa-balance-scale"></i> Ethics Considerations
+
+1. 
+
+
+## R code: 
