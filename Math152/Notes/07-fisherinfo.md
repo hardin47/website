@@ -352,7 +352,6 @@ The Cramér-Rao Lower Bound (seen previously in these notes) and the Rao-Blackwe
 
 1. Why does it matter **who** does mathematics and statistics?
 2. Is there only one definition of "best" (in terms of an estimator)?
-3. What version of "best" estimator does the CRLB provide?
+3. What version of "best" estimator does the CRLB speak to?
 
 
-## R code: 
