@@ -1,7 +1,7 @@
 --- 
 title: "Statistical Theory"
 author: "Jo Hardin"
-date: "2022-11-08"
+date: "2022-11-09"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
