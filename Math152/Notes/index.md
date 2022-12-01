@@ -1,13 +1,14 @@
 --- 
 title: "Statistical Theory"
 author: "Jo Hardin"
-date: "2022-11-29"
+date: "2022-11-30"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
     includes:
       in_header: preamble.tex
+      fig_caption: yes
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike

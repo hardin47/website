@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 11 Changepoint Problem | Statistical Theory</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="11.1 Preliminaries for the Changepoint Problem Thanks to Andrew Bray at Reed College as well as Ilker Yildirim “Bayesian Inference: Gibbs Sampling” at...">
+<meta name="generator" content="bookdown 0.26 with bs4_book()">
+<meta property="og:title" content="Chapter 11 Changepoint Problem | Statistical Theory">
+<meta property="og:type" content="book">
+<meta property="og:description" content="11.1 Preliminaries for the Changepoint Problem Thanks to Andrew Bray at Reed College as well as Ilker Yildirim “Bayesian Inference: Gibbs Sampling” at...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 11 Changepoint Problem | Statistical Theory">
+<meta name="twitter:description" content="11.1 Preliminaries for the Changepoint Problem Thanks to Andrew Bray at Reed College as well as Ilker Yildirim “Bayesian Inference: Gibbs Sampling” at...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Statistical Theory</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">1</span> Introduction</a></li>
+<li><a class="" href="bayes.html"><span class="header-section-number">2</span> Bayesian Estimation</a></li>
+<li><a class="" href="MLE.html"><span class="header-section-number">3</span> Maximum Likelihood Estimation</a></li>
+<li><a class="" href="sampdist.html"><span class="header-section-number">4</span> Sampling Distributions of Estimators</a></li>
+<li><a class="" href="bootdist.html"><span class="header-section-number">5</span> Bootstrap Distributions</a></li>
+<li><a class="" href="intest.html"><span class="header-section-number">6</span> Interval Estimates</a></li>
+<li><a class="" href="fisher.html"><span class="header-section-number">7</span> Fisher Information</a></li>
+<li><a class="" href="ht.html"><span class="header-section-number">8</span> Hypothesis Testing</a></li>
+<li><a class="" href="gibbs.html"><span class="header-section-number">9</span> Gibbs Sampler</a></li>
+<li><a class="" href="small-example.html"><span class="header-section-number">10</span> Small Example</a></li>
+<li><a class="active" href="changepoint-problem.html"><span class="header-section-number">11</span> Changepoint Problem</a></li>
+<li><a class="" href="em.html"><span class="header-section-number">12</span> The EM Algorithm</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="changepoint-problem" class="section level1" number="11">
+<h1>
+<span class="header-section-number">11</span> Changepoint Problem<a class="anchor" aria-label="anchor" href="#changepoint-problem"><i class="fas fa-link"></i></a>
+</h1>
+<div id="preliminaries-for-the-changepoint-problem" class="section level2" number="11.1">
+<h2>
+<span class="header-section-number">11.1</span> Preliminaries for the Changepoint Problem<a class="anchor" aria-label="anchor" href="#preliminaries-for-the-changepoint-problem"><i class="fas fa-link"></i></a>
+</h2>
+<p>Thanks to Andrew Bray at Reed College as well as Ilker Yildirim “Bayesian Inference: Gibbs Sampling” at <a href="http://www.mit.edu/~ilkery/papers/GibbsSampling.pdf" class="uri">http://www.mit.edu/~ilkery/papers/GibbsSampling.pdf</a></p>
+<p>Consider a series of Poisson random variables, <span class="math inline">\(Y_1, Y_2, \ldots, Y_n\)</span>. At some unknown point, <span class="math inline">\(m\)</span>, the rate of the Poisson distribution changed. That is,</p>
+<p><span class="math display">\[\begin{align}
+Y_1, \ldots, Y_m &amp;\sim \textrm{Poi}(\mu) \\
+Y_{m+1}, \ldots, Y_n &amp;\sim \textrm{Poi}(\lambda)
+\end{align}\]</span></p>
+<p>To get a sense of what we’re talking about, let’s pick <span class="math inline">\(\mu =\)</span> 2, <span class="math inline">\(\lambda =\)</span> 4 and <span class="math inline">\(m =\)</span> 38 (at <span class="math inline">\(n =\)</span> 60). We can visualize one realization of this process by plotting the index against the combined Poisson vector of counts from both random variables <span class="math inline">\(\{Y_{\mu}, Y_{\lambda} \}\)</span>.</p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;"></div>
+<p>Our goal is to assess when the change occurred by learning the posterior distribution of the parameter <span class="math inline">\(m\)</span> by synthesizing our prior expectation with the observed data.</p>
+<hr>
+</div>
+<div id="i.-specifying-priors" class="section level2" number="11.2">
+<h2>
+<span class="header-section-number">11.2</span> I. Specifying priors<a class="anchor" aria-label="anchor" href="#i.-specifying-priors"><i class="fas fa-link"></i></a>
+</h2>
+<p>When thinking about a prior distribution, it’s important that distribution’s support match the conceivable values of the parameter. In the case of the Poisson rate parameter, that means we need to be looking for a density function that is non-zero over the positive real line. While there are many (indeed infinitely many) to choose from, we’ll select the Gamma distribution because it is fairly flexible and happens to be a conjugate prior for the Poisson.</p>
+<p>Let’s say that based on my prior knowledge of this process, I have reason to think that the process had a lower rate before the change and a higher rate after the change (note that this needs to be selected before looking at the plot above). I’ll select</p>
+<p><span class="math display">\[\begin{align}
+\mu &amp;\sim \textrm{Gamma}(\alpha = 10, \beta = 4) \\
+\lambda &amp;\sim \textrm{Gamma}(\nu = 8, \phi = 2).
+\end{align}\]</span></p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;"></div>
+<p>The third parameter that governs this process is <span class="math inline">\(m\)</span>, the changepoint. If we assume that the data set has at least one observation from each Poisson distribution, then <span class="math inline">\(m\)</span> can take integer values between 1 and <span class="math inline">\(n - 1\)</span>. Any discrete distribution on those integers will work. We’ll express our ambivalence concerning its value by specifying a flat prior.</p>
+<p><span class="math display">\[
+m \sim \textrm{Unif}\{1, 2, \ldots, n - 1\}
+\]</span></p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-19-1.png" width="768" style="display: block; margin: auto;"></div>
+</div>
+<div id="ii.-full-joint-distribution" class="section level2" number="11.3">
+<h2>
+<span class="header-section-number">11.3</span> II. Full Joint Distribution<a class="anchor" aria-label="anchor" href="#ii.-full-joint-distribution"><i class="fas fa-link"></i></a>
+</h2>
+<p>While our primary interest is the posterior distribution of <span class="math inline">\(m\)</span>, to get there we need to start by writing down the joint distribution of all the parameters and all of the data, <span class="math inline">\(f(Y_\mu, Y_\lambda, \mu, \lambda, m)\)</span>. This is an unusual expression for those that have spent most of their time with frequentist statistics. To a Bayesian, though, these are all random variables, so it’s no problem to think about their joint distribution.</p>
+<p>If each of these random variables were independent of one another, we could write their joint distribution like this.</p>
+<p><span class="math display">\[
+f(Y_\mu, Y_\lambda, \mu, \lambda, m) = f(Y_\mu)f(Y_\lambda)f(\mu)f(\lambda)f(m)
+\]</span>
+But if we went to write down the first term, <span class="math inline">\(f(Y_\mu)\)</span>, we’d find it’s actually a function of two other random variables, <span class="math inline">\(\mu\)</span> and <span class="math inline">\(m\)</span>. So the full joint probability is more accurately expressed as,</p>
+<p><span class="math display">\[
+f(Y_\mu, Y_\lambda, \mu, \lambda, m) = f(Y_\mu\,|\,\mu, m)f(Y_\lambda\,|\,\lambda, m)f(\mu)f(\lambda)f(m)
+\]</span>
+The last three terms are fine to leave as marginal probabilities since they are independent of one another and of the conditional distributions of data. Next we substitute in the respective density functions, keeping in mind that the data are vectors, so we’ll use the product notation shorthand.</p>
+<p><span class="math display">\[\begin{align}
+f(Y_\mu, Y_\lambda, \mu, \lambda, m) &amp;\propto
+\prod_{i = 1}^{m} \left( \frac{\mu^{Y_i}e^{-\mu}}{Y_i!} \right)
+\prod_{j = m+1}^{n} \left( \frac{\lambda^{Y_j}e^{-\lambda}}{Y_j!} \right)
+\frac{\beta^\alpha}{\Gamma(\alpha)}\mu^{\alpha - 1}e^{-\beta \mu}
+\frac{\phi^\nu}{\Gamma(\nu)}\lambda^{\nu - 1}e^{-\phi \lambda}
+\end{align}\]</span></p>
+<p>It looks like a mess right now, but it’s a useful formulation to have on hand when thinking about posterior distributions.</p>
+</div>
+<div id="iii.-joint-posterior" class="section level2" number="11.4">
+<h2>
+<span class="header-section-number">11.4</span> III. Joint Posterior<a class="anchor" aria-label="anchor" href="#iii.-joint-posterior"><i class="fas fa-link"></i></a>
+</h2>
+<p>To move from the full joint to the joint posterior distribution of just the parameters given the data, we’ll use the following definition of conditional probability.</p>
+<p><span class="math display">\[\begin{align}
+f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda) = \frac{f(Y_\mu, Y_\lambda, \mu, \lambda, m)}{f(Y_\mu, Y_\lambda)}
+\end{align}\]</span></p>
+<p>If you look at the denominator, that’s what we’d get if we took the joint distribution in the numerator and integrated over all values of the parameters. This leaves us with an expression that is only a function of the data, and since we’ll be conditioning on those, the denominator is just a constant, which we’ll call <span class="math inline">\(1/c\)</span>. So we can rewrite like this:</p>
+<p><span class="math display">\[\begin{align}
+f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda) = c \,f(Y_\mu, Y_\lambda, \mu, \lambda, m)
+\end{align}\]</span></p>
+<p>To get an expression that is clearly a function of the parameters, let’s expand out the term on the right but move any terms that aren’t a function of <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\lambda\)</span>, or <span class="math inline">\(m\)</span> into <span class="math inline">\(c\)</span> (which is now a different constant but we’ll still call it <span class="math inline">\(c\)</span>).</p>
+<p><span class="math display">\[\begin{align}
+f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda) &amp;= c \,f(Y_\mu, Y_\lambda, \mu, \lambda, m) \\
+&amp;= c \,\prod_{i = 1}^{m} \left( \frac{\mu^{Y_i}e^{-\mu}}{Y_i!} \right)
+\prod_{j = m+1}^{n} \left( \frac{\lambda^{Y_j}e^{-\lambda}}{Y_j!} \right)
+\frac{\beta^\alpha}{\Gamma(\alpha)}\mu^{\alpha - 1}e^{-\beta \mu}
+\frac{\phi^\nu}{\Gamma(\nu)}\lambda^{\nu - 1}e^{-\phi \lambda} \frac{1}{n - 1} \\
+&amp;= c \,\prod_{i = 1}^{m} \left( \mu^{Y_i}e^{-\mu} \right)
+\prod_{j = m+1}^{n} \left( \lambda^{Y_j}e^{-\lambda} \right)
+\mu^{\alpha - 1}e^{-\beta \mu}
+\lambda^{\nu - 1}e^{-\phi \lambda} \\
+&amp;= c \,  \mu^{\sum_{i=1}^{m}Y_i}e^{-m\mu}
+\lambda^{\sum_{j=m+1}^{n}Y_j}e^{-(n - m)\lambda}
+\mu^{\alpha - 1}e^{-\beta \mu}
+\lambda^{\nu - 1}e^{-\phi \lambda} \\
+&amp;= c \,  \mu^{\alpha + \sum_{i=1}^{m}Y_i - 1}e^{-(\beta + m) \mu}
+\lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}
+\end{align}\]</span></p>
+</div>
+<div id="iv.-conditional-posteriors" class="section level2" number="11.5">
+<h2>
+<span class="header-section-number">11.5</span> IV. Conditional Posteriors<a class="anchor" aria-label="anchor" href="#iv.-conditional-posteriors"><i class="fas fa-link"></i></a>
+</h2>
+<div id="posterior-for-m" class="section level3" number="11.5.1">
+<h3>
+<span class="header-section-number">11.5.1</span> Posterior for m<a class="anchor" aria-label="anchor" href="#posterior-for-m"><i class="fas fa-link"></i></a>
+</h3>
+<p>The key to implementing a Gibbs Sampler is to secure the conditional distribution of the parameters. We can find them from the joint posterior distribution by repeating the same technique of conditioning: treating this as a function of just the parameter of interest and dividing by the new normalizing constant. Staring with <span class="math inline">\(m\)</span>, the normalizing constant is <span class="math inline">\(f(\mu, \lambda \,|\, Y_\mu, Y_\lambda)\)</span>, which can be found by summing the joint posterior over all possible values of <span class="math inline">\(m\)</span>. If we take <span class="math inline">\(\mu\)</span> to be <span class="math inline">\(A\)</span> and <span class="math inline">\(\lambda\)</span> to be <span class="math inline">\(B\)</span>, this is just an application of the law of total probability, <span class="math inline">\(P(A) = \sum_n A\cap B_n\)</span>.</p>
+<p><span class="math display">\[\begin{align}
+f(m \,|\, \mu, \lambda, Y_\mu, Y_\lambda) &amp;= \frac{f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda)}{f(\mu, \lambda \,|\, Y_\mu, Y_\lambda)} \\
+&amp;= \frac{c \,  \mu^{\alpha + \sum_{i=1}^{m}Y_i - 1}e^{-(\beta + m) \mu}\lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}}
+{\sum_{k = 1}^{n - 1} c \,  \mu^{\alpha + \sum_{i=1}^{k}Y_i - 1}e^{-(\beta + k) \mu}\lambda^{\nu + \sum_{j=k+1}^{n}Y_j - 1}e^{-(\phi + n - k)\lambda}}
+\end{align}\]</span></p>
+<p>Once we cancel out the <span class="math inline">\(c\)</span>, this serves as our discrete posterior distribution on <span class="math inline">\(m\)</span>.</p>
+</div>
+<div id="posterior-for-mu" class="section level3" number="11.5.2">
+<h3>
+<span class="header-section-number">11.5.2</span> Posterior for <span class="math inline">\(\mu\)</span><a class="anchor" aria-label="anchor" href="#posterior-for-mu"><i class="fas fa-link"></i></a>
+</h3>
+<p>We can repeat this same process to find the conditional posterior for <span class="math inline">\(\mu\)</span>, which requires that we first find the normalizing constant <span class="math inline">\(f(\lambda, m \,|\, Y_\mu, Y_\lambda)\)</span>.</p>
+<p><span class="math display">\[\begin{align}
+f(\lambda, m \,|\, Y_\mu, Y_\lambda) &amp;= \int_0^\infty f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda) \, \textrm{d}\mu \\
+&amp;= \int_{0}^{\infty}c \,  \mu^{\alpha + \sum_{i=1}^{m}Y_i - 1}e^{-(\beta + m) \mu}\lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda} \,  \mathrm{d} \mu \\
+&amp;= c  \, \lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}
+\int_{0}^{\infty} \mu^{\alpha + \sum_{i=1}^{m}Y_i + 1} e^{-(\beta + m)\mu} \mathrm{d} \mu \\
+&amp;= c  \, \lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}
+\frac{\Gamma(\alpha + \sum_{i=1}^{m}Y_i)}{(\beta + m)^{\alpha + \sum_{i=1}^{m}Y_i}}
+\int_{0}^{\infty} \frac{(\beta + m)^{\alpha + \sum_{i=1}^{m}Y_i}}{\Gamma(\alpha + \sum_{i=1}^{m}Y_i)}
+\mu^{\alpha + \sum_{i=1}^{m}Y_i + 1} e^{-(\beta + m)\mu} \mathrm{d} \mu \\
+&amp;= c  \, \lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}
+\frac{\Gamma(\alpha + \sum_{i=1}^{m}Y_i)}{(\beta + m)^{\alpha + \sum_{i=1}^{m}Y_i}}
+\end{align}\]</span></p>
+<p>In step 4 above we introduced a constant and it’s reciprocal so that the function being integrated is recognizable as the pdf of a Gamma random variable, which evaluates to 1 in the step 5. With this normalizing constant in hand, we can write out the form of the posterior for <span class="math inline">\(\mu\)</span>.</p>
+<p><span class="math display">\[\begin{align}
+f(\mu \,|\, \lambda, m, Y_\mu, Y_\lambda) &amp;= \frac{f(\mu, \lambda, m, \,|\, Y_\mu, Y_\lambda)}{f(\lambda, m \,|\, Y_\mu, Y_\lambda)} \\
+&amp;= \frac{c \,  \mu^{\alpha + \sum_{i=1}^{m}Y_i - 1}e^{-(\beta + m) \mu}\lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}}{c  \, \lambda^{\nu + \sum_{j=m+1}^{n}Y_j - 1}e^{-(\phi + n - m)\lambda}
+\frac{\Gamma(\alpha + \sum_{i=1}^{m}Y_i)}{(\beta + m)^{\alpha + \sum_{i=1}^{m}Y_i}}} \\
+&amp;= \frac{(\beta + m)^{\alpha + \sum_{i=1}^{m}Y_i}}{\Gamma(\alpha + \sum_{i=1}^{m}Y_i)}
+\mu^{\alpha + \sum_{i=1}^{m}Y_i - 1}e^{-(\beta + m) \mu}
+\end{align}\]</span></p>
+<p>Which is recognizable as the pdf of the a Gamma random variable. Therefore,</p>
+<p><span class="math display">\[
+\mu \,|\, m, Y_\mu \sim \textrm{Gamma}(\alpha + \sum_{i=1}^{m}Y_i, \beta + m)
+\]</span></p>
+</div>
+<div id="posterior-for-lambda" class="section level3" number="11.5.3">
+<h3>
+<span class="header-section-number">11.5.3</span> Posterior for <span class="math inline">\(\lambda\)</span><a class="anchor" aria-label="anchor" href="#posterior-for-lambda"><i class="fas fa-link"></i></a>
+</h3>
+<p>The approach that we used to find the posterior distribution of <span class="math inline">\(\mu\)</span> is the very same that we can carry out on <span class="math inline">\(\lambda\)</span>. Instead of replicating all of the steps, we’ll note the link between the joint posterior and posterior for <span class="math inline">\(\mu\)</span> and use the same mapping to assert that,</p>
+<p><span class="math display">\[
+\lambda \,|\, m, Y_\lambda \sim \textrm{Gamma}(\nu + \sum_{i=m+1}^n Y_i, \phi + n - m)
+\]</span></p>
+</div>
+</div>
+<div id="gibbs-sampler-1" class="section level2" number="11.6">
+<h2>
+<span class="header-section-number">11.6</span> Gibbs Sampler<a class="anchor" aria-label="anchor" href="#gibbs-sampler-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>To draw samples from the joint posterior <span class="math inline">\(f(\mu, \lambda, m \,|\, Y_\mu, Y_\lambda)\)</span>, we will form a Markov chain that begins by initializing a value for <span class="math inline">\(m_{j-1}\)</span>, then iterates through the following three steps many times.</p>
+<ol style="list-style-type: decimal">
+<li>Sample <span class="math inline">\(\mu_j\)</span> from <span class="math inline">\(\textrm{Gamma}(\alpha + \sum_{i=1}^{m_{j-1}}Y_i, \beta + m_{i-j})\)</span>
+</li>
+<li>Sample <span class="math inline">\(\lambda_j\)</span> from <span class="math inline">\(\textrm{Gamma}(\nu + \sum_{i=m_{j-1}+1}^n Y_i, \phi + n - m_{j-1})\)</span>
+</li>
+<li>Sample <span class="math inline">\(m_j\)</span> from <span class="math inline">\(f(m \,|\, \mu_{j}, \lambda_j, Y_{\mu_{j}}, Y_{\lambda_{j}})\)</span>
+</li>
+</ol>
+<p>We’ll run our Gibbs sampler 5,000 times and store the results in a matrix called <code>post_samples</code>. Note that we’re moving back into the specific scenario where <span class="math inline">\(n = 60\)</span>, <span class="math inline">\(\alpha = 10\)</span>, <span class="math inline">\(\beta = 4\)</span>, <span class="math inline">\(\nu = 8\)</span>, and <span class="math inline">\(\phi = 2\)</span>.</p>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">it</span> <span class="op">&lt;-</span> <span class="fl">5000</span>
+<span class="va">post_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">it</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">post_samples</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"mu"</span>, <span class="st">"lambda"</span>, <span class="st">"m"</span><span class="op">)</span>
+<span class="va">m_j</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="co"># initialize m</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">it</span><span class="op">)</span> <span class="op">{</span>
+  <span class="co"># sample mu</span>
+  <span class="va">mu_j</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">alpha</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">m_j</span><span class="op">]</span><span class="op">)</span>, <span class="va">beta</span> <span class="op">+</span> <span class="va">m_j</span><span class="op">)</span>
+  <span class="co"># sample lambda</span>
+  <span class="va">lambda_j</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">nu</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="op">(</span><span class="va">m_j</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span>, <span class="va">phi</span> <span class="op">+</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="va">m_j</span><span class="op">)</span><span class="op">)</span>
+  <span class="co"># sample m</span>
+  <span class="va">m_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>
+  <span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">m_vec</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span>  <span class="va">mu_j</span><span class="op">^</span><span class="op">(</span><span class="va">alpha</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">beta</span> <span class="op">+</span> <span class="va">k</span><span class="op">)</span> <span class="op">*</span> <span class="va">mu_j</span><span class="op">)</span> <span class="op">*</span>
+      <span class="va">lambda_j</span><span class="op">^</span><span class="op">(</span><span class="va">nu</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="op">(</span><span class="va">k</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">phi</span> <span class="op">+</span> <span class="va">n</span> <span class="op">-</span> <span class="va">k</span><span class="op">)</span> <span class="op">*</span> <span class="va">lambda_j</span><span class="op">)</span>
+  <span class="op">}</span>
+  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">m_vec</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">m_vec</span><span class="op">)</span>
+  <span class="va">m_j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="va">p</span><span class="op">)</span>
+  <span class="co"># store results</span>
+  <span class="va">post_samples</span><span class="op">[</span><span class="va">j</span>, <span class="st">"mu"</span><span class="op">]</span>     <span class="op">&lt;-</span> <span class="va">mu_j</span>
+  <span class="va">post_samples</span><span class="op">[</span><span class="va">j</span>, <span class="st">"lambda"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">lambda_j</span>
+  <span class="va">post_samples</span><span class="op">[</span><span class="va">j</span>, <span class="st">"m"</span><span class="op">]</span>      <span class="op">&lt;-</span> <span class="va">m_j</span>
+<span class="op">}</span></code></pre></div>
+<div id="convergence-1" class="section level3" number="11.6.1">
+<h3>
+<span class="header-section-number">11.6.1</span> Convergence<a class="anchor" aria-label="anchor" href="#convergence-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>After gathering the results from running a Gibbs Sampler, it’s a good idea to investigate the convergence. We started with a fairly extreme initial value for <span class="math inline">\(m\)</span>, so let’s look at the first 500 <span class="math inline">\(m\)</span>s that we drew.</p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-21-1.png" width="768" style="display: block; margin: auto;"></div>
+<p>We see that the chain escaped the initial value very quickly. Part of the reason for this is the conditional independence of two of the three parameters. Let’s plot the full sample across all indices.</p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-22-1.png" width="768" style="display: block; margin: auto;"></div>
+</div>
+</div>
+<div id="conclusions" class="section level2" number="11.7">
+<h2>
+<span class="header-section-number">11.7</span> Conclusions<a class="anchor" aria-label="anchor" href="#conclusions"><i class="fas fa-link"></i></a>
+</h2>
+<p>Returning to the question that motivated this example, what is our updated best guess for when the changepoint occurred? We can start by looking at the posterior distribution on <span class="math inline">\(m\)</span>.</p>
+<div class="inline-figure"><img src="09-gibbs_files/figure-html/unnamed-chunk-23-1.png" width="768" style="display: block; margin: auto;"></div>
+<p>Those two prominent modes are at 34 and 27, so those are probably fine point estimates for <span class="math inline">\(m\)</span> based on this data and your prior information. Before you try to puzzle through why there might be two modes, consider what happens if we change our our random seed at the outset, where we first generated the data.</p>
+<p><img src="09-gibbs_files/figure-html/unnamed-chunk-24-1.png" width="768" style="display: block; margin: auto;"><img src="09-gibbs_files/figure-html/unnamed-chunk-24-2.png" width="768" style="display: block; margin: auto;"></p>
+<p>This reveals that with a flat prior on <span class="math inline">\(m\)</span>, the posterior will be drawing most of it’s structure from the data, which, at these sample sizes, are still subject to considerable sampling variability.</p>
+</div>
+<div id="appendix" class="section level2" number="11.8">
+<h2>
+<span class="header-section-number">11.8</span> Appendix<a class="anchor" aria-label="anchor" href="#appendix"><i class="fas fa-link"></i></a>
+</h2>
+<div id="density-functions" class="section level3" number="11.8.1">
+<h3>
+<span class="header-section-number">11.8.1</span> Density functions<a class="anchor" aria-label="anchor" href="#density-functions"><i class="fas fa-link"></i></a>
+</h3>
+<p>The random variable <span class="math inline">\(X\)</span> is <em>Poisson</em> if,</p>
+<p><span class="math display">\[
+f(x \,|\, \lambda) = \frac{\lambda^x e^{-\lambda}}{x!} \, ; \quad \quad \lambda &gt; 0, x \in \{0, 1, 2, \ldots \}
+\]</span></p>
+<p>The random variable <span class="math inline">\(X\)</span> is <em>Gamma</em> if,</p>
+<p><span class="math display">\[
+f(x\,|\,\alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}x^{\alpha - 1}e^{-\beta x} \, ; \quad \quad \alpha &gt; 0, \beta &gt; 0, x \in \{0, \infty \}
+\]</span></p>
+<p>Where <span class="math inline">\(E(X) = \frac{\alpha}{\beta}\)</span> and <span class="math inline">\(Var(X) = \frac{\alpha}{\beta^2}\)</span></p>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="small-example.html"><span class="header-section-number">10</span> Small Example</a></div>
+<div class="next"><a href="em.html"><span class="header-section-number">12</span> The EM Algorithm</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#changepoint-problem"><span class="header-section-number">11</span> Changepoint Problem</a></li>
+<li><a class="nav-link" href="#preliminaries-for-the-changepoint-problem"><span class="header-section-number">11.1</span> Preliminaries for the Changepoint Problem</a></li>
+<li><a class="nav-link" href="#i.-specifying-priors"><span class="header-section-number">11.2</span> I. Specifying priors</a></li>
+<li><a class="nav-link" href="#ii.-full-joint-distribution"><span class="header-section-number">11.3</span> II. Full Joint Distribution</a></li>
+<li><a class="nav-link" href="#iii.-joint-posterior"><span class="header-section-number">11.4</span> III. Joint Posterior</a></li>
+<li>
+<a class="nav-link" href="#iv.-conditional-posteriors"><span class="header-section-number">11.5</span> IV. Conditional Posteriors</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#posterior-for-m"><span class="header-section-number">11.5.1</span> Posterior for m</a></li>
+<li><a class="nav-link" href="#posterior-for-mu"><span class="header-section-number">11.5.2</span> Posterior for \(\mu\)</a></li>
+<li><a class="nav-link" href="#posterior-for-lambda"><span class="header-section-number">11.5.3</span> Posterior for \(\lambda\)</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#gibbs-sampler-1"><span class="header-section-number">11.6</span> Gibbs Sampler</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#convergence-1"><span class="header-section-number">11.6.1</span> Convergence</a></li></ul>
+</li>
+<li><a class="nav-link" href="#conclusions"><span class="header-section-number">11.7</span> Conclusions</a></li>
+<li>
+<a class="nav-link" href="#appendix"><span class="header-section-number">11.8</span> Appendix</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#density-functions"><span class="header-section-number">11.8.1</span> Density functions</a></li></ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/09-gibbs.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/09-gibbs.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-11-30.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
