@@ -25,7 +25,7 @@ Consider a situation where a posterior distribution is needed.  For example, the
 * The samples approximate the joint distribution of all variables.
 * The marginal distribution of any subset of variables can be approximated by simply considering the samples for that subset of variables, ignoring the rest.
 * The expected value of any variable can be approximated by averaging over all the samples.
-Gibbs sampling was proposed in the early 1990s (Geman and Geman, 1984; Gelfand and Smith, 1990) and fundamentally changed Bayesian computing.
+Gibbs sampling was proposed in the 1980s and 1990s [@geman84;@gelfand90] and fundamentally changed Bayesian computing.
 * Gibbs sampling is attractive because it can sample from high-dimensional posteriors.
 * The main idea is to break the problem of sampling from the high-dimensional joint distribution into a series of samples from low-dimensional conditional distributions.
 * Because the low-dimensional updates are done in a loop, samples are not independent as in rejection sampling.
@@ -35,13 +35,13 @@ Gibbs sampling was proposed in the early 1990s (Geman and Geman, 1984; Gelfand a
 * The Markov chain will converge to $p(\theta | \underline{x})$ if it satisfies the detailed balance condition
 $$ p(\theta_t | \underline{x}) p(\theta_{t+1} | \theta_t) = p(\theta_{t+1}|\underline{x}) p(\theta_t | \theta_{t+1})$$
 where $p(\theta_{t+1} | \theta_t)$ is the PDF of the transition from one iteration to the next.
-* Geman and Geman showed this holds for Gibbs sampling.
+* @geman84 showed this holds for Gibbs sampling.
 * This is an asymptotic result, in practice we need a finite time to mark convergence.
 
 
 ### two Bernoulli RVs example
 
-In order to motivate the use of a Gibbs sampler, we start with an example of two variables which both have marginal Bernoulli distributions and the following joint distribution^[Taken from Casella and George, "Explaining the Gibbs Sampler." *The American Statistician, 46*(3), 1992, pgs 167-174.]:
+In order to motivate the use of a Gibbs sampler, we start with an example of two variables which both have marginal Bernoulli distributions and the following joint distribution^[Taken from @casella92]:
 
 |   |   |   X   |       |
 |:-:|:-:|:-----:|:-----:|
@@ -161,7 +161,7 @@ f(\theta, \mu, \log(\sigma), \log(\tau) | {\bf y}) \propto \tau \prod_{j=1}^J N(
 
 
 
-### Gibbs Sampler Algorithm^[Algorithm and example from *Bayesian Data Analysis*, 2004, Gelman, Carlin, Stern, and Rubin]
+### Gibbs Sampler Algorithm^[Algorithm and example from @gelman04]
 
 The conditional distributions for this model all have simple conjugate forms.  Accordingly, it is easy to iterate through the conditional posterior distributions one at a time to generate a marginal posterior distribution of any of the individual parameters of interest.  (Note, the vector of values is taken after sufficient burn in time such that the distribution of the variables converge to their true values.)  Often starting values (here, we initialize $\theta_j$ and $\mu$ and start at step 3) are found using frequentist estimates of the observations.  We won't go over the technical conditions which lead to the iterative procedure producing a sample of values from the marginal posterior distributions, but know that there are technical conditions (those conditions are all met here for the normal mixture problem).   Generally, however, a 
 
