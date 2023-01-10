@@ -6,9 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 8 Poisson Regression | Methods in Biostatistics</title>
 <meta name="author" content="Jo Hardin">
-<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.2"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.7.13/header-attrs.js"></script><script src="libs/jquery-3.5.1/jquery-3.5.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="libs/bootstrap-4.5.3/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.5.3/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.2.4.9000/tabs.js"></script><script src="libs/bs3compat-0.2.4.9000/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<meta name="description" content="8.1 Regression Models Consider the following example from Poole (1989) (described in Ramsey and Schafer (2012)) on age and mating success (number of successful matings) in male African Elephants....">
+<meta name="generator" content="bookdown 0.31 with bs4_book()">
+<meta property="og:title" content="Chapter 8 Poisson Regression | Methods in Biostatistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="8.1 Regression Models Consider the following example from Poole (1989) (described in Ramsey and Schafer (2012)) on age and mating success (number of successful matings) in male African Elephants....">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 8 Poisson Regression | Methods in Biostatistics">
+<meta name="twitter:description" content="8.1 Regression Models Consider the following example from Poole (1989) (described in Ramsey and Schafer (2012)) on age and mating success (number of successful matings) in male African Elephants....">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
 <script src="libs/bsTable-3.3.7/bootstrapTable.js"></script><script type="text/x-mathjax-config">
@@ -28,7 +36,33 @@
       	})
       }
     }
-    </script><script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js"></script><!-- CSS --><link rel="stylesheet" href="style.css">
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -75,11 +109,11 @@
 <h2>
 <span class="header-section-number">8.1</span> Regression Models<a class="anchor" aria-label="anchor" href="#regPois"><i class="fas fa-link"></i></a>
 </h2>
-<p>Consider the following example from <span class="citation"><a href="references.html#ref-poole" role="doc-biblioref">Poole</a> (<a href="references.html#ref-poole" role="doc-biblioref">1989</a>)</span> (described in <span class="citation"><a href="references.html#ref-sleuth" role="doc-biblioref">Ramsey and Schafer</a> (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>) on age and mating success (number of successful matings) in male African Elephants.</p>
+<p>Consider the following example from <span class="citation">Poole (<a href="references.html#ref-poole" role="doc-biblioref">1989</a>)</span> (described in <span class="citation">Ramsey and Schafer (<a href="references.html#ref-sleuth" role="doc-biblioref">2012</a>)</span>) on age and mating success (number of successful matings) in male African Elephants.</p>
 <div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">elephants</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"elephants.csv"</span><span class="op">)</span>
-
-<span class="fu">ggplot</span><span class="op">(</span><span class="va">elephants</span>, <span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/jitter.html">jitter</a></span><span class="op">(</span><span class="va">AGE</span><span class="op">)</span>, y<span class="op">=</span><span class="va">MATINGS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">elephants</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"elephants.csv"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">elephants</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/jitter.html">jitter</a></span><span class="op">(</span><span class="va">AGE</span><span class="op">)</span>, y<span class="op">=</span><span class="va">MATINGS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="inline-figure"><img src="08-PoisReg_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p>While it does seem like there is an increasing trend in the two variables, there are some concerns with directly applying linear regression. Indeed, the example above acts as a proxy for many regression examples where the response variable is a count with particular properties:</p>
 <ol style="list-style-type: decimal">
@@ -104,7 +138,7 @@ where the observed counts come from a Poisson model: <span class="math inline">\
 <span class="header-section-number">8.1.1.1</span> Technical Conditions<a class="anchor" aria-label="anchor" href="#technical-conditions-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>Like every model, there are technical conditions associated with Poisson Regression. The closer the data (population) conform to the conditions, the more useful the model will be at describing the context at hand. Remember,
-&gt; All models are wrong, but some models are useful." -George Box.</p>
+&gt; All models are wrong, but some models are useful.” -George Box.</p>
 <p>So, assessing whether the technical conditions are reasonable will help in determining whether the analysis performed under a particular model was a good thing to do.</p>
 <ol style="list-style-type: decimal">
 <li>Line: The log of the mean is a linear function of <span class="math inline">\(X\)</span>: <span class="math inline">\(\ln(\mu_i) = \beta_0 + \beta_1 X_i.\)</span>
@@ -114,9 +148,9 @@ where the observed counts come from a Poisson model: <span class="math inline">\
 <li>Error: The mean of the response variables is equal to the variance of the response variable for each combination of explanatory variables in the model.</li>
 </ol>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-3"></span>
+<span style="display:block;" id="fig:unnamed-chunk-3"></span>
 <img src="NormPoisReg1.jpg" alt="Visualizing Normal vs Poisson Error Regression from @bysh." width="90%"><p class="caption">
-Figure 1.3: Visualizing Normal vs Poisson Error Regression from <span class="citation"><a href="references.html#ref-bysh" role="doc-biblioref">Legler and Roback</a> (<a href="references.html#ref-bysh" role="doc-biblioref">2019</a>)</span>.
+Figure 1.3: Visualizing Normal vs Poisson Error Regression from <span class="citation">Legler and Roback (<a href="references.html#ref-bysh" role="doc-biblioref">2019</a>)</span>.
 </p>
 </div>
 </div>
@@ -135,23 +169,23 @@ Figure 1.3: Visualizing Normal vs Poisson Error Regression from <span class="cit
 <li>The first is to remember that the average (i.e., expected value) of the logs is not the log of the averages. So in the Poisson model, the linear function measures the log of the average, and in the normal model, the linear function measures the average of the logs.</li>
 </ol>
 <div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span>
-<span class="va">example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>
-<span class="va">example</span>
-<span class="co">#&gt;  [1]  0.0725  2.3911  0.9302  0.6237  4.2508  1.4575  2.7521 10.2177  7.3042</span>
-<span class="co">#&gt; [10]  0.2404</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">example</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 1.11</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">example</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.343</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span></span>
+<span><span class="va">example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html">rcauchy</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">example</span></span>
+<span><span class="co">#&gt;  [1]  0.0725  2.3911  0.9302  0.6237  4.2508  1.4575  2.7521 10.2177  7.3042</span></span>
+<span><span class="co">#&gt; [10]  0.2404</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">example</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.11</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">example</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.343</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>The second difference to note across the two regression set-ups is that the variability is modeled differently. Indeed, the likelihood functions are quite different and will produce different maximum likelihood estimates of the parameter values.</li>
 </ol>
 <div class="figure" style="text-align: center">
-<span id="fig:unnamed-chunk-5"></span>
+<span style="display:block;" id="fig:unnamed-chunk-5"></span>
 <img src="NormPoisReg2.jpg" alt="Differences in Normal vs Poisson Error Regression from @bysh." width="90%"><p class="caption">
-Figure 8.1: Differences in Normal vs Poisson Error Regression from <span class="citation"><a href="references.html#ref-bysh" role="doc-biblioref">Legler and Roback</a> (<a href="references.html#ref-bysh" role="doc-biblioref">2019</a>)</span>.
+Figure 8.1: Differences in Normal vs Poisson Error Regression from <span class="citation">Legler and Roback (<a href="references.html#ref-bysh" role="doc-biblioref">2019</a>)</span>.
 </p>
 </div>
 </div>
@@ -174,7 +208,7 @@ Figure 8.1: Differences in Normal vs Poisson Error Regression from <span class="
 <p>Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables. Because the sample size is limited, we group the age variable into 5 year increments. Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean. It might also be good to find the sample mean per group and plot the Poisson probabilities onto each bar.</p>
 <div class="inline-figure"><img src="08-PoisReg_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></div>
 <p><strong>Technical Condition 4, Error:</strong> To check whether the mean and variance are similar, we can calculate the values per group (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis). Note that the mean and variance are reasonably similar! When the “mean=variance” condition is violated, it is almost always violated in such that the variance is even <em>bigger</em> than would have been expected by the Poisson model. Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in the following section <a href="poisson-regression.html#overdis">8.2.1.2</a>.</p>
-<pre><code>#&gt; # A tibble: 3 x 5
+<pre><code>#&gt; # A tibble: 3 × 5
 #&gt;   AGEgroups  mean variance stdev     n
 #&gt;   &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
 #&gt; 1 (20,30]    1.08    0.992 0.996    12
@@ -184,26 +218,26 @@ Figure 8.1: Differences in Normal vs Poisson Error Regression from <span class="
 <p><span class="math display">\[\ln(\mu_i) = \beta_0 + \beta_1 X_i,\]</span>
 which means we’d really like to plot <span class="math inline">\(\mu_i\)</span> as a function of the explanatory variable. Unfortunately, <span class="math inline">\(\mu_i\)</span> is unknown, and so cannot be plotted. We can, however, plot the log of the average value of the response for a group of x values which are close to one another. In the plot below, we’ve grouped observations based on the age of the elephants being within 3 years of years of each other. It is actually quite linear! The points that don’t follow the linear relationship are based on age groups with very few observations.</p>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">matelogmean</span> <span class="op">&lt;-</span> <span class="va">elephants</span> <span class="op">%&gt;%</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>agecut <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">AGE</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">26.5</span>,<span class="fl">53.5</span>,by<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">group_by</span><span class="op">(</span><span class="va">agecut</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">summarize</span><span class="op">(</span>meanmate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">MATINGS</span><span class="op">)</span>, logmate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">MATINGS</span><span class="op">)</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span> <span class="op">)</span>
-
-<span class="va">elephantsGRP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">matelogmean</span>, age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">26.5</span>,<span class="fl">52.5</span>,by<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">+</span><span class="fl">1.5</span> <span class="op">)</span><span class="op">)</span>
-
-<span class="va">elephantsGRP</span>
-<span class="co">#&gt;        agecut meanmate logmate  n age</span>
-<span class="co">#&gt; 1 (26.5,29.5]     1.09   0.087 11  28</span>
-<span class="co">#&gt; 2 (29.5,32.5]     1.50   0.405  2  31</span>
-<span class="co">#&gt; 3 (32.5,35.5]     2.44   0.894  9  34</span>
-<span class="co">#&gt; 4 (35.5,38.5]     3.50   1.253  6  37</span>
-<span class="co">#&gt; 5 (38.5,41.5]     2.00   0.693  2  40</span>
-<span class="co">#&gt; 6 (41.5,44.5]     3.57   1.273  7  43</span>
-<span class="co">#&gt; 7 (44.5,47.5]     6.00   1.792  2  46</span>
-<span class="co">#&gt; 8 (47.5,50.5]     2.00   0.693  1  49</span>
-<span class="co">#&gt; 9 (50.5,53.5]     9.00   2.197  1  52</span>
-
-<span class="va">elephantsGRP</span> <span class="op">%&gt;%</span> <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">age</span>, y<span class="op">=</span><span class="va">logmate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">matelogmean</span> <span class="op">&lt;-</span> <span class="va">elephants</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>agecut <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span><span class="va">AGE</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">26.5</span>,<span class="fl">53.5</span>,by<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">agecut</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/Hmisc/man/summarize.html">summarize</a></span><span class="op">(</span>meanmate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">MATINGS</span><span class="op">)</span>, logmate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">MATINGS</span><span class="op">)</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">elephantsGRP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">matelogmean</span>, age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">26.5</span>,<span class="fl">52.5</span>,by<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">+</span><span class="fl">1.5</span> <span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">elephantsGRP</span></span>
+<span><span class="co">#&gt;        agecut meanmate logmate  n age</span></span>
+<span><span class="co">#&gt; 1 (26.5,29.5]     1.09   0.087 11  28</span></span>
+<span><span class="co">#&gt; 2 (29.5,32.5]     1.50   0.405  2  31</span></span>
+<span><span class="co">#&gt; 3 (32.5,35.5]     2.44   0.894  9  34</span></span>
+<span><span class="co">#&gt; 4 (35.5,38.5]     3.50   1.253  6  37</span></span>
+<span><span class="co">#&gt; 5 (38.5,41.5]     2.00   0.693  2  40</span></span>
+<span><span class="co">#&gt; 6 (41.5,44.5]     3.57   1.273  7  43</span></span>
+<span><span class="co">#&gt; 7 (44.5,47.5]     6.00   1.792  2  46</span></span>
+<span><span class="co">#&gt; 8 (47.5,50.5]     2.00   0.693  1  49</span></span>
+<span><span class="co">#&gt; 9 (50.5,53.5]     9.00   2.197  1  52</span></span>
+<span></span>
+<span><span class="va">elephantsGRP</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">age</span>, y<span class="op">=</span><span class="va">logmate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="inline-figure"><img src="08-PoisReg_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
 </div>
@@ -252,7 +286,7 @@ res_{di} &amp;=&amp; [-\hat{\mu}_i + y_i \ln(\hat{\mu}_i) - \ln(y_i!) ] - [-y_i 
 E(Y_i) &amp;=&amp; \mu_i\\
 Var(Y_i) &amp;=&amp; \phi \mu_i\\
 \end{eqnarray*}\]</span></p>
-<p>If we can estimate <span class="math inline">\(\phi\)</span>, then a more appropriate SE to use is adjusted by <span class="math inline">\(\phi\)</span>: <span class="math inline">\(SE_Q(\hat{\beta}) = \sqrt{\phi} SE(\hat{\beta})\)</span>. (<span class="math inline">\(Q\)</span> stands for “quasiPoisson.”)</p>
+<p>If we can estimate <span class="math inline">\(\phi\)</span>, then a more appropriate SE to use is adjusted by <span class="math inline">\(\phi\)</span>: <span class="math inline">\(SE_Q(\hat{\beta}) = \sqrt{\phi} SE(\hat{\beta})\)</span>. (<span class="math inline">\(Q\)</span> stands for “quasiPoisson”.)</p>
 <p>When <span class="math inline">\(Y\)</span> comes from a setting where the sample size is large, then we can use normal (sums of standard normal random variables are distributed according to a <span class="math inline">\(\chi^2\)</span> distribution) theory to assess the residuals:</p>
 <p><span class="math display">\[\sum_{i=1}^n res_{pi}^2 = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{Var(Y_i)} = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{\phi \mu_i} \sim \chi^2_{n-p}\]</span></p>
 <p>The expected value of <span class="math inline">\(\chi^2_{n-p}\)</span> is <span class="math inline">\(n-p\)</span>, which gives an estimator of <span class="math inline">\(\phi\)</span> to be:</p>
@@ -287,62 +321,62 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 </h2>
 <p>The R example is taken from data given in the textbook. The scientific question relates to predicting the total number of observed <code>species</code> on the Galapagos archipelago related to island <code>area</code> (km<span class="math inline">\(^2\)</span>), <code>elevation</code> (m), distance (km) to the <code>nearest</code> neighbor and to the largest island (km<span class="math inline">\(^2\)</span>) in the archipelago Santa Cruz (<code>scruz</code>), and the area of the <code>adjacent</code> island (km<span class="math inline">\(^2\)</span>). We could also consider an additional response variable which is the island <code>endemic</code> species count.</p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">galap</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"Galapagos.csv"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">galap</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 8</span>
-<span class="co">#&gt;   island      species endemics  area elevation nearest scruz adjacent</span>
-<span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 Baltra           58       23 25.1        346     0.6   0.6     1.84</span>
-<span class="co">#&gt; 2 Bartolome        31       21  1.24       109     0.6  26.3   572.  </span>
-<span class="co">#&gt; 3 Caldwell          3        3  0.21       114     2.8  58.7     0.78</span>
-<span class="co">#&gt; 4 Champion         25        9  0.1         46     1.9  47.4     0.18</span>
-<span class="co">#&gt; 5 Coamano           2        1  0.05        77     1.9   1.9   904.  </span>
-<span class="co">#&gt; 6 DaphneMajor      18       11  0.34       119     8     8       1.84</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">galap</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"Galapagos.csv"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">galap</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 8</span></span>
+<span><span class="co">#&gt;   island      species endemics  area elevation nearest scruz adjacent</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Baltra           58       23 25.1        346     0.6   0.6     1.84</span></span>
+<span><span class="co">#&gt; 2 Bartolome        31       21  1.24       109     0.6  26.3   572.  </span></span>
+<span><span class="co">#&gt; 3 Caldwell          3        3  0.21       114     2.8  58.7     0.78</span></span>
+<span><span class="co">#&gt; 4 Champion         25        9  0.1         46     1.9  47.4     0.18</span></span>
+<span><span class="co">#&gt; 5 Coamano           2        1  0.05        77     1.9   1.9   904.  </span></span>
+<span><span class="co">#&gt; 6 DaphneMajor      18       11  0.34       119     8     8       1.84</span></span></code></pre></div>
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">ggplot</span><span class="op">(</span><span class="va">galap</span>, <span class="fu">aes</span><span class="op">(</span>y<span class="op">=</span><span class="va">species</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">adjacent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">galap</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">species</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">adjacent</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="inline-figure"><img src="08-PoisReg_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></div>
 <div id="glm" class="section level3" number="8.3.1">
 <h3>
 <span class="header-section-number">8.3.1</span> glm<a class="anchor" aria-label="anchor" href="#glm"><i class="fas fa-link"></i></a>
 </h3>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt;   term            estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 (Intercept)     3.02     0.303         9.96  2.28e-23</span>
-<span class="co">#&gt; 2 log(area)       0.315    0.0185       17.1   2.20e-65</span>
-<span class="co">#&gt; 3 log(elevation)  0.0977   0.0604        1.62  1.06e- 1</span>
-<span class="co">#&gt; 4 nearest        -0.00106  0.00169      -0.626 5.32e- 1</span>
-<span class="co">#&gt; 5 scruz          -0.00314  0.000597     -5.26  1.40e- 7</span>
-<span class="co">#&gt; 6 adjacent       -0.000243 0.0000281    -8.65  5.31e-18</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 5</span></span>
+<span><span class="co">#&gt;   term            estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)     3.02     0.303         9.96  2.28e-23</span></span>
+<span><span class="co">#&gt; 2 log(area)       0.315    0.0185       17.1   2.20e-65</span></span>
+<span><span class="co">#&gt; 3 log(elevation)  0.0977   0.0604        1.62  1.06e- 1</span></span>
+<span><span class="co">#&gt; 4 nearest        -0.00106  0.00169      -0.626 5.32e- 1</span></span>
+<span><span class="co">#&gt; 5 scruz          -0.00314  0.000597     -5.26  1.40e- 7</span></span>
+<span><span class="co">#&gt; 6 adjacent       -0.000243 0.0000281    -8.65  5.31e-18</span></span></code></pre></div>
 </div>
 <div id="drop-in-deviance" class="section level3" number="8.3.2">
 <h3>
 <span class="header-section-number">8.3.2</span> drop in deviance<a class="anchor" aria-label="anchor" href="#drop-in-deviance"><i class="fas fa-link"></i></a>
 </h3>
-<p>It seems like we might not need either <code><a href="https://rdrr.io/r/base/Log.html">log(elevation)</a></code> or <code>nearest</code>. A drop in deviance test will help:</p>
+<p>It seems like we might not need either <code>log(elevation)</code> or <code>nearest</code>. A drop in deviance test will help:</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">glance</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 8</span>
-<span class="co">#&gt;   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs</span>
-<span class="co">#&gt;           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1         3511.      29  -294.  600.  609.     427.          24    30</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">glance</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 8</span>
-<span class="co">#&gt;   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs</span>
-<span class="co">#&gt;           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1         3511.      29  -296.  600.  606.     431.          26    30</span>
-
-<span class="fl">431.11</span> <span class="op">-</span> <span class="fl">427.48</span>
-<span class="co">#&gt; [1] 3.63</span>
-<span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">pchisq</a></span><span class="op">(</span><span class="fl">3.63</span>, <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.163</span></code></pre></div>
-<p>The relatively large p-value suggests that we do not need either of the variables <code><a href="https://rdrr.io/r/base/Log.html">log(elevation)</a></code> or <code>nearest</code></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">glance</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span><span class="co">#&gt;   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1         3511.      29  -294.  600.  609.     427.          24    30</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">glance</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span><span class="co">#&gt;   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1         3511.      29  -296.  600.  606.     431.          26    30</span></span>
+<span></span>
+<span><span class="fl">431.11</span> <span class="op">-</span> <span class="fl">427.48</span></span>
+<span><span class="co">#&gt; [1] 3.63</span></span>
+<span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">pchisq</a></span><span class="op">(</span><span class="fl">3.63</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.163</span></span></code></pre></div>
+<p>The relatively large p-value suggests that we do not need either of the variables <code>log(elevation)</code> or <code>nearest</code></p>
 </div>
 <div id="residuals-1" class="section level3" number="8.3.3">
 <h3>
@@ -350,26 +384,26 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 </h3>
 <p>Keep in mind that the expectation of a Poisson model is that the residuals will be more variable for larger predicted values. The <code>broom</code> package provides <code>.resid</code>uals which are the observed value minus the fitted value. I <em>think</em> that <code>.std.resid</code> is the Pearson residual.</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 10</span>
-<span class="co">#&gt;   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma</span>
-<span class="co">#&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1      58       3.22    0.6     1.84    4.61 -4.57      -4.83  0.105    4.04</span>
-<span class="co">#&gt; 2      31       0.215  26.3   572.      3.36  0.414      0.427 0.0605   4.15</span>
-<span class="co">#&gt; 3       3      -1.56   58.7     0.78    2.76 -3.96      -4.05  0.0417   4.07</span>
-<span class="co">#&gt; 4      25      -2.30   47.4     0.18    2.55  3.01       3.08  0.0413   4.11</span>
-<span class="co">#&gt; 5       2      -3.00    1.9   904.      2.27 -3.01      -3.10  0.0559   4.11</span>
-<span class="co">#&gt; 6      18      -1.08    8       1.84    3.11 -0.953     -0.986 0.0661   4.15</span>
-<span class="co">#&gt; # … with 1 more variable: .cooksd &lt;dbl&gt;</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.std.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 10</span></span>
+<span><span class="co">#&gt;   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd</span></span>
+<span><span class="co">#&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1      58       3.22    0.6    1.84    4.61 -4.57   -4.83  0.105    4.04 0.581  </span></span>
+<span><span class="co">#&gt; 2      31       0.215  26.3  572.      3.36  0.414   0.427 0.0605   4.15 0.00301</span></span>
+<span><span class="co">#&gt; 3       3      -1.56   58.7    0.78    2.76 -3.96   -4.05  0.0417   4.07 0.118  </span></span>
+<span><span class="co">#&gt; 4      25      -2.30   47.4    0.18    2.55  3.01    3.08  0.0413   4.11 0.131  </span></span>
+<span><span class="co">#&gt; 5       2      -3.00    1.9  904.      2.27 -3.01   -3.10  0.0559   4.11 0.0959 </span></span>
+<span><span class="co">#&gt; 6      18      -1.08    8      1.84    3.11 -0.953  -0.986 0.0661   4.15 0.0161 </span></span>
+<span><span class="co">#&gt; # … with abbreviated variable names ¹​adjacent, ²​.std.resid</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"poisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.std.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="08-PoisReg_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;"><img src="08-PoisReg_files/figure-html/unnamed-chunk-14-2.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div id="quasipoisson" class="section level3" number="8.3.4">
@@ -378,48 +412,48 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 </h3>
 <p>Note that all of the above analyses can be done using the overdispersed quasiPoisson model.</p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt;   term            estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 (Intercept)     3.02      1.29         2.34  0.0278  </span>
-<span class="co">#&gt; 2 log(area)       0.315     0.0786       4.02  0.000507</span>
-<span class="co">#&gt; 3 log(elevation)  0.0977    0.257        0.381 0.707   </span>
-<span class="co">#&gt; 4 nearest        -0.00106   0.00720     -0.147 0.884   </span>
-<span class="co">#&gt; 5 scruz          -0.00314   0.00254     -1.24  0.228   </span>
-<span class="co">#&gt; 6 adjacent       -0.000243  0.000120    -2.03  0.0532</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 x 5</span>
-<span class="co">#&gt;   term         estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 (Intercept)  3.50      0.203        17.3  8.76e-16</span>
-<span class="co">#&gt; 2 log(area)    0.342     0.0304       11.3  1.63e-11</span>
-<span class="co">#&gt; 3 scruz       -0.00354   0.00197      -1.80 8.36e- 2</span>
-<span class="co">#&gt; 4 adjacent    -0.000221  0.000104     -2.12 4.35e- 2</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span> <span class="op">+</span> <span class="va">nearest</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 5</span></span>
+<span><span class="co">#&gt;   term            estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)     3.02      1.29         2.34  0.0278  </span></span>
+<span><span class="co">#&gt; 2 log(area)       0.315     0.0786       4.02  0.000507</span></span>
+<span><span class="co">#&gt; 3 log(elevation)  0.0977    0.257        0.381 0.707   </span></span>
+<span><span class="co">#&gt; 4 nearest        -0.00106   0.00720     -0.147 0.884   </span></span>
+<span><span class="co">#&gt; 5 scruz          -0.00314   0.00254     -1.24  0.228   </span></span>
+<span><span class="co">#&gt; 6 adjacent       -0.000243  0.000120    -2.03  0.0532</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 5</span></span>
+<span><span class="co">#&gt;   term         estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)  3.50      0.203        17.3  8.76e-16</span></span>
+<span><span class="co">#&gt; 2 log(area)    0.342     0.0304       11.3  1.63e-11</span></span>
+<span><span class="co">#&gt; 3 scruz       -0.00354   0.00197      -1.80 8.36e- 2</span></span>
+<span><span class="co">#&gt; 4 adjacent    -0.000221  0.000104     -2.12 4.35e- 2</span></span></code></pre></div>
 <div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 10</span>
-<span class="co">#&gt;   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma</span>
-<span class="co">#&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1      58       3.22    0.6     1.84    4.61 -4.57      -1.18  0.105    4.04</span>
-<span class="co">#&gt; 2      31       0.215  26.3   572.      3.36  0.414      0.104 0.0605   4.15</span>
-<span class="co">#&gt; 3       3      -1.56   58.7     0.78    2.76 -3.96      -0.989 0.0417   4.07</span>
-<span class="co">#&gt; 4      25      -2.30   47.4     0.18    2.55  3.01       0.752 0.0413   4.11</span>
-<span class="co">#&gt; 5       2      -3.00    1.9   904.      2.27 -3.01      -0.758 0.0559   4.11</span>
-<span class="co">#&gt; 6      18      -1.08    8       1.84    3.11 -0.953     -0.241 0.0661   4.15</span>
-<span class="co">#&gt; # … with 1 more variable: .cooksd &lt;dbl&gt;</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, 
-    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.std.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 10</span></span>
+<span><span class="co">#&gt;   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd</span></span>
+<span><span class="co">#&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1      58       3.22    0.6    1.84    4.61 -4.57   -1.18  0.105    4.04 3.47e-2</span></span>
+<span><span class="co">#&gt; 2      31       0.215  26.3  572.      3.36  0.414   0.104 0.0605   4.15 1.80e-4</span></span>
+<span><span class="co">#&gt; 3       3      -1.56   58.7    0.78    2.76 -3.96   -0.989 0.0417   4.07 7.05e-3</span></span>
+<span><span class="co">#&gt; 4      25      -2.30   47.4    0.18    2.55  3.01    0.752 0.0413   4.11 7.81e-3</span></span>
+<span><span class="co">#&gt; 5       2      -3.00    1.9  904.      2.27 -3.01   -0.758 0.0559   4.11 5.72e-3</span></span>
+<span><span class="co">#&gt; 6      18      -1.08    8      1.84    3.11 -0.953  -0.241 0.0661   4.15 9.58e-4</span></span>
+<span><span class="co">#&gt; # … with abbreviated variable names ¹​adjacent, ²​.std.resid</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">species</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">+</span> <span class="va">scruz</span> <span class="op">+</span> <span class="va">adjacent</span>, </span>
+<span>    data<span class="op">=</span> <span class="va">galap</span>, family<span class="op">=</span><span class="st">"quasipoisson"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">.fitted</span>, y<span class="op">=</span><span class="va">.std.resid</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="08-PoisReg_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;"><img src="08-PoisReg_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;"></p>
 
 </div>
@@ -472,7 +506,7 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2021-05-19.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-01-10.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -485,13 +519,29 @@ Var(Y_i) &amp;=&amp; \phi \mu_i\\
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
 </html>

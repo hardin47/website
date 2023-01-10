@@ -513,7 +513,6 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
 #> #   BIC <dbl>, nobs <int>, and abbreviated variable names ¹​statistic.log,
 #> #   ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc, ⁵​statistic.wald, ⁶​p.value.wald,
 #> #   ⁷​statistic.robust, ⁸​p.value.robust
-#> # ℹ Use `colnames()` to see all variable names
 ```
 
 -   **Note 1**: There is no intercept in the linear component of the model (i.e., there is no $\beta_0$ or $b_0).$ The baseline estimate (usually the role of the "intercept") is contained within the $h_0(t)$ parameter.\
@@ -1846,7 +1845,6 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>%
 #> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
 #> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
 #> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
-#> # ℹ Use `colnames()` to see all variable names
 
 # score_factor and race
 coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
@@ -1868,7 +1866,6 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>%
 #> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
 #> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
 #> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
-#> # ℹ Use `colnames()` to see all variable names
 
 # score_factor, race, age, sex
 coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
@@ -1892,7 +1889,6 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
 #> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
 #> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
-#> # ℹ Use `colnames()` to see all variable names
 ```
 
 Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:

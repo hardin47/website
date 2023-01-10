@@ -1330,7 +1330,6 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
 #> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
 #> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
 #> # … with 89 more rows
-#> # ℹ Use `print(n = ...)` to see more rows
 glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
   print.data.frame(digits=6)
 #>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
@@ -1373,7 +1372,6 @@ glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
 #> 5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
 #> 6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.00 
 #> # … with 28 more rows
-#> # ℹ Use `print(n = ...)` to see more rows
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance() %>%
   print.data.frame(digits=6)
 #>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
