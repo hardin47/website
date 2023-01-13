@@ -398,7 +398,7 @@ So, when testing, the appropriate test statistic is:
 \end{eqnarray*}
 
 
-### CI for differences in proportions
+#### CI for differences in proportions
 
 We can't pool our estimate for the SE, but everything else stays the same...
 
@@ -411,7 +411,7 @@ SE(\hat{p}_1 - \hat{p}_2) = \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\ha
 
 The main idea here is to determine whether two categorical variables are independent.  That is, does knowledge of the value of one variable tell me something about the probability of the other variable (gender and pregnancy).  We're going to talk about two different ways to approach this problem.
 
-### Relative Risk
+### Relative Risk {#rr}
 
 ::: {.definition}
 **Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."
@@ -430,13 +430,25 @@ $\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5$.  We say, "The r
 * sample size?  
 * baseline risk?  
 
-To create confidence intervals for relative risk, we use the fact that:
+#### Confidence Interval for RR {#ciRR} {-}
+
+Due to some theory that we won't cover, we use the fact that:
 
 \begin{eqnarray*}
 SE(\ln (\hat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}
 \end{eqnarray*}
 
-### Odds Ratios
+A $(1-\alpha)100\%$ CI for the $\ln(RR)$ is:
+\begin{eqnarray*}
+\ln(\hat{RR}) \pm z_{1-\alpha/2} SE(\ln(\hat{RR}))
+\end{eqnarray*}
+
+Which gives a $(1-\alpha)100\%$ CI for the $RR$:
+\begin{eqnarray*}
+(e^{\ln(\hat{RR}) - z_{1-\alpha/2} SE(\ln(\hat{RR}))}, e^{\ln(\hat{RR}) + z_{1-\alpha/2} SE(\ln(\hat{RR}))})
+\end{eqnarray*}
+
+### Odds Ratios {#or}
 
 A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.
 
@@ -457,7 +469,7 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 $\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02$.  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
 
 
-#### OR is more extreme than RR
+#### OR is more extreme than RR {-}
 
 Without loss of generality, assume the true $RR > 1$, implying $p_1 / p_2 > 1$ and $p_1 > p_2$.
 
@@ -471,7 +483,7 @@ RR = \frac{p_1}{p_2} &>& 1\\
 OR &>& RR
 \end{eqnarray*}
 
-#### Other considerations:
+#### Other considerations: {-}
 
 * Observational study (who worked in each place?)  
 * Cross sectional (only one point in time)  
@@ -593,7 +605,7 @@ Now we have a cohort prospective study.  (Previously we had a case-control retro
 :::
 
 
-### Confidence Interval for OR {#ciOR}
+#### Confidence Interval for OR {#ciOR} {-}
 
 Due to some theory that we won't cover:
 
