@@ -21,12 +21,12 @@ See a great video (less than 2 min) on a reproducible workflow: https://www.yout
 * You may use Pomona's server: https://rstudio.pomona.edu/
 
 <div class="figure" style="text-align: center">
-<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="796" />
+<img src="figs/RRstudio.jpg" alt="Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim" width="80%" />
 <p class="caption">(\#fig:unnamed-chunk-1)Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim</p>
 </div>
 
 <div class="figure" style="text-align: center">
-<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="484" />
+<img src="figs/cookingRstudio.jpg" alt="[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University" width="80%" />
 <p class="caption">(\#fig:unnamed-chunk-2)[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University</p>
 </div>
 

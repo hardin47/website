@@ -10,7 +10,7 @@ bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: hardin47/website/Math58/
-description: "Class notes for both Math 58 and Math 58B at Pomona College: Introduction to Statistics and Introduction to Biostatistics.  The notes are based extensively on Introduction to Modern Statistics by Çetinkaya-Rundel and Hardin Investigating Statistical Concepts, Applications, and Methods by Chance and Rossman."
+description: "Class notes for both Math 58 and Math 58B at Pomona College: Introduction to Statistics and Introduction to Biostatistics.  The notes are based extensively on Introduction to Modern Statistics by Çetinkaya-Rundel and Hardin and Investigating Statistical Concepts, Applications, and Methods by Chance and Rossman."
 ---
 
 # Class Information {.unnumbered}

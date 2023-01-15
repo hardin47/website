@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2023-01-13"
+date: "2023-01-15"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -23,6 +23,8 @@ Class notes for Math 150 at Pomona College: Methods in Biostatistics.  The notes
 
 
 You are responsible for reading your text.  Your text is very good & readable, so you should use it.  Your text is not, however, overly technical.  You should make sure you are coming to class and asking lots of questions.
+
+More information and course details can be found at the <a href = "https://m150-method-biostat.netlify.app/" target = "_blank">Math150 website</a>.
 
 
 
