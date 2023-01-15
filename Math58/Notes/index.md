@@ -1,7 +1,7 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2022-08-14"
+date: "2023-01-15"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
@@ -17,7 +17,7 @@ description: "Class notes for both Math 58 and Math 58B at Pomona College: Intro
 
 Class notes for Math 58(B) at Pomona College: Introduction to (Bio)Statistics. The notes are based extensively on "Introduction to Modern Statistics" by Çetinkaya-Rundel and Hardin [@ims]. We will also be using many examples (and applets) from "Investigating Statistics, Concepts, Applications, and Methods" by Chance and Rossman [@iscam].
 
-You are responsible for reading the relevant chapters in the text.  You will have a much deeper understanding of the material if you spend time working through the applets at <http://www.rossmanchance.com/iscam3/files.html>. You should make sure you are coming to class and also reading the materials associated with the activities.
+You are responsible for reading the relevant chapters in the text.  You will have a much deeper understanding of the material if you spend time working through the <a href = "https://www.rossmanchance.com/applets/index2021.html" target = "_blank">online applets</a>. You should make sure you are coming to class and also reading the materials associated with the activities.
 
 
 
