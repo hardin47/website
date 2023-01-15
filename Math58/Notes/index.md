@@ -19,6 +19,8 @@ Class notes for Math 58(B) at Pomona College: Introduction to (Bio)Statistics. T
 
 You are responsible for reading the relevant chapters in the text.  You will have a much deeper understanding of the material if you spend time working through the <a href = "https://www.rossmanchance.com/applets/index2021.html" target = "_blank">online applets</a>. You should make sure you are coming to class and also reading the materials associated with the activities.
 
+More information and course details can be found at the <a href = "https://m58-intro-stats.netlify.app/" target = "_blank">Math58B website</a>.
+
 
 
 
