@@ -268,7 +268,7 @@ The data below represents 10 different variables on health of a country measured
 ### Reading the data into R
 
 ```r
-happy <- read_delim("~/Dropbox/teaching/MA150/spring17/happyPlanet.txt", delim="\t")
+happy <- read_delim("./data/happyPlanet.txt", delim="\t")
 glimpse(happy)  
 #> Rows: 143
 #> Columns: 11

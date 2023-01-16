@@ -19,17 +19,6 @@ The related data set contains 32,001 elective general surgical patients. Age, ge
 
 Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August.  We'd like to compare the average age of the participants from the July group to the August group.  Even if the mortality difference is significant, we can't conclude causation because it was an observational study.  However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing.  How different are the groups based on clinical variables?
 
-
-```r
-surgeryurl <- url("https://www.causeweb.org/tshs/datasets/surgery_timing.Rdata")
-load(surgeryurl)
-surgery <- stata_data
-head(surgery)  %>%
-  select(age, gender, race, hour, dow, month, complication, bmi, everything(), -ahrq_ccs) %>%
-  kable(caption = "Varibles associated with the surgery data.") %>%
- kable_styling()
-```
-
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
  <thead>
@@ -346,7 +335,7 @@ In the video, a rider in the back of a taxi (played by Linklater himself) muses 
 What is the point?  Why watch the video?  How does it relate the to the material from class?  What is the relationship to sampling distributions?  [Thanks to Ben Baumer at Smith College for the pointer to the specific video.]
     
     
-## ANOVA {-}
+## ANOVA
 Skip ANOVA in your text (2.4 and part of 2.9 in @KuiperSklar).
   
   

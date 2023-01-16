@@ -116,14 +116,6 @@
 <p>The study, “Operation Timing and 30-Day Mortality After Elective General Surgery”, tested the hypotheses that the risk of 30-day mortality associated with elective general surgery: 1) increases from morning to evening throughout the routine workday; 2) increases from Monday to Friday through the workweek; and 3) is more frequent in July and August than during other months of the year. As a presumed negative control, the investigators also evaluated mortality as a function of the phase of the moon. Secondarily, they evaluated these hypotheses as they pertain to a composite in-hospital morbidity endpoint.</p>
 <p>The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from <span class="citation">(<a href="references.html#ref-Sessler2011" role="doc-biblioref">Sessler et al. 2011</a>)</span></p>
 <p>Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August. We’d like to compare the average age of the participants from the July group to the August group. Even if the mortality difference is significant, we can’t conclude causation because it was an observational study. However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing. How different are the groups based on clinical variables?</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgeryurl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span><span class="op">(</span><span class="st">"https://www.causeweb.org/tshs/datasets/surgery_timing.Rdata"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="va">surgeryurl</span><span class="op">)</span></span>
-<span><span class="va">surgery</span> <span class="op">&lt;-</span> <span class="va">stata_data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">surgery</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">gender</span>, <span class="va">race</span>, <span class="va">hour</span>, <span class="va">dow</span>, <span class="va">month</span>, <span class="va">complication</span>, <span class="va">bmi</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span>, <span class="op">-</span><span class="va">ahrq_ccs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Varibles associated with the surgery data."</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 <span id="tab:unnamed-chunk-2">Table 3.1: </span>Varibles associated with the surgery data.
@@ -649,11 +641,11 @@ No
 </tr>
 </tbody>
 </table></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>agemean <span class="op">=</span> <span class="fu">mean</span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, agesd <span class="op">=</span> <span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/aggregating.html">sd</a></span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, agen <span class="op">=</span> <span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/aggregating.html">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>agemean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, agesd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, agen <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
 <span><span class="co">#&gt;   month agemean agesd  agen</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;</span></span>
@@ -699,10 +691,10 @@ df &amp;= n_1 + n_2 -2\\
 \end{align}\]</span></p>
 </div>
 <p>The same analysis can be done in R (with and without tidying the output):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/ttest.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Welch Two Sample t-test</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -715,10 +707,10 @@ df &amp;= n_1 + n_2 -2\\
 <span><span class="co">#&gt; mean in group Aug mean in group Jul </span></span>
 <span><span class="co">#&gt;              58.1              57.6</span></span>
 <span></span>
-<span><span class="va">surgery</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/ttest.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸</span></span>
 <span><span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  </span></span>
@@ -761,14 +753,15 @@ df &amp;= \min(n_1-1, n_2-1)\\
 <p>What is the point? Why watch the video? How does it relate the to the material from class? What is the relationship to sampling distributions? [Thanks to Ben Baumer at Smith College for the pointer to the specific video.]</p>
 </div>
 </div>
-<div id="anova" class="section level2 unnumbered">
-<h2>ANOVA<a class="anchor" aria-label="anchor" href="#anova"><i class="fas fa-link"></i></a>
+<div id="anova" class="section level2" number="3.2">
+<h2>
+<span class="header-section-number">3.2</span> ANOVA<a class="anchor" aria-label="anchor" href="#anova"><i class="fas fa-link"></i></a>
 </h2>
 <p>Skip ANOVA in your text (2.4 and part of 2.9 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>).</p>
 </div>
-<div id="tslr" class="section level2" number="3.2">
+<div id="tslr" class="section level2" number="3.3">
 <h2>
-<span class="header-section-number">3.2</span> Simple Linear Regression<a class="anchor" aria-label="anchor" href="#tslr"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.3</span> Simple Linear Regression<a class="anchor" aria-label="anchor" href="#tslr"><i class="fas fa-link"></i></a>
 </h2>
 <p>(Section 2.3 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
 <p>Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a {linear} relationship between two variables. It typically has the form of:</p>
@@ -812,12 +805,12 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 \hat{y}_i &amp;= b_0 + b_1 x_i
 \end{align}\]</span></p>
 <p>That is, we are assuming that for each observation the true population <em>average</em> is fixed and an individual that is randomly selected will have some amount of <em>random error</em> away from the true population mean at their value for the explanatory variable, <span class="math inline">\(x_i\)</span>. Note that we have assumed that the variance is constant across any level of the explanatory variable. We have also assumed that there is independence across individuals. <strong>[Note: there are no assumptions about the distribution of the explanatory variable, <span class="math inline">\(X\)</span>]</strong>.</p>
-<p>Note the similarity in running a <code><a href="https://www.mosaic-web.org/mosaic/reference/ttest.html">t.test()</a></code> and a linear model (<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>):</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://www.mosaic-web.org/mosaic/reference/ttest.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
+<p>Note the similarity in running a <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> and a linear model (<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸</span></span>
 <span><span class="co">#&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  </span></span>
@@ -825,10 +818,10 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 <span><span class="co">#&gt; # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,</span></span>
 <span><span class="co">#&gt; #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative</span></span>
 <span></span>
-<span><span class="va">surgery</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 5</span></span>
 <span><span class="co">#&gt;   term        estimate std.error statistic p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
@@ -854,9 +847,9 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 </div>
 </div>
 </div>
-<div id="confidence-intervals" class="section level2" number="3.3">
+<div id="confidence-intervals" class="section level2" number="3.4">
 <h2>
-<span class="header-section-number">3.3</span> Confidence Intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.4</span> Confidence Intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"><i class="fas fa-link"></i></a>
 </h2>
 <p>(Section 2.11 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
 <p>A fantastic applet for visualizing what it means to have 95% confidence: [<a href="http://www.rossmanchance.com/applets/2021/confsim/ConfSim.html" class="uri">http://www.rossmanchance.com/applets/2021/confsim/ConfSim.html</a>]</p>
@@ -879,9 +872,9 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 &amp; (0.29 s, 4.81 s)
 \end{align}\]</span></p>
 </div>
-<div id="random-sample-vs.-random-allocation" class="section level2" number="3.4">
+<div id="random-sample-vs.-random-allocation" class="section level2" number="3.5">
 <h2>
-<span class="header-section-number">3.4</span> Random Sample vs. Random allocation<a class="anchor" aria-label="anchor" href="#random-sample-vs.-random-allocation"><i class="fas fa-link"></i></a>
+<span class="header-section-number">3.5</span> Random Sample vs. Random allocation<a class="anchor" aria-label="anchor" href="#random-sample-vs.-random-allocation"><i class="fas fa-link"></i></a>
 </h2>
 <p>Recall what you’ve learned about how good random samples lead to inference about a population. On the other hand, in order to make a causal conclusion, you need a randomized experiment with random allocation of the treatments (impossible to happen in many settings). Random sampling and random allocation are DIFFERENT ideas that should be clear in your mind.</p>
 <div class="figure" style="text-align: center">
@@ -906,12 +899,12 @@ Figure 3.1: Figure taken from <span class="citation">(<a href="references.html#r
 <li>
 <a class="nav-link" href="#ttest"><span class="header-section-number">3.1</span> t-test</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#what-is-an-alternative-hypothesis"><span class="header-section-number">3.1.1</span> What is an Alternative Hypothesis?</a></li></ul>
 </li>
-<li><a class="nav-link" href="#anova">ANOVA</a></li>
+<li><a class="nav-link" href="#anova"><span class="header-section-number">3.2</span> ANOVA</a></li>
 <li>
-<a class="nav-link" href="#tslr"><span class="header-section-number">3.2</span> Simple Linear Regression</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#why-are-they-the-same">Why are they the same?</a></li></ul>
+<a class="nav-link" href="#tslr"><span class="header-section-number">3.3</span> Simple Linear Regression</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#why-are-they-the-same">Why are they the same?</a></li></ul>
 </li>
-<li><a class="nav-link" href="#confidence-intervals"><span class="header-section-number">3.3</span> Confidence Intervals</a></li>
-<li><a class="nav-link" href="#random-sample-vs.-random-allocation"><span class="header-section-number">3.4</span> Random Sample vs. Random allocation</a></li>
+<li><a class="nav-link" href="#confidence-intervals"><span class="header-section-number">3.4</span> Confidence Intervals</a></li>
+<li><a class="nav-link" href="#random-sample-vs.-random-allocation"><span class="header-section-number">3.5</span> Random Sample vs. Random allocation</a></li>
 </ul>
 
       <div class="book-extra">
