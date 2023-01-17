@@ -250,7 +250,7 @@ Note: we will assume the *population variances* are equal if neither *sample var
 
 
 ::: {.example}
-Are the mean ages of the July vs August patients statistically different? (why two sided?)
+Are the mean ages of the July + August vs other patients statistically different? (why two sided?)
   
 \begin{align}
 H_0: \mu_1 = \mu_2\\
@@ -309,7 +309,7 @@ surgery %>%
 * Look at SD and SEM
 * What is the statistic? What is the sampling distribution of the statistic?
 * Why do we use the t-distribution?
-* Why is the big p-value important?  (It's a good thing!)  How do we interpret the p-value?
+* Why is the **big** p-value important?  (It's a good thing!)  How do we interpret the p-value?
 * What can we conclude?
 * applet from [@iscam]: <a href = http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model target = "_blank">sampling from two populations</a>
 * What are the model assumptions? (basically all the assumptions are given in the original linear model: independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2))$
