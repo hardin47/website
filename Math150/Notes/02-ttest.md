@@ -17,7 +17,7 @@ The study, "Operation Timing and 30-Day Mortality After Elective General Surgery
 The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from [@Sessler2011]
 
 
-Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August.  We'd like to compare the average age of the participants from the July group to the August group.  Even if the mortality difference is significant, we can't conclude causation because it was an observational study.  However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing.  How different are the groups based on clinical variables?
+Note that in the example, mortality rates are compared for patients electing to have surgery in July August vs. other months of the year.  We'd like to compare the average age of the participants from the July and August groups as compared to the rest of the year.  Even if the mortality difference is significant, we can't conclude causation (of the treatment) because it was an observational study.  However, the more similar the groups are based on clinical variables (e.g., age), the more likely any differences in mortality are due to timing (i.e., the treatment).  Let's start by asking: how different are the groups based on clinical variables, here we assess age?
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
@@ -210,18 +210,20 @@ Note that in the example, mortality rates are compared for patients electing to 
 </table>
 
 
+
 ```r
 surgery %>%
- dplyr::filter(month %in% c("Jul", "Aug")) %>%
- dplyr::group_by(month) %>%
- dplyr::summarize(agemean = mean(age, na.rm=TRUE), agesd = sd(age, na.rm=TRUE), agen = sum(!is.na(age)))
+ dplyr::mutate(summer = case_when(
+   month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+ dplyr::group_by(summer) %>%
+ dplyr::summarize(age_mean = mean(age, na.rm=TRUE), age_sd = sd(age, na.rm=TRUE), age_n = sum(!is.na(age)))
 #> # A tibble: 2 × 4
-#>   month agemean agesd  agen
-#>   <chr>   <dbl> <dbl> <int>
-#> 1 Aug      58.1  15.2  3176
-#> 2 Jul      57.6  15.5  2325
+#>   summer age_mean age_sd age_n
+#>   <lgl>     <dbl>  <dbl> <int>
+#> 1 FALSE      57.6   15.0 26498
+#> 2 TRUE       57.8   15.3  5501
 ```
-
 
 ## t-test {#ttest}
 
@@ -260,13 +262,13 @@ t &= \frac{(\overline{y}_1 - \overline{y}_2) - 0}{s_p \sqrt{\frac{1}{n_1} + \fra
 s_p &= \sqrt{ \frac{(n_1 - 1)s_1^2 + (n_2-1) s_2^2}{n_1 + n_2 -2}}\\
 df &= n_1 + n_2 -2\\
 &\\
-t &= \frac{(58.05 - 57.57) - 0}{15.34 \sqrt{\frac{1}{3176} + \frac{1}{2325}}}\\
-&= 1.15\\  
-s_p &= \sqrt{ \frac{(3176-1)15.22^2 + (2325-1) 15.5^2}{3176 + 2325 -2}}\\
-&= 15.34\\
+t &= \frac{(57.62 - 57.84) - 0}{15.04 \sqrt{\frac{1}{26498} + \frac{1}{5501}}}\\
+&= -0.99\\  
+s_p &= \sqrt{ \frac{(26498-1)14.98^2 + (5501-1) 15.34^2}{26498 + 5501 -2}}\\
+&= 15.04\\
 df &= n_1 + n_2 -2\\
-&= 5499\\
-\mbox{p-value} &= 2 \cdot (1-pt(1.15,5499)) = 0.25\\
+&= 31997\\
+\mbox{p-value} &= 2 \cdot pt(-0.99,31997) = 0.322\\
 \end{align}
 :::
 
@@ -274,28 +276,32 @@ The same analysis can be done in R (with and without tidying the output):
 
 ```r
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .)
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE)
 #> 
-#> 	Welch Two Sample t-test
+#> 	Two Sample t-test
 #> 
-#> data:  age by month
-#> t = 1, df = 4954, p-value = 0.2
-#> alternative hypothesis: true difference in means between group Aug and group Jul is not equal to 0
+#> data:  age by summer
+#> t = -1, df = 31997, p-value = 0.3
+#> alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
 #> 95 percent confidence interval:
-#>  -0.337  1.309
+#>  -0.662  0.212
 #> sample estimates:
-#> mean in group Aug mean in group Jul 
-#>              58.1              57.6
+#> mean in group FALSE  mean in group TRUE 
+#>                57.6                57.8
 
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .) %>%
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE) %>%
   tidy()
 #> # A tibble: 1 × 10
 #>   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸
 #>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>  <chr>  
-#> 1   0.486    58.1    57.6    1.16   0.247   4954.  -0.337    1.31 Welch… two.si…
+#> 1  -0.225    57.6    57.8   -1.01   0.312   31997  -0.662   0.212 Two S… two.si…
 #> # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,
 #> #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative
 ```
@@ -305,7 +311,7 @@ surgery %>%
 * Why do we use the t-distribution?
 * Why is the big p-value important?  (It's a good thing!)  How do we interpret the p-value?
 * What can we conclude?
-* applet from [@iscam]: [http://www.rossmanchance.com/applets/2021/sampling/OneSample.html]
+* applet from [@iscam]: <a href = http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model target = "_blank">sampling from two populations</a>
 * What are the model assumptions? (basically all the assumptions are given in the original linear model: independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2))$
 
  

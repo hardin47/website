@@ -25,7 +25,7 @@ The study, "Operation Timing and 30-Day Mortality After Elective General Surgery
 The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from [@Sessler2011]
 
 
-Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August.  We'd like to compare the average age of the participants from the July group to the August group.  Even if the mortality difference is significant, we can't conclude causation because it was an observational study.  However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing.  How different are the groups based on clinical variables?
+Note that in the example, mortality rates are compared for patients electing to have surgery in July August vs. other months of the year.  We'd like to compare the average age of the participants from the July and August groups as compared to the rest of the year.  Even if the mortality difference is significant, we can't conclude causation (of the treatment) because it was an observational study.  However, the more similar the groups are based on clinical variables (e.g., age), the more likely any differences in mortality are due to timing (i.e., the treatment).  Let's start by asking: how different are the groups based on clinical variables, here we assess age?
 
 ```{r echo = FALSE}
 surgeryurl <- url("https://www.causeweb.org/tshs/datasets/surgery_timing.Rdata")
@@ -37,13 +37,15 @@ head(surgery)  %>%
  kable_styling()
 ```
 
+
 ```{r echo = TRUE}
 surgery %>%
- dplyr::filter(month %in% c("Jul", "Aug")) %>%
- dplyr::group_by(month) %>%
- dplyr::summarize(agemean = mean(age, na.rm=TRUE), agesd = sd(age, na.rm=TRUE), agen = sum(!is.na(age)))
+ dplyr::mutate(summer = case_when(
+   month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+ dplyr::group_by(summer) %>%
+ dplyr::summarize(age_mean = mean(age, na.rm=TRUE), age_sd = sd(age, na.rm=TRUE), age_n = sum(!is.na(age)))
 ```
-
 
 ## t-test {#ttest}
 
@@ -82,25 +84,29 @@ t &= \frac{(\overline{y}_1 - \overline{y}_2) - 0}{s_p \sqrt{\frac{1}{n_1} + \fra
 s_p &= \sqrt{ \frac{(n_1 - 1)s_1^2 + (n_2-1) s_2^2}{n_1 + n_2 -2}}\\
 df &= n_1 + n_2 -2\\
 &\\
-t &= \frac{(58.05 - 57.57) - 0}{15.34 \sqrt{\frac{1}{3176} + \frac{1}{2325}}}\\
-&= 1.15\\  
-s_p &= \sqrt{ \frac{(3176-1)15.22^2 + (2325-1) 15.5^2}{3176 + 2325 -2}}\\
-&= 15.34\\
+t &= \frac{(57.62 - 57.84) - 0}{15.04 \sqrt{\frac{1}{26498} + \frac{1}{5501}}}\\
+&= -0.99\\  
+s_p &= \sqrt{ \frac{(26498-1)14.98^2 + (5501-1) 15.34^2}{26498 + 5501 -2}}\\
+&= 15.04\\
 df &= n_1 + n_2 -2\\
-&= 5499\\
-\mbox{p-value} &= 2 \cdot (1-pt(1.15,5499)) = 0.25\\
+&= 31997\\
+\mbox{p-value} &= 2 \cdot pt(-0.99,31997) = 0.322\\
 \end{align}
 :::
 
 The same analysis can be done in R (with and without tidying the output):
 ```{r echo = TRUE}
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .)
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE)
 
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .) %>%
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE) %>%
   tidy()
 ```
   
@@ -109,7 +115,7 @@ surgery %>%
 * Why do we use the t-distribution?
 * Why is the big p-value important?  (It's a good thing!)  How do we interpret the p-value?
 * What can we conclude?
-* applet from [@iscam]: [http://www.rossmanchance.com/applets/2021/sampling/OneSample.html]
+* applet from [@iscam]: <a href = http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model target = "_blank">sampling from two populations</a>
 * What are the model assumptions? (basically all the assumptions are given in the original linear model: independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2))$
 
  
