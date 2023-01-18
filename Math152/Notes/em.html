@@ -6,17 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 10 The EM Algorithm | Statistical Theory</title>
 <meta name="author" content="Jo Hardin">
-<meta name="description" content="Class notes for Math 152 at Pomona College: Statistical Theory. The notes are based extensively on Probability &amp; Statistics by DeGroot and Schervish.">
-<meta name="generator" content="bookdown 0.26 with bs4_book()">
+<meta name="description" content="Remember how MLEs were motivated … Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses...">
+<meta name="generator" content="bookdown 0.31 with bs4_book()">
 <meta property="og:title" content="Chapter 10 The EM Algorithm | Statistical Theory">
 <meta property="og:type" content="book">
-<meta property="og:description" content="Class notes for Math 152 at Pomona College: Statistical Theory. The notes are based extensively on Probability &amp; Statistics by DeGroot and Schervish.">
+<meta property="og:description" content="Remember how MLEs were motivated … Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 10 The EM Algorithm | Statistical Theory">
-<meta name="twitter:description" content="Class notes for Math 152 at Pomona College: Statistical Theory. The notes are based extensively on Probability &amp; Statistics by DeGroot and Schervish.">
+<meta name="twitter:description" content="Remember how MLEs were motivated … Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script type="text/x-mathjax-config">
     const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
     for (let popover of popovers){
@@ -34,7 +34,8 @@
       	})
       }
     }
-    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    </script><link rel="shortcut icon" href="figs/favicon.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
     
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   </style>
@@ -105,14 +106,311 @@
 <h1>
 <span class="header-section-number">10</span> The EM Algorithm<a class="anchor" aria-label="anchor" href="#em"><i class="fas fa-link"></i></a>
 </h1>
+<p>Remember how MLEs were motivated … Maximum likelihood estimation is a method for choosing estimators of parameters that avoids using prior distributions or loss functions. MLE chooses <span class="math inline">\(\hat{\theta}\)</span> as the estimate of <span class="math inline">\(\theta\)</span> that <strong>maximizes</strong> the likelihood function (easily the most widely used estimation method in statistics). But what happens when the maximization process cannot be performed in closed form?</p>
+<p><em>THE</em> seminal EM Algorithm paper is: Dempster, Laird, Rubin (1977) “Maximum likelihood from incomplete data via the EM Algorithm.” <em>JRSS B 39</em>: 1-38.</p>
+<div id="em-motivation" class="section level2" number="10.1">
+<h2>
+<span class="header-section-number">10.1</span> EM Motivation<a class="anchor" aria-label="anchor" href="#em-motivation"><i class="fas fa-link"></i></a>
+</h2>
+<p>Recall that the goal is to maximize the likelihood (or log likelihood) of the observed data:
+<span class="math display">\[\log (P_Y(y; \theta)).\]</span></p>
+<p>Sometimes, when the log likelihood is difficult to maximize, a missing (or latent) variable can help with the computations. Consider <span class="math inline">\(Z\)</span> to be the missing / latent variable. By using the law of total probability (and wlog assume <span class="math inline">\(Z\)</span> is discrete):
+<span class="math display">\[\log (P_Y(y; \theta)) = \log \bigg( \sum_z P_{Y,Z}(y, z; \theta)\bigg).\]</span>
+The next few steps require some of the techniques and tools covered in Probability Theory.
+<span class="math display" id="eq:emmax">\[\begin{eqnarray}
+\log (P_Y(y; \theta)) &amp;=&amp; \log \bigg( \sum_z P_{Y,Z}(y, z; \theta)\bigg) \nonumber \\
+&amp;=&amp;  \log \bigg( \sum_z  q_{Z,\theta^i}(z) \frac{P_{Y,Z}(y, z; \theta)}{q_{Z,\theta^i}(z)}\bigg) \nonumber \\
+&amp;=&amp;  \log \bigg(E_{q_{Z,\theta^i}} \bigg[ \frac{P_{Y,Z}(y, z; \theta)}{q_{Z,\theta^i}(z)} \bigg] \bigg) \nonumber \\
+&amp;\geq&amp; E_{q_{Z,\theta^i}}   \bigg[  \log \bigg(\frac{P_{Y,Z}(y, z; \theta)}{q_{Z,\theta^i}(z)}  \bigg) \bigg]  \mbox{ by Jensen's Inequality} \tag{10.1}
+\end{eqnarray}\]</span>
+Equation (<a href="em.html#eq:emmax">(10.1)</a>) creates a lower bound on the quantity we want to maximize. For ease of computation, the focus will be on the right side of equation (<a href="em.html#eq:emmax">(10.1)</a>) during the *maximization step}.</p>
+<p><span class="math display" id="eq:emlog">\[\begin{eqnarray}
+E_{q_{Z,\theta^i}}   \bigg[  \log \bigg(\frac{P_{Y,Z}(y, z; \theta)}{q_{Z,\theta^i}(z)}  \bigg) \bigg]  &amp;=&amp;  E_{q_{Z,\theta^i}} [\log( P_{Y,Z}(y,z; \theta))] -  E_{q_{Z,\theta^i}} [\log(q_{Z,\theta^i}(z))] \\
+&amp;=&amp; Q(\theta | \theta^i) -  E_{q_{Z,\theta^i}} [\log(q_{Z,\theta^i}(z))]  \tag{10.2}
+\end{eqnarray}\]</span></p>
+<p>Because the goal is to maximize the likelihood with respect to <span class="math inline">\(\theta\)</span>, only the first term on the right side of equation (<a href="em.html#eq:emlog">(10.2)</a>) is relevant. That is, if <span class="math inline">\(Z\)</span> is known (for a given value of <span class="math inline">\(\theta^i\)</span>), then the maximization of the likelihood simplifies to:</p>
+<p><strong>The M-Step</strong>
+<span class="math display">\[\begin{eqnarray*}
+\hat{\theta} &amp;\leftarrow&amp; \mbox{argmax}_{\theta} E_{q_{Z,\theta^i}} [\log( P_{Y,Z}(y,z; \theta))]\\
+\hat{\theta} &amp;\leftarrow&amp; \mbox{argmax}_\theta \ \ Q(\theta | \theta^{i})
+\end{eqnarray*}\]</span>
+But unfortunately, we don’t typically know the value of <span class="math inline">\(Z\)</span>, or really, <span class="math inline">\(q_{Z,\theta^i}(z)\)</span>.</p>
+<p><strong>The E-Step</strong>
+In the <em>expectation step</em> we aim to find <span class="math inline">\(q_{Z,\theta^i}(z)\)</span> that will optimize the likelihood. Recall the quantity above that we hope to maximize:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+E_{q_{Z,\theta^i}}   \bigg[  \log \bigg(\frac{P_{Y,Z}(y, z; \theta)}{q_{Z,\theta^i}(z)}  \bigg) \bigg]  &amp;=&amp;
+E_{q_{Z,\theta^i}}   \bigg[  \log \bigg(\frac{P_Y(y; \theta) P_{Z|Y}(z|y; \theta)}{q_{Z,\theta^i}(z)}  \bigg) \bigg]\\
+&amp;=&amp; \log ( P_Y(y; \theta) ) - E_{q_{Z,\theta^i}}   \bigg[  \log \bigg(\frac{q_{Z,\theta^i}(z)}{P_{Z|Y}(z|y; \theta)}  \bigg) \bigg]
+\end{eqnarray*}\]</span>
+It turns out that <span class="math inline">\(\frac{q_{Z,\theta^i}(z)}{P_{Z|Y}(z|y; \theta)}\)</span> is always greater than 1 (it is called the Kullback-Leibler divergence), so <span class="math inline">\(\log(\frac{q_{Z,\theta^i}(z)}{P_{Z|Y}(z|y; \theta)})\)</span> is always greater than zero. In order to make it as small as possible (i.e., to maximize the righthand size), we want the ratio to be as close to one as possible.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+q_{Z,\theta^i}(z) \approx P_{Z|Y}(z|y; \theta)
+\end{eqnarray*}\]</span>
+That is, the value of <span class="math inline">\(q_{Z,\theta^i}(z)\)</span> that maximizes the likelihood, is <span class="math inline">\(P_{Z|Y}(z|y; \theta)\)</span>. So, what did we do? We wanted to maximize the likelihood of the given data. Because it was difficult to do directly, we found an algorithm that would iterate between maximizing the likelihood with respect to <span class="math inline">\(\theta\)</span> when <span class="math inline">\(q_{Z,\theta^i}(z)\)</span> is known, and then solving for <span class="math inline">\(q_{Z,\theta^i}(z)\)</span> when <span class="math inline">\(\theta\)</span> is known.</p>
+<div id="does-it-work" class="section level3" number="10.1.1">
+<h3>
+<span class="header-section-number">10.1.1</span> Does it work?<a class="anchor" aria-label="anchor" href="#does-it-work"><i class="fas fa-link"></i></a>
+</h3>
+<p>The EM Algorithm (especially in implementation below!) seems like an intuitive way to go back and forth between parameter estimation and estimation of missing information. However, how can we show that it actually converges to a maximum of some kind?</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\log(P_Y(y; \theta)) &amp;=&amp; \log(P_{Y,Z}(y,z ; \theta)) - \log(P_{Z|Y}(z | y; \theta)) \ \ \mbox{cond prob, rearranged}\\
+E_{q_{Z,\theta^i}} [\log(P_Y(y; \theta)) ]&amp;=&amp; E_{q_{Z,\theta^i}} [\log(P_{Y,Z}(y,z ; \theta)) ] - E_{q_{Z,\theta^i}} [\log(P_{Z|Y}(z | y; \theta))] \\
+\log(P_Y(y; \theta)) &amp;=&amp; Q(\theta | \theta^i) + H(\theta | \theta^i)\\
+\end{eqnarray*}\]</span>
+which holds for any value of <span class="math inline">\(\theta\)</span>, including <span class="math inline">\(\theta^i\)</span>.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\log(P_Y(y; \theta^i)) &amp;=&amp; Q(\theta^i | \theta^i) + H(\theta^i | \theta^i)\\
+\end{eqnarray*}\]</span>
+Subtracting the two previous equations gives:
+<span class="math display">\[\begin{eqnarray*}
+\log(P_Y(y; \theta))  - \log(P_Y(y; \theta^i)) &amp;=&amp; Q(\theta | \theta^i) - Q(\theta^i | \theta^i) + H(\theta | \theta^i) - H(\theta^i | \theta^i)\\
+\end{eqnarray*}\]</span>
+And Gibbs’ inequality tells us that <span class="math inline">\(H(\theta | \theta^i) \geq H(\theta^i | \theta^i)\)</span>. So we can conclude that:
+<span class="math display">\[\begin{eqnarray*}
+\log(P_Y(y; \theta))  - \log(P_Y(y; \theta^i)) &amp;\geq&amp; Q(\theta | \theta^i) - Q(\theta^i | \theta^i)
+\end{eqnarray*}\]</span>
+That is, if we choose a value of <span class="math inline">\(\theta\)</span> which makes <span class="math inline">\(Q(\theta | \theta^i)\)</span> bigger than <span class="math inline">\(Q(\theta^i | \theta^i)\)</span>, then <span class="math inline">\(\log(P_Y(y; \theta))\)</span> cannot go lower than $(P_Y(y; ^i)) $.</p>
+</div>
+</div>
+<div id="em-algorithm" class="section level2" number="10.2">
+<h2>
+<span class="header-section-number">10.2</span> EM Algorithm<a class="anchor" aria-label="anchor" href="#em-algorithm"><i class="fas fa-link"></i></a>
+</h2>
+<p><strong>EM Algorithm</strong>
+1. Take initial guesses for the parameters, <span class="math inline">\(i=0\)</span>.
+2. For <span class="math inline">\(i = 1, 2, 3, \ldots\)</span> <em>Expectation Step:</em><br>
+a. compute the probabilities of each possible value of <span class="math inline">\(Z\)</span>, given <span class="math inline">\(\theta\)</span>. Use them to estimate the complete data likelihood as a function of <span class="math inline">\(\theta\)</span>.
+<span class="math display">\[ q_{Z,\theta^{i-1}} \leftarrow p_{Z|Y}(z|y; \theta^{i-1})\]</span>
+b. find:
+<span class="math display">\[ Q(\theta | \theta^{i-1} ) = E_{q_{Z, \theta^{i-1}}} [P_{Y,Z}(y,z; \theta)]\]</span>
+3. <em>Maximization Step:</em>
+a. compute the values of the parameters by maximizing the likelihood with the distribution of <span class="math inline">\(z\)</span> known (that is, under the probability distribution of <span class="math inline">\(Z\)</span> given above).
+<span class="math display">\[\theta^{i} \leftarrow \mbox{argmax}_\theta E_{q_{Z,\theta^{i-1}}} [P_{Y,Z}(y,z; \theta)]\]</span>
+b. alternatively:
+<span class="math display">\[\theta^i \leftarrow \mbox{argmax}_\theta \ Q(\theta | \theta^{i-1})\]</span>
+4. If <span class="math inline">\(\theta^{i} \approx \theta^{i-1}\)</span>, return <span class="math inline">\(\theta^{i}\)</span>.</p>
+</div>
+<div id="examples" class="section level2" number="10.3">
+<h2>
+<span class="header-section-number">10.3</span> Examples<a class="anchor" aria-label="anchor" href="#examples"><i class="fas fa-link"></i></a>
+</h2>
+<div id="multinomial-example" class="section level3" number="10.3.1">
+<h3>
+<span class="header-section-number">10.3.1</span> Multinomial Example<a class="anchor" aria-label="anchor" href="#multinomial-example"><i class="fas fa-link"></i></a>
+</h3>
+<p>Consider the following data to be distributed according to a multinomial distribution:<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;problem taken from McLachlan and Krishnan, (1997) &lt;strong&gt;The EM Algorithm and Extensions&lt;/strong&gt;, page 9. Originally given in Dempster, Laird, and Rubin (1977).&lt;/p&gt;"><sup>23</sup></a></p>
+<p><span class="math display">\[\begin{eqnarray*}
+\underline{y} &amp;=&amp; (y_1, y_2, y_3, y_4)\\
+\underline{y} &amp;\sim&amp; \mbox{multinomial}\bigg(197, \bigg(\frac{1}{2} + \frac{1}{4}\theta, \frac{1}{4}(1-\theta), \frac{1}{4}(1-\theta), \frac{1}{4}\theta\bigg)\bigg)\\
+&amp;&amp; \mbox{with } 0 \leq \theta \leq 1\\
+&amp;&amp;\\
+\mbox{ observed data:}&amp;&amp;\\
+\underline{y} &amp;=&amp; (125, 18, 20, 34)
+\end{eqnarray*}\]</span></p>
+<p>The probability function <span class="math inline">\(f(\underline{y}; \theta)\)</span> for the observed data is given by:
+<span class="math display">\[\begin{eqnarray*}
+f(\underline{y}; \theta) &amp;=&amp; \frac{n!}{y_1! y_2! y_3! y_4!} \bigg(\frac{1}{2} + \frac{1}{4}\theta\bigg)^{y_1} \bigg(\frac{1}{4}(1-\theta)\bigg)^{y_2} \bigg(\frac{1}{4}(1-\theta)\bigg)^{y_3} \bigg(\frac{1}{4}\theta\bigg)^{y_4}\\
+\frac{\partial log L(\theta)}{\partial \theta} &amp;=&amp; \frac{y_1}{2 + \theta} - \frac{y_2 + y_3}{(1-\theta)} + \frac{y_4}{\theta}
+\end{eqnarray*}\]</span></p>
+<p>It turns out that the righthand side of the derivative of the log likelihood can be written as a rational function whose numerator is quadratic in <span class="math inline">\(\theta\)</span>. One of the roots is negative and so the binomial formula give the other root (which is the MLE). However, in the example here, we will use the EM algorithm to solve the problem.</p>
+<p>Suppose, that instead of 4 multinomial cells, we have five multinomial cells where the first one is split into two subcells have probabilities <span class="math inline">\(\frac{1}{2}\)</span> and <span class="math inline">\(\frac{1}{4}\theta\)</span> respectively. Let</p>
+<p><span class="math display">\[y_1 = y_{11} + z.\]</span></p>
+<p>If we knew the above split, it is a straightforward rearrangement of the original multinomial likelihood into a binomial (with sample size = <span class="math inline">\(z + y_2 + y_3 + y_4\)</span> and parameter <span class="math inline">\(\theta\)</span>) to see that the MLE of <span class="math inline">\(\theta\)</span> is:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\hat{\theta} = \frac{z + y_4}{z + y_2 + y_3 + y_4}
+\end{eqnarray*}\]</span></p>
+<p>But we don’t know know <span class="math inline">\(z\)</span>, so we’ll have to <em>estimate</em> <span class="math inline">\(z\)</span>, then find the MLE (i.e., <em>maximize</em>), then iterate.</p>
+<div id="applying-the-em-algorithm" class="section level4" number="10.3.1.1">
+<h4>
+<span class="header-section-number">10.3.1.1</span> Applying the EM Algorithm<a class="anchor" aria-label="anchor" href="#applying-the-em-algorithm"><i class="fas fa-link"></i></a>
+</h4>
+<p>The data (including the missing information) are now seen to come from a multinomial distribution with five sells. That is, the complete log likelihood is:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\underline{x} &amp;=&amp; (y_{11}, z, y_2, y_3, y_4)\\
+f(\underline{x}; \theta) &amp;\propto&amp; \theta^{z + y_4} (1-\theta)^{y_2 + y_3}\\
+\end{eqnarray*}\]</span></p>
+<p><em>E-step</em>
+Given the observed data <span class="math inline">\(y_1\)</span> and an initial value of <span class="math inline">\(\theta = \theta^{0}\)</span>, <span class="math inline">\(Z \sim\)</span> binomial(<span class="math inline">\(y_1\)</span>, prob = <span class="math inline">\(\frac{\theta^{0}/4}{1/2 + \theta^0 /4} = \frac{\theta^0}{2+\theta^0}\)</span>).</p>
+<p><span class="math display">\[\begin{eqnarray*}
+Q(\theta | \theta^0) &amp;=&amp; E_{q_{Z,\theta^0}} [\log( P_{Y,Z}(y,z; \theta))]\\
+&amp;\propto&amp; E_{q_{Z,\theta^0}}  [(Z + y_4) \log \theta + (y_2 + y_3) \log (1-\theta) ] \ \ \mbox{ only $Z$ is random}\\
+&amp;\propto&amp; (E_{q_{Z,\theta^0}}[Z] + y_4) \log \theta + (y_2 + y_3) \log (1-\theta)  \\
+&amp;=&amp; \bigg(\frac{y_1 \theta^0}{2 + \theta^0}+ y_4 \bigg) \log \theta + (y_2 + y_3) \log (1-\theta)  \\
+&amp;=&amp; \bigg(z^1 + y_4 \bigg) \log \theta + (y_2 + y_3) \log (1-\theta)
+\end{eqnarray*}\]</span></p>
+<p><em>M-step</em>
+<span class="math display">\[\begin{eqnarray*}
+\frac{\partial Q(\theta | \theta^0) }{\partial \theta} &amp;=&amp; \bigg(z^1 + y_4 \bigg) (1/\theta) - (y_2 + y_3) (1 / (1-\theta))\\
+\theta^1 &amp;=&amp; \frac{z^1 + y_4}{z_1 + y_2 + y_3 + y_4}
+\end{eqnarray*}\]</span></p>
+<p>n.b. Although we won’t discuss it in detail here, initializing the EM algorithm is an important aspect of the algorithm. The algorithm is known to converge, but not always to a global max. Initializing the algorithm at a value close to the MLE gives it a better chance of converging to the actual MLE value.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+E[Y_1]  &amp;=&amp; n\cdot \bigg(\frac{1}{2} + \frac{1}{4}\theta\bigg)\\
+E[Y_2]  &amp;=&amp; n\cdot \bigg(\frac{1}{4}(1 - \theta)\bigg)\\
+E[Y_3]  &amp;=&amp; n\cdot \bigg(\frac{1}{4}(1 - \theta)\bigg)\\
+E[Y_4]  &amp;=&amp; n\cdot \bigg( \frac{1}{4}\theta\bigg)\\
+E\bigg[ \frac{Y_1 - Y_2 - Y_3 + Y_4}{4n} \bigg] &amp;=&amp; \theta
+\end{eqnarray*}\]</span>
+Therefore, the algorithm is initialized with <span class="math inline">\(\hat{\theta} = (y_1 - y_2 - y_3 + y_4)/4n = 0.057\)</span>.</p>
+<p>** EM Algorithm for Multinomial**</p>
+<ol style="list-style-type: decimal">
+<li>Let <span class="math inline">\(\theta^0 = (y_1 - y_2 - y_3 + y_4)/4n\)</span>.</li>
+<li>
+<em>Expectation Step:</em> estimate the missing data:
+<span class="math display">\[ z^i = \frac{y_1 \theta^{i-1}}{2 + \theta^{i-1}}\]</span>
+</li>
+<li>
+<em>Maximization Step:</em> maximize Q to estimate the parameter
+<span class="math display">\[\begin{eqnarray*}
+\theta^i &amp;=&amp; \frac{z^i + y_4}{z_i + y_2 + y_3 + y_4}
+\end{eqnarray*}\]</span>
+</li>
+<li>Iterate Steps 2. and 3. until convergence.</li>
+</ol>
+</div>
+</div>
+<div id="censored-exponential" class="section level3" number="10.3.2">
+<h3>
+<span class="header-section-number">10.3.2</span> Censored Exponential<a class="anchor" aria-label="anchor" href="#censored-exponential"><i class="fas fa-link"></i></a>
+</h3>
+<p>Consider an experiment where it is assumed that the lifetime of light bulbs follows an exponential distribution with mean <span class="math inline">\(\theta\)</span>. To estimate <span class="math inline">\(\theta\)</span>, <span class="math inline">\(n\)</span> light
+bulbs were tested but only <span class="math inline">\(r\)</span> of them failed.</p>
+<p><span class="math display">\[ f(w; \mu) = \frac{1}{\mu} e^{-w / \mu}\]</span></p>
+<p>Recall that the exponential has the memoryless property, so <span class="math inline">\(P(W &gt; w) = e^{-w / \mu}\)</span>.</p>
+<p>Generally, observed censored data is thought of as:
+<span class="math display">\[\begin{eqnarray*}
+y_j &amp;=&amp; (c_j, \delta_j)\\
+w_j &amp;=&amp; c_j \ \ \ \ \mbox{if }  \delta_j = 1\\
+w_j &amp; &gt; &amp; c_j \ \ \ \ \mbox{if } \delta_j = 0
+\end{eqnarray*}\]</span></p>
+<p>Using the information above, we can write out the loglikelihood for the observed data. Assume that the first <span class="math inline">\(r\)</span> observations are uncensored.
+<span class="math display">\[\begin{eqnarray*}
+\log L(\mu) &amp;=&amp; \log(\prod_{j=1}^n f(c_j; \mu))\\
+&amp;=&amp; \log(\prod_{j=1}^r \frac{1}{\mu} e^{-c_j / \mu}) \log(\prod_{j=r+1}^n e^{-c_j / \mu})\\
+&amp;=&amp; -r\log \mu - \sum_{j=1}^n \frac{c_j}{\mu}
+\end{eqnarray*}\]</span>
+It turns out that the MLE for <span class="math inline">\(\mu\)</span> is actually straightforward to find given the likelihood above, but this missing data case provides a nice implementation of the EM algorithm that is instructive for working through the steps of the algorithm.</p>
+<p><span class="math display">\[\mbox{MLE: }\hat{\mu} = \frac{\sum_{j=1}^n c_j}{r}\]</span></p>
+<p>Consider the complete data likelihood to contain the true failure times of all <span class="math inline">\(n\)</span> lightbulbs.<br><span class="math display">\[z = (w_{r+1}, \ldots, w_n)\]</span>
+represents the missing (censored) observations, which givens the complete log likelihood:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\log L(\mu) &amp;=&amp; -n\log \mu - \sum_{j=1}^n \frac{w_j}{\mu}
+\end{eqnarray*}\]</span></p>
+<p><em>E-Step:</em><br>
+Recall that the expectation step requires that we compute the probabilities of <span class="math inline">\(Z\)</span> and their expected values under the new probability model. The complete loglikelihood above is linear in the missing information, so the expected values are straightforward to compute.</p>
+<p>By the lack of memory property, the conditional distribution of <span class="math inline">\(W_j - c_j\)</span> given that <span class="math inline">\(W_j &gt; c_j\)</span> is exponential with mean <span class="math inline">\(\mu\)</span>;
+<span class="math display">\[f(w_j - c_j | w_j &gt; c_j) = \frac{1}{\mu} e^{-(w_j - c_j) / \mu}\]</span>
+leads to
+<span class="math display">\[\begin{eqnarray*}
+E_{q_{Z,\mu^{i-1}}} [W_j ] &amp;=&amp; E_{\mu^{i-1}} [ W_j | W_j &gt; c_j]\\
+&amp;=&amp; c_j + E_{\mu^{i-1}} [ W_j ]\\
+&amp;=&amp; c_j + \mu^{i-1}
+\end{eqnarray*}\]</span></p>
+<p>Putting together the expected value of the missing information with the joint likelihood, we get:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+Q(\mu | \mu^{i-1}) &amp;=&amp; -n \log \mu - \frac{1}{\mu} \Bigg\{ \sum_{j=1}^r c_j + \sum_{j=r+1}^n (c_j + \mu^{i-1}) \Bigg\}\\
+&amp;=&amp; -n \log \mu - \frac{1}{\mu} \Bigg\{ \sum_{j=1}^n c_j + (n-r)\mu^{i-1} \Bigg\}\\
+\end{eqnarray*}\]</span></p>
+<p><em>M-Step:</em><br>
+Either by directly differentiating, or by recognizing the form of the loglikelihood is an exponential with each unobservable value of <span class="math inline">\(w_j\)</span> replaced by its censored value plus the current value of the parameter:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+\mu^i &amp;=&amp; \Bigg\{  \sum_{j=1}^r c_j + \sum_{j=r+1}^n (c_j + \mu^{i-1}) \Bigg\} / n\\
+&amp;=&amp;\Bigg\{ \sum_{j=1}^n c_j + (n-r)\mu^{i-1} \Bigg\} / n
+\end{eqnarray*}\]</span></p>
+</div>
+<div id="mixture-models" class="section level3" number="10.3.3">
+<h3>
+<span class="header-section-number">10.3.3</span> Mixture Models<a class="anchor" aria-label="anchor" href="#mixture-models"><i class="fas fa-link"></i></a>
+</h3>
+<p>The EM algorithm procedure is used here in the context of estimating the parameters of a two-component mixture model. Consider the Old Faithful geyser with the following histogram of waiting times between each eruption:</p>
+<div class="inline-figure"><img src="10-em_files/figure-html/unnamed-chunk-4-1.png" width="672"></div>
+<p><span class="math display">\[\begin{eqnarray*}
+Y_1 &amp;\sim&amp; N(\mu_1, \sigma_1^2)\\
+Y_2 &amp;\sim&amp; N(\mu_2, \sigma_2^2)\\
+Y &amp;=&amp; (1-\Delta) Y_1 + \Delta Y_2\\
+P(\Delta=1) &amp;=&amp; \pi\\
+\end{eqnarray*}\]</span>
+In the two component case, we can see that the representation above indicates that first we generate a <span class="math inline">\(\Delta \in \{0,1\}\)</span>, and then, depending on the result, we generate either <span class="math inline">\(Y_1\)</span> or <span class="math inline">\(Y_2\)</span>. The likelihood associated with the above setting is:</p>
+<p><span class="math display">\[\begin{eqnarray*}
+g_Y(y_j) = (1-\pi) \phi_{\theta_1}(y_j) + \pi\phi_{\theta_2}(y_j)
+\end{eqnarray*}\]</span>
+where <span class="math inline">\(\phi_\theta\)</span> represents the normal distribution with a vector <span class="math inline">\(\theta=(\mu, \sigma)\)</span> of parameters. Typically, to find <span class="math inline">\(\theta\)</span>, we would take the derivative of the log-likelihood to find the values which maximize. Here, however, the likelihood is too complicated to solve for <span class="math inline">\(\theta\)</span> in closed form.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+l(\theta; **y}) = \sum_{j=1}^N \log [(1-\pi) \phi_{\theta_1}(y_j) + \pi\phi_{\theta_2}(y_j)].
+\end{eqnarray*}\]</span></p>
+<p>If we know which point comes from which distribution, however, the maximization is straightforward in that we can use the points in group one to estimate the parameters from the first distribution, and the points in group two to estimate the parameters in the second distribution. With the goal of creating easier maximum likelihood estimation, create a new latent variable to denote group membership. [n.b., sometimes the group membership is tangible in the sense that the variables came from different populations, but sometimes the “missing” information is just a conceptual device that allows us to formulate the problem within the EM framework (e.g., see the Geyser data).]</p>
+<p>Let <span class="math inline">\(z_{j} = 1\)</span> if it belongs to group 2. The use of <span class="math inline">\(z_j\)</span> leads to an MLE for <span class="math inline">\(\pi\)</span>:
+<span class="math display">\[\hat{\pi} = \frac{\sum_{j=1}^n z_j}{n}.\]</span></p>
+<p>The complete loglikelihood now becomes:
+<span class="math display">\[\begin{eqnarray*}
+l(\theta; **y, z}) &amp;=&amp; \log\Bigg(\prod_{j=1}^n \bigg[(1-\pi) \phi_{\theta_1}(y_j) \bigg]^{1-z_j} \bigg[\pi\phi_{\theta_2}(y_j)\bigg]^{z_j} \Bigg)\\
+&amp;=&amp; \sum_{j=1}^n \bigg[(1 - z_j)\log((1-\pi) \phi_{\theta_1}(y_j)) + z_j \log(\pi\phi_{\theta_2}(y_j)) \bigg]\\
+&amp;=&amp;  \sum_{j=1}^n \bigg[(1 - z_j)\bigg[\log(1-\pi)  + \log(\phi_{\theta_1}(y_j)) \bigg] + z_j \bigg[\log(\pi) + \log(\phi_{\theta_2}(y_j)) \bigg] \bigg]\\
+&amp;=&amp;  \sum_{j=1}^n \bigg[(1 - z_j)\log(1-\pi)) + z_j \log(\pi)) \bigg]  +  \sum_{j=1}^n \bigg[(1 - z_j)\log(\phi_{\theta_1}(y_j))+ z_j  \log(\phi_{\theta_2}(y_j)) \bigg]
+\end{eqnarray*}\]</span></p>
+<p>Again, notice that the loglikelihood is linear in the unobservable variables, so the expected value of the loglikelihood boils down to finding the expected value of the <span class="math inline">\(Z_j\)</span> given the observed data and the parameters at the previous iteration.</p>
+<p><span class="math display">\[\begin{eqnarray*}
+E_{q_Z, \theta^{i-1}} [Z_j] &amp;=&amp; P(Z_j = 1 | y_j; \theta^{i-1})\\
+&amp;=&amp; P(Z_j = 1, y_j; \theta^{i-1}) / P(y_j; \theta^{i-1}) \\
+&amp;=&amp; \frac{\hat{\pi} \phi_{\hat{\theta}_2} (y_j)}{(1-\hat{\pi}) \phi_{\hat{\theta}_1} (y_j) + \hat{\pi} \phi_{\hat{\theta}_2} (y_j)}
+\end{eqnarray*}\]</span></p>
+<p>The process of assigning points and estimating parameters can be thought of as two steps:</p>
+<ol style="list-style-type: decimal">
+<li>
+<em>Expectation:</em> an assignment (soft here, because the points are weighted) of each observation to a group.</li>
+<li>
+<em>Maximization:</em> update the parameter estimates.</li>
+</ol>
+<p><strong>EM Algorithm for two-component Gaussian mixture</strong><a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;From &lt;em&gt;The Elements of Statistical Learning&lt;/em&gt; (2001), by Hastie, Tibshirani, and Friedman, pg 238.&lt;/p&gt;"><sup>24</sup></a></p>
+<ol style="list-style-type: decimal">
+<li>Take initial guesses for the parameters <span class="math inline">\(\hat{\mu}_1, \hat{\sigma}_1^2, \hat{\mu}_2, \hat{\sigma}_2^2, \hat{\pi}\)</span>.</li>
+<li>
+<em>Expectation Step:</em> compute the responsibilities:
+<span class="math display">\[ \hat{z}_j = \frac{\hat{\pi} \phi_{\hat{\theta}_2} (y_j)}{(1-\hat{\pi}) \phi_{\hat{\theta}_1} (y_j) + \hat{\pi} \phi_{\hat{\theta}_2} (y_j)}, j=1, 2, \ldots, n.\]</span>
+</li>
+<li>
+<em>Maximization Step:</em> compute the weighted means and variances:
+<span class="math display">\[\begin{eqnarray*}
+\hat{\mu}_1 = \frac{\sum_{j=1}^n (1-\hat{z}_j)y_j}{\sum_{j=1}^n (1-\hat{z})} &amp;&amp; \hat{\sigma}_1^2 = \frac{\sum_{j=1}^n (1-\hat{z}_j)(y_j - \hat{\mu}_1)^2}{\sum_{j=1}^n (1-\hat{z}_j)}\\
+\hat{\mu}_2 = \frac{\sum_{j=1}^n \hat{z}_jy_j}{\sum_{j=1}^n \hat{z}_j} &amp;&amp; \hat{\sigma}_2^2 = \frac{\sum_{j=1}^n \hat{z}_j(y_j - \hat{\mu}_2)^2}{\sum_{j=1}^n \hat{z}_j}
+\end{eqnarray*}\]</span>
+and the mixing probability <span class="math inline">\(\hat{\pi} = \sum_{j=1}^n z_i / n.\)</span>
+</li>
+<li>Iterate Steps 2. and 3. until convergence.</li>
+</ol>
+<p>The algorithm shows that for a particular allocation of the points, we can maximize the given likelihood to estimate the parameter values (done in the Maximization Step). However, it is not obvious from the algorithm that the first allocation step leads to a maximization (local or global) of the likelihood. The proof of the EM algorithm converging to a local maximum likelihood (it does not necessarily converge to a global max) uses information on the marginal prior and posterior likelihoods of the parameter values and Jensen’s inequality to show that the likelihood does not decrease through the iterative steps.</p>
+<p>Note that in the previous <span class="math inline">\(k\)</span>-means algorithm we iterated between two steps of assigning points to clusters and estimating the cluster centers (we thought of the space as scaled so that the Euclidean distance was appropriate in all dimensions). Two differences in the algorithms we covered are:</p>
+<ol style="list-style-type: decimal">
+<li>
+<span class="math inline">\(k\)</span>-means uses hard thresholding and EM uses soft thresholding</li>
+<li>
+<span class="math inline">\(k\)</span>-means uses a fixed standard deviation of 1, EM allows the data/algorithm to find the standard deviation</li>
+</ol>
+<p>Indeed, although the EM-algorithm above is slightly different than the previous <span class="math inline">\(k\)</span>-means algorithm, the two methods typically converge to the same result and are both considered to be different implementations of a <span class="math inline">\(k\)</span>-means algorithm.</p>
 
 </div>
+</div>
+</div>
+
   <div class="chapter-nav">
 <div class="prev"><a href="gibbs.html"><span class="header-section-number">9</span> Gibbs Sampler</a></div>
 <div class="next"><a href="references.html">References</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
-      <ul class="nav navbar-nav"><li><a class="nav-link" href="#em"><span class="header-section-number">10</span> The EM Algorithm</a></li></ul>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#em"><span class="header-section-number">10</span> The EM Algorithm</a></li>
+<li>
+<a class="nav-link" href="#em-motivation"><span class="header-section-number">10.1</span> EM Motivation</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#does-it-work"><span class="header-section-number">10.1.1</span> Does it work?</a></li></ul>
+</li>
+<li><a class="nav-link" href="#em-algorithm"><span class="header-section-number">10.2</span> EM Algorithm</a></li>
+<li>
+<a class="nav-link" href="#examples"><span class="header-section-number">10.3</span> Examples</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#multinomial-example"><span class="header-section-number">10.3.1</span> Multinomial Example</a></li>
+<li><a class="nav-link" href="#censored-exponential"><span class="header-section-number">10.3.2</span> Censored Exponential</a></li>
+<li><a class="nav-link" href="#mixture-models"><span class="header-section-number">10.3.3</span> Mixture Models</a></li>
+</ul>
+</li>
+</ul>
 
       <div class="book-extra">
         <ul class="list-unstyled">
@@ -129,7 +427,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2022-12-16.</p>
+    <p>"<strong>Statistical Theory</strong>" was written by Jo Hardin. It was last built on 2023-01-18.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -142,7 +440,7 @@
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');
