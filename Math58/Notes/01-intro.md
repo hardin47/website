@@ -89,7 +89,7 @@ Math 58(B) meets twice a week for 75 min for lecture and once a week for an hour
 All of the work will be done in R using RStudio as a front end.  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  The class is a mix of many real world applications and case studies, some higher level math, programming, and communication skills.  The final project requires your own analysis of a dataset of your choosing.
 
 
-* You may use R on the Pomona server:  https://rstudio.campus.pomona.edu/  (All Pomona students will be able to log in immediately.  Non-Pomona students need to go to ITS at Pomona to get Pomona login information.)
+* You may use R on the Pomona server:  https://rstudio.pomona.edu/  (All Pomona students will be able to log in immediately.  Non-Pomona students need to go to ITS at Pomona to get Pomona login information.)
 * If you want to use R on your own machine, you may.  Please make sure all components are updated:
 R is freely available at http://www.r-project.org/ and is already installed on college computers. Additionally, installing R Studio is required http://rstudio.org/.
 * http://swirlstats.com/ is one way to walk through learning the basics of R.

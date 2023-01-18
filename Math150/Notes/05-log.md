@@ -337,7 +337,7 @@ where $\nu$ is the number of extra parameters we estimate using the unconstraine
 Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25$.
 \begin{align}
 H_0:& p=0.25\\
-H_1:& p \ne 0.25\\
+H_a:& p \ne 0.25\\
 \hat{p} &= \frac{49}{147}\\
 -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &= -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
 &= -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
@@ -353,7 +353,7 @@ But really, usually likelihood ratio tests are more interesting.  In fact, usual
 
 \begin{align}
 H_0: & \beta_1 =0\\
-H_1: & \beta_1 \ne 0\\
+H_a: & \beta_1 \ne 0\\
 p_0 &= \frac{e^{\hat{b}_0}}{1 + e^{\hat{b}_0}}
 \end{align}
 where $\hat{b}_0$ is the MLE from the logistic regression model which does not contain any explanatory variable, $x$.

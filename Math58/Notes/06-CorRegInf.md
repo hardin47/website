@@ -61,7 +61,7 @@ See the Cat Jumping^[@iscam, Inv 5.6 & 5.13] example below in section \@ref(ex:c
 **HT:**  
 \begin{eqnarray*}
 H_0:&& \rho = 0\\
-H_a:&& \rho \ne 0\\
+H_A:&& \rho \ne 0\\
 t^* &=& \frac{r}{\sqrt{(1-r^2)/(n-2)}} = \frac{-0.496}{\sqrt{(1-0.496^2) / (18-2)}}= -2.2849\\
 p-value &=& 2 \cdot P(t_{18-2} \leq -2.2849) = 2\cdot(pt(-2.2849,16)) = 0.036 \mbox{  (borderline significant)}
 \end{eqnarray*}
