@@ -233,7 +233,7 @@ The three most important types of variables in most studies, include the variabl
 
 ### Example: Hand Writing & SAT Scores^[@iscam, Inv 3.3]
 
-> An article about handwriting appeared in the October 11, 2006 issue of the Washington Post. The article mentioned that among students who took the essay portion of the SAT exam in 2005-06, those who wrote in cursive style scored significantly higher on the essay, on average, than students who used printed block letters. Researchers wanted to know whether simply writing in cursive would be a way to increase scores.
+> An article about handwriting appeared in the <a href = "https://www.washingtonpost.com/archive/politics/2006/10/11/the-handwriting-is-on-the-wall-span-classbankheadresearchers-see-a-downside-as-keyboards-replace-pens-in-schools-span/dc4cf5e7-adf6-45c6-9987-5b6189438688/" target = "_blank">October 11, 2006 issue of the Washington Post</a>. The article mentioned that among students who took the essay portion of the SAT exam in 2005-06, those who wrote in cursive style scored higher on the essay, on average, than students who used printed block letters. Researchers wanted to know whether simply writing in cursive would be a way to increase scores.
 
 
 * Identify the observational units, the variables, the types of variables, the parameter of interest, and the statistic which was measured.  What type of study was it?
