@@ -474,13 +474,23 @@ estimate +/- critical value x standard error of the estimate
 
 Age data:
 \begin{align}
-90\% \mbox{ CI for } \mu_1: & \overline{y}_1 \pm t^*_{3176-1} \times \hat{\sigma}_{\overline{y}_1}\\
-& 58.05 \pm 1.645 \times 15.22/\sqrt{3176}\\
+90\% \mbox{ CI for } \mu_1: & \overline{y}_1 \pm t^*_{26498 - 1} \times \hat{\sigma}_{\overline{y}_1}\\
+& 57.62 \pm 1.645 \times 14.98/\sqrt{26498}\\
 & (57.61, 58.49)\\
-95\% \mbox{ CI for }\mu_1 - \mu_2: & \overline{y}_1 - \overline{y}_2 \pm t^*_{5499} s_p \sqrt{1/n_1 + 1/n_2}\\
-& 0.48 \pm 1.96 \times 0.42\\
-& (-0.34, 1.30)
+98\% \mbox{ CI for }\mu_1 - \mu_2: & \overline{y}_1 - \overline{y}_2 \pm t^*_{5499} s_p \sqrt{1/n_1 + 1/n_2}\\
+& 57.62 - 57.84 \pm 2.33 \times 15.04\cdot \sqrt{\frac{1}{26498} + \frac{1}{5501}}\\
+& (-0.739, 0.299)
 \end{align}
+
+
+```r
+qt(.95, df = (26498-1))
+#> [1] 1.64
+qt(.99, df = (26498+5501-2))
+#> [1] 2.33
+```
+
+We are 98% confident that the true difference in ages for all people (in the population) who get elective surgery in July/August versus in other months is between -0.739 years and  0.299 years.  Note that our CI overlaps zero and so the true difference in parameters might be zero.  Therefore, we have no evidence to claim that the July/August group is significantly younger (or significantly older!) than the rest of the patients.
 
 Note the CI on pgs 54/55, there is a typo.  The correct interval for $\mu_1 - \mu_2$ for the games data should be:
     
@@ -499,7 +509,7 @@ Recall what you've learned about how good random samples lead to inference about
 
 <div class="figure" style="text-align: center">
 <img src="figs/randsampValloc.jpg" alt="Figure taken from [@iscam]" width="95%" />
-<p class="caption">(\#fig:unnamed-chunk-6)Figure taken from [@iscam]</p>
+<p class="caption">(\#fig:unnamed-chunk-7)Figure taken from [@iscam]</p>
 </div>
   
 Note: no ANOVA (section 2.4 in @KuiperSklar) or normal probability plots (section 2.8 in @KuiperSklar).
