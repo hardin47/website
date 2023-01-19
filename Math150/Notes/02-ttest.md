@@ -331,6 +331,21 @@ Considerations when running a t-test:
 ::: {.example}
 Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2$.
 :::
+
+By considering the estimates of the parameters, we can see that Model 1 expands to include both the parameter model as well as the statistic model:
+
+##### Model 1: {-}
+
+\begin{align}
+y_{1j} &= \mu_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+y_{2j} &= \mu_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+\epsilon_{ij} &\sim N(0,\sigma^2)\\
+E[Y_i] &= \mu_i\\
+y_{1j} &= \hat{\mu}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+&= \overine{y}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+y_{2j} &= \hat{\mu}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+&= \overline{y}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+\end{align}
   
 ### What is an Alternative Hypothesis?
   
@@ -349,7 +364,7 @@ Skip ANOVA in your text (2.4 and part of 2.9 in @KuiperSklar).
 
 (Section 2.3 in @KuiperSklar.)
   
-Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a {\sc linear} relationship between two variables.  It typically has the form of:
+Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a *linear* relationship between two variables.  It typically has the form of:
 
 \begin{align}
 y_i &= \beta_0 + \beta_1 x_i + \epsilon_i  \ \ \ \ i = 1, 2, \ldots, n\\
@@ -359,7 +374,7 @@ E(Y|x) &= \beta_0 + \beta_1 x
 
 For this model, the deterministic component ($\beta_0 + \beta_1 x$) is a linear function of the two parameters, $\beta_0$ and $\beta_1$, and the explanatory variable $x$.  **The random error terms, $\epsilon_i$, are assumed to be independent and to follow a normal distribution with mean 0 and variance $\sigma^2$.**
     
-How can we use this model to describe the two sample means case we discussed on the esophageal data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
+How can we use this model to describe the two sample means case we discussed on the ages of the patients from the elective surgery data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
     
 (For the color game in the text, the natural way to code is 1 for the color distracter and 0 for the standard game. Why?  What does $\beta_0$ represent?  What does $\beta_1$ represent?)
   
@@ -370,6 +385,18 @@ How can we use this model to describe the two sample means case we discussed on 
 \end{align}
   
 ### Why are they the same? {-}
+
+You may remember that to find estimates for $\beta_0$ and $\beta_1$ we minimized the sum of the squared error terms (we'll see that in the next section) and came up with estimates of:
+
+\begin{eqnarray*}
+b_1 &=& \hat{\beta}_1 = \hat{\beta}_1 &= \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - (\sum x_i )^2}\\
+&=& r \frac{s_y}{s_x}\\
+b_0 &=& \jat{\beta}_0 = \frac{\sum y_i - b_1 \sum x_i}{n}\\
+&=& \overline{y} - b_1 \overline{x}
+\end{eqnarray*}
+
+Some simplifying of terms gets us to see that the model estimates (of the deterministic part of the model) are the same whether we use model 1 or model 2.
+
 \begin{align}
 b_1= \hat{\beta}_1 &= \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - (\sum x_i )^2}\\
 &= \frac{n \sum_2 y_i - n_2 \sum y_i}{(n n_2-n_2^2)}\\

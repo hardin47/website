@@ -155,7 +155,7 @@ Figure 1.2: Figs 3.13 and 3.15 taken from <span class="citation">Kutner et al. (
 </h2>
 <p>How do we fit a regression line? Find <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span> that minimize the sum of squared distance of the points to the line (called ordinary least squares):</p>
 <p><span class="math display">\[\begin{align}
-\min \sum (y_i \hat{y}_i)^2 &amp;= \min RSS \mbox{ residual sum of squares}\\
+\min \sum (y_i - \hat{y}_i)^2 &amp;= \min RSS \mbox{ residual sum of squares}\\
 RSS &amp;= \sum (y_i - b_0 - b_1 x_i)^2\\
 \frac{\partial RSS}{\partial b_0} &amp;= 0\\
 \frac{\partial RSS}{\partial b_1} &amp;= 0\\
@@ -288,7 +288,7 @@ b_1 &amp;\pm t_{\alpha/2,n-2} SE(b_1)\\
 b_1 &amp;\pm t_{\alpha/2, n-2} \frac{s_{y|x}}{\sqrt{(n-1)}s_x}\\
 6.693 &amp;\pm t_{.025, 141} 0.375\\
 t_{.025,141} &amp;= qt(0.025, 141) = -1.977\\
-\mbox{CI} &amp; (5.95 \mbox{ years/unit of happy}, 7.43 \mbox{ years/unit of happy})
+\mbox{CI: } &amp; (5.95 \mbox{ years/unit of happy}, 7.43 \mbox{ years/unit of happy})
 \end{align}\]</span>
 How can we interpret the CI? Does it make sense to talk about a unit of happiness?</p>
 </div>
@@ -388,8 +388,8 @@ DFBETAS_i &amp;= \frac{b_1 - b_{1(i)}}{\frac{s_{y|x, (i)}}{\sqrt{(n-1)} s_x}}\\
 <span class="header-section-number">4.7.1</span> Reading the data into R<a class="anchor" aria-label="anchor" href="#reading-the-data-into-r"><i class="fas fa-link"></i></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">happy</span> <span class="op">&lt;-</span> <span class="fu">read_delim</span><span class="op">(</span><span class="st">"./data/happyPlanet.txt"</span>, delim<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span></span>
-<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">happy</span><span class="op">)</span>  </span>
+<code class="sourceCode R"><span><span class="va">happy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_delim</a></span><span class="op">(</span><span class="st">"./data/happyPlanet.txt"</span>, delim<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">happy</span><span class="op">)</span>  </span>
 <span><span class="co">#&gt; Rows: 143</span></span>
 <span><span class="co">#&gt; Columns: 11</span></span>
 <span><span class="co">#&gt; $ Country        &lt;chr&gt; "Albania", "Algeria", "Angola", "Argentina", "Armenia",…</span></span>
@@ -411,7 +411,7 @@ DFBETAS_i &amp;= \frac{b_1 - b_{1(i)}}{\frac{s_{y|x, (i)}}{\sqrt{(n-1)} s_x}}\\
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">happy.lm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">LifeExpectancy</span> <span class="op">~</span> <span class="va">Happiness</span>, data<span class="op">=</span><span class="va">happy</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 5</span></span>
 <span><span class="co">#&gt;   term        estimate std.error statistic  p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
@@ -424,7 +424,7 @@ DFBETAS_i &amp;= \frac{b_1 - b_{1(i)}}{\frac{s_{y|x, (i)}}{\sqrt{(n-1)} s_x}}\\
 </h3>
 <p>Some analyses will need the residuals, fitted values, or coefficients individually.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 143 × 8</span></span>
 <span><span class="co">#&gt;   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid</span></span>
 <span><span class="co">#&gt;            &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span></span>
@@ -458,7 +458,7 @@ happy.lm %&gt;%
 <span><span class="co">#&gt; 1 55.0 42.7 67.3</span></span>
 <span><span class="co">#&gt; 2 75.1 62.9 87.3</span></span>
 <span></span>
-<span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span>conf.int <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span>conf.int <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 7</span></span>
 <span><span class="co">#&gt;   term        estimate std.error statistic  p.value conf.low conf.high</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span></span>
@@ -470,7 +470,7 @@ happy.lm %&gt;%
 </h4>
 <p>We skipped the residuals section, so you are not responsible for finding residuals in R, but the R code is here for completion in case you are interested:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">happy.lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html">augment</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 143 × 8</span></span>
 <span><span class="co">#&gt;   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid</span></span>
 <span><span class="co">#&gt;            &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span></span>
@@ -541,7 +541,7 @@ happy.lm %&gt;%
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-01-18.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-01-19.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
