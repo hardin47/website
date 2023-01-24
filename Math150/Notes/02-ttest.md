@@ -232,7 +232,7 @@ surgery %>%
 A t-test is a test of means.  For the surgery timing data, the groups would ideally have similar age distributions.  Why? What are the advantages and disadvantages of running a retrospective cohort study?
   
   
-The two-sample t-test starts with the assumption that the population means of the two groups are equal, $H_0: \mu_1 = \mu_2$.  The sample means $\overline{y}_1$ and $\overline{y}_2$ will always be different.  How different must the $\overline{y}$ values be in order to reject the null hypothesis?
+The two-sample t-test starts with the assumption that the population means of the two groups are equal, $H_0: \mu_1 = \mu_2.$  The sample means $\overline{y}_1$ and $\overline{y}_2$ will always be different.  How different must the $\overline{y}$ values be in order to reject the null hypothesis?
 
 ##### Model 1: {-}
 
@@ -329,7 +329,7 @@ Considerations when running a t-test:
 
    
 ::: {.example}
-Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2$.
+Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2.$
 :::
 
 By considering the estimates of the parameters, we can see that Model 1 expands to include both the parameter model as well as the statistic model:
@@ -372,7 +372,7 @@ y_i &= \beta_0 + \beta_1 x_i + \epsilon_i  \ \ \ \ i = 1, 2, \ldots, n\\
 E(Y|x) &= \beta_0 + \beta_1 x
 \end{align}
 
-For this model, the deterministic component ($\beta_0 + \beta_1 x$) is a linear function of the two parameters, $\beta_0$ and $\beta_1$, and the explanatory variable $x$.  **The random error terms, $\epsilon_i$, are assumed to be independent and to follow a normal distribution with mean 0 and variance $\sigma^2$.**
+For this model, the deterministic component $(\beta_0 + \beta_1 x)$ is a linear function of the two parameters, $\beta_0$ and $\beta_1,$ and the explanatory variable $x.$  **The random error terms, $\epsilon_i,$ are assumed to be independent and to follow a normal distribution with mean 0 and variance $\sigma^2.$**
     
 How can we use this model to describe the two sample means case we discussed on the ages of the patients from the elective surgery data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
     
@@ -422,7 +422,7 @@ E[Y_i] &= \beta_0 + \beta_1 x_i\\
 \hat{y}_i &= b_0 + b_1 x_i
 \end{align}
 
-That is, we are assuming that for each observation the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean at their value for the explanatory variable, $x_i$.  Note that we have assumed that the variance is constant across any level of the explanatory variable.  We have also assumed that there is independence across individuals.  **[Note: there are no assumptions about the distribution of the explanatory variable, $X$]**.
+That is, we are assuming that for each observation the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean at their value for the explanatory variable, $x_i.$  Note that we have assumed that the variance is constant across any level of the explanatory variable.  We have also assumed that there is independence across individuals.  **[Note: there are no assumptions about the distribution of the explanatory variable, $X].$**
   
 Note the similarity in running a `t.test()` and a linear model (`lm()`):
 

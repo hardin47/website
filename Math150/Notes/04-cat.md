@@ -224,7 +224,7 @@ Note also that we get an exact probability with no conditions needed about the s
 
 (Section 6.6 in @KuiperSklar.)
 
-2x2... but also rxc ($p_a = p_b = p_c$)
+2x2... but also rxc $(p_a = p_b = p_c)$
 
 
 We can also use $\chi^2$ tests to evaluate $r \times c$ contingency tables.  Our main question now will be whether there is an association between two categorical variables of interest.  Note that we are now generalizing what we did with the Botox and back pain example.  Are the two variables independent?  If the two variables are independent, then the state of one variable is not related to the probability of the different outcomes of the other variable.
@@ -269,7 +269,7 @@ If there is no difference in blood type proportions across the groups, then:
 P(AB | FL) = P(AB | IA) = P(AB | MO) = P(AB)
 \end{eqnarray*}
 
-We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0$) for all the groups.  That is, we would expect,
+We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0)$ for all the groups.  That is, we would expect,
 
 \begin{eqnarray*}
 \# \mbox{expected for AB blood and Iowa} &=&  \frac{368}{8619} \cdot 6722\\
@@ -312,12 +312,12 @@ X^2 &=& \sum_{all cells} \frac{( O - E)^2}{E}\\
 We cannot reject the null hypothesis.  Again, we have no evidence against the null hypothesis that blood types are independently distributed in the various regions.
 
 
-How do we know if our test statistic is a big number or not?  Well, it turns out that the test statistic ($X^2$) will have an approximate $\chi^2$ distribution with degrees of freedom = $(r- 1)\cdot (c-1)$.  As long as:
+How do we know if our test statistic is a big number or not?  Well, it turns out that the test statistic $(X^2)$ will have an approximate $\chi^2$ distribution with degrees of freedom = $(r- 1)\cdot (c-1).$  As long as:
 
 
 * We have a random sample from the population.  
-* We expect at least 1 observation in every cell ($E_i \geq 1 \forall i$)  
-* We expect at least 5 observations in 80\% of the cells ($E_i \geq 5$ for 80% of $i$)  
+* We expect at least 1 observation in every cell $(E_i \geq 1 \forall i)$  
+* We expect at least 5 observations in 80\% of the cells $(E_i \geq 5$ for 80% of $i)$  
 
 
 
@@ -387,7 +387,7 @@ Note:
 \hat{p}_1 - \hat{p}_2 \sim N\Bigg(p_1 - p_2, \sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}}\Bigg)
 \end{eqnarray*}
 
-When testing independence, we assume that $p_1=p_2$, so we use the pooled estimate of the proportion to calculate the SE:
+When testing independence, we assume that $p_1=p_2,$ so we use the pooled estimate of the proportion to calculate the SE:
 \begin{eqnarray*}
 SE(\hat{p}_1 - \hat{p}_2) = \sqrt{ \hat{p}_c(1-\hat{p}_c) \bigg(\frac{1}{n_1} + \frac{1}{n_2}\bigg)}
 \end{eqnarray*}
@@ -425,7 +425,7 @@ The main idea here is to determine whether two categorical variables are indepen
 \end{eqnarray*}
 
 
-$\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5$.  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
+$\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5.$  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
 
 * sample size?  
 * baseline risk?  
@@ -466,12 +466,12 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 \end{eqnarray*}
 
 
-$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02$.  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
+$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02.$  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
 
 
 #### OR is more extreme than RR {-}
 
-Without loss of generality, assume the true $RR > 1$, implying $p_1 / p_2 > 1$ and $p_1 > p_2$.
+Without loss of generality, assume the true $RR > 1,$ implying $p_1 / p_2 > 1$ and $p_1 > p_2.$
 
 Note the following sequence of consequences:
 
@@ -613,7 +613,7 @@ Due to some theory that we won't cover:
 SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
 \end{eqnarray*}
 
-Note that your book introduces $SE(\ln(\hat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2$, is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
+Note that your book introduces $SE(\ln(\hat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2,$ is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
 
 \begin{eqnarray*}
 SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p} (1-\hat{p})} + \frac{1}{n_2 \hat{p}(1-\hat{p})}}
@@ -647,11 +647,11 @@ We are 90% confident that the true $\ln(OR)$ is between 2.71 and 4.02.  We are 9
 
 
 
-Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR$.
+Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR.$
 
 Note 2: We do not use the t-distribution here because we are not estimating the population standard deviation.
 
-Note 3: There are not good general guidelines for checking whether the sample sizes are large enough for the normal approximation.  Most authorities agree that one can get away with smaller sample sizes here than for the differences of two proportions.  If the sample sizes pass the rough check discussed for $\chi^2$, they should be large enough to support inferences based on the approximate normality of the log of the estimated odds ratio, too.  [@sleuth, page 541]
+Note 3: There are not good general guidelines for checking whether the sample sizes are large enough for the normal approximation.  Most authorities agree that one can get away with smaller sample sizes here than for the differences of two proportions.  If the sample sizes pass the rough check discussed for $\chi^2,$ they should be large enough to support inferences based on the approximate normality of the log of the estimated odds ratio, too.  [@sleuth, page 541]
 
 For the normal approximation to hold, we need the expected counts in each cell to be at least 5. [@pagano, page 355]
 

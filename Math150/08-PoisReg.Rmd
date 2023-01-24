@@ -38,10 +38,10 @@ The Poisson distribution is given by a probability function of the form:
 
 $$P(Y = y) = \frac{e^{-\mu} \mu^y}{y!} \ \ \ \ \ y=0, 1, 2, \ldots$$
 
-Which gives: $E(Y) = \mu$ and $Var(Y) = \mu$.   That is, the Poisson model is characterized by a mean and variance given by the same value.
+Which gives: $E(Y) = \mu$ and $Var(Y) = \mu.$   That is, the Poisson model is characterized by a mean and variance given by the same value.
 
 
-Recall that with linear regression, $E(Y_i) = \beta_0 + \beta_1 X_i$ which might be a reasonable idea to apply to the count data; however, as seen above, if the mean of the distribution is modeled strictly as a linear function in $X$, then the line has the potential to predict negative counts and the variability will not be a function of $X$ if normal errors regression is used.
+Recall that with linear regression, $E(Y_i) = \beta_0 + \beta_1 X_i$ which might be a reasonable idea to apply to the count data; however, as seen above, if the mean of the distribution is modeled strictly as a linear function in $X,$ then the line has the potential to predict negative counts and the variability will not be a function of $X$ if normal errors regression is used.
 
 An alternative the normal errors regression is to use a $\ln$ transformation to describe the relationship between the predicted value of the response and the explanatory variables of interest:
 
@@ -96,13 +96,13 @@ include_graphics("NormPoisReg2.jpg")
 
 ###  Interpreting Poisson Regression Coefficients
 
-As we've done with other generalized linear models (linear regression, logistic regression, even survival analysis!), in order to understand the model more completely, we look at the impact on the response variable for a one unit change in $X$.
+As we've done with other generalized linear models (linear regression, logistic regression, even survival analysis!), in order to understand the model more completely, we look at the impact on the response variable for a one unit change in $X.$
 
-Consider $X$ and $X+1$.
+Consider $X$ and $X+1.$
 
 $$\frac{E(Y|X+1)}{E(Y|X)} = \frac{e^{\beta_0 + \beta_1 (X+1)}}{e^{\beta_0 + \beta_1 (X)}} = e^{\beta_1}$$
 
-That is, $e^{\beta_1}$ represents the ratio of means for a one unit increase in $X$.  In the elephant example, for every additional year of life, we expect the elephant's mating success, on average, to change by a factor of $e^{\beta_1}$.  [For the savvy consumer, you might note that this is an additional contrast to normal error regression on the log transformed Y where it was required to interpret the multiplicative change in *median*.  Because with Poisson, the log is taken after the average, taking the inverse of the log gives the mean directly.  Previously, it was necessary to use the identity:  $median(\ln(Y)) = \ln(median(Y))$.]
+That is, $e^{\beta_1}$ represents the ratio of means for a one unit increase in $X.$  In the elephant example, for every additional year of life, we expect the elephant's mating success, on average, to change by a factor of $e^{\beta_1}.$  [For the savvy consumer, you might note that this is an additional contrast to normal error regression on the log transformed Y where it was required to interpret the multiplicative change in *median*.  Because with Poisson, the log is taken after the average, taking the inverse of the log gives the mean directly.  Previously, it was necessary to use the identity:  $median(\ln(Y)) = \ln(median(Y)).]$
 
 ###  Assessing Model Validity
 
@@ -158,7 +158,7 @@ elephantsGRP %>% ggplot(aes(x=age, y=logmate)) + geom_point()
 
 ## Inference in Poisson Regression {#inferPois}
 
-Recall that in Poisson regression, $E(Y_i) = \mu_i = e^{\beta_0 + \beta_1 X_i}$.  Therefore, the probability function for the $i^{th}$ observation is:
+Recall that in Poisson regression, $E(Y_i) = \mu_i = e^{\beta_0 + \beta_1 X_i}.$  Therefore, the probability function for the $i^{th}$ observation is:
 
 $$f(y_i) = \frac{e^{-\mu_i} \mu_i^{y_i}}{y_i!} = \frac{e^{-e^{\beta_0 + \beta_1 X_i}} \bigg(e^{\beta_0 + \beta_1 X_i}\bigg)^{y_i}}{y_i!}.$$
 Which gives the resulting likelihood of:
@@ -175,11 +175,11 @@ l(\beta_0, \beta_1) &=& \ln L(\beta_0, \beta_1) = \sum_{i=1}^n \bigg(-\mu_i + y_
 
 ### Maximum Likelihood 
 
-As with other probabilistic models we've encountered, the joint likelihood of the entire sample represents the product of the individual likelihoods for each data value.  The likelihood (or more typically, the $\ln$-likelihood) is maximized to find estimates for $\beta_0$ and $\beta_1$.
+As with other probabilistic models we've encountered, the joint likelihood of the entire sample represents the product of the individual likelihoods for each data value.  The likelihood (or more typically, the $\ln$-likelihood) is maximized to find estimates for $\beta_0$ and $\beta_1.$
 
 The parameter estimates maximize the $\ln$-likelihood, and the SE of the estimates are given by the Fisher Information from the likelihood (roughly the second derivative).
 
-Given $b_0$ and $b_1$ as estimates of the parameter values, $\beta_0$ and $\beta_1$, we can estimate the average count value:
+Given $b_0$ and $b_1$ as estimates of the parameter values, $\beta_0$ and $\beta_1,$ we can estimate the average count value:
 
 $$\hat{\mu}_i = e^{b_0 + b_1 X_i}$$
 
@@ -213,18 +213,18 @@ E(Y_i) &=& \mu_i\\
 Var(Y_i) &=& \phi \mu_i\\
 \end{eqnarray*}
 
-If we can estimate $\phi$, then a more appropriate SE to use is adjusted by $\phi$:  $SE_Q(\hat{\beta}) = \sqrt{\phi} SE(\hat{\beta})$.  ($Q$ stands for "quasiPoisson".)
+If we can estimate $\phi,$ then a more appropriate SE to use is adjusted by $\phi:$  $SE_Q(\hat{\beta}) = \sqrt{\phi} SE(\hat{\beta}).$  $(Q$ stands for "quasiPoisson".)
 
 When $Y$ comes from a setting where the sample size is large, then we can use normal (sums of standard normal random variables are distributed according to a $\chi^2$ distribution) theory to assess the residuals:
 
 $$\sum_{i=1}^n res_{pi}^2 = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{Var(Y_i)} = \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{\phi \mu_i} \sim \chi^2_{n-p}$$
 
-The expected value of $\chi^2_{n-p}$ is $n-p$, which gives an estimator of $\phi$ to be:
+The expected value of $\chi^2_{n-p}$ is $n-p,$ which gives an estimator of $\phi$ to be:
 
 $$\hat{\phi} =  \sum_{i=1}^n \frac{(Y_i - \mu_i)^2}{\mu_i} /(n-p).$$
 
 
-Note that your text uses the Deviance residual instead of the Pearson residual to estimate $\phi$.  Both are reasonable things to do.
+Note that your text uses the Deviance residual instead of the Pearson residual to estimate $\phi.$  Both are reasonable things to do.
 
 ### Wald Tests
 
@@ -255,7 +255,7 @@ The drop-in-deviance test can also be adjusted for overdispersion:  $F_Q =  (D_{
 
 ## R Poisson Example
 
-The R example is taken from data given in the textbook.  The scientific question relates to predicting the total number of observed `species` on the Galapagos archipelago related to island `area` (km$^2$), `elevation` (m), distance (km) to the `nearest` neighbor and to the largest island (km$^2$) in the archipelago Santa Cruz (`scruz`), and the area of the `adjacent` island (km$^2$).  We could also consider an additional response variable which is the island `endemic` species count.
+The R example is taken from data given in the textbook.  The scientific question relates to predicting the total number of observed `species` on the Galapagos archipelago related to island `area` (km$^2),$ `elevation` (m), distance (km) to the `nearest` neighbor and to the largest island (km$^2)$ in the archipelago Santa Cruz (`scruz`), and the area of the `adjacent` island (km$^2).$  We could also consider an additional response variable which is the island `endemic` species count.
 
 ```{r}
 galap <- readr::read_csv("Galapagos.csv")

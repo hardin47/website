@@ -77,8 +77,8 @@ x &= - \beta_0 / \beta_1\\
 e^{0} &= 1\\
 p(-\beta_0 / \beta_1) &= p(x) = 0.5
 \end{align}
-(for a given $\beta_1$, $\beta_0$ determines the median survival value)
-* **Note 2**  If $x=0$,
+(for a given $\beta_1,$ $\beta_0$ determines the median survival value)
+* **Note 2**  If $x=0,$
 \begin{align}
 p(0) = \frac{e^{\beta_0}}{1+e^{\beta_0}}
 \end{align}
@@ -138,7 +138,7 @@ Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^
 
 * independent trials  
 * success / failure  
-* probability of success is constant for a particular $X$.  
+* probability of success is constant for a particular $X.$  
 * $E[Y|x] = p(x)$ is given by the logistic function  
 
 
@@ -168,7 +168,7 @@ to `log(area +1)= 2.00`. The odds ratio $\hat{OR}_{1.90, 2.00}$ is given by
 That is, the odds of survival for a patient with `log(area+1)= 1.90` is 2.9 times higher than the odds of survival for a patient with `log(area+1)= 2.0`.)
 
 
-What about the RR (relative risk) or difference in risks?  It won't be constant for a given $X$, so it must be calculated as a function of $X$.
+What about the RR (relative risk) or difference in risks?  It won't be constant for a given $X,$ so it must be calculated as a function of $X.$
 
 ### constant OR, varying RR
 
@@ -213,13 +213,13 @@ The excess (or additive) risk model can modeled by using simple linear regressio
 \begin{align}
 p(x) &= \beta_0 + \beta_1 x
 \end{align}
-which we have already seen is problematic for a variety of reasons.  However, any **unit increase in $x$ gives a $\beta_1$ increase in the risk** (for *all* values of $x$).
+which we have already seen is problematic for a variety of reasons.  However, any **unit increase in $x$ gives a $\beta_1$ increase in the risk** (for *all* values of $x.)$
 * **log-linear**  
 As long as we do not have a case-control study, we can model the risk using a log-linear model.
 \begin{align}
 \ln (p(x)) = \beta_0 + \beta_1 x
 \end{align}
-The regression coefficient, $\beta_1$, has the interpretation of the **logarithm of the relative risk associated with a unit increase in $x$**.  Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]).  As a result, convergence of standard fitting algorithms may be unreliable in some cases.
+The regression coefficient, $\beta_1,$ has the interpretation of the **logarithm of the relative risk associated with a unit increase in $x.$**  Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]).  As a result, convergence of standard fitting algorithms may be unreliable in some cases.
 
 
 ## Estimating coefficients in logistic regression  {#logMLE}
@@ -231,7 +231,7 @@ Recall how we estimated the coefficients for linear regression. The values of $b
 RSS &= \sum_i (Y_i - \hat{Y}_i)^2\\
  &= \sum_i (Y_i - (\beta_0 + \beta_1 X_i))^2
 \end{align}
-That is, we take derivatives with respect to both $\beta_0$ and $\beta_1$, set them equal to zero (take second derivatives to ensure minimums), and solve to get $b_0$ and $b_1$.  It turns out that we've also *maximized the normal likelihood*.
+That is, we take derivatives with respect to both $\beta_0$ and $\beta_1,$ set them equal to zero (take second derivatives to ensure minimums), and solve to get $b_0$ and $b_1.$  It turns out that we've also *maximized the normal likelihood*.
 \begin{align}
 L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
 &= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
@@ -240,9 +240,9 @@ L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \
 
 What does that even mean?  Likelihood?  Maximizing the likelihood? WHY???  The likelihood is the probability distribution of the data given *specific* values of the unknown parameters.
 
-Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of $p$) and get: failure, success, failure, failure (FSFF).
+Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of $p)$ and get: failure, success, failure, failure (FSFF).
 
-Would you guess $p=0.49$??  No, you would guess $p=0.25$... you *maximized* the likelihood of **seeing your data**.
+Would you guess $p=0.49??$  No, you would guess $p=0.25...$ you *maximized* the likelihood of **seeing your data**.
 \begin{align}
 P(FSFF| p) &=  p^1 (1-p)^{4-1}\\
 P(FSFF | p = 0.90) &= 0.0009 \\
@@ -253,13 +253,13 @@ P(FSFF | p = 0.15) &= 0.092\\
 P(FSFF | p = 0.05) &= 0.043\\
 \end{align}
 
-Think about the example as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n$.  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
+Think about the example as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n.$  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
 \begin{align}
 P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &= P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
 &= p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
 &= p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
 \end{align}
-where $y_1, y_2, \ldots, y_n$ represents a particular observed series of 0 or 1 outcomes and $p$ is a probability $0 \leq p \leq 1$.  Once $y_1, y_2, \ldots, y_n$ have been observed, they are fixed values.  Maximum likelihood estimates are functions of sample data that are derived by finding the value of $p$ that maximizes the likelihood functions.
+where $y_1, y_2, \ldots, y_n$ represents a particular observed series of 0 or 1 outcomes and $p$ is a probability $0 \leq p \leq 1.$  Once $y_1, y_2, \ldots, y_n$ have been observed, they are fixed values.  Maximum likelihood estimates are functions of sample data that are derived by finding the value of $p$ that maximizes the likelihood functions.
 
 To maximize the likelihood, we use the natural log of the likelihood (because we know we'll get the same answer):
 \begin{align}
@@ -313,7 +313,7 @@ burnglm %>%
 #> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
 ```
 
-**Note:**  Although the model is a Bernoulli model and not really a binomial model (although the Bernoulli is a binomial with $n=1$), the way to fit a logistic regression model in R is to use `family = "binomial"`.  It just is what it is.
+**Note:**  Although the model is a Bernoulli model and not really a binomial model (although the Bernoulli is a binomial with $n=1),$ the way to fit a logistic regression model in R is to use `family = "binomial"`.  It just is what it is.
 
 ### Likelihood Ratio Tests
 $\frac{L(p_0)}{L(\hat{p})}$ gives us a sense of whether the null value or the observed value produces a higher likelihood. Recall:
@@ -334,7 +334,7 @@ where $\nu$ is the number of extra parameters we estimate using the unconstraine
 
 
 ::: {.example}
-Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25$.
+Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25.$
 \begin{align}
 H_0:& p=0.25\\
 H_a:& p \ne 0.25\\
@@ -356,7 +356,7 @@ H_0: & \beta_1 =0\\
 H_a: & \beta_1 \ne 0\\
 p_0 &= \frac{e^{\hat{b}_0}}{1 + e^{\hat{b}_0}}
 \end{align}
-where $\hat{b}_0$ is the MLE from the logistic regression model which does not contain any explanatory variable, $x$.
+where $\hat{b}_0$ is the MLE from the logistic regression model which does not contain any explanatory variable, $x.$
 
 **Important note:**
 \begin{align}
@@ -819,7 +819,7 @@ Both techniques suggest choosing a model with the smallest AIC and BIC value; bo
 
 #### Stepwise Regression
 
-As done previously, we can add and remove variables based on the deviance.  Recall, when comparing two nested models, the differences in the deviances can be modeled by a $\chi^2_\nu$ variable where $\nu = \Delta p$.
+As done previously, we can add and remove variables based on the deviance.  Recall, when comparing two nested models, the differences in the deviances can be modeled by a $\chi^2_\nu$ variable where $\nu = \Delta p.$
 
 
 Consider the HERS data described in your book (page 30); variable description also given on the book website http://www.epibiostat.ucsf.edu/biostat/vgsm/data/hersdata.codebook.txt
@@ -914,10 +914,10 @@ One idea is to start with an empty model and adding the best available variable 
 
 
 #### Forward Stepwise Selection {-}
-This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l$, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.
+This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l,$ otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.
 
-1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e$.  
-2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e$.  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l$, we remove the variable.   
+1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e.$  
+2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e.$  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l,$ we remove the variable.   
 3. We continue with this process until there are no more variables that meet either requirements.  In many situations, this will help us from stopping at a less than desirable model.  
 
 How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, you might walk away with no variables in your model, or at least not many.  If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren't necessary.
@@ -1081,7 +1081,7 @@ And, most of all, don't forget that there is not necessarily only one good model
 
 ### Measures of Association
 
-With logistic regression, we don't have residuals, so we don't have a value like $R^2$.  We can, however, measure whether or not the estimated model is consistent with the data.  That is, is the model able to discriminate between successes and failures.
+With logistic regression, we don't have residuals, so we don't have a value like $R^2.$  We can, however, measure whether or not the estimated model is consistent with the data.  That is, is the model able to discriminate between successes and failures.
 
 We'd like to choose a model that produces high probabilities of success for those observations where success was recorded and low probabilities of success for those observation where failure was recorded.  In other words, we want mostly **concordant** pairs.
 
