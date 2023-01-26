@@ -117,13 +117,13 @@ Notice that regardless of whether or not the drug has an effect, the data will b
 
 The simulation from the applet can be recreated using the **infer** package in R.  Note the different pieces of the simulation using functions like `specify()`, `hypothesize()`, `generate()`, and `calculate()`.  Also notice that this particular function works best using the difference in proportions (which we discussed in class is equivalent to recording the single count of Botox patients who had reduced back pain).
 
-Step 1.  Calculate the observed difference in proportion of patients with reduced back pain.  Note that as with linear regression we continue to use the syntax:  `responsevariable ~ explanatoryvariable`.  
+Step 1.  Calculate the observed difference in proportion of patients with reduced back pain.  Note that as with linear regression we continue to use the syntax:  `response variable ~ explanatory variable`.  
 
 Step 2.  Go through the simulation steps, just like the applet.
 
 * `specify()` the variables  
 * `hypothesize()` about the null claim  
-* `generate()` many permutions of the data  
+* `generate()` many permutations of the data  
 * `calculate()` the statistic of interest for all the different permutations  
 
 Step 3. Plot a histogram representing the differences in proportions for all the many permuted tables. The plot represents the distribution of the differences in proportion under the null hypothesis.
@@ -138,34 +138,33 @@ library(infer)
 # Step 1.
 diff_props <- backpain %>%
   specify(outcome ~ treatment, success = "reduction") %>%
-  calculate(stat = "diff in props")
+  calculate(stat = "diff in props", order = c("Botox", "placebo")) %>%
+  pull()
 
 diff_props  # print to screen to see the observed difference
-#> Response: outcome (factor)
-#> Explanatory: treatment (factor)
-#> # A tibble: 1 × 1
-#>    stat
-#>   <dbl>
-#> 1 0.475
+#> [1] 0.475
 
 # Step 2.
 nulldist <- backpain %>%
   specify(outcome ~ treatment, success = "reduction") %>%
   hypothesize(null = "independence") %>%
   generate(reps = 1000, type = "permute") %>%
-  calculate(stat = "diff in props")
+  calculate(stat = "diff in props", order = c("Botox", "placebo"))
 
 # Step 3.
-visualize(nulldist) + 
-  shade_p_value(obs_stat = diff_props, direction = "greater")
+nulldist %>%
+  ggplot(aes(x = stat)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = diff_props, col = "red")
 
 # Step 4.
+# note that the average (mean) of TRUE and FALSE is a proportion
 nulldist %>%
-  get_p_value(obs_stat = diff_props, direction = "greater")
+  summarize(mean(stat >= diff_props))
 #> # A tibble: 1 × 1
-#>   p_value
-#>     <dbl>
-#> 1   0.007
+#>   `mean(stat >= diff_props)`
+#>                        <dbl>
+#> 1                      0.007
 ```
 
 <img src="04-cat_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" />
@@ -790,6 +789,46 @@ backpain %>%
 ```
 
 <img src="04-cat_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-6-2.png" width="80%" style="display: block; margin: auto;" />
+
+### Simulation of Fisher's Exact Test
+
+
+```r
+library(infer)
+
+# Step 1.
+odds_ratio <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  calculate(stat = "odds ratio", order = c("Botox", "placebo")) %>%
+  pull()
+
+odds_ratio  # print to screen to see the observed difference
+#> [1] 10.5
+
+# Step 2.
+nulldist <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "odds ratio", order = c("Botox", "placebo"))
+
+# Step 3.
+nulldist %>%
+  ggplot(aes(x = stat)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = odds_ratio, col = "red")
+
+# Step 4.
+# note that the average (mean) of TRUE and FALSE is a proportion
+nulldist %>%
+  summarize(mean(stat >= odds_ratio))
+#> # A tibble: 1 × 1
+#>   `mean(stat >= odds_ratio)`
+#>                        <dbl>
+#> 1                      0.016
+```
+
+<img src="04-cat_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Fisher's Exact Test
