@@ -48,6 +48,12 @@ backpain %>%
 #> treatment no_reduction reduction
 #>   Botox              6         9
 #>   placebo           14         2
+
+backpain %>% glimpse()
+#> Rows: 31
+#> Columns: 2
+#> $ treatment <chr> "placebo", "placebo", "placebo", "placebo", "placebo", "plac…
+#> $ outcome   <chr> "reduction", "reduction", "no_reduction", "no_reduction", "n…
 ```
 
 
@@ -778,14 +784,16 @@ backpain %>%
 #>   Botox              6         9
 #>   placebo           14         2
 
-backpain %>%
-  ggplot(aes(x = treatment)) + 
-  geom_bar(aes(fill = outcome), position = "fill") +
-  ylab("percentage")
+
 
 backpain %>%
   ggplot(aes(x = treatment)) + 
   geom_bar(aes(fill = outcome))
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome), position = "fill") +
+  ylab("percentage")
 ```
 
 <img src="04-cat_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-6-2.png" width="80%" style="display: block; margin: auto;" />

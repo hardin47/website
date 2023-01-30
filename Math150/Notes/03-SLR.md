@@ -19,6 +19,7 @@ y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
 \hat{y}_i &=& b_0 + b_1 x_i\\
 y_i &=& b_0 + b_1 x_i + e_i\\
 && e_i = y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
+\epsilon_i &\sim& N(0, \sigma^2)
 \end{eqnarray*}
 
 ### Technical Conditions 

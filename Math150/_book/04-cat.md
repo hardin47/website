@@ -18,15 +18,15 @@ The randomized clinical trial examined whether the drug botulinum toxin A (Botox
 
 1. Is this an experiment or an observational study?  
 2. Explain the importance of using the "placebo" treatment of saline.  
-3. Create the two-way table for summarizing the data, putting the explanatory variable as the columns and the response as rows.  
+3. Create the two-way table for summarizing the data, putting the explanatory variable as the rows and the response variable as the columns  
 4. Calculate the conditional proportions of pain reduction in the two groups.  Display the results as a segmented bar graph.  Comment on the preliminary analysis.  
 
 
 |           	| pain reduction 	| no pain reduction	|    	|
 |-----------	|---------	|-------	|----	|
-| placebo    	| 2        	| 14     	| 16 	|
 | Botox 	    | 9       	|    6  	| 15 	|
-|                   	    | 11    	| 20	| 31 	|
+| placebo    	| 2        	| 14     	| 16 	|
+|         | 11    	| 20	| 31 	|
 
 
 \begin{eqnarray*}
@@ -38,14 +38,40 @@ RR &=& 4.8
 
 
 
-```
+```r
+backpain <- data.frame(treatment = c(rep("placebo", 16), rep("Botox", 15)),
+                     outcome = c(rep("reduction", 2), rep("no_reduction", 14), 
+                                 rep("reduction", 9), rep("no_reduction", 6)))
+backpain %>%
+  table()
 #>          outcome
-#> treatment no reduction reduction
+#> treatment no_reduction reduction
 #>   Botox              6         9
 #>   placebo           14         2
+
+backpain %>% glimpse()
+#> Rows: 31
+#> Columns: 2
+#> $ treatment <chr> "placebo", "placebo", "placebo", "placebo", "placebo", "plac…
+#> $ outcome   <chr> "reduction", "reduction", "no_reduction", "no_reduction", "n…
 ```
 
-<img src="04-cat_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-2-2.png" width="80%" style="display: block; margin: auto;" />
+
+Note that sometimes it makes sense for the y-axis to be count and sometimes it makes sense for the y-axis to be percent.  Probably doesn't matter much here, you should choose the bar plot that seems most informative to you.
+
+
+```r
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome), position = "fill") +
+  ylab("percentage")
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome))
+```
+
+<img src="04-cat_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 
@@ -68,7 +94,7 @@ RR &=& 4.8
     * why would we count the number of repetitions with 9 or more "successes"?
 
 * Repeat simulation using the two-way table applet:
-http://www.rossmanchance.com/applets/TwowaySim/TwowaySim.html
+[http://www.rossmanchance.com/applets/2021/chisqshuffle/ChiSqShuffle.htm]
 
 * summary
     * How many reps?
@@ -93,20 +119,75 @@ Notice that regardless of whether or not the drug has an effect, the data will b
 | 0.10  	|   $<$ p-value   	|       	| little or no evidence        	|
 
 
+### Simulation using R {#inferFET}
+
+The simulation from the applet can be recreated using the **infer** package in R.  Note the different pieces of the simulation using functions like `specify()`, `hypothesize()`, `generate()`, and `calculate()`.  Also notice that this particular function works best using the difference in proportions (which we discussed in class is equivalent to recording the single count of Botox patients who had reduced back pain).
+
+Step 1.  Calculate the observed difference in proportion of patients with reduced back pain.  Note that as with linear regression we continue to use the syntax:  `response variable ~ explanatory variable`.  
+
+Step 2.  Go through the simulation steps, just like the applet.
+
+* `specify()` the variables  
+* `hypothesize()` about the null claim  
+* `generate()` many permutations of the data  
+* `calculate()` the statistic of interest for all the different permutations  
+
+Step 3. Plot a histogram representing the differences in proportions for all the many permuted tables. The plot represents the distribution of the differences in proportion under the null hypothesis.
+
+Step 4. Calculate the p-value from the sampling distribution generated in Step 3.
+
+
+
+```r
+library(infer)
+
+# Step 1.
+diff_props <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  calculate(stat = "diff in props", order = c("Botox", "placebo")) %>%
+  pull()
+
+diff_props  # print to screen to see the observed difference
+#> [1] 0.475
+
+# Step 2.
+nulldist <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in props", order = c("Botox", "placebo"))
+
+# Step 3.
+nulldist %>%
+  ggplot(aes(x = stat)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = diff_props, col = "red")
+
+# Step 4.
+# note that the average (mean) of TRUE and FALSE is a proportion
+nulldist %>%
+  summarize(mean(stat >= diff_props))
+#> # A tibble: 1 × 1
+#>   `mean(stat >= diff_props)`
+#>                        <dbl>
+#> 1                      0.007
+```
+
+<img src="04-cat_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" />
 
 ## Fisher's Exact Test {#fisher}
 
-(Section 6.4 in @KuiperSklar.)
+(Section 6.4 in @KuiperSklar, great detailed explanation!)
 
-Because we have a fixed sample, we can't use the Binomial distribution to figure out associated probabilities. Instead, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.
+Because we have a fixed sample, we use the hypergeometric distribution to enumerate the possible ways of choosing our data or more extreme given fixed row and column totals.
 
 
-|     	|  placebo	|      Botox     	|  	|
-|-------------------	|:------:	|:----------:	|:------:	|
-| pain reduction    	|  2 = x 	|      9     	| 11 = n 	|
-| no pain reduction 	|   14   	|      6     	|   20   	|
-|                   	| 16 = M 	| 15 = N - M 	| 31 = N 	|
 
+|           	| pain reduction 	| no pain reduction	|    	|
+|-----------	|---------	|-------	|----	|
+| Botox 	    | 9 = x      	|    6  	| 15 	= n |
+| placebo    	| 2        	| 14     	| 16 	|
+|         | 11  = M  	| 20 = N - M	| 31 	= N|
 
 To make it simpler, let's say I have 5 items (N=5), and I want to choose 3 of them (n=3).  How many ways can I do that?
 
@@ -129,15 +210,15 @@ Find the P(X=2)
 
 We can now find EXACT probabilities associated with the following hypotheses.
 \begin{eqnarray*}
-&&H_0: \pi_{pl} = \pi_{Btx}\\
-&&H_a: \pi_{pl} < \pi_{Btx}\\
-&&\pi = \mbox{true probability of no pain}\\
+&&H_0: p_{pl} = p_{btx}\\
+&&H_a: p_{pl} < p_{btx}\\
+&&p = \mbox{true probability of no pain}\\
 \end{eqnarray*}
 
 
-Is this a one- or two-sided test?  Why?  [Note:  the assumptions here are that the row and column totals are fixed -- a **conditional test of independence**.  However, the research project in the back of chapter 6 extends the permutation test to demonstrated that the probabilities hold even under alternative technical conditions.
+Is this a one- or two-sided test?  Why?  [Note:  the conditions here include that the row and column totals are fixed -- a **conditional test of independence**.  However, the research project in the back of chapter 6 extends the permutation test to demonstrated that the probabilities hold even under alternative technical conditions.
 
-Note also that we get an exact probability with no assumptions about sample size (we can use Fisher's Exact Test even when true probabilities are close to 0 or 1.]
+Note also that we get an exact probability with no conditions needed about the sample size being big enough (we can use Fisher's Exact Test even when true probabilities are close to 0 or 1.]
 
 
 ## Testing independence of two categorical variables {#chisq}
@@ -148,7 +229,7 @@ Note also that we get an exact probability with no assumptions about sample size
 
 (Section 6.6 in @KuiperSklar.)
 
-2x2... but also rxc ($\pi_a = \pi_b = \pi_c$)
+2x2... but also rxc $(p_a = p_b = p_c)$
 
 
 We can also use $\chi^2$ tests to evaluate $r \times c$ contingency tables.  Our main question now will be whether there is an association between two categorical variables of interest.  Note that we are now generalizing what we did with the Botox and back pain example.  Are the two variables independent?  If the two variables are independent, then the state of one variable is not related to the probability of the different outcomes of the other variable.
@@ -163,10 +244,10 @@ H_a: && \mbox{ the two variables are not independent}
 If the data are sampled in such a way that the response is measured across specified populations (as in the example below), we typically do a test of homogeneity of proportions.  For example,
 
 \begin{eqnarray*}
-H_0: && \pi_1 = \pi_2 = \pi_3\\
+H_0: && p_1 = p_2 = p_3\\
 H_a: && \mbox{not } H_0
 \end{eqnarray*}
-where $\pi=P(\mbox{success})$ for each of groups 1,2,3.
+where $p=P(\mbox{success})$ for each of groups 1,2,3.
 
 
 How do we get expected frequencies?  The same mathematics hold regardless of the type of test (i.e., sampling mechanism used to collect the data). If, in fact,the variables are independent, then we should be able to multiply their probabilities.  If the probabilities are the same, we expect the overall proportion of each response variable to be the same as the proportion of the response variable in each explanatory group.  And the math in the example below follows directly.
@@ -193,7 +274,7 @@ If there is no difference in blood type proportions across the groups, then:
 P(AB | FL) = P(AB | IA) = P(AB | MO) = P(AB)
 \end{eqnarray*}
 
-We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0$) for all the groups.  That is, we would expect,
+We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0)$ for all the groups.  That is, we would expect,
 
 \begin{eqnarray*}
 \# \mbox{expected for AB blood and Iowa} &=&  \frac{368}{8619} \cdot 6722\\
@@ -236,12 +317,12 @@ X^2 &=& \sum_{all cells} \frac{( O - E)^2}{E}\\
 We cannot reject the null hypothesis.  Again, we have no evidence against the null hypothesis that blood types are independently distributed in the various regions.
 
 
-How do we know if our test statistic is a big number or not?  Well, it turns out that the test statistic ($X^2$) will have an approximate $\chi^2$ distribution with degrees of freedom = $(r- 1)\cdot (c-1)$.  As long as:
+How do we know if our test statistic is a big number or not?  Well, it turns out that the test statistic $(X^2)$ will have an approximate $\chi^2$ distribution with degrees of freedom = $(r- 1)\cdot (c-1).$  As long as:
 
 
 * We have a random sample from the population.  
-* We expect at least 1 observation in every cell ($E_i \geq 1 \forall i$)  
-* We expect at least 5 observations in 80\% of the cells ($E_i \geq 5$ for 80% of $i$)  
+* We expect at least 1 observation in every cell $(E_i \geq 1 \forall i)$  
+* We expect at least 5 observations in 80\% of the cells $(E_i \geq 5$ for 80% of $i)$  
 
 
 
@@ -299,7 +380,7 @@ p_1 = 0.001 & p_2 = 0.157 & \Delta = 0.156\\
 \end{eqnarray*}
 :::
 
-\subsection{Differences in Proportions}
+### Differences in Proportions
 
 It turns out that the sampling distribution of the difference in the sample proportions (of success) across two *independent* groups can be modeled by the normal distribution if we have reasonably large sample sizes (CLT).
 
@@ -308,10 +389,10 @@ To ensure the accuracy of the test, check whether np and n(1-p) is bigger than 5
 
 Note:
 \begin{eqnarray*}
-\hat{p}_1 - \hat{p}_2 \sim N\Bigg(\pi_1 - \pi_2, \sqrt{\frac{\pi_1(1-\pi_1)}{n_1} + \frac{\pi_2(1-\pi_2)}{n_2}}\Bigg)
+\hat{p}_1 - \hat{p}_2 \sim N\Bigg(p_1 - p_2, \sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}}\Bigg)
 \end{eqnarray*}
 
-When testing independence, we assume that $\pi_1=\pi_2$, so we use the pooled estimate of the proportion to calculate the SE:
+When testing independence, we assume that $p_1=p_2,$ so we use the pooled estimate of the proportion to calculate the SE:
 \begin{eqnarray*}
 SE(\hat{p}_1 - \hat{p}_2) = \sqrt{ \hat{p}_c(1-\hat{p}_c) \bigg(\frac{1}{n_1} + \frac{1}{n_2}\bigg)}
 \end{eqnarray*}
@@ -322,7 +403,7 @@ So, when testing, the appropriate test statistic is:
 \end{eqnarray*}
 
 
-### CI for differences in proportions
+#### CI for differences in proportions
 
 We can't pool our estimate for the SE, but everything else stays the same...
 
@@ -335,7 +416,7 @@ SE(\hat{p}_1 - \hat{p}_2) = \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\ha
 
 The main idea here is to determine whether two categorical variables are independent.  That is, does knowledge of the value of one variable tell me something about the probability of the other variable (gender and pregnancy).  We're going to talk about two different ways to approach this problem.
 
-### Relative Risk
+### Relative Risk {#rr}
 
 ::: {.definition}
 **Relative Risk**  The relative risk (RR) is the ratio of risks for each group.  We say, "The risk of success is **RR** times higher for those in group 1 compared to those in group 2."
@@ -344,23 +425,35 @@ The main idea here is to determine whether two categorical variables are indepen
 \begin{eqnarray*}
 \mbox{relative risk} &=& \frac{\mbox{risk group 1}}{\mbox{risk group 2}}\\
 &=&  \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}\\
-\mbox{RR} &=& \frac{p_1}{p_2} = \frac{\pi_1}{\pi_2}\\
+\mbox{RR} &=& \frac{p_1}{p_2} = \frac{p_1}{p_2}\\
 \hat{\mbox{RR}} &=& \frac{\hat{p}_1}{\hat{p}_2}
 \end{eqnarray*}
 
 
-$\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5$.  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
+$\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5.$  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
 
 * sample size?  
 * baseline risk?  
 
-To create confidence intervals for relative risk, we use the fact that:
+#### Confidence Interval for RR {#ciRR} {-}
+
+Due to some theory that we won't cover, we use the fact that:
 
 \begin{eqnarray*}
 SE(\ln (\hat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}
 \end{eqnarray*}
 
-### Odds Ratios
+A $(1-\alpha)100\%$ CI for the $\ln(RR)$ is:
+\begin{eqnarray*}
+\ln(\hat{RR}) \pm z_{1-\alpha/2} SE(\ln(\hat{RR}))
+\end{eqnarray*}
+
+Which gives a $(1-\alpha)100\%$ CI for the $RR$:
+\begin{eqnarray*}
+(e^{\ln(\hat{RR}) - z_{1-\alpha/2} SE(\ln(\hat{RR}))}, e^{\ln(\hat{RR}) + z_{1-\alpha/2} SE(\ln(\hat{RR}))})
+\end{eqnarray*}
+
+### Odds Ratios {#or}
 
 A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.
 
@@ -373,29 +466,29 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 &=& \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
 \hat{\mbox{odds}} &=& \hat{\theta}\\
 \mbox{odds ratio} &=& \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
-\mbox{OR} &=& \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{\pi_1/(1-\pi_1)}{\pi_2/(1-\pi_2)}\\
+\mbox{OR} &=& \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
 \hat{\mbox{OR}} &=& \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
 \end{eqnarray*}
 
 
-$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02$.  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
+$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02.$  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
 
 
-#### OR is more extreme than RR
+#### OR is more extreme than RR {-}
 
-Without loss of generality, assume the true $RR > 1$, implying $\pi_1 / \pi_2 > 1$ and $\pi_1 > \pi_2$.
+Without loss of generality, assume the true $RR > 1,$ implying $p_1 / p_2 > 1$ and $p_1 > p_2.$
 
 Note the following sequence of consequences:
 
 \begin{eqnarray*}
-RR = \frac{\pi_1}{\pi_2} &>& 1\\
-\frac{1 - \pi_1}{1 - \pi_2} &<& 1\\
-\frac{ 1 / (1 - \pi_1)}{1 / (1 - \pi_2)} &>& 1\\
-\frac{\pi_1}{\pi_2} \cdot \frac{ 1 / (1 - \pi_1)}{1 / (1 - \pi_2)} &>& \frac{\pi_1}{\pi_2}\\
+RR = \frac{p_1}{p_2} &>& 1\\
+\frac{1 - p_1}{1 - p_2} &<& 1\\
+\frac{ 1 / (1 - p_1)}{1 / (1 - p_2)} &>& 1\\
+\frac{p_1}{p_2} \cdot \frac{ 1 / (1 - p_1)}{1 / (1 - p_2)} &>& \frac{p_1}{p_2}\\
 OR &>& RR
 \end{eqnarray*}
 
-#### Other considerations:
+#### Other considerations: {-}
 
 * Observational study (who worked in each place?)  
 * Cross sectional (only one point in time)  
@@ -517,7 +610,7 @@ Now we have a cohort prospective study.  (Previously we had a case-control retro
 :::
 
 
-### Confidence Interval for OR
+#### Confidence Interval for OR {#ciOR} {-}
 
 Due to some theory that we won't cover:
 
@@ -525,7 +618,7 @@ Due to some theory that we won't cover:
 SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
 \end{eqnarray*}
 
-Note that your book introduces $SE(\ln(\hat{OR}))$ in the context of hypothesis testing where the null, $H_0: \pi_1 = \pi_2$, is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
+Note that your book introduces $SE(\ln(\hat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2,$ is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
 
 \begin{eqnarray*}
 SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p} (1-\hat{p})} + \frac{1}{n_2 \hat{p}(1-\hat{p})}}
@@ -539,11 +632,11 @@ So, a $(1-\alpha)100\%$ CI for the $\ln(OR)$ is:
 
 Which gives a $(1-\alpha)100\%$ CI for the $OR$:
 \begin{eqnarray*}
-(e^{\ln(OR) - z_{1-\alpha/2} SE(\ln(OR))}, e^{\ln(OR) + z_{1-\alpha/2} SE(\ln(OR))})
+(e^{\ln(\hat{OR}) - z_{1-\alpha/2} SE(\ln(\hat{OR}))}, e^{\ln(\hat{OR}) + z_{1-\alpha/2} SE(\ln(\hat{OR}))})
 \end{eqnarray*}
 
 
-Back to the example... OR = 28.9.
+Back to the example... $OR = 28.9.$
 \begin{eqnarray*}
 SE(\ln(\hat{OR})) &=& \sqrt{\frac{1}{182*0.67*(1-0.67)} + \frac{1}{122*0.0656*(1-0.0656)}}\\
 &=& 0.398\\
@@ -559,11 +652,11 @@ We are 90% confident that the true $\ln(OR)$ is between 2.71 and 4.02.  We are 9
 
 
 
-Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR$.
+Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR.$
 
 Note 2: We do not use the t-distribution here because we are not estimating the population standard deviation.
 
-Note 3: There are not good general guidelines for checking whether the sample sizes are large enough for the normal approximation.  Most authorities agree that one can get away with smaller sample sizes here than for the differences of two proportions.  If the sample sizes pass the rough check discussed for $\chi^2$, they should be large enough to support inferences based on the approximate normality of the log of the estimated odds ratio, too.  [@sleuth, page 541]
+Note 3: There are not good general guidelines for checking whether the sample sizes are large enough for the normal approximation.  Most authorities agree that one can get away with smaller sample sizes here than for the differences of two proportions.  If the sample sizes pass the rough check discussed for $\chi^2,$ they should be large enough to support inferences based on the approximate normality of the log of the estimated odds ratio, too.  [@sleuth, page 541]
 
 For the normal approximation to hold, we need the expected counts in each cell to be at least 5. [@pagano, page 355]
 
@@ -586,7 +679,7 @@ OR &=& RR \ \ \bigg(\frac{n_1}{n_2} \bigg) \frac{n_2 - X_2}{n_1 - X_1}\\
 [$1 - \frac{X_2}{n_2} > 1 - \frac{X_1}{n_1} \rightarrow \frac{1 - \frac{X_2}{n_2}}{1 - \frac{X_1}{n_1}} > 1$]
 
 
-Note 6: $RR \approx OR$ if RR is very small (the denominator of the OR will be very similar to the denominator of the RR).
+Note 6: $RR \approx OR$ if the risk is small (the denominator of the OR will be very similar to the denominator of the RR).
 
 
 
@@ -659,16 +752,16 @@ Disadvantages from: http://sphweb.bumc.bu.edu/otlt/MPH-Modules/EP/EP713_CohortSt
 
 * cross-classification, prospective: NHANES  
 * cross-classification, retrospective: death records (if exposure is measured post-hoc)  
-* case-control, prospective: the investigator still *enrolls* based on outcome status, but the investigator must wait to the cases to occur    
+* case-control, prospective: the investigator still *enrolls* based on outcome status, but the investigator must wait for the cases to occur    
 * case-control, retrospective: at the start of the study, all cases have already occurred and the investigator goes back to measure the exposure (explanatory) variable  
-* cohort, retrospective: the exposure and outcomes have already happened (i.e., death records)    
 * cohort, prospective: follows the selected participants to assess the proportion who develop the disease of interest  
+* cohort, retrospective: the exposure and outcomes have already happened (i.e., death records)    
 
 #### Which test? {-}
 
 (Section 6.1 of @KuiperSklar.)
 
-It turns out that the tests above (independence, homogeneity of proportions, homogeneity of odds) are typically equivalent with respect to their conclusions.  However, they each have particular assumptions about what they are testing, but that we can generally use any of them for our hypotheses of interest.  However, we need to be very careful about our **interpretations**!
+It turns out that the tests above (independence, homogeneity of proportions, homogeneity of odds) are typically equivalent with respect to their conclusions.  However, they each have particular conditions related to what they are testing, but that we can generally use any of them for our hypotheses of interest.  However, we need to be very careful about our **interpretations**!
 
 
 
@@ -680,20 +773,79 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 ###  Entering and visualizing the data
 
 
-```
+```r
+backpain <- data.frame(treatment = c(rep("placebo", 16), rep("Botox", 15)),
+                     outcome = c(rep("reduction", 2), rep("no reduction", 14), 
+                                 rep("reduction", 9), rep("no reduction", 6)))
+backpain %>%
+  table()
 #>          outcome
 #> treatment no reduction reduction
 #>   Botox              6         9
 #>   placebo           14         2
+
+
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome))
+
+backpain %>%
+  ggplot(aes(x = treatment)) + 
+  geom_bar(aes(fill = outcome), position = "fill") +
+  ylab("percentage")
 ```
 
-<img src="04-cat_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-3-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="04-cat_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /><img src="04-cat_files/figure-html/unnamed-chunk-6-2.png" width="80%" style="display: block; margin: auto;" />
+
+### Simulation of Fisher's Exact Test
+
+
+```r
+library(infer)
+
+# Step 1.
+odds_ratio <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  calculate(stat = "odds ratio", order = c("Botox", "placebo")) %>%
+  pull()
+
+odds_ratio  # print to screen to see the observed difference
+#> [1] 10.5
+
+# Step 2.
+nulldist <- backpain %>%
+  specify(outcome ~ treatment, success = "reduction") %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "odds ratio", order = c("Botox", "placebo"))
+
+# Step 3.
+nulldist %>%
+  ggplot(aes(x = stat)) + 
+  geom_histogram() + 
+  geom_vline(xintercept = odds_ratio, col = "red")
+
+# Step 4.
+# note that the average (mean) of TRUE and FALSE is a proportion
+nulldist %>%
+  summarize(mean(stat >= odds_ratio))
+#> # A tibble: 1 × 1
+#>   `mean(stat >= odds_ratio)`
+#>                        <dbl>
+#> 1                      0.016
+```
+
+<img src="04-cat_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" />
 
 
 ### Fisher's Exact Test
 
 
-```
+```r
+backpain %>%
+  table() %>%
+  fisher.test()
 #> 
 #> 	Fisher's Exact Test for Count Data
 #> 
@@ -705,13 +857,21 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 #> sample estimates:
 #> odds ratio 
 #>      0.104
+
+# their CI is an inversion of the HT
+# an approximate SE for the ln(OR) is given by:
+se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
+se.lnOR
 #> [1] 0.922
 ```
 
 ### Chi-squared Analysis
 
 
-```
+```r
+backpain %>%
+  table() %>%
+  chisq.test()
 #> 
 #> 	Pearson's Chi-squared test with Yates' continuity correction
 #> 
