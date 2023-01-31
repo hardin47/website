@@ -435,7 +435,7 @@ $\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5.$  We say, "The r
 * sample size?  
 * baseline risk?  
 
-#### Confidence Interval for RR {#ciRR} {-}
+#### Confidence Interval for RR {#ciRR}
 
 Due to some theory that we won't cover, we use the fact that:
 
@@ -610,7 +610,7 @@ Now we have a cohort prospective study.  (Previously we had a case-control retro
 :::
 
 
-#### Confidence Interval for OR {#ciOR} {-}
+#### Confidence Interval for OR {#ciOR}
 
 Due to some theory that we won't cover:
 
