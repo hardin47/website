@@ -756,7 +756,7 @@ Disadvantages from: http://sphweb.bumc.bu.edu/otlt/MPH-Modules/EP/EP713_CohortSt
 
 * cross-classification, prospective: NHANES  
 * cross-classification, retrospective: death records (if exposure is measured post-hoc)  
-* case-control, prospective: the investigator still *enrolls* based on outcome status, but the investigator must wait for the cases to occur    
+* case-control, prospective: the investigator still *enrolls* based on outcome status, but the measurements for the outcome variable happened after the measurements for the explanatory variable (e.g., medical records on BMI or smoking status)    
 * case-control, retrospective: at the start of the study, all cases have already occurred and the investigator goes back to measure the exposure (explanatory) variable  
 * cohort, prospective: follows the selected participants to assess the proportion who develop the disease of interest  
 * cohort, retrospective: the exposure and outcomes have already happened (i.e., death records)    
