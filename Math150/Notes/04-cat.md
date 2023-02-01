@@ -845,6 +845,8 @@ nulldist %>%
 
 ### Fisher's Exact Test
 
+Note that the <a href = "https://stats.stackexchange.com/questions/409219/how-does-fisher-test-calculate-the-confidence-interval-for-the-odds-ratio-in-r" target = "_blank">method used</a> in `fisher.test()` to compute the CI is outside the scope of this class.
+
 
 ```r
 backpain %>%
@@ -862,7 +864,6 @@ backpain %>%
 #> odds ratio 
 #>      0.104
 
-# their CI is an inversion of the HT
 # an approximate SE for the ln(OR) is given by:
 se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
 se.lnOR
