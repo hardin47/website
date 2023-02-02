@@ -10,7 +10,7 @@
 3. Hypothesis testing structure
 -->
 
-## Randomization Test {#randtest}
+= ## Randomization Test {#randtest}
 
 Hypothesis testing is arguably the most fundamental process for decision making in statistics.
 The particular hypothesis test given here is called a Randomization Test.  Many other hypothesis tests (with slightly different structure but all of the same pieces) will be seen throughout the course.
@@ -221,7 +221,7 @@ Below is a youtube video describing permuting (i.e., randomizing) different voti
 
 ::: {.example}
 **Email or Paper & Pencil?**^[@iscam, Chapter 3, HW 5]
-Are people more likely to lie with e-mail than with pencil and paper? A study reported at a meeting of the Academy of Management involved 48 graduate students studying business at a particular university who participated in a bargaining game (Naquin, Kurtzberg, & Belkin, 2008). The response variable of interest was whether the person misrepresented (lied about) the size of the pot when negotiating with another player. Some of the participants were randomly assigned to use e-mail for their communication, whereas others used paper and pencil. It turned out that 24 of 26 who used e-mail were guilty of lying about the pot size, compared to 14 of 22 who used paper and pencil.
+Is the probability of lying different if using e-mail as opposed to using pencil and paper? A study reported at a meeting of the Academy of Management involved 48 graduate students studying business at a particular university who participated in a bargaining game (Naquin, Kurtzberg, & Belkin, 2008). The response variable of interest was whether the person misrepresented (lied about) the size of the pot when negotiating with another player. Some of the participants were randomly assigned to use e-mail for their communication, whereas others used paper and pencil. It turned out that 24 of 26 who used e-mail were guilty of lying about the pot size, compared to 14 of 22 who used paper and pencil.
 
 As usual, state the following:  observational units, variables, population of interest, statistic to measure, parameter.
 
