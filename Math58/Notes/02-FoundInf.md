@@ -10,7 +10,7 @@
 3. Hypothesis testing structure
 -->
 
-= ## Randomization Test {#randtest}
+## Randomization Test {#randtest}
 
 Hypothesis testing is arguably the most fundamental process for decision making in statistics.
 The particular hypothesis test given here is called a Randomization Test.  Many other hypothesis tests (with slightly different structure but all of the same pieces) will be seen throughout the course.
