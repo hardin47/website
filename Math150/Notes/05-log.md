@@ -242,12 +242,13 @@ What does that even mean?  Likelihood?  Maximizing the likelihood? WHY???  The l
 
 Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of $p)$ and get: failure, success, failure, failure (FSFF).
 
-Would you guess $p=0.49??$  No, you would guess $p=0.25...$ you *maximized* the likelihood of **seeing your data**.
+Would you guess $p=0.47??$  No, you would guess $p=0.25...$ you *maximized* the likelihood of **seeing your data**.
 \begin{align}
 P(FSFF| p) &=  p^1 (1-p)^{4-1}\\
 P(FSFF | p = 0.90) &= 0.0009 \\
 P(FSFF | p = 0.75) &= 0.0117 \\
 P(FSFF | p = 0.50) &= 0.0625\\
+P(FSFF | p = 0.47) &= 0.070\\
 P(FSFF | p = 0.25) &= 0.105\\
 P(FSFF | p = 0.15) &= 0.092\\
 P(FSFF | p = 0.05) &= 0.043\\
