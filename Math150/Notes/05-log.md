@@ -104,7 +104,7 @@ gives the $\ln$ odds of success .
 
 
 
-#### model assumptions
+#### model conditions
 
 Just like in linear regression, our `Y` response is the only random component.
 
@@ -163,7 +163,7 @@ $e^{\beta_1}$ is the *odds ratio* for dying associated with a one unit increase 
 (Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to `log(area +1)= 1.90`, and patients with burns corresponding
 to `log(area +1)= 2.00`. The odds ratio $\hat{OR}_{1.90, 2.00}$ is given by
 \begin{align}
-\hat{OR}_{1.90, 2.00} = e^{-10.662} (1.90-2.00) = e^{1.0662} = 2.904
+\hat{OR}_{1.90, 2.00} = e^{-10.662 \cdot (1.90-2.00)} = e^{1.0662} = 2.904
 \end{align}
 That is, the odds of survival for a patient with `log(area+1)= 1.90` is 2.9 times higher than the odds of survival for a patient with `log(area+1)= 2.0`.)
 
