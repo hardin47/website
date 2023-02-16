@@ -653,33 +653,33 @@ glm( death ~ smoke, family="binomial") %>% tidy()
 #> 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
 #> 2 smoke         -0.379    0.126      -3.01 2.59e- 3
 
-glm( death ~ as.factor(age), family="binomial") %>% tidy()
+glm( death ~ age, family="binomial") %>% tidy()
 #> # A tibble: 3 × 5
-#>   term                estimate std.error statistic  p.value
-#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)           -0.571     0.125     -4.56 5.01e- 6
-#> 2 as.factor(age)old      1.45      0.187      7.75 9.00e-15
-#> 3 as.factor(age)young   -1.44      0.167     -8.63 6.02e-18
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.571     0.125     -4.56 5.01e- 6
+#> 2 ageold         1.45      0.187      7.75 9.00e-15
+#> 3 ageyoung      -1.44      0.167     -8.63 6.02e-18
 
-glm( death ~ smoke + as.factor(age), family="binomial") %>% tidy()
+glm( death ~ smoke + age, family="binomial") %>% tidy()
 #> # A tibble: 4 × 5
-#>   term                estimate std.error statistic  p.value
-#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)           -0.668     0.135     -4.96 7.03e- 7
-#> 2 smoke                  0.312     0.154      2.03 4.25e- 2
-#> 3 as.factor(age)old      1.47      0.188      7.84 4.59e-15
-#> 4 as.factor(age)young   -1.52      0.173     -8.81 1.26e-18
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.668     0.135     -4.96 7.03e- 7
+#> 2 smoke          0.312     0.154      2.03 4.25e- 2
+#> 3 ageold         1.47      0.188      7.84 4.59e-15
+#> 4 ageyoung      -1.52      0.173     -8.81 1.26e-18
 
-glm( death ~ smoke * as.factor(age), family="binomial") %>% tidy()
+glm( death ~ smoke * age, family="binomial") %>% tidy()
 #> # A tibble: 6 × 5
-#>   term                      estimate std.error statistic  p.value
-#>   <chr>                        <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)                 -0.655     0.152    -4.31  1.61e- 5
-#> 2 smoke                        0.269     0.269     0.999 3.18e- 1
-#> 3 as.factor(age)old            1.53      0.221     6.93  4.29e-12
-#> 4 as.factor(age)young         -1.65      0.240    -6.88  6.00e-12
-#> 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
-#> 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1
+#>   term           estimate std.error statistic  p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)      -0.655     0.152    -4.31  1.61e- 5
+#> 2 smoke             0.269     0.269     0.999 3.18e- 1
+#> 3 ageold            1.53      0.221     6.93  4.29e-12
+#> 4 ageyoung         -1.65      0.240    -6.88  6.00e-12
+#> 5 smoke:ageold     -0.251     0.420    -0.596 5.51e- 1
+#> 6 smoke:ageyoung    0.218     0.355     0.614 5.40e- 1
 ```
 
 
