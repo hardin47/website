@@ -7,7 +7,7 @@
 <title>Chapter 7 Simultaneous Inference | Linear Models</title>
 <meta name="author" content="Jo Hardin">
 <meta name="description" content="(sections 4.1, 4.2, 4.3 in ALSM) Spring 2022: We will cover joint estimation of \(\beta_0\) and \(\beta_1\), but we will not cover simultaneous estimation of a mean response or simultaneous...">
-<meta name="generator" content="bookdown 0.26 with bs4_book()">
+<meta name="generator" content="bookdown 0.31 with bs4_book()">
 <meta property="og:title" content="Chapter 7 Simultaneous Inference | Linear Models">
 <meta property="og:type" content="book">
 <meta property="og:description" content="(sections 4.1, 4.2, 4.3 in ALSM) Spring 2022: We will cover joint estimation of \(\beta_0\) and \(\beta_1\), but we will not cover simultaneous estimation of a mean response or simultaneous...">
@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="(sections 4.1, 4.2, 4.3 in ALSM) Spring 2022: We will cover joint estimation of \(\beta_0\) and \(\beta_1\), but we will not cover simultaneous estimation of a mean response or simultaneous...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.0/transition.js"></script><script src="libs/bs3compat-0.4.0/tabs.js"></script><script src="libs/bs3compat-0.4.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <script type="text/x-mathjax-config">
     const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
@@ -35,7 +35,8 @@
       	})
       }
     }
-    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    </script><link rel="shortcut icon" href="figs/favicon.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
     
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   </style>
@@ -235,47 +236,47 @@ where <span class="math inline">\(B = t_{(1-\alpha/2g; n-2)}\)</span>.</p>
 <p>There are R packages that will do simultaneous inference automatically. However, for the purposes of what we are covering, we’ll focus only on changing the multiplier in order to control the type I error rate.</p>
 <p>Consider the regression on the <code>ames</code> housing data. We regression <code>ln_price</code> on <code>area</code> of the home (in sqft). See the full analysis in section @ref{ames-inf}.</p>
 <div class="sourceCode" id="cb298"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ames_lm</span> <span class="op">&lt;-</span> <span class="va">ames_inf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">price_ln</span> <span class="op">~</span> <span class="va">area</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> 
-
-<span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ames_lm</span> <span class="op">&lt;-</span> <span class="va">ames_inf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">price_ln</span> <span class="op">~</span> <span class="va">area</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term         estimate std.error statistic p.value
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 (Intercept) 11.1      0.0177        628.        0
 ## 2 area         0.000614 0.0000114      53.9       0</code></pre>
 <div class="sourceCode" id="cb300"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>## # A tibble: 1 × 12
 ##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
 ##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     0.500         0.500 0.284     2901.       0     1  -461.  928.  946.
 ## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
 <div class="sourceCode" id="cb302"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ames_df</span> <span class="op">&lt;-</span> <span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">ames_df</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ames_df</span> <span class="op">&lt;-</span> <span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">df.residual</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ames_df</span></span></code></pre></div>
 <pre><code>## [1] 2902</code></pre>
 <p>Let’s say that we want CI for both the intercept and the slope parameters. In that case, two intervals are created. Bonferroni controls the type I error by dividing the alpha error by the number of intervals. So the multiplier is a t value with the adjusted alpha level and degrees of freedom from the linear model (<code>n-2</code>).</p>
 <div class="sourceCode" id="cb304"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">num_int_param</span> <span class="op">&lt;-</span> <span class="fl">2</span>  <span class="co"># for beta0 and beta1</span>
-
-<span class="co"># Bonferroni:</span>
-<span class="va">crit_Bonf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="fl">.975</span><span class="op">)</span><span class="op">/</span><span class="va">num_int_param</span>, <span class="va">ames_df</span><span class="op">)</span>
-<span class="va">crit_Bonf</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">num_int_param</span> <span class="op">&lt;-</span> <span class="fl">2</span>  <span class="co"># for beta0 and beta1</span></span>
+<span></span>
+<span><span class="co"># Bonferroni:</span></span>
+<span><span class="va">crit_Bonf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="fl">.975</span><span class="op">)</span><span class="op">/</span><span class="va">num_int_param</span>, <span class="va">ames_df</span><span class="op">)</span></span>
+<span><span class="va">crit_Bonf</span></span></code></pre></div>
 <pre><code>## [1] -2.24</code></pre>
 <p>The intervals can then be created directly from the output of the <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function.</p>
 <div class="sourceCode" id="cb306"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">term</span>, <span class="va">estimate</span>, <span class="va">std.error</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>lower.ci <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="va">crit_Bonf</span><span class="op">*</span><span class="va">std.error</span>,
-         upper.ci <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="va">crit_Bonf</span><span class="op">*</span><span class="va">std.error</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ames_lm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html">select</a></span><span class="op">(</span><span class="va">term</span>, <span class="va">estimate</span>, <span class="va">std.error</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>lower.ci <span class="op">=</span> <span class="va">estimate</span> <span class="op">+</span> <span class="va">crit_Bonf</span><span class="op">*</span><span class="va">std.error</span>,</span>
+<span>         upper.ci <span class="op">=</span> <span class="va">estimate</span> <span class="op">-</span> <span class="va">crit_Bonf</span><span class="op">*</span><span class="va">std.error</span><span class="op">)</span></span></code></pre></div>
 <pre><code>## # A tibble: 2 × 5
 ##   term         estimate std.error  lower.ci  upper.ci
 ##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
@@ -283,15 +284,15 @@ where <span class="math inline">\(B = t_{(1-\alpha/2g; n-2)}\)</span>.</p>
 ## 2 area         0.000614 0.0000114  0.000588  0.000639</code></pre>
 <p>Similarly, the intervals for mean response (confidence interval) and individual response (prediction interval) use the appropriate standard errors and a new multiplier. Below is the code for the Working-Hotelling multiplier and the Scheffe multiplier, both for 10 new observations.</p>
 <div class="sourceCode" id="cb308"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Working-Hotelling</span>
-<span class="va">crit_WH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">qf</a></span><span class="op">(</span><span class="fl">.95</span>, <span class="fl">2</span>, <span class="va">ames_df</span><span class="op">)</span><span class="op">)</span>
-<span class="va">crit_WH</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Working-Hotelling</span></span>
+<span><span class="va">crit_WH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">qf</a></span><span class="op">(</span><span class="fl">.95</span>, <span class="fl">2</span>, <span class="va">ames_df</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">crit_WH</span></span></code></pre></div>
 <pre><code>## [1] 2.45</code></pre>
 <div class="sourceCode" id="cb310"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Scheffe</span>
-<span class="va">num_int_pred</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># if 10 new observations for prediction</span>
-<span class="va">crit_Sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">num_int_pred</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">qf</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="va">num_int_pred</span>, <span class="va">ames_df</span><span class="op">)</span><span class="op">)</span>
-<span class="va">crit_Sch</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Scheffe</span></span>
+<span><span class="va">num_int_pred</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># if 10 new observations for prediction</span></span>
+<span><span class="va">crit_Sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">num_int_pred</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Fdist.html">qf</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="va">num_int_pred</span>, <span class="va">ames_df</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">crit_Sch</span></span></code></pre></div>
 <pre><code>## [1] 4.28</code></pre>
 
 </div>
@@ -339,7 +340,7 @@ where <span class="math inline">\(B = t_{(1-\alpha/2g; n-2)}\)</span>.</p>
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2022-10-06.</p>
+    <p>"<strong>Linear Models</strong>" was written by Jo Hardin. It was last built on 2023-02-20.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -352,7 +353,7 @@ where <span class="math inline">\(B = t_{(1-\alpha/2g; n-2)}\)</span>.</p>
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

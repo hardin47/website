@@ -85,6 +85,36 @@ knitr::include_graphics("figs/varbias.png")
 ```
 
 
+```{r echo = FALSE, fig.width = 7}
+library(patchwork)
+explanatory <- runif(100, 1, 10)
+response <- 12 + 15*explanatory^2 + rnorm(100,0,100)
+
+data <- data.frame(explanatory, response)
+
+p1 <- data %>%
+  ggplot(aes(x = explanatory, y = response)) + 
+  geom_point(size = 0.7) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  ggtitle("underfit: \nhigh bias, low var")
+
+p2 <- data %>%
+  ggplot(aes(x = explanatory, y = response)) + 
+  geom_point(size = 0.7) + 
+  geom_smooth(method = "loess", se = FALSE) + 
+  ggtitle("good fit: \nlow bias, low var")
+
+p3 <- data %>%
+  ggplot(aes(x = explanatory, y = response)) + 
+  geom_point(size = 0.7) + 
+  geom_smooth(method = "loess", se = FALSE, span = 0.1) + 
+  ggtitle("overfit: \nlow bias, high var")
+
+p1 + p2 + p3
+```
+
+
+
 ## Feature Engineering
 
 For the example used to consider feature engineering, the data come from [data.world](https://data.world/anujjain7/the-office-imdb-ratings-dataset), by way of [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-17/readme.md).  They now exist in the [**schrute** R package](https://bradlindblad.github.io/schrute/).

@@ -67,6 +67,10 @@ Note the bias-variance trade-off.  We want our prediction error to be small, so 
 </div>
 
 
+<img src="04a-process_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" />
+
+
+
 ## Feature Engineering
 
 For the example used to consider feature engineering, the data come from [data.world](https://data.world/anujjain7/the-office-imdb-ratings-dataset), by way of [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-17/readme.md).  They now exist in the [**schrute** R package](https://bradlindblad.github.io/schrute/).
@@ -95,15 +99,15 @@ Instead of jumping into the predictions immediately, let's look at the data itse
 
 #### IMDB ratings {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
 
 #### IMDB ratings vs. number of votes {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-6-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Outliers? {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
 
 #### Aside... {-}
 
@@ -111,11 +115,11 @@ If you like the [Dinner Party](https://www.imdb.com/title/tt1031477/) episode, I
 
 #### Rating vs. air date {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
 
 #### IMDB ratings vs. seasons {-}
 
-<img src="04a-process_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" />
+<img src="04a-process_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" />
 
 ### Building a Model
 
@@ -207,15 +211,15 @@ office_train %>%
 
 ```
 ## # A tibble: 141 × 8
-##   season episode title            imdb_rating total_votes air_date   month  wday
-##   <fct>    <dbl> <chr>                  <dbl>       <dbl> <date>     <dbl> <dbl>
-## 1 8           18 Last Day in Flo…         7.8        1429 2012-03-08     3     5
-## 2 9           14 Vandalism                7.6        1402 2013-01-31     1     5
-## 3 2            8 Performance Rev…         8.2        2416 2005-11-15    11     3
-## 4 9            5 Here Comes Treb…         7.1        1515 2012-10-25    10     5
-## 5 3           22 Beach Games              9.1        2783 2007-05-10     5     5
-## 6 7            1 Nepotism                 8.4        1897 2010-09-23     9     5
-## # … with 135 more rows
+##   season episode title               imdb_rating total_…¹ air_date   month  wday
+##   <fct>    <dbl> <chr>                     <dbl>    <dbl> <date>     <dbl> <dbl>
+## 1 8           18 Last Day in Florida         7.8     1429 2012-03-08     3     5
+## 2 9           14 Vandalism                   7.6     1402 2013-01-31     1     5
+## 3 2            8 Performance Review          8.2     2416 2005-11-15    11     3
+## 4 9            5 Here Comes Treble           7.1     1515 2012-10-25    10     5
+## 5 3           22 Beach Games                 9.1     2783 2007-05-10     5     5
+## 6 7            1 Nepotism                    8.4     1897 2010-09-23     9     5
+## # … with 135 more rows, and abbreviated variable name ¹​total_votes
 ```
 
 > Can you identify any potential problems with this approach?
@@ -242,7 +246,7 @@ The process is synthesized in the following graphic from a course at Johns Hopki
 
 <div class="figure" style="text-align: center">
 <img src="figs/tidypackages.png" alt="Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/" width="80%" />
-<p class="caption">(\#fig:unnamed-chunk-17)Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/</p>
+<p class="caption">(\#fig:unnamed-chunk-18)Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/</p>
 </div>
 
 ### Specifying a model
@@ -441,10 +445,10 @@ bake(office_rec_trained, office_train) %>%
 ## $ imdb_rating                <dbl> 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0…
 ## $ air_date_dow               <fct> Thu, Thu, Tue, Thu, Thu, Thu, Thu, Thu, Thu…
 ## $ air_date_month             <fct> Mar, Jan, Nov, Oct, May, Sep, Feb, May, Apr…
-## $ air_date_USThanksgivingDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USChristmasDay    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USNewYearsDay     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USIndependenceDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USThanksgivingDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USChristmasDay    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USNewYearsDay     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USIndependenceDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ```
 
 #### Step 4: Convert numbers to factors {-}
@@ -496,10 +500,10 @@ bake(office_rec_trained, office_train) %>%
 ## $ imdb_rating                <dbl> 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0…
 ## $ air_date_dow               <fct> Thu, Thu, Tue, Thu, Thu, Thu, Thu, Thu, Thu…
 ## $ air_date_month             <fct> Mar, Jan, Nov, Oct, May, Sep, Feb, May, Apr…
-## $ air_date_USThanksgivingDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USChristmasDay    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USNewYearsDay     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USIndependenceDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USThanksgivingDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USChristmasDay    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USNewYearsDay     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USIndependenceDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ```
 
 #### Step 5: Make dummy variables {-}
@@ -549,10 +553,10 @@ bake(office_rec_trained, office_train) %>%
 ## $ title                      <fct> "Last Day in Florida", "Vandalism", "Perfor…
 ## $ total_votes                <dbl> 1429, 1402, 2416, 1515, 2783, 1897, 2283, 2…
 ## $ imdb_rating                <dbl> 7.8, 7.6, 8.2, 7.1, 9.1, 8.4, 8.3, 8.9, 8.0…
-## $ air_date_USThanksgivingDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USChristmasDay    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USNewYearsDay     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-## $ air_date_USIndependenceDay <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USThanksgivingDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USChristmasDay    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USNewYearsDay     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ air_date_USIndependenceDay <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ## $ season_X2                  <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 ## $ season_X3                  <dbl> 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0…
 ## $ season_X4                  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
@@ -714,34 +718,34 @@ ls(pattern = '^step_', env = as.environment('package:recipes'))
 ##  [7] "step_classdist"          "step_corr"              
 ##  [9] "step_count"              "step_cut"               
 ## [11] "step_date"               "step_depth"             
-## [13] "step_discretize"         "step_downsample"        
-## [15] "step_dummy"              "step_dummy_extract"     
-## [17] "step_dummy_multi_choice" "step_factor2string"     
-## [19] "step_filter"             "step_filter_missing"    
-## [21] "step_geodist"            "step_harmonic"          
-## [23] "step_holiday"            "step_hyperbolic"        
-## [25] "step_ica"                "step_impute_bag"        
-## [27] "step_impute_knn"         "step_impute_linear"     
-## [29] "step_impute_lower"       "step_impute_mean"       
-## [31] "step_impute_median"      "step_impute_mode"       
-## [33] "step_impute_roll"        "step_indicate_na"       
-## [35] "step_integer"            "step_interact"          
-## [37] "step_intercept"          "step_inverse"           
-## [39] "step_invlogit"           "step_isomap"            
-## [41] "step_knnimpute"          "step_kpca"              
-## [43] "step_kpca_poly"          "step_kpca_rbf"          
-## [45] "step_lag"                "step_lincomb"           
-## [47] "step_log"                "step_logit"             
-## [49] "step_lowerimpute"        "step_meanimpute"        
-## [51] "step_medianimpute"       "step_modeimpute"        
-## [53] "step_mutate"             "step_mutate_at"         
-## [55] "step_naomit"             "step_nnmf"              
-## [57] "step_nnmf_sparse"        "step_normalize"         
-## [59] "step_novel"              "step_ns"                
-## [61] "step_num2factor"         "step_nzv"               
-## [63] "step_ordinalscore"       "step_other"             
-## [65] "step_pca"                "step_percentile"        
-## [67] "step_pls"                "step_poly"              
+## [13] "step_discretize"         "step_dummy"             
+## [15] "step_dummy_extract"      "step_dummy_multi_choice"
+## [17] "step_factor2string"      "step_filter"            
+## [19] "step_filter_missing"     "step_geodist"           
+## [21] "step_harmonic"           "step_holiday"           
+## [23] "step_hyperbolic"         "step_ica"               
+## [25] "step_impute_bag"         "step_impute_knn"        
+## [27] "step_impute_linear"      "step_impute_lower"      
+## [29] "step_impute_mean"        "step_impute_median"     
+## [31] "step_impute_mode"        "step_impute_roll"       
+## [33] "step_indicate_na"        "step_integer"           
+## [35] "step_interact"           "step_intercept"         
+## [37] "step_inverse"            "step_invlogit"          
+## [39] "step_isomap"             "step_knnimpute"         
+## [41] "step_kpca"               "step_kpca_poly"         
+## [43] "step_kpca_rbf"           "step_lag"               
+## [45] "step_lincomb"            "step_log"               
+## [47] "step_logit"              "step_lowerimpute"       
+## [49] "step_meanimpute"         "step_medianimpute"      
+## [51] "step_modeimpute"         "step_mutate"            
+## [53] "step_mutate_at"          "step_naomit"            
+## [55] "step_nnmf"               "step_nnmf_sparse"       
+## [57] "step_normalize"          "step_novel"             
+## [59] "step_ns"                 "step_num2factor"        
+## [61] "step_nzv"                "step_ordinalscore"      
+## [63] "step_other"              "step_pca"               
+## [65] "step_percentile"         "step_pls"               
+## [67] "step_poly"               "step_poly_bernstein"    
 ## [69] "step_profile"            "step_range"             
 ## [71] "step_ratio"              "step_regex"             
 ## [73] "step_relevel"            "step_relu"              
@@ -750,10 +754,13 @@ ls(pattern = '^step_', env = as.environment('package:recipes'))
 ## [79] "step_sample"             "step_scale"             
 ## [81] "step_select"             "step_shuffle"           
 ## [83] "step_slice"              "step_spatialsign"       
-## [85] "step_sqrt"               "step_string2factor"     
-## [87] "step_unknown"            "step_unorder"           
-## [89] "step_upsample"           "step_window"            
-## [91] "step_YeoJohnson"         "step_zv"
+## [85] "step_spline_b"           "step_spline_convex"     
+## [87] "step_spline_monotone"    "step_spline_natural"    
+## [89] "step_spline_nonnegative" "step_sqrt"              
+## [91] "step_string2factor"      "step_time"              
+## [93] "step_unknown"            "step_unorder"           
+## [95] "step_window"             "step_YeoJohnson"        
+## [97] "step_zv"
 ```
 
 ### Building workflows
@@ -877,7 +884,6 @@ office_train_pred
 ##  9  7.87         8   Promos             
 ## 10  7.74         8   Pool Party         
 ## # … with 131 more rows
-## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 ### R-squared {-}
@@ -969,7 +975,6 @@ office_test_pred
 ##  9  8.80         8.9 Gay Witch Hunt     
 ## 10  8.37         8.2 Initiation         
 ## # … with 37 more rows
-## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 #### Evaluate performance for testing data {-}
@@ -1190,7 +1195,7 @@ office_wflow2
 
 <div class="figure" style="text-align: center">
 <img src="figs/overfitting.jpg" alt="[@flach12]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-54)[@flach12]</p>
+<p class="caption">(\#fig:unnamed-chunk-55)[@flach12]</p>
 </div>
 
 Cross validation is typically used in two ways.  
@@ -1257,7 +1262,7 @@ To do both, one approach is to use test/training data *and* CV in order to both 
 
 <div class="figure" style="text-align: center">
 <img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-55)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
+<p class="caption">(\#fig:unnamed-chunk-56)Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]</p>
 </div>
 
 
@@ -1283,7 +1288,7 @@ For each iteration of resampling, the data are partitioned into two subsamples:
 
 <div class="figure" style="text-align: center">
 <img src="figs/resampling.svg" alt="Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-57)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-58)Repeated samples are taken from the training data, and with each resample some of the observations are used to build a model and some observations are used to estimate the performance. Source: [@tidymodelingR]</p>
 </div>
 
 Aside: the "re" in "resamples" is for repeated samples.  Not to be confused where repeated samples are taken in bootstrapping with replacement.  In cross validation, the repeated samples are taken **without** replacement.
@@ -1312,7 +1317,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-58)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-59)Splitting the data into a partition of v=3 groups. Source: [@tidymodelingR]</p>
 </div>
 
 
@@ -1342,7 +1347,7 @@ Note that the three repeated samples ("resamples") are taken without replacement
 
 <div class="figure" style="text-align: center">
 <img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-60)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
+<p class="caption">(\#fig:unnamed-chunk-61)With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: [@tidymodelingR]</p>
 </div>
 
 #### Fit resamples {-}
@@ -1788,7 +1793,6 @@ office_fit %>% tidy()
 ##  9 season_X7    1.02     0.352         2.89  4.52e- 3
 ## 10 season_X8    0.497    0.348         1.43  1.55e- 1
 ## # … with 11 more rows
-## # ℹ Use `print(n = ...)` to see more rows
 ```
 
 ```r
@@ -1802,7 +1806,6 @@ office_fit %>% glance()
 ## 1     0.670        0.615 0.327    12.2 2.10e-20    20  -31.2  106.  171.    12.9
 ## # … with 2 more variables: df.residual <int>, nobs <int>, and abbreviated
 ## #   variable names ¹​adj.r.squared, ²​statistic, ³​deviance
-## # ℹ Use `colnames()` to see all variable names
 ```
 
 #### Cross validate to choose between models {-}
