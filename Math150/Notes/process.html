@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 7 Modeling as a Process | Methods in Biostatistics</title>
+<meta name="author" content="Jo Hardin">
+<meta name="description" content="7.1 Comparing Models3 So many models, so little time. Understanding how to interpret a multiple linear regression model is only half of the modeling process. In most real-life situations, there...">
+<meta name="generator" content="bookdown 0.31 with bs4_book()">
+<meta property="og:title" content="Chapter 7 Modeling as a Process | Methods in Biostatistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="7.1 Comparing Models3 So many models, so little time. Understanding how to interpret a multiple linear regression model is only half of the modeling process. In most real-life situations, there...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 7 Modeling as a Process | Methods in Biostatistics">
+<meta name="twitter:description" content="7.1 Comparing Models3 So many models, so little time. Understanding how to interpret a multiple linear regression model is only half of the modeling process. In most real-life situations, there...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<link href="libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
+<script src="libs/bsTable-3.3.7/bootstrapTable.js"></script><script type="text/x-mathjax-config">
+    const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+    for (let popover of popovers){
+      const div = document.createElement('div');
+      div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+      div.innerHTML = popover.getAttribute('data-content');
+      
+      // Will this work with TeX on its own line?
+      var has_math = div.querySelector("span.math");
+      if (has_math) {
+        document.body.appendChild(div);
+      	MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+      	MathJax.Hub.Queue(function(){
+          popover.setAttribute('data-content', div.innerHTML);
+      	})
+      }
+    }
+    </script><link rel="shortcut icon" href="figs/favicon.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Methods in Biostatistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Class Information</a></li>
+<li><a class="" href="rfunc.html"><span class="header-section-number">1</span> R functions</a></li>
+<li><a class="" href="intro.html"><span class="header-section-number">2</span> Introduction</a></li>
+<li><a class="" href="t-tests-vs-slr.html"><span class="header-section-number">3</span> t-tests vs SLR</a></li>
+<li><a class="" href="SLR.html"><span class="header-section-number">4</span> Simple Linear Regression</a></li>
+<li><a class="" href="analysis-of-categorical-data.html"><span class="header-section-number">5</span> Analysis of Categorical Data</a></li>
+<li><a class="" href="logreg.html"><span class="header-section-number">6</span> Logistic Regression</a></li>
+<li><a class="active" href="process.html"><span class="header-section-number">7</span> Modeling as a Process</a></li>
+<li><a class="" href="survival-analysis.html"><span class="header-section-number">8</span> Survival Analysis</a></li>
+<li><a class="" href="multiple-comparisons.html"><span class="header-section-number">9</span> Multiple Comparisons</a></li>
+<li><a class="" href="poisson-regression.html"><span class="header-section-number">10</span> Poisson Regression</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/hardin47/website">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="process" class="section level1" number="7">
+<h1>
+<span class="header-section-number">7</span> Modeling as a Process<a class="anchor" aria-label="anchor" href="#process"><i class="fas fa-link"></i></a>
+</h1>
+<div id="comparing-models" class="section level2" number="7.1">
+<h2>
+<span class="header-section-number">7.1</span> Comparing Models<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;Thanks to Mine Çentinkaya-Rundel and Julia Silge for the ideas and much of the code in this chapter. Mine’s course is at &lt;a href="https://mine-cr.com/teaching/sta210/" class="uri"&gt;https://mine-cr.com/teaching/sta210/&lt;/a&gt;. Julia’s blog is at &lt;a href="https://juliasilge.com/blog/project-feederwatch/" class="uri"&gt;https://juliasilge.com/blog/project-feederwatch/&lt;/a&gt;.&lt;/p&gt;'><sup>3</sup></a><a class="anchor" aria-label="anchor" href="#comparing-models"><i class="fas fa-link"></i></a>
+</h2>
+<p>So many models, so little time. Understanding how to interpret a multiple linear regression model is only half of the modeling process. In most real-life situations, there are many variables which can be used to predict or describe the response variable at hand. But how to choose which combination or subset of variables is best?</p>
+<p>Here, we’ll walk through many of the big ideas surrounding the modeling building process. In the next chapter we will consider the technical ideas behind statistical inference for modeling building. But even when using formal inference, the ideas here should always inform the larger process and analysis conclusions.</p>
+<p><a href="https://en.wikipedia.org/wiki/Leo_Breiman">Leo Breiman</a> was among the giants in machine learning who helped to bridge ideas in statistics and computer science. Trained as a statistician, he spent his career at the University of California, Berkeley where he developed Classification and Regression Trees (CART), bagging, and Random Forests.</p>
+<p>Among his important insights was an idea that there are <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">two cultures</a> which can motivate (linear) modeling:</p>
+<blockquote>
+<p>Think of the data as being generated by a black box in which a vector of input variables x (independent variables) go in one side, and on the other side the response variables y come out. Inside the black box, nature functions to associate the predictor variables with the response variables.</p>
+</blockquote>
+<div class="inline-figure"><img src="figs/blackbox.png" width="80%" style="display: block; margin: auto;"></div>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>Data Modeling: The analysis in this culture starts with assuming a stochastic data model for the inside of the black box…The values of the parameters are estimated from the data and the model then used for information and/or prediction</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li>Algorithmic Modeling: The analysis in this culture considers the inside of the box complex and unknown. [The] approach is to find a function f(x) — an algorithm that operates on x to predict the responses y.</li>
+</ol>
+</blockquote>
+<p>Here in Chapter <a href="process.html#process">7</a>, the focus will be on algorithmic modeling and developing models which are optimally predictive of the response variable at hand.</p>
+<p><strong>Spoiler:</strong></p>
+<ul>
+<li>In Chapter <a href="logreg.html#logreg">6</a>, the model building uses hypothesis testing and p-values.</li>
+<li>In Chapter <a href="process.html#process">7</a>, the model building uses outside information and independent assessment.</li>
+</ul>
+<p>There isn’t a right way to model. In fact, good data analysis is <strong>hard</strong>. You are building a tool box. Make sure to notice that not every tool is the same, and you have more than just one hammer to use. Sometimes the tools can work together to form even better models.</p>
+<div id="worth-a-comment" class="section level4 unnumbered">
+<h4>Worth a comment<a class="anchor" aria-label="anchor" href="#worth-a-comment"><i class="fas fa-link"></i></a>
+</h4>
+<p>Notice that the R code has gotten more interesting now. How fun!! The R code will help the process! The R package <strong>tidymodels</strong> includes tools to facilitate, in particular, feature engineering and cross validation.</p>
+</div>
+<div id="bias-variance-trade-off" class="section level3 unnumbered">
+<h3>Bias-variance trade-off<a class="anchor" aria-label="anchor" href="#bias-variance-trade-off"><i class="fas fa-link"></i></a>
+</h3>
+<p><strong>Excellent resource</strong></p>
+<p>for explaining the bias-variance trade-off: <a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" class="uri">http://scott.fortmann-roe.com/docs/BiasVariance.html</a></p>
+<ul>
+<li><p><strong>Variance</strong> refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training set. Generally, the closer the model fits the data, the more variable it will be (it’ll be different for each data set!). A model with many many explanatory variables will often fit the data too closely.</p></li>
+<li><p><strong>Bias</strong> refers to the error that is introduced by approximating the “truth” by a model which is too simple. For example, we often use linear models to describe complex relationships, but it is unlikely that any real life situation actually has a <em>true</em> linear model. However, if the true relationship is close to linear, then the linear model will have a low bias.</p></li>
+</ul>
+<p>Generally, the simpler the model, the lower the variance. The more complicated the model, the lower the bias. In this class, cross validation will be used to assess model fit using metrics like accuracy and Receiver Operating Characteristic (ROC) curves.</p>
+<p><span class="math display">\[\begin{align}
+\mbox{prediction error } = \mbox{ irreducible error } + \mbox{ bias } + \mbox{ variance}
+\end{align}\]</span></p>
+<ul>
+<li>
+<strong>irreducible error</strong> The irreducible error is the natural variability that comes with observations. No matter how good the model is, we will never be able to predict perfectly.</li>
+<li>
+<strong>bias</strong> The bias of the model represents the difference between the true model and a model which is too simple. That is, the more complicated the model (e.g., the more variables), the closer the points are to the prediction. As the model gets more complicated (e.g., as variables are added), the bias goes down.</li>
+<li>
+<strong>variance</strong> The variance represents the variability of the model from sample to sample. That is, a simple model (very few variables) would not change a lot from sample to sample. The variance decreases as the model becomes more simple (e.g., variables are removed).</li>
+</ul>
+<p>Note the bias-variance trade-off. We want our prediction error to be small, so we choose a model that is medium with respect to both bias and variance. We cannot control the irreducible error.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-3"></span>
+<img src="figs/varbias.png" alt="Test and training error as a function of model complexity.  Note that the error goes down monotonically only for the training data.  Be careful not to overfit!!  [@ESL]" width="100%"><p class="caption">
+Figure 2.1: Test and training error as a function of model complexity. Note that the error goes down monotonically only for the training data. Be careful not to overfit!! <span class="citation">(<a href="#ref-ESL" role="doc-biblioref"><strong>ESL?</strong></a>)</span>
+</p>
+</div>
+<p>In the linear regression case, the following plots describe the bias-variance tradeoff. In our setting, the models change due to the number of variables included in the model (which is difficult to draw because those models exist in dozens of dimensions).</p>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
+</div>
+<div id="modeling-squirrel-activity" class="section level2" number="7.2">
+<h2>
+<span class="header-section-number">7.2</span> Modeling Squirrel Activity<a class="anchor" aria-label="anchor" href="#modeling-squirrel-activity"><i class="fas fa-link"></i></a>
+</h2>
+<p>For the example used to consider feature engineering and cross validation, the data come from <a href="https://feederwatch.org/explore/raw-dataset-requests/" target="_blank">Project FeederWatch</a>#TidyTuesday dataset on Project FeederWatch, a citizen science project for bird science, by way of <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10" target="_blank">TidyTuesday</a>. Many of the ideas below are due to <a href="https://juliasilge.com/blog/project-feederwatch/" target="_blank">screencasts by Julia Silge</a>.</p>
+<blockquote>
+<p>Can the characteristics of the bird feeder site like the surrounding yard and habitat predict whether a bird feeder site will be used by squirrels?</p>
+</blockquote>
+<p>Instead of jumping into the predictions immediately, let’s look at the data itself. What wrangling can we do to the data in order to take advantage of all the information in the variables? We’d also like to make the model accurate and easy to communicate.</p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">site_data</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>squirrels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">squirrels</span>, <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">glimpse</span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 254,355</span></span>
+<span><span class="co">#&gt; Columns: 62</span></span>
+<span><span class="co">#&gt; $ loc_id                       &lt;chr&gt; "L100016", "L100016", "L100016", "L100016…</span></span>
+<span><span class="co">#&gt; $ proj_period_id               &lt;chr&gt; "PFW_2002", "PFW_2003", "PFW_2004", "PFW_…</span></span>
+<span><span class="co">#&gt; $ yard_type_pavement           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_garden             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_landsca            &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ yard_type_woods              &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ yard_type_desert             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ hab_dcid_woods               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_evgr_woods               &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_mixed_woods              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, NA, NA, NA, NA, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ hab_orchard                  &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_park                     &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, 1, …</span></span>
+<span><span class="co">#&gt; $ hab_water_fresh              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ hab_water_salt               &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, 1, …</span></span>
+<span><span class="co">#&gt; $ hab_residential              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, NA, NA, NA, NA, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ hab_industrial               &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, 1, …</span></span>
+<span><span class="co">#&gt; $ hab_agricultural             &lt;dbl&gt; 1, 1, 1, 1, 1, 1, NA, NA, NA, NA, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ hab_desert_scrub             &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_young_woods              &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_swamp                    &lt;dbl&gt; NA, NA, NA, NA, 0, 0, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ hab_marsh                    &lt;dbl&gt; 1, 1, 1, 1, 1, 1, NA, NA, NA, NA, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ evgr_trees_atleast           &lt;dbl&gt; 11, 11, 11, 11, 11, 11, 0, 0, 0, 4, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ evgr_shrbs_atleast           &lt;dbl&gt; 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4,…</span></span>
+<span><span class="co">#&gt; $ dcid_trees_atleast           &lt;dbl&gt; 11, 11, 11, 11, 1, 1, 11, 11, 11, 11, 4, …</span></span>
+<span><span class="co">#&gt; $ dcid_shrbs_atleast           &lt;dbl&gt; 4, 4, 4, 4, 4, 4, 11, 11, 11, 11, 4, 4, 4…</span></span>
+<span><span class="co">#&gt; $ fru_trees_atleast            &lt;dbl&gt; 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ cacti_atleast                &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ brsh_piles_atleast           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ water_srcs_atleast           &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ bird_baths_atleast           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ nearby_feeders               &lt;dbl&gt; 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ squirrels                    &lt;fct&gt; no squirrels, no squirrels, no squirrels,…</span></span>
+<span><span class="co">#&gt; $ cats                         &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ dogs                         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ humans                       &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ housing_density              &lt;dbl&gt; 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2,…</span></span>
+<span><span class="co">#&gt; $ fed_yr_round                 &lt;dbl&gt; 0, 0, 0, 0, NA, NA, 1, 1, 1, 1, 0, NA, 0,…</span></span>
+<span><span class="co">#&gt; $ fed_in_jan                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_feb                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_mar                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_apr                   &lt;dbl&gt; 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_may                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_jun                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_jul                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_aug                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_sep                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 0, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_oct                   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_nov                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ fed_in_dec                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1, N…</span></span>
+<span><span class="co">#&gt; $ numfeeders_suet              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 1, 1, 1, 2,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_ground            &lt;dbl&gt; NA, 0, 0, 0, NA, NA, 1, 1, 1, 1, 3, 3, 3,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hanging           &lt;dbl&gt; 1, 1, 1, 3, NA, NA, 2, 2, 2, 2, 2, 2, 1, …</span></span>
+<span><span class="co">#&gt; $ numfeeders_platfrm           &lt;dbl&gt; 1, 1, 1, 0, NA, NA, 1, 1, 1, 2, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ numfeeders_humming           &lt;dbl&gt; NA, 0, 0, 0, NA, NA, 1, 1, 1, 1, NA, 0, 0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_water             &lt;dbl&gt; 1, 1, 1, 1, NA, NA, 2, 2, 2, 2, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ numfeeders_thistle           &lt;dbl&gt; NA, 0, 0, 0, NA, NA, 1, 1, 1, 2, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_fruit             &lt;dbl&gt; NA, 0, 0, 0, NA, NA, 1, 1, 1, 1, NA, 0, 0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hopper            &lt;dbl&gt; NA, NA, NA, NA, 1, 1, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_tube              &lt;dbl&gt; NA, NA, NA, NA, 1, 1, NA, NA, NA, NA, NA,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_other             &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
+<span><span class="co">#&gt; $ population_atleast           &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5001, 5001,…</span></span>
+<span><span class="co">#&gt; $ count_area_size_sq_m_atleast &lt;dbl&gt; 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 375.0…</span></span></code></pre></div>
+<p>It is a huge dataset, although it has a lot of missing information.</p>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">count</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   squirrels         n</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;         &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 no squirrels  45323</span></span>
+<span><span class="co">#&gt; 2 squirrels    190362</span></span>
+<span><span class="co">#&gt; 3 &lt;NA&gt;          18670</span></span></code></pre></div>
+<p>How are other characteristics of these sites related to the presence of squirrels?</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span>nearby_feeders <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">nearby_feeders</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 2</span></span>
+<span><span class="co">#&gt;   squirrels    nearby_feeders</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;                 &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 no squirrels          0.344</span></span>
+<span><span class="co">#&gt; 2 squirrels             0.456</span></span></code></pre></div>
+<p>What about some of the other variables like those describing the habitat?</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"hab"</span><span class="op">)</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">pivot_longer</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"hab"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>name <span class="op">=</span> <span class="fu">str_remove</span><span class="op">(</span><span class="va">name</span>, <span class="st">"hab_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span>, <span class="fu">fct_reorder</span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span><span class="op">)</span>, fill <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.8</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/percent_format.html">percent</a></span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"% of locations"</span>, y <span class="op">=</span> <span class="cn">NULL</span>, fill <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
+<div id="building-a-model" class="section level2" number="7.3">
+<h2>
+<span class="header-section-number">7.3</span> Building a Model<a class="anchor" aria-label="anchor" href="#building-a-model"><i class="fas fa-link"></i></a>
+</h2>
+<p>If the idea is to build a model which can predict squirrel activity, we need to have a way to see how we did (at the end). Indeed, it is important for us to put some data in our pocket (it will be called the “test” data) which doesn’t see any of the modeling process. We’ll use the test data at the end to assess whether or not our predictions are any good.</p>
+<div id="create-the-dataset" class="section level4" number="7.3.0.1">
+<h4>
+<span class="header-section-number">7.3.0.1</span> Create the dataset<a class="anchor" aria-label="anchor" href="#create-the-dataset"><i class="fas fa-link"></i></a>
+</h4>
+<p>There is a little bit of work to do to use only the observations that recodered whether or not there was a squirrel and to remove a few variables which are not of interest.</p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">site_data</span> <span class="op">&lt;-</span> <span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="op">~</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">loc_id</span>, <span class="op">-</span><span class="va">proj_period_id</span>, <span class="op">-</span><span class="va">fed_yr_round</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+</div>
+<div id="train-test" class="section level4 unnumbered">
+<h4>Train / test<a class="anchor" aria-label="anchor" href="#train-test"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Step 1:</strong> Create an initial split:</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">470</span><span class="op">)</span></span>
+<span><span class="va">feeder_split</span> <span class="op">&lt;-</span> <span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">initial_split</span><span class="op">(</span>strata <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span> <span class="co"># prop = 3/4 in each group, by default</span></span></code></pre></div>
+<p><strong>Step 2:</strong> Save training data</p>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">feeder_split</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">feeder_train</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 176763     59</span></span></code></pre></div>
+<p><strong>Step 3:</strong> Save testing data</p>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test</span>  <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">feeder_split</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">feeder_test</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 58922    59</span></span></code></pre></div>
+</div>
+<div id="using-the-training-data" class="section level4 unnumbered">
+<h4>Using the training data<a class="anchor" aria-label="anchor" href="#using-the-training-data"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_train</span></span>
+<span><span class="co">#&gt; # A tibble: 176,763 × 59</span></span>
+<span><span class="co">#&gt;   squirrels    yard_ty…¹ yard_…² yard_…³ yard_…⁴ yard_…⁵ hab_d…⁶ hab_e…⁷ hab_m…⁸</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;            &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 no squirrels         0       0       1       0       0       1      NA       1</span></span>
+<span><span class="co">#&gt; 2 no squirrels         0       0       1       0       0       1      NA       1</span></span>
+<span><span class="co">#&gt; 3 no squirrels         0       0       1       0       0       1       0       1</span></span>
+<span><span class="co">#&gt; 4 no squirrels         0       0       1       0       0       1      NA      NA</span></span>
+<span><span class="co">#&gt; 5 no squirrels         0       0       1       1       0       1       0       0</span></span>
+<span><span class="co">#&gt; 6 no squirrels         0       0       1       0       0       1      NA       1</span></span>
+<span><span class="co">#&gt; # … with 176,757 more rows, 50 more variables: hab_orchard &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   hab_park &lt;dbl&gt;, hab_water_fresh &lt;dbl&gt;, hab_water_salt &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   hab_residential &lt;dbl&gt;, hab_industrial &lt;dbl&gt;, hab_agricultural &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   hab_desert_scrub &lt;dbl&gt;, hab_young_woods &lt;dbl&gt;, hab_swamp &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   hab_marsh &lt;dbl&gt;, evgr_trees_atleast &lt;dbl&gt;, evgr_shrbs_atleast &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   dcid_trees_atleast &lt;dbl&gt;, dcid_shrbs_atleast &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   fru_trees_atleast &lt;dbl&gt;, cacti_atleast &lt;dbl&gt;, brsh_piles_atleast &lt;dbl&gt;, …</span></span></code></pre></div>
+</div>
+<div id="modeling-workflow" class="section level3" number="7.3.1">
+<h3>
+<span class="header-section-number">7.3.1</span> Modeling workflow<a class="anchor" aria-label="anchor" href="#modeling-workflow"><i class="fas fa-link"></i></a>
+</h3>
+<p>Ideally, the feature engineering / variable selection happens as part of the workflow. That is, part of the modeling process. That way, when the training data is used to fit the model, feature engineering happens. When the test data is used to come up with predictions, feature engineering also happens.</p>
+<ul>
+<li><p>Create a <strong>recipe</strong> for feature engineering steps to be applied to the training data</p></li>
+<li><p>Fit the model to the training data after these steps have been applied</p></li>
+<li><p>Use the model estimates from the training data, predict outcomes for the test data</p></li>
+<li><p>Evaluate the performance of the model on the test data</p></li>
+</ul>
+<p>The process is synthesized in the following graphic from a course at Johns Hopkins, <a href="https://jhudatascience.org/tidyversecourse/" target="_blank">Tidyverse Skills for Data Science</a>.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-14"></span>
+<img src="figs/tidypackages.png" alt="Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science https://jhudatascience.org/tidyversecourse/" width="80%"><p class="caption">
+Figure 7.1: Image credit: Wright et al., Chapter 5 of Tidyverse Skills for Data Science <a href="https://jhudatascience.org/tidyversecourse/" class="uri">https://jhudatascience.org/tidyversecourse/</a>
+</p>
+</div>
+</div>
+<div id="specifying-a-model" class="section level3" number="7.3.2">
+<h3>
+<span class="header-section-number">7.3.2</span> Specifying a model<a class="anchor" aria-label="anchor" href="#specifying-a-model"><i class="fas fa-link"></i></a>
+</h3>
+<p>Instead of using the <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> command, we’re going to use the <strong>tidymodels</strong> framework to specify a model. In Math 150 we will <em>always</em> use “glm” as the engine, but if you take other applied statistics classes, you’ll use different model specifications with the same feature engineering and modeling fitting steps.</p>
+<p>Note that (above) I pulled in all of the relevant functions from the package using <code><a href="https://tidymodels.tidymodels.org">library(tidymodels)</a></code>.</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_spec</span> <span class="op">&lt;-</span> <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">feeder_spec</span></span>
+<span><span class="co">#&gt; Logistic Regression Model Specification (classification)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Computational engine: glm</span></span></code></pre></div>
+</div>
+<div id="building-a-recipe" class="section level3" number="7.3.3">
+<h3>
+<span class="header-section-number">7.3.3</span> Building a recipe<a class="anchor" aria-label="anchor" href="#building-a-recipe"><i class="fas fa-link"></i></a>
+</h3>
+<p>The steps in building a recipe are done sequentially so that the format of each variable is as desired for the model. As seen in Section (@ref{sec:wflow}), the recipe steps can happen in sequence using the pipe (<code>%&gt;%</code>) function.</p>
+<p>However, when you work with a single pipeline, the recipe effects on the data aren’t seen, which can be unsettling. You can look at what will happen when you ultimately apply the recipe to your data by using the functions <code>prep()</code> and <code>bake()</code>.</p>
+<p><strong>Note:</strong> Using <code>prep()</code> and <code>bake()</code> are shown here for demonstrative purposes. They do not need to be a part of your pipeline. I do find them assuring, however, so that I can see the effects of the recipe steps as the recipe is built.</p>
+<div id="initiate-a-recipe" class="section level4 unnumbered">
+<h4>Initiate a recipe<a class="anchor" aria-label="anchor" href="#initiate-a-recipe"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span></span>
+<span>  <span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>,    <span class="co"># formula</span></span>
+<span>  data <span class="op">=</span> <span class="va">feeder_train</span> <span class="co"># data for cataloging names and types of variables</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_rec</span></span>
+<span><span class="co">#&gt; Recipe</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Inputs:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;       role #variables</span></span>
+<span><span class="co">#&gt;    outcome          1</span></span>
+<span><span class="co">#&gt;  predictor         58</span></span></code></pre></div>
+</div>
+<div id="remove-zero-variance-predictors" class="section level4 unnumbered">
+<h4>Remove zero variance predictors<a class="anchor" aria-label="anchor" href="#remove-zero-variance-predictors"><i class="fas fa-link"></i></a>
+</h4>
+<p>Remove all predictors that contain only a single value. “zero variance” means that there is no variability in the entire column, literally every value is the same. Those variables won’t ever help with prediction.</p>
+<blockquote>
+<p><code>step_impute_mean()</code> fills in all the missing values using the average of that variable.
+<code>step_nzv()</code> creates a specification of a recipe step that will remove variables that contain only a single value.</p>
+</blockquote>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec</span> <span class="op">&lt;-</span> <span class="va">feeder_rec</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_rec</span></span>
+<span><span class="co">#&gt; Recipe</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Inputs:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;       role #variables</span></span>
+<span><span class="co">#&gt;    outcome          1</span></span>
+<span><span class="co">#&gt;  predictor         58</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Operations:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Mean imputation for all_numeric_predictors()</span></span>
+<span><span class="co">#&gt; Sparse, unbalanced variable filter on all_numeric_predictors()</span></span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec_trained</span> <span class="op">&lt;-</span> <span class="fu">prep</span><span class="op">(</span><span class="va">feeder_rec</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bake</span><span class="op">(</span><span class="va">feeder_rec_trained</span>, <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="va">glimpse</span></span>
+<span><span class="co">#&gt; Rows: 176,763</span></span>
+<span><span class="co">#&gt; Columns: 59</span></span>
+<span><span class="co">#&gt; $ yard_type_pavement           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_garden             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_landsca            &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ yard_type_woods              &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_desert             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ hab_dcid_woods               &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_evgr_woods               &lt;dbl&gt; 0.223, 0.223, 0.000, 0.223, 0.000, 0.223,…</span></span>
+<span><span class="co">#&gt; $ hab_mixed_woods              &lt;dbl&gt; 1.000, 1.000, 1.000, 0.655, 0.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_orchard                  &lt;dbl&gt; 0.0932, 0.0932, 0.0000, 0.0932, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_park                     &lt;dbl&gt; 0.45, 0.45, 0.00, 0.45, 0.00, 0.45, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_water_fresh              &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 0.605,…</span></span>
+<span><span class="co">#&gt; $ hab_water_salt               &lt;dbl&gt; 0.0502, 0.0502, 0.0000, 0.0502, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_residential              &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_industrial               &lt;dbl&gt; 0.222, 0.222, 0.000, 0.222, 0.000, 0.222,…</span></span>
+<span><span class="co">#&gt; $ hab_agricultural             &lt;dbl&gt; 1.00, 1.00, 1.00, 0.41, 1.00, 0.41, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_desert_scrub             &lt;dbl&gt; 0.0926, 0.0926, 0.0000, 0.0926, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_young_woods              &lt;dbl&gt; 0.35, 0.35, 0.00, 0.35, 0.00, 1.00, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_swamp                    &lt;dbl&gt; 0.292, 0.292, 0.000, 0.292, 0.000, 0.292,…</span></span>
+<span><span class="co">#&gt; $ hab_marsh                    &lt;dbl&gt; 1.000, 1.000, 1.000, 0.175, 0.000, 0.175,…</span></span>
+<span><span class="co">#&gt; $ evgr_trees_atleast           &lt;dbl&gt; 11, 11, 11, 0, 11, 1, 4, 4, 4, 1, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ evgr_shrbs_atleast           &lt;dbl&gt; 4, 4, 1, 4, 0, 1, 4, 4, 4, 1, 0, 4, 4, 11…</span></span>
+<span><span class="co">#&gt; $ dcid_trees_atleast           &lt;dbl&gt; 11, 11, 1, 4, 1, 4, 11, 11, 4, 1, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ dcid_shrbs_atleast           &lt;dbl&gt; 4, 4, 4, 1, 1, 4, 11, 11, 1, 1, 0, 4, 4, …</span></span>
+<span><span class="co">#&gt; $ fru_trees_atleast            &lt;dbl&gt; 4.00, 4.00, 1.00, 1.00, 0.00, 0.00, 2.39,…</span></span>
+<span><span class="co">#&gt; $ cacti_atleast                &lt;dbl&gt; 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ brsh_piles_atleast           &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 1, 4, 1, 0, 0, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ water_srcs_atleast           &lt;dbl&gt; 1.000, 1.000, 1.000, 0.000, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ bird_baths_atleast           &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 1, 1, 4, 0, 0, 0, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ nearby_feeders               &lt;dbl&gt; 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ cats                         &lt;dbl&gt; 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ dogs                         &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ humans                       &lt;dbl&gt; 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ housing_density              &lt;dbl&gt; 2, 2, 2, 2, 2, 3, 1, 1, 1, 1, 2, 1, 2, 2,…</span></span>
+<span><span class="co">#&gt; $ fed_in_jan                   &lt;dbl&gt; 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00,…</span></span>
+<span><span class="co">#&gt; $ fed_in_feb                   &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_mar                   &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_apr                   &lt;dbl&gt; 1.000, 1.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_may                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_jun                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_jul                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_aug                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_sep                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_oct                   &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ fed_in_nov                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ fed_in_dec                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_suet              &lt;dbl&gt; 1, 1, 1, 2, 1, 1, 1, 1, 3, 2, 2, 3, 4, 1,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_ground            &lt;dbl&gt; 0.00, 0.00, 1.27, 1.00, 0.00, 1.00, 1.27,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hanging           &lt;dbl&gt; 1.00, 1.00, 2.71, 2.00, 2.71, 1.00, 2.71,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_platfrm           &lt;dbl&gt; 1.00, 1.00, 1.03, 1.03, 0.00, 0.00, 1.03,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_humming           &lt;dbl&gt; 0.000, 0.000, 0.499, 0.499, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_water             &lt;dbl&gt; 1.000, 1.000, 0.789, 0.789, 0.789, 0.000,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_thistle           &lt;dbl&gt; 0.00, 0.00, 1.01, 1.00, 1.01, 0.00, 1.01,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_fruit             &lt;dbl&gt; 0.000, 0.000, 0.144, 0.144, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hopper            &lt;dbl&gt; 1.39, 1.39, 1.00, 1.39, 0.00, 1.39, 1.39,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_tube              &lt;dbl&gt; 2.16, 2.16, 1.00, 2.16, 2.00, 2.16, 1.00,…</span></span>
+<span><span class="co">#&gt; $ numfeeders_other             &lt;dbl&gt; 0.604, 0.604, 0.604, 0.604, 0.000, 0.604,…</span></span>
+<span><span class="co">#&gt; $ population_atleast           &lt;dbl&gt; 1, 1, 1, 25001, 5001, 25001, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ count_area_size_sq_m_atleast &lt;dbl&gt; 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 375.0…</span></span>
+<span><span class="co">#&gt; $ squirrels                    &lt;fct&gt; no squirrels, no squirrels, no squirrels,…</span></span></code></pre></div>
+<p><strong><code>step_</code> functions</strong></p>
+<p>For more information: <a href="https://recipes.tidymodels.org/reference/index.html" class="uri">https://recipes.tidymodels.org/reference/index.html</a></p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">'^step_'</span>, env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.environment.html">as.environment</a></span><span class="op">(</span><span class="st">'package:recipes'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "step_arrange"            "step_bagimpute"         </span></span>
+<span><span class="co">#&gt;  [3] "step_bin2factor"         "step_BoxCox"            </span></span>
+<span><span class="co">#&gt;  [5] "step_bs"                 "step_center"            </span></span>
+<span><span class="co">#&gt;  [7] "step_classdist"          "step_corr"              </span></span>
+<span><span class="co">#&gt;  [9] "step_count"              "step_cut"               </span></span>
+<span><span class="co">#&gt; [11] "step_date"               "step_depth"             </span></span>
+<span><span class="co">#&gt; [13] "step_discretize"         "step_dummy"             </span></span>
+<span><span class="co">#&gt; [15] "step_dummy_extract"      "step_dummy_multi_choice"</span></span>
+<span><span class="co">#&gt; [17] "step_factor2string"      "step_filter"            </span></span>
+<span><span class="co">#&gt; [19] "step_filter_missing"     "step_geodist"           </span></span>
+<span><span class="co">#&gt; [21] "step_harmonic"           "step_holiday"           </span></span>
+<span><span class="co">#&gt; [23] "step_hyperbolic"         "step_ica"               </span></span>
+<span><span class="co">#&gt; [25] "step_impute_bag"         "step_impute_knn"        </span></span>
+<span><span class="co">#&gt; [27] "step_impute_linear"      "step_impute_lower"      </span></span>
+<span><span class="co">#&gt; [29] "step_impute_mean"        "step_impute_median"     </span></span>
+<span><span class="co">#&gt; [31] "step_impute_mode"        "step_impute_roll"       </span></span>
+<span><span class="co">#&gt; [33] "step_indicate_na"        "step_integer"           </span></span>
+<span><span class="co">#&gt; [35] "step_interact"           "step_intercept"         </span></span>
+<span><span class="co">#&gt; [37] "step_inverse"            "step_invlogit"          </span></span>
+<span><span class="co">#&gt; [39] "step_isomap"             "step_knnimpute"         </span></span>
+<span><span class="co">#&gt; [41] "step_kpca"               "step_kpca_poly"         </span></span>
+<span><span class="co">#&gt; [43] "step_kpca_rbf"           "step_lag"               </span></span>
+<span><span class="co">#&gt; [45] "step_lincomb"            "step_log"               </span></span>
+<span><span class="co">#&gt; [47] "step_logit"              "step_lowerimpute"       </span></span>
+<span><span class="co">#&gt; [49] "step_meanimpute"         "step_medianimpute"      </span></span>
+<span><span class="co">#&gt; [51] "step_modeimpute"         "step_mutate"            </span></span>
+<span><span class="co">#&gt; [53] "step_mutate_at"          "step_naomit"            </span></span>
+<span><span class="co">#&gt; [55] "step_nnmf"               "step_nnmf_sparse"       </span></span>
+<span><span class="co">#&gt; [57] "step_normalize"          "step_novel"             </span></span>
+<span><span class="co">#&gt; [59] "step_ns"                 "step_num2factor"        </span></span>
+<span><span class="co">#&gt; [61] "step_nzv"                "step_ordinalscore"      </span></span>
+<span><span class="co">#&gt; [63] "step_other"              "step_pca"               </span></span>
+<span><span class="co">#&gt; [65] "step_percentile"         "step_pls"               </span></span>
+<span><span class="co">#&gt; [67] "step_poly"               "step_poly_bernstein"    </span></span>
+<span><span class="co">#&gt; [69] "step_profile"            "step_range"             </span></span>
+<span><span class="co">#&gt; [71] "step_ratio"              "step_regex"             </span></span>
+<span><span class="co">#&gt; [73] "step_relevel"            "step_relu"              </span></span>
+<span><span class="co">#&gt; [75] "step_rename"             "step_rename_at"         </span></span>
+<span><span class="co">#&gt; [77] "step_rm"                 "step_rollimpute"        </span></span>
+<span><span class="co">#&gt; [79] "step_sample"             "step_scale"             </span></span>
+<span><span class="co">#&gt; [81] "step_select"             "step_shuffle"           </span></span>
+<span><span class="co">#&gt; [83] "step_slice"              "step_spatialsign"       </span></span>
+<span><span class="co">#&gt; [85] "step_spline_b"           "step_spline_convex"     </span></span>
+<span><span class="co">#&gt; [87] "step_spline_monotone"    "step_spline_natural"    </span></span>
+<span><span class="co">#&gt; [89] "step_spline_nonnegative" "step_sqrt"              </span></span>
+<span><span class="co">#&gt; [91] "step_string2factor"      "step_time"              </span></span>
+<span><span class="co">#&gt; [93] "step_unknown"            "step_unorder"           </span></span>
+<span><span class="co">#&gt; [95] "step_window"             "step_YeoJohnson"        </span></span>
+<span><span class="co">#&gt; [97] "step_zv"</span></span></code></pre></div>
+</div>
+</div>
+<div id="building-workflows" class="section level3" number="7.3.4">
+<h3>
+<span class="header-section-number">7.3.4</span> Building workflows<a class="anchor" aria-label="anchor" href="#building-workflows"><i class="fas fa-link"></i></a>
+</h3>
+<p><strong>Workflows</strong> bring together models and recipes so that they can be easily applied to both the training and test data.</p>
+<div id="specify-model" class="section level4 unnumbered">
+<h4>Specify model<a class="anchor" aria-label="anchor" href="#specify-model"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_spec</span> <span class="op">&lt;-</span> <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_spec</span></span>
+<span><span class="co">#&gt; Logistic Regression Model Specification (classification)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Computational engine: glm</span></span></code></pre></div>
+<p><strong>The workflow:</strong> Notice that the two important parts to the workflows are the model specification and the feature engineering recipe information.</p>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_wflow</span></span>
+<span><span class="co">#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; Preprocessor: Recipe</span></span>
+<span><span class="co">#&gt; Model: logistic_reg()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; 2 Recipe Steps</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; • step_impute_mean()</span></span>
+<span><span class="co">#&gt; • step_nzv()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Model ───────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Logistic Regression Model Specification (classification)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Computational engine: glm</span></span></code></pre></div>
+</div>
+<div id="fit-model-to-training-data" class="section level4 unnumbered">
+<h4>Fit model to training data<a class="anchor" aria-label="anchor" href="#fit-model-to-training-data"><i class="fas fa-link"></i></a>
+</h4>
+<p>With the workflow in hand, the model can now be fit to the training data. Although, wow… there are <em>so many predictors</em>!</p>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">21</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 59 × 5</span></span>
+<span><span class="co">#&gt;    term               estimate std.error statistic   p.value</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 (Intercept)         -1.42     0.0505    -28.2   2.26e-174</span></span>
+<span><span class="co">#&gt;  2 yard_type_pavement  -0.854    0.149      -5.74  9.23e-  9</span></span>
+<span><span class="co">#&gt;  3 yard_type_garden    -0.175    0.0392     -4.47  7.89e-  6</span></span>
+<span><span class="co">#&gt;  4 yard_type_landsca    0.168    0.0219      7.69  1.45e- 14</span></span>
+<span><span class="co">#&gt;  5 yard_type_woods      0.309    0.0170     18.1   1.59e- 73</span></span>
+<span><span class="co">#&gt;  6 yard_type_desert    -0.297    0.0789     -3.76  1.68e-  4</span></span>
+<span><span class="co">#&gt;  7 hab_dcid_woods       0.336    0.0161     20.9   6.55e- 97</span></span>
+<span><span class="co">#&gt;  8 hab_evgr_woods      -0.0797   0.0192     -4.15  3.36e-  5</span></span>
+<span><span class="co">#&gt;  9 hab_mixed_woods      0.420    0.0158     26.5   3.17e-155</span></span>
+<span><span class="co">#&gt; 10 hab_orchard         -0.307    0.0252    -12.2   4.00e- 34</span></span>
+<span><span class="co">#&gt; 11 hab_park             0.0614   0.0192      3.20  1.36e-  3</span></span>
+<span><span class="co">#&gt; 12 hab_water_fresh      0.0638   0.0157      4.07  4.79e-  5</span></span>
+<span><span class="co">#&gt; 13 hab_water_salt      -0.320    0.0331     -9.67  4.03e- 22</span></span>
+<span><span class="co">#&gt; 14 hab_residential      0.197    0.0208      9.51  1.88e- 21</span></span>
+<span><span class="co">#&gt; 15 hab_industrial      -0.0365   0.0191     -1.91  5.61e-  2</span></span>
+<span><span class="co">#&gt; 16 hab_agricultural    -0.578    0.0179    -32.3   2.87e-228</span></span>
+<span><span class="co">#&gt; 17 hab_desert_scrub    -0.557    0.0240    -23.2   2.42e-119</span></span>
+<span><span class="co">#&gt; 18 hab_young_woods      0.0874   0.0186      4.70  2.63e-  6</span></span>
+<span><span class="co">#&gt; 19 hab_swamp            0.406    0.0223     18.2   5.54e- 74</span></span>
+<span><span class="co">#&gt; 20 hab_marsh           -0.0149   0.0231     -0.644 5.20e-  1</span></span>
+<span><span class="co">#&gt; 21 evgr_trees_atleast   0.0405   0.00220    18.4   1.44e- 75</span></span>
+<span><span class="co">#&gt; # … with 38 more rows</span></span></code></pre></div>
+</div>
+</div>
+<div id="evaluate-the-model" class="section level3" number="7.3.5">
+<h3>
+<span class="header-section-number">7.3.5</span> Evaluate the model<a class="anchor" aria-label="anchor" href="#evaluate-the-model"><i class="fas fa-link"></i></a>
+</h3>
+<div id="predictions-for-training-data" class="section level4 unnumbered">
+<h4>Predictions for training data<a class="anchor" aria-label="anchor" href="#predictions-for-training-data"><i class="fas fa-link"></i></a>
+</h4>
+</div>
+<div id="model-assessment-1" class="section level4 unnumbered">
+<h4>Model assessment<a class="anchor" aria-label="anchor" href="#model-assessment-1"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_train_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_fit</span>, <span class="va">feeder_train</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.pred_squirrels</span> <span class="op">&gt;=</span><span class="fl">0.5</span>,</span>
+<span>                                        <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_train</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_train_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               .pred_class</span></span>
+<span><span class="co">#&gt; squirrels      no squirrels squirrels</span></span>
+<span><span class="co">#&gt;   no squirrels         3448     30544</span></span>
+<span><span class="co">#&gt;   squirrels            2122    140649</span></span>
+<span></span>
+<span><span class="fu">roc_auc</span><span class="op">(</span><span class="va">feeder_train_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">`.pred_no squirrels`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 roc_auc binary         0.720</span></span>
+<span></span>
+<span><span class="fu">accuracy</span><span class="op">(</span><span class="va">feeder_train_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 accuracy binary         0.815</span></span>
+<span></span>
+<span><span class="fu">sensitivity</span><span class="op">(</span><span class="va">feeder_train_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sensitivity binary         0.101</span></span>
+<span></span>
+<span><span class="fu">specificity</span><span class="op">(</span><span class="va">feeder_train_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 specificity binary         0.985</span></span>
+<span></span>
+<span><span class="va">feeder_train_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">plotROC</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plotROC/man/geom_roc.html">geom_roc</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">.pred_squirrels</span>, d <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;"></div>
+<p>Wow, that model does <strong>TERRIBLY</strong> at predicting when there are no squirrels. Yikes! (The underlying problem is all about the imbalance in the dataset.)</p>
+<p>But, really…</p>
+<p><em>who cares about predictions on <strong>training</strong> data?</em></p>
+</div>
+</div>
+<div id="predictions-for-testing-data" class="section level3 unnumbered">
+<h3>Predictions for testing data<a class="anchor" aria-label="anchor" href="#predictions-for-testing-data"><i class="fas fa-link"></i></a>
+</h3>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_fit</span>, <span class="va">feeder_test</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_test</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_test_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               squirrels</span></span>
+<span><span class="co">#&gt; .pred_class    no squirrels squirrels</span></span>
+<span><span class="co">#&gt;   no squirrels         1119       726</span></span>
+<span><span class="co">#&gt;   squirrels           10212     46865</span></span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_fit</span>, <span class="va">feeder_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.pred_squirrels</span> <span class="op">&gt;=</span><span class="fl">0.5</span>,</span>
+<span>                                        <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_test</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_test_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               .pred_class</span></span>
+<span><span class="co">#&gt; squirrels      no squirrels squirrels</span></span>
+<span><span class="co">#&gt;   no squirrels         1119     10212</span></span>
+<span><span class="co">#&gt;   squirrels             726     46865</span></span>
+<span></span>
+<span><span class="fu">roc_auc</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">`.pred_no squirrels`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 roc_auc binary         0.721</span></span>
+<span></span>
+<span><span class="fu">accuracy</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 accuracy binary         0.814</span></span>
+<span></span>
+<span><span class="fu">sensitivity</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sensitivity binary        0.0988</span></span>
+<span></span>
+<span><span class="fu">specificity</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 specificity binary         0.985</span></span>
+<span></span>
+<span><span class="va">feeder_test_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">plotROC</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plotROC/man/geom_roc.html">geom_roc</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">.pred_squirrels</span>, d <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;"></div>
+<div id="evaluating-performance-on-training-data" class="section level4 unnumbered">
+<h4>Evaluating performance on training data<a class="anchor" aria-label="anchor" href="#evaluating-performance-on-training-data"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li><p>The training set does not have the capacity to be a good arbiter of performance.</p></li>
+<li><p>It is not an independent piece of information; predicting the training set can only reflect what the model already knows.</p></li>
+<li><p>Suppose you give a class a test, then give them the answers, then provide the same test.
+The student scores on the second test do not accurately reflect what they know about the subject; these scores would probably be higher than their results on the first test.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="cross-validation" class="section level2" number="7.4">
+<h2>
+<span class="header-section-number">7.4</span> Cross Validation<a class="anchor" aria-label="anchor" href="#cross-validation"><i class="fas fa-link"></i></a>
+</h2>
+<p>Before reading the notes, look through <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/" target="_blank">this great visualization</a>. Don’t worry about building the model (classification trees are not a topic for class), but check out the end where they talk about predicting on test and training data.</p>
+<p>In order to motivate cross validation, let’s set up the scenario for when we need cross validation. Recall that we use the test data to assess how the model does. But we haven’t yet thought about how to use the data to <strong>build</strong> a particular model.</p>
+<p>For example, let’s set up a scenario to compare two different models to predict whether or not there are squirrels. The first model removes the information about the habitat and about the trees and shrubs, but it is otherwise similar to the model above. The second model does use the habitat + trees + shrubs information, but it removes the information about feeding the birds.</p>
+<p><strong>Model 1:</strong></p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec1</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the habitat variables</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"hab"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the tree/shrub info</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"atleast"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">prep</span><span class="op">(</span><span class="va">feeder_rec1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="fu">bake</span><span class="op">(</span><span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 176,763</span></span>
+<span><span class="co">#&gt; Columns: 34</span></span>
+<span><span class="co">#&gt; $ yard_type_pavement &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</span></span>
+<span><span class="co">#&gt; $ yard_type_garden   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</span></span>
+<span><span class="co">#&gt; $ yard_type_landsca  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ yard_type_woods    &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ yard_type_desert   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</span></span>
+<span><span class="co">#&gt; $ nearby_feeders     &lt;dbl&gt; 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ cats               &lt;dbl&gt; 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ dogs               &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, …</span></span>
+<span><span class="co">#&gt; $ humans             &lt;dbl&gt; 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, …</span></span>
+<span><span class="co">#&gt; $ housing_density    &lt;dbl&gt; 2, 2, 2, 2, 2, 3, 1, 1, 1, 1, 2, 1, 2, 2, 3, 3, 3, …</span></span>
+<span><span class="co">#&gt; $ fed_in_jan         &lt;dbl&gt; 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 1.00, 1.0…</span></span>
+<span><span class="co">#&gt; $ fed_in_feb         &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_mar         &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_apr         &lt;dbl&gt; 1.000, 1.000, 0.000, 1.000, 1.000, 0.000, 0.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_may         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000, 0.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_jun         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000, 0.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_jul         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_aug         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_sep         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_oct         &lt;dbl&gt; 0.000, 0.000, 0.000, 1.000, 1.000, 1.000, 1.000, 1.…</span></span>
+<span><span class="co">#&gt; $ fed_in_nov         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ fed_in_dec         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ numfeeders_suet    &lt;dbl&gt; 1, 1, 1, 2, 1, 1, 1, 1, 3, 2, 2, 3, 4, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ numfeeders_ground  &lt;dbl&gt; 0.00, 0.00, 1.27, 1.00, 0.00, 1.00, 1.27, 1.00, 0.0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hanging &lt;dbl&gt; 1.00, 1.00, 2.71, 2.00, 2.71, 1.00, 2.71, 2.00, 3.0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_platfrm &lt;dbl&gt; 1.00, 1.00, 1.03, 1.03, 0.00, 0.00, 1.03, 2.00, 0.0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_humming &lt;dbl&gt; 0.000, 0.000, 0.499, 0.499, 0.000, 0.000, 1.000, 0.…</span></span>
+<span><span class="co">#&gt; $ numfeeders_water   &lt;dbl&gt; 1.000, 1.000, 0.789, 0.789, 0.789, 0.000, 0.789, 1.…</span></span>
+<span><span class="co">#&gt; $ numfeeders_thistle &lt;dbl&gt; 0.00, 0.00, 1.01, 1.00, 1.01, 0.00, 1.01, 1.00, 1.0…</span></span>
+<span><span class="co">#&gt; $ numfeeders_fruit   &lt;dbl&gt; 0.000, 0.000, 0.144, 0.144, 0.000, 0.000, 0.144, 0.…</span></span>
+<span><span class="co">#&gt; $ numfeeders_hopper  &lt;dbl&gt; 1.39, 1.39, 1.00, 1.39, 0.00, 1.39, 1.39, 1.39, 1.3…</span></span>
+<span><span class="co">#&gt; $ numfeeders_tube    &lt;dbl&gt; 2.16, 2.16, 1.00, 2.16, 2.00, 2.16, 1.00, 2.16, 2.1…</span></span>
+<span><span class="co">#&gt; $ numfeeders_other   &lt;dbl&gt; 0.604, 0.604, 0.604, 0.604, 0.000, 0.604, 0.604, 0.…</span></span>
+<span><span class="co">#&gt; $ squirrels          &lt;fct&gt; no squirrels, no squirrels, no squirrels, no squirr…</span></span></code></pre></div>
+<p><strong>Model 2:</strong></p>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec2</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the variables on when the birds were fed</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"fed"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the variables about the bird feeders</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"feed"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">prep</span><span class="op">(</span><span class="va">feeder_rec2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="fu">bake</span><span class="op">(</span><span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">glimpse</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 176,763</span></span>
+<span><span class="co">#&gt; Columns: 35</span></span>
+<span><span class="co">#&gt; $ yard_type_pavement           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_garden             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_landsca            &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ yard_type_woods              &lt;dbl&gt; 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0,…</span></span>
+<span><span class="co">#&gt; $ yard_type_desert             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ hab_dcid_woods               &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_evgr_woods               &lt;dbl&gt; 0.223, 0.223, 0.000, 0.223, 0.000, 0.223,…</span></span>
+<span><span class="co">#&gt; $ hab_mixed_woods              &lt;dbl&gt; 1.000, 1.000, 1.000, 0.655, 0.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_orchard                  &lt;dbl&gt; 0.0932, 0.0932, 0.0000, 0.0932, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_park                     &lt;dbl&gt; 0.45, 0.45, 0.00, 0.45, 0.00, 0.45, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_water_fresh              &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 0.605,…</span></span>
+<span><span class="co">#&gt; $ hab_water_salt               &lt;dbl&gt; 0.0502, 0.0502, 0.0000, 0.0502, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_residential              &lt;dbl&gt; 1.000, 1.000, 1.000, 1.000, 1.000, 1.000,…</span></span>
+<span><span class="co">#&gt; $ hab_industrial               &lt;dbl&gt; 0.222, 0.222, 0.000, 0.222, 0.000, 0.222,…</span></span>
+<span><span class="co">#&gt; $ hab_agricultural             &lt;dbl&gt; 1.00, 1.00, 1.00, 0.41, 1.00, 0.41, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_desert_scrub             &lt;dbl&gt; 0.0926, 0.0926, 0.0000, 0.0926, 0.0000, 0…</span></span>
+<span><span class="co">#&gt; $ hab_young_woods              &lt;dbl&gt; 0.35, 0.35, 0.00, 0.35, 0.00, 1.00, 0.00,…</span></span>
+<span><span class="co">#&gt; $ hab_swamp                    &lt;dbl&gt; 0.292, 0.292, 0.000, 0.292, 0.000, 0.292,…</span></span>
+<span><span class="co">#&gt; $ hab_marsh                    &lt;dbl&gt; 1.000, 1.000, 1.000, 0.175, 0.000, 0.175,…</span></span>
+<span><span class="co">#&gt; $ evgr_trees_atleast           &lt;dbl&gt; 11, 11, 11, 0, 11, 1, 4, 4, 4, 1, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ evgr_shrbs_atleast           &lt;dbl&gt; 4, 4, 1, 4, 0, 1, 4, 4, 4, 1, 0, 4, 4, 11…</span></span>
+<span><span class="co">#&gt; $ dcid_trees_atleast           &lt;dbl&gt; 11, 11, 1, 4, 1, 4, 11, 11, 4, 1, 1, 1, 1…</span></span>
+<span><span class="co">#&gt; $ dcid_shrbs_atleast           &lt;dbl&gt; 4, 4, 4, 1, 1, 4, 11, 11, 1, 1, 0, 4, 4, …</span></span>
+<span><span class="co">#&gt; $ fru_trees_atleast            &lt;dbl&gt; 4.00, 4.00, 1.00, 1.00, 0.00, 0.00, 2.39,…</span></span>
+<span><span class="co">#&gt; $ cacti_atleast                &lt;dbl&gt; 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ brsh_piles_atleast           &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 1, 4, 1, 0, 0, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ water_srcs_atleast           &lt;dbl&gt; 1.000, 1.000, 1.000, 0.000, 0.000, 0.000,…</span></span>
+<span><span class="co">#&gt; $ bird_baths_atleast           &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 1, 1, 4, 0, 0, 0, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ cats                         &lt;dbl&gt; 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ dogs                         &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,…</span></span>
+<span><span class="co">#&gt; $ humans                       &lt;dbl&gt; 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1,…</span></span>
+<span><span class="co">#&gt; $ housing_density              &lt;dbl&gt; 2, 2, 2, 2, 2, 3, 1, 1, 1, 1, 2, 1, 2, 2,…</span></span>
+<span><span class="co">#&gt; $ population_atleast           &lt;dbl&gt; 1, 1, 1, 25001, 5001, 25001, 1, 1, 1, 1, …</span></span>
+<span><span class="co">#&gt; $ count_area_size_sq_m_atleast &lt;dbl&gt; 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 375.0…</span></span>
+<span><span class="co">#&gt; $ squirrels                    &lt;fct&gt; no squirrels, no squirrels, no squirrels,…</span></span></code></pre></div>
+<div id="creating-workflows" class="section level4 unnumbered">
+<h4>Creating workflows<a class="anchor" aria-label="anchor" href="#creating-workflows"><i class="fas fa-link"></i></a>
+</h4>
+<p>Using each of the separate recipes, different workflows are set up:</p>
+<p><strong>Model 1:</strong></p>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_wflow1</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_wflow1</span></span>
+<span><span class="co">#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; Preprocessor: Recipe</span></span>
+<span><span class="co">#&gt; Model: logistic_reg()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; 4 Recipe Steps</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; • step_rm()</span></span>
+<span><span class="co">#&gt; • step_rm()</span></span>
+<span><span class="co">#&gt; • step_impute_mean()</span></span>
+<span><span class="co">#&gt; • step_nzv()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Model ───────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Logistic Regression Model Specification (classification)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Computational engine: glm</span></span></code></pre></div>
+<p><strong>Model 2:</strong></p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_wflow2</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec2</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">feeder_wflow2</span></span>
+<span><span class="co">#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co">#&gt; Preprocessor: Recipe</span></span>
+<span><span class="co">#&gt; Model: logistic_reg()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; 4 Recipe Steps</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; • step_rm()</span></span>
+<span><span class="co">#&gt; • step_rm()</span></span>
+<span><span class="co">#&gt; • step_impute_mean()</span></span>
+<span><span class="co">#&gt; • step_nzv()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Model ───────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Logistic Regression Model Specification (classification)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Computational engine: glm</span></span></code></pre></div>
+</div>
+<div id="fit-the-models-to-the-training-data" class="section level4 unnumbered">
+<h4>Fit the models to the training data<a class="anchor" aria-label="anchor" href="#fit-the-models-to-the-training-data"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>WAIT</strong>, not so fast!</p>
+</div>
+<div id="implementing-cross-validation" class="section level4 unnumbered">
+<h4>Implementing Cross Validation<a class="anchor" aria-label="anchor" href="#implementing-cross-validation"><i class="fas fa-link"></i></a>
+</h4>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-34"></span>
+<img src="figs/overfitting.jpg" alt="[@flach12]" width="100%"><p class="caption">
+Figure 7.2: <span class="citation">(<a href="#ref-flach12" role="doc-biblioref"><strong>flach12?</strong></a>)</span>
+</p>
+</div>
+<p>Cross validation is typically used in two ways.</p>
+<ol style="list-style-type: decimal">
+<li>To assess a model’s accuracy (<em>model assessment</em>).<br>
+</li>
+<li>To build a model (<em>model selection</em>).</li>
+</ol>
+</div>
+<div id="different-ways-to-cv" class="section level3" number="7.4.1">
+<h3>
+<span class="header-section-number">7.4.1</span> Different ways to CV<a class="anchor" aria-label="anchor" href="#different-ways-to-cv"><i class="fas fa-link"></i></a>
+</h3>
+<p>Suppose that we build a classifier on a given data set. We’d like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model’s inherent accuracy rate. Instead, we’d like to predict <em>new</em> observations that were not used to create the model. There are various ways of creating <em>test</em> or <em>validation</em> sets of data:</p>
+<ul>
+<li><p>one training set, one test set [two drawbacks: estimate of error is highly variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]</p></li>
+<li><p>leave one out cross validation (LOOCV)</p></li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>remove one observation</li>
+<li>build the model using the remaining n-1 points</li>
+<li>predict class membership for the observation which was removed</li>
+<li>repeat by removing each observation one at a time</li>
+</ol>
+<ul>
+<li>
+<span class="math inline">\(V\)</span>-fold cross validation (<span class="math inline">\(V\)</span>-fold CV)
+<ul>
+<li>like LOOCV except that the algorithm is run <span class="math inline">\(V\)</span> times on each group (of approximately equal size) from a partition of the data set.]</li>
+<li>LOOCV is a special case of <span class="math inline">\(V\)</span>-fold CV with <span class="math inline">\(V=n\)</span>
+</li>
+<li>advantage of <span class="math inline">\(V\)</span>-fold is computational</li>
+<li>
+<span class="math inline">\(V\)</span>-fold often has a better bias-variance trade-off [bias is lower with LOOCV. however, because LOOCV predicts <span class="math inline">\(n\)</span> observations from <span class="math inline">\(n\)</span> models which are basically the same, the variability will be higher (i.e., based on the <span class="math inline">\(n\)</span> data values). with <span class="math inline">\(V\)</span>-fold, prediction is on <span class="math inline">\(n\)</span> values from <span class="math inline">\(V\)</span> models which are much less correlated. the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.]</li>
+</ul>
+</li>
+</ul>
+<div id="cv-for-model-assessment-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model assessment</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>assume variables are set</li>
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+<li>a good measure of the model’s ability to predict is the error rate associated with the predictions on the data which have been independently predicted</li>
+</ol>
+</div>
+<div id="cv-for-model-selection-10-fold" class="section level4 unnumbered">
+<h4>CV for <strong>Model selection</strong> 10-fold<a class="anchor" aria-label="anchor" href="#cv-for-model-selection-10-fold"><i class="fas fa-link"></i></a>
+</h4>
+<ol style="list-style-type: decimal">
+<li>set the variables</li>
+<li>build the model using the variables set above:
+<ol style="list-style-type: lower-alpha">
+<li>remove 10% of the data</li>
+<li>build the model using the remaining 90%</li>
+<li>predict response for the 10% of the observations which were removed</li>
+<li>repeat by removing each decile one at a time</li>
+</ol>
+</li>
+<li>measure the CV prediction error for the <span class="math inline">\(k\)</span> value at hand</li>
+<li>repeat steps 1-3 and choose the variables for which the prediction error is lowest</li>
+</ol>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-35"></span>
+<img src="figs/CV.png" alt="4-fold CV is depicted.  Notice that the holdout group is never used as part of the coefficient estimation process." width="90%"><p class="caption">
+Figure 7.3: 4-fold CV is depicted. Notice that the holdout group is never used as part of the coefficient estimation process.
+</p>
+</div>
+<p>Once the model has been built (i.e., the variables have been selected), we can come up with a good estimate of the accuracy in the wild by applying the model to the test data.</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-37"></span>
+<img src="figs/CV.jpg" alt="Nested cross-validation: two cross-validation loops are run one inside the other.  [@CVpaper]" width="100%"><p class="caption">
+Figure 7.4: Nested cross-validation: two cross-validation loops are run one inside the other. <span class="citation">(<a href="#ref-CVpaper" role="doc-biblioref"><strong>CVpaper?</strong></a>)</span>
+</p>
+</div>
+</div>
+</div>
+<div id="fit-the-models-using-cross-validation" class="section level3" number="7.4.2">
+<h3>
+<span class="header-section-number">7.4.2</span> Fit the models using cross validation<a class="anchor" aria-label="anchor" href="#fit-the-models-using-cross-validation"><i class="fas fa-link"></i></a>
+</h3>
+<div id="spending-the-data" class="section level4 unnumbered">
+<h4>“Spending” the data<a class="anchor" aria-label="anchor" href="#spending-the-data"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>We have already established that the idea of data spending where the test set was recommended for obtaining an unbiased estimate of performance.</li>
+<li>However, we need to decide which model to choose <em>before using the test set</em>.</li>
+<li>Typically we can’t decide on <em>which</em> final model to take to the test set without making model assessments.</li>
+<li>Remedy: Cross validation to make model assessments on training data in a way that can generalize to new data.</li>
+</ul>
+</div>
+<div id="cv-for-model-assessment" class="section level4 unnumbered">
+<h4>CV for model assessment<a class="anchor" aria-label="anchor" href="#cv-for-model-assessment"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Cross validation is only conducted on the training set</strong>.
+The test set is not involved.
+For each iteration, the data are partitioned into two subsamples:</p>
+<ul>
+<li>The model is fit with the <strong>analysis set</strong>.</li>
+<li>The model is evaluated with the <strong>assessment set</strong>.</li>
+</ul>
+</div>
+<div id="cross-validation-1" class="section level4 unnumbered">
+<h4>Cross validation<a class="anchor" aria-label="anchor" href="#cross-validation-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>More specifically, <strong>v-fold cross validation</strong>:</p>
+<ul>
+<li>Randomly split the <strong>training</strong> <strong>data</strong> into v partitions</li>
+<li>Use 1 partition for assessment, and the remaining v-1 partitions for analysis</li>
+<li>Repeat v times, updating which partition is used for assessment each time</li>
+</ul>
+<p>Let’s give an example where <code>v = 3</code>…</p>
+</div>
+<div id="cross-validation-step-1" class="section level4 unnumbered">
+<h4>Cross validation, step 1<a class="anchor" aria-label="anchor" href="#cross-validation-step-1"><i class="fas fa-link"></i></a>
+</h4>
+<p>Consider the example below where the <strong>training</strong> <strong>data</strong> are randomly split into 3 partitions:</p>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-40"></span>
+<img src="figs/three-CV.svg" alt="Thirty observations are seen where three colors are used to demonstrate that the observations can be partitioned into three groups." width="100%"><p class="caption">
+Figure 7.5: Splitting the data into a partition of v=3 groups. Source: <span class="citation">(<a href="#ref-tidymodelingR" role="doc-biblioref"><strong>tidymodelingR?</strong></a>)</span>
+</p>
+</div>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">4747</span><span class="op">)</span></span>
+<span><span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">feeder_train</span>, v <span class="op">=</span> <span class="fl">3</span>, strata <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span></span>
+<span><span class="va">folds</span></span>
+<span><span class="co">#&gt; #  3-fold cross-validation using stratification </span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   splits                 id   </span></span>
+<span><span class="co">#&gt;   &lt;list&gt;                 &lt;chr&gt;</span></span>
+<span><span class="co">#&gt; 1 &lt;split [117841/58922]&gt; Fold1</span></span>
+<span><span class="co">#&gt; 2 &lt;split [117842/58921]&gt; Fold2</span></span>
+<span><span class="co">#&gt; 3 &lt;split [117843/58920]&gt; Fold3</span></span></code></pre></div>
+<p>Note that the three repeated samples (“resamples”) are taken without replacement from the original dataset.</p>
+</div>
+<div id="cross-validation-steps-2-and-3" class="section level4 unnumbered">
+<h4>Cross validation, steps 2 and 3<a class="anchor" aria-label="anchor" href="#cross-validation-steps-2-and-3"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Use 1 partition for assessment, and the remaining v-1 partitions for analysis</li>
+<li>Repeat v times, updating which partition is used for assessment each time</li>
+</ul>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:unnamed-chunk-42"></span>
+<img src="figs/three-CV-iter.svg" alt="Three iterations of model fitting are shown, each time using only 2/3 of the observations.  The remaining 1/3 of the observations are used to estimate the performance of the model." width="100%"><p class="caption">
+Figure 7.6: With the data split into three groups, we can see how 2/3 of the observations are used to fit the model and 1/3 of the observations are used to estimate the performance of the model. Source: <span class="citation">(<a href="#ref-tidymodelingR" role="doc-biblioref"><strong>tidymodelingR?</strong></a>)</span>
+</p>
+</div>
+</div>
+<div id="fit-cv-folds" class="section level4 unnumbered">
+<h4>Fit CV folds<a class="anchor" aria-label="anchor" href="#fit-cv-folds"><i class="fas fa-link"></i></a>
+</h4>
+<p>After the data have been split into v (here 3) resamples, they can each be fit to the two models of interest.</p>
+<p>Let’s also make sure that we can get back all of the metrics we are interested in:</p>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">metrics_interest</span> <span class="op">&lt;-</span> <span class="fu">metric_set</span><span class="op">(</span><span class="va">accuracy</span>, <span class="va">roc_auc</span>, </span>
+<span>                              <span class="va">sensitivity</span>, <span class="va">specificity</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p>sensitivty = number of squirrels that are accurately predicted to be squirrels (true positive rate)</p>
+</blockquote>
+<blockquote>
+<p>specificity = number of non-squirrels that are accurately predicted to be non-squirrels (true negative rate)</p>
+</blockquote>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_train</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; squirrels</span></span>
+<span><span class="co">#&gt; no squirrels    squirrels </span></span>
+<span><span class="co">#&gt;        33992       142771</span></span></code></pre></div>
+<p><strong>Model 1:</strong></p>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit_rs1</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">fit_resamples</span><span class="op">(</span>resamples <span class="op">=</span> <span class="va">folds</span>,</span>
+<span>                metrics <span class="op">=</span> <span class="va">metrics_interest</span>,</span>
+<span>                control <span class="op">=</span> <span class="fu">control_resamples</span><span class="op">(</span>save_pred <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_fit_rs1</span></span>
+<span><span class="co">#&gt; # Resampling results</span></span>
+<span><span class="co">#&gt; # 3-fold cross-validation using stratification </span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
+<span><span class="co">#&gt;   splits                 id    .metrics         .notes           .predictions</span></span>
+<span><span class="co">#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;           &lt;list&gt;           &lt;list&gt;      </span></span>
+<span><span class="co">#&gt; 1 &lt;split [117841/58922]&gt; Fold1 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </span></span>
+<span><span class="co">#&gt; 2 &lt;split [117842/58921]&gt; Fold2 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </span></span>
+<span><span class="co">#&gt; 3 &lt;split [117843/58920]&gt; Fold3 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;</span></span></code></pre></div>
+<p><strong>Model 2:</strong></p>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit_rs2</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">fit_resamples</span><span class="op">(</span>resamples <span class="op">=</span> <span class="va">folds</span>,</span>
+<span>                metrics <span class="op">=</span> <span class="va">metrics_interest</span>,</span>
+<span>                control <span class="op">=</span> <span class="fu">control_resamples</span><span class="op">(</span>save_pred <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_fit_rs2</span></span>
+<span><span class="co">#&gt; # Resampling results</span></span>
+<span><span class="co">#&gt; # 3-fold cross-validation using stratification </span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
+<span><span class="co">#&gt;   splits                 id    .metrics         .notes           .predictions</span></span>
+<span><span class="co">#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;           &lt;list&gt;           &lt;list&gt;      </span></span>
+<span><span class="co">#&gt; 1 &lt;split [117841/58922]&gt; Fold1 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </span></span>
+<span><span class="co">#&gt; 2 &lt;split [117842/58921]&gt; Fold2 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </span></span>
+<span><span class="co">#&gt; 3 &lt;split [117843/58920]&gt; Fold3 &lt;tibble [4 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;</span></span></code></pre></div>
+</div>
+<div id="cross-validation-now-what" class="section level4 unnumbered">
+<h4>Cross validation, now what?<a class="anchor" aria-label="anchor" href="#cross-validation-now-what"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>We’ve fit a bunch of models</li>
+<li>Now it’s time to use them to collect metrics (e.g., accuracy or AUC) on each model and use them to evaluate model fit and how it varies across folds</li>
+</ul>
+</div>
+<div id="collect-cv-metrics" class="section level4 unnumbered">
+<h4>Collect CV metrics<a class="anchor" aria-label="anchor" href="#collect-cv-metrics"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Model 1:</strong></p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">feeder_fit_rs1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 6</span></span>
+<span><span class="co">#&gt;   .metric     .estimator   mean     n  std_err .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 accuracy    binary     0.809      3 0.000247 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 roc_auc     binary     0.663      3 0.00180  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 sensitivity binary     0.0265     3 0.000545 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 specificity binary     0.996      3 0.000190 Preprocessor1_Model1</span></span></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit_rs1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>squirrels <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/conf_mat.html">conf_mat</a></span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"heatmap"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient</a></span><span class="op">(</span>low<span class="op">=</span><span class="st">"#D6EAF8"</span>, high<span class="op">=</span><span class="st">"#2E86C1"</span><span class="op">)</span> </span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-48-1.png" width="80%" style="display: block; margin: auto;"></div>
+<p><strong>Model 2:</strong></p>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">feeder_fit_rs2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 6</span></span>
+<span><span class="co">#&gt;   .metric     .estimator   mean     n  std_err .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 accuracy    binary     0.813      3 0.000325 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 roc_auc     binary     0.698      3 0.00228  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 sensitivity binary     0.0693     3 0.000291 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 specificity binary     0.990      3 0.000424 Preprocessor1_Model1</span></span></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit_rs2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">augment</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>squirrels <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/conf_mat.html">conf_mat</a></span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">.pred_class</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"heatmap"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient</a></span><span class="op">(</span>low<span class="op">=</span><span class="st">"#D6EAF8"</span>, high<span class="op">=</span><span class="st">"#2E86C1"</span><span class="op">)</span> </span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-50-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
+<div id="deeper-look-into-cv-metrics" class="section level4 unnumbered">
+<h4>Deeper look into CV metrics<a class="anchor" aria-label="anchor" href="#deeper-look-into-cv-metrics"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Model 1:</strong></p>
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv_metrics1</span> <span class="op">&lt;-</span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="va">feeder_fit_rs1</span>, summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">cv_metrics1</span></span>
+<span><span class="co">#&gt; # A tibble: 12 × 5</span></span>
+<span><span class="co">#&gt;   id    .metric     .estimator .estimate .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 Fold1 accuracy    binary        0.810  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 Fold1 sensitivity binary        0.0275 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 Fold1 specificity binary        0.996  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 Fold1 roc_auc     binary        0.666  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 5 Fold2 accuracy    binary        0.809  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 6 Fold2 sensitivity binary        0.0257 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; # … with 6 more rows</span></span></code></pre></div>
+<p><strong>Model 2:</strong></p>
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv_metrics2</span> <span class="op">&lt;-</span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="va">feeder_fit_rs2</span>, summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">cv_metrics2</span></span>
+<span><span class="co">#&gt; # A tibble: 12 × 5</span></span>
+<span><span class="co">#&gt;   id    .metric     .estimator .estimate .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 Fold1 accuracy    binary        0.813  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 Fold1 sensitivity binary        0.0687 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 Fold1 specificity binary        0.990  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 Fold1 roc_auc     binary        0.699  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 5 Fold2 accuracy    binary        0.812  Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 6 Fold2 sensitivity binary        0.0695 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; # … with 6 more rows</span></span></code></pre></div>
+</div>
+<div id="better-tabulation-of-cv-metrics" class="section level4 unnumbered">
+<h4>Better tabulation of CV metrics<a class="anchor" aria-label="anchor" href="#better-tabulation-of-cv-metrics"><i class="fas fa-link"></i></a>
+</h4>
+<p><strong>Model 1:</strong></p>
+<pre><code>#&gt; # A tibble: 3 × 5
+#&gt;   id    accuracy sensitivity specificity roc_auc
+#&gt;   &lt;chr&gt;    &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 Fold1    0.81        0.028       0.996   0.666
+#&gt; 2 Fold2    0.809       0.026       0.995   0.662
+#&gt; 3 Fold3    0.809       0.026       0.996   0.66</code></pre>
+<p><strong>Model 2:</strong></p>
+<pre><code>#&gt; # A tibble: 3 × 5
+#&gt;   id    accuracy sensitivity specificity roc_auc
+#&gt;   &lt;chr&gt;    &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 Fold1    0.813       0.069       0.99    0.699
+#&gt; 2 Fold2    0.812       0.069       0.989   0.701
+#&gt; 3 Fold3    0.813       0.07        0.99    0.693</code></pre>
+<p><strong>Conclusions:</strong></p>
+<ul>
+<li>The logistic model is <strong>terrible</strong> at predicting when there are no squirrels (this is partly due to imbalanced data).</li>
+<li>It seems as though the linear model which includes the information about the habitat and the trees does a slightly better job than the linear model that includes the information about when and how the birds are fed.</li>
+</ul>
+</div>
+<div id="cross-validation-jargon" class="section level4 unnumbered">
+<h4>Cross validation jargon<a class="anchor" aria-label="anchor" href="#cross-validation-jargon"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li>Referred to as v-fold or k-fold cross validation</li>
+<li>Also commonly abbreviated as CV</li>
+</ul>
+</div>
+<div id="cross-validation-redux" class="section level4 unnumbered">
+<h4>Cross validation, redux<a class="anchor" aria-label="anchor" href="#cross-validation-redux"><i class="fas fa-link"></i></a>
+</h4>
+<ul>
+<li><p>To illustrate how CV works, we used <code>v = 3</code>:</p></li>
+<li><p>Analysis sets are 2/3 of the training set</p></li>
+<li><p>Each assessment set is a distinct 1/3</p></li>
+<li><p>The final resampling estimate of performance averages each of the 3 replicates</p></li>
+<li><p>It was useful for illustrative purposes, but <code>v = 3</code> is a poor choice in practice</p></li>
+<li><p>Values of <code>v</code> are most often 5 or 10; we generally prefer 10-fold cross-validation as a default</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="final-model-assessment" class="section level2" number="7.5">
+<h2>
+<span class="header-section-number">7.5</span> Final model assessment<a class="anchor" aria-label="anchor" href="#final-model-assessment"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now that Model 2 has been chosen as the better model, the test data is <strong>finally</strong> brought in to measure how well Model 2 will predict data in the wild.</p>
+<p><strong>Model 2:</strong></p>
+<p>n.b. For whatever reason, <code>collect_metrics()</code> only works when multiple models have been run. When a single model is run, the metrics need to be evaluated individually.</p>
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_preds2</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.pred_squirrels</span> <span class="op">&gt;=</span><span class="fl">0.5</span>,</span>
+<span>                              <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_test</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">feeder_preds2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/roc_auc.html">roc_auc</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">squirrels</span>,</span>
+<span>                     estimate <span class="op">=</span> <span class="va">`.pred_no squirrels`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 roc_auc binary         0.702</span></span>
+<span></span>
+<span><span class="va">feeder_preds2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/accuracy.html">accuracy</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">squirrels</span>,</span>
+<span>                      estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 accuracy binary         0.813</span></span>
+<span></span>
+<span><span class="va">feeder_preds2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/sens.html">sensitivity</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sensitivity binary        0.0697</span></span>
+<span></span>
+<span></span>
+<span><span class="va">feeder_preds2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/spec.html">specificity</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 specificity binary         0.989</span></span></code></pre></div>
+</div>
+<div id="r-full-pipeline-with-cv-assessment" class="section level2" number="7.6">
+<h2>
+<span class="header-section-number">7.6</span> R: Full pipeline with CV + assessment<a class="anchor" aria-label="anchor" href="#r-full-pipeline-with-cv-assessment"><i class="fas fa-link"></i></a>
+</h2>
+<p>The following example uses <strong>tidymodels</strong> modeling to work through different aspects of the logistic regression model. Using the same example as above, the process has been synthesized into the essential aspects / code.</p>
+<div id="the-data" class="section level3" number="7.6.1">
+<h3>
+<span class="header-section-number">7.6.1</span> The data<a class="anchor" aria-label="anchor" href="#the-data"><i class="fas fa-link"></i></a>
+</h3>
+<p>Break the data into test and training sets.</p>
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">470</span><span class="op">)</span></span>
+<span><span class="va">feeder_split</span> <span class="op">&lt;-</span> <span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">initial_split</span><span class="op">(</span>strata <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span> <span class="co"># prop = 3/4 in each group, by default</span></span>
+<span><span class="va">feeder_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">feeder_split</span><span class="op">)</span></span>
+<span><span class="va">feeder_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">feeder_split</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div id="the-model-enigne" class="section level3" number="7.6.2">
+<h3>
+<span class="header-section-number">7.6.2</span> The model / enigne<a class="anchor" aria-label="anchor" href="#the-model-enigne"><i class="fas fa-link"></i></a>
+</h3>
+<p>Tell the computer to run logistic regression using the <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> function.</p>
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_spec</span> <span class="op">&lt;-</span> <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div id="the-recipes" class="section level3" number="7.6.3">
+<h3>
+<span class="header-section-number">7.6.3</span> The recipe(s)<a class="anchor" aria-label="anchor" href="#the-recipes"><i class="fas fa-link"></i></a>
+</h3>
+<p>Set the variables of interest (in the formula) and perform any necessary feature engineering.</p>
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span></span>
+<span>  <span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>,    <span class="co"># formula</span></span>
+<span>  data <span class="op">=</span> <span class="va">feeder_train</span> <span class="co"># data for cataloging names and types of variables</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_rec1</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the habitat variables</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"hab"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the tree/shrub info</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"atleast"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">feeder_rec2</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">squirrels</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the variables on when the birds were fed</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"fed"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># delete the variables about the bird feeders</span></span>
+<span>  <span class="fu">step_rm</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"feed"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_impute_mean</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">step_nzv</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div id="the-workflows" class="section level3" number="7.6.4">
+<h3>
+<span class="header-section-number">7.6.4</span> The workflow(s)<a class="anchor" aria-label="anchor" href="#the-workflows"><i class="fas fa-link"></i></a>
+</h3>
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_wflow1</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_wflow2</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">feeder_spec</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">feeder_rec2</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div id="choice-fit-the-model-cross-validate-to-decide-between-models" class="section level3" number="7.6.5">
+<h3>
+<span class="header-section-number">7.6.5</span> Choice: fit the model? cross validate to decide between models?<a class="anchor" aria-label="anchor" href="#choice-fit-the-model-cross-validate-to-decide-between-models"><i class="fas fa-link"></i></a>
+</h3>
+<div id="fit-the-model" class="section level4 unnumbered">
+<h4>Fit the model<a class="anchor" aria-label="anchor" href="#fit-the-model"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">feeder_train</span><span class="op">)</span></span></code></pre></div>
+<p>The fit object is the same as the output of <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> that you are used to working with:</p>
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 59 × 5</span></span>
+<span><span class="co">#&gt;   term               estimate std.error statistic   p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)          -1.42     0.0505    -28.2  2.26e-174</span></span>
+<span><span class="co">#&gt; 2 yard_type_pavement   -0.854    0.149      -5.74 9.23e-  9</span></span>
+<span><span class="co">#&gt; 3 yard_type_garden     -0.175    0.0392     -4.47 7.89e-  6</span></span>
+<span><span class="co">#&gt; 4 yard_type_landsca     0.168    0.0219      7.69 1.45e- 14</span></span>
+<span><span class="co">#&gt; 5 yard_type_woods       0.309    0.0170     18.1  1.59e- 73</span></span>
+<span><span class="co">#&gt; 6 yard_type_desert     -0.297    0.0789     -3.76 1.68e-  4</span></span>
+<span><span class="co">#&gt; # … with 53 more rows</span></span>
+<span></span>
+<span><span class="va">feeder_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">glance</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span><span class="co">#&gt;   null.deviance df.null  logLik     AIC     BIC deviance df.residual   nobs</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt;   &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;  &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1       173067.  176762 -77659. 155435. 156030.  155317.      176704 176763</span></span></code></pre></div>
+</div>
+<div id="cross-validate-to-choose-between-models" class="section level4 unnumbered">
+<h4>Cross validate to choose between models<a class="anchor" aria-label="anchor" href="#cross-validate-to-choose-between-models"><i class="fas fa-link"></i></a>
+</h4>
+<p>If cross validating, the model needs to be fit separately on each one of the hold out folds of the CV model. Here, <code>v=10</code> is used, different from above where <code>v=3</code> was used to simplify the explanation. Typically, the number of folds is 5 or 10.</p>
+<p>Note that the objects are now similar to what you’ve worked with previously (output of <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>), but they contain a separate fit (i.e., linear model) for each of the CV folds.</p>
+<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">47</span><span class="op">)</span></span>
+<span><span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">feeder_train</span>, v <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_fit_rs1</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">fit_resamples</span><span class="op">(</span><span class="va">folds</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">feeder_fit_rs2</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">fit_resamples</span><span class="op">(</span><span class="va">folds</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div id="assess-the-fit" class="section level3" number="7.6.6">
+<h3>
+<span class="header-section-number">7.6.6</span> Assess the fit<a class="anchor" aria-label="anchor" href="#assess-the-fit"><i class="fas fa-link"></i></a>
+</h3>
+<div id="on-the-test-data" class="section level4 unnumbered">
+<h4>On the test data<a class="anchor" aria-label="anchor" href="#on-the-test-data"><i class="fas fa-link"></i></a>
+</h4>
+<p>Note that we should only assess the fit to the test data if we are done with the model building process and we’ve chosen the model we want to move forward with.</p>
+<p>Accuracy, AUC, sensitivity, and specificity are all calculated.</p>
+<p>If the first few lines don’t make sense, run the pieces. That is, run <code>predict(feeder_fit, feeder_test)</code> and then run <code>feeder_test %&gt;% select(imdb_rating, title)</code> and then think about what it would mean to <strong>bind</strong> those columns together.</p>
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_fit</span>, <span class="va">feeder_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.pred_squirrels</span> <span class="op">&gt;=</span><span class="fl">0.5</span>,</span>
+<span>                                        <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_test</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">roc_auc</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">`.pred_no squirrels`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 roc_auc binary         0.721</span></span>
+<span></span>
+<span><span class="fu">accuracy</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 accuracy binary         0.814</span></span>
+<span></span>
+<span><span class="fu">sensitivity</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sensitivity binary        0.0988</span></span>
+<span></span>
+<span><span class="fu">specificity</span><span class="op">(</span><span class="va">feeder_test_pred</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 specificity binary         0.985</span></span>
+<span></span>
+<span><span class="va">feeder_test_pred</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">plotROC</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plotROC/man/geom_roc.html">geom_roc</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">.pred_squirrels</span>, d <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-63-1.png" width="80%" style="display: block; margin: auto;"></div>
+</div>
+<div id="on-the-cv-folds" class="section level4 unnumbered">
+<h4>On the CV folds<a class="anchor" aria-label="anchor" href="#on-the-cv-folds"><i class="fas fa-link"></i></a>
+</h4>
+<p>Note the difference in the information. If you want the values per fold, don’t summarize. If you want the overall information, do summarize.</p>
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_fit_rs1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   .metric  .estimator  mean     n  std_err .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 accuracy binary     0.810    10 0.000747 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 roc_auc  binary     0.663    10 0.00183  Preprocessor1_Model1</span></span>
+<span><span class="va">feeder_fit_rs2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   .metric  .estimator  mean     n  std_err .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 accuracy binary     0.813    10 0.000727 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 roc_auc  binary     0.698    10 0.00162  Preprocessor1_Model1</span></span>
+<span></span>
+<span><span class="va">feeder_fit_rs1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span>summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 20 × 5</span></span>
+<span><span class="co">#&gt;   id     .metric  .estimator .estimate .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 Fold01 accuracy binary         0.808 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 Fold01 roc_auc  binary         0.661 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 Fold02 accuracy binary         0.805 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 Fold02 roc_auc  binary         0.662 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 5 Fold03 accuracy binary         0.810 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 6 Fold03 roc_auc  binary         0.664 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; # … with 14 more rows</span></span>
+<span><span class="va">feeder_fit_rs2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">collect_metrics</span><span class="op">(</span>summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 20 × 5</span></span>
+<span><span class="co">#&gt;   id     .metric  .estimator .estimate .config             </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1 Fold01 accuracy binary         0.814 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 2 Fold01 roc_auc  binary         0.701 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 3 Fold02 accuracy binary         0.809 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 4 Fold02 roc_auc  binary         0.699 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 5 Fold03 accuracy binary         0.813 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; 6 Fold03 roc_auc  binary         0.689 Preprocessor1_Model1</span></span>
+<span><span class="co">#&gt; # … with 14 more rows</span></span></code></pre></div>
+<p>Note that the variables in Model 2 perform better using cross validation than the variables in Model 1, we choose Model 2 to report out:</p>
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test_pred_2</span> <span class="op">&lt;-</span> <span class="va">feeder_wflow2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">feeder_train</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">feeder_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.pred_squirrels</span> <span class="op">&gt;=</span><span class="fl">0.5</span>,</span>
+<span>                                        <span class="st">"squirrels"</span>, <span class="st">"no squirrels"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">feeder_test</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="va">squirrels</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">roc_auc</span><span class="op">(</span><span class="va">feeder_test_pred_2</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">`.pred_no squirrels`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 roc_auc binary         0.702</span></span>
+<span></span>
+<span><span class="fu">accuracy</span><span class="op">(</span><span class="va">feeder_test_pred_2</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 accuracy binary         0.813</span></span>
+<span></span>
+<span><span class="fu">sensitivity</span><span class="op">(</span><span class="va">feeder_test_pred_2</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sensitivity binary        0.0697</span></span>
+<span></span>
+<span><span class="fu">specificity</span><span class="op">(</span><span class="va">feeder_test_pred_2</span>, truth <span class="op">=</span> <span class="va">squirrels</span>, estimate <span class="op">=</span> <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric     .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 specificity binary         0.989</span></span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">feeder_test_pred_2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">plotROC</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plotROC/man/geom_roc.html">geom_roc</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">.pred_squirrels</span>, d <span class="op">=</span> <span class="va">squirrels</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>intercept <span class="op">=</span> <span class="fl">0</span>, slope <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="05a-model_files/figure-html/unnamed-chunk-66-1.png" width="80%" style="display: block; margin: auto;"></div>
+
+</div>
+</div>
+</div>
+</div>
+
+  <div class="chapter-nav">
+<div class="prev"><a href="logreg.html"><span class="header-section-number">6</span> Logistic Regression</a></div>
+<div class="next"><a href="survival-analysis.html"><span class="header-section-number">8</span> Survival Analysis</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#process"><span class="header-section-number">7</span> Modeling as a Process</a></li>
+<li>
+<a class="nav-link" href="#comparing-models"><span class="header-section-number">7.1</span> Comparing Models3</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#bias-variance-trade-off">Bias-variance trade-off</a></li></ul>
+</li>
+<li><a class="nav-link" href="#modeling-squirrel-activity"><span class="header-section-number">7.2</span> Modeling Squirrel Activity</a></li>
+<li>
+<a class="nav-link" href="#building-a-model"><span class="header-section-number">7.3</span> Building a Model</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#modeling-workflow"><span class="header-section-number">7.3.1</span> Modeling workflow</a></li>
+<li><a class="nav-link" href="#specifying-a-model"><span class="header-section-number">7.3.2</span> Specifying a model</a></li>
+<li><a class="nav-link" href="#building-a-recipe"><span class="header-section-number">7.3.3</span> Building a recipe</a></li>
+<li><a class="nav-link" href="#building-workflows"><span class="header-section-number">7.3.4</span> Building workflows</a></li>
+<li><a class="nav-link" href="#evaluate-the-model"><span class="header-section-number">7.3.5</span> Evaluate the model</a></li>
+<li><a class="nav-link" href="#predictions-for-testing-data">Predictions for testing data</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#cross-validation"><span class="header-section-number">7.4</span> Cross Validation</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#different-ways-to-cv"><span class="header-section-number">7.4.1</span> Different ways to CV</a></li>
+<li><a class="nav-link" href="#fit-the-models-using-cross-validation"><span class="header-section-number">7.4.2</span> Fit the models using cross validation</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#final-model-assessment"><span class="header-section-number">7.5</span> Final model assessment</a></li>
+<li>
+<a class="nav-link" href="#r-full-pipeline-with-cv-assessment"><span class="header-section-number">7.6</span> R: Full pipeline with CV + assessment</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-data"><span class="header-section-number">7.6.1</span> The data</a></li>
+<li><a class="nav-link" href="#the-model-enigne"><span class="header-section-number">7.6.2</span> The model / enigne</a></li>
+<li><a class="nav-link" href="#the-recipes"><span class="header-section-number">7.6.3</span> The recipe(s)</a></li>
+<li><a class="nav-link" href="#the-workflows"><span class="header-section-number">7.6.4</span> The workflow(s)</a></li>
+<li><a class="nav-link" href="#choice-fit-the-model-cross-validate-to-decide-between-models"><span class="header-section-number">7.6.5</span> Choice: fit the model? cross validate to decide between models?</a></li>
+<li><a class="nav-link" href="#assess-the-fit"><span class="header-section-number">7.6.6</span> Assess the fit</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/05a-model.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/05a-model.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-02-20.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

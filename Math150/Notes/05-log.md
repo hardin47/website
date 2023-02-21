@@ -1,4 +1,4 @@
-# Logistic Regression
+# Logistic Regression {#logreg}
 
 
 
@@ -1234,50 +1234,11 @@ H: is worse than random guessing.  Note that the opposite classifier to (H) migh
 
 
 
-### Cross Validation {#cv}
 
-Before reading the notes here, look through the following visualization.  Don't worry about building the model (classification trees are not a topic for class), but check out the end where they talk about predicting on test and training data.
-
-http://www.r2d3.us/visual-intro-to-machine-learning-part-1/
-
-#### Overfitting
-
-Imagine you are preparing for your statistics exam. Helpfully, Professor Hardin has made previous exam papers and their worked answers available online. You begin by trying to answer the questions from previous papers and comparing your answers with the model answers provided. Unfortunately, you get carried away and spend all your time on memorizing the model answers to all past questions.
-
-Now, if the upcoming exam completely consists of past questions, you are certain to do very well. But if the new exam asks different questions about the same material, you would be ill-prepared and get a much lower mark than with a more traditional preparation.  In this case, one could say that you were **overfitting** the past exam papers and that the knowledge gained didn't generalize to future exam questions.
-
-
-
-#### CV Model Assessment
-
-Cross validation is commonly used to perform two different tasks:    
-1. To assess a model's accuracy (**model assessment**).    
-2. To build a model (**model selection**).  
-
-We will focus here only on model assessment.
-
-Suppose that we build a classifier (logistic regression model) on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
-
-*  one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]   
-* leave one out cross validation (LOOCV)  [LOOCV is a special case of $k$-fold CV with $k=n$]  
-1. remove one observation  
-2. build the model using the remaining n-1 points  
-3. predict class membership for the observation which was removed  
-4. repeat by removing each observation one at a time  (time consuming to keep building models)  
-* $k$-fold cross validation ($k$-fold CV)  
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.  
-    * advantage of $k$-fold is computational  
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are all basically the same, the variability will be higher.  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.  
-
-
-<div class="figure" style="text-align: center">
-<img src="figs/CV.png" alt="4-fold CV is depicted.  Notice that the holdout group is never used as part of the coefficient estimation process." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-21)4-fold CV is depicted.  Notice that the holdout group is never used as part of the coefficient estimation process.</p>
-</div>
 
 ## R: Birdnest Example {#birdexamp}
 
-
+The following example uses base R modeling to work through different aspects of the logistic regression model.
 
 **Length of Bird Nest**  This example is from problem E1 in your text and includes 99 species of N. American passerine birds.  Recall that the response variable is binary and represents whether there is a small opening (`closed=1`) or a large opening (`closed=0`) for the nest.  The explanatory variable of interest was the length of the bird.
 
@@ -1441,37 +1402,9 @@ predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 ### Measues of association
 
 
-
-```r
-# install.packages(c("Hmisc", "rms"))
-
-library(rms)   # you need this line!!
-bird_lrm <- lrm(`Closed?` ~ Length, data = nests)
-print(bird_lrm)
-#> Frequencies of Missing Values Due to Each Variable
-#> Closed?  Length 
-#>       0       4 
-#> 
-#> Logistic Regression Model
-#>  
-#>  lrm(formula = `Closed?` ~ Length, data = nests)
-#>  
-#>  
-#>                        Model Likelihood     Discrimination    Rank Discrim.    
-#>                              Ratio Test            Indexes          Indexes    
-#>  Obs            95    LR chi2      3.11     R2       0.045    C       0.638    
-#>   0             64    d.f.            1     R2(1,95) 0.022    Dxy     0.276    
-#>   1             31    Pr(> chi2) 0.0777    R2(1,62.7)0.033    gamma   0.288    
-#>  max |deriv| 2e-07                          Brier    0.210    tau-a   0.123    
-#>  
-#>            Coef    S.E.   Wald Z Pr(>|Z|)
-#>  Intercept  0.4571 0.7530  0.61  0.5438  
-#>  Length    -0.0677 0.0425 -1.59  0.1117  
-#> 
-```
-
-
 ###  ROC curves
+
+ROC curve for the model on `Length` only, with no testing / training / cross validated data.
 
 
 ```r
@@ -1497,132 +1430,105 @@ head(bird_indiv)
 #> 5 6         no       18.5   0.311 -0.863     -0.868 0.0116   1.12 0.00267
 #> 6 7         yes      17     0.333  1.48       1.49  0.0110   1.12 0.0112
 
-bird_cv_plot <- bird_indiv %>%
+bird_indiv %>%
   ggplot() + 
   geom_roc(aes(d = Closed, m = .fitted)) +
   geom_abline(intercept = 0, slope = 1)
+```
 
-bird_cv_plot
+<img src="05-log_files/figure-html/unnamed-chunk-28-1.png" width="80%" style="display: block; margin: auto;" />
 
-calc_auc(bird_cv_plot)
-#>   PANEL group   AUC
-#> 1     1    -1 0.638
+### Cross Validation on nest data
+
+Note that the syntax here is slightly different from what we've seen previously.  From the **tidymodels** and **plotROC** packages.  See the full explanation in Chapter \@ref(process).
+
+
+
+```r
+library(tidymodels)
+library(plotROC)
+
+bird_spec <- logistic_reg() %>%
+  set_engine("glm")
+
+bird_rec <- recipe(
+  Closed ~ Length + Incubate + Nestling,    # formula
+  data = nests # data for cataloging names and types of variables
+  ) 
+
+bird_wflow <- workflow() %>%
+  add_model(bird_spec) %>%
+  add_recipe(bird_rec)
+
+set.seed(47)
+bird_folds <- vfold_cv(nests, v = 3)
+
+metrics_interest <- yardstick::metric_set(accuracy, roc_auc, 
+                              sensitivity, specificity)
+
+bird_fit_rs <- bird_wflow %>%
+  fit_resamples(bird_folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE))
+
+bird_fit_rs %>% collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator  mean     n std_err .config             
+#>   <chr>       <chr>      <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.755     3 0.00766 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.815     3 0.00964 Preprocessor1_Model1
+#> 3 sensitivity binary     0.842     3 0.0313  Preprocessor1_Model1
+#> 4 specificity binary     0.559     3 0.0926  Preprocessor1_Model1
+
+bird_fit_rs %>%
+  unnest(cols = .predictions) %>%
+  ggplot() + 
+  plotROC::geom_roc(aes(m = .pred_yes, d = Closed,
+                        color = id)) + 
+  geom_abline(intercept = 0, slope = 1, color = "black")
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-29-1.png" width="80%" style="display: block; margin: auto;" />
+
+
+We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better? No, everything gets worse.  But it's the specificity that we should really pay attention to because it is terrible in the single variable model!
+
+
+```r
+bird_rec_1 <- recipe(
+  Closed ~ Length,    # formula
+  data = nests # data for cataloging names and types of variables
+  ) 
+
+bird_wflow_1 <- workflow() %>%
+  add_model(bird_spec) %>%
+  add_recipe(bird_rec_1)
+
+
+bird_fit_rs_1 <- bird_wflow_1 %>%
+  fit_resamples(bird_folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE))
+
+bird_fit_rs_1 %>% collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator   mean     n std_err .config             
+#>   <chr>       <chr>       <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.684      3  0.0563 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.639      3  0.0622 Preprocessor1_Model1
+#> 3 sensitivity binary     0.986      3  0.0145 Preprocessor1_Model1
+#> 4 specificity binary     0.0833     3  0.0833 Preprocessor1_Model1
+
+bird_fit_rs_1 %>%
+  unnest(cols = .predictions) %>%
+  ggplot() + 
+  plotROC::geom_roc(aes(m = .pred_yes, d = Closed,
+                        color = id)) + 
+  geom_abline(intercept = 0, slope = 1, color = "black")
+
 ```
 
 <img src="05-log_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" />
 
-### Cross Validation on nest data
-
-Note that the syntax here is slightly different from what we've seen previously.  From the **caret** and **plotROC** packages:
-
-* `train()` to partition the data into 4 groups and run the logistic regression separately
-* `geom_roc()` to plot the ROC curve for each partition
-
-
-```r
-library(caret)
-library(plotROC)
-
-bird_cv <- train(Closed ~ Length + Incubate + Nestling,
-                 data = nests,
-                 na.action = na.omit,
-                 method = "glm", 
-                 family = "binomial",
-                 trControl = trainControl(method = "cv", number = 4,
-                                          classProbs = TRUE,
-                                          savePredictions = TRUE))
-
-bird_cv
-#> Generalized Linear Model 
-#> 
-#> 99 samples
-#>  3 predictor
-#>  2 classes: 'no', 'yes' 
-#> 
-#> No pre-processing
-#> Resampling: Cross-Validated (4 fold) 
-#> Summary of sample sizes: 65, 65, 64, 64 
-#> Resampling results:
-#> 
-#>   Accuracy  Kappa
-#>   0.756     0.427
-bird_cv$pred %>% head()
-#>   pred obs     no    yes rowIndex parameter Resample
-#> 1   no yes 0.7163 0.2837        2      none    Fold1
-#> 2   no yes 0.7959 0.2041        5      none    Fold1
-#> 3   no  no 0.8989 0.1011       10      none    Fold1
-#> 4  yes yes 0.0207 0.9793       11      none    Fold1
-#> 5   no  no 0.9725 0.0275       19      none    Fold1
-#> 6  yes  no 0.1779 0.8221       21      none    Fold1
-
-bird_cv_plot <- bird_cv$pred %>%
-  ggplot() + 
-  geom_roc(aes(m = yes, d = obs, color = Resample))
-
-bird_cv_plot +  
-  geom_abline(slope = 1, intercept = 0) +
-  geom_roc(aes(m = yes, d = obs), color = "black") 
-
-#seems broken (?) with groups
-#calc_auc(bird_cv_plot)
-```
-
-<img src="05-log_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;" />
-
-
-We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better?
-
-
-```r
-bird_cv_length <- train(Closed ~ Length,
-                 data = nests,
-                 na.action = na.omit,
-                 method = "glm", 
-                 family = "binomial",
-                 trControl = trainControl(method = "cv", number = 4,
-                                          classProbs = TRUE,
-                                          savePredictions = TRUE))
-
-bird_cv_length
-#> Generalized Linear Model 
-#> 
-#> 99 samples
-#>  1 predictor
-#>  2 classes: 'no', 'yes' 
-#> 
-#> No pre-processing
-#> Resampling: Cross-Validated (4 fold) 
-#> Summary of sample sizes: 71, 72, 71, 71 
-#> Resampling results:
-#> 
-#>   Accuracy  Kappa  
-#>   0.643     -0.0556
-bird_cv_length$pred %>% head()
-#>   pred obs    no      yes rowIndex parameter Resample
-#> 1   no  no 0.742 0.257625        5      none    Fold1
-#> 2   no  no 0.959 0.041269       20      none    Fold1
-#> 3   no yes 0.999 0.000967       23      none    Fold1
-#> 4   no yes 0.504 0.496307       26      none    Fold1
-#> 5   no yes 0.504 0.496307       33      none    Fold1
-#> 6   no yes 0.724 0.276182       37      none    Fold1
-
-bird_cv_length_plot <- bird_cv_length$pred %>%
-  ggplot() + 
-  geom_roc(aes(m = yes, d = obs, color = Resample))
-
-
-bird_cv_length_plot +  
-  geom_abline(slope = 1, intercept = 0) +
-  geom_roc(aes(m = yes, d = obs), color = "black")
-
-#seems broken (?) with groups
-#plotROC::calc_auc(bird_cv_length_plot)
-```
-
-<img src="05-log_files/figure-html/unnamed-chunk-32-1.png" width="80%" style="display: block; margin: auto;" />
-
-### Drawing interactions
-
-https://interactions.jacob-long.com/index.html
 
 

@@ -26,6 +26,13 @@ suppressMessages(library(ggthreed))
 suppressMessages(library(caret))
 suppressMessages(library(palmerpenguins))
 suppressMessages(library(survival))
+suppressMessages(library(plotROC))
+tidymodels::tidymodels_prefer()
+suppressMessages(library(conflicted))
+conflict_prefer("chisq.test", "stats")
+conflict_prefer("fisher.test", "stats")
+conflicts_prefer(yardstick::sensitivity)
+conflicts_prefer(yardstick::specificity)
 
 # knitr chunk options ----------------------------------------------------------
 
