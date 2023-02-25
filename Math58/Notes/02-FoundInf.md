@@ -823,7 +823,7 @@ Answer:  because the intervals would typically be too wide to provide any real i
 ### Example: aliens on Earth^[From Allan Rossman: https://askgoodquestions.blog/2019/10/07/14-how-confident-are-you-part-1/]
 
 
-Assume that an alien has landed on Earth and wants to understand the gender diversity of humans.  Fortunately, the alien took a good statistics course on its home planet, so it knows to take a sample of human beings and produce a confidence interval for this proportion.  Unfortunately, the alien happens upon the 2019 US Senate as its sample of human beings.  The US Senate has 25 senators who self-identify as having a female gender (its most ever!) among its 100 members in 2019.
+Assume that an alien has landed on Earth and wants to understand the gender diversity of humans.  Fortunately, the alien took a good statistics course on its home planet, so it knows to take a sample of human beings and produce a confidence interval for this proportion.  Unfortunately, the alien happens upon the 2023 US Senate as its sample of human beings.  The US Senate has 25 senators who self-identify as having a female gender (its most ever!) among its 100 members in 2023.
 
 a) Calculate the alien's 95% confidence interval. (uh... confidence interval for *what*?)  
 
@@ -845,9 +845,9 @@ e) As we saw with the applet, about 5% of all 95% confidence intervals fail to c
 
 No!  The explanation about 5% of all intervals failing is only relevant when you have selected random samples over and over again.  The lack of random sampling is the problem here.
 
-f) Would it be reasonable for the alien to conclude, with 95% confidence, that between 16.5% and 33.5% of US senators in the year 2019 self-identify as female?
+f) Would it be reasonable for the alien to conclude, with 95% confidence, that between 16.5% and 33.5% of US senators in the year 2023 self-identify as female?
 
-No.  We know (for sure, with 100% confidence) that exactly 25% of U.S. senators in 2019 self identify as female.  If that's the entire population of interest, there's no reason to calculate a confidence interval.  
+No.  We know (for sure, with 100% confidence) that exactly 25% of U.S. senators in 2023 self identify as female.  If that's the entire population of interest, there's no reason to calculate a confidence interval.  
 
 Confidence intervals are not appropriate when the data were collected with a biased sampling method.  A confidence interval calculated from such a sample can provide very dubious and misleading information.
 

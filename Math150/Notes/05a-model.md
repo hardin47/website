@@ -593,29 +593,22 @@ feeder_train_pred %>% select(squirrels, .pred_class) %>% table()
 #>   no squirrels         3448     30544
 #>   squirrels            2122    140649
 
-roc_auc(feeder_train_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-#> # A tibble: 1 × 3
-#>   .metric .estimator .estimate
-#>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary         0.720
-
-accuracy(feeder_train_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric  .estimator .estimate
-#>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.815
-
-sensitivity(feeder_train_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
+rbind(roc_auc(feeder_train_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_train_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_train_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_train_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 sensitivity binary         0.101
-
-specificity(feeder_train_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric     .estimator .estimate
-#>   <chr>       <chr>          <dbl>
-#> 1 specificity binary         0.985
+#> 1 roc_auc     binary         0.720
+#> 2 accuracy    binary         0.815
+#> 3 sensitivity binary         0.985
+#> 4 specificity binary         0.101
 
 feeder_train_pred %>%
   ggplot() + 
@@ -659,29 +652,22 @@ feeder_test_pred %>% select(squirrels, .pred_class) %>% table()
 #>   no squirrels         1119     10212
 #>   squirrels             726     46865
 
-roc_auc(feeder_test_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-#> # A tibble: 1 × 3
-#>   .metric .estimator .estimate
-#>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary         0.721
-
-accuracy(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric  .estimator .estimate
-#>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.814
-
-sensitivity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
+rbind(roc_auc(feeder_test_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 sensitivity binary        0.0988
-
-specificity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric     .estimator .estimate
-#>   <chr>       <chr>          <dbl>
-#> 1 specificity binary         0.985
+#> 1 roc_auc     binary        0.721 
+#> 2 accuracy    binary        0.814 
+#> 3 sensitivity binary        0.985 
+#> 4 specificity binary        0.0988
 
 feeder_test_pred %>%
   ggplot() + 
@@ -1060,7 +1046,8 @@ feeder_train %>% select(squirrels) %>% table()
 feeder_fit_rs1 <- feeder_wflow1 %>%
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
-                control = control_resamples(save_pred = TRUE))
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs1
 #> # Resampling results
@@ -1080,7 +1067,8 @@ feeder_fit_rs1
 feeder_fit_rs2 <- feeder_wflow2 %>%
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
-                control = control_resamples(save_pred = TRUE))
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs2
 #> # Resampling results
@@ -1109,14 +1097,13 @@ collect_metrics(feeder_fit_rs1)
 #>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
 #> 1 accuracy    binary     0.809      3 0.000247 Preprocessor1_Model1
 #> 2 roc_auc     binary     0.663      3 0.00180  Preprocessor1_Model1
-#> 3 sensitivity binary     0.0265     3 0.000545 Preprocessor1_Model1
-#> 4 specificity binary     0.996      3 0.000190 Preprocessor1_Model1
+#> 3 sensitivity binary     0.996      3 0.000190 Preprocessor1_Model1
+#> 4 specificity binary     0.0265     3 0.000545 Preprocessor1_Model1
 ```
 
 
 ```r
 feeder_fit_rs1 %>% augment() %>%
-  mutate(squirrels = squirrels) %>%
   select(squirrels, .pred_class) %>%
   yardstick::conf_mat(squirrels, .pred_class) %>%
   autoplot(type = "heatmap") + 
@@ -1134,14 +1121,13 @@ collect_metrics(feeder_fit_rs2)
 #>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
 #> 1 accuracy    binary     0.813      3 0.000325 Preprocessor1_Model1
 #> 2 roc_auc     binary     0.698      3 0.00228  Preprocessor1_Model1
-#> 3 sensitivity binary     0.0693     3 0.000291 Preprocessor1_Model1
-#> 4 specificity binary     0.990      3 0.000424 Preprocessor1_Model1
+#> 3 sensitivity binary     0.990      3 0.000424 Preprocessor1_Model1
+#> 4 specificity binary     0.0693     3 0.000291 Preprocessor1_Model1
 ```
 
 
 ```r
 feeder_fit_rs2 %>% augment() %>%
-  mutate(squirrels = squirrels) %>%
   select(squirrels, .pred_class) %>%
   yardstick::conf_mat(squirrels, .pred_class) %>%
   autoplot(type = "heatmap") + 
@@ -1162,11 +1148,11 @@ cv_metrics1
 #>   id    .metric     .estimator .estimate .config             
 #>   <chr> <chr>       <chr>          <dbl> <chr>               
 #> 1 Fold1 accuracy    binary        0.810  Preprocessor1_Model1
-#> 2 Fold1 sensitivity binary        0.0275 Preprocessor1_Model1
-#> 3 Fold1 specificity binary        0.996  Preprocessor1_Model1
+#> 2 Fold1 sensitivity binary        0.996  Preprocessor1_Model1
+#> 3 Fold1 specificity binary        0.0275 Preprocessor1_Model1
 #> 4 Fold1 roc_auc     binary        0.666  Preprocessor1_Model1
 #> 5 Fold2 accuracy    binary        0.809  Preprocessor1_Model1
-#> 6 Fold2 sensitivity binary        0.0257 Preprocessor1_Model1
+#> 6 Fold2 sensitivity binary        0.995  Preprocessor1_Model1
 #> # … with 6 more rows
 ```
 
@@ -1180,11 +1166,11 @@ cv_metrics2
 #>   id    .metric     .estimator .estimate .config             
 #>   <chr> <chr>       <chr>          <dbl> <chr>               
 #> 1 Fold1 accuracy    binary        0.813  Preprocessor1_Model1
-#> 2 Fold1 sensitivity binary        0.0687 Preprocessor1_Model1
-#> 3 Fold1 specificity binary        0.990  Preprocessor1_Model1
+#> 2 Fold1 sensitivity binary        0.990  Preprocessor1_Model1
+#> 3 Fold1 specificity binary        0.0687 Preprocessor1_Model1
 #> 4 Fold1 roc_auc     binary        0.699  Preprocessor1_Model1
 #> 5 Fold2 accuracy    binary        0.812  Preprocessor1_Model1
-#> 6 Fold2 sensitivity binary        0.0695 Preprocessor1_Model1
+#> 6 Fold2 sensitivity binary        0.989  Preprocessor1_Model1
 #> # … with 6 more rows
 ```
 
@@ -1196,9 +1182,9 @@ cv_metrics2
 #> # A tibble: 3 × 5
 #>   id    accuracy sensitivity specificity roc_auc
 #>   <chr>    <dbl>       <dbl>       <dbl>   <dbl>
-#> 1 Fold1    0.81        0.028       0.996   0.666
-#> 2 Fold2    0.809       0.026       0.995   0.662
-#> 3 Fold3    0.809       0.026       0.996   0.66
+#> 1 Fold1    0.81        0.996       0.028   0.666
+#> 2 Fold2    0.809       0.995       0.026   0.662
+#> 3 Fold3    0.809       0.996       0.026   0.66
 ```
 
 **Model 2:**
@@ -1207,9 +1193,9 @@ cv_metrics2
 #> # A tibble: 3 × 5
 #>   id    accuracy sensitivity specificity roc_auc
 #>   <chr>    <dbl>       <dbl>       <dbl>   <dbl>
-#> 1 Fold1    0.813       0.069       0.99    0.699
-#> 2 Fold2    0.812       0.069       0.989   0.701
-#> 3 Fold3    0.813       0.07        0.99    0.693
+#> 1 Fold1    0.813       0.99        0.069   0.699
+#> 2 Fold2    0.812       0.989       0.069   0.701
+#> 3 Fold3    0.813       0.99        0.07    0.693
 ```
 
 
@@ -1253,36 +1239,22 @@ feeder_preds2 <- feeder_wflow2 %>%
                               "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels)) 
 
-feeder_preds2 %>%
-  yardstick::roc_auc(truth = squirrels,
-                     estimate = `.pred_no squirrels`)
-#> # A tibble: 1 × 3
-#>   .metric .estimator .estimate
-#>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary         0.702
-
-feeder_preds2 %>%
-  yardstick::accuracy(truth = squirrels,
-                      estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric  .estimator .estimate
-#>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.813
-
-feeder_preds2 %>%
-  yardstick::sensitivity(truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
+rbind(roc_auc(feeder_preds2, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_preds2, truth = squirrels, 
+               estimate = .pred_class, event_level = "second"),
+      sensitivity(feeder_preds2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_preds2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 sensitivity binary        0.0697
-
-
-feeder_preds2 %>%
-  yardstick::specificity(truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric     .estimator .estimate
-#>   <chr>       <chr>          <dbl>
-#> 1 specificity binary         0.989
+#> 1 roc_auc     binary        0.702 
+#> 2 accuracy    binary        0.813 
+#> 3 sensitivity binary        0.989 
+#> 4 specificity binary        0.0697
 ```
 
 
@@ -1410,10 +1382,16 @@ set.seed(47)
 folds <- vfold_cv(feeder_train, v = 10)
 
 feeder_fit_rs1 <- feeder_wflow1 %>%
-  fit_resamples(folds)
+  fit_resamples(folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs2 <- feeder_wflow2 %>%
-  fit_resamples(folds)
+  fit_resamples(folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 ```
 
 ### Assess the fit
@@ -1433,29 +1411,22 @@ feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") %>%
                                         "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels))
 
-roc_auc(feeder_test_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-#> # A tibble: 1 × 3
-#>   .metric .estimator .estimate
-#>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary         0.721
-
-accuracy(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric  .estimator .estimate
-#>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.814
-
-sensitivity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
+rbind(roc_auc(feeder_test_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 sensitivity binary        0.0988
-
-specificity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric     .estimator .estimate
-#>   <chr>       <chr>          <dbl>
-#> 1 specificity binary         0.985
+#> 1 roc_auc     binary        0.721 
+#> 2 accuracy    binary        0.814 
+#> 3 sensitivity binary        0.985 
+#> 4 specificity binary        0.0988
 
 feeder_test_pred %>%
   ggplot() + 
@@ -1472,40 +1443,44 @@ Note the difference in the information.  If you want the values per fold, don't 
 
 ```r
 feeder_fit_rs1 %>% collect_metrics()
-#> # A tibble: 2 × 6
-#>   .metric  .estimator  mean     n  std_err .config             
-#>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.810    10 0.000747 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.663    10 0.00183  Preprocessor1_Model1
+#> # A tibble: 4 × 6
+#>   .metric     .estimator   mean     n  std_err .config             
+#>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
+#> 1 accuracy    binary     0.810     10 0.000747 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.663     10 0.00183  Preprocessor1_Model1
+#> 3 sensitivity binary     0.996     10 0.000154 Preprocessor1_Model1
+#> 4 specificity binary     0.0269    10 0.000563 Preprocessor1_Model1
 feeder_fit_rs2 %>% collect_metrics()
-#> # A tibble: 2 × 6
-#>   .metric  .estimator  mean     n  std_err .config             
-#>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.813    10 0.000727 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.698    10 0.00162  Preprocessor1_Model1
+#> # A tibble: 4 × 6
+#>   .metric     .estimator   mean     n  std_err .config             
+#>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
+#> 1 accuracy    binary     0.813     10 0.000727 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.698     10 0.00162  Preprocessor1_Model1
+#> 3 sensitivity binary     0.990     10 0.000367 Preprocessor1_Model1
+#> 4 specificity binary     0.0695    10 0.00156  Preprocessor1_Model1
 
 feeder_fit_rs1 %>% collect_metrics(summarize = FALSE)
-#> # A tibble: 20 × 5
-#>   id     .metric  .estimator .estimate .config             
-#>   <chr>  <chr>    <chr>          <dbl> <chr>               
-#> 1 Fold01 accuracy binary         0.808 Preprocessor1_Model1
-#> 2 Fold01 roc_auc  binary         0.661 Preprocessor1_Model1
-#> 3 Fold02 accuracy binary         0.805 Preprocessor1_Model1
-#> 4 Fold02 roc_auc  binary         0.662 Preprocessor1_Model1
-#> 5 Fold03 accuracy binary         0.810 Preprocessor1_Model1
-#> 6 Fold03 roc_auc  binary         0.664 Preprocessor1_Model1
-#> # … with 14 more rows
+#> # A tibble: 40 × 5
+#>   id     .metric     .estimator .estimate .config             
+#>   <chr>  <chr>       <chr>          <dbl> <chr>               
+#> 1 Fold01 accuracy    binary        0.808  Preprocessor1_Model1
+#> 2 Fold01 sensitivity binary        0.996  Preprocessor1_Model1
+#> 3 Fold01 specificity binary        0.0263 Preprocessor1_Model1
+#> 4 Fold01 roc_auc     binary        0.661  Preprocessor1_Model1
+#> 5 Fold02 accuracy    binary        0.805  Preprocessor1_Model1
+#> 6 Fold02 sensitivity binary        0.996  Preprocessor1_Model1
+#> # … with 34 more rows
 feeder_fit_rs2 %>% collect_metrics(summarize = FALSE)
-#> # A tibble: 20 × 5
-#>   id     .metric  .estimator .estimate .config             
-#>   <chr>  <chr>    <chr>          <dbl> <chr>               
-#> 1 Fold01 accuracy binary         0.814 Preprocessor1_Model1
-#> 2 Fold01 roc_auc  binary         0.701 Preprocessor1_Model1
-#> 3 Fold02 accuracy binary         0.809 Preprocessor1_Model1
-#> 4 Fold02 roc_auc  binary         0.699 Preprocessor1_Model1
-#> 5 Fold03 accuracy binary         0.813 Preprocessor1_Model1
-#> 6 Fold03 roc_auc  binary         0.689 Preprocessor1_Model1
-#> # … with 14 more rows
+#> # A tibble: 40 × 5
+#>   id     .metric     .estimator .estimate .config             
+#>   <chr>  <chr>       <chr>          <dbl> <chr>               
+#> 1 Fold01 accuracy    binary        0.814  Preprocessor1_Model1
+#> 2 Fold01 sensitivity binary        0.991  Preprocessor1_Model1
+#> 3 Fold01 specificity binary        0.0738 Preprocessor1_Model1
+#> 4 Fold01 roc_auc     binary        0.701  Preprocessor1_Model1
+#> 5 Fold02 accuracy    binary        0.809  Preprocessor1_Model1
+#> 6 Fold02 sensitivity binary        0.991  Preprocessor1_Model1
+#> # … with 34 more rows
 ```
 
 Note that the variables in Model 2 perform better using cross validation than the variables in Model 1, we choose Model 2 to report out:
@@ -1519,29 +1494,22 @@ feeder_test_pred_2 <- feeder_wflow2 %>%
                                         "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels))
 
-roc_auc(feeder_test_pred_2, truth = squirrels, estimate = `.pred_no squirrels`)
-#> # A tibble: 1 × 3
-#>   .metric .estimator .estimate
-#>   <chr>   <chr>          <dbl>
-#> 1 roc_auc binary         0.702
-
-accuracy(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric  .estimator .estimate
-#>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.813
-
-sensitivity(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
+rbind(roc_auc(feeder_test_pred_2, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred_2, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred_2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred_2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 sensitivity binary        0.0697
-
-specificity(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
-#> # A tibble: 1 × 3
-#>   .metric     .estimator .estimate
-#>   <chr>       <chr>          <dbl>
-#> 1 specificity binary         0.989
+#> 1 roc_auc     binary        0.702 
+#> 2 accuracy    binary        0.813 
+#> 3 sensitivity binary        0.989 
+#> 4 specificity binary        0.0697
 ```
 
 

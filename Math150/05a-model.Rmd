@@ -345,13 +345,15 @@ feeder_train_pred <- predict(feeder_fit, feeder_train, type = "prob") %>%
 
 feeder_train_pred %>% select(squirrels, .pred_class) %>% table()
 
-roc_auc(feeder_train_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-
-accuracy(feeder_train_pred, truth = squirrels, estimate = .pred_class)
-
-sensitivity(feeder_train_pred, truth = squirrels, estimate = .pred_class)
-
-specificity(feeder_train_pred, truth = squirrels, estimate = .pred_class)
+rbind(roc_auc(feeder_train_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_train_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_train_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_train_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
 
 feeder_train_pred %>%
   ggplot() + 
@@ -383,13 +385,15 @@ feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") %>%
 
 feeder_test_pred %>% select(squirrels, .pred_class) %>% table()
 
-roc_auc(feeder_test_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-
-accuracy(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-
-sensitivity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-
-specificity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
+rbind(roc_auc(feeder_test_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
 
 feeder_test_pred %>%
   ggplot() + 
@@ -672,7 +676,8 @@ feeder_train %>% select(squirrels) %>% table()
 feeder_fit_rs1 <- feeder_wflow1 %>%
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
-                control = control_resamples(save_pred = TRUE))
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs1
 ```
@@ -683,7 +688,8 @@ feeder_fit_rs1
 feeder_fit_rs2 <- feeder_wflow2 %>%
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
-                control = control_resamples(save_pred = TRUE))
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs2
 ```
@@ -702,7 +708,6 @@ collect_metrics(feeder_fit_rs1)
 
 ```{r}
 feeder_fit_rs1 %>% augment() %>%
-  mutate(squirrels = squirrels) %>%
   select(squirrels, .pred_class) %>%
   yardstick::conf_mat(squirrels, .pred_class) %>%
   autoplot(type = "heatmap") + 
@@ -716,7 +721,6 @@ collect_metrics(feeder_fit_rs2)
 
 ```{r}
 feeder_fit_rs2 %>% augment() %>%
-  mutate(squirrels = squirrels) %>%
   select(squirrels, .pred_class) %>%
   yardstick::conf_mat(squirrels, .pred_class) %>%
   autoplot(type = "heatmap") + 
@@ -796,20 +800,15 @@ feeder_preds2 <- feeder_wflow2 %>%
                               "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels)) 
 
-feeder_preds2 %>%
-  yardstick::roc_auc(truth = squirrels,
-                     estimate = `.pred_no squirrels`)
-
-feeder_preds2 %>%
-  yardstick::accuracy(truth = squirrels,
-                      estimate = .pred_class)
-
-feeder_preds2 %>%
-  yardstick::sensitivity(truth = squirrels, estimate = .pred_class)
-
-
-feeder_preds2 %>%
-  yardstick::specificity(truth = squirrels, estimate = .pred_class)
+rbind(roc_auc(feeder_preds2, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_preds2, truth = squirrels, 
+               estimate = .pred_class, event_level = "second"),
+      sensitivity(feeder_preds2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_preds2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
 
 ```
 
@@ -917,10 +916,16 @@ set.seed(47)
 folds <- vfold_cv(feeder_train, v = 10)
 
 feeder_fit_rs1 <- feeder_wflow1 %>%
-  fit_resamples(folds)
+  fit_resamples(folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 
 feeder_fit_rs2 <- feeder_wflow2 %>%
-  fit_resamples(folds)
+  fit_resamples(folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE,
+                                            event_level = "second"))
 ```
 
 ### Assess the fit
@@ -939,13 +944,15 @@ feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") %>%
                                         "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels))
 
-roc_auc(feeder_test_pred, truth = squirrels, estimate = `.pred_no squirrels`)
-
-accuracy(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-
-sensitivity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
-
-specificity(feeder_test_pred, truth = squirrels, estimate = .pred_class)
+rbind(roc_auc(feeder_test_pred, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
 
 feeder_test_pred %>%
   ggplot() + 
@@ -975,13 +982,16 @@ feeder_test_pred_2 <- feeder_wflow2 %>%
                                         "squirrels", "no squirrels"))) %>%
   bind_cols(feeder_test %>% select(squirrels))
 
-roc_auc(feeder_test_pred_2, truth = squirrels, estimate = `.pred_no squirrels`)
+rbind(roc_auc(feeder_test_pred_2, truth = squirrels, 
+              estimate = .pred_squirrels, event_level = "second"),
+      accuracy(feeder_test_pred_2, truth = squirrels, 
+               estimate = .pred_class),
+      sensitivity(feeder_test_pred_2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second"),
+      specificity(feeder_test_pred_2, truth = squirrels, 
+                  estimate = .pred_class, event_level = "second")
+)
 
-accuracy(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
-
-sensitivity(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
-
-specificity(feeder_test_pred_2, truth = squirrels, estimate = .pred_class)
 ```
 
 ```{r}
