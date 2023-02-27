@@ -1031,10 +1031,10 @@ I can't possibly over-emphasize the data exploration step. There's not a data an
 
 #### The fourth step {-}
 
-(The fourth step is very good modeling practice.  It gives you a sense of whether or not you've overfit the model in the building process.) Randomly divide the data into a training set and a validation set:
+(The fourth step is very good modeling practice.  It gives you a sense of whether or not you've overfit the model in the building process.) Randomly divide the data into a training set and a test set:
 
-* The training set, with at least 15-20 error degrees of freedom, is used to estimate the model.  
-* The validation set is used for cross-validation of the fitted model.
+* The training set, with at least 20 error degrees of freedom (the number of observations is more than 20 larger than the number of variables), is used to estimate the model.  
+* The test set is used for validation of the fitted model.
 
 
 #### The fifth step {-}
@@ -1042,7 +1042,7 @@ I can't possibly over-emphasize the data exploration step. There's not a data an
 Using the training set, identify several candidate models:
 
 * Use best subsets regression.  
-* Use stepwise regression, which of course only yields one model unless different alpha-to-remove and alpha-to-enter values are specified.
+* Use stepwise regression, forward or backward.
 
 #### The sixth step {-}
 
@@ -1052,11 +1052,13 @@ Select and evaluate a few "good" models:
 * Evaluate the selected models for violation of the model conditions.  
 * If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.
 
+n.b., You could evaluate the few models based on cross-validation of the training data.  It isn't a terrible idea, but you must remind yourself that the training data as a whole were used in the stepwise regression steps, so the cross-validated folds are not independent arbiters of model accuracy.
+
 #### The seventh and final step {-}
 
 Select the final model:
 
-* A large cross-validation AUC on the validation data is indicative of a good predictive model (for your population of interest).  
+* A large AUC on the test data is indicative of a good predictive model (for your population of interest).  
 * Consider false positive rate, false negative rate, outliers, parsimony, relevance, and ease of measurement of predictors.
 
 And, most of all, don't forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.
