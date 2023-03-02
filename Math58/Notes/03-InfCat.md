@@ -251,7 +251,7 @@ $$\mbox{exponentiate} \Bigg[ \ln(\hat{p}_1/\hat{p}_2) \pm z^*\sqrt{ \frac{1}{A} 
 
 To remember with relative risk:
 
-* The percent change is defined as:
+* The *percent change* is defined as (and also known as *efficacy* as seen in most papers describing COVID-19 vaccines):
 \begin{eqnarray*}
 (\widehat{RR} - 1)*100\% = \frac{\hat{p}_1 - \hat{p}_2}{\hat{p}_2}*100\% = \mbox{percent change from group 2 to group 1}
 \end{eqnarray*}

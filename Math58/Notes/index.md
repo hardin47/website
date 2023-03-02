@@ -1,7 +1,7 @@
 ---
 title: "Introduction to (Bio)Statistics"
 author: "Jo Hardin"
-date: "2023-02-23"
+date: "2023-03-02"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 header-includes:  \usepackage{blkarray}
