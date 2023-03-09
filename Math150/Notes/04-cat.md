@@ -447,6 +447,12 @@ Due to some theory that we won't cover, we use the fact that:
 SE(\ln (\widehat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}
 \end{eqnarray*}
 
+And more theory we won't cover that tells us:
+
+$$
+\ln(\widehat{RR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(RR), \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}\Bigg)
+$$
+
 A $(1-\alpha)100\%$ CI for the $\ln(RR)$ is:
 \begin{eqnarray*}
 \ln(\widehat{RR}) \pm z_{1-\alpha/2} SE(\ln(\widehat{RR}))
@@ -465,14 +471,14 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 **Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."
 :::
 
-\begin{eqnarray*}
-\mbox{odds} &=& \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
-&=& \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
-\widehat{\mbox{odds}} &=& \hat{\theta}\\
-\mbox{odds ratio} &=& \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
-\mbox{OR} &=& \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
-\widehat{\mbox{OR}} &=& \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
-\end{eqnarray*}
+\begin{align}
+\mbox{odds} &= \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
+&= \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
+\widehat{\mbox{odds}} &= \hat{\theta}\\
+\mbox{odds ratio} &= \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
+\mbox{OR} &= \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
+\widehat{\mbox{OR}} &= \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
+\end{align}
 
 
 $\widehat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02.$  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
@@ -631,6 +637,13 @@ Due to some theory that we won't cover:
 \begin{eqnarray*}
 SE(\ln (\widehat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
 \end{eqnarray*}
+
+And more theory we won't cover that tells us:
+
+$$
+\ln(\widehat{OR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(OR), \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}\Bigg)
+$$
+
 
 Note that your book introduces $SE(\ln(\widehat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2,$ is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
 

@@ -342,7 +342,7 @@ y_{2j} &= \mu_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
 \epsilon_{ij} &\sim N(0,\sigma^2)\\
 E[Y_i] &= \mu_i\\
 y_{1j} &= \hat{\mu}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
-&= \overine{y}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+&= \overline{y}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
 y_{2j} &= \hat{\mu}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
 &= \overline{y}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
 \end{align}
@@ -391,7 +391,7 @@ You may remember that to find estimates for $\beta_0$ and $\beta_1$ we minimized
 \begin{eqnarray*}
 b_1 &=& \hat{\beta}_1 = \hat{\beta}_1 &= \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - (\sum x_i )^2}\\
 &=& r \frac{s_y}{s_x}\\
-b_0 &=& \jat{\beta}_0 = \frac{\sum y_i - b_1 \sum x_i}{n}\\
+b_0 &=& \hat{\beta}_0 = \frac{\sum y_i - b_1 \sum x_i}{n}\\
 &=& \overline{y} - b_1 \overline{x}
 \end{eqnarray*}
 
