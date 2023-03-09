@@ -450,7 +450,7 @@ SE(\ln (\widehat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \
 And more theory we won't cover that tells us:
 
 $$
-\ln(\widehat{RR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(RR), \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}\Bigg)
+\ln(\widehat{RR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(RR), \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}} \Bigg)
 $$
 
 A $(1-\alpha)100\%$ CI for the $\ln(RR)$ is:
@@ -470,6 +470,8 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 ::: {.definition}
 **Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."
 :::
+
+$\mbox{ }$
 
 \begin{align}
 \mbox{odds} &= \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
@@ -641,7 +643,7 @@ SE(\ln (\widehat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \
 And more theory we won't cover that tells us:
 
 $$
-\ln(\widehat{OR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(OR), \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}\Bigg)
+\ln(\widehat{OR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(OR), \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}} \Bigg)
 $$
 
 
