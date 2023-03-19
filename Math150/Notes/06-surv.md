@@ -7,16 +7,16 @@ To motivate the technical details which are vital to understanding survival anal
 ::: {.example}
 In class -- experience the Titanic going down.
 
--   The Titanic is sinking. How long can you hold your breath?\
--   Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).\
--   Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).\
--   Accrual period will last about a minute.\
--   When I say "stop" (about another minute), everyone should end their time clocks (this is the end of the follow-up period).\
+-   The Titanic is sinking. How long can you hold your breath?
+-   Every person is sinking and will also be their own time keeper (number of seconds the sinker can hold their breath).
+-   Because the Titanic is sinking slowly, the participants go under water asynchronously (i.e., at different times).
+-   Accrual period will last about a minute.
+-   When I say "stop" (about another minute), everyone should end their time clocks (this is the end of the follow-up period).
 -   Each participant will have a recorded time as well as an indicator as to whether or not they have died.
 
-Based on the data, we would like to calculate:\
-1. What is the probability of surviving 40 seconds?\
-2. What is the median survival time?\
+Based on the data, we would like to calculate:
+1. What is the probability of surviving 40 seconds?
+2. What is the median survival time?
 3. What is the average survival time?
 :::
 
@@ -68,7 +68,8 @@ D(t) &= P(T \leq t) = \mbox{ probability of dying by time } t \ (= F(t))\\
 \end{align*}
 $$ Where $T$ is a random variable representing the time to event; t is a number.
 
-If $t_i$ is known for all i (no censoring), we can estimate $S(t)$ and $D(t)$ with $$
+If $t_i$ is known for all i (no censoring), we can estimate $S(t)$ and $D(t)$ with 
+$$
 \begin{align*}
 \hat{S}(t)_E &= m(t)/n = \mbox{ proportion alive at time } t\\
 \hat{D}(t)_E &= d(t)/n = \mbox{ proportion who have died by time } t\\
@@ -171,7 +172,10 @@ $$
 &= \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
 &= \frac{m(t)}{n}
 \end{align*}
-$$ ::: {.example} milk chocolate times by hand.
+$$ 
+
+::: {.example} 
+milk chocolate times, estimating the KM curve values by hand.
 
 | $t_i$ | $n_i$ | $d_i$ | $n_i - d_i$ | $\frac{n_i - d_i}{n_i}$ |
 |:-----:|:-----:|:-----:|:-----------:|:-----------------------:|
@@ -197,7 +201,9 @@ $$ ::: {.example} milk chocolate times by hand.
 
 Recall: $\hat{S}(t)_{KM} = \prod_{k:t_k < t} [ (n_k - d_k) / n_k].$
 
-Because $\hat{S}(t)_{KM}$ is just a product of counts, we can "easily" estimate the SE: $$
+Because $\hat{S}(t)_{KM}$ is just a product of counts, we can "easily" estimate the SE: 
+
+$$
 \begin{align*}
 s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{k:t_k < t}
 \frac{d_k}{n_k(n_k - d_k)}
@@ -213,7 +219,9 @@ $$
 \hat{\sigma}^2(t) &= SE( l l \hat{S}(t))\\
 &= \frac{\sum_{k:t_k < t} \frac{d_k}{n_k(n_k - d_k)}}{\bigg[\sum_{k:t_k < t} \ln ( (n_k - d_k) / n_k) \bigg]^2}
 \end{align*}
-$$ A 95 % CI for $\ln ( -\ln S(t))$ is $$ll\hat{S}(t) \pm 1.96 \hat{\sigma}(t) \ \ \ \mbox{(a function of
+$$ 
+
+A 95 % CI for $\ln ( -\ln S(t))$ is $$ll\hat{S}(t) \pm 1.96 \hat{\sigma}(t) \ \ \ \mbox{(a function of
 t!!!)}$$
 
 A 95 % CI for $S(t)$ is $$\bigg(\hat{S}(t)_{KM}^{\exp(1.96\hat{\sigma}(t))},
@@ -230,20 +238,24 @@ $$
 
 ##### Derivation of the above confidence intervals. {.unnumbered}
 
-Remember that $\exp(a \cdot b) = (\exp(a))^b,$ we'll need that below. A CI is an interval of values that captures the true parameter in 95 of samples. Let's say that the complementary log-log interval from above happens to catch the true value of $S(t).$ Then,
+Remember that $\exp(a \cdot b) = (\exp(a))^b,$ we'll need that below. A CI is an interval of values that captures the true parameter in 95 of samples. Let's say that the complementary log-log interval from above happens to catch the true value of $\ln(-\ln(S(t))).$ Then,
 
 $$
 \begin{align*}
-ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq  & llS(t)  \leq ll\hat{S}(t) + 1.96 \hat{\sigma}(t) \\
-\exp(ll\hat{S}(t) - 1.96 \hat{\sigma}(t)) \leq  & -lS(t)  \leq \exp(ll\hat{S}(t) + 1.96 \hat{\sigma}(t)) \\
--l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\leq  &-lS(t)  \leq -l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
-l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq  & lS(t)  \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
-l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq  & lS(t)  \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
-\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq  & S(t)  \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
-\exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq  & S(t)  \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
-(\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq  & S(t)  \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
+ll\hat{S}(t) - 1.96 \hat{\sigma}(t) \leq  & \ llS(t)  \leq ll\hat{S}(t) + 1.96 \hat{\sigma}(t) \\
+\exp(ll\hat{S}(t) - 1.96 \hat{\sigma}(t)) \leq  & \ -lS(t)  \leq \exp(ll\hat{S}(t) + 1.96 \hat{\sigma}(t)) \\
+-l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\leq  & \ -lS(t)  \leq -l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(- 1.96 \hat{\sigma}(t))\geq  & \ lS(t)  \geq l\hat{S}(t)\exp(1.96 \hat{\sigma}(t)) \\
+l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))\leq  & \ lS(t)  \leq l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t)) \\
+\exp(l\hat{S}(t)\exp(1.96 \hat{\sigma}(t))) \leq  & \ S(t)  \leq \exp(l\hat{S}(t)\exp(-1.96 \hat{\sigma}(t))) \\
+\exp(l\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq  & \ S(t)  \leq \exp(l\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))} \\
+(\hat{S}(t))^{\exp(1.96 \hat{\sigma}(t))} \leq  & \ S(t)  \leq (\hat{S}(t))^{\exp(-1.96 \hat{\sigma}(t))}
 \end{align*}
 $$
+
+That is, if and only if $\bigg(ll\hat{S}(t) - 1.96 \hat{\sigma}(t), ll\hat{S}(t) + 1.96 \hat{\sigma}(t) \bigg)$ captures $\ln(-\ln(S(t)))$ will $\bigg(\hat{S}(t)_{KM}^{\exp(1.96\hat{\sigma}(t))},
+\hat{S}(t)_{KM}^{\exp(-1.96\hat{\sigma}(t))} \bigg)$ capture $S(t).$
+
 
 #### Mean and Median values
 
@@ -251,7 +263,7 @@ $$
 
 > Mean survival time is estimated as the area under the survival curve. The estimator is based upon the entire range of data. Some software uses only the data up to the last observed event [@SurvHL] point out that this biases the estimate of the mean downwards, and they recommend that the entire range of data be used. A large sample method is used to estimate the variance of the mean survival time and thus to construct a confidence interval [@Andersen]. [@KMmean]
 
-In some ways, it is easier to conceptualize the mean as the average under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths. See the example here: <http://blog.data-miners.com/2010/06/why-is-area-under-survival-curve-equal.html>
+In some ways, it is easier to conceptualize the mean as the average under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths. 
 
 $$
 \begin{align*}
@@ -470,7 +482,9 @@ x_i}}{\sum_{k:t_k \geq t_i} e^{\beta x_k}} \Bigg)^{\delta_i}\\
 \ln L(\beta) &= \sum_{i=1}^n \delta_i \bigg[ \beta x_i - \ln
 (\sum_{k:t_k \geq t_i} e^{\beta x_k}) \bigg]
 \end{align*}
-$$ $b$ is found using numerical methods (as it was with logistic regression).
+$$ 
+
+$b$ is found using numerical methods (in the same way it was estimated when we were working with the logistic regression model).
 
 ::: {.example}
 Consider the following data from a prostate cancer study. The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group. The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES). The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer. The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).
@@ -537,7 +551,7 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
     -   Independent censoring: the censored observations have the same survival prospects as the non-censored participants.\
 :::
 
-#### Cox PH Multiple Regression Analysis {#multcoxph}
+### Cox PH Multiple Regression Analysis {#multcoxph}
 
 Extending the simple proportional hazards model to include multiple covariates.
 
@@ -635,14 +649,11 @@ One reason, however, to keep the variable broken into groups is because of the w
 
 
 ```r
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy() %>%
-  kable(caption = "coefficients for Cox PH with dpb categorical.",
-        digits = 3) %>%
-  kable_styling()
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-6)coefficients for Cox PH with dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-7)coefficients for Cox PH with dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -698,16 +709,14 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy() %>%
 </tbody>
 </table>
 
-```r
 
-coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() %>%
-  kable(caption = "coefficients for Cox PH with dpb numeric",
-        digits = 3) %>%
-  kable_styling()
+```r
+coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() 
 ```
 
+
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-6)coefficients for Cox PH with dpb numeric</caption>
+<caption>(\#tab:unnamed-chunk-9)coefficients for Cox PH with dpb numeric</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -728,16 +737,13 @@ coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() %>%
 </tbody>
 </table>
 
-```r
 
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() %>%
-  kable(caption = "glance for Cox PH with dpb categorical.",
-        digits = 2) %>%
-  kable_styling()
+```r
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-6)glance for Cox PH with dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-11)glance for Cox PH with dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -786,7 +792,7 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() %>%
 
 <div class="figure" style="text-align: center">
 <img src="figs/table71_CHDHR.png" alt="Table 7.1 from @Dupont." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-7)Table 7.1 from @Dupont.</p>
+<p class="caption">(\#fig:unnamed-chunk-12)Table 7.1 from @Dupont.</p>
 </div>
 
 
@@ -799,18 +805,16 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() %>%
     $$ We say the effects are multiplicative because we are adding in the exponent, so any effect due to gender will be multiplied with the effect due to dbp. How do we tell - from the results - that interaction wasn't modeled? Look at the hazard ratios, are they consistent when comparing one variable and keeping the other one constant? That is, check to see if the HR for two different levels of dbp is the same regardless of whether men or women are considered.
 
     -   The change in deviance is 133 ($H_0: \gamma =0),$ so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0,$ so we need gender in the model.
-
+    
 
 ```r
 coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
-  tidy() %>%
-  kable(caption = "coefficients for Cox PH with sex and dpb categorical.",
-        digits = 3) %>%
-  kable_styling()
+  tidy()
+
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-8)coefficients for Cox PH with sex and dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-14)coefficients for Cox PH with sex and dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -873,17 +877,15 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
 </tbody>
 </table>
 
+
+
 ```r
-  
 coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
-  glance() %>%
-  kable(caption = "glance for Cox PH with sex and dpb categorical.",
-        digits = 2) %>%
-  kable_styling()
+  glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-8)glance for Cox PH with sex and dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-16)glance for Cox PH with sex and dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -933,7 +935,7 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
 
 <div class="figure" style="text-align: center">
 <img src="figs/table72_CHDHR.png" alt="Table 7.2 from @Dupont." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-9)Table 7.2 from @Dupont.</p>
+<p class="caption">(\#fig:unnamed-chunk-17)Table 7.2 from @Dupont.</p>
 </div>
 
 
@@ -950,16 +952,15 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
     -   Note the marked differences between the estimates in table 7.2 and 7.3. The interactive model indicates that the effect of gender on the risk of CHD is greatest for people with low or moderate blood pressure and diminishes as blood pressure rises. Gender appears to have no effect on CHD for people with a DBP above 110 mm Hg.
 
 
+
 ```r
 coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
-  tidy() %>%
-  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting.",
-        digits = 3) %>%
-  kable_styling()
+  tidy()
 ```
 
+
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-10)coefficients for Cox PH with sex and dpb categorical interacting.</caption>
+<caption>(\#tab:unnamed-chunk-19)coefficients for Cox PH with sex and dpb categorical interacting.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -1064,17 +1065,15 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>%
 </tbody>
 </table>
 
+
+
 ```r
-  
 coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
-  glance() %>%
-  kable(caption = "glance for Cox PH with sex and dpb categorical interacting.",
-        digits = 2) %>%
-  kable_styling()
+  glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-10)glance for Cox PH with sex and dpb categorical interacting.</caption>
+<caption>(\#tab:unnamed-chunk-21)glance for Cox PH with sex and dpb categorical interacting.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -1123,7 +1122,7 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>%
 
 <div class="figure" style="text-align: center">
 <img src="figs/table73_CHDHR.png" alt="Table 7.3 from @Dupont." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-11)Table 7.3 from @Dupont.</p>
+<p class="caption">(\#fig:unnamed-chunk-22)Table 7.3 from @Dupont.</p>
 </div>
 
 
@@ -1138,7 +1137,7 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>%
     -   We need $\theta_1, \theta_2, \theta_3,$ as they are all statistically significant.
     -   The HR in Table 7.4 are substantially smaller than those in Table 7.3. It is important to realize that the HR in Table 7.4 compare people of the same age, body mass index, and serum cholesterol, while those of Table 7.3 compare people without regard to other variables. It is not surprising that the unadjusted HR are inflated due to the confounding variables.
     -   Goal: to predict CHD $\rightarrow$ because it's easier to measure blood pressure than cholesterol, we may just prefer to use the unadjusted model.
-    -   Goal: to establish a causal link $\rightarrow$ we *must* adjust for all possible confounding variables.
+    -   Goal: to establish a causal link $\rightarrow$ we *must* adjust for all possible confounding variables (which isn't ever possible, but sometimes it is reasonable to adjust for the main confounding variables which are known to be problematic).
 
 When should we transform a continuous variable into a factor variable?
 
@@ -1148,14 +1147,11 @@ When should we transform a continuous variable into a factor variable?
 
 ```r
 coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
-  tidy() %>% 
-  kable(caption = "coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
-        digits = 3) %>%
-  kable_styling()
+  tidy() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-12)coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+<caption>(\#tab:unnamed-chunk-24)coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -1281,17 +1277,14 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>%
 </tbody>
 </table>
 
-```r
 
+```r
 coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
-  glance() %>% 
-  kable(caption = "glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.",
-        digits = 3) %>%
-  kable_styling()
+  glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-12)glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+<caption>(\#tab:unnamed-chunk-26)glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -1341,7 +1334,7 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>%
 
 <div class="figure" style="text-align: center">
 <img src="figs/table74_CHDHR.png" alt="Table 7.4 from @Dupont." width="90%" />
-<p class="caption">(\#fig:unnamed-chunk-13)Table 7.4 from @Dupont.</p>
+<p class="caption">(\#fig:unnamed-chunk-27)Table 7.4 from @Dupont.</p>
 </div>
 
 
@@ -1696,7 +1689,7 @@ legend(10,.4, c("low", "high", "medium"),lty=2:4)
 survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-16-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-30-2.png" width="80%" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1705,7 +1698,7 @@ ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
 ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-17-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-31-2.png" width="80%" style="display: block; margin: auto;" />
 
 different options for CI
 
@@ -1726,7 +1719,7 @@ ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
                  data=recidKM2, facet.by = "race")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-18-5.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-32-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-5.png" width="80%" style="display: block; margin: auto;" />
 
 ### Log-rank test [rho=0] and the Wilcoxon test [rho=1]
 
@@ -1761,7 +1754,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
            censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-33-1.png" width="80%" style="display: block; margin: auto;" />
 
 Violent recidivism
 
@@ -1822,7 +1815,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
   ggtitle("Violent Recidivism")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-20-3.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-34-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-34-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-34-3.png" width="80%" style="display: block; margin: auto;" />
 
 ### Cox Proportional Hazards models
 
@@ -1905,7 +1898,7 @@ options(datadist = 'ddist')
 plot(summary(recid.final), log = TRUE)
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-36-1.png" width="80%" style="display: block; margin: auto;" />
 
 The survminer packages also has the `ggforest()` function which makes a fantastic data viz.
 
@@ -1923,7 +1916,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM),
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-38-1.png" width="80%" style="display: block; margin: auto;" />
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
 
@@ -1957,7 +1950,7 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-26-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-40-1.png" width="80%" style="display: block; margin: auto;" />
 
 ### Cox PH diagnostics ... look into all the different arguments of the function!
 
@@ -1966,4 +1959,4 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
 ```
 
-<img src="06-surv_files/figure-html/unnamed-chunk-27-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="06-surv_files/figure-html/unnamed-chunk-41-1.png" width="80%" style="display: block; margin: auto;" />
