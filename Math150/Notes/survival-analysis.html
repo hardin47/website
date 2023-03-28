@@ -318,15 +318,15 @@ P(T &gt; t_2) &amp;= P(T &gt; t_2 | T &gt; t_1) P(T &gt; t_1)\\
 \end{align*}
 \]</span> The probability of surviving the first t days is: <span class="math display">\[
 \begin{align*}
-\hat{S}(t)_{KM} &amp;= \prod_{i:t_i &lt; t} \frac{n_i - d_i}{n_i}\\
-&amp;= \prod_{i:t_i &lt; t} p_i\\
+\hat{S}(t)_{KM} &amp;= \prod_{i:t_i \leq t} \frac{n_i - d_i}{n_i}\\
+&amp;= \prod_{i:t_i \leq t} p_i\\
 \hat{D}(t)_{KM} &amp;= 1 - \hat{S}(t)_{KM}\\
 \end{align*}
 \]</span> If there are no deaths at time <span class="math inline">\(t_i,\)</span> then <span class="math inline">\((n_i -d_i) / n_i = 1.\)</span></p>
 <p>If there is no censoring at time <span class="math inline">\(t_i,\)</span> then <span class="math inline">\(n_i - d_i = n_{i+1}.\)</span> The Kaplan-Meier survival curve will be equivalent to the empirical survival curve:</p>
 <p><span class="math display">\[
 \begin{align*}
-\hat{S}(t)_{KM} &amp;= \prod_{i:t_i &lt; t} \frac{n_i - d_i}{n_i}\\
+\hat{S}(t)_{KM} &amp;= \prod_{i:t_i \leq t} \frac{n_i - d_i}{n_i}\\
 &amp;= \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
 &amp;= \frac{m(t)}{n}
 \end{align*}
@@ -423,11 +423,11 @@ P(T &gt; t_2) &amp;= P(T &gt; t_2 | T &gt; t_1) P(T &gt; t_1)\\
 <h3>
 <span class="header-section-number">8.2.1</span> CI for KM curve<a class="anchor" aria-label="anchor" href="#KMCI"><i class="fas fa-link"></i></a>
 </h3>
-<p>Recall: <span class="math inline">\(\hat{S}(t)_{KM} = \prod_{k:t_k &lt; t} [ (n_k - d_k) / n_k].\)</span></p>
+<p>Recall: <span class="math inline">\(\hat{S}(t)_{KM} = \prod_{k:t_k \leq t} [ (n_k - d_k) / n_k].\)</span></p>
 <p>Because <span class="math inline">\(\hat{S}(t)_{KM}\)</span> is just a product of counts, we can “easily” estimate the SE:</p>
 <p><span class="math display">\[
 \begin{align*}
-s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{i:t_i &lt; t}
+s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{i:t_i \leq t}
 \frac{d_i}{n_i(n_i - d_i)}
 \end{align*}
 \]</span></p>
@@ -436,7 +436,7 @@ s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{i:t_i &lt; t}
 <p><span class="math display">\[
 \begin{align*}
 \hat{\sigma}^2(t) &amp;= SE( l l \hat{S}(t))\\
-&amp;= \frac{\sum_{i:t_i &lt; t} \frac{d_i}{n_i(n_i - d_i)}}{\bigg[\sum_{i:t_i &lt; t} \ln ( (n_i - d_i) / n_i) \bigg]^2}
+&amp;= \frac{\sum_{i:t_i \leq t} \frac{d_i}{n_i(n_i - d_i)}}{\bigg[\sum_{i:t_i \leq t} \ln ( (n_i - d_i) / n_i) \bigg]^2}
 \end{align*}
 \]</span></p>
 <p>A 95 % CI for <span class="math inline">\(\ln ( -\ln S(t))\)</span> is <span class="math display">\[ll\hat{S}(t) \pm 1.96 \hat{\sigma}(t) \ \ \ \mbox{(a function of
@@ -511,7 +511,8 @@ Since the distribution of survival times tend to be positively skewed, the media
 <h3>
 <span class="header-section-number">8.2.2</span> Log-rank Test<a class="anchor" aria-label="anchor" href="#logrank"><i class="fas fa-link"></i></a>
 </h3>
-<p>As before, we’d like to know if two treatments produce the same probability of survival (how did we do that with logistic regression? significance of the <span class="math inline">\(\beta\)</span> coefficient). Here: <span class="math display">\[
+<p>As before, we’d like to know if two treatments produce the same probability of survival (how did we do that with logistic regression? significance of the <span class="math inline">\(\beta\)</span> coefficient). Here:</p>
+<p><span class="math display">\[
 \begin{align*}
 H_0: &amp; S_1(t) = S_2(t) \ \ \ \ \ \forall t \mbox{
 parameters!}\\
@@ -552,17 +553,22 @@ H_a: &amp; S_1(t) \ne S_2(t) \ \ \ \ \ \mbox{ for some } t\\
 \begin{align*}
 d_{1j} &amp;\approx \frac{d_j}{n_j}n_{1j}\\
 d_{1j} &amp;= \mbox{observed}\\
-\frac{d_j}{n_j} n_{1j} &amp;= E(d_{1j} | d_j) = E_{1j} \\
-var(d_{1j}) &amp;= \frac{n_{1j} n_{2j} d_j (n_j - d_j)}{n_j^2(n_j-1)}
+E(d_{1j} | d_j) &amp;= \frac{d_j}{n_j} n_{1j} = E_{1j} \\
+var(d_{1j}| d_j) &amp;= \frac{n_{1j} n_{2j} d_j (n_j - d_j)}{n_j^2(n_j-1)}
 = V_{1j}\\
 \end{align*}
-\]</span> where the variance is derived from the hypergeometric distribution.</p>
-<p>To estimate the overall difference between the observed and expected death counts: <span class="math display">\[
+\]</span></p>
+<p>where the variance is derived from the hypergeometric distribution.</p>
+<p>To estimate the overall difference between the observed and expected death counts:</p>
+<p><span class="math display">\[
 \begin{align*}
 \sum_j d_{1j} - \sum_j E(d_{1j} | d_j) = \sum_j d_{1j} - \sum_j
-\frac{d_j}{n_j}n\_{1j}
-\end{align*}
-\]</span> The overall variability: <span class="math display">\[\sum_j var(d_{1j}|d_j)\]</span> The test statistic we use to compare the observed and expected frequency of deaths. (Sum over all of the death (or event) times.) <span class="math display">\[
+\frac{d_j}{n_j}n_{1j}
+\end{align*}\]</span></p>
+<p>The overall variability:</p>
+<p><span class="math display">\[\sum_j var(d_{1j}|d_j)\]</span></p>
+<p>The test statistic we use to compare the observed and expected frequency of deaths. (Sum over all of the death (or event) times.)</p>
+<p><span class="math display">\[
 \begin{align*}
 T = \frac{(|\sum_j d_{1j} - \sum_j E(d_{1j} | d_j)| -
 0.5)^2}{\sum_j var(d_{1j}|d_j)} \sim \chi^2_1
@@ -605,7 +611,7 @@ S(t) &amp;= \exp \{ - \int^t_0 h(x) dx  \}\\
 \begin{align*}
 h(t) = 0 &amp;&amp;\Rightarrow \mbox{ no risk of death at time } t\\
 &amp;&amp; \Rightarrow S(t) \mbox{ is flat at } t\\
-h(t) \&gt; \&gt;&amp;&amp; \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
+h(t) &gt; &gt;&amp;&amp; \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
 h(t) =k &amp;&amp; \Rightarrow S(t) = e^{-kt}
 \end{align*}
 \]</span></p>
@@ -3117,7 +3123,7 @@ n &amp;\geq \frac{16 \cdot 14^2}{4}\\
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-03-23.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-03-28.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

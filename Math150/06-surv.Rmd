@@ -171,8 +171,8 @@ P(T > t_2) &= P(T > t_2 | T > t_1) P(T > t_1)\\
 \end{align*}
 $$ The probability of surviving the first t days is: $$
 \begin{align*}
-\hat{S}(t)_{KM} &= \prod_{i:t_i < t} \frac{n_i - d_i}{n_i}\\
-&= \prod_{i:t_i < t} p_i\\
+\hat{S}(t)_{KM} &= \prod_{i:t_i \leq t} \frac{n_i - d_i}{n_i}\\
+&= \prod_{i:t_i \leq t} p_i\\
 \hat{D}(t)_{KM} &= 1 - \hat{S}(t)_{KM}\\
 \end{align*}
 $$ If there are no deaths at time $t_i,$ then $(n_i -d_i) / n_i = 1.$
@@ -181,7 +181,7 @@ If there is no censoring at time $t_i,$ then $n_i - d_i = n_{i+1}.$ The Kaplan-M
 
 $$
 \begin{align*}
-\hat{S}(t)_{KM} &= \prod_{i:t_i < t} \frac{n_i - d_i}{n_i}\\
+\hat{S}(t)_{KM} &= \prod_{i:t_i \leq t} \frac{n_i - d_i}{n_i}\\
 &= \frac{n_1 - d_1}{n_1} \frac{n_2 - d_2}{n_2} \cdots \frac{n_k - d_k}{n_k}\\
 &= \frac{m(t)}{n}
 \end{align*}
@@ -212,13 +212,13 @@ milk chocolate times, estimating the KM curve values by hand.
 
 ### CI for KM curve {#KMCI}
 
-Recall: $\hat{S}(t)_{KM} = \prod_{k:t_k < t} [ (n_k - d_k) / n_k].$
+Recall: $\hat{S}(t)_{KM} = \prod_{k:t_k \leq t} [ (n_k - d_k) / n_k].$
 
 Because $\hat{S}(t)_{KM}$ is just a product of counts, we can "easily" estimate the SE: 
 
 $$
 \begin{align*}
-s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{i:t_i < t}
+s^2_{\hat{S}(t)_{KM}} = \hat{S}(t)_{KM}^2 \sum_{i:t_i \leq t}
 \frac{d_i}{n_i(n_i - d_i)}
 \end{align*}
 $$
@@ -230,7 +230,7 @@ $l l \hat{S}(t) = \ln (-\ln \hat{S}(t)_{KM})$ has a much more normal sampling di
 $$
 \begin{align*}
 \hat{\sigma}^2(t) &= SE( l l \hat{S}(t))\\
-&= \frac{\sum_{i:t_i < t} \frac{d_i}{n_i(n_i - d_i)}}{\bigg[\sum_{i:t_i < t} \ln ( (n_i - d_i) / n_i) \bigg]^2}
+&= \frac{\sum_{i:t_i \leq t} \frac{d_i}{n_i(n_i - d_i)}}{\bigg[\sum_{i:t_i \leq t} \ln ( (n_i - d_i) / n_i) \bigg]^2}
 \end{align*}
 $$ 
 
@@ -314,7 +314,9 @@ $\hat{S}(t_i)_{KM}$ then gives the time at which at least p % of events have occ
 
 ### Log-rank Test {#logrank}
 
-As before, we'd like to know if two treatments produce the same probability of survival (how did we do that with logistic regression? significance of the $\beta$ coefficient). Here: $$
+As before, we'd like to know if two treatments produce the same probability of survival (how did we do that with logistic regression? significance of the $\beta$ coefficient). Here: 
+
+$$
 \begin{align*}
 H_0: & S_1(t) = S_2(t) \ \ \ \ \ \forall t \mbox{
 parameters!}\\
@@ -336,18 +338,29 @@ $$
 \begin{align*}
 d_{1j} &\approx \frac{d_j}{n_j}n_{1j}\\
 d_{1j} &= \mbox{observed}\\
-\frac{d_j}{n_j} n_{1j} &= E(d_{1j} | d_j) = E_{1j} \\
-var(d_{1j}) &= \frac{n_{1j} n_{2j} d_j (n_j - d_j)}{n_j^2(n_j-1)}
+E(d_{1j} | d_j) &= \frac{d_j}{n_j} n_{1j} = E_{1j} \\
+var(d_{1j}| d_j) &= \frac{n_{1j} n_{2j} d_j (n_j - d_j)}{n_j^2(n_j-1)}
 = V_{1j}\\
 \end{align*}
-$$ where the variance is derived from the hypergeometric distribution.
+$$ 
 
-To estimate the overall difference between the observed and expected death counts: $$
+where the variance is derived from the hypergeometric distribution.
+
+To estimate the overall difference between the observed and expected death counts: 
+
+$$
 \begin{align*}
 \sum_j d_{1j} - \sum_j E(d_{1j} | d_j) = \sum_j d_{1j} - \sum_j
-\frac{d_j}{n_j}n\_{1j}
-\end{align*}
-$$ The overall variability: $$\sum_j var(d_{1j}|d_j)$$ The test statistic we use to compare the observed and expected frequency of deaths. (Sum over all of the death (or event) times.) $$
+\frac{d_j}{n_j}n_{1j}
+\end{align*}$$ 
+
+The overall variability: 
+
+$$\sum_j var(d_{1j}|d_j)$$ 
+
+The test statistic we use to compare the observed and expected frequency of deaths. (Sum over all of the death (or event) times.) 
+
+$$
 \begin{align*}
 T = \frac{(|\sum_j d_{1j} - \sum_j E(d_{1j} | d_j)| -
 0.5)^2}{\sum_j var(d_{1j}|d_j)} \sim \chi^2_1
@@ -386,7 +399,7 @@ $$
 \begin{align*}
 h(t) = 0 &&\Rightarrow \mbox{ no risk of death at time } t\\
 && \Rightarrow S(t) \mbox{ is flat at } t\\
-h(t) \> \>&& \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
+h(t) > >&& \Rightarrow S(t) \mbox{ is rapidly declining in } t\\
 h(t) =k && \Rightarrow S(t) = e^{-kt}
 \end{align*}
 $$
