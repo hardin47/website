@@ -412,7 +412,7 @@ $$
 
 ### Proportional Hazards
 
-Suppose that $h_0(t)$ and $h_1(t)$ are the hazard functions for patients on control and experimental treatments. The two groups have {\sc proportional hazards} if $h_1(t) = R h_0(t)$ for some constant R: $$\frac{h_1(t)}{h_0(t)} = R \ \ \ \ \ \forall t$$ R is called the **hazard ratio**. $h_0(t)$ can be anything as long as $h_1(t)$ is proportional. Note in the pictures below that no one dies between 3 and 7 days, the survival curves are flat over that interval.
+Suppose that $h_0(t)$ and $h_1(t)$ are the hazard functions for patients on control and experimental treatments. The two groups have **proportional hazards** if $h_1(t) = R h_0(t)$ for some constant R: $$\frac{h_1(t)}{h_0(t)} = R \ \ \ \ \ \forall t$$ R is called the **hazard ratio**. $h_0(t)$ can be anything as long as $h_1(t)$ is proportional. Note in the pictures below that no one dies between 3 and 7 days, the survival curves are flat over that interval.
 
 <img src="06-surv_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" />
 
