@@ -867,7 +867,7 @@ $$(\hat{p}_1 - \hat{p}_2) \pm Z^* \sqrt{\frac{\hat{p}_1 (1-\hat{p}_1)}{n_1} + \f
 
 > The United States federal government shutdown of 2018-2019 occurred from December 22, 2018 until January 25, 2019, a span of 35 days. A Survey USA poll of 608 randomly sampled Americans during this time period reported that 48% (77 of 160 people) of those who make less than $40,000 per year and 55% (247 of 448 people) of those who make $40,000 or more per year said the government shutdown has not at all affected them personally. 
 
-0. Notice that the observational units have been selected from the entire population:  **not** by using the response or explanatory variable.  (This type of study is called a cross-classification study.)  The beauty of having been selected from the entire population is that we have a good sense of **both** the proportions of each group as well as the proportion of people for whom the shutdown has affected them.
+n.b., Notice that the observational units have been selected from the entire population:  **not** by using the response or explanatory variable.  (This type of study is called a cross-classification study.)  The beauty of having been selected from the entire population is that we have a good sense of **both** the proportions of each group as well as the proportion of people for whom the shutdown has affected them.
 
 1. Test the research claim that the proportion of people who are affected by the shutdown is different in comparing those who make more than $40,000 and less than $40,000 per year.
 
@@ -935,13 +935,13 @@ $$\mbox{p-value} = 2* P( Z \leq -1.522) = 0.128$$
 
 Determine if the following statements are true or false, and explain your reasoning if you identify the statement as false.^[(a) FALSE (because the interval overlaps zero), (b) FALSE (We are 95% confident that 16% more to 2% fewer Americans who make \$40,000 or more per year are not at all personally affected by the government shutdown compared to those who less than \$40,000 per year.), (c) FALSE (it would be more narrow), (d) TRUE]
 
-(a) At the 5% significance level, the data provide convincing evidence of a real difference in the proportion who are not affected personally between Americans who make less than \$40,000 annually and Americans who make \$40,000 or more annually.
+(a) At the 5% significance level, the data provide convincing evidence of a real difference in the proportion who are not affected personally between Americans who make less than \$40,000 annually and Americans who make \$40,000 or more annually.^[(a) FALSE (because the interval overlaps zero)]
 
-(b) We are 95% confident that 16% more to 2% fewer Americans who make less than \$40,000 per year are not at all personally affected by the government shutdown compared to those who make \$40,000 or more per year.
+(b) We are 95% confident that 16% more to 2% fewer Americans who make less than \$40,000 per year are not at all personally affected by the government shutdown compared to those who make \$40,000 or more per year.^[(b) FALSE (We are 95% confident that 16% more to 2% fewer Americans who make \$40,000 or more per year are not at all personally affected by the government shutdown compared to those who less than \$40,000 per year.)]
 
-(c) A 90% confidence interval for ($p_{<40K}- p_{ \geq40K}$) would be wider than the (-0.16, 0.02) interval.
+(c) A 90% confidence interval for ($p_{<40K}- p_{ \geq40K}$) would be wider than the (-0.16, 0.02) interval.^[(c) FALSE (it would be more narrow)]
 
-(d) A 95% confidence interval for($p_{ \geq40K} - p_{<40K}$) is (-0.02, 0.16).
+(d) A 95% confidence interval for($p_{ \geq40K} - p_{<40K}$) is (-0.02, 0.16).^[(d) TRUE]
 
 <!--
 ## 2/27/20 Agenda {#Feb27}

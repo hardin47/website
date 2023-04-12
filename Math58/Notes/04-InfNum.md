@@ -120,7 +120,7 @@ In order to work through the analysis it is imperative that we understand the da
 
 ####  Hypothesis test on true average healthy body temperature {-}
 
-The first research question we want to ask is:  how surprising would it be to select a group of 130 participants who have an average healthy body temperature of 98.249 F ?
+The first research question we want to ask is:  how surprising would it be to select a group of 130 participants who have an average healthy body temperature of 98.249 F?
 
 The questions is set up perfectly for a hypothesis test!
 

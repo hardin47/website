@@ -299,11 +299,10 @@ surgery %>%
   t.test(age ~ summer, data = ., var.equal = TRUE) %>%
   tidy()
 #> # A tibble: 1 × 10
-#>   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸
-#>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>  <chr>  
-#> 1  -0.225    57.6    57.8   -1.01   0.312   31997  -0.662   0.212 Two S… two.si…
-#> # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,
-#> #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative
+#>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
+#>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
+#> 1   -0.225      57.6      57.8     -1.01   0.312     31997   -0.662     0.212
+#> # ℹ 2 more variables: method <chr>, alternative <chr>
 ```
   
 * Look at SD and SEM
@@ -433,11 +432,10 @@ surgery %>%
   t.test(age ~ month, data = .) %>%
   tidy()
 #> # A tibble: 1 × 10
-#>   estim…¹ estim…² estim…³ stati…⁴ p.value param…⁵ conf.…⁶ conf.…⁷ method alter…⁸
-#>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>  <chr>  
-#> 1   0.486    58.1    57.6    1.16   0.247   4954.  -0.337    1.31 Welch… two.si…
-#> # … with abbreviated variable names ¹​estimate, ²​estimate1, ³​estimate2,
-#> #   ⁴​statistic, ⁵​parameter, ⁶​conf.low, ⁷​conf.high, ⁸​alternative
+#>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
+#>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
+#> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
+#> # ℹ 2 more variables: method <chr>, alternative <chr>
 
 surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%

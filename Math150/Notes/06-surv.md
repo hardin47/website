@@ -88,13 +88,15 @@ Said differently: within any subgroup of interest, the subjects who are censored
 
 -   Not independent
 
-    -   Subjects who drop out because they are extremely ill\
-    -   Subjects who drop out because of adverse effects of the treatment regimen\
+    -   Subjects who drop out because they are extremely ill
+    -   Subjects who drop out because of adverse effects of the treatment regimen
 
 -   Independent
 
-    -   Subjects who drop out because the study ends\
+    -   Subjects who drop out because the study ends
     -   Subjects who drop out because they move away
+    
+Additionally, if someone, for example, dies in a car accident while enrolled in a clinical trial (where the event of interest is death), the person is considered dead, not censored.  The rationale is that dying of any cause is likely related to the underlying disease, so we don't try to parse out the death reason. In some trials a cause of death is assigned, and competing risks models used, but assigning cause can be dicey.
 
 ::: {.example}
 Suppose we have the following melting times (in seconds) of milk chocolate chips for 7 students where the maximum time allowed for the experiment was 60 seconds:
@@ -354,7 +356,7 @@ T = \frac{(|\sum_j d_{1j} - \sum_j E(d_{1j} | d_j)| -
 \end{align*}
 $$
 
-What if we had had $g$ groups (instead of 2)? We would have $g-1$ "death" values. Consider the test statistic above, call it $T_1.$ If we had $g$ groups, we would need to sum $T_i, i=1,2, \ldots, g-1.$ However, the variances of the $T_i$ would be correlated (because the values must sum to $D_k)...$ so the test statistic is slightly more complicated. [@Collett(section 2.6)]
+What if we had had $g$ groups (instead of 2)? We would have to consider the $g-1$ "death" values. Consider the test statistic above, call it $T_1.$ If we had $g$ groups, we would need to sum $T_i, i=1,2, \ldots, g-1.$ However, the variances of the $T_i$ would be correlated (because the values must sum to $D_k)...$ so the test statistic is slightly more complicated. [@Collett(section 2.6)]
 
 -   The Wilcoxon test is very similar to the log-rank test, but it uses a different derivation for the variance, and therefore a different denominator and test statistic.\
 -   The log-rank test is more powerful than the Wilcoxon, but the log-rank test requires the proportional hazards assumption.\
@@ -534,14 +536,13 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% tidy()
 #> 1 Treatment    -1.98      1.10     -1.80  0.0717
 coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
 #> # A tibble: 1 × 18
-#>       n nevent statist…¹ p.val…² stati…³ p.val…⁴ stati…⁵ p.val…⁶ stati…⁷ p.val…⁸
-#>   <int>  <dbl>     <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-#> 1    38      6      4.55  0.0329    4.42  0.0355    3.24  0.0717      NA      NA
-#> # … with 8 more variables: r.squared <dbl>, r.squared.max <dbl>,
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1    38      6          4.55      0.0329         4.42     0.0355           3.24
+#> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>, and abbreviated variable names ¹​statistic.log,
-#> #   ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc, ⁵​statistic.wald, ⁶​p.value.wald,
-#> #   ⁷​statistic.robust, ⁸​p.value.robust
+#> #   BIC <dbl>, nobs <int>
 ```
 
 -   **Note 1**: There is no intercept in the linear component of the model (i.e., there is no $\beta_0$ or $b_0).$ The baseline estimate (usually the role of the "intercept") is contained within the $h_0(t)$ parameter.
@@ -1379,7 +1380,7 @@ $$
 
 Therefore, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta.$
 
-Note that if $h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta),$ then
+$h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta),$ then
 
 $$
 \begin{align*}
@@ -1845,14 +1846,13 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>%
 coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
   glance()
 #> # A tibble: 1 × 18
-#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
-#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
-#> 1 11426   3058        617. 9.39e-135    654. 1.15e-142    609. 5.57e-133      NA
-#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
-#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
-#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
-#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
-#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          617.   9.39e-135         654.  1.15e-142           609.
+#> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 
 # score_factor and race
 coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
@@ -1866,14 +1866,13 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>%
 coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
   glance()
 #> # A tibble: 1 × 18
-#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
-#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
-#> 1 11426   3058        636. 1.65e-137    671. 3.72e-145    626. 2.10e-135      NA
-#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
-#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
-#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
-#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
-#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          636.   1.65e-137         671.  3.72e-145           626.
+#> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 
 # score_factor, race, age, sex
 coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
@@ -1889,14 +1888,13 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
   glance()
 #> # A tibble: 1 × 18
-#>       n nevent statistic…¹ p.value…² stati…³ p.value…⁴ stati…⁵ p.value…⁶ stati…⁷
-#>   <int>  <dbl>       <dbl>     <dbl>   <dbl>     <dbl>   <dbl>     <dbl>   <dbl>
-#> 1 11426   3058        768. 8.91e-164    787. 7.45e-168    739. 2.07e-157      NA
-#> # … with 9 more variables: p.value.robust <dbl>, r.squared <dbl>,
-#> #   r.squared.max <dbl>, concordance <dbl>, std.error.concordance <dbl>,
-#> #   logLik <dbl>, AIC <dbl>, BIC <dbl>, nobs <int>, and abbreviated variable
-#> #   names ¹​statistic.log, ²​p.value.log, ³​statistic.sc, ⁴​p.value.sc,
-#> #   ⁵​statistic.wald, ⁶​p.value.wald, ⁷​statistic.robust
+#>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
+#>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
+#> 1 11426   3058          768.   8.91e-164         787.  7.45e-168           739.
+#> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
+#> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
+#> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
+#> #   BIC <dbl>, nobs <int>
 ```
 
 Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:

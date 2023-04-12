@@ -252,21 +252,21 @@ dim(feeder_test)
 ```r
 feeder_train
 #> # A tibble: 176,763 × 59
-#>   squirrels    yard_ty…¹ yard_…² yard_…³ yard_…⁴ yard_…⁵ hab_d…⁶ hab_e…⁷ hab_m…⁸
-#>   <fct>            <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-#> 1 no squirrels         0       0       1       0       0       1      NA       1
-#> 2 no squirrels         0       0       1       0       0       1      NA       1
-#> 3 no squirrels         0       0       1       0       0       1       0       1
-#> 4 no squirrels         0       0       1       0       0       1      NA      NA
-#> 5 no squirrels         0       0       1       1       0       1       0       0
-#> 6 no squirrels         0       0       1       0       0       1      NA       1
-#> # … with 176,757 more rows, 50 more variables: hab_orchard <dbl>,
-#> #   hab_park <dbl>, hab_water_fresh <dbl>, hab_water_salt <dbl>,
-#> #   hab_residential <dbl>, hab_industrial <dbl>, hab_agricultural <dbl>,
-#> #   hab_desert_scrub <dbl>, hab_young_woods <dbl>, hab_swamp <dbl>,
-#> #   hab_marsh <dbl>, evgr_trees_atleast <dbl>, evgr_shrbs_atleast <dbl>,
-#> #   dcid_trees_atleast <dbl>, dcid_shrbs_atleast <dbl>,
-#> #   fru_trees_atleast <dbl>, cacti_atleast <dbl>, brsh_piles_atleast <dbl>, …
+#>   squirrels    yard_type_pavement yard_type_garden yard_type_landsca
+#>   <fct>                     <dbl>            <dbl>             <dbl>
+#> 1 no squirrels                  0                0                 1
+#> 2 no squirrels                  0                0                 1
+#> 3 no squirrels                  0                0                 1
+#> 4 no squirrels                  0                0                 1
+#> 5 no squirrels                  0                0                 1
+#> 6 no squirrels                  0                0                 1
+#> # ℹ 176,757 more rows
+#> # ℹ 55 more variables: yard_type_woods <dbl>, yard_type_desert <dbl>,
+#> #   hab_dcid_woods <dbl>, hab_evgr_woods <dbl>, hab_mixed_woods <dbl>,
+#> #   hab_orchard <dbl>, hab_park <dbl>, hab_water_fresh <dbl>,
+#> #   hab_water_salt <dbl>, hab_residential <dbl>, hab_industrial <dbl>,
+#> #   hab_agricultural <dbl>, hab_desert_scrub <dbl>, hab_young_woods <dbl>,
+#> #   hab_swamp <dbl>, hab_marsh <dbl>, evgr_trees_atleast <dbl>, …
 ```
 
 
@@ -570,7 +570,7 @@ feeder_fit %>% tidy() %>% print(n = 21)
 #> 19 hab_swamp            0.406    0.0223     18.2   5.54e- 74
 #> 20 hab_marsh           -0.0149   0.0231     -0.644 5.20e-  1
 #> 21 evgr_trees_atleast   0.0405   0.00220    18.4   1.44e- 75
-#> # … with 38 more rows
+#> # ℹ 38 more rows
 ```
 
 
@@ -1153,7 +1153,7 @@ cv_metrics1
 #> 4 Fold1 roc_auc     binary        0.666  Preprocessor1_Model1
 #> 5 Fold2 accuracy    binary        0.809  Preprocessor1_Model1
 #> 6 Fold2 sensitivity binary        0.995  Preprocessor1_Model1
-#> # … with 6 more rows
+#> # ℹ 6 more rows
 ```
 
 **Model 2:**
@@ -1171,7 +1171,7 @@ cv_metrics2
 #> 4 Fold1 roc_auc     binary        0.699  Preprocessor1_Model1
 #> 5 Fold2 accuracy    binary        0.812  Preprocessor1_Model1
 #> 6 Fold2 sensitivity binary        0.989  Preprocessor1_Model1
-#> # … with 6 more rows
+#> # ℹ 6 more rows
 ```
 
 #### Better tabulation of CV metrics {-}
@@ -1361,7 +1361,7 @@ feeder_fit %>% tidy()
 #> 4 yard_type_landsca     0.168    0.0219      7.69 1.45e- 14
 #> 5 yard_type_woods       0.309    0.0170     18.1  1.59e- 73
 #> 6 yard_type_desert     -0.297    0.0789     -3.76 1.68e-  4
-#> # … with 53 more rows
+#> # ℹ 53 more rows
 
 feeder_fit %>% glance()
 #> # A tibble: 1 × 8
@@ -1469,7 +1469,7 @@ feeder_fit_rs1 %>% collect_metrics(summarize = FALSE)
 #> 4 Fold01 roc_auc     binary        0.661  Preprocessor1_Model1
 #> 5 Fold02 accuracy    binary        0.805  Preprocessor1_Model1
 #> 6 Fold02 sensitivity binary        0.996  Preprocessor1_Model1
-#> # … with 34 more rows
+#> # ℹ 34 more rows
 feeder_fit_rs2 %>% collect_metrics(summarize = FALSE)
 #> # A tibble: 40 × 5
 #>   id     .metric     .estimator .estimate .config             
@@ -1480,7 +1480,7 @@ feeder_fit_rs2 %>% collect_metrics(summarize = FALSE)
 #> 4 Fold01 roc_auc     binary        0.701  Preprocessor1_Model1
 #> 5 Fold02 accuracy    binary        0.809  Preprocessor1_Model1
 #> 6 Fold02 sensitivity binary        0.991  Preprocessor1_Model1
-#> # … with 34 more rows
+#> # ℹ 34 more rows
 ```
 
 Note that the variables in Model 2 perform better using cross validation than the variables in Model 1, we choose Model 2 to report out:

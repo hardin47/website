@@ -341,15 +341,15 @@ Keep in mind that the expectation of a Poisson model is that the residuals will 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") %>% augment() %>% head()
 #> # A tibble: 6 × 10
-#>   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd
-#>     <dbl>       <dbl> <dbl>   <dbl>   <dbl>  <dbl>   <dbl>  <dbl>  <dbl>   <dbl>
-#> 1      58       3.22    0.6    1.84    4.61 -4.57   -4.83  0.105    4.04 0.581  
-#> 2      31       0.215  26.3  572.      3.36  0.414   0.427 0.0605   4.15 0.00301
-#> 3       3      -1.56   58.7    0.78    2.76 -3.96   -4.05  0.0417   4.07 0.118  
-#> 4      25      -2.30   47.4    0.18    2.55  3.01    3.08  0.0413   4.11 0.131  
-#> 5       2      -3.00    1.9  904.      2.27 -3.01   -3.10  0.0559   4.11 0.0959 
-#> 6      18      -1.08    8      1.84    3.11 -0.953  -0.986 0.0661   4.15 0.0161 
-#> # … with abbreviated variable names ¹​adjacent, ²​.std.resid
+#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
+#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
+#> 1      58       3.22    0.6     1.84    4.61 -4.57      -4.83  0.105    4.04
+#> 2      31       0.215  26.3   572.      3.36  0.414      0.427 0.0605   4.15
+#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -4.05  0.0417   4.07
+#> 4      25      -2.30   47.4     0.18    2.55  3.01       3.08  0.0413   4.11
+#> 5       2      -3.00    1.9   904.      2.27 -3.01      -3.10  0.0559   4.11
+#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.986 0.0661   4.15
+#> # ℹ 1 more variable: .cooksd <dbl>
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") %>% augment() %>%
@@ -398,15 +398,15 @@ glm(species ~ log(area) + scruz + adjacent,
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% augment() %>% head()
 #> # A tibble: 6 × 10
-#>   species `log(area)` scruz adjac…¹ .fitted .resid .std.…²   .hat .sigma .cooksd
-#>     <dbl>       <dbl> <dbl>   <dbl>   <dbl>  <dbl>   <dbl>  <dbl>  <dbl>   <dbl>
-#> 1      58       3.22    0.6    1.84    4.61 -4.57   -1.18  0.105    4.04 3.47e-2
-#> 2      31       0.215  26.3  572.      3.36  0.414   0.104 0.0605   4.15 1.80e-4
-#> 3       3      -1.56   58.7    0.78    2.76 -3.96   -0.989 0.0417   4.07 7.05e-3
-#> 4      25      -2.30   47.4    0.18    2.55  3.01    0.752 0.0413   4.11 7.81e-3
-#> 5       2      -3.00    1.9  904.      2.27 -3.01   -0.758 0.0559   4.11 5.72e-3
-#> 6      18      -1.08    8      1.84    3.11 -0.953  -0.241 0.0661   4.15 9.58e-4
-#> # … with abbreviated variable names ¹​adjacent, ²​.std.resid
+#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
+#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
+#> 1      58       3.22    0.6     1.84    4.61 -4.57      -1.18  0.105    4.04
+#> 2      31       0.215  26.3   572.      3.36  0.414      0.104 0.0605   4.15
+#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -0.989 0.0417   4.07
+#> 4      25      -2.30   47.4     0.18    2.55  3.01       0.752 0.0413   4.11
+#> 5       2      -3.00    1.9   904.      2.27 -3.01      -0.758 0.0559   4.11
+#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.241 0.0661   4.15
+#> # ℹ 1 more variable: .cooksd <dbl>
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") %>% augment() %>%
