@@ -491,7 +491,7 @@ The mean square error (MSE) of ANOVA is the pooled sample variance, a measure of
 $$
 \begin{align*}
 MSE&= \frac{\sum_{i=1}^I s_i^2(n_i -1)}{N-I}\\
-\overline{x} &= \frac{\sum_{i=1}^I n_i \overline{x}_i}{N}\\
+s_i &= \sqrt{\frac{\sum_{j=1}^{n_i} (x_{ji}  -  \overline{x}_i)^2}{n_i - 1}}\\
 \end{align*}
 $$
 
@@ -1080,7 +1080,7 @@ t_salaries %>%
 1. What changed about the studies (data structure) from section 4.1?
 2. What is the statistic of interest now?  What is the parameter of interest?
 3. What is the sampling distribution for the statistic of interest?
-4. How is the t-distribution become relevant?
+4. How did the t-distribution become relevant?
 5. What are degrees of freedom in general?  What are the actual degrees of freedom for the test in section 4.3?
 6. How is the null mechanism different across the three analysis methods in section 3.2:  randomization test, two-sample t-test, random sampling test (n.b. this is also called the parametric bootstrap)?
 7. How do you create a CI?  How do you interpret the CI?
