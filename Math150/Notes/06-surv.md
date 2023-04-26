@@ -408,7 +408,7 @@ $h(t)$ is the rate at which individuals in the population experience the event i
 $$
 \begin{align*}
 \hat{P}(t_i \leq T < t_{i+1} | T \geq t_i) &= \frac{d_i}{n_i} = \hat{p}_i\\
-\hat{h}_{KM}(t) &= \frac{\hat{p}_i}{t_{i+1} - t_i}  \ \ \ \ \ \ t_{i+1} \leq t < t_i\\
+\hat{h}_{KM}(t) &= \frac{\hat{p}_i}{t_{i+1} - t_i}  \ \ \ \ \ \ t_{i} \leq t < t_{i+1}\\
 \end{align*}
 $$
 
