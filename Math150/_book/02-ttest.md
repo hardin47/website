@@ -14,10 +14,10 @@ data = deterministic model + random error
 ### Surgery Timing {-}
 The study, "Operation Timing and 30-Day Mortality After Elective General Surgery", tested the hypotheses that the risk of 30-day mortality associated with elective general surgery: 1) increases from morning to evening throughout the routine workday; 2) increases from Monday to Friday through the workweek; and 3) is more frequent in July and August than during other months of the year. As a presumed negative control, the investigators also evaluated mortality as a function of the phase of the moon. Secondarily, they evaluated these hypotheses as they pertain to a composite in-hospital morbidity endpoint.
 
-The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hosptial complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from [@Sessler2011]
+The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from [@Sessler2011]
 
 
-Note that in the example, mortality rates are compared for patients electing to have surgery in July vs August.  We'd like to compare the average age of the participants from the July group to the August group.  Even if the mortality difference is significant, we can't conclude causation because it was an observational study.  However, the more similar the groups are based on clinical variables, the more likely any differences in mortality are due to timing.  How different are the groups based on clinical variables?
+Note that in the example, mortality rates are compared for patients electing to have surgery in July August vs. other months of the year.  We'd like to compare the average age of the participants from the July and August groups as compared to the rest of the year.  Even if the mortality difference is significant, we can't conclude causation (of the treatment) because it was an observational study.  However, the more similar the groups are based on clinical variables (e.g., age), the more likely any differences in mortality are due to timing (i.e., the treatment).  Let's start by asking: how different are the groups based on clinical variables, here we assess age?
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
@@ -210,18 +210,20 @@ Note that in the example, mortality rates are compared for patients electing to 
 </table>
 
 
+
 ```r
 surgery %>%
- dplyr::filter(month %in% c("Jul", "Aug")) %>%
- dplyr::group_by(month) %>%
- dplyr::summarize(agemean = mean(age, na.rm=TRUE), agesd = sd(age, na.rm=TRUE), agen = sum(!is.na(age)))
-#> # A tibble: 2 x 4
-#>   month agemean agesd  agen
-#>   <chr>   <dbl> <dbl> <int>
-#> 1 Aug      58.1  15.2  3176
-#> 2 Jul      57.6  15.5  2325
+ dplyr::mutate(summer = case_when(
+   month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+ dplyr::group_by(summer) %>%
+ dplyr::summarize(age_mean = mean(age, na.rm=TRUE), age_sd = sd(age, na.rm=TRUE), age_n = sum(!is.na(age)))
+#> # A tibble: 2 × 4
+#>   summer age_mean age_sd age_n
+#>   <lgl>     <dbl>  <dbl> <int>
+#> 1 FALSE      57.6   15.0 26498
+#> 2 TRUE       57.8   15.3  5501
 ```
-
 
 ## t-test {#ttest}
 
@@ -230,7 +232,7 @@ surgery %>%
 A t-test is a test of means.  For the surgery timing data, the groups would ideally have similar age distributions.  Why? What are the advantages and disadvantages of running a retrospective cohort study?
   
   
-The two-sample t-test starts with the assumption that the population means of the two groups are equal, $H_0: \mu_1 = \mu_2$.  The sample means $\overline{y}_1$ and $\overline{y}_2$ will always be different.  How different must the $\overline{y}$ values be in order to reject the null hypothesis?
+The two-sample t-test starts with the assumption that the population means of the two groups are equal, $H_0: \mu_1 = \mu_2.$  The sample means $\overline{y}_1$ and $\overline{y}_2$ will always be different.  How different must the $\overline{y}$ values be in order to reject the null hypothesis?
 
 ##### Model 1: {-}
 
@@ -247,12 +249,12 @@ Note: we will assume the *population variances* are equal if neither *sample var
   
 
 
-#### Example1 {-}
-Are the mean ages of the July vs August patients statistically different? (why two sided?)
+::: {.example}
+Are the mean ages of the July + August vs other patients statistically different? (why two sided?)
   
 \begin{align}
 H_0: \mu_1 = \mu_2\\
-H_1: \mu_1 \ne \mu_2
+H_a: \mu_1 \ne \mu_2
 \end{align}
   
 \begin{align}
@@ -260,51 +262,56 @@ t &= \frac{(\overline{y}_1 - \overline{y}_2) - 0}{s_p \sqrt{\frac{1}{n_1} + \fra
 s_p &= \sqrt{ \frac{(n_1 - 1)s_1^2 + (n_2-1) s_2^2}{n_1 + n_2 -2}}\\
 df &= n_1 + n_2 -2\\
 &\\
-t &= \frac{(58.05 - 57.57) - 0}{15.34 \sqrt{\frac{1}{3176} + \frac{1}{2325}}}\\
-&= 1.15\\  
-s_p &= \sqrt{ \frac{(3176-1)15.22^2 + (2325-1) 15.5^2}{3176 + 2325 -2}}\\
-&= 15.34\\
+t &= \frac{(57.62 - 57.84) - 0}{15.04 \sqrt{\frac{1}{26498} + \frac{1}{5501}}}\\
+&= -0.99\\  
+s_p &= \sqrt{ \frac{(26498-1)14.98^2 + (5501-1) 15.34^2}{26498 + 5501 -2}}\\
+&= 15.04\\
 df &= n_1 + n_2 -2\\
-&= 5499\\
-\mbox{p-value} &= 2 \cdot (1-pt(1.15,5499)) = 0.25\\
+&= 31997\\
+\mbox{p-value} &= 2 \cdot pt(-0.99,31997) = 0.322\\
 \end{align}
-  
-The same analysis can be done in R (with and without tydying the output):
+:::
+
+The same analysis can be done in R (with and without tidying the output):
 
 ```r
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .)
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE)
 #> 
-#> 	Welch Two Sample t-test
+#> 	Two Sample t-test
 #> 
-#> data:  age by month
-#> t = 1, df = 4954, p-value = 0.2
-#> alternative hypothesis: true difference in means is not equal to 0
+#> data:  age by summer
+#> t = -1, df = 31997, p-value = 0.3
+#> alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
 #> 95 percent confidence interval:
-#>  -0.337  1.309
+#>  -0.662  0.212
 #> sample estimates:
-#> mean in group Aug mean in group Jul 
-#>              58.1              57.6
+#> mean in group FALSE  mean in group TRUE 
+#>                57.6                57.8
 
 surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .) %>%
+  dplyr::mutate(summer = case_when(
+    month %in% c("Jul", "Aug") ~ TRUE,
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
+  t.test(age ~ summer, data = ., var.equal = TRUE) %>%
   tidy()
-#> # A tibble: 1 x 10
+#> # A tibble: 1 × 10
 #>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
 #>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
-#> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
-#> # … with 2 more variables: method <chr>, alternative <chr>
+#> 1   -0.225      57.6      57.8     -1.01   0.312     31997   -0.662     0.212
+#> # ℹ 2 more variables: method <chr>, alternative <chr>
 ```
   
 * Look at SD and SEM
 * What is the statistic? What is the sampling distribution of the statistic?
 * Why do we use the t-distribution?
-* Why is the big p-value important?  (It's a good thing!)  How do we interpret the p-value?
+* Why is the **big** p-value important?  (It's a good thing!)  How do we interpret the p-value?
 * What can we conclude?
-* applet from [@iscam]: [http://www.rossmanchance.com/applets/2021/sampling/OneSample.html]
-* What are the model assumptions? (independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2)$, ... basically all the assumptions are given in the original linear model)
+* applet from [@iscam]: <a href = http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model target = "_blank">sampling from two populations</a>
+* What are the model assumptions? (basically all the assumptions are given in the original linear model: independence between & within groups, random sample, pop values don't change, additive error, $\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2))$
 
  
 Considerations when running a t-test:  
@@ -320,9 +327,24 @@ Considerations when running a t-test:
 
 
    
-#### Example 2 {-}
-Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2$.
+::: {.example}
+Assume we have two very small **samples**: $(y_{11}=3, y_{12} = 9, y_{21} = 5, y_{22}=1, y_{23}=9).$  Find $\hat{\mu}_1, \hat{\mu}_2, \hat{\epsilon}_{11}, \hat{\epsilon}_{12}, \hat{\epsilon}_{21}, \hat{\epsilon}_{22}, \hat{\epsilon}_{23}, n_1, n_2.$
+:::
 
+By considering the estimates of the parameters, we can see that Model 1 expands to include both the parameter model as well as the statistic model:
+
+##### Model 1: {-}
+
+\begin{align}
+y_{1j} &= \mu_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+y_{2j} &= \mu_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+\epsilon_{ij} &\sim N(0,\sigma^2)\\
+E[Y_i] &= \mu_i\\
+y_{1j} &= \hat{\mu}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+&= \overline{y}_{1} + \epsilon_{1j} \ \ \ \ j=1, 2, \ldots, n_1\\
+y_{2j} &= \hat{\mu}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+&= \overline{y}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
+\end{align}
   
 ### What is an Alternative Hypothesis?
   
@@ -333,7 +355,7 @@ In the video, a rider in the back of a taxi (played by Linklater himself) muses 
 What is the point?  Why watch the video?  How does it relate the to the material from class?  What is the relationship to sampling distributions?  [Thanks to Ben Baumer at Smith College for the pointer to the specific video.]
     
     
-## ANOVA {-}
+## ANOVA
 Skip ANOVA in your text (2.4 and part of 2.9 in @KuiperSklar).
   
   
@@ -341,7 +363,7 @@ Skip ANOVA in your text (2.4 and part of 2.9 in @KuiperSklar).
 
 (Section 2.3 in @KuiperSklar.)
   
-Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a {\sc linear} relationship between two variables.  It typically has the form of:
+Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a *linear* relationship between two variables.  It typically has the form of:
 
 \begin{align}
 y_i &= \beta_0 + \beta_1 x_i + \epsilon_i  \ \ \ \ i = 1, 2, \ldots, n\\
@@ -349,9 +371,9 @@ y_i &= \beta_0 + \beta_1 x_i + \epsilon_i  \ \ \ \ i = 1, 2, \ldots, n\\
 E(Y|x) &= \beta_0 + \beta_1 x
 \end{align}
 
-For this model, the deterministic component ($\beta_0 + \beta_1 x$) is a linear function of the two parameters, $\beta_0$ and $\beta_1$, and the explanatory variable $x$.  **The random error terms, $\epsilon_i$, are assumed to be independent and to follow a normal distribution with mean 0 and variance $\sigma^2$.**
+For this model, the deterministic component $(\beta_0 + \beta_1 x)$ is a linear function of the two parameters, $\beta_0$ and $\beta_1,$ and the explanatory variable $x.$  **The random error terms, $\epsilon_i,$ are assumed to be independent and to follow a normal distribution with mean 0 and variance $\sigma^2.$**
     
-How can we use this model to describe the two sample means case we discussed on the esophageal data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
+How can we use this model to describe the two sample means case we discussed on the ages of the patients from the elective surgery data?  Consider $x$ to be a dummy variable that takes on the **value 0 if the observation is a control and 1 if the observation is a case**.  Assume we have $n_1$ controls and $n_2$ cases.  It turns out that, coded in this way, the regression model and the two-sample t-test model are mathematically equivalent!
     
 (For the color game in the text, the natural way to code is 1 for the color distracter and 0 for the standard game. Why?  What does $\beta_0$ represent?  What does $\beta_1$ represent?)
   
@@ -362,6 +384,18 @@ How can we use this model to describe the two sample means case we discussed on 
 \end{align}
   
 ### Why are they the same? {-}
+
+You may remember that to find estimates for $\beta_0$ and $\beta_1$ we minimized the sum of the squared error terms (we'll see that in the next section) and came up with estimates of:
+
+\begin{eqnarray*}
+b_1 &=& \hat{\beta}_1 = \hat{\beta}_1 &= \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - (\sum x_i )^2}\\
+&=& r \frac{s_y}{s_x}\\
+b_0 &=& \hat{\beta}_0 = \frac{\sum y_i - b_1 \sum x_i}{n}\\
+&=& \overline{y} - b_1 \overline{x}
+\end{eqnarray*}
+
+Some simplifying of terms gets us to see that the model estimates (of the deterministic part of the model) are the same whether we use model 1 or model 2.
+
 \begin{align}
 b_1= \hat{\beta}_1 &= \frac{n \sum x_i y_i - \sum x_i \sum y_i}{n \sum x_i^2 - (\sum x_i )^2}\\
 &= \frac{n \sum_2 y_i - n_2 \sum y_i}{(n n_2-n_2^2)}\\
@@ -387,7 +421,7 @@ E[Y_i] &= \beta_0 + \beta_1 x_i\\
 \hat{y}_i &= b_0 + b_1 x_i
 \end{align}
 
-That is, we are assuming that for each observation the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean at their value for the explanatory variable, $x_i$.  Note that we have assumed that the variance is constant across any level of the explanatory variable.  We have also assumed that there is independence across individuals.  **[Note: there are no assumptions about the distribution of the explanatory variable, $X$]**.
+That is, we are assuming that for each observation the true population *average* is fixed and an individual that is randomly selected will have some amount of *random error* away from the true population mean at their value for the explanatory variable, $x_i.$  Note that we have assumed that the variance is constant across any level of the explanatory variable.  We have also assumed that there is independence across individuals.  **[Note: there are no assumptions about the distribution of the explanatory variable, $X].$**
   
 Note the similarity in running a `t.test()` and a linear model (`lm()`):
 
@@ -397,17 +431,17 @@ surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   t.test(age ~ month, data = .) %>%
   tidy()
-#> # A tibble: 1 x 10
+#> # A tibble: 1 × 10
 #>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
 #>      <dbl>     <dbl>     <dbl>     <dbl>   <dbl>     <dbl>    <dbl>     <dbl>
 #> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
-#> # … with 2 more variables: method <chr>, alternative <chr>
+#> # ℹ 2 more variables: method <chr>, alternative <chr>
 
 surgery %>%
   dplyr::filter(month %in% c("Jul", "Aug")) %>%
   lm(age ~ month, data = .) %>%
   tidy()
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   58.1       0.272    213.     0    
@@ -438,13 +472,23 @@ estimate +/- critical value x standard error of the estimate
 
 Age data:
 \begin{align}
-90\% \mbox{ CI for } \mu_1: & \overline{y}_1 \pm t^*_{3176-1} \times \hat{\sigma}_{\overline{y}_1}\\
-& 58.05 \pm 1.645 \times 15.22/\sqrt{3176}\\
+90\% \mbox{ CI for } \mu_1: & \overline{y}_1 \pm t^*_{26498 - 1} \times \hat{\sigma}_{\overline{y}_1}\\
+& 57.62 \pm 1.645 \times 14.98/\sqrt{26498}\\
 & (57.61, 58.49)\\
-95\% \mbox{ CI for }\mu_1 - \mu_2: & \overline{y}_1 - \overline{y}_2 \pm t^*_{5499} s_p \sqrt{1/n_1 + 1/n_2}\\
-& 0.48 \pm 1.96 \times 0.42\\
-& (-0.34, 1.30)
+98\% \mbox{ CI for }\mu_1 - \mu_2: & \overline{y}_1 - \overline{y}_2 \pm t^*_{5499} s_p \sqrt{1/n_1 + 1/n_2}\\
+& 57.62 - 57.84 \pm 2.33 \times 15.04\cdot \sqrt{\frac{1}{26498} + \frac{1}{5501}}\\
+& (-0.739, 0.299)
 \end{align}
+
+
+```r
+qt(.95, df = (26498-1))
+#> [1] 1.64
+qt(.99, df = (26498+5501-2))
+#> [1] 2.33
+```
+
+We are 98% confident that the true difference in ages for all people (in the population) who get elective surgery in July/August versus in other months is between -0.739 years and  0.299 years.  Note that our CI overlaps zero and so the true difference in parameters might be zero.  Therefore, we have no evidence to claim that the July/August group is significantly younger (or significantly older!) than the rest of the patients.
 
 Note the CI on pgs 54/55, there is a typo.  The correct interval for $\mu_1 - \mu_2$ for the games data should be:
     
@@ -463,7 +507,7 @@ Recall what you've learned about how good random samples lead to inference about
 
 <div class="figure" style="text-align: center">
 <img src="figs/randsampValloc.jpg" alt="Figure taken from [@iscam]" width="95%" />
-<p class="caption">(\#fig:unnamed-chunk-6)Figure taken from [@iscam]</p>
+<p class="caption">(\#fig:unnamed-chunk-7)Figure taken from [@iscam]</p>
 </div>
   
 Note: no ANOVA (section 2.4 in @KuiperSklar) or normal probability plots (section 2.8 in @KuiperSklar).

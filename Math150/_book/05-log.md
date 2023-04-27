@@ -1,4 +1,4 @@
-# Logistic Regression
+# Logistic Regression {#logreg}
 
 
 
@@ -13,7 +13,7 @@ GLM: g(E[Y | X]) = \beta_0 + \beta_1 X
 \end{align}
 where $g(\cdot)$ is the link function.  For logistic regression, we use the logit link function:
 \begin{align}
-\logit (p) = \ln \bigg( \frac{p}{1-p} \bigg)
+\mbox{logit} (p) = \ln \bigg( \frac{p}{1-p} \bigg)
 \end{align}
 
 
@@ -77,8 +77,8 @@ x &= - \beta_0 / \beta_1\\
 e^{0} &= 1\\
 p(-\beta_0 / \beta_1) &= p(x) = 0.5
 \end{align}
-(for a given $\beta_1$, $\beta_0$ determines the median survival value)
-* **Note 2**  If $x=0$,
+(for a given $\beta_1,$ $\beta_0$ determines the median survival value)
+* **Note 2**  If $x=0,$
 \begin{align}
 p(0) = \frac{e^{\beta_0}}{1+e^{\beta_0}}
 \end{align}
@@ -99,12 +99,12 @@ gives the $\ln$ odds of success .
 
 * **Note 4** Every type of generalized linear model has a link function. Ours is called the *logit*.  The link is the relationship between the response variable and the *linear* function in x.
 \begin{align}
-\logit(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 < \star < 1
+\mbox{logit}(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 < \star < 1
 \end{align}
 
 
 
-#### model assumptions
+#### model conditions
 
 Just like in linear regression, our `Y` response is the only random component.
 
@@ -138,7 +138,7 @@ Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^
 
 * independent trials  
 * success / failure  
-* probability of success is constant for a particular $X$.  
+* probability of success is constant for a particular $X.$  
 * $E[Y|x] = p(x)$ is given by the logistic function  
 
 
@@ -146,9 +146,9 @@ Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^
 
 Let's say the log odds of survival for given observed (log) burn areas $x$ and $x+1$ are:
 \begin{align}
-\logit(p(x)) &= \beta_0 + \beta_1 x\\
-\logit(p(x+1)) &= \beta_0 + \beta_1 (x+1)\\
-\beta_1 &= \logit(p(x+1)) - \logit(p(x))\\
+\mbox{logit}(p(x)) &= \beta_0 + \beta_1 x\\
+\mbox{logit}(p(x+1)) &= \beta_0 + \beta_1 (x+1)\\
+\beta_1 &= \mbox{logit}(p(x+1)) - \mbox{logit}(p(x))\\
 &= \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
 &= \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 e^{\beta_1} &= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
@@ -157,25 +157,25 @@ e^{\beta_1} &= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
 $e^{\beta_1}$ is the *odds ratio* for dying associated with a one unit increase in x. [$\beta_1$ is the change in log-odds associated with a one unit increase in x.
 
 \begin{align}
-\logit (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
+\mbox{logit} (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
 \end{align}
 
 (Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to `log(area +1)= 1.90`, and patients with burns corresponding
 to `log(area +1)= 2.00`. The odds ratio $\hat{OR}_{1.90, 2.00}$ is given by
 \begin{align}
-\hat{OR}_{1.90, 2.00} = e^{-10.662} (1.90-2.00) = e^{1.0662} = 2.904
+\hat{OR}_{1.90, 2.00} = e^{-10.662 \cdot (1.90-2.00)} = e^{1.0662} = 2.904
 \end{align}
 That is, the odds of survival for a patient with `log(area+1)= 1.90` is 2.9 times higher than the odds of survival for a patient with `log(area+1)= 2.0`.)
 
 
-What about the RR (relative risk) or difference in risks?  It won't be constant for a given $X$, so it must be calculated as a function of $X$.
+What about the RR (relative risk) or difference in risks?  It won't be constant for a given $X,$ so it must be calculated as a function of $X.$
 
 ### constant OR, varying RR
 
 The previous model specifies that the OR is constant for any value of $X$ which is not true about RR.  Using the burn data, convince yourself that the RR isn't constant.  Try computing the RR at 1.5 versus 2.5, then again at 1 versus 2.
 \begin{align}
-\logit (\hat{p}) &= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
-\hat{p(x)} &= \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
+\mbox{logit} (\hat{p}) &= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
+\hat{p}(x) &= \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
 \end{align}
 
 \begin{align}
@@ -213,51 +213,54 @@ The excess (or additive) risk model can modeled by using simple linear regressio
 \begin{align}
 p(x) &= \beta_0 + \beta_1 x
 \end{align}
-which we have already seen is problematic for a variety of reasons.  However, any **unit increase in $x$ gives a $\beta_1$ increase in the risk** (for *all* values of $x$).
+which we have already seen is problematic for a variety of reasons.  However, any **unit increase in $x$ gives a $\beta_1$ increase in the risk** (for *all* values of $x.)$
 * **log-linear**  
 As long as we do not have a case-control study, we can model the risk using a log-linear model.
 \begin{align}
 \ln (p(x)) = \beta_0 + \beta_1 x
 \end{align}
-The regression coefficient, $\beta_1$, has the interpretation of the **logarithm of the relative risk associated with a unit increase in $x$**.  Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]).  As a result, convergence of standard fitting algorithms may be unreliable in some cases.
+The regression coefficient, $\beta_1,$ has the interpretation of the **logarithm of the relative risk associated with a unit increase in $x.$**  Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]).  As a result, convergence of standard fitting algorithms may be unreliable in some cases.
 
 
 ## Estimating coefficients in logistic regression  {#logMLE}
 
 ### Maximum Likelihood Estimation
 
-Recall how we estimated the coefficients for linear regression. We minimized the residual sum of squares:
+Recall how we estimated the coefficients for linear regression. The values of $b_0$ and $b_1$ are those that minimize the residual sum of squares:
 \begin{align}
 RSS &= \sum_i (Y_i - \hat{Y}_i)^2\\
- &= \sum_i (Y_i - (b_0 + b_1 X_i))^2
+ &= \sum_i (Y_i - (\beta_0 + \beta_1 X_i))^2
 \end{align}
-That is, we take derivatives with respect to both $b_0$ and $b_1$, set them equal to zero (take second derivatives to ensure minimums), and solve for $b_0$ and $b_1$.  It turns out that we've also *maximized the normal likelihood*.
+That is, we take derivatives with respect to both $\beta_0$ and $\beta_1,$ set them equal to zero (take second derivatives to ensure minimums), and solve to get $b_0$ and $b_1.$  It turns out that we've also *maximized the normal likelihood*.
 \begin{align}
-L(\underline{y} | b_0, b_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
-&= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - b_0 - b_1 x_i)^2 / 2 \sigma}\\
+L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+&= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
 \end{align}
 
 
 What does that even mean?  Likelihood?  Maximizing the likelihood? WHY???  The likelihood is the probability distribution of the data given *specific* values of the unknown parameters.
 
-Consider a toy example describing, for example, flipping coins. Let's say $X \sim Bin(p, n=4).$  We have 4 trials and $X=1$.  Would you guess $p=0.49$??  No, you would guess $p=0.25$... you *maximized* the likelihood of **seeing your data**.
+Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of $p)$ and get: failure, success, failure, failure (FSFF).
+
+Would you guess $p=0.47??$  No, you would guess $p=0.25...$ you *maximized* the likelihood of **seeing your data**.
 \begin{align}
-P(X=1 | p) &= {4 \choose 1} p^1 (1-p)^{4-1}\\
-P(X=1 | p = 0.9) &= 0.0036 \\
-P(X=1 | p = 0.75) &= 0.047 \\
-P(X=1 | p = 0.5) &= 0.25\\
-P(X=1 | p = 0.05) &= 0.171\\
-P(X=1 | p = 0.15) &= 0.368\\
-P(X=1 | p = 0.25) &= 0.422\\
+P(FSFF| p) &=  p^1 (1-p)^{4-1}\\
+P(FSFF | p = 0.90) &= 0.0009 \\
+P(FSFF | p = 0.75) &= 0.0117 \\
+P(FSFF | p = 0.50) &= 0.0625\\
+P(FSFF | p = 0.47) &= 0.070\\
+P(FSFF | p = 0.25) &= 0.105\\
+P(FSFF | p = 0.15) &= 0.092\\
+P(FSFF | p = 0.05) &= 0.043\\
 \end{align}
 
-Or, we can think about it as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n$.  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
+Think about the example as a set of independent binary responses, $Y_1, Y_2, \ldots Y_n.$  Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as:
 \begin{align}
 P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &= P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
 &= p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
 &= p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
 \end{align}
-where $y_1, y_2, \ldots, y_n$ represents a particular observed series of 0 or 1 outcomes and $p$ is a probability $0 \leq p \leq 1$.  Once $y_1, y_2, \ldots, y_n$ have been observed, they are fixed values.  Maximum likelihood estimates are functions of sample data that are derived by finding the value of $p$ that maximizes the likelihood functions.
+where $y_1, y_2, \ldots, y_n$ represents a particular observed series of 0 or 1 outcomes and $p$ is a probability $0 \leq p \leq 1.$  Once $y_1, y_2, \ldots, y_n$ have been observed, they are fixed values.  Maximum likelihood estimates are functions of sample data that are derived by finding the value of $p$ that maximizes the likelihood functions.
 
 To maximize the likelihood, we use the natural log of the likelihood (because we know we'll get the same answer):
 \begin{align}
@@ -270,14 +273,16 @@ To maximize the likelihood, we use the natural log of the likelihood (because we
 
 Using the logistic regression model makes the likelihood substantially more complicated because the probability of success changes for each individual. Recall:
 \begin{align}
-p_i = p(x_i) &= \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}}
+p_i = p(x_i) &= \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}}
 \end{align}
 which gives a likelihood of:
 \begin{align}
-L(\underline{p}) &= \prod_i \Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)^{(1- y_i)} \\
-\mbox{& a loglikelihood of}: &\\
-\ln L(\underline{p}) &= \sum_i y_i \ln\Bigg( \frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{b_0 + b_1 x_i}}{1+e^{b_0 + b_1 x_i}} \Bigg)\\
+L(\beta_0,\beta_1) &= \prod_i \Bigg( \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)^{(1- y_i)} \\
+\mbox{and a log likelihood of}: &\\
+\ln L(\beta_0, \beta_1) &= \sum_i y_i \ln\Bigg( \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)\\
 \end{align}
+
+To find $b_0$ and $b_1$ we actually use numerical optimization techniques to maximize $L(\beta_0,\beta_1)$  (...Because using calculus won't provide closed form solutions.  Try taking derivatives and setting them equal to zero.  What happens?)  
 
 Why use maximum likelihood estimates?
 
@@ -298,23 +303,18 @@ z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{align}
 
 
-```
-#> 
-#> Call:  glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#> 
-#> Coefficients:
-#> (Intercept)     burnexpl  
-#>        22.7        -10.7  
-#> 
-#> Degrees of Freedom: 434 Total (i.e. Null);  433 Residual
-#> Null Deviance:	    525 
-#> Residual Deviance: 335 	AIC: 339
-#> # A tibble: 2 x 5
+```r
+burnglm %>%
+  glm(burnresp~burnexpl, data = ., family="binomial") %>% 
+  tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
 #> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
 ```
+
+**Note:**  Although the model is a Bernoulli model and not really a binomial model (although the Bernoulli is a binomial with $n=1),$ the way to fit a logistic regression model in R is to use `family = "binomial"`.  It just is what it is.
 
 ### Likelihood Ratio Tests
 $\frac{L(p_0)}{L(\hat{p})}$ gives us a sense of whether the null value or the observed value produces a higher likelihood. Recall:
@@ -334,11 +334,11 @@ If we are testing only one parameter value.  More generally,
 where $\nu$ is the number of extra parameters we estimate using the unconstrained likelihood (as compared to the constrained null likelihood).
 
 
-#### Example {-}
-Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25$.
+::: {.example}
+Consider a data set with 147 people.  49 got cancer and 98 didn't.  Let's test whether the true proportion of people who get cancer is $p=0.25.$
 \begin{align}
 H_0:& p=0.25\\
-H_1:& p \ne 0.25\\
+H_a:& p \ne 0.25\\
 \hat{p} &= \frac{49}{147}\\
 -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &= -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
 &= -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
@@ -346,7 +346,7 @@ H_1:& p \ne 0.25\\
 &= -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
 P( \chi^2_1 \geq 5.11) &= 0.0238
 \end{align}
-
+:::
 
 
 
@@ -354,10 +354,10 @@ But really, usually likelihood ratio tests are more interesting.  In fact, usual
 
 \begin{align}
 H_0: & \beta_1 =0\\
-H_1: & \beta_1 \ne 0\\
-p_0 &= \frac{e^{\hat{\beta}_0}}{1 + e^{\hat{\beta}_0}}
+H_a: & \beta_1 \ne 0\\
+p_0 &= \frac{e^{\hat{b}_0}}{1 + e^{\hat{b}_0}}
 \end{align}
-where $\hat{\beta}_0$ is fit from a model without any explanatory variable, $x$.
+where $\hat{b}_0$ is the MLE from the logistic regression model which does not contain any explanatory variable, $x.$
 
 **Important note:**
 \begin{align}
@@ -366,8 +366,8 @@ where $\hat{\beta}_0$ is fit from a model without any explanatory variable, $x$.
 That is, the difference in log likelihoods will be the opposite difference in deviances:
 \begin{align}
 \mbox{test stat} &= \chi^2\\
-&= -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
-&= -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&= -2 \ln \bigg( \frac{L(\mbox{null value(s)})}{L(MLEs)} \bigg)\\
+&= -2 [ \ln(L(\mbox{null value(s)}) - \ln(L(MLEs)) ]\\
 &= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
 &= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
 &= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
@@ -375,42 +375,20 @@ That is, the difference in log likelihoods will be the opposite difference in de
 
 
 
-```
-#> 
-#> Call:
-#> glm(formula = burnresp ~ burnexpl, family = "binomial", data = burnglm)
-#> 
-#> Deviance Residuals: 
-#>    Min      1Q  Median      3Q     Max  
-#> -2.852  -0.700   0.186   0.524   2.209  
-#> 
-#> Coefficients:
-#>             Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)    22.71       2.27   10.02   <2e-16 ***
-#> burnexpl      -10.66       1.08   -9.85   <2e-16 ***
-#> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#> 
-#> (Dispersion parameter for binomial family taken to be 1)
-#> 
-#>     Null deviance: 525.39  on 434  degrees of freedom
-#> Residual deviance: 335.23  on 433  degrees of freedom
-#> AIC: 339.2
-#> 
-#> Number of Fisher Scoring iterations: 6
-#> # A tibble: 2 x 5
-#>   term        estimate std.error statistic  p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
-#> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
-#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
-#> 1       525.386     434 -167.616 339.231 347.382  335.231         433  435
+```r
+burnglm %>% 
+  glm(burnresp~burnexpl, data = ., family="binomial") %>% 
+  glance() 
+#> # A tibble: 1 × 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1          525.     434  -168.  339.  347.     335.         433   435
 ```
 
 \begin{align}
 \mbox{test stat} &= G\\
-&= -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg)\\
-&= -2 [ \ln(L(p_0)) - \ln(L(\hat{p})) ]\\
+&= -2 \ln \bigg( \frac{L(\mbox{null value(s)})}{L(MLEs)} \bigg)\\
+&= -2 [ \ln(L(\mbox{null value(s)}) - \ln(L(MLEs)) ]\\
 &= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
 &= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
 &= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
@@ -425,8 +403,9 @@ p-value &= P(\chi^2_1 \geq 190.16) = 0
 
 #### modeling categorical predictors with multiple levels 
 
-##### Snoring 
-A study was undertaken to investigate whether snoring is related to a heart disease. In the survey, 2484 people were classified according to their proneness to snoring (never, occasionally, often, always) and whether or not they had the heart disease.
+::: {.example}
+
+**Snoring** A study was undertaken to investigate whether snoring is related to a heart disease. In the survey, 2484 people were classified according to their proneness to snoring (never, occasionally, often, always) and whether or not they had the heart disease.
 
 | Variable 	| Description 	|
 |--------------------------------	|--------------------------------------------------	|
@@ -454,11 +433,12 @@ X_3 = \begin{cases}
 
 Our new model becomes:
 \begin{align}
-\logit(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
+\mbox{logit}(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
 \end{align}
 
 
 We can use the drop-in-deviance test to test the effect of any or all of the parameters (of which there are now *four*) in the model.
+:::
 
 
 See the birdnest example, \@ref(birdexamp)
@@ -469,8 +449,8 @@ See the birdnest example, \@ref(birdexamp)
 
 Another worry when building models with multiple explanatory variables has to do with variables interacting.  That is, for one level of a variable, the relationship of the main predictor on the response is different.
 
-#### Example {-}
-Consider a simple linear regression model on number of hours studied and exam grade.  Then addclass year to the model.  There would probably be a different slope for each class year in order to model the two variables most effectively.  For simplicity, consider only first year students and seniors.
+::: {.example}
+Consider a simple linear regression model on number of hours studied and exam grade.  Then add class year to the model.  There would probably be a different slope for each class year in order to model the two variables most effectively.  For simplicity, consider only first year students and seniors.
 
 \begin{align}
 E[\mbox{grade seniors}| \mbox{hours studied}] &= \beta_{0s} + \beta_{1s} \mbox{hrs}\\
@@ -483,15 +463,19 @@ E[\mbox{grade}| \mbox{hours studied}] &= \beta_{0} + \beta_{1} \mbox{hrs} + \bet
 \end{align}
 
 Why do we need the $I(\mbox{year=seniors})$ variable?
+:::
 
 
+::: {.definition}
+*Interaction* means that the effect of an explanatory variable on the outcome differs according to the level of another explanatory variable.  (Not the case with age on smoking and lung cancer above.  With the smoking example, age is a significant variable, but it does not interact with lung cancer.)
+:::
 
 <!--
 Recall the homework assignment where APACHE score was a significant predictor of the odds of dying for treated black patients but not for untreated.  This is interaction.  The relationship between the explanatory variable (APACHE score) and the response (survival) changes depending on a 3rd variables (treated vs. untreated).
 -->
 
-#### Example {-}
-The Heart and Estrogen/progestin Replacement Study (HERS) is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD.  Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo.  The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 [@HERS].
+::: {.example}
+The **Heart and Estrogen/progestin Replacement Study (HERS)** is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD.  Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo.  The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 [@HERS].
 
 The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.
 
@@ -499,36 +483,44 @@ The hormone replacement regimen also increased the risk of clots in the veins (d
  
  
 Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), `medcond`.  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.
+:::
 
 
 
 
-```
-#> # A tibble: 2 x 5
+
+
+```r
+glm(medcond ~ age, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
 #> 2 age           0.0162   0.00597      2.71 0.00664
-#> # A tibble: 3 x 5
+glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
 #> 2 age          0.0189    0.00613      3.09 0.00203  
 #> 3 weight       0.00528   0.00274      1.93 0.0542
-#> # A tibble: 3 x 5
+glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic      p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
 #> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
 #> 2 age           0.0185   0.00603      3.07 0.00217     
 #> 3 diabetes      0.487    0.0882       5.52 0.0000000330
-#> # A tibble: 4 x 5
+glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term         estimate std.error statistic     p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
 #> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
 #> 2 age            0.0278   0.00707      3.93 0.0000844  
 #> 3 diabetes       2.83     0.914        3.10 0.00192    
 #> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
-#> # A tibble: 4 x 5
+glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term         estimate std.error statistic p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
@@ -543,27 +535,63 @@ Write out a few models *by hand*, does any of the significance change with respe
 
 **Simpson's paradox** is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.
 
-#### Example {-}
-Back to linear regression to consider Simpson's Paradox.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
+::: {.example}
+Back to linear regression to consider Simpson's Paradox in the wild.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
 
 
+<img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;" />
 
-```
-#> # A tibble: 2 x 5
+
+```r
+head(SAT)
+#>        state expend ratio salary frac verbal math  sat         fracgrp
+#> 1    Alabama   4.41  17.2   31.1    8    491  538 1029    low fraction
+#> 2     Alaska   8.96  17.6   48.0   47    445  489  934 medium fraction
+#> 3    Arizona   4.78  19.3   32.2   27    448  496  944 medium fraction
+#> 4   Arkansas   4.46  17.1   28.9    6    482  523 1005    low fraction
+#> 5 California   4.99  24.0   41.1   45    417  485  902 medium fraction
+#> 6   Colorado   5.44  18.4   34.6   29    462  518  980 medium fraction
+lm(sat ~ salary, data=SAT) %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)  1159.       57.7      20.1  5.13e-25
 #> 2 salary         -5.54      1.63     -3.39 1.39e- 3
-#> # A tibble: 3 x 5
+lm(sat ~ salary + frac, data=SAT) %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)   988.      31.9       31.0  6.20e-33
 #> 2 salary          2.18     1.03       2.12 3.94e- 2
 #> 3 frac           -2.78     0.228    -12.2  4.00e-16
+lm(sat ~ salary * frac, data=SAT) %>% tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic  p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept) 1082.       54.4       19.9   3.00e-24
+#> 2 salary        -0.720     1.70      -0.424 6.73e- 1
+#> 3 frac          -5.03      1.09      -4.62  3.15e- 5
+#> 4 salary:frac    0.0648    0.0308     2.11  4.05e- 2
+lm(sat ~ salary + fracgrp, data=SAT) %>% tidy()
+#> # A tibble: 4 × 5
+#>   term                   estimate std.error statistic  p.value
+#>   <chr>                     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)             1002.      31.8       31.5  8.55e-33
+#> 2 salary                     1.09     0.988      1.10 2.76e- 1
+#> 3 fracgrpmedium fraction  -112.      14.3       -7.82 5.46e-10
+#> 4 fracgrphigh fraction    -150.      12.8      -11.7  2.09e-15
+lm(sat ~ salary * fracgrp, data=SAT) %>% tidy()
+#> # A tibble: 6 × 5
+#>   term                           estimate std.error statistic  p.value
+#>   <chr>                             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)                   1012.         55.8    18.1    4.85e-22
+#> 2 salary                           0.768       1.77    0.435  6.65e- 1
+#> 3 fracgrpmedium fraction        -107.        103.     -1.04   3.03e- 1
+#> 4 fracgrphigh fraction          -175.         79.2    -2.21   3.27e- 2
+#> 5 salary:fracgrpmedium fraction   -0.0918      2.93   -0.0313 9.75e- 1
+#> 6 salary:fracgrphigh fraction      0.692       2.28    0.303  7.63e- 1
 ```
-
-<img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;" />
-
+:::
 
 <!--
 %Consider the following data on twenty-year vital status by smoking behavior: %(pgs 52-53 in VGSM)
@@ -593,8 +621,8 @@ Back to linear regression to consider Simpson's Paradox.  Consider data on SAT s
 %After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
 -->
 
-#### Example {-}
-Consider the example on smoking and 20-year mortality (case) from section 3.4 of *Regression Methods in Biostatistics*, pg 52-53.
+::: {.example}
+Consider the example on smoking and 20-year mortality (case) from section 3.4 of *Regression Methods in Biostatistics*, pg 52-53.  The study represents women participating in a health survey in Whickham, England in 1972-1972 with follow-up 20 years later [@Vanderpump95]. Mortality was recorded as the response variable and self-reported smoking and age (both given in the original study) as the explanatory variables.
 
 | age 	| test 	| smoker 	| nonsmoker 	| prob smoke 	| odds smoke 	| empirical OR 	|
 |---------	|---------	|:------:	|:---------:	|:----------:	|:----------:	|:------------:	|
@@ -615,40 +643,49 @@ What would it mean to *adjust* for age in this context?  It means that we have t
 
 
 
-```
-#> # A tibble: 2 x 5
+
+
+```r
+glm( death ~ smoke, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
 #> 2 smoke         -0.379    0.126      -3.01 2.59e- 3
-#> # A tibble: 3 x 5
-#>   term                estimate std.error statistic  p.value
-#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)           -0.571     0.125     -4.56 5.01e- 6
-#> 2 as.factor(age)old      1.45      0.187      7.75 9.00e-15
-#> 3 as.factor(age)young   -1.44      0.167     -8.63 6.02e-18
-#> # A tibble: 4 x 5
-#>   term                estimate std.error statistic  p.value
-#>   <chr>                  <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)           -0.668     0.135     -4.96 7.03e- 7
-#> 2 smoke                  0.312     0.154      2.03 4.25e- 2
-#> 3 as.factor(age)old      1.47      0.188      7.84 4.59e-15
-#> 4 as.factor(age)young   -1.52      0.173     -8.81 1.26e-18
-#> # A tibble: 6 x 5
-#>   term                      estimate std.error statistic  p.value
-#>   <chr>                        <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)                 -0.655     0.152    -4.31  1.61e- 5
-#> 2 smoke                        0.269     0.269     0.999 3.18e- 1
-#> 3 as.factor(age)old            1.53      0.221     6.93  4.29e-12
-#> 4 as.factor(age)young         -1.65      0.240    -6.88  6.00e-12
-#> 5 smoke:as.factor(age)old     -0.251     0.420    -0.596 5.51e- 1
-#> 6 smoke:as.factor(age)young    0.218     0.355     0.614 5.40e- 1
+
+glm( death ~ age, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.571     0.125     -4.56 5.01e- 6
+#> 2 ageold         1.45      0.187      7.75 9.00e-15
+#> 3 ageyoung      -1.44      0.167     -8.63 6.02e-18
+
+glm( death ~ smoke + age, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.668     0.135     -4.96 7.03e- 7
+#> 2 smoke          0.312     0.154      2.03 4.25e- 2
+#> 3 ageold         1.47      0.188      7.84 4.59e-15
+#> 4 ageyoung      -1.52      0.173     -8.81 1.26e-18
+
+glm( death ~ smoke * age, family="binomial") %>% tidy()
+#> # A tibble: 6 × 5
+#>   term           estimate std.error statistic  p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)      -0.655     0.152    -4.31  1.61e- 5
+#> 2 smoke             0.269     0.269     0.999 3.18e- 1
+#> 3 ageold            1.53      0.221     6.93  4.29e-12
+#> 4 ageyoung         -1.65      0.240    -6.88  6.00e-12
+#> 5 smoke:ageold     -0.251     0.420    -0.596 5.51e- 1
+#> 6 smoke:ageyoung    0.218     0.355     0.614 5.40e- 1
 ```
 
 
 Using the additive model above:
 \begin{align}
-\logit (p(x_1, x_2) ) &= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
+\mbox{logit} (p(x_1, x_2) ) &= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
 OR &= \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
 x_1 &= \begin{cases}
 0 & \mbox{ don't smoke}\\
@@ -679,28 +716,36 @@ where we are modeling the probability of 20-year mortality using smoking status 
 \mbox{old OR} &= e^{0.2689 + -0.2505} = 1.018570\\
 \end{align}
 What does it mean that the interaction terms are not significant in the last model?
+:::
 
 
+## Multicollinearity {#multicol}
 
-## Multicolinearity {#multicol}
+Multicollinearity happens when the explanatory variables in a model are correlated.  If explanatory variables are correlated, great care needs to be taken in interpreting the coefficients because the idea of "holding all other variables constant" does not make sense.  The following example illustrates the point.
 
+::: {.example}
 Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
 
-<img src="05-log_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" />
 
 
-```
-#> # A tibble: 2 x 5
+```r
+glm(Candy ~ Coins, data = Offering, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
 #> 2 Coins          0.286    0.0772      3.70 0.000213
-#> # A tibble: 2 x 5
+
+glm(Candy ~ Small, data = Offering, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
 #> 2 Small          0.184    0.0576      3.19 0.00142
-#> # A tibble: 3 x 5
+
+glm(Candy ~ Coins + Small, data = Offering, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   -17.0       7.80     -2.18  0.0296
@@ -709,15 +754,35 @@ Consider the following data set collected from church offering plates in 62 cons
 ```
 
 Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.
-
+:::
 
 
 ## Model Building {#logstep}
 
-#### Example {-}
-Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  A better strategy is to select the second not by considering what he or she knows regarding the entire agenda, but by looking for the person who knows more about the topics than the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
-<!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
+::: {.example}
+Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them.  The rules, however, state that you can bring two classmates as consultants.  Suppose also that you know which topics each of your classmates is familiar with.  If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer).  Let's say this is Sage who knows 85 topics.  With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.  
 
+The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.  
+
+A better strategy is to select the second not by considering what they  know regarding the entire agenda, but by looking for the person who knows more about the topics that the first does not know (the variable that best explains the residual of the equation with the variables entered).  It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.  
+
+|    Individual    |    # topics   |     Pair    |    # topics      |
+|--------------|-----------|---------------------|------------|
+|     Sage     |     85    |     Sage & Bruno    |     95     |
+|     Bruno    |     80    |     Sage & Beta     |     93     |
+|     Luna     |     55    |     Sage & Luna     |     92     |
+|     Beta     |     45    |     Bruno & Beta    |     90     |
+|              |           |     Bruno & Luna    |     90     |
+|              |           |     Beta & Luna     |     100    |
+
+
+
+With forward selection, which two are chosen?^[Sage & Bruno]
+
+With backward selection, which two are chosen?^[Beta & Luna]
+
+<!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
+:::
 
 <!--
 % added January 2019 ...  I need to read through, edit, etc.
@@ -757,7 +822,7 @@ Both techniques suggest choosing a model with the smallest AIC and BIC value; bo
 
 #### Stepwise Regression
 
-As done previously, we can add and remove variables based on the deviance.  Recall, when comparing two nested models, the differences in the deviances can be modeled by a $\chi^2_\nu$ variable where $\nu = \Delta p$.
+As done previously, we can add and remove variables based on the deviance.  Recall, when comparing two nested models, the differences in the deviances can be modeled by a $\chi^2_\nu$ variable where $\nu = \Delta p.$
 
 
 Consider the HERS data described in your book (page 30); variable description also given on the book website http://www.epibiostat.ucsf.edu/biostat/vgsm/data/hersdata.codebook.txt
@@ -765,39 +830,49 @@ Consider the HERS data described in your book (page 30); variable description al
 For now, we will try to predict whether the individuals had a medical condition, `medcond` (defined as a pre-existing and self-reported medical condition).  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.
 
 
-```
-#> # A tibble: 2 x 5
+
+
+```r
+glm(medcond ~ age, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
 #> 2 age           0.0162   0.00597      2.71 0.00664
-#> # A tibble: 3 x 5
+glm(medcond ~ age + weight, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
 #> 2 age          0.0189    0.00613      3.09 0.00203  
 #> 3 weight       0.00528   0.00274      1.93 0.0542
-#> # A tibble: 3 x 5
+glm(medcond ~ age+diabetes, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 3 × 5
 #>   term        estimate std.error statistic      p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
 #> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
 #> 2 age           0.0185   0.00603      3.07 0.00217     
 #> 3 diabetes      0.487    0.0882       5.52 0.0000000330
-#> # A tibble: 4 x 5
+glm(medcond ~ age*diabetes, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term         estimate std.error statistic     p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
 #> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
 #> 2 age            0.0278   0.00707      3.93 0.0000844  
 #> 3 diabetes       2.83     0.914        3.10 0.00192    
 #> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
-#> # A tibble: 4 x 5
+glm(medcond ~ age*drinkany, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term         estimate std.error statistic p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
 #> 2 age           0.00885   0.00759      1.17  0.244 
 #> 3 drinkany     -1.44      0.831       -1.73  0.0833
 #> 4 age:drinkany  0.0168    0.0124       1.36  0.175
-#> # A tibble: 5 x 5
+
+
+glm(medcond ~ age + weight + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 5 × 5
 #>   term        estimate std.error statistic    p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
 #> 1 (Intercept) -1.87      0.505      -3.72  0.000203  
@@ -805,22 +880,26 @@ For now, we will try to predict whether the individuals had a medical condition,
 #> 3 weight       0.00143   0.00285     0.500 0.617     
 #> 4 diabetes     0.432     0.0924      4.68  0.00000288
 #> 5 drinkany    -0.253     0.0835     -3.03  0.00248
-#> # A tibble: 2 x 5
+glm(medcond ~ age , data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic   p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
 #> 2 age           0.0162   0.00597      2.71 0.00664
-#> # A tibble: 2 x 5
+glm(medcond ~ weight , data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept) -0.769     0.198       -3.88 0.000106
 #> 2 weight       0.00339   0.00267      1.27 0.204
-#> # A tibble: 2 x 5
+glm(medcond ~ diabetes , data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
 #> 2 diabetes       0.468    0.0878      5.34 9.55e- 8
-#> # A tibble: 2 x 5
+glm(medcond ~ drinkany, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
@@ -828,7 +907,7 @@ For now, we will try to predict whether the individuals had a medical condition,
 ```
 
 
-##### Forward Selection
+#### Forward Selection {-}
 One idea is to start with an empty model and adding the best available variable at each iteration, checking for needs for transformations. We should also look at interactions which we might suspect.  However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.
 
 1. We start with the response variable versus all variables and find the best predictor.  If there are too many, we might just look at the correlation matrix.  However, we may miss out of variables that are good predictors but aren't linearly related.  Therefore, if its possible, a scatter plot matrix would be best.  
@@ -837,32 +916,35 @@ One idea is to start with an empty model and adding the best available variable 
 4. If not, we stop.
 
 
-##### Forward Stepwise Selection
-This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l$, otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.
+#### Forward Stepwise Selection {-}
+This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed.  This is done by specifying two values, $\alpha_e$ as the $\alpha$ level needed to **enter** the model, and $\alpha_l$ as the $\alpha$ level needed to **leave** the model.  We require that $\alpha_e<\alpha_l,$ otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum.  This is bad.
 
-1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e$.  
-2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e$.  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l$, we remove the variable.   
+1. We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than $\alpha_e.$  
+2. Now, we find the best of the remaining variables, and add it if the p-value is smaller than $\alpha_e.$  If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model).  If its p-value is greater than $\alpha_l,$ we remove the variable.   
 3. We continue with this process until there are no more variables that meet either requirements.  In many situations, this will help us from stopping at a less than desirable model.  
 
 How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, you might walk away with no variables in your model, or at least not many.  If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren't necessary.
 
 
-##### Backward Selection
+#### Backward Selection {-}
 1. Start with the full model including every term (and possibly every interaction, etc.).  
 2. Remove the variable that is *least* significant (biggest p-value) in the model.  
 3. Continue removing variables until all variables are significant at the chosen $\alpha$ level.  
 
 
-```
-#> # A tibble: 1 x 8
+```r
+glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") %>% glance()
+#> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759
-#> # A tibble: 1 x 8
+glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") %>% glance()
+#> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759
-#> # A tibble: 4 x 5
+glm(medcond ~ age + diabetes + drinkany, data = HERS, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term        estimate std.error statistic     p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>       <dbl>
 #> 1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
@@ -923,14 +1005,14 @@ Generally:  the idea is to use a model building strategy with some criteria ($\c
 
 Taken from https://onlinecourses.science.psu.edu/stat501/node/332.
 
-Model building is definitely an ``art."  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
+Model building is definitely an "art."  Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.
 
 #### The first step {-}
 
 Decide on the type of model that is needed in order to achieve the goals of the study. In general, there are five reasons one might want to build a regression model. They are:
 
 * For predictive reasons - that is, the model will be used to predict the response variable from a chosen set of predictors.  
-* For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors.   
+* For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors.  For example, there may be a known physical relationship (with parameters to esimate) or a differential equation that models state changes.   
 * For control purposes - that is, the model will be used to control a response variable by manipulating the values of the predictor variables.  
 * For inferential reasons - that is, the model will be used to explore the strength of the relationships between the response and the predictors.  
 * For data summary reasons - that is, the model will be used merely as a way to summarize a large set of data by a single equation.  
@@ -951,10 +1033,10 @@ I can't possibly over-emphasize the data exploration step. There's not a data an
 
 #### The fourth step {-}
 
-(The fourth step is very good modeling practice.  It gives you a sense of whether or not you've overfit the model in the building process.) Randomly divide the data into a training set and a validation set:
+(The fourth step is very good modeling practice.  It gives you a sense of whether or not you've overfit the model in the building process.) Randomly divide the data into a training set and a test set:
 
-* The training set, with at least 15-20 error degrees of freedom, is used to estimate the model.  
-* The validation set is used for cross-validation of the fitted model.
+* The training set, with at least 20 error degrees of freedom (the number of observations is more than 20 larger than the number of variables), is used to estimate the model.  
+* The test set is used for validation of the fitted model.
 
 
 #### The fifth step {-}
@@ -962,7 +1044,7 @@ I can't possibly over-emphasize the data exploration step. There's not a data an
 Using the training set, identify several candidate models:
 
 * Use best subsets regression.  
-* Use stepwise regression, which of course only yields one model unless different alpha-to-remove and alpha-to-enter values are specified.
+* Use stepwise regression, forward or backward.
 
 #### The sixth step {-}
 
@@ -972,19 +1054,24 @@ Select and evaluate a few "good" models:
 * Evaluate the selected models for violation of the model conditions.  
 * If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.
 
+n.b., You could evaluate the few models based on cross-validation of the training data.  It isn't a terrible idea, but you must remind yourself that the training data as a whole were used in the stepwise regression steps, so the cross-validated folds are not independent arbiters of model accuracy.
+
 #### The seventh and final step {-}
 
 Select the final model:
 
-* A large cross-validation AUC on the validation data is indicative of a good predictive model (for your population of interest).  
+* A large AUC on the test data is indicative of a good predictive model (for your population of interest).  
 * Consider false positive rate, false negative rate, outliers, parsimony, relevance, and ease of measurement of predictors.
 
 And, most of all, don't forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.
 
 #### Another Model Building Strategy
 
-![Another strategy for model building. Figure taken from [@sleuth]](sleuthmodelbuild.jpg)
 
+<div class="figure" style="text-align: center">
+<img src="figs/sleuthmodelbuild.png" alt="Another strategy for model building. Figure taken from [@sleuth]." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-18)Another strategy for model building. Figure taken from [@sleuth].</p>
+</div>
 
 
 <!--
@@ -999,37 +1086,46 @@ And, most of all, don't forget that there is not necessarily only one good model
 
 ### Measures of Association
 
-With logistic regression, we don't have residuals, so we don't have a value like $R^2$.  We can, however, measure whether or not the estimated model is consistent with the data.  That is, is the model able to discriminate between successes and failures.
+With logistic regression, we don't have residuals, so we don't have a value like $R^2.$  We can, however, measure whether or not the estimated model is consistent with the data.  That is, is the model able to discriminate between successes and failures.
 
-#### back to the burn data \@ref(ex:burnexamp):
-Consider looking at all the pairs of successes and failures.  In the burn data we have 308 survivors and 127 deaths = 39,116 pairs of people.  Given a particular pair, if the observation corresponding to a survivor has a *higher* probability of success than the observation corresponding to a death, we call the pair *concordant*.  If the observation corresponding to a survivor has a *lower* probability of success than the observation corresponding to a death, we call the pair *discordant*.  Tied pairs occur when the observed survivor has the same estimated probability as the observed death.
+We'd like to choose a model that produces high probabilities of success for those observations where success was recorded and low probabilities of success for those observation where failure was recorded.  In other words, we want mostly **concordant** pairs.
 
-* $D_{xy}$: Somers' D is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.  
-* gamma: Goodman-Kruskal gamma is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.  
-* tau-a: Kendall's tau-a is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
+Given a particular pair of observations where one was a success and the other was a failure, if the observation corresponding to a success has a *higher* probability of success than the observation corresponding to a failure, we call the pair *concordant*.  If the observation corresponding to a success has a *lower* probability of success than the observation corresponding to a failure, we call the pair *discordant*.  Tied pairs occur when the observed success has the same estimated probability as the observed failure.
 
+#### Back to the burn data \@ref(ex:burnexamp):
+Consider looking at all the pairs of successes and failures in the burn data, we have 308 survivors and 127 deaths = 39,116 pairs of individuals.  
 
-
-For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
+One pair of individuals has burn areas of 1.75 and 2.35.
 \begin{align}
 p(x=1.75) &= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
 p(x=2.35) &= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
 \end{align}
 The pairs would be concordant if the first individual survived and the second didn't.  The pairs would be discordant if the first individual died and the second survived.
 
+Ideally the model chosen would have a large number of concordant pairs.  The following metrics quantify the concordance across the entire model with respect to the observed data:
 
-```
+* $D_{xy}$: **Somers' D** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.  
+* gamma: **Goodman-Kruskal gamma** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.  
+* tau-a: **Kendall's tau-a** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
+
+
+
+```r
+# install.packages(c("Hmisc", "rms"))
+
+library(rms)   # you need this line!!
+burn.glm <- lrm(burnresp~burnexpl, data = burnglm)
+print(burn.glm)
 #> Logistic Regression Model
 #>  
 #>  lrm(formula = burnresp ~ burnexpl, data = burnglm)
 #>  
-#>                         Model Likelihood    Discrimination    Rank Discrim.    
-#>                               Ratio Test           Indexes          Indexes    
-#>  Obs           435    LR chi2     190.15    R2       0.505    C       0.877    
-#>   0            127    d.f.             1    g        2.576    Dxy     0.753    
-#>   1            308    Pr(> chi2) <0.0001    gr      13.146    gamma   0.824    
-#>  max |deriv| 8e-11                          gp       0.313    tau-a   0.312    
-#>                                             Brier    0.121                     
+#>                         Model Likelihood      Discrimination    Rank Discrim.    
+#>                               Ratio Test             Indexes          Indexes    
+#>  Obs           435    LR chi2     190.15      R2       0.505    C       0.877    
+#>   0            127    d.f.             1      R2(1,435)0.353    Dxy     0.753    
+#>   1            308    Pr(> chi2) <0.0001    R2(1,269.8)0.504    gamma   0.824    
+#>  max |deriv| 8e-11                            Brier    0.121    tau-a   0.312    
 #>  
 #>            Coef     S.E.   Wald Z Pr(>|Z|)
 #>  Intercept  22.7083 2.2661 10.02  <0.0001 
@@ -1072,7 +1168,7 @@ Recall that logistic regression can be used to predict the outcome of a binary e
 
 
 
-#### Example {-}
+::: {.example}
 For example: consider a pair of individuals with burn areas of 1.75 and 2.35.
 \begin{align}
 p(x=1.75) &= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
@@ -1080,12 +1176,12 @@ p(x=2.35) &= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.3
 x &= \mbox{log area burned}
 \end{align}
 What value would we assign to 1.75 or 2.35 or 15 for log(area) burned?  By changing our cutoff, we can fit an entire curve.  We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1).  Notice that the color band represents the probability cutoff for predicting a ``success."
+:::
 
-
-
-![](ROCcurve_burn.jpg)
-
-
+<div class="figure" style="text-align: center">
+<img src="figs/ROCcurve_burn.png" alt="ROC curve.  Color indicates the probability cutoff used to determine predictions." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-20)ROC curve.  Color indicates the probability cutoff used to determine predictions.</p>
+</div>
 
 
 A: Let's say we use prob=0.25 as a cutoff: 
@@ -1142,45 +1238,11 @@ H: is worse than random guessing.  Note that the opposite classifier to (H) migh
 
 
 
-### Cross Validation {#cv}
-
-Before reading the notes here, look through the following visualization.  Don't worry about building the model (classification trees are not a topic for class), but check out the end where they talk about predicting on test and training data.
-
-http://www.r2d3.us/visual-intro-to-machine-learning-part-1/
-
-#### Overfitting
-
-Imagine you are preparing for your statistics exam. Helpfully, Professor Hardin has made previous exam papers and their worked answers available online. You begin by trying to answer the questions from previous papers and comparing your answers with the model answers provided. Unfortunately, you get carried away and spend all your time on memorizing the model answers to all past questions.
-
-Now, if the upcoming exam completely consists of past questions, you are certain to do very well. But if the new exam asks different questions about the same material, you would be ill-prepared and get a much lower mark than with a more traditional preparation.  In this case, one could say that you were **overfitting** the past exam papers and that the knowledge gained didn't generalize to future exam questions.
-
-
-
-#### CV Model Assessment
-
-Cross validation is commonly used to perform two different tasks:    
-1. To assess a model's accuracy (**model assessment**).    
-2. To build a model (**model selection**).  
-
-We will focus here only on model assessment.
-
-Suppose that we build a classifier (logistic regression model) on a given data set.  We'd like to know how well the model classifies observations, but if we test on the samples at hand, the error rate will be much lower than the model's inherent accuracy rate.  Instead, we'd like to predict *new* observations that were not used to create the model.  There are various ways of creating *test* or *validation* sets of data:
-
-*  one training set, one test set  [two drawbacks:  estimate of error is highly  variable because it depends on which points go into the training set; and because the training data set is smaller than the full data set, the error rate is biased in such a way that it overestimates the actual error rate of the modeling technique.]   
-* leave one out cross validation (LOOCV)  [LOOCV is a special case of $k$-fold CV with $k=n$]  
-1. remove one observation  
-2. build the model using the remaining n-1 points  
-3. predict class membership for the observation which was removed  
-4. repeat by removing each observation one at a time  (time consuming to keep building models)  
-* $k$-fold cross validation ($k$-fold CV)  
-    * like LOOCV except that the algorithm is run $k$ times on each group (of approximately equal size) from a partition of the data set.  
-    * advantage of $k$-fold is computational  
-    * $k$-fold often has a better bias-variance trade-off [bias is lower with LOOCV.  however, because LOOCV predicts $n$ observations from $n$ models which are all basically the same, the variability will be higher.  with $k$-fold, prediction is on $n$ values from $k$ models which are much less correlated.  the effect is to average out the predicted values in such a way that there will be less variability from data set to data set.  
 
 
 ## R: Birdnest Example {#birdexamp}
 
-
+The following example uses base R modeling to work through different aspects of the logistic regression model.
 
 **Length of Bird Nest**  This example is from problem E1 in your text and includes 99 species of N. American passerine birds.  Recall that the response variable is binary and represents whether there is a small opening (`closed=1`) or a large opening (`closed=0`) for the nest.  The explanatory variable of interest was the length of the bird.
 
@@ -1198,12 +1260,15 @@ G &\sim \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 where $\nu$ represents the difference in the number of parameters needed to estimate in the full model versus the null model.
 
 
-```
-#> # A tibble: 2 x 5
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   0.457     0.753      0.607   0.544
 #> 2 Length       -0.0677    0.0425    -1.59    0.112
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
+  print.data.frame(digits=6)
 #>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
 #> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
@@ -1213,13 +1278,15 @@ where $\nu$ represents the difference in the number of parameters needed to esti
 Note that `tidy` contains the same number of rows as the number of coefficients.  `augment` contains the same number of rows as number of observations.  `glance` always has one row (containing overall model information).
 
 
-```
-#> # A tibble: 2 x 5
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   0.457     0.753      0.607   0.544
 #> 2 Length       -0.0677    0.0425    -1.59    0.112
-#> # A tibble: 95 x 9
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% augment()
+#> # A tibble: 95 × 9
 #>   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
 #>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
 #> 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
@@ -1228,7 +1295,9 @@ Note that `tidy` contains the same number of rows as the number of coefficients.
 #> 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
 #> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
 #> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
-#> # … with 89 more rows
+#> # ℹ 89 more rows
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>% 
+  print.data.frame(digits=6)
 #>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
 #> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
@@ -1240,12 +1309,15 @@ Note that `tidy` contains the same number of rows as the number of coefficients.
 Length as a continuous explanatory variable:
 
 
-```
-#> # A tibble: 2 x 5
+```r
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   0.457     0.753      0.607   0.544
 #> 2 Length       -0.0677    0.0425    -1.59    0.112
+glm(`Closed?` ~ Length, data = nests, family="binomial") %>% glance() %>%
+  print.data.frame(digits=6)
 #>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
 #> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
@@ -1254,8 +1326,9 @@ Length as a continuous explanatory variable:
 Length as a categorical explanatory variables:
 
 
-```
-#> # A tibble: 34 x 5
+```r
+glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% tidy()
+#> # A tibble: 34 × 5
 #>   term                       estimate std.error statistic p.value
 #>   <chr>                         <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)            19.6            10754.  1.82e- 3   0.999
@@ -1264,21 +1337,26 @@ Length as a categorical explanatory variables:
 #> 4 as.factor(Length)11   -18.9            10754. -1.75e- 3   0.999
 #> 5 as.factor(Length)12   -21.2            10754. -1.97e- 3   0.998
 #> 6 as.factor(Length)12.5   0.000000431    15208.  2.83e-11   1.00 
-#> # … with 28 more rows
+#> # ℹ 28 more rows
+glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") %>% glance() %>%
+  print.data.frame(digits=6)
 #>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
 #> 1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95
 ```
 
 Length plus a few other explanatory variables:
 
-```
-#> # A tibble: 4 x 5
+```r
+glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% tidy()
+#> # A tibble: 4 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   -2.64     2.06      -1.28   0.201 
 #> 2 Length        -0.114    0.0527    -2.17   0.0302
 #> 3 Incubate       0.314    0.172      1.82   0.0684
 #> 4 Color         -0.420    0.609     -0.690  0.490
+glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") %>% glance() %>% 
+  print.data.frame(digits=6)
 #>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
 #> 1       110.086      87 -51.6633 111.327 121.236  103.327          84   88
 ```
@@ -1287,12 +1365,18 @@ Length plus a few other explanatory variables:
 
 
 
-```
-#> # A tibble: 2 x 5
+```r
+bird_glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
+bird_glm %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 (Intercept)   0.457     0.753      0.607   0.544
 #> 2 Length       -0.0677    0.0425    -1.59    0.112
+
+# predicting the linear part:
+# reasonable to use the SE to create CIs
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
 #> $fit
 #>     1 
 #> -2.72 
@@ -1302,6 +1386,11 @@ Length plus a few other explanatory variables:
 #> 
 #> $residual.scale
 #> [1] 1
+
+# predicting the probability of success (on the `scale` of the response variable):
+# do NOT use the SE to create a CI for the predicted value
+# instead, use the SE from `type="link" ` and transform the interval
+predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 #> $fit
 #>      1 
 #> 0.0616 
@@ -1317,53 +1406,133 @@ Length plus a few other explanatory variables:
 ### Measues of association
 
 
-
-```
-#> Frequencies of Missing Values Due to Each Variable
-#> Closed?  Length 
-#>       0       4 
-#> 
-#> Logistic Regression Model
-#>  
-#>  lrm(formula = `Closed?` ~ Length, data = nests)
-#>  
-#>  
-#>                        Model Likelihood    Discrimination    Rank Discrim.    
-#>                              Ratio Test           Indexes          Indexes    
-#>  Obs            95    LR chi2      3.11    R2       0.045    C       0.638    
-#>   0             64    d.f.            1    g        0.455    Dxy     0.276    
-#>   1             31    Pr(> chi2) 0.0777    gr       1.576    gamma   0.288    
-#>  max |deriv| 2e-07                         gp       0.088    tau-a   0.123    
-#>                                            Brier    0.210                     
-#>  
-#>            Coef    S.E.   Wald Z Pr(>|Z|)
-#>  Intercept  0.4571 0.7530  0.61  0.5438  
-#>  Length    -0.0677 0.0425 -1.59  0.1117  
-#> 
-```
-
-
 ###  ROC curves
 
+ROC curve for the model on `Length` only, with no testing / training / cross validated data.
+
+
+```r
+library(plotROC)
+
+nests <- nests %>%
+  mutate(Closed = as.factor(ifelse(`Closed?` == 0, "no", 
+                                   ifelse(`Closed?` == 1, "yes", `Closed?`))))
+
+bird_glm <- glm(Closed ~ Length, data = nests, family="binomial")
+
+bird_indiv <- bird_glm %>% 
+  augment(type.predict = "response") 
+
+head(bird_indiv)
+#> # A tibble: 6 × 9
+#>   .rownames Closed Length .fitted .resid .std.resid   .hat .sigma .cooksd
+#>   <chr>     <fct>   <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 1         no       20     0.290 -0.827     -0.833 0.0137   1.12 0.00288
+#> 2 2         yes      20     0.290  1.57       1.58  0.0137   1.11 0.0173 
+#> 3 4         yes      20     0.290  1.57       1.58  0.0137   1.11 0.0173 
+#> 4 5         yes      22.5   0.256  1.65       1.67  0.0202   1.11 0.0305 
+#> 5 6         no       18.5   0.311 -0.863     -0.868 0.0116   1.12 0.00267
+#> 6 7         yes      17     0.333  1.48       1.49  0.0110   1.12 0.0112
+
+bird_indiv %>%
+  ggplot() + 
+  geom_roc(aes(d = Closed, m = .fitted)) +
+  geom_abline(intercept = 0, slope = 1)
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-28-1.png" width="80%" style="display: block; margin: auto;" />
+
+### Cross Validation on nest data
+
+Note that the syntax here is slightly different from what we've seen previously.  From the **tidymodels** and **plotROC** packages.  See the full explanation in Chapter \@ref(process).
+
+
+
+```r
+library(tidymodels)
+library(plotROC)
+
+bird_spec <- logistic_reg() %>%
+  set_engine("glm")
+
+bird_rec <- recipe(
+  Closed ~ Length + Incubate + Nestling,    # formula
+  data = nests # data for cataloging names and types of variables
+  ) 
+
+bird_wflow <- workflow() %>%
+  add_model(bird_spec) %>%
+  add_recipe(bird_rec)
+
+set.seed(47)
+bird_folds <- vfold_cv(nests, v = 3)
+
+metrics_interest <- yardstick::metric_set(accuracy, roc_auc, 
+                              sensitivity, specificity)
+
+bird_fit_rs <- bird_wflow %>%
+  fit_resamples(bird_folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE))
+
+bird_fit_rs %>% collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator  mean     n std_err .config             
+#>   <chr>       <chr>      <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.755     3 0.00766 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.815     3 0.00964 Preprocessor1_Model1
+#> 3 sensitivity binary     0.842     3 0.0313  Preprocessor1_Model1
+#> 4 specificity binary     0.559     3 0.0926  Preprocessor1_Model1
+
+bird_fit_rs %>%
+  unnest(cols = .predictions) %>%
+  ggplot() + 
+  plotROC::geom_roc(aes(m = .pred_yes, d = Closed,
+                        color = id)) + 
+  geom_abline(intercept = 0, slope = 1, color = "black")
+```
+
+<img src="05-log_files/figure-html/unnamed-chunk-29-1.png" width="80%" style="display: block; margin: auto;" />
+
+
+We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better? No, everything gets worse.  But it's the specificity that we should really pay attention to because it is terrible in the single variable model!
+
+
+```r
+bird_rec_1 <- recipe(
+  Closed ~ Length,    # formula
+  data = nests # data for cataloging names and types of variables
+  ) 
+
+bird_wflow_1 <- workflow() %>%
+  add_model(bird_spec) %>%
+  add_recipe(bird_rec_1)
+
+
+bird_fit_rs_1 <- bird_wflow_1 %>%
+  fit_resamples(bird_folds,
+                metrics = metrics_interest,
+                control = control_resamples(save_pred = TRUE))
+
+bird_fit_rs_1 %>% collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator   mean     n std_err .config             
+#>   <chr>       <chr>       <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.684      3  0.0563 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.639      3  0.0622 Preprocessor1_Model1
+#> 3 sensitivity binary     0.986      3  0.0145 Preprocessor1_Model1
+#> 4 specificity binary     0.0833     3  0.0833 Preprocessor1_Model1
+
+bird_fit_rs_1 %>%
+  unnest(cols = .predictions) %>%
+  ggplot() + 
+  plotROC::geom_roc(aes(m = .pred_yes, d = Closed,
+                        color = id)) + 
+  geom_abline(intercept = 0, slope = 1, color = "black")
 
 ```
-#> # A tibble: 6 x 10
-#>   .rownames `Closed?` Length .fitted .resid .std.resid   .hat .sigma .cooksd
-#>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>   <dbl>
-#> 1 1                 0   20    -0.896 -0.827     -0.833 0.0137   1.12 0.00288
-#> 2 2                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-#> 3 4                 1   20    -0.896  1.57       1.58  0.0137   1.11 0.0173 
-#> 4 5                 1   22.5  -1.07   1.65       1.67  0.0202   1.11 0.0305 
-#> 5 6                 0   18.5  -0.795 -0.863     -0.868 0.0116   1.12 0.00267
-#> 6 7                 1   17    -0.693  1.48       1.49  0.0110   1.12 0.0112 
-#> # … with 1 more variable: probs <dbl>
-```
 
-<img src="05-log_files/figure-html/unnamed-chunk-23-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="05-log_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" />
 
-
-### Drawing interactions
-
-https://interactions.jacob-long.com/index.html
 
 

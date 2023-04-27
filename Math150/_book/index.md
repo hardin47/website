@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2021-02-02"
+date: "2023-04-26"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:
@@ -24,6 +24,7 @@ Class notes for Math 150 at Pomona College: Methods in Biostatistics.  The notes
 
 You are responsible for reading your text.  Your text is very good & readable, so you should use it.  Your text is not, however, overly technical.  You should make sure you are coming to class and asking lots of questions.
 
+More information and course details can be found at the <a href = "https://m150-method-biostat.netlify.app/" target = "_blank">Math150 website</a>.
 
 
 
@@ -36,34 +37,5 @@ You are responsible for reading your text.  Your text is very good & readable, s
 
 
 
-| Week    	| Topic                      	|  Book Chp   	|   Notes Section |
-|:---------	|:---------------------------	|:----------------:	|:----------------:	|
-| 1/25/21 	| t-tests / SLR  | 2 | \@ref(intro), \@ref(ttest), \@ref(tslr) [t-test] |
-| 1/27/21 	| SLR | 2 |  \@ref(tslr) [t-test as SLR]   |
-| 2/1/21 	| SLR | 2 | \@ref(SLR) [SLR] |
-| 2/3/21  	| Contingency Analysis | 6 | \@ref(fisher), \@ref(catest)   [Fisher's Exact Test] |
-| 2/8/21 	| Contingency Analysis | 6 |  \@ref(studies) [Types of studies], \@ref(chisq) [ChiSq test]
-| 2/10/21 	| Contingency Analysis | 6 | \@ref(catest) [RR and OR] |
-| 2/15/21 	| Logistic Regression | 7 | \@ref(logmodel) [Log Reg] |
-| 2/17/21 	| | | \@ref(logMLE), \@ref(loginf) [Log MLE and Inference] |
-| 2/22/21 	| Logistic Regression | 7 | \@ref(multlog), \@ref(multicol) [Multiple Log Reg] |
-| 2/24/21 	| | | \@ref(logstep) [Model Build] |
-| 3/1/21  	| Logistic Regression | 7 | \@ref(roc) [ROC] |
-| 3/3/21  	| | | \@ref(cv)   [.Cross Validation] | 
-| 3/8/21 	| Spring Break | |
-| 3/10/21 	| Spring Break |  	|
-| 3/15/21 	| Catch-up / Review | |
-| 3/17/21 	| Exam 1 (Wednesday) |  (2, 6, 7) 	|
-| 3/22/21 	| Survival Analysis | 9 | \@ref(timedata), \@ref(KM) [KM curves] |
-| 3/24/21 	| | | \@ref(KMCI) [KM CI]  |
-| 3/29/21  	| Survival Analysis | 9 |  \@ref(logrank)  [Log Rank test]|
-| 3/31/21  	| | |  \@ref(hazfunc) [haz functions] |
-| 4/5/21  	| Survival Analysis | 9 | \@ref(coxph) [Cox PH model] |
-| 4/7/21  	| | | \@ref(multcoxph) [Multiple Cox PH]  |
-| 4/12/21 	| Survival Analysis | 9 |  \@ref(testingph) [Assessing PH] |
-| 4/14/21 	| Ioannidis & mult. compar. | 1.13 | \@ref(Ioannidis) [False Published]
-| 4/19/21 	| |  | \@ref(multcomp) [Mult Comp]
-| 4/26/21 	| Ioannidis & mult. compar. | 1.13 | \@ref(qvals) [qvalues]
-| 4/28/21 	| Exam 2 (Wednesday) |  (9, multiple comparisons) 	|
-| 5/3/21 	| Poisson Regression | 8 | \@ref(regPois) [Poisson model]
-| 5/5/21  	| Poisson Regression | 8 | \@ref(inferPois) [Poisson inference]
+
+

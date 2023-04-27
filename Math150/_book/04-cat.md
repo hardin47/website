@@ -223,7 +223,7 @@ Note also that we get an exact probability with no conditions needed about the s
 
 ## Testing independence of two categorical variables {#chisq}
 
-(Sections 6.5, 6.6, 6.7 in @KuiperSklar.)
+(Sections 6.5, 6.6, 6.7 in @KuiperSklar.  We are skipping Chi-square tests in Spring 2023.)
 
 ### $\chi^2$ tests 
 
@@ -274,7 +274,7 @@ If there is no difference in blood type proportions across the groups, then:
 P(AB | FL) = P(AB | IA) = P(AB | MO) = P(AB)
 \end{eqnarray*}
 
-We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0)$ for all the groups.  That is, we would expect,
+We will use $\widehat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under $H_0)$ for all the groups.  That is, we would expect,
 
 \begin{eqnarray*}
 \# \mbox{expected for AB blood and Iowa} &=&  \frac{368}{8619} \cdot 6722\\
@@ -284,12 +284,15 @@ We will use $\hat{P}(AB) = \frac{368}{8619}$ as baseline for expectation (under 
 #### Test of Independence (equivalent mathematically to homogeneity of proporitions)
 
 \begin{eqnarray*}
-P(cond1 \mbox{ & } cond2 ) &=& P(cond1) P(cond2)  \mbox{ if variables 1 and 2 are independent}\\
+P(\mbox{ cond1 & cond2}) &=& P(\mbox{cond1}) P(\mbox{cond2})  \mbox{ if variables 1 and 2 are independent}\\
+&&\\
 P(AB \mbox{ blood & Iowa}) &=& P(AB \mbox{ blood}) P(\mbox{Iowa}) \\
 &=& \bigg( \frac{368}{8619}\bigg) \bigg( \frac{6722}{8619} \bigg)\\
 &=& 0.0333\\
+&&\\
 \# \mbox{expected for AB blood and Iowa} &=& 0.033 \cdot 8619\\
 &=& \frac{368 \cdot 6722}{8619}\\
+&&\\
 E_{i,j} &=& \frac{(i \mbox{ row total})(j \mbox{ col total})}{\mbox{grand total}}\\
 \end{eqnarray*}
 
@@ -353,6 +356,10 @@ use z-test if you want one-sided tests or confidence intervals.
 ::: {.example} 
 **Popcorn & Lung Disease** @iscam  
 
+In May 2000, eight people who had worked at the same microwave-popcorn production plant reported to the Missouri Department of Health with fixed obstructive lung disease.  These workers had become ill between 1993 and 2000 while employed at the plant.  On the basis of these cases, in November 2000 researchers began conducting medical examinations and environmental surveys of workers employed at the plant to assess their occupational exposures to certain compounds (Kreiss, et al., 2002).  As part of the study, current employees at the plant underwent spirometric testing.  This measures FVC – forced viral capacity – the volume of air that can be maximally, forcefully exhaled.  On this test, 31 employees had abnormal results, including 21 with airway obstruction.  A total of 116 employees were tested.
+
+Researchers were curious as to whether the baseline risk was high among microwave-popcorn workers.  The plant itself was broken into several areas, some of which were separate from the popcorn production area.  Air and dust samples in each job area were measured to determine the exposure to diacetyl, and marker of organic chemical exposure.  Employees were classified into two groups:  a "low-exposure group" and a "high-exposure group," determined by how long an employee spent at different jobs within the plant and the average exposure in that job area. Of the 21 participants with airway obstruction, 6 were from the low-exposure group and 15 were from the high-exposure group.  Both exposure groups contained 58 total employees.
+
 How can we tell if popcorn production is related to lung disease?  Consider High / Low exposure:
 
 
@@ -403,7 +410,7 @@ So, when testing, the appropriate test statistic is:
 \end{eqnarray*}
 
 
-#### CI for differences in proportions
+#### Confidence interval for $p_1 - p_2$
 
 We can't pool our estimate for the SE, but everything else stays the same...
 
@@ -426,31 +433,35 @@ The main idea here is to determine whether two categorical variables are indepen
 \mbox{relative risk} &=& \frac{\mbox{risk group 1}}{\mbox{risk group 2}}\\
 &=&  \frac{\mbox{proportion of successes in group 1}}{\mbox{proportion of successes in group 2}}\\
 \mbox{RR} &=& \frac{p_1}{p_2} = \frac{p_1}{p_2}\\
-\hat{\mbox{RR}} &=& \frac{\hat{p}_1}{\hat{p}_2}
+\widehat{\mbox{RR}} &=& \frac{\hat{p}_1}{\hat{p}_2}
 \end{eqnarray*}
 
 
-$\hat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5.$  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
+$\widehat{RR}$ in the popcorn example is $\frac{15/58}{6/58} = 2.5.$  We say, "The risk of airway obstruction is 2.5 times higher for those in high exposure group compared to those in the low exposure group."  What about
 
 * sample size?  
 * baseline risk?  
 
-#### Confidence Interval for RR {#ciRR} {-}
+#### Confidence Interval for RR {#ciRR}
 
 Due to some theory that we won't cover, we use the fact that:
 
-\begin{eqnarray*}
-SE(\ln (\hat{RR})) &\approx& \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}
-\end{eqnarray*}
+$$SE(\ln (\widehat{RR})) \approx \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}}$$
+
+And more theory we won't cover that tells us:
+
+$$
+\ln(\widehat{RR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(RR), \sqrt{\frac{(1 - \hat{p}_1)}{n_1 \hat{p}_1} + \frac{(1-\hat{p}_2)}{n_2 \hat{p}_2}} \Bigg)
+$$
 
 A $(1-\alpha)100\%$ CI for the $\ln(RR)$ is:
 \begin{eqnarray*}
-\ln(\hat{RR}) \pm z_{1-\alpha/2} SE(\ln(\hat{RR}))
+\ln(\widehat{RR}) \pm z_{1-\alpha/2} SE(\ln(\widehat{RR}))
 \end{eqnarray*}
 
 Which gives a $(1-\alpha)100\%$ CI for the $RR$:
 \begin{eqnarray*}
-(e^{\ln(\hat{RR}) - z_{1-\alpha/2} SE(\ln(\hat{RR}))}, e^{\ln(\hat{RR}) + z_{1-\alpha/2} SE(\ln(\hat{RR}))})
+(e^{\ln(\widehat{RR}) - z_{1-\alpha/2} SE(\ln(\widehat{RR}))}, e^{\ln(\widehat{RR}) + z_{1-\alpha/2} SE(\ln(\widehat{RR}))})
 \end{eqnarray*}
 
 ### Odds Ratios {#or}
@@ -461,17 +472,19 @@ A related concept to risk is odds.  It is often used in horse racing, where "suc
 **Odds Ratio** A related concept to risk is odds.  It is often used in horse racing, where "success" is typically defined as losing.  So, if the odds are 3 to 1 we would expect to lose 3/4 of the time.  The odds ratio (OR) is the ratio of odds for each group.  We say, "The odds of success is **OR** times higher for those in group 1 compared to those group 2."
 :::
 
-\begin{eqnarray*}
-\mbox{odds} &=& \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
-&=& \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
-\hat{\mbox{odds}} &=& \hat{\theta}\\
-\mbox{odds ratio} &=& \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
-\mbox{OR} &=& \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
-\hat{\mbox{OR}} &=& \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
-\end{eqnarray*}
+$\mbox{ }$
+
+\begin{align}
+\mbox{odds} &= \frac{\mbox{proportion of successes}}{\mbox{proportion of failures}}\\
+&= \frac{\mbox{number of successes}}{\mbox{number of failures}} = \theta\\
+\widehat{\mbox{odds}} &= \hat{\theta}\\
+\mbox{odds ratio} &= \frac{\mbox{odds group 1}}{\mbox{odds group 2}} \\
+\mbox{OR} &= \frac{\theta_1}{\theta_2} = \frac{p_1/(1-p_1)}{p_2/(1-p_2)}= \frac{p_1/(1-p_1)}{p_2/(1-p_2)}\\
+\widehat{\mbox{OR}} &= \frac{\hat{\theta}_1}{\hat{\theta}_2} = \frac{\hat{p}_1/(1-\hat{p}_1)}{\hat{p}_2/(1-\hat{p}_2)}\\
+\end{align}
 
 
-$\hat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02.$  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
+$\widehat{OR}$ in the popcorn example is $\frac{15/43}{6/52} = 3.02.$  We say, "The odds of airway obstruction are 3 times higher for those in the high exposure group compared to those in the low exposure group."
 
 
 #### OR is more extreme than RR {-}
@@ -539,10 +552,10 @@ Given the results of the study, do you think we can generalize from the sample t
 * If lung cancer is considered a success and no smoking is baseline:  
 
 \begin{eqnarray*}
-\hat{RR} &=& \frac{122/182}{8/122} = 10.22\\
-\hat{OR} &=& \frac{122/60}{8/114} = 28.9\\
+\widehat{RR} &=& \frac{122/182}{8/122} = 10.22\\
+\widehat{OR} &=& \frac{122/60}{8/114} = 28.9\\
 \end{eqnarray*}
-The risk of lung cancer is 10.22 times higher for those who smoke than for those who don't smoke.
+~~The risk of lung cancer is 10.22 times higher for those who smoke than for those who don't smoke.~~
 
 The odds of lung cancer is 28.9 times higher for those who smoke than for those who don't smoke.
 
@@ -550,12 +563,22 @@ The odds of lung cancer is 28.9 times higher for those who smoke than for those 
 * If chain smoking is considered a success and healthy is baseline:  
 
 \begin{eqnarray*}
-\hat{RR} &=& \frac{122/130}{60/174} = 2.7\\
-\hat{OR} &=& \frac{122/8}{60/114} = 28.9\\
+\widehat{RR} &=& \frac{122/130}{60/174} = 2.7\\
+\widehat{OR} &=& \frac{122/8}{60/114} = 28.9\\
 \end{eqnarray*}
 The risk of smoking is 2.7 times higher for those who have lung cancer than for those who don't have lung cancer.
 
 The odds of smoking is 28.9 times higher for those who have lung cancer than for those who don't have lung cancer.
+
+#### Important Take-Away
+
+We **want** to interpret as the probability of cancer if smoker.  But those individual proportions and individual odds are not estimable.  Therefore the relative risk is also not estimable.  
+
+BUT because the odds ratio is invariant to which is the response variable and which is the explanatory variable, the odds ratio is estimable! 
+
+AND the interpretation for the study will be:
+
+> The odds of lung cancer is 28.9 times higher for those who smoke than for those who don't smoke.
 
 
 \noindent
@@ -610,35 +633,42 @@ Now we have a cohort prospective study.  (Previously we had a case-control retro
 :::
 
 
-#### Confidence Interval for OR {#ciOR} {-}
+#### Confidence Interval for OR {#ciOR}
 
 Due to some theory that we won't cover:
 
 \begin{eqnarray*}
-SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
+SE(\ln (\widehat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}}
 \end{eqnarray*}
 
-Note that your book introduces $SE(\ln(\hat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2,$ is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
+And more theory we won't cover that tells us:
+
+$$
+\ln(\widehat{OR}) \stackrel{\mbox{approx}}{\sim} N\Bigg( \ln(OR), \sqrt{\frac{1}{n_1 \hat{p}_1 (1-\hat{p}_1)} + \frac{1}{n_2 \hat{p}_2 (1-\hat{p}_2)}} \Bigg)
+$$
+
+
+Note that your book introduces $SE(\ln(\widehat{OR}))$ in the context of hypothesis testing where the null, $H_0: p_1 = p_2,$ is assumed to be true.  If the null is true, you'd prefer an estimate for the proportion of success to be based on the entire sample:
 
 \begin{eqnarray*}
-SE(\ln (\hat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p} (1-\hat{p})} + \frac{1}{n_2 \hat{p}(1-\hat{p})}}
+SE(\ln (\widehat{OR})) &\approx& \sqrt{\frac{1}{n_1 \hat{p} (1-\hat{p})} + \frac{1}{n_2 \hat{p}(1-\hat{p})}}
 \end{eqnarray*}
 
 
 So, a $(1-\alpha)100\%$ CI for the $\ln(OR)$ is:
 \begin{eqnarray*}
-\ln(\hat{OR}) \pm z_{1-\alpha/2} SE(\ln(\hat{OR}))
+\ln(\widehat{OR}) \pm z_{1-\alpha/2} SE(\ln(\widehat{OR}))
 \end{eqnarray*}
 
 Which gives a $(1-\alpha)100\%$ CI for the $OR$:
 \begin{eqnarray*}
-(e^{\ln(\hat{OR}) - z_{1-\alpha/2} SE(\ln(\hat{OR}))}, e^{\ln(\hat{OR}) + z_{1-\alpha/2} SE(\ln(\hat{OR}))})
+(e^{\ln(\widehat{OR}) - z_{1-\alpha/2} SE(\ln(\widehat{OR}))}, e^{\ln(\widehat{OR}) + z_{1-\alpha/2} SE(\ln(\widehat{OR}))})
 \end{eqnarray*}
 
 
 Back to the example... $OR = 28.9.$
 \begin{eqnarray*}
-SE(\ln(\hat{OR})) &=& \sqrt{\frac{1}{182*0.67*(1-0.67)} + \frac{1}{122*0.0656*(1-0.0656)}}\\
+SE(\ln(\widehat{OR})) &=& \sqrt{\frac{1}{182*0.67*(1-0.67)} + \frac{1}{122*0.0656*(1-0.0656)}}\\
 &=& 0.398\\
 90\% \mbox{ CI for } \ln(OR) && \ln(28.9) \pm 1.645 \cdot 0.398\\
 && 3.366 \pm 1.645 \cdot 0.398\\
@@ -652,7 +682,7 @@ We are 90% confident that the true $\ln(OR)$ is between 2.71 and 4.02.  We are 9
 
 
 
-Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\hat{OR}).$  We use the *process* for creating CIs to transform back to $OR.$
+Note 1: we use the theory which allows us to understand the sampling distribution for the $\ln(\widehat{OR}).$  We use the *process* for creating CIs to transform back to $OR.$
 
 Note 2: We do not use the t-distribution here because we are not estimating the population standard deviation.
 
@@ -752,7 +782,7 @@ Disadvantages from: http://sphweb.bumc.bu.edu/otlt/MPH-Modules/EP/EP713_CohortSt
 
 * cross-classification, prospective: NHANES  
 * cross-classification, retrospective: death records (if exposure is measured post-hoc)  
-* case-control, prospective: the investigator still *enrolls* based on outcome status, but the investigator must wait for the cases to occur    
+* case-control, prospective: the investigator still *enrolls* based on outcome status, but the measurements for the outcome variable happened after the measurements for the explanatory variable (e.g., medical records on BMI or smoking status)    
 * case-control, retrospective: at the start of the study, all cases have already occurred and the investigator goes back to measure the exposure (explanatory) variable  
 * cohort, prospective: follows the selected participants to assess the proportion who develop the disease of interest  
 * cohort, retrospective: the exposure and outcomes have already happened (i.e., death records)    
@@ -841,6 +871,8 @@ nulldist %>%
 
 ### Fisher's Exact Test
 
+Note that the <a href = "https://stats.stackexchange.com/questions/409219/how-does-fisher-test-calculate-the-confidence-interval-for-the-odds-ratio-in-r" target = "_blank">method used</a> in `fisher.test()` to compute the CI is outside the scope of this class.
+
 
 ```r
 backpain %>%
@@ -858,7 +890,6 @@ backpain %>%
 #> odds ratio 
 #>      0.104
 
-# their CI is an inversion of the HT
 # an approximate SE for the ln(OR) is given by:
 se.lnOR <- sqrt(1/(16*(2/16)*(14/16)) + 1/(15*(9/15)*(6/15)))
 se.lnOR

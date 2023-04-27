@@ -4,11 +4,23 @@
 
 Though we've discussed the relationship between tests of means and simple linear regression, we will really consider simple linear regression in a much broader context (one where both the explanatory and response variables are quantitative).
 
-The data below represents 10 different variables on health of a country measured on 143 countries.  Data taken from [@Lock5], originally from the Happy Planet Index Project [http://www.happyplanetindex.org/].  Region of the world is coded as 1 = Latin America, 2 = Western nations, 3 = Middle East, 4 = Sub-Saharan Africa, 5 = South Asia, 6 = East Asia, 7 = former Communist countries.  We are going to investigate happiness and life expectancy.  
+The data below represents 10 different variables on health of a country measured on 143 countries.  Data taken from [@Lock5], originally from the <a href = "http://www.happyplanetindex.org/" target = "_blank">Happy Planet Index Project</a>.  Region of the world is coded as 1 = Latin America, 2 = Western nations, 3 = Middle East, 4 = Sub-Saharan Africa, 5 = South Asia, 6 = East Asia, 7 = former Communist countries.  We are going to investigate happiness and life expectancy.  
 
 ## Inference on the Linear Model
 
 In order to make an inferential claims on a linear regression model (e.g., p-values on hypotheses about coefficients, confidence intervals for coefficients, confidence interval for the line, prediction interval for the points, ...), we have a set of technical conditions that provide the mathematical structure leading to the t-procedures (e.g., t-test).  A course more focused on linear regression would spend time discussing how robust the model is to various deviations from the following technical conditions.  For now, we will say that sometimes transformations of either the explanatory or response variables can be an effective way to mitigate deviations from the model.
+
+As with any measurement of the data / population, regression models are built from either statistics (Roman letters to describe a sample) or parameters (Greek letters to describe a population).  For linear regression, we have one additional differentiation due to whether the observed values $(y_i)$ or the average values $(\hat{y}_i$ or $E[Y_i])$ are being modeled.  
+
+\begin{eqnarray*}
+E[Y_i|x_i] &=& \beta_0 + \beta_1 x_i \\
+y_i &=& \beta_0 + \beta_1 x_i + \epsilon_i\\
+&& \epsilon_i = y_i -  (\beta_0 + \beta_1 x_i)\\
+\hat{y}_i &=& b_0 + b_1 x_i\\
+y_i &=& b_0 + b_1 x_i + e_i\\
+&& e_i = y_i - \hat{y}_i = y_i -  (b_0 + b_1 x_i)\\
+\epsilon_i &\sim& N(0, \sigma^2)
+\end{eqnarray*}
 
 ### Technical Conditions 
 
@@ -16,9 +28,9 @@ In order to make an inferential claims on a linear regression model (e.g., p-val
 * The average value for the response variable is a linear function of the explanatory variable.
 * The error terms follow a normal distribution around the linear model.
 * The error terms have a mean of zero.
-* The error terms have a constant variance of $\sigma^2$.
+* The error terms have a constant variance of $\sigma^2.$
 * The error terms are independent (and identically distributed).
-* [http://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm]
+* <a href = "http://www.rossmanchance.com/applets/2021/regshuffle/regshuffle.htm" target = "_blank">Regression applet</a>
 
 How do we tell whether the assumptions are met?  We can't always.  But it's good to look at plots: scatter plot, residual plot, histograms of residuals.  We denote the residuals for this model as:
 
@@ -32,7 +44,7 @@ r_i = \hat{e}_i = y_i - \hat{y}_i
 </div>
 
 
-**important note!!**  The idea behind transformations is to make the model as appropriate as possible for the data at hand.  We want to find the correct **linear** model; we want our assumptions to hold.  We are not trying to find the most *significant* model or big $R^2$.
+**important note!!**  The idea behind transformations is to make the model as appropriate as possible for the data at hand.  We want to find the correct **linear** model; we want our assumptions to hold.  We are not trying to find the most *significant* model or big $R^2.$
 
 
 See section 2.9 in @KuiperSklar.  No normal probability plots (qq-plots); use histograms or boxplots to assess the symmetry and normality of the residuals.
@@ -42,12 +54,13 @@ See section 2.9 in @KuiperSklar.  No normal probability plots (qq-plots); use hi
 How do we fit a regression line?  Find $b_0$ and $b_1$ that minimize the sum of squared distance of the points to the line (called ordinary least squares):
 
 \begin{align}
-\min \sum (y_i \hat{y}_i)^2 &= \min RSS \mbox{ residual sum of squares}\\
+\min \sum (y_i - \hat{y}_i)^2 &= \min RSS \mbox{ residual sum of squares}\\
 RSS &= \sum (y_i - b_0 - b_1 x_i)^2\\
 \frac{\partial RSS}{\partial b_0} &= 0\\
 \frac{\partial RSS}{\partial b_1} &= 0\\
 b_0 &= \overline{y} - b_1 \overline{x}\\
-b_1 &= r(x,y) \frac{s_x}{s_y}\\
+b_1 &= r \frac{s_y}{s_x}\\
+&= \frac{\sum(x_i - \overline{X})(y_i - \overline{y})}{\sum(x_i - \overline{x})^2}
 \end{align}
 
 
@@ -61,7 +74,7 @@ b_1 &= r(x,y) \frac{s_x}{s_y}\\
 &= \overline{y}
 \end{align}
 
-The regression line will always pass through the point $(\overline{x}, \overline{y})$.
+The regression line will always pass through the point $(\overline{x}, \overline{y}).$
 
 ::: {.definition}
 An estimate is *unbiased* if, over many repeated samples drawn from the population, the average value of the estimates based on the different samples would equal the population value of the parameter being estimated.  That is, a statistic is unbiased if the mean of its sampling distribution is the population parameter.
@@ -70,7 +83,7 @@ An estimate is *unbiased* if, over many repeated samples drawn from the populati
 
 ## Correlation
 
-Consider a scatterplot, you'll have variability in both directions:  $(x_i - \overline{x}) \& (y_i - \overline{y})$.
+Consider a scatterplot, you'll have variability in both directions:  $(x_i - \overline{x}) \ \ \& \ \ (y_i - \overline{y}).$
 
 \begin{align}
 \mbox{sample covariance}&\\
@@ -85,8 +98,8 @@ r(x,y) &= \frac{cov(x,y)}{s_x s_y}\\
 
 
 
-* $-1 \leq r \leq 1 \ \ \ \ \ \& \ \ \ -1 \leq \rho \leq 1$.  
-* No Spearman's rank correlation or Kendall's $\tau$.  
+* $-1 \leq r \leq 1 \ \ \ \ \ \& \ \ \ -1 \leq \rho \leq 1.$  
+* No Spearman's rank correlation or Kendall's $\tau.$  
 * $b_1 = r \frac{s_y}{s_x}$  
     * if $r=0, b_1=0$  
     * if $r=1, b_1 > 0$ but can be anything!  
@@ -95,7 +108,7 @@ r(x,y) &= \frac{cov(x,y)}{s_x s_y}\\
 
 
 ## Errors / Residuals
-Recall, part of the technical conditions required that $\epsilon_i \sim N(0, \sigma^2)$.  How do we estimate $\sigma^2$?
+Recall, part of the technical conditions required that $\epsilon_i \sim N(0, \sigma^2).$  How do we estimate $\sigma^2?$
 
 \begin{align}
 RSS &= \sum (y_i - \hat{y}_i)^2 \ \ \ \mbox{ residual sum of squares}\\
@@ -123,8 +136,8 @@ R^2 = r^2 = \frac{MSS}{TSS}
 
 $R^2$ is the proportion of total variability explained by the regression line (the linear relationship between the explanatory and response variables).
 
-* If $x$ and $y$ are not at all correlated, $\hat{y}_i \approx \overline{y}$, MSS = 0, $R^2=0$.
-* If $x$ and $y$ are perfectly correlated, $\hat{y}_i = y_i$, MSS=TSS, $R^2 = 1$.
+* If $x$ and $y$ are not at all correlated, $\hat{y}_i \approx \overline{y},$ MSS = 0, $R^2=0.$
+* If $x$ and $y$ are perfectly correlated, $\hat{y}_i = y_i,$ MSS=TSS, $R^2 = 1.$
 
 
 ### Testing $\beta_1$
@@ -134,7 +147,7 @@ If $H_0: \beta=0$ is true, then
 \begin{align}
 \frac{b_1 - 0}{SE(b_1)} \sim t_{n-2}
 \end{align}
-Note that the degrees of freedom are now $n-2$ because we are estimating two parameters ($\beta_0$ and $\beta_1$).  We can also find a $(1-\alpha)100\%$ confidence interval for $\beta_1$:
+Note that the degrees of freedom are now $n-2$ because we are estimating two parameters $(\beta_0$ and $\beta_1).$  We can also find a $(1-\alpha)100\%$ confidence interval for $\beta_1$:
 \begin{align}
 b_1 \pm t_{\alpha/2, n-2} SE(b_1)
 \end{align}
@@ -160,12 +173,12 @@ b_1 &\pm t_{\alpha/2,n-2} SE(b_1)\\
 b_1 &\pm t_{\alpha/2, n-2} \frac{s_{y|x}}{\sqrt{(n-1)}s_x}\\
 6.693 &\pm t_{.025, 141} 0.375\\
 t_{.025,141} &= qt(0.025, 141) = -1.977\\
-\mbox{CI} & (5.95 \mbox{ years/unit of happy}, 7.43 \mbox{ years/unit of happy})
+\mbox{CI: } & (5.95 \mbox{ years/unit of happy}, 7.43 \mbox{ years/unit of happy})
 \end{align}
 How can we interpret the CI?  Does it make sense to talk about a unit of happiness?
 
 ### Mean Response
-We can also create a CI for the mean response, $E[Y|x^*] = \beta_0 + \beta_1 x^*$.  Note that the standard error of the point estimate ($\hat{y}=b_0 + b_1 x^*$) now depends on the variability associated with two things ($b_0, b_1$).
+We can also create a CI for the mean response, $E[Y|x^*] = \beta_0 + \beta_1 x^*.$  Note that the standard error of the point estimate $(\hat{y}=b_0 + b_1 x^*)$ now depends on the variability associated with two things ($b_0, b_1).$
 \begin{align}
 SE(\hat{y(x^*)}) &= \sqrt{ \frac{s^2_{y|x}}{n} + (x^* - \overline{x})^2 SE(b_1)^2}\\
 SE(\hat{y}(\overline{x})) &= s_{y|x}/\sqrt{n}\\
@@ -193,7 +206,7 @@ How would you interpret the associated interval?
 *High leverage points* are x-outliers with the potential to exert undue influence on regression coefficient estimates.  *Influential points* are points that have exerted undue influence on the regression coefficient estimates.
 :::
 
-Note: typically we think of more data as better; more values will tend to decrease the sampling variability of our statistic.  But if I give you a lot more data and put it all at $\overline{x}$, $SE(b_1)$ stays exactly the same.  Why??
+Note: typically we think of more data as better; more values will tend to decrease the sampling variability of our statistic.  But if I give you a lot more data and put it all at $\overline{x},$ $SE(b_1)$ stays exactly the same.  Why??
 
 Recall
 \begin{align}
@@ -201,7 +214,7 @@ y_{i} &= \beta_0 + \beta_1 x_i \ \ \ \epsilon_i \sim N(0,\sigma^2)\\
 e_i &= y_i - \hat{y}_i
 \end{align}
 
-We plot $e_i$ versus $\hat{y}_i$.  (Why?  Typically, we want the $e_i$ to be constant at each value of $x_i$.  Note that $\hat{y}_i$ is a simple linear transformation of $x_i$, so the plot is identical.)  We want to see if the distributions of the residuals is different across the fitted line (we look for patterns).
+We plot $e_i$ versus $\hat{y}_i.$  (Why?  Typically, we want the $e_i$ to be constant at each value of $x_i.$  Note that $\hat{y}_i$ is a simple linear transformation of $x_i,$ so the plot is identical.)  We want to see if the distributions of the residuals is different across the fitted line (we look for patterns).
 
 
 **Not all residuals have an equal effect on the regression line!!**
@@ -220,7 +233,7 @@ SE(y(x_i)) &= s_{y|x} \sqrt{(h_i + 1)}\\
 SE(e_i) &= s_{y|x} \sqrt{(1-h_i)}\\
 \hat{y}(x^*) &\pm t_{n-2, .025} (s_{y|x} \sqrt{h(x^*)+1})\\
 \end{align}
-is a 95\% prediction interval at $x^*$.  High leverage reduces the variability because the line gets pulled toward the point.
+is a 95% prediction interval at $x^*.$  High leverage reduces the variability because the line gets pulled toward the point.
 
 ### standardized residuals
 
@@ -235,7 +248,7 @@ is a 95\% prediction interval at $x^*$.  High leverage reduces the variability b
 s_{y|x, (i)} &= \frac{1}{n-3} \sum_{j \ne i} (y_j - \hat{y}_{j(i)})^2
 \end{align}
 
-Where do we predict 90\% of residuals?  $\pm t_{n-2,3 , .05}$.  About $\pm 2$.
+Where do we predict 90% of residuals?  $\pm t_{n-2,3 , .05}.$  Approximately $\pm 2.$
 
 ### DFBETAs
 
@@ -256,28 +269,33 @@ The data below represents 10 different variables on health of a country measured
 
 ### Reading the data into R
 
-```
+```r
+happy <- read_delim("./data/happyPlanet.txt", delim="\t")
+glimpse(happy)  
 #> Rows: 143
 #> Columns: 11
-#> $ Country        <chr> "Albania", "Algeria", "Angola", "Argentina", "Armenia"…
-#> $ Region         <dbl> 7, 3, 4, 1, 7, 2, 2, 7, 5, 7, 2, 1, 4, 5, 1, 7, 4, 1, …
-#> $ Happiness      <dbl> 5.5, 5.6, 4.3, 7.1, 5.0, 7.9, 7.8, 5.3, 5.3, 5.8, 7.6,…
-#> $ LifeExpectancy <dbl> 76.2, 71.7, 41.7, 74.8, 71.7, 80.9, 79.4, 67.1, 63.1, …
-#> $ Footprint      <dbl> 2.2, 1.7, 0.9, 2.5, 1.4, 7.8, 5.0, 2.2, 0.6, 3.9, 5.1,…
-#> $ HLY            <dbl> 41.7, 40.1, 17.8, 53.4, 36.1, 63.7, 61.9, 35.4, 33.1, …
-#> $ HPI            <dbl> 47.9, 51.2, 26.8, 59.0, 48.3, 36.6, 47.7, 41.2, 54.1, …
-#> $ HPIRank        <dbl> 54, 40, 130, 15, 48, 102, 57, 85, 31, 104, 64, 27, 134…
-#> $ GDPperCapita   <dbl> 5316, 7062, 2335, 14280, 4945, 31794, 33700, 5016, 205…
-#> $ HDI            <dbl> 0.801, 0.733, 0.446, 0.869, 0.775, 0.962, 0.948, 0.746…
-#> $ Population     <dbl> 3.15, 32.85, 16.10, 38.75, 3.02, 20.40, 8.23, 8.39, 15…
+#> $ Country        <chr> "Albania", "Algeria", "Angola", "Argentina", "Armenia",…
+#> $ Region         <dbl> 7, 3, 4, 1, 7, 2, 2, 7, 5, 7, 2, 1, 4, 5, 1, 7, 4, 1, 7…
+#> $ Happiness      <dbl> 5.5, 5.6, 4.3, 7.1, 5.0, 7.9, 7.8, 5.3, 5.3, 5.8, 7.6, …
+#> $ LifeExpectancy <dbl> 76.2, 71.7, 41.7, 74.8, 71.7, 80.9, 79.4, 67.1, 63.1, 6…
+#> $ Footprint      <dbl> 2.2, 1.7, 0.9, 2.5, 1.4, 7.8, 5.0, 2.2, 0.6, 3.9, 5.1, …
+#> $ HLY            <dbl> 41.7, 40.1, 17.8, 53.4, 36.1, 63.7, 61.9, 35.4, 33.1, 4…
+#> $ HPI            <dbl> 47.9, 51.2, 26.8, 59.0, 48.3, 36.6, 47.7, 41.2, 54.1, 3…
+#> $ HPIRank        <dbl> 54, 40, 130, 15, 48, 102, 57, 85, 31, 104, 64, 27, 134,…
+#> $ GDPperCapita   <dbl> 5316, 7062, 2335, 14280, 4945, 31794, 33700, 5016, 2053…
+#> $ HDI            <dbl> 0.801, 0.733, 0.446, 0.869, 0.775, 0.962, 0.948, 0.746,…
+#> $ Population     <dbl> 3.15, 32.85, 16.10, 38.75, 3.02, 20.40, 8.23, 8.39, 153…
 ```
 
 
 ### Running the linear model (lm)
 
 
-```
-#> # A tibble: 2 x 5
+```r
+happy.lm = lm(LifeExpectancy ~ Happiness, data=happy) 
+
+happy.lm %>% tidy()
+#> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 (Intercept)    28.2      2.28       12.4 2.76e-24
@@ -288,8 +306,9 @@ The data below represents 10 different variables on health of a country measured
 
 Some analyses will need the residuals, fitted values, or coefficients individually.
 
-```
-#> # A tibble: 143 x 8
+```r
+happy.lm %>% augment()
+#> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
 #> 1           76.2       5.5    65.0  11.2   0.00765   6.09 0.0128        1.83  
@@ -298,7 +317,7 @@ Some analyses will need the residuals, fitted values, or coefficients individual
 #> 4           74.8       7.1    75.7  -0.944 0.0122    6.16 0.000148     -0.155 
 #> 5           71.7       5      61.7  10.0   0.0101    6.10 0.0138        1.64  
 #> 6           80.9       7.9    81.1  -0.198 0.0216    6.16 0.0000118    -0.0326
-#> # … with 137 more rows
+#> # ℹ 137 more rows
 ```
 
 
@@ -321,14 +340,18 @@ happy.lm %>%
 
 Intervals of interest: mean response, individual response, and parameter(s).
 
-```
+```r
+predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("conf"), level=.95)
 #>    fit  lwr  upr
 #> 1 55.0 53.2 56.7
 #> 2 75.1 73.8 76.4
+predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("pred"), level=.95)
 #>    fit  lwr  upr
 #> 1 55.0 42.7 67.3
 #> 2 75.1 62.9 87.3
-#> # A tibble: 2 x 7
+
+happy.lm %>% tidy(conf.int = TRUE)
+#> # A tibble: 2 × 7
 #>   term        estimate std.error statistic  p.value conf.low conf.high
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
 #> 1 (Intercept)    28.2      2.28       12.4 2.76e-24    23.7      32.7 
@@ -342,8 +365,9 @@ We skipped the residuals section, so you are not responsible for finding residua
   
 
 
-```
-#> # A tibble: 143 x 8
+```r
+happy.lm %>% augment()
+#> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
 #> 1           76.2       5.5    65.0  11.2   0.00765   6.09 0.0128        1.83  
@@ -352,7 +376,7 @@ We skipped the residuals section, so you are not responsible for finding residua
 #> 4           74.8       7.1    75.7  -0.944 0.0122    6.16 0.000148     -0.155 
 #> 5           71.7       5      61.7  10.0   0.0101    6.10 0.0138        1.64  
 #> 6           80.9       7.9    81.1  -0.198 0.0216    6.16 0.0000118    -0.0326
-#> # … with 137 more rows
+#> # ℹ 137 more rows
 ```
 
 
