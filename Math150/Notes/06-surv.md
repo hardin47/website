@@ -1445,15 +1445,15 @@ Recall: under the Cox model, the probability that any particular member $i$ fail
 
 $$
 \begin{align*}
-P(i^{th} \mbox{ indiv w/}x_i \mbox{ dies at } t_j | \mbox{at least
-one death at } t_j) &= \frac{P(i^{th} \mbox{ indiv w/}x_i \mbox{
+P(j^{th} \mbox{ indiv w/}x_j \mbox{ dies at } t_j | \mbox{at least
+one death at } t_j) &= \frac{P(j^{th} \mbox{ indiv w/}x_j \mbox{
 dies at } t_j )}{P(\mbox{at least one death at } t_j)}\\
-&= \frac{\mbox{hazard at } t_i}{\mbox{sum over all patients at risk
+&= \frac{\mbox{hazard at } t_j}{\mbox{sum over all patients at risk
 at time } t_j}\\
-&= \frac{h_i(t_j)}{\sum_{k:t_k \geq t_j} h_k (t_j)} \\
-&= \frac{e^{\beta x_i}}{\sum_{k:t_k \geq t_j} e^{\beta
+&= \frac{h_j(t_j)}{\sum_{k:t_k \geq t_j} h_k (t_j)} \\
+&= \frac{e^{\beta x_j}}{\sum_{k:t_k \geq t_j} e^{\beta
 x_k}}\\
-w_j(\beta, t_j) &= \frac{e^{\beta x_i}}{\sum_{k:t_k \geq t_j}
+w_j(\beta, t_j) &= \frac{e^{\beta x_j}}{\sum_{k:t_k \geq t_j}
 e^{\beta x_k}}
 \end{align*}
 $$
@@ -1461,7 +1461,7 @@ $$
 Using the weights above, we can calculate the average value for the $l^{th}$ covariate (i.e., explanatory variable): $$\bar{x}_l (\beta,t_j) = \sum_{k: t_k \geq t_j} x_{kl}
 w_j(\beta, t_j)$$
 
-The Schoenfeld Residual for $x_l$ and any subject $i$ who is still alive at time $t_j,$ is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)$$ Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i.$
+The Schoenfeld Residual for $x_l$ ($l^{th}$ covariate) and any subject $i$ who is still alive at time $t_i,$ is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)$$ Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i.$
 
 ##### Test 3 for PH {-}
 
