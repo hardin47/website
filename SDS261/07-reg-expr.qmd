@@ -1,0 +1,263 @@
+# Regular Expressions {#sec-reg-expr}
+
+```{r}
+#| include: false
+
+source("_common.R")
+library(tidyverse)
+```
+
+
+
+> A regular expression ... is a sequence of characters that define a search pattern. Usually such patterns are used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique developed in theoretical computer science and formal language theory. [From https://en.wikipedia.org/wiki/Regular_expression]
+
+#### Main tasks in character matching: {-}
+1. basic string operations
+2. pattern matching (regular expressions)
+3. sentiment analysis
+
+
+The ideas below are mostly taken from Jenny Bryan's STAT545 class: https://github.com/STAT545-UBC/STAT545-UBC-original-website/blob/master/block022_regular-expression.rmd
+
+#### R packages to make your life easier {-}
+* [`stringr` package](https://stringr.tidyverse.org/) A core package in the `tidyverse`. It is installed via `install.packages("tidyverse")` and also loaded via `library(tidyverse)`. Of course, you can also install or load it individually.
+     * Many of the main functions start with `str_`. Auto-complete is your friend.
+     * Replacements for base functions re: string manipulation and regular expressions (see below).
+     * Main advantages over base functions: greater consistency about inputs and outputs. Outputs are more ready for your next analytical task.
+     * `stringr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/strings.pdf
+* [`tidyr` package](https://tidyr.tidyverse.org/) Especially useful for functions that split one character vector into many and vice versa: `separate()`, `unite()`, `extract()`.
+* Base functions: `nchar()`, `strsplit()`, `substr()`, `paste()`, `paste0()`.
+* The `glue` package is fantastic for string interpolation. If `stringr::str_interp()` doesn't get your job done, check out the `glue` package.
+
+#### String functions related to regular expression {-}
+Regular expression is a pattern that describes a specific set of strings with a common structure. It is heavily used for string matching / replacing in all programming languages, although specific syntax may differ a bit. It is truly the heart and soul for string operations. In R, many string functions in `base` R as well as in `stringr` package use regular expressions, even Rstudio's search and replace allows regular expression:
+
+  * identify match to a pattern: `grep(..., value = FALSE)`, `grepl()`, `stringr::str_detect()`
+  * extract match to a pattern: `grep(..., value = TRUE)`, `stringr::str_extract()`, `stringr::str_extract_all()`     
+  * locate pattern within a string, i.e. give the start position of matched patterns. `regexpr()`, `gregexpr()`, `stringr::str_locate()`, `string::str_locate_all()`     
+  * replace a pattern: `sub()`, `gsub()`, `stringr::str_replace()`, `stringr::str_replace_all()`     
+  * split a string using a pattern: `strsplit()`, `stringr::str_split()`     
+
+Regular expressions typically specify characters (or character classes) to seek out, possibly with information about repeats and location within the string. This is accomplished with the help of metacharacters that have specific meaning: `$ * + . ? [ ] ^ { } | ( ) \`. We will use some small examples to introduce regular expression syntax and what these metacharacters mean. 
+
+#### Escape sequences {-}
+
+There are some special characters in R that cannot be directly coded in a string. For example, let's say you specify your pattern with single quotes and you want to find countries with the single quote `'`. You would have to "escape" the single quote in the pattern, by preceding it with `\`, so it is clear that it is not part of the string-specifying machinery.
+
+
+There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R escape sequences.        
+
+  * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `"'"` in the previous example.        
+  * `\"`: double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. `'"'`.          
+  * `\n`: newline.   
+  * `\r`: carriage return.   
+  * `\t`: tab character.   
+
+> Note: `cat()` and `print()` handle escape sequences differently, if you want to print a string out with these sequences interpreted, use `cat()`.      
+```{r cat_print}
+print("a\nb")
+cat("a\nb")
+```
+
+#### Quantifiers {-}
+
+Quantifiers specify how many repetitions of the pattern.   
+
+  * `*`: matches at least 0 times.   
+  * `+`: matches at least 1 times.     
+  * `?`: matches at most 1 times.    
+  * `{n}`: matches exactly n times.    
+  * `{n,}`: matches at least n times.    
+  * `{n,m}`: matches between n and m times.     
+
+```{r quantifiers}
+(strings <- c("a", "ab", "acb", "accb", "acccb", "accccb"))
+grep("ac*b", strings, value = TRUE)
+grep("ac*b", strings, value = FALSE)
+grep("ac+b", strings, value = TRUE)
+grep("ac?b", strings, value = TRUE)
+grep("ac{2}b", strings, value = TRUE)
+grep("ac{2}b", strings, value = FALSE)
+grep("ac{2,}b", strings, value = TRUE)
+grep("ac{2,3}b", strings, value = TRUE)
+```
+
+#### Position of pattern within the string{-}
+
+  * `^`: matches the start of the string.   
+  * `$`: matches the end of the string.   
+  * `\b`: matches the empty string at either edge of a _word_. Don't confuse it with `^ $` which marks the edge of a _string_.   
+  * `\B`: matches the empty string provided it is not at an edge of a word.    
+
+```{r position}
+(strings <- c("abcd", "cdab", "cabd", "c abd"))
+grep("ab", strings, value = TRUE)
+grep("^ab", strings, value = TRUE)
+grep("ab$", strings, value = TRUE)
+grep("\\bab", strings, value = TRUE)
+```
+
+
+#### Operators {-}
+
+  * `.`: matches any single character, as shown in the first example. 
+  * `[...]`: a character list, matches any one of the characters inside the square brackets. We can also use `-` inside the brackets to specify a range of characters.   
+  * `[^...]`: an inverted character list, similar to `[...]`, but matches any characters __except__ those inside the square brackets.  
+  * `\`: suppress the special meaning of metacharacters in regular expression, i.e. `$ * + . ? [ ] ^ { } | ( ) \`, similar to its usage in escape sequences. Since `\` itself needs to be escaped in R, we need to escape these metacharacters with double backslash like `\\$`.   
+  * `|`: an "or" operator, matches patterns on either side of the `|`.  
+  * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.    
+
+```{r operators}
+(strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12"))
+grep("ab.", strings, value = TRUE)
+grep("ab[c-e]", strings, value = TRUE)
+grep("ab[^c]", strings, value = TRUE)
+grep("^ab", strings, value = TRUE)
+grep("\\^ab", strings, value = TRUE)
+grep("abc|abd", strings, value = TRUE)
+gsub("(ab) 12", "\\1 34", strings)
+```
+
+
+#### Character classes {-}
+
+Character classes allow specifying entire classes of characters, such as numbers, letters, etc. There are two flavors of character classes, one uses `[:` and `:]` around a predefined name inside square brackets and the other uses `\` and a special character. They are sometimes interchangeable.   
+
+  * `[:digit:]` or `\d`: digits, 0 1 2 3 4 5 6 7 8 9, equivalent to `[0-9]`.  
+  * `\D`: non-digits, equivalent to `[^0-9]`.  
+  * `[:lower:]`: lower-case letters, equivalent to `[a-z]`.  
+  * `[:upper:]`: upper-case letters, equivalent to `[A-Z]`.  
+  * `[:alpha:]`: alphabetic characters, equivalent to `[[:lower:][:upper:]]` or `[A-z]`.  
+  * `[:alnum:]`: alphanumeric characters, equivalent to `[[:alpha:][:digit:]]` or `[A-z0-9]`.   
+  * `\w`: word characters, equivalent to `[[:alnum:]_]` or `[A-z0-9_]`.  
+  * `\W`: not word, equivalent to `[^A-z0-9_]`.  
+  * `[:xdigit:]`: hexadecimal digits (base 16), 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f, equivalent to `[0-9A-Fa-f]`.
+  * `[:blank:]`: blank characters, i.e. space and tab.  
+  * `[:space:]`: space characters: tab, newline, vertical tab, form feed, carriage return, space.
+  * `\s`: space, ` `.  
+  * `\S`: not space.  
+  * `[:punct:]`: punctuation characters, ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~.
+  * `[:graph:]`: graphical (human readable) characters: equivalent to `[[:alnum:][:punct:]]`.
+  * `[:print:]`: printable characters, equivalent to `[[:alnum:][:punct:]\\s]`.
+  * `[:cntrl:]`: control characters, like `\n` or `\r`, `[\x00-\x1F\x7F]`.  
+
+Note:       
+* `[:...:]` has to be used inside square brackets, e.g. `[[:digit:]]`.     
+* `\` itself is a special character that needs escape, e.g. `\\d`. Do not confuse these regular expressions with R escape sequences such as `\t`.      
+
+
+#### `stringr` {-}
+
+In many cases, you will want to use the incredibly useful and tidy set of functions available in the `stringr` package.  (`stringr` is a core package in the `tidyverse`.) For example, below we've extracted the first (and then last) word as a character string from the `StreetName` variable.
+
+* `stringr` cheat sheet: https://github.com/rstudio/cheatsheets/raw/master/strings.pdf
+
+
+```{r}
+library(Stat2Data)
+data(RailsTrails)
+RailsTrails <- RailsTrails |> 
+  select(HouseNum, Bedrooms, Price2014, StreetName) 
+RailsTrails |> head()
+RailsTrails |>
+  mutate(first_piece = stringr::word(StreetName, start = 1)) |> head()
+RailsTrails |>
+  mutate(last_piece = stringr::word(StreetName, start = -1)) |> head()
+```
+
+#### An example from my work {-}
+
+Below are a handful of string characters that represent genomic sequences which were measured in an RNA Sequencing dataset.  The task below is to find  intergenic regions (IGR) and identify which coding sequences (CDS) bookend the intergenic regions.  Note that IGRs do not code for proteins while CDSs do.  Additionally, AS refers to anti-sense which identifies the genomic sequence in the opposite orientation (e.g., CGGATCC  vs CCTAGGC).  [The code below was written by Madison Hobbs, Scripps '19.]
+
+#####  The names of the genomic pieces {-}
+```{r}
+allCounts <- data.frame(Geneid = c("CDS:b2743:pcm:L-isoaspartate_protein_carboxylmethyltransferase_type_II:cds2705:-:626:NC_000913.3",
+            "CDS:b2764:cysJ:sulfite_reductase2C_alpha_subunit2C_flavoprotein:cds2726:-:1799:NC_000913.3",
+            "IGR:(CDS,b1594,mlc,glucosamine_anaerobic_growth_regulon_transcriptional_repressor3B_autorepressor,cds1581,-,1220/CDS,b1595,ynfL,LysR_family_putative_transcriptional_regulator,cds1582,-,893):+:945:NC_000913.3",
+            "AS_IGR:(CDS,b0008,talB,transaldolase_B,cds7,+,953/CDS,b0009,mog,molybdochelatase_incorporating_molybdenum_into_molybdopterin,cds8,+,587):+:639:NC_000913.3",
+            "IGR:(CDS,b1808,yoaA,putative_ATP-dependent_helicase2C_DinG_family,cds1798,-,1910/CDS,b1809,yoaB,putative_reactive_intermediate_deaminase,cds1799,+,344):+:396:NC_000913.3"))
+
+allCounts$GeneidBackup = allCounts$Geneid
+```
+
+First, it is important to identify which are IGR, CDS, and anti-sense.
+
+```{r}
+allCounts <- allCounts |> tidyr::separate(Geneid, c("feature", "rest"), sep="[:]")
+allCounts
+```
+
+
+
+We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note, the separation comes at the backslash.
+```{r}
+igr <- allCounts |> filter(feature %in% c("IGR", "AS_IGR"))
+igr <- igr |> tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
+names(igr)
+igr
+```
+
+For each of the two bookend Genes, we need to separate out the feature from the rest.  Note that we write over feature1 in the second line of code below.  Both of the bookends for all sequences are CDS elements.
+
+```{r}
+igr$feature1 <- tidyr::separate(igr, Geneid1, c("feature1", "rest"), sep = "[,]")$feature1
+igr$feature1 <- tidyr::separate(igr, feature1, c("rest", "feature1"), sep = "[()]")$feature1
+igr$feature2 <- tidyr::separate(igr, Geneid2, c("feature2", "rest"), sep = "[,]")$feature2
+names(igr)
+igr
+```
+
+As CDS, it is now important to find the actual genenames for each of the IGR sequences.  We also keep each element's `bnum` which represents a unique gene identifier in *E. coli*.
+
+
+`bnum`, `genename`, `rna.name` act as place holders for the types of elements that we will need to identify the bookends of the IGRs.
+
+```{r}
+bnum = "b[0-9]{4}"
+bnum
+genename = ",[a-z]{3}[A-Z,]."
+rna.name = ",rna[0-9].."
+```
+
+```{r}
+igr$start.gene <- dplyr::case_when(
+  igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, genename),
+  TRUE ~ stringr::str_extract(igr$Geneid1, rna.name))
+igr$end.gene <- dplyr::case_when(
+  igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, genename),
+  TRUE ~ stringr::str_extract(igr$Geneid2, rna.name))
+igr$start.bnum <- dplyr::case_when(
+  igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, bnum),
+  TRUE ~ "none")
+igr$end.bnum <- dplyr::case_when(
+  igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, bnum),
+  TRUE ~ "none")
+igr <- igr |> tidyr::separate(start.gene, into = c("comma", "start.gene"), sep = "[,]") |> 
+  dplyr::select(-comma) |> 
+  tidyr::separate(end.gene, into = c("comma", "end.gene"), sep = "[,]") |> 
+  dplyr::select(-comma)
+names(igr)
+igr
+```
+
+
+#### Helpful tutorials/files {-}
+* `stringr` vignette: https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
+* [`stringr` package](https://stringr.tidyverse.org/) 
+* Jenny Bryan's STAT 545 notes: https://stat545.com/character-vectors.html
+* Jenny Bryan's STAT 545 lab: http://stat545.com/block022_regular-expression.html
+* Hadley Wickham's book [R for Data Science](https://r4ds.had.co.nz/strings.html)
+* [regexpal](http://regexpal.com/)    
+* [RegExr](http://www.regexr.com/)   
+* Regular expression in R [official document](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).  
+
+
+
+
+
+#### Fun examples {-}
+
+* The name Hilary: https://hilaryparker.com/2013/01/30/hilary-the-most-poisoned-baby-name-in-us-history/
+* Trump's tweets: http://varianceexplained.org/r/trump-tweets/
+* Trump's tweets, take two: http://varianceexplained.org/r/trump-followup/
+

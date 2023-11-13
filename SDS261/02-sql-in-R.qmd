@@ -1,0 +1,140 @@
+# SQL in R
+
+
+```{r}
+#| include: false
+
+source("_common.R")
+library(tidyverse)
+```
+
+Note that there exists an R interface to work with SQL commands from within an R Markdown file.  For consistency with the class notes, we've continued to use the R Markdown structure to demonstrate the course material.
+
+(Taken from the Teach Data Science blog: https://teachdatascience.com/sql/, this entry written by Nick Horton)
+
+SQL (pronounced *sequel*) stands for [Structured Query Language](https://en.wikipedia.org/wiki/SQL); it is a language designed to manage data in a relational database system. 
+
+We will use a public facing MySQL [database](http://www.science.smith.edu/wai-database/home/about) containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, [PI Susan Voss, R15 DC014129-01](https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&icde=44962011&ddparam=&ddvalue=&ddsub=&cr=46&csb=default&cs=ASC&pball=).) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.
+
+We begin by demonstrating how SQL queries can be sent to a database.  It is necessary to set up a connection using the `dbConnect()` function.
+
+```{r eval = FALSE}
+library(mosaic)
+library(RMySQL)  
+con <- dbConnect(
+  RMySQL::MySQL(), host = "scidb.smith.edu", user = "waiuser", 
+  password = "smith_waiDB", dbname = "wai")
+```
+
+Next a series of SQL queries can be sent to the database using the `DBI::dbGetQuery()` function: each query returns an R dataframe.
+
+```{r eval = FALSE}
+class(dbGetQuery(con, "SHOW TABLES"))
+```
+
+There are multiple tables within the `wai` database.
+
+```{r eval = FALSE}
+dbGetQuery(con, "SHOW TABLES")
+```
+
+The `EXPLAIN` command describes the ten field names (variables) in the `PI_Info` table.
+
+```{r eval = FALSE}
+dbGetQuery(con, "EXPLAIN PI_Info")
+```
+
+The `SELECT` statement can be used to select all fields for eight observations in the `Measurements` table.
+
+```{r eval = FALSE}
+eightobs <- dbGetQuery(con, "SELECT * FROM Measurements LIMIT 8")
+eightobs
+```
+
+
+More interesting and complicated `SELECT` calls can be used to undertake grouping and aggregation.  Here we calculate the sample size for each study
+
+```{r eval = FALSE}
+dbGetQuery(con, 
+  "SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM")
+```
+
+
+#### Accessing a database using `dplyr` commands {-}
+
+Alternatively, a connection can be made to the server by creating a series of `dplyr` tbl
+objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadley Wickham](https://dbplyr.tidyverse.org/articles/dbplyr.html) has noted, SQL and R have similar syntax (but sufficiently different to be confusing).  
+
+The setup process looks similar.
+
+```{r eval = FALSE}
+Measurements <- tbl(con, "Measurements")
+class(Measurements)
+PI_Info <- tbl(con, "PI_Info")
+Subject <- tbl(con, "Subjects")
+```
+
+We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
+
+```{r eval = FALSE}
+PI_Info %>% collect() %>% data.frame()   
+# be careful with collect() when dealing with large tables!
+```
+
+Note how the number of rows is unknown (`??` at the top of the output above) for the lazy query.
+
+Similarly, we can explore the `Subjects` table.
+```{r eval = FALSE}
+#Subject  %>% summarise(total = n())
+Subject %>% collect()  # be careful with collect() with large tables!
+```
+
+Let's explore the `Measurements` table.
+```{r eval = FALSE}
+#Measurements %>% summarise(total = n())
+Measurements %>% collect()
+```
+
+There are more than a quarter million observations.  
+
+In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al. (2012) entitled ["Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults"](https://www.ncbi.nlm.nih.gov/pubmed/21857517).
+
+Arbitrarily we choose to collect data from subject number three.
+
+```{r eval = FALSE}
+onesubj <- 
+  Measurements %>% 
+  filter(Identifier == "Rosowski_2012", Sub_Number == 3) %>%
+  collect %>%
+  mutate(SessionNum = as.factor(Session))
+head(onesubj)
+```
+
+Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.
+
+```{r eval=FALSE, fig.height=6}
+onesubj <- mutate(onesubj, Ear = ifelse(Left_Ear == 1, "Left", "Right"))
+ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
+  aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
+```
+
+
+Always a good idea to terminate the SQL connection.
+
+```{r eval = FALSE}
+dbDisconnect(con)
+```
+
+We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
+
+Setting up and managing a database is a topic for a different day: here we focused on how SQL can be used within R to access data in a flexible and powerful manner.  
+
+
+#### Learn more {-}
+
+- https://chance.amstat.org/2015/04/setting-the-stage/ (Setting the stage for data technologies)
+- https://www.w3schools.com/sql/sql_intro.asp (Intro to SQL)
+- http://www.science.smith.edu/wai-database/home/about/ (WAI SQL Database)
+- https://cran.r-project.org/web/views/Databases.html (CRAN Task View on Databases with R)
+- https://db.rstudio.com (RStudio Database resources)
+- https://dbplyr.tidyverse.org/articles/dbplyr.html (dbplyr package)

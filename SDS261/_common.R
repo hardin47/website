@@ -37,7 +37,7 @@ suppressMessages(library(mosaicData))
 # knitr chunk options ----------------------------------------------------------
 
 #knitr::opts_chunk$set(
-#  #eval = FALSE,
+#  #eval = TRUE,
 #  #comment = "#>",
 #  #collapse = TRUE,
 #  #message = FALSE,
