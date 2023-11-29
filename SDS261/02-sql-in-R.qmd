@@ -1,140 +1,175 @@
-# SQL in R
-
+# SQL in R {#sec-sql-R}
 
 ```{r}
 #| include: false
 
 source("_common.R")
 library(tidyverse)
+library(fontawesome)
+fontawesome::fa_html_dependency()
 ```
 
-Note that there exists an R interface to work with SQL commands from within an R Markdown file.  For consistency with the class notes, we've continued to use the R Markdown structure to demonstrate the course material.
+There are three ways to engage with SQL using R.  We will discuss each of them in this chapter, and we will expand on the third method in what follows (comparing the RStudio IDE with other interfaces like DBeaver to run actual SQL code chunks).
 
-(Taken from the Teach Data Science blog: https://teachdatascience.com/sql/, this entry written by Nick Horton)
+1. Using the package **dbplyr** **R** will directly translate **dplyr** code into **SQL**.
+2. Using the **DBI** package, we can send **SQL** queries through an `r` chunk.
+3. Using a `sql` chunk, we can write actual **SQL** code inside a quarto document.
 
-SQL (pronounced *sequel*) stands for [Structured Query Language](https://en.wikipedia.org/wiki/SQL); it is a language designed to manage data in a relational database system. 
 
-We will use a public facing MySQL [database](http://www.science.smith.edu/wai-database/home/about) containing wideband acoustic immittance (WAI) measures made on normal ears of adults. (The project is funded by the National Institutes of Health, NIDCD, and hosted on a server at Smith College, [PI Susan Voss, R15 DC014129-01](https://projectreporter.nih.gov/project_info_description.cfm?aid=8769352&icde=44962011&ddparam=&ddvalue=&ddsub=&cr=46&csb=default&cs=ASC&pball=).) The database was created to enable auditory researchers to share WAI measurements and combine analyses over multiple datasets.
 
-We begin by demonstrating how SQL queries can be sent to a database.  It is necessary to set up a connection using the `dbConnect()` function.
+## Translating **dplyr** code into SQL {#sec-dplyr-seq}
 
-```{r eval = FALSE}
-library(mosaic)
-library(RMySQL)  
-con <- dbConnect(
-  RMySQL::MySQL(), host = "scidb.smith.edu", user = "waiuser", 
-  password = "smith_waiDB", dbname = "wai")
+Let's go back to the **airlines** database to try out some things that we already know how to do in **R**.  Recall that we need the **DBI** and **RMariaDB** packages to connect to **R**; we need the **dbplyr** package to translate **SQL** code into **R**.
+
+```{r}
+library(DBI)
+library(RMariaDB)
+library(dbplyr)
+
+con <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
+  user = "mdsr_public",
+  password = "ImhsmflMDSwR"
+)
 ```
 
-Next a series of SQL queries can be sent to the database using the `DBI::dbGetQuery()` function: each query returns an R dataframe.
+The function `dbListTables()` in the **DBI** package will tell us what tables exist in the **airlines** database.
 
-```{r eval = FALSE}
-class(dbGetQuery(con, "SHOW TABLES"))
+```{r}
+DBI::dbListTables(con)
+flights <- tbl(con, "flights")
+carriers <- tbl(con, "carriers")
 ```
 
-There are multiple tables within the `wai` database.
+Let's ask a few questions about the data set using data wrangling techniques that should already be familiar.
 
-```{r eval = FALSE}
-dbGetQuery(con, "SHOW TABLES")
+* Over what years is the `flights` data taken?
+
+To start, let's write the commands using tidy **dplyr** code.
+
+```{r}
+yrs <- flights |>
+  summarize(min_year = min(year), max_year = max(year))
+
+yrs
 ```
 
-The `EXPLAIN` command describes the ten field names (variables) in the `PI_Info` table.
+Because `flights` is not actually a `data.frame` in **R** (but instead a `tbl` in **SQL**), the work that was done above was actually performed in **SQL**.  To see the **SQL** code, we can use the function `show_query`.
 
-```{r eval = FALSE}
-dbGetQuery(con, "EXPLAIN PI_Info")
+```{r}
+show_query(yrs)
 ```
 
-The `SELECT` statement can be used to select all fields for eight observations in the `Measurements` table.
+Note the similarity between the **R** code and the **SQL** code.  We can see `SELECT` and `MIN` and `MAX` which are familiar.  The `AS` function is new, but maybe it that `AS` does the job of assigning a new name to the output columns.  `FROM` is also new and does the job of piping in a data set to use.
 
-```{r eval = FALSE}
-eightobs <- dbGetQuery(con, "SELECT * FROM Measurements LIMIT 8")
-eightobs
+* Create a data set containing only flights between `LAX` and `BOS` in 2012.
+
+```{r}
+la_bos <- flights |>
+  filter(year == 2012 & ((origin == "LAX" & dest == "BOS") | 
+           (origin == "BOS" & dest == "LAX"))) 
+
+
+la_bos
+```
+
+```{r}
+show_query(la_bos)
+```
+
+The `WHERE` function in **SQL** acts as `filter()` did in **R**; `&` has been translated to `AND`, and `|` has been translated to `OR`.
+
+Because the data set has been subsetted substantially, we could pull it into **R** to create an **R** object.  Note that now **R** is aware of the size of the entire data frame (7064 rows and 21 columns).  The `la_bos` object now exists in the **R** environment and can be explored through the IDE.  
+
+::: {.callout-tip}
+
+## Watch out
+
+{{< fa triangle-exclamation >}} Be careful with `collect()`! Don't use `collect()` on large dataframes that won't fit in an **R** environment.
+:::
+
+```{r}
+la_bos <- la_bos |>
+  collect()
+
+la_bos
+```
+
+@sec-sql-verbs will explore more **SQL** queries and using **SQL** verbs. For now, let's continue learning about the different ways **R** can talk to **SQL**.
+
+
+## SQL queries through the **DBI** package
+
+Using **R** as a wrapper, we can send actual **SQL** code to query data from the connection.  It is okay if you aren't yet able to write **SQL** commands from scratch, but try to figure out what the command is asking for.  As mentioned above, we will start from scratch to learn **SQL** commands in @sec-sql-verbs.
+
+Start by setting up the **SQL** connection in the same way.
+
+```{r}
+con <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
+  user = "mdsr_public",
+  password = "ImhsmflMDSwR"
+)
 ```
 
 
-More interesting and complicated `SELECT` calls can be used to undertake grouping and aggregation.  Here we calculate the sample size for each study
+* Look at the first few rows of the `flights` data.
 
-```{r eval = FALSE}
+Because the `flights` data is not an **R** object, we can't open it in **R** to explore the variables.  If we want to see a small bit of the data, we can `SELECT` **everything** (i.e, `*`) from the `flights` table but `LIMIT` the query to only the first eight observations.  
+
+Note that the code in the `dbGetQuery()` **R** function is written in **SQL** not in **R**.
+
+```{r}
+DBI::dbGetQuery(con,
+                "SELECT * FROM flights LIMIT 8")
+```
+* How many flights per year are in the `flights` table?
+
+```{r}
 dbGetQuery(con, 
-  "SELECT Identifier, count(*) AS NUM FROM Measurements GROUP BY Identifier ORDER BY NUM")
+  "SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights")
+```
+
+Note that we've now `SELECT`ed two variables: `year` and `num_flights` (which we created along the way using `count(*)` which is written as `n()` in **R**) `FROM` the `flights` table.  Then we `GROUP BY` the `year` variable which retroactively acts on the `count(*)` function.  And last, we `ORDER BY` (which is similar to `arrange()`) the new `num_flights` variable.
+
+
+## Direct **SQL** queries through a `sql` chunk
+
+Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed.  The **SQL** chunks are given by `{sql}` instead of `{r}` and each **SQL** chunk is required to connect to a particular database (through the `con` connection).
+
+The same queries have been run.
+
+Start by setting up the **SQL** connection in the same way.
+
+```{r}
+#| echo: fenced
+
+con <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
+  user = "mdsr_public",
+  password = "ImhsmflMDSwR"
+)
 ```
 
 
-#### Accessing a database using `dplyr` commands {-}
 
-Alternatively, a connection can be made to the server by creating a series of `dplyr` tbl
-objects. Connecting with familiar `dplyr` syntax is attractive because, as [Hadley Wickham](https://dbplyr.tidyverse.org/articles/dbplyr.html) has noted, SQL and R have similar syntax (but sufficiently different to be confusing).  
+```{sql}
+#| connection: con
+#| echo: fenced
 
-The setup process looks similar.
-
-```{r eval = FALSE}
-Measurements <- tbl(con, "Measurements")
-class(Measurements)
-PI_Info <- tbl(con, "PI_Info")
-Subject <- tbl(con, "Subjects")
-```
-
-We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
-
-```{r eval = FALSE}
-PI_Info %>% collect() %>% data.frame()   
-# be careful with collect() when dealing with large tables!
-```
-
-Note how the number of rows is unknown (`??` at the top of the output above) for the lazy query.
-
-Similarly, we can explore the `Subjects` table.
-```{r eval = FALSE}
-#Subject  %>% summarise(total = n())
-Subject %>% collect()  # be careful with collect() with large tables!
-```
-
-Let's explore the `Measurements` table.
-```{r eval = FALSE}
-#Measurements %>% summarise(total = n())
-Measurements %>% collect()
-```
-
-There are more than a quarter million observations.  
-
-In the next step, we will download the data from a given subject for a specific study, in this case a paper by Rosowski et al. (2012) entitled ["Ear-canal reflectance, umbo velocity, and tympanometry in normal-hearing adults"](https://www.ncbi.nlm.nih.gov/pubmed/21857517).
-
-Arbitrarily we choose to collect data from subject number three.
-
-```{r eval = FALSE}
-onesubj <- 
-  Measurements %>% 
-  filter(Identifier == "Rosowski_2012", Sub_Number == 3) %>%
-  collect %>%
-  mutate(SessionNum = as.factor(Session))
-head(onesubj)
-```
-
-Finally we can display the results of the measurements as a function of frequency and which ear (left or right) that was used.
-
-```{r eval=FALSE, fig.height=6}
-onesubj <- mutate(onesubj, Ear = ifelse(Left_Ear == 1, "Left", "Right"))
-ggplot(onesubj, aes(x = Freq, y = Absorbance)) + geom_point() +
-  aes(colour = Ear) + scale_x_log10() + labs(title="Absorbance by ear Rosowski subject 3")
+SELECT * FROM flights LIMIT 8
 ```
 
 
-Always a good idea to terminate the SQL connection.
+```{sql}
+#| connection: con
+#| echo: fenced
 
-```{r eval = FALSE}
-dbDisconnect(con)
+SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights
 ```
-
-We note that a number of relational database systems exist, including MySQL (illustrated here), PostgreSQL, and SQLite.  More information about databases within R can be found in the CRAN [Databases with R](https://cran.r-project.org/web/views/Databases.html) Task View.
-
-Setting up and managing a database is a topic for a different day: here we focused on how SQL can be used within R to access data in a flexible and powerful manner.  
-
-
-#### Learn more {-}
-
-- https://chance.amstat.org/2015/04/setting-the-stage/ (Setting the stage for data technologies)
-- https://www.w3schools.com/sql/sql_intro.asp (Intro to SQL)
-- http://www.science.smith.edu/wai-database/home/about/ (WAI SQL Database)
-- https://cran.r-project.org/web/views/Databases.html (CRAN Task View on Databases with R)
-- https://db.rstudio.com (RStudio Database resources)
-- https://dbplyr.tidyverse.org/articles/dbplyr.html (dbplyr package)
