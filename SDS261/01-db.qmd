@@ -41,9 +41,9 @@ The `tbl()` function (in the **dplyr** package) maps the tables called `flights`
 ```{r}
 library(tidyverse)
 library(mdsr)
-db <- dbConnect_scidb("airlines")
-flights <- tbl(db, "flights")
-carriers <- tbl(db, "carriers")
+db_air <- dbConnect_scidb("airlines")
+flights <- tbl(db_air, "flights")
+carriers <- tbl(db_air, "carriers")
 ```
 
 We can now use the objects `flights` and `carriers` as if they were data frames, but they are not actually the **R** version of `data.frame`.  Instead, they exist as a `tbl` which is a special object that behaves similarly to a `data.frame`.
@@ -88,6 +88,13 @@ Indeed, the `flights` data set contains all of the flights and is much larger th
 flights |>
   object.size() |>
   print(units = "Kb")
+```
+
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+library(DBI)
+dbDisconnect(db_air)
 ```
 
 ## Engaging with a database
@@ -137,6 +144,15 @@ con <- DBI::dbConnect(
 
 Note that the function `dbConnect_scidb()` in the **mdsr** package is just a wrapper of the `dbConnect()` function where all the arguments are filled in to connect to the **mdsr** database.
 
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+#| eval: false
+
+dbDisconnect(con)
+```
+
+
 ### Connecting to Duckdb
 
 Connecting to Duckdb is reasonably straightforward because the default values of the `duckdb()` function in the **duckdb** package create a temporary database that is deleted when you quit **R**.
@@ -146,3 +162,8 @@ con_duckdb <- DBI::dbConnect(duckdb::duckdb())
 ```
 
 
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_duckdb)
+```

@@ -311,9 +311,9 @@ for (let popover of popovers){
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mdsr-book/mdsr">mdsr</a></span><span class="op">)</span></span>
-<span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mdsr/man/src_scidb.html">dbConnect_scidb</a></span><span class="op">(</span><span class="st">"airlines"</span><span class="op">)</span></span>
-<span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"flights"</span><span class="op">)</span></span>
-<span><span class="va">carriers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"carriers"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">db_air</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mdsr/man/src_scidb.html">dbConnect_scidb</a></span><span class="op">(</span><span class="st">"airlines"</span><span class="op">)</span></span>
+<span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">db_air</span>, <span class="st">"flights"</span><span class="op">)</span></span>
+<span><span class="va">carriers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">db_air</span>, <span class="st">"carriers"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can now use the objects <code>flights</code> and <code>carriers</code> as if they were data frames, but they are not actually the <strong>R</strong> version of <code>data.frame</code>. Instead, they exist as a <code>tbl</code> which is a special object that behaves similarly to a <code>data.frame</code>.</p>
 <p>The <code>carriers</code> data represents the name of each airline and the associated carrier code. Note that when the data are printed to screen, the number of rows is given by <code>??</code>, indicating that they are unknown. Indeed, <strong>R</strong> just needed the first few rows to print to screen, no need to spend precious computing resources looking at the entire table.</p>
@@ -380,6 +380,11 @@ for (let popover of popovers){
 <pre><code>6.5 Kb</code></pre>
 </div>
 </div>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org">DBI</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">db_air</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section><section id="engaging-with-a-database" class="level2" data-number="1.3"><h2 data-number="1.3" class="anchored" data-anchor-id="engaging-with-a-database">
 <span class="header-section-number">1.3</span> Engaging with a database</h2>
 <section id="many-sql-implementations" class="level3" data-number="1.3.1"><h3 data-number="1.3.1" class="anchored" data-anchor-id="many-sql-implementations">
@@ -405,7 +410,7 @@ for (let popover of popovers){
 <span class="header-section-number">1.4.1</span> Creating a database connection</h3>
 <p>Before we can do anything, we need to set up a connection to a <strong>MySQL</strong> database. We will call the connection <code>con</code>, and the syntax will look something like what is written below. However, the code below won’t run because values must be set for <code>dbname</code>, <code>host</code>, <code>user</code>, and <code>password</code>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dbname <span class="op">=</span> <span class="st">"  "</span>,</span>
 <span>  host <span class="op">=</span> <span class="st">"  "</span>,</span>
@@ -413,12 +418,20 @@ for (let popover of popovers){
 <span>  password <span class="op">=</span> <span class="st">"  "</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Note that the function <code><a href="https://rdrr.io/pkg/mdsr/man/src_scidb.html">dbConnect_scidb()</a></code> in the <strong>mdsr</strong> package is just a wrapper of the <code>dbConnect()</code> function where all the arguments are filled in to connect to the <strong>mdsr</strong> database.</p>
+<p>Note that the function <code><a href="https://rdrr.io/pkg/mdsr/man/src_scidb.html">dbConnect_scidb()</a></code> in the <strong>mdsr</strong> package is just a wrapper of the <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect()</a></code> function where all the arguments are filled in to connect to the <strong>mdsr</strong> database.</p>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section><section id="connecting-to-duckdb" class="level3" data-number="1.4.2"><h3 data-number="1.4.2" class="anchored" data-anchor-id="connecting-to-duckdb">
 <span class="header-section-number">1.4.2</span> Connecting to Duckdb</h3>
 <p>Connecting to Duckdb is reasonably straightforward because the default values of the <code>duckdb()</code> function in the <strong>duckdb</strong> package create a temporary database that is deleted when you quit <strong>R</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_duckdb</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_duckdb</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

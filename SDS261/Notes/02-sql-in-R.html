@@ -270,7 +270,7 @@ for (let popover of popovers){
   </div>
   
 
-</header><p>There are three ways to engage with SQL using R. We will discuss each of them in this chapter, and we will expand on the third method in what follows (comparing the RStudio IDE with other interfaces like DBeaver to run actual SQL code chunks).</p>
+</header><p>There are three ways to engage with SQL using R. We will discuss each of them in this chapter, and we will expand on the third method in what follows (using interfaces like DBeaver, and RStudio, to run actual SQL code directly).</p>
 <ol type="1">
 <li>Using the package <strong>dbplyr</strong> <strong>R</strong> will directly translate <strong>dplyr</strong> code into <strong>SQL</strong>.</li>
 <li>Using the <strong>DBI</strong> package, we can send <strong>SQL</strong> queries through an <code>r</code> chunk.</li>
@@ -284,7 +284,7 @@ for (let popover of popovers){
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rmariadb.r-dbi.org">RMariaDB</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<span><span class="va">con_air</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dbname <span class="op">=</span> <span class="st">"airlines"</span>,</span>
 <span>  host <span class="op">=</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
@@ -294,12 +294,12 @@ for (let popover of popovers){
 </div>
 <p>The function <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables()</a></code> in the <strong>DBI</strong> package will tell us what tables exist in the <strong>airlines</strong> database.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="op">(</span><span class="va">con_air</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "airports" "carriers" "flights"  "planes"  </code></pre>
 </div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights"</span><span class="op">)</span></span>
-<span><span class="va">carriers</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con</span>, <span class="st">"carriers"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"flights"</span><span class="op">)</span></span>
+<span><span class="va">carriers</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"carriers"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s ask a few questions about the data set using data wrangling techniques that should already be familiar.</p>
 <ul>
@@ -366,18 +366,19 @@ WHERE (`year` = 2012.0 AND ((`origin` = 'LAX' AND `dest` = 'BOS') OR (`origin` =
 </div>
 </div>
 <p>The <code>WHERE</code> function in <strong>SQL</strong> acts as <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> did in <strong>R</strong>; <code>&amp;</code> has been translated to <code>AND</code>, and <code>|</code> has been translated to <code>OR</code>.</p>
+<p>As might be expected, <strong>dbplyr</strong> doesn’t translate every <strong>R</strong> command into <strong>SQL</strong>. After all, <strong>SQL</strong> is not a statistical software and doesn’t, for example, have a mechanism for creating data visualizations. To track which <strong>R</strong> commands are connected to <strong>SQL</strong> see the <a href="https://dbplyr.tidyverse.org/reference/" target="_blank"><strong>dbplyr</strong> reference sheet</a>.</p>
 <p>Because the data set has been subsetted substantially, we could pull it into <strong>R</strong> to create an <strong>R</strong> object. Note that now <strong>R</strong> is aware of the size of the entire data frame (7064 rows and 21 columns). The <code>la_bos</code> object now exists in the <strong>R</strong> environment and can be explored through the IDE.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon"></i>
+<i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Watch out
+<i class="fas fa-triangle-exclamation"></i> Watch out!
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p> Be careful with <code>collect()</code>! Don’t use <code>collect()</code> on large dataframes that won’t fit in an <strong>R</strong> environment.</p>
+<p>Be careful with <code>collect()</code>. Don’t use <code>collect()</code> on large dataframes that won’t fit in an <strong>R</strong> environment.</p>
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
@@ -402,12 +403,16 @@ Watch out
 </div>
 </div>
 <p><a href="03-sql-verbs.html"><span>Chapter&nbsp;3</span></a> will explore more <strong>SQL</strong> queries and using <strong>SQL</strong> verbs. For now, let’s continue learning about the different ways <strong>R</strong> can talk to <strong>SQL</strong>.</p>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_air</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section><section id="sql-queries-through-the-dbi-package" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="sql-queries-through-the-dbi-package">
 <span class="header-section-number">2.2</span> SQL queries through the <strong>DBI</strong> package</h2>
 <p>Using <strong>R</strong> as a wrapper, we can send actual <strong>SQL</strong> code to query data from the connection. It is okay if you aren’t yet able to write <strong>SQL</strong> commands from scratch, but try to figure out what the command is asking for. As mentioned above, we will start from scratch to learn <strong>SQL</strong> commands in <a href="03-sql-verbs.html"><span>Chapter&nbsp;3</span></a>.</p>
 <p>Start by setting up the <strong>SQL</strong> connection in the same way.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_air</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dbname <span class="op">=</span> <span class="st">"airlines"</span>,</span>
 <span>  host <span class="op">=</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
@@ -420,9 +425,10 @@ Watch out
 </ul>
 <p>Because the <code>flights</code> data is not an <strong>R</strong> object, we can’t open it in <strong>R</strong> to explore the variables. If we want to see a small bit of the data, we can <code>SELECT</code> <strong>everything</strong> (i.e, <code>*</code>) from the <code>flights</code> table but <code>LIMIT</code> the query to only the first eight observations.</p>
 <p>Note that the code in the <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery()</a></code> <strong>R</strong> function is written in <strong>SQL</strong> not in <strong>R</strong>.</p>
+<p>A semicolon (<code>;</code>) is typically used to indicate the termination of a <strong>SQL</strong> statement. They are not always required (particularly when only one statement is being sent), however, it is good practice to use a semicolon at the end of each <strong>SQL</strong> statement. (Indeed, some <strong>SQL</strong> dialects require the semicolon at the end of every statement, regardless of whether or not there are more statements following.)</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>,</span>
-<span>                <span class="st">"SELECT * FROM flights LIMIT 8"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery</a></span><span class="op">(</span><span class="va">con_air</span>,</span>
+<span>                <span class="st">"SELECT * FROM flights LIMIT 8;"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  year month day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 1 2010    10   1        1           2100       181      159           2320
@@ -457,8 +463,8 @@ Watch out
 <li>How many flights per year are in the <code>flights</code> table?</li>
 </ul>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, </span>
-<span>  <span class="st">"SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery</a></span><span class="op">(</span><span class="va">con_air</span>, </span>
+<span>  <span class="st">"SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights;"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  year num_flights
 1 2016     5617658
@@ -472,28 +478,32 @@ Watch out
 </div>
 </div>
 <p>Note that we’ve now <code>SELECT</code>ed two variables: <code>year</code> and <code>num_flights</code> (which we created along the way using <code>count(*)</code> which is written as <code>n()</code> in <strong>R</strong>) <code>FROM</code> the <code>flights</code> table. Then we <code>GROUP BY</code> the <code>year</code> variable which retroactively acts on the <code>count(*)</code> function. And last, we <code>ORDER BY</code> (which is similar to <code>arrange()</code>) the new <code>num_flights</code> variable.</p>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_air</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section><section id="direct-sql-queries-through-a-sql-chunk" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="direct-sql-queries-through-a-sql-chunk">
 <span class="header-section-number">2.3</span> Direct <strong>SQL</strong> queries through a <code>sql</code> chunk</h2>
-<p>Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed. The <strong>SQL</strong> chunks are given by <code>{sql}</code> instead of <code>{r}</code> and each <strong>SQL</strong> chunk is required to connect to a particular database (through the <code>con</code> connection).</p>
+<p>Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed. The <strong>SQL</strong> chunks are given by <code>{sql}</code> instead of <code>{r}</code> and each <strong>SQL</strong> chunk is required to connect to a particular database (through the <code>con_air</code> connection).</p>
 <p>The same queries have been run.</p>
 <p>Start by setting up the <strong>SQL</strong> connection in the same way.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  RMariaDB<span class="sc">::</span><span class="fu">MariaDB</span>(),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dbname =</span> <span class="st">"airlines"</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">host =</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">user =</span> <span class="st">"mdsr_public"</span>,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">password =</span> <span class="st">"ImhsmflMDSwR"</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>con_air <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  RMariaDB<span class="sc">::</span><span class="fu">MariaDB</span>(),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dbname =</span> <span class="st">"airlines"</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">host =</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">user =</span> <span class="st">"mdsr_public"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">password =</span> <span class="st">"ImhsmflMDSwR"</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">LIMIT</span> <span class="dv">8</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_air</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">LIMIT</span> <span class="dv">8</span>;</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1091,11 +1101,11 @@ IAH
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">year</span>, <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> num_flights <span class="kw">FROM</span> flights <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="fu">year</span> <span class="kw">ORDER</span> <span class="kw">BY</span> num_flights</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_air</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">year</span>, <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> num_flights <span class="kw">FROM</span> flights <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="fu">year</span> <span class="kw">ORDER</span> <span class="kw">BY</span> num_flights;</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1178,6 +1188,10 @@ num_flights
 </tbody>
 </table>
 </div>
+</div>
+<p>Always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_air</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

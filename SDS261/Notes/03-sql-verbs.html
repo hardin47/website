@@ -245,7 +245,17 @@ for (let popover of popovers){
 </nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#looking-at-the-tables-in-the-database" id="toc-looking-at-the-tables-in-the-database" class="nav-link active" data-scroll-target="#looking-at-the-tables-in-the-database"><span class="header-section-number">3.1</span> Looking at the tables in the database</a></li>
+  <li><a href="#select-from" id="toc-select-from" class="nav-link" data-scroll-target="#select-from"><span class="header-section-number">3.2</span> SELECT … FROM</a></li>
+  <li><a href="#where" id="toc-where" class="nav-link" data-scroll-target="#where"><span class="header-section-number">3.3</span> WHERE</a></li>
+  <li><a href="#group-by" id="toc-group-by" class="nav-link" data-scroll-target="#group-by"><span class="header-section-number">3.4</span> GROUP BY</a></li>
+  <li><a href="#order-by" id="toc-order-by" class="nav-link" data-scroll-target="#order-by"><span class="header-section-number">3.5</span> ORDER BY</a></li>
+  <li><a href="#having" id="toc-having" class="nav-link" data-scroll-target="#having"><span class="header-section-number">3.6</span> HAVING</a></li>
+  <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">3.7</span> LIMIT</a></li>
+  </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
@@ -262,30 +272,1099 @@ for (let popover of popovers){
   </div>
   
 
-</header><div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SHOW TABLES"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</header><p>Most of this chapter will focus on the <strong>SQL</strong> commands needed to run queries of the database. Much of the syntax is strikingly familiar to tidy verbs in <strong>R</strong>. However, this chapter starts with a few <strong>SQL</strong> specific tools used to learn about the tables in any particular database.</p>
+<section id="looking-at-the-tables-in-the-database" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="looking-at-the-tables-in-the-database">
+<span class="header-section-number">3.1</span> Looking at the tables in the database</h2>
+<p>Consider a database which is based on the <a href="https://openpolicing.stanford.edu/data/" target="_blank">Stanford Open Policing Database</a>.</p>
+<!--
+Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
+-->
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_traffic</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<span>    <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    dbname <span class="op">=</span> <span class="st">"traffic"</span>,</span>
+<span>    host <span class="op">=</span> <span class="st">"traffic.st47s.com"</span>, </span>
+<span>    user <span class="op">=</span> <span class="st">"student"</span>,</span>
+<span>    password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SQL_LOADING"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are 88 tables in the <code>traffic</code> database. Each table is traffic stop data from a particular city or a given state’s highway patrol.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+Displaying records 1 - 10
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+Tables_in_traffic
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ar_little_rock_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+az_gilbert_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+az_mesa_2023_01_26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+az_statewide_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_anaheim_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_bakersfield_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_long_beach_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_los_angeles_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_oakland_2020_04_01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ca_san_bernardino_2020_04_01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <code>EXPLAIN</code> command describes the 24 field names (variables) in the <code>ma_statewide_2020_04_01</code> table. Some of the variables are characters (<code>text</code>) and some are numeric (either <code>double</code> or <code>bigint</code>)</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> ma_statewide_2020_04_01;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+Displaying records 1 - 10
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+Field
+</th>
+<th style="text-align:left;">
+Type
+</th>
+<th style="text-align:left;">
+Null
+</th>
+<th style="text-align:left;">
+Key
+</th>
+<th style="text-align:left;">
+Default
+</th>
+<th style="text-align:left;">
+Extra
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+raw_row_number
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+date
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+location
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+county_name
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+subject_age
+</td>
+<td style="text-align:left;">
+bigint(20)
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+subject_race
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+subject_sex
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+type
+</td>
+<td style="text-align:left;">
+text
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+arrest_made
+</td>
+<td style="text-align:left;">
+double
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+citation_issued
+</td>
+<td style="text-align:left;">
+double
+</td>
+<td style="text-align:left;">
+YES
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="select-from" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="select-from">
+<span class="header-section-number">3.2</span> SELECT … FROM</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code>select()</code></p>
+</blockquote>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> ma_statewide_2020_04_01 <span class="kw">LIMIT</span> <span class="dv">14</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+Displaying records 1 - 10
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+raw_row_number
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+location
+</th>
+<th style="text-align:left;">
+county_name
+</th>
+<th style="text-align:right;">
+subject_age
+</th>
+<th style="text-align:left;">
+subject_race
+</th>
+<th style="text-align:left;">
+subject_sex
+</th>
+<th style="text-align:left;">
+type
+</th>
+<th style="text-align:right;">
+arrest_made
+</th>
+<th style="text-align:right;">
+citation_issued
+</th>
+<th style="text-align:right;">
+warning_issued
+</th>
+<th style="text-align:left;">
+outcome
+</th>
+<th style="text-align:right;">
+contraband_found
+</th>
+<th style="text-align:right;">
+contraband_drugs
+</th>
+<th style="text-align:right;">
+contraband_weapons
+</th>
+<th style="text-align:right;">
+contraband_alcohol
+</th>
+<th style="text-align:right;">
+contraband_other
+</th>
+<th style="text-align:right;">
+frisk_performed
+</th>
+<th style="text-align:right;">
+search_conducted
+</th>
+<th style="text-align:left;">
+search_basis
+</th>
+<th style="text-align:left;">
+reason_for_stop
+</th>
+<th style="text-align:left;">
+vehicle_type
+</th>
+<th style="text-align:left;">
+vehicle_registration_state
+</th>
+<th style="text-align:left;">
+raw_Race
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2007-06-06
+</td>
+<td style="text-align:left;">
+MIDDLEBOROUGH
+</td>
+<td style="text-align:left;">
+Plymouth County
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Speed
+</td>
+<td style="text-align:left;">
+Passenger
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+SEEKONK
+</td>
+<td style="text-align:left;">
+Bristol County
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+warning
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+other
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Commercial
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+MEDFORD
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+warning
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Passenger
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+MEDFORD
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+warning
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Commercial
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+EVERETT
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+hispanic
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Commercial
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+MEDFORD
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Speed
+</td>
+<td style="text-align:left;">
+Commercial
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+SOMERVILLE
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:left;">
+hispanic
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Commercial
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+HOPKINTON
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:left;">
+hispanic
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Passenger
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+2007-06-07
+</td>
+<td style="text-align:left;">
+SOMERVILLE
+</td>
+<td style="text-align:left;">
+Middlesex County
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Passenger
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+2007-06-06
+</td>
+<td style="text-align:left;">
+BARNSTABLE
+</td>
+<td style="text-align:left;">
+Barnstable County
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:left;">
+white
+</td>
+<td style="text-align:left;">
+male
+</td>
+<td style="text-align:left;">
+vehicular
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+citation
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Speed
+</td>
+<td style="text-align:left;">
+Passenger
+</td>
+<td style="text-align:left;">
+MA
+</td>
+<td style="text-align:left;">
+White
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"SHOW TABLES"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The <code>EXPLAIN</code> command describes the ten field names (variables) in the <code>PI_Info</code> table.</p>
-<div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbGetQuery</span><span class="op">(</span><span class="va">con</span>, <span class="st">"EXPLAIN flights"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">Measurements</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con</span>, <span class="st">"Measurements"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">Measurements</span><span class="op">)</span></span>
-<span><span class="va">PI_Info</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con</span>, <span class="st">"PI_Info"</span><span class="op">)</span></span>
-<span><span class="va">Subject</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con</span>, <span class="st">"Subjects"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Always a good idea to terminate the SQL connection.</p>
-<div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+</section><section id="where" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="where">
+<span class="header-section-number">3.3</span> WHERE</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code></p>
+</blockquote>
+<p><code>WHERE</code> operates on the original data in the table and <code>HAVING</code> operates on the result set.</p>
+</section><section id="group-by" class="level2" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="group-by">
+<span class="header-section-number">3.4</span> GROUP BY</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code>group_by()</code></p>
+</blockquote>
+</section><section id="order-by" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="order-by">
+<span class="header-section-number">3.5</span> ORDER BY</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code>arrange()</code></p>
+</blockquote>
+</section><section id="having" class="level2" data-number="3.6"><h2 data-number="3.6" class="anchored" data-anchor-id="having">
+<span class="header-section-number">3.6</span> HAVING</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code></p>
+</blockquote>
+<p><code>WHERE</code> operates on the original data in the table and <code>HAVING</code> operates on the result set.</p>
+</section><section id="limit" class="level2" data-number="3.7"><h2 data-number="3.7" class="anchored" data-anchor-id="limit">
+<span class="header-section-number">3.7</span> LIMIT</h2>
+<blockquote class="blockquote">
+<p><strong>R</strong> function: <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code></p>
+</blockquote>
 
 
-
-</main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -533,7 +1612,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-left">Data Science, the SQL by Jo Hardin.</div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></div>
+    </div>
     <div class="nav-footer-right">Built with 💚 and <a href="https://quarto.org/">Quarto</a>.</div>
   </div>
 </footer>

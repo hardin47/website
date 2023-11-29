@@ -4,12 +4,10 @@
 #| include: false
 
 source("_common.R")
-library(tidyverse)
-library(fontawesome)
 fontawesome::fa_html_dependency()
 ```
 
-There are three ways to engage with SQL using R.  We will discuss each of them in this chapter, and we will expand on the third method in what follows (comparing the RStudio IDE with other interfaces like DBeaver to run actual SQL code chunks).
+There are three ways to engage with SQL using R.  We will discuss each of them in this chapter, and we will expand on the third method in what follows (using interfaces like DBeaver, and RStudio, to run actual SQL code directly).
 
 1. Using the package **dbplyr** **R** will directly translate **dplyr** code into **SQL**.
 2. Using the **DBI** package, we can send **SQL** queries through an `r` chunk.
@@ -26,7 +24,7 @@ library(DBI)
 library(RMariaDB)
 library(dbplyr)
 
-con <- DBI::dbConnect(
+con_air <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "airlines",
   host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
@@ -38,9 +36,9 @@ con <- DBI::dbConnect(
 The function `dbListTables()` in the **DBI** package will tell us what tables exist in the **airlines** database.
 
 ```{r}
-DBI::dbListTables(con)
-flights <- tbl(con, "flights")
-carriers <- tbl(con, "carriers")
+DBI::dbListTables(con_air)
+flights <- tbl(con_air, "flights")
+carriers <- tbl(con_air, "carriers")
 ```
 
 Let's ask a few questions about the data set using data wrangling techniques that should already be familiar.
@@ -81,13 +79,17 @@ show_query(la_bos)
 
 The `WHERE` function in **SQL** acts as `filter()` did in **R**; `&` has been translated to `AND`, and `|` has been translated to `OR`.
 
+
+As might be expected, **dbplyr** doesn't translate every **R** command into **SQL**.  After all, **SQL** is not a statistical software and doesn't, for example, have a mechanism for creating data visualizations.  To track which **R** commands are connected to **SQL** see the <a href = "https://dbplyr.tidyverse.org/reference/" target= "_blank">**dbplyr** reference sheet</a>.
+
+
 Because the data set has been subsetted substantially, we could pull it into **R** to create an **R** object.  Note that now **R** is aware of the size of the entire data frame (7064 rows and 21 columns).  The `la_bos` object now exists in the **R** environment and can be explored through the IDE.  
 
-::: {.callout-tip}
+::: {.callout-tip icon=false}
 
-## Watch out
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
 
-{{< fa triangle-exclamation >}} Be careful with `collect()`! Don't use `collect()` on large dataframes that won't fit in an **R** environment.
+Be careful with `collect()`. Don't use `collect()` on large dataframes that won't fit in an **R** environment.
 :::
 
 ```{r}
@@ -99,6 +101,11 @@ la_bos
 
 @sec-sql-verbs will explore more **SQL** queries and using **SQL** verbs. For now, let's continue learning about the different ways **R** can talk to **SQL**.
 
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air)
+```
 
 ## SQL queries through the **DBI** package
 
@@ -107,7 +114,7 @@ Using **R** as a wrapper, we can send actual **SQL** code to query data from the
 Start by setting up the **SQL** connection in the same way.
 
 ```{r}
-con <- DBI::dbConnect(
+con_air <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "airlines",
   host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
@@ -121,25 +128,34 @@ con <- DBI::dbConnect(
 
 Because the `flights` data is not an **R** object, we can't open it in **R** to explore the variables.  If we want to see a small bit of the data, we can `SELECT` **everything** (i.e, `*`) from the `flights` table but `LIMIT` the query to only the first eight observations.  
 
-Note that the code in the `dbGetQuery()` **R** function is written in **SQL** not in **R**.
+Note that the code in the `dbGetQuery()` **R** function is written in **SQL** not in **R**.  
+
+A semicolon (`;`) is typically used to indicate the termination of a **SQL** statement.  They are not always required (particularly when only one statement is being sent), however, it is good practice to use a semicolon at the end of each **SQL** statement.  (Indeed, some **SQL** dialects require the semicolon at the end of every statement, regardless of whether or not there are more statements following.)
 
 ```{r}
-DBI::dbGetQuery(con,
-                "SELECT * FROM flights LIMIT 8")
+DBI::dbGetQuery(con_air,
+                "SELECT * FROM flights LIMIT 8;")
 ```
 * How many flights per year are in the `flights` table?
 
 ```{r}
-dbGetQuery(con, 
-  "SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights")
+dbGetQuery(con_air, 
+  "SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights;")
 ```
 
 Note that we've now `SELECT`ed two variables: `year` and `num_flights` (which we created along the way using `count(*)` which is written as `n()` in **R**) `FROM` the `flights` table.  Then we `GROUP BY` the `year` variable which retroactively acts on the `count(*)` function.  And last, we `ORDER BY` (which is similar to `arrange()`) the new `num_flights` variable.
 
 
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air)
+```
+
+
 ## Direct **SQL** queries through a `sql` chunk
 
-Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed.  The **SQL** chunks are given by `{sql}` instead of `{r}` and each **SQL** chunk is required to connect to a particular database (through the `con` connection).
+Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed.  The **SQL** chunks are given by `{sql}` instead of `{r}` and each **SQL** chunk is required to connect to a particular database (through the `con_air` connection).
 
 The same queries have been run.
 
@@ -148,7 +164,7 @@ Start by setting up the **SQL** connection in the same way.
 ```{r}
 #| echo: fenced
 
-con <- DBI::dbConnect(
+con_air <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "airlines",
   host = "mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com",
@@ -160,16 +176,23 @@ con <- DBI::dbConnect(
 
 
 ```{sql}
-#| connection: con
+#| connection: con_air
 #| echo: fenced
 
-SELECT * FROM flights LIMIT 8
+SELECT * FROM flights LIMIT 8;
 ```
 
 
 ```{sql}
-#| connection: con
+#| connection: con_air
 #| echo: fenced
 
-SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights
+SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights;
+```
+
+
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air)
 ```

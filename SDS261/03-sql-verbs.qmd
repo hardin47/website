@@ -5,38 +5,87 @@
 #| include: false
 
 source("_common.R")
-library(tidyverse)
+```
+
+Most of this chapter will focus on the **SQL** commands needed to run queries of the database.  Much of the syntax is strikingly familiar to tidy verbs in **R**.  However, this chapter starts with a few **SQL** specific tools used to learn about the tables in any particular database.
+
+## Looking at the tables in the database
+
+Consider a database which is based on the <a href = "https://openpolicing.stanford.edu/data/" target = "_blank">Stanford Open Policing Database</a>.
+
+<!--
+Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
+-->
+
+
+```{r}
+con_traffic <- DBI::dbConnect(
+    RMariaDB::MariaDB(),
+    dbname = "traffic",
+    host = "traffic.st47s.com", 
+    user = "student",
+    password = Sys.getenv("SQL_LOADING")
+)
+```
+
+There are 88 tables in the `traffic` database. Each table is traffic stop data from a particular city or a given state's highway patrol.
+
+```{sql}
+#| connection: con_traffic
+
+SHOW TABLES;
+```
+
+The `EXPLAIN` command describes the 24 field names (variables) in the `ma_statewide_2020_04_01` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+
+```{sql}
+#| connection: con_traffic
+
+EXPLAIN ma_statewide_2020_04_01;
 ```
 
 
-```{r eval = FALSE}
-class(dbGetQuery(con, "SHOW TABLES"))
+## SELECT ... FROM
+
+> **R** function: `select()`
+
+```{sql}
+#| connection: con_traffic
+
+SELECT * FROM ma_statewide_2020_04_01 LIMIT 14;
+
 ```
 
-```{r eval = FALSE}
-dbGetQuery(con, "SHOW TABLES")
+```{sql}
+#| connection: con_traffic
+#| eval: false
+
+
 ```
 
-The `EXPLAIN` command describes the ten field names (variables) in the `PI_Info` table.
+## WHERE
 
-```{r eval = FALSE}
-dbGetQuery(con, "EXPLAIN flights")
-```
+> **R** function: `filter()`
 
+`WHERE` operates on the original data in the table and `HAVING` operates on the result set.
 
-```{r eval = FALSE}
-Measurements <- tbl(con, "Measurements")
-class(Measurements)
-PI_Info <- tbl(con, "PI_Info")
-Subject <- tbl(con, "Subjects")
-```
+## GROUP BY
 
+> **R** function: `group_by()`
 
+## ORDER BY
 
-Always a good idea to terminate the SQL connection.
+> **R** function: `arrange()`
 
-```{r eval = FALSE}
-dbDisconnect(con)
-```
+## HAVING
+
+> **R** function: `filter()`
+
+`WHERE` operates on the original data in the table and `HAVING` operates on the result set.
+
+## LIMIT
+
+> **R** function: `head()`
+
 
  

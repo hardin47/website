@@ -33,6 +33,10 @@ suppressMessages(library(ukbabynames))
 suppressMessages(library(Stat2Data))
 suppressMessages(library(GGally))
 suppressMessages(library(mosaicData))
+suppressMessages(library(fontawesome))
+suppressMessages(library(DBI))
+suppressMessages(library(dbplyr))
+suppressMessages(library(RMariaDB))
 
 # knitr chunk options ----------------------------------------------------------
 
