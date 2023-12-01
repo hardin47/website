@@ -5,87 +5,324 @@
 #| include: false
 
 source("_common.R")
+fontawesome::fa_html_dependency()
 ```
 
 Most of this chapter will focus on the **SQL** commands needed to run queries of the database.  Much of the syntax is strikingly familiar to tidy verbs in **R**.  However, this chapter starts with a few **SQL** specific tools used to learn about the tables in any particular database.
 
 ## Looking at the tables in the database
 
-Consider a database which is based on the <a href = "https://openpolicing.stanford.edu/data/" target = "_blank">Stanford Open Policing Database</a>.
+Consider a database of 
 
 <!--
 Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
 -->
 
-
 ```{r}
-con_traffic <- DBI::dbConnect(
-    RMariaDB::MariaDB(),
-    dbname = "traffic",
-    host = "traffic.st47s.com", 
-    user = "student",
-    password = Sys.getenv("SQL_LOADING")
-)
+library(mdsr)
+con_taxi <- dbConnect_scidb("nyctaxi")
 ```
 
-There are 88 tables in the `traffic` database. Each table is traffic stop data from a particular city or a given state's highway patrol.
-
 ```{sql}
-#| connection: con_traffic
+#| connection: con_taxi
 
 SHOW TABLES;
 ```
 
-The `EXPLAIN` command describes the 24 field names (variables) in the `ma_statewide_2020_04_01` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+There is only one table in the `nyctaxi` database, called `yellow_old`.
 
 ```{sql}
-#| connection: con_traffic
+#| connection: con_taxi
+#| label: select-explain
+#| output.var: "select_explain"
 
-EXPLAIN ma_statewide_2020_04_01;
+EXPLAIN yellow_old;
 ```
 
+
+
+```{r}
+#| label: tbl-select-explain
+#| echo: false
+#| tbl-cap: "EXPLAIN variables in yellow_old"
+
+select_explain |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+The `EXPLAIN` command describes the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+
+
+Most engagements with SQL are don through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
+
+* `SELECT` allows you to list the columns, or functions operating on columns, that you want to retrieve. This is an analogous operation to the `select()` verb in **dplyr**, potentially combined with `mutate()` or `summarize()`.
+* `FROM` specifies the table where the data are.
+* `JOIN` allows you to stitch together two or more tables using a key. This is analogous to the `inner_join()` and `left_join()` commands in **dplyr**.  More details of `JOIN` are given in @sec-join.
+* `WHERE` allows you to filter the records according to some criteria and is an analogous operation to the `filter()` verb in **dplyr**.
+* `GROUP BY` allows you to aggregate the records according to some shared value and is an analogous operation to the `group_by()` verb in **dplyr**.
+* `HAVING` is like a `WHERE` clause that operates on the result set—not the records themselves and is analogous to applying a second `filter()` command in **dplyr**, after the rows have already been aggregated.
+* `ORDER BY` is exactly what it sounds like—it specifies a condition for ordering the rows of the result set and is analogous to the `arrange()` verb in **dplyr**.
+* `LIMIT` restricts the number of rows in the output and is similar to the **R** commands `head()` and `slice()`.
 
 ## SELECT ... FROM
 
-> **R** function: `select()`
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `select()`
+
+:::
+
+A **SQL** query starts with a `SELECT` command and has a corresponding `FROM` to indicate the table being queried.  Columns may be specified, or the `*` will indicate that every column in the table should be returned.
+
+The shortest **SQL** query is the following `SELECT` command.  Do not run this command!!! The `yellow_old` table has 15 million rows, and we do not want to look at them simultaneously.
+
+```{r}
+#| eval: false
+
+DO NOT RUN:  SELECT * FROM yellow_old;
+```
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+Do not run the following command unless you are **certain** that the table from which you are querying is small enough so that the query results fit easily into your memory.
+
+`SELECT` * `FROM` table;
+:::
+
+Instead, to look at the top of the table, `SELECT` the first few rows.  The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).
 
 ```{sql}
-#| connection: con_traffic
+#| connection: con_taxi
 
-SELECT * FROM ma_statewide_2020_04_01 LIMIT 14;
+SELECT * FROM yellow_old LIMIT 0, 14;
 
 ```
 
+Speaking of which, how many rows are there in the `yellow_old` table?  That is, how many taxi rides are recorded?  Now `SELECT` is used with a summary function, `COUNT()`.  Instead of using a separate summary function (like `mutate()` or `summarize()`), all the work is done inside the `SELECT` call.
+
 ```{sql}
-#| connection: con_traffic
+#| connection: con_taxi
+
+SELECT COUNT(*) FROM yellow_old;
+```
+
+Yikes, more than 15 million taxi rides!!!!
+
+
+You might have noticed that the `yellow_old` table has two different datetime variables (one for pickup, the other for dropoff).  We can use the information to assess the length of each ride (in time, not distance).  However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they **look** like they are stored in a DateTime format!), see @tbl-select-explain.  Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
+
+```{sql}
+#| connection: con_taxi
+
+SELECT
+      pickup_datetime, dropoff_datetime,
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff
+   FROM yellow_old
+   LIMIT 0, 10;
+```
+
+Now that the variables are no longer strings, we can subtract them to figure out the number of minutes for each taxi ride.  Unfortunately, the following code won't run because neither of the variables `pickup` or `dropoff` are in the table `yellow_old`.
+
+```{sql}
+#| connection: con_taxi
+#| eval: false
+
+SELECT
+      pickup_datetime, dropoff_datetime,
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff.
+      TIMEDIFF(pickup, dropoff) AS length_min
+   FROM yellow_old
+   LIMIT 0, 10;
+```
+
+
+Instead, we need two layers of `SELECT` commands so that the first `SELECT` (i.e., inside) layer creates the new variables, and the second `SELECT` (i.e., outside) layer subtracts the two times.
+
+```{sql}
+#| connection: con_taxi
+
+SELECT 
+   pickup,
+   dropoff, 
+   TIMEDIFF(pickup, dropoff) AS length_time 
+FROM (
+   SELECT
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff
+   FROM yellow_old)
+   AS subquery_table
+LIMIT 0, 20;
+
+
+```
+
+Alternatively, the `STR_TO_DATE()` function can be applied inside the `TIMEDIFF()` function so that the full (now only) `SELECT` command is being used only on variables that are in the original table.
+
+```{sql}
+#| connection: con_taxi
+
+SELECT 
+   pickup_datetime,
+   dropoff_datetime, 
+   TIMEDIFF(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T"), 
+            STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T")) AS length_time 
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+
+Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `pickup_datetime` and `dropoff_datetime` are columns in the original table - they are written to disk on the **SQL** server.  The variables `pickup`, `dropoff`, and `length_time` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **RStudio** or **DBeaver**) and is not written to disk.
+
+
+## WHERE
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `filter()`
+
+:::
+
+The `WHERE` clause is analogous to the `filter()` function in **dplyr**.  However, keep in mind that there are two **SQL** commands that resemble the **dplyr** `filter()` function. `WHERE` operates on the original data in the table and `HAVING` operates on the result set. See below for examples using `HAVING`.
+
+What was the fare for those taxi rides where the `tip_amount` was more than $10 and the person used cash? (Note that in **SQL** the equality logical is `=` and in **R** the equality logical is `==`.) 
+
+```{sql}
+#| connection: con_taxi
+#| label: select-10
+#| output.var: "select_10"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount > 10
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+```{r}
+#| label: tbl-select-10
+#| echo: false
+#| tbl-cap: "SELECT payment amounts from yellow_old"
+
+select_10 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+`BETWEEN` can be used to specify a range of values for a numeric value.
+
+```{sql}
+#| connection: con_taxi
+#| label: select-1020a
+#| output.var: "select_1020a"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount BETWEEN 10 and 20
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+`IN` is similar to the **dplyr** `%in%` function which specifies distinct values for the variable.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: select-1020b
+#| output.var: "select_1020b"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount IN (10, 20)
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+The `WHERE` clause can be established by a number of logical commands combined using either `AND` or `OR`.
+
+
+## GROUP BY
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `group_by()`
+
+:::
+
+
+```{sql}
+#| connection: con_taxi
 #| eval: false
 
 
 ```
 
-## WHERE
-
-> **R** function: `filter()`
-
-`WHERE` operates on the original data in the table and `HAVING` operates on the result set.
-
-## GROUP BY
-
-> **R** function: `group_by()`
-
 ## ORDER BY
 
-> **R** function: `arrange()`
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `arrange()`
+:::
+
+
+```{sql}
+#| connection: con_taxi
+#| eval: false
+
+
+```
+
 
 ## HAVING
 
-> **R** function: `filter()`
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `filter()`
+:::
+
+make the example based on the time variable (in the result set!)
 
 `WHERE` operates on the original data in the table and `HAVING` operates on the result set.
 
+
+```{sql}
+#| connection: con_taxi
+#| eval: false
+
+
+```
+
 ## LIMIT
 
-> **R** function: `head()`
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `head()`
+:::
 
 
+```{sql}
+#| connection: con_taxi
+#| eval: false
+
+
+```
  
+
+# Saving **SQL** queries as **R** objects
+
+If you are working in **R** to run **SQL** commands, you may want to use the query output for further analysis or visualizations.  
