@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.3.450">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
 <meta name="author" content="Jo Hardin">
-
-<title>Data Science, the SQL - 4&nbsp; joining tables in SQL</title>
+<title>Data Science, the SQL - 4&nbsp; Combining tables in SQL</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,8 +18,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -31,7 +61,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./05-creating-db.html" rel="next">
+<link href="./p3-build-db.html" rel="next">
 <link href="./03-sql-verbs.html" rel="prev">
 <link href="./images/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -42,8 +72,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -62,8 +91,7 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
-<script type="text/x-mathjax-config">
+}</script><script type="text/x-mathjax-config">
 const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
 for (let popover of popovers){
   const div = document.createElement('div');
@@ -80,39 +108,29 @@ for (let popover of popovers){
   	})
   }
 }
-</script>
-
-<link rel="shortcut icon" href="figs/favicon.ico">
-
-<link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css2?family=Quicksand" type="text/css">
-
-
+</script><link rel="shortcut icon" href="figs/favicon.ico">
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
+<script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script><link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css2?family=Quicksand" type="text/css">
 </head>
-
 <body class="nav-sidebar floating">
 
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./using-sql.html">Untitled</a></li><li class="breadcrumb-item"><a href="./04-sql-joins.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">`join`ing tables in SQL</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./p2-using-sql.html">Using SQL</a></li><li class="breadcrumb-item"><a href="./04-sql-joins.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Combining tables in SQL</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Data Science, the SQL</a> 
         <div class="sidebar-tools-main">
@@ -132,7 +150,7 @@ for (let popover of popovers){
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Welcome to Data Science, the SQL</span></a>
@@ -140,14 +158,14 @@ for (let popover of popovers){
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./intro-to-sql.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Untitled</span></a>
+            <a href="./p1-intro-to-sql.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to databases and SQL</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01-db.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Databases</span></span></a>
@@ -160,84 +178,86 @@ for (let popover of popovers){
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./using-sql.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Untitled</span></a>
+            <a href="./p2-using-sql.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using SQL</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03-sql-verbs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">SQL verbs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">SQL clauses</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04-sql-joins.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title"><code>join</code>ing tables in SQL</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Combining tables in SQL</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
- <span class="menu-text">build-db.qmd</span></a>
+            <a href="./p3-build-db.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building databases</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05-creating-db.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">05-creating-db.qmd</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Creating databases</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06-const-change-db.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Untitled</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Creating databases</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reg-expr.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Untitled</span></a>
+            <a href="./p4-reg-expr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regular expressions</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07-reg-expr.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regular Expressions</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
     </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+</div>
+</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#join" id="toc-join" class="nav-link active" data-scroll-target="#join"><span class="header-section-number">4.1</span> <code>JOIN</code></a></li>
+  <li><a href="#union" id="toc-union" class="nav-link" data-scroll-target="#union"><span class="header-section-number">4.2</span> <code>UNION</code></a></li>
+  <li><a href="#subqueries" id="toc-subqueries" class="nav-link" data-scroll-target="#subqueries"><span class="header-section-number">4.3</span> Subqueries</a></li>
+  </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title"><span id="sec-join" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title"><code>join</code>ing tables in SQL</span></span></h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title"><span id="sec-join" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Combining tables in SQL</span></span></h1>
 </div>
 
 
@@ -250,13 +270,299 @@ for (let popover of popovers){
   </div>
   
 
-</header>
+</header><p>Beyond <code>SELECT</code> queries, the next most fundamental actions in <strong>SQL</strong> have to do with working with two or more tables simultaneously. If you have worked in <strong>R</strong>, you may be familiar with the <code>join_()</code> family of functions. Moving beyond <code>JOIN</code>, we will also cover subqueries which create temporary tables inside a <strong>SQL</strong> statement.</p>
+<p>The database we’ll work with for learning how to combine tables is on Yelp reviews. There are three tables: <code>businesses</code>, <code>reviews</code>, and <code>users</code>, see <a href="#tbl-yelp-tables">Table&nbsp;<span>4.1</span></a>. From the <code>EXPLAIN</code> output <a href="#tbl-bus-vars">Table&nbsp;<span>4.2</span></a>, <a href="#tbl-rev-vars">Table&nbsp;<span>4.3</span></a>, <a href="#tbl-user-vars">Table&nbsp;<span>4.4</span></a>, we can see that the tables match up by ID. The variable <code>id</code> in the <code>businesses</code> table is the same as the variable <code>business_id</code> in the <code>reviews</code> table. <code>user_id</code> is the same variable in both the <code>reviews</code> and <code>users</code> tables. The connections across the tables will be important when performing <code>JOIN</code>s.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_yelp</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dbname <span class="op">=</span> <span class="st">"yelp"</span>,</span>
+<span>  host <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_HOST"</span><span class="op">)</span>,</span>
+<span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_USER"</span><span class="op">)</span>,</span>
+<span>  password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_PWD"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-output.var="yelp_tables" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-yelp-tables" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.1: SHOW all the TABLES in the yelp database.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Tables_in_yelp</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">businesses</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reviews</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">users</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
+</div>
+</div>
+<div class="cell" data-output.var="bus_vars" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> businesses;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-bus-vars" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.2: EXPLAIN the variables in the businesses table.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Field</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Null</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Key</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Default</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Extra</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">id</td>
+<td style="text-align: left;">varchar(22)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;">PRI</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">name</td>
+<td style="text-align: left;">varchar(255)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stars</td>
+<td style="text-align: left;">smallint</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">open</td>
+<td style="text-align: left;">varchar(5)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">review_count</td>
+<td style="text-align: left;">smallint</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">city</td>
+<td style="text-align: left;">varchar(255)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">longitude</td>
+<td style="text-align: left;">decimal(15,12)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">latitude</td>
+<td style="text-align: left;">decimal(15,12)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</div>
+</div>
+<div class="cell" data-output.var="rev_vars" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> reviews;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-rev-vars" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.3: EXPLAIN the variables in the reviews table.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Field</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Null</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Key</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Default</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Extra</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">business_id</td>
+<td style="text-align: left;">varchar(22)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;">MUL</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">user_id</td>
+<td style="text-align: left;">varchar(22)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;">MUL</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stars</td>
+<td style="text-align: left;">smallint</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<div class="cell" data-output.var="user_vars" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> users;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-user-vars" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.4: EXPLAIN the variables in the users table.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Field</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Null</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Key</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Default</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Extra</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">user_id</td>
+<td style="text-align: left;">varchar(22)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;">PRI</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">name</td>
+<td style="text-align: left;">varchar(255)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">average_stars</td>
+<td style="text-align: left;">decimal(3,2)</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">review_count</td>
+<td style="text-align: left;">smallint</td>
+<td style="text-align: left;">NO</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<section id="join" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="join">
+<span class="header-section-number">4.1</span> <code>JOIN</code>
+</h2>
+<p>Recall that <strong>SQL</strong> is a programming language that works on <em>relational databases</em>. One of its major strengths is being able to efficiently store information in separate tables that can be easily connected as needed. The syntax for tying together information from multiple tables is done with a <code>JOIN</code> clause.</p>
+<p>Each <code>JOIN</code> clause needs four specific pieces of information:</p>
+<ol type="1">
+<li>The name of the first table you want to <code>JOIN</code>.</li>
+<li>The type of <code>JOIN</code> being used.</li>
+<li>The name of the second table you want to <code>JOIN</code>.</li>
+<li>The condition(s) under which you want the records in the first table to match records in the second table.</li>
+</ol>
+<p>Some types of <code>JOIN</code>s available in <strong>MySQL</strong> include the following, which are represented as Venn diagrams in <a href="#fig-venn-joins">Figure&nbsp;<span>4.1</span></a>.</p>
+<ul>
+<li>
+<code>JOIN</code>: include all of the rows that exist in both tables (similar to <code>inner_join()</code> in <strong>R</strong>, the intersection of the two tables). <code>INNER JOIN</code> is alternative, and identical, function to <code>JOIN</code>.</li>
+<li>
+<code>LEFT JOIN</code>: include all of the rows in the first table. Connect them, as much as possible, to the rows in the second table. Rows that have no match in the second table will have a value of <code>NULL</code> for the new “second table” variables.</li>
+<li>
+<code>RIGHT JOIN</code>: include all of the rows in the second table. Connect them, as much as possible, to the rows in the first table. Rows that have no match in the first table will have a value of <code>NULL</code> for the new “first table” variables. A <code>RIGHT JOIN</code> with the tables in the opposite order is the same as a <code>LEFT JOIN</code> with the tables in the original order.</li>
+<li>
+<code>FULL OUTER JOIN</code>: include all rows in either table. Rows that have no match in the other table will have a value of <code>NULL</code> for the other table variables.</li>
+<li>
+<code>CROSS JOIN</code>: match each row of the first table with each row in the second table.</li>
+</ul>
+<p><a href="#fig-venn-joins">Figure&nbsp;<span>4.1</span></a> shows Venn diagrams of the different types of joins. <a href="#fig-table-joins">Figure&nbsp;<span>4.2</span></a> shows four of the <code>JOIN</code> functions with mini data tables. Note that in <strong>SQL</strong> the missing values will be labeled as <code>NULL</code> (not <code>NA</code>).</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="fig-venn-joins" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure"><p><img src="images/join-types.png" class="img-fluid figure-img" style="width:70.0%" alt="Venn diagrams describing different types of JOINs."></p>
+<figcaption class="figure-caption">Figure&nbsp;4.1: Venn diagrams describing different JOINs, image credit: phoenixNAP https://phoenixnap.com/kb/mysql-join</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="fig-table-joins" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure"><p><img src="images/table-joins.png" class="img-fluid figure-img" style="width:70.0%" alt="Mini data tables describing different types of JOINs."></p>
+<figcaption class="figure-caption">Figure&nbsp;4.2: Mini data tables describing different JOINs, image credit: Statistics Globe blog, https://statisticsglobe.com/r-dplyr-join-inner-left-right-full-semi-anti</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="union" class="level2" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="union">
+<span class="header-section-number">4.2</span> <code>UNION</code>
+</h2>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="fig-table-union" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure"><p><img src="04-sql-joins_files/figure-html/fig-table-union-1.png" class="img-fluid figure-img" style="width:120.0%" alt="Mini data tables describing how UNION binds rows and JOIN appends columns."></p>
+<figcaption class="figure-caption">Figure&nbsp;4.3: UNION binds rows while JOIN appends columns, image credit: Jane Williams https://blog.devart.com/mysql-union-tutorial-html.html</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="subqueries" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="subqueries">
+<span class="header-section-number">4.3</span> Subqueries</h2>
+<p>A <strong>SQL</strong> <strong>subquery</strong> is a query used as a data source in the <code>FROM</code> clause, instead of the usual table. There was a subquery in <a href="03-sql-verbs.html#sec-select"><span>Section&nbsp;3.2</span></a> when the task required a function of the <em>results set</em> within the <code>SELECT</code> clause.</p>
+<p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_yelp</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -488,30 +794,26 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
       <a href="./03-sql-verbs.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">SQL verbs</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">SQL clauses</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./05-creating-db.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">05-creating-db.qmd</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./p3-build-db.html" class="pagination-link">
+        <span class="nav-page-text">Building databases</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
+<footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">Data Science, the SQL by Jo Hardin.</div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></div>
+    </div>
     <div class="nav-footer-right">Built with 💚 and <a href="https://quarto.org/">Quarto</a>.</div>
   </div>
 </footer>
-
 
 
 </body></html>

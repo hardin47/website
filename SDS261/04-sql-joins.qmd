@@ -1,4 +1,4 @@
-# `join`ing tables in SQL {#sec-join}
+# Combining tables in SQL {#sec-join}
 
 ```{r}
 #| include: false
@@ -8,3 +8,183 @@ library(tidyverse)
 ```
 
 
+Beyond `SELECT` queries, the next most fundamental actions in **SQL** have to do with working with two or more tables simultaneously.  If you have worked in **R**, you may be familiar with the `join_()` family of functions.  Moving beyond `JOIN`, we will also cover subqueries which create temporary tables inside a **SQL** statement.
+
+The database we'll work with for learning how to combine tables is on Yelp reviews.  There are three tables: `businesses`, `reviews`, and `users`, see @tbl-yelp-tables.  From the `EXPLAIN` output [@tbl-bus-vars; @tbl-rev-vars; @tbl-user-vars], we can see that the tables match up by ID.  The variable `id` in the `businesses` table is the same as the variable `business_id` in the `reviews` table.  `user_id` is the same variable in both the `reviews` and `users` tables.  The connections across the tables will be important when performing `JOIN`s.
+
+```{r}
+con_yelp <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "yelp",
+  host = Sys.getenv("SMITH_HOST"),
+  user = Sys.getenv("SMITH_USER"),
+  password = Sys.getenv("SMITH_PWD")
+)
+```
+
+
+```{sql}
+#| connection: con_yelp
+#| label: yelp-tables
+#| output.var: "yelp_tables"
+
+SHOW TABLES;
+```
+
+
+```{r}
+#| label: tbl-yelp-tables
+#| echo: false
+#| tbl-cap: "SHOW all the TABLES in the yelp database."
+
+yelp_tables |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+```{sql}
+#| connection: con_yelp
+#| label: bus-vars
+#| output.var: "bus_vars"
+
+EXPLAIN businesses;
+```
+
+```{r}
+#| label: tbl-bus-vars
+#| echo: false
+#| tbl-cap: "EXPLAIN the variables in the businesses table."
+
+bus_vars |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+```{sql}
+#| connection: con_yelp
+#| label: rev-vars
+#| output.var: "rev_vars"
+
+EXPLAIN reviews;
+```
+
+```{r}
+#| label: tbl-rev-vars
+#| echo: false
+#| tbl-cap: "EXPLAIN the variables in the reviews table."
+
+rev_vars |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+```{sql}
+#| connection: con_yelp
+#| label: user-vars
+#| output.var: "user_vars"
+
+EXPLAIN users;
+```
+
+```{r}
+#| label: tbl-user-vars
+#| echo: false
+#| tbl-cap: "EXPLAIN the variables in the users table."
+
+user_vars |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+## `JOIN`
+
+Recall that **SQL** is a programming language that works on *relational databases*. One of its major strengths is being able to efficiently store information in separate tables that can be easily connected as needed.  The syntax for tying together information from multiple tables is done with a `JOIN` clause.  
+
+Each `JOIN` clause needs four specific pieces of information:
+
+1. The name of the first table you want to `JOIN`.
+2. The type of `JOIN` being used.
+3. The name of the second table you want to `JOIN`.
+4. The condition(s) under which you want the records in the first table to match records in the second table.
+
+Some types of `JOIN`s available in **MySQL** include the following, which are represented as Venn diagrams in @fig-venn-joins.
+
+* `JOIN`: include all of the rows that exist in both tables (similar to `inner_join()` in **R**, the intersection of the two tables).  `INNER JOIN` is alternative, and identical, function to `JOIN`.
+* `LEFT JOIN`: include all of the rows in the first table.  Connect them, as much as possible, to the rows in the second table.  Rows that have no match in the second table will have a value of `NULL` for the new "second table" variables.
+* `RIGHT JOIN`: include all of the rows in the second table.  Connect them, as much as possible, to the rows in the first table.  Rows that have no match in the first table will have a value of `NULL` for the new "first table" variables.  A `RIGHT JOIN` with the tables in the opposite order is the same as a `LEFT JOIN` with the tables in the original order.
+* `FULL OUTER JOIN`: include all rows in either table.  Rows that have no match in the other table will have a value of `NULL` for the other table variables.
+* `CROSS JOIN`: match each row of the first table with each row in the second table. 
+
+
+@fig-venn-joins shows Venn diagrams of the different types of joins.  @fig-table-joins shows four of the `JOIN` functions with mini data tables.  Note that in **SQL** the missing values will be labeled as `NULL` (not `NA`).
+
+```{r}
+#| label: fig-venn-joins
+#| out.width: 70%
+#| fig-cap: "Venn diagrams describing different JOINs, image credit: phoenixNAP https://phoenixnap.com/kb/mysql-join"
+#| fig-alt: Venn diagrams describing different types of JOINs.
+#| echo: false
+include_graphics("images/join-types.png")
+```
+
+```{r}
+#| label: fig-table-joins
+#| out.width: 70%
+#| fig-cap: "Mini data tables describing different JOINs, image credit: Statistics Globe blog, https://statisticsglobe.com/r-dplyr-join-inner-left-right-full-semi-anti"
+#| fig-alt: Mini data tables describing different types of JOINs.
+#| echo: false
+include_graphics("images/table-joins.png")
+```
+
+
+## `UNION`
+
+
+```{r}
+#| label: fig-table-union
+#| out.width: 120%
+#| fig-cap: "UNION binds rows while JOIN appends columns, image credit: Jane Williams https://blog.devart.com/mysql-union-tutorial-html.html"
+#| fig-alt: Mini data tables describing how UNION binds rows and JOIN appends columns.
+#| echo: false
+
+library(cowplot)
+library(ggpubr)
+
+fig1_path <- "images/join-union.png"
+fig2_path <- "images/union-all.png"
+
+fig1 <- ggdraw() + draw_image(fig1_path)
+fig2 <- ggdraw() + draw_image(fig2_path)
+
+ggarrange(fig1, fig2, ncol = 1)
+```
+
+
+## Subqueries
+
+A **SQL** **subquery** is a query used as a data source in the `FROM` clause, instead of the usual table.  There was a subquery in @sec-select when the task required a function of the *results set* within the `SELECT` clause.
+
+
+
+
+It is always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_yelp)
+```
