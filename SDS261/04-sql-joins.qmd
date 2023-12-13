@@ -75,6 +75,42 @@ select_kind |>
 
 A **SQL** **subquery** is a query used as a data source in the `FROM` clause, instead of the usual table.  There was a subquery in @tbl-length-time2 when the task required a function of the *results set* within the `SELECT` clause.
 
+We could do something similar if we wanted to transform the variables in the select column.  The example is a little bit forced, and there are other ways to obtain the same results.  But hopefully the idea of a subquery is becoming more clear.  Again, a subquery is just a query that becomes the data source for `FROM`.
+
+@sec-reg-expr will cover regular expressions in some detail.  Here we use the function `REGEXP_REPLACE` to remove any characters which are not letters, comma, or space.  The function `LOWER` converts any upper case letters to lower case.
+
+
+```{sql}
+#| connection: con_imdb
+#| label: act-names
+#| output.var: "act_names"
+
+SELECT name,
+       name_clean,
+       SUBSTRING_INDEX(name_clean, ',', 1) AS last_name,
+       SUBSTRING_INDEX(name_clean, ',', -1) AS first_name
+FROM (
+SELECT LOWER(REGEXP_REPLACE(name, '[^a-z,. ]', '')) AS name_clean,
+       name,
+       id, person_id
+FROM aka_name) AS temp_subquery
+LIMIT 0, 30;
+```
+
+
+
+```{r}
+#| label: tbl-act-names
+#| echo: false
+#| tbl-cap: "A subquery is used so that the variable in the subquery can be used and transformed in the SELECT clause."
+
+act_names |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
 
 
 
@@ -118,12 +154,68 @@ include_graphics("images/join-types.png")
 include_graphics("images/table-joins.png")
 ```
 
+### A toy example
+
+We will head to **R** for just a minute so as to understand joins using a small toy dataset on rock bands from the 60s, The Beatles and The Rolling Stones.  The function `sqldf()` in the **sqldf** **R** package allows for **SQL** commands on **R** objects.
+
+Consider the following datasets which are available in the **dplyr** package.
+
+```{r}
+band_members
+band_instruments
+```
+#### Inner join {-}
+
+An inner join combines two datasets returning only the observations that exist in both of the original datasets.
+
+```{r}
+sqldf::sqldf("SELECT star.name,
+                     star.band,
+                     inst.plays
+              FROM band_members AS star
+              JOIN band_instruments AS inst ON star.name = inst.name")
+```
 
 
+#### Full join {-}
+
+A full join combines two datasets returning every observation that exists in either one of the original datasets.  Note that in the results, Mick's instrument is missing, and Keith's band is missing.
+
+The `full_join()` function does not have an equivalent in **MySQL**.  See @sec-full-union for using `JOIN`s and `UNION`s to produce a full join.
+
+```{r}
+band_members |>
+  full_join(band_instruments)
+```
+
+#### Left join {-}
+
+A left join combines two datasets returning every observation that exists in the left (or first) original datasets.  Note that in the results, Mick's instrument is missing.
+
+```{r}
+sqldf::sqldf("SELECT star.name,
+                     star.band,
+                      inst.plays
+              FROM band_members AS star
+              LEFT JOIN band_instruments AS inst 
+              ON star.name = inst.name")
+```
+
+
+#### Right join {-}
+
+A right join combines two datasets returning every observation that exists in the right (or second) original datasets. Note that in the results, Keith's band is missing.
+
+```{r}
+sqldf::sqldf("SELECT inst.name,
+                     star.band,
+                      inst.plays
+              FROM band_members AS star
+              RIGHT JOIN band_instruments AS inst 
+              ON star.name = inst.name")
+```
 
 ### `JOIN`
-
---> to make the JOINs different, make the the tables something... either smaller or random sample or something.  Maybe just one year?  Do ther WHERE command before the JOIN command.
 
 In the `imdb` database, the `title` table includes information about the 4,626,322  titles in the database, including the `id`, `title`, `kind_id` (indicator for the kind of ID it is), and `production_year`.  It does not, however, include the review of the title.  See @tbl-title-glance.
 
@@ -149,7 +241,7 @@ title_glance |>
 ```
 
 
-The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the rating (given by `info` where `type_id = 100`).
+The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the rating (given by `info` where `type_id = 100`).  See @tbl-idx-glance.
 
 ```{sql}
 #| connection: con_imdb
@@ -178,7 +270,7 @@ Let's say we want to combine the titles with the ratings so that each title with
 Remember that `WHERE` will work on the raw variables, and `HAVING` works on the results set.  
 
 Some aspects of the query are worth pointing out:
-* The variables in the output are given in the `SELECT` clause.  The `id` and `title` (both from the `title` table) and the `info` fromt he `movie_info_idx` which represents the number of IMDb votes.
+* The variables in the output are given in the `SELECT` clause.  The `id` and `title` (both from the `title` table) and the `info` from the `movie_info_idx` which represents the number of IMDb votes.
 * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion.
 * The `JOIN` happens by linking the `id` variable in the `title` table with the `movie_id` variable in the `movie_info_idx` table.
 * The `LIMIT` wasn't necessary (there are only 12 observations), but it's good practice so that we don't end up with unwieldy query results.
@@ -315,8 +407,6 @@ movie_join_actress |>
 
 
 ### Other `JOIN`s
-
-first, do an example with the band members https://rpubs.com/will-kent/stds-vignette
 
 
 Consider the following two tables.  The first has seven movies in it (from 2015 with at least 400,000 IMDb votes).  The second consists of almost 3 million actresses (`person_role_id = 2`).  In order to find a subset of actresses, the `person_id > 3900000` was set arbitrarily (in order to have a smaller group with which to work).
@@ -619,8 +709,9 @@ num_actress |>
 ```
 
 
-## `UNION`
+## `UNION`ing
 
+In **SQL** a `UNION` clause combines two different tables by their rows (whereas `JOIN` combines two tables by columns). Think about `UNION` similarly to the `bind_rows()` command in **R**.
 
 ```{r}
 #| label: fig-table-union
@@ -641,20 +732,232 @@ fig2 <- ggdraw() + draw_image(fig2_path)
 ggarrange(fig1, fig2, ncol = 1)
 ```
 
-## `UNION ALL`
+### `UNION`s
 
-### `FULL OUTER JOIN`
+`UNION` does not check the names of the columns to make sure they match.  `UNION` requires that the number of columns be the same and that the variable type be the same for all columns in the two tables being combined.
 
-**MySQL** doesn't have a `FULL OUTER JOIN` (although other implementations of **SQL** do have full join functionality).  However, we can mimick a full join using right and left joins with `UNION`.
+@tbl-foo-bar contains a silly example.  The first table has 1 as `bar` and the second table has 20 as `bar`.  But when the tables are `UNION`ed, the `bar` column contains `c(1, 10)`. **SQL** took the column names from the first table and appended the second table without considering the variable names.
+
+```{sql}
+#| connection: con_imdb
+#| label: foo-bar
+#| output.var: "foo_bar"
+
+SELECT 
+    1 AS bar,
+    2 AS foo
+
+UNION
+
+SELECT 
+    10 AS foo,
+    20 AS bar;
+```
+
+```{r}
+#| label: tbl-foo-bar
+#| echo: false
+#| tbl-cap: "The variable names are chosen from the first table.  The names and order of the variables in the second table are ignored when using `UNION`."
+
+foo_bar |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+`UNION` is specifically designed to bind rows from two different `SELECT` queries where the variables have been selected in the same order.  If the two `SELECT` clauses are done from the same table with the same order of variables, you do not need to worry about the order of the variables matching up in the `UNION`.  If you are `UNION`ing two very different subqueries, you *do* need to worry about the variables and their order.
+
+#### `UNION` {-}
+
+Let's say we want to combine the top voted movies from 2015 with the top voted movies from 2019.  However, to account for time, we require the movies from 2015 to have more votes (400,000) than the movies from 2017 (200,000).  That is, the `WHERE` clause is different for the two subqueries.
 
 
 
+```{sql}
+#| connection: con_imdb
+#| label: union-years
+#| output.var: "union_years"
+
+(SELECT t.title, 
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 400000)
+
+UNION
+
+(SELECT t.title, 
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2017  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 200000)
+LIMIT 0, 100;
+   
+
+```
+
+```{r}
+#| label: tbl-union-years
+#| echo: false
+#| tbl-cap: "The variable names are chosen from the first table.  The names and order of the variables in the second table are ignored when using `UNION`."
+
+union_years |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
 
 
 
+#### `UNION ALL` {-}
+
+`UNION` does check, however, to see if any of the rows in the two tables are identical.  If the goal is to include duplicates across two tables, use `UNION ALL` instead of `UNION`.
+
+Let's say that the first table is all movies with production year after 2012 and number of votes greater than 500,000.  The second table is movies with production year equal to 2015 and number of votes greater than 400,000.  Even though the Martian would have been in both tables, the results table lists The Marian only once in @tbl-union-years-votes.
 
 
+```{sql}
+#| connection: con_imdb
+#| label: union-years-votes
+#| output.var: "union_years_votes"
 
+(SELECT t.title,
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year > 2012  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 500000)
+
+UNION
+
+(SELECT t.title, 
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 400000)
+ORDER BY production_year, num_votes;
+
+```
+
+```{r}
+#| label: tbl-union-years-votes
+#| echo: false
+#| tbl-cap: "Using `UNION` to combine movies from table 1: later than 2012 and at least 500,000 votes with movies from table 2: 2015 and at least 400,000 votes."
+
+union_years_votes |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+When `UNION ALL` is applied int he same context, The Martian is listed twice in the results table given in @tbl-union-all-years-votes.
+
+```{sql}
+#| connection: con_imdb
+#| label: union-all-years-votes
+#| output.var: "union_all_years_votes"
+
+(SELECT t.title,
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year > 2012  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 500000)
+
+UNION ALL
+
+(SELECT t.title, 
+        t.production_year, 
+        idx.info AS num_votes
+    FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               
+    AND idx.info_type_id = 100      
+    AND idx.info > 400000)
+ORDER BY production_year, num_votes;
+
+```
+
+```{r}
+#| label: tbl-union-all-years-votes
+#| echo: false
+#| tbl-cap: "Using `UNION ALL` to combine movies from table 1: later than 2012 and at least 500,000 votes with movies from table 2: 2015 and at least 400,000 votes."
+
+union_all_years_votes |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+#### `FULL OUTER JOIN` via `UNION` {#sec-full-union}
+
+**MySQL** doesn't have a `FULL OUTER JOIN` (although other implementations of **SQL** do have full join functionality).  However, we can mimic a full join using right and left joins with `UNION`.
+
+Recall the ideas of `RIGHT JOIN` (which keeps all observations in the right table) and `LEFT JOIN` (which keeps all observations in the left table). By `UNION`ing the right and left joins, all of the observations are obtained (i.e., a full join).  Using the function `sqldf()` in the **sqldf** **R** package, the full join will be demonstrated using the 1960s rock bands. 
+
+Notice that in the `RIGHT JOIN` the `name` column must come from the *right* table (not the *left* table).
+
+Also notice that `UNION ALL` keeps the duplicate rows which is probably not what we want.
+
+
+```{r}
+
+sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+      FROM band_members AS star
+      LEFT JOIN band_instruments AS inst ON star.name = inst.name")
+sqldf::sqldf("SELECT inst.name, star.band, inst.plays 
+      FROM band_members AS star
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name")
+
+sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+      FROM band_members AS star
+      LEFT JOIN band_instruments AS inst ON star.name = inst.name
+UNION
+      SELECT inst.name, star.band, inst.plays 
+      FROM band_members AS star
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name ")
+
+sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+      FROM band_members AS star
+      LEFT JOIN band_instruments AS inst ON star.name = inst.name
+UNION ALL
+      SELECT inst.name, star.band, inst.plays 
+      FROM band_members AS star
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name ")
+
+```
+
+
+## Best practice
 
 It is always a good idea to terminate the **SQL** connection when you are done with it.
 

@@ -258,17 +258,18 @@ for (let popover of popovers){
   <li>
 <a href="#all-the-joins" id="toc-all-the-joins" class="nav-link" data-scroll-target="#all-the-joins"><span class="header-section-number">4.2</span> All the <code>JOIN</code>s</a>
   <ul class="collapse">
-<li><a href="#join" id="toc-join" class="nav-link" data-scroll-target="#join"><span class="header-section-number">4.2.1</span> <code>JOIN</code></a></li>
-  <li><a href="#other-joins" id="toc-other-joins" class="nav-link" data-scroll-target="#other-joins"><span class="header-section-number">4.2.2</span> Other <code>JOIN</code>s</a></li>
+<li><a href="#a-toy-example" id="toc-a-toy-example" class="nav-link" data-scroll-target="#a-toy-example"><span class="header-section-number">4.2.1</span> A toy example</a></li>
+  <li><a href="#join" id="toc-join" class="nav-link" data-scroll-target="#join"><span class="header-section-number">4.2.2</span> <code>JOIN</code></a></li>
+  <li><a href="#other-joins" id="toc-other-joins" class="nav-link" data-scroll-target="#other-joins"><span class="header-section-number">4.2.3</span> Other <code>JOIN</code>s</a></li>
   </ul>
 </li>
-  <li><a href="#union" id="toc-union" class="nav-link" data-scroll-target="#union"><span class="header-section-number">4.3</span> <code>UNION</code></a></li>
   <li>
-<a href="#union-all" id="toc-union-all" class="nav-link" data-scroll-target="#union-all"><span class="header-section-number">4.4</span> <code>UNION ALL</code></a>
+<a href="#unioning" id="toc-unioning" class="nav-link" data-scroll-target="#unioning"><span class="header-section-number">4.3</span> <code>UNION</code>ing</a>
   <ul class="collapse">
-<li><a href="#full-outer-join" id="toc-full-outer-join" class="nav-link" data-scroll-target="#full-outer-join"><span class="header-section-number">4.4.1</span> <code>FULL OUTER JOIN</code></a></li>
+<li><a href="#unions" id="toc-unions" class="nav-link" data-scroll-target="#unions"><span class="header-section-number">4.3.1</span> <code>UNION</code>s</a></li>
   </ul>
 </li>
+  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">4.4</span> Best practice</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -433,6 +434,219 @@ for (let popover of popovers){
 <section id="subqueries" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="subqueries">
 <span class="header-section-number">4.1</span> Subqueries</h2>
 <p>A <strong>SQL</strong> <strong>subquery</strong> is a query used as a data source in the <code>FROM</code> clause, instead of the usual table. There was a subquery in <a href="03-sql-verbs.html#tbl-length-time2">Table&nbsp;<span>3.6</span></a> when the task required a function of the <em>results set</em> within the <code>SELECT</code> clause.</p>
+<p>We could do something similar if we wanted to transform the variables in the select column. The example is a little bit forced, and there are other ways to obtain the same results. But hopefully the idea of a subquery is becoming more clear. Again, a subquery is just a query that becomes the data source for <code>FROM</code>.</p>
+<p><a href="07-reg-expr.html"><span>Chapter&nbsp;4</span></a> will cover regular expressions in some detail. Here we use the function <code>REGEXP_REPLACE</code> to remove any characters which are not letters, comma, or space. The function <code>LOWER</code> converts any upper case letters to lower case.</p>
+<div class="cell" data-output.var="act_names" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       name_clean,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       SUBSTRING_INDEX(name_clean, <span class="st">','</span>, <span class="dv">1</span>) <span class="kw">AS</span> last_name,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>       SUBSTRING_INDEX(name_clean, <span class="st">','</span>, <span class="op">-</span><span class="dv">1</span>) <span class="kw">AS</span> first_name</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">LOWER</span>(<span class="fu">REGEXP_REPLACE</span>(name, <span class="st">'[^a-z,. ]'</span>, <span class="st">''</span>)) <span class="kw">AS</span> name_clean,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>       name,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>       <span class="kw">id</span>, person_id</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> aka_name) <span class="kw">AS</span> temp_subquery</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">30</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-act-names" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.3: A subquery is used so that the variable in the subquery can be used and transformed in the SELECT clause.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">name_clean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">last_name</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">first_name</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Smith, Jessica Noel</td>
+<td style="text-align: left;">smith, jessica noel</td>
+<td style="text-align: left;">smith</td>
+<td style="text-align: left;">jessica noel</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pain, L. $ham</td>
+<td style="text-align: left;">pain, l. ham</td>
+<td style="text-align: left;">pain</td>
+<td style="text-align: left;">l. ham</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Boy, $hutter</td>
+<td style="text-align: left;">boy, hutter</td>
+<td style="text-align: left;">boy</td>
+<td style="text-align: left;">hutter</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dollasign, Ty</td>
+<td style="text-align: left;">dollasign, ty</td>
+<td style="text-align: left;">dollasign</td>
+<td style="text-align: left;">ty</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sign, Ty Dolla</td>
+<td style="text-align: left;">sign, ty dolla</td>
+<td style="text-align: left;">sign</td>
+<td style="text-align: left;">ty dolla</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Moore, Brandon</td>
+<td style="text-align: left;">moore, brandon</td>
+<td style="text-align: left;">moore</td>
+<td style="text-align: left;">brandon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">$torm, Country</td>
+<td style="text-align: left;">torm, country</td>
+<td style="text-align: left;">torm</td>
+<td style="text-align: left;">country</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">'Hooper', Simon P.J. Kelly</td>
+<td style="text-align: left;">hooper, simon p.j. kelly</td>
+<td style="text-align: left;">hooper</td>
+<td style="text-align: left;">simon p.j. kelly</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hooper</td>
+<td style="text-align: left;">hooper</td>
+<td style="text-align: left;">hooper</td>
+<td style="text-align: left;">hooper</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kelly, Simon P.J.</td>
+<td style="text-align: left;">kelly, simon p.j.</td>
+<td style="text-align: left;">kelly</td>
+<td style="text-align: left;">simon p.j.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Abdul-Hamid, Jaffar</td>
+<td style="text-align: left;">abdulhamid, jaffar</td>
+<td style="text-align: left;">abdulhamid</td>
+<td style="text-align: left;">jaffar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Al-Hamid, Jaffar Abd</td>
+<td style="text-align: left;">alhamid, jaffar abd</td>
+<td style="text-align: left;">alhamid</td>
+<td style="text-align: left;">jaffar abd</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Svensson, Acke</td>
+<td style="text-align: left;">svensson, acke</td>
+<td style="text-align: left;">svensson</td>
+<td style="text-align: left;">acke</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Viera, Michael 'Power'</td>
+<td style="text-align: left;">viera, michael power</td>
+<td style="text-align: left;">viera</td>
+<td style="text-align: left;">michael power</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Buguelo</td>
+<td style="text-align: left;">buguelo</td>
+<td style="text-align: left;">buguelo</td>
+<td style="text-align: left;">buguelo</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">'El Burro' Rankin', Jorge Van</td>
+<td style="text-align: left;">el burro rankin, jorge van</td>
+<td style="text-align: left;">el burro rankin</td>
+<td style="text-align: left;">jorge van</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Burro, El</td>
+<td style="text-align: left;">burro, el</td>
+<td style="text-align: left;">burro</td>
+<td style="text-align: left;">el</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Van Rankin, Jorge 'Burro'</td>
+<td style="text-align: left;">van rankin, jorge burro</td>
+<td style="text-align: left;">van rankin</td>
+<td style="text-align: left;">jorge burro</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Van Rankin, Jorge</td>
+<td style="text-align: left;">van rankin, jorge</td>
+<td style="text-align: left;">van rankin</td>
+<td style="text-align: left;">jorge</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">van Rankin, Jorge 'El Burro'</td>
+<td style="text-align: left;">van rankin, jorge el burro</td>
+<td style="text-align: left;">van rankin</td>
+<td style="text-align: left;">jorge el burro</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Seigal, Jason</td>
+<td style="text-align: left;">seigal, jason</td>
+<td style="text-align: left;">seigal</td>
+<td style="text-align: left;">jason</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kaufman, Murray</td>
+<td style="text-align: left;">kaufman, murray</td>
+<td style="text-align: left;">kaufman</td>
+<td style="text-align: left;">murray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">'Knoccout'Madison, Kareim</td>
+<td style="text-align: left;">knoccoutmadison, kareim</td>
+<td style="text-align: left;">knoccoutmadison</td>
+<td style="text-align: left;">kareim</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Starks, Johnny</td>
+<td style="text-align: left;">starks, johnny</td>
+<td style="text-align: left;">starks</td>
+<td style="text-align: left;">johnny</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kraemer, 'Logan' Howard</td>
+<td style="text-align: left;">kraemer, logan howard</td>
+<td style="text-align: left;">kraemer</td>
+<td style="text-align: left;">logan howard</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gee, Emm</td>
+<td style="text-align: left;">gee, emm</td>
+<td style="text-align: left;">gee</td>
+<td style="text-align: left;">emm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cusick, Maura</td>
+<td style="text-align: left;">cusick, maura</td>
+<td style="text-align: left;">cusick</td>
+<td style="text-align: left;">maura</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Maura, Maude Cusick</td>
+<td style="text-align: left;">maura, maude cusick</td>
+<td style="text-align: left;">maura</td>
+<td style="text-align: left;">maude cusick</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wheeler, Mackenzie</td>
+<td style="text-align: left;">wheeler, mackenzie</td>
+<td style="text-align: left;">wheeler</td>
+<td style="text-align: left;">mackenzie</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Monkey</td>
+<td style="text-align: left;">monkey</td>
+<td style="text-align: left;">monkey</td>
+<td style="text-align: left;">monkey</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
 </section><section id="all-the-joins" class="level2" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="all-the-joins">
 <span class="header-section-number">4.2</span> All the <code>JOIN</code>s</h2>
 <p>Recall that <strong>SQL</strong> is a programming language that works on <em>relational databases</em>. One of its major strengths is being able to efficiently store information in separate tables that can be easily connected as needed. The syntax for tying together information from multiple tables is done with a <code>JOIN</code> clause.</p>
@@ -473,19 +687,104 @@ for (let popover of popovers){
 </div>
 </div>
 </div>
-<section id="join" class="level3" data-number="4.2.1"><h3 data-number="4.2.1" class="anchored" data-anchor-id="join">
-<span class="header-section-number">4.2.1</span> <code>JOIN</code>
+<section id="a-toy-example" class="level3" data-number="4.2.1"><h3 data-number="4.2.1" class="anchored" data-anchor-id="a-toy-example">
+<span class="header-section-number">4.2.1</span> A toy example</h3>
+<p>We will head to <strong>R</strong> for just a minute so as to understand joins using a small toy dataset on rock bands from the 60s, The Beatles and The Rolling Stones. The function <code>sqldf()</code> in the <strong>sqldf</strong> <strong>R</strong> package allows for <strong>SQL</strong> commands on <strong>R</strong> objects.</p>
+<p>Consider the following datasets which are available in the <strong>dplyr</strong> package.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">band_members</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  name  band   
+  &lt;chr&gt; &lt;chr&gt;  
+1 Mick  Stones 
+2 John  Beatles
+3 Paul  Beatles</code></pre>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">band_instruments</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  name  plays 
+  &lt;chr&gt; &lt;chr&gt; 
+1 John  guitar
+2 Paul  bass  
+3 Keith guitar</code></pre>
+</div>
+</div>
+<section id="inner-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="inner-join">Inner join</h4>
+<p>An inner join combines two datasets returning only the observations that exist in both of the original datasets.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT star.name,</span></span>
+<span><span class="st">                     star.band,</span></span>
+<span><span class="st">                     inst.plays</span></span>
+<span><span class="st">              FROM band_members AS star</span></span>
+<span><span class="st">              JOIN band_instruments AS inst ON star.name = inst.name"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  name    band  plays
+1 John Beatles guitar
+2 Paul Beatles   bass</code></pre>
+</div>
+</div>
+</section><section id="full-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="full-join">Full join</h4>
+<p>A full join combines two datasets returning every observation that exists in either one of the original datasets. Note that in the results, Mick’s instrument is missing, and Keith’s band is missing.</p>
+<p>The <code>full_join()</code> function does not have an equivalent in <strong>MySQL</strong>. See <a href="#sec-full-union"><span>Section&nbsp;4.3.1.1</span></a> for using <code>JOIN</code>s and <code>UNION</code>s to produce a full join.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">band_members</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">full_join</span><span class="op">(</span><span class="va">band_instruments</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  name  band    plays 
+  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+1 Mick  Stones  &lt;NA&gt;  
+2 John  Beatles guitar
+3 Paul  Beatles bass  
+4 Keith &lt;NA&gt;    guitar</code></pre>
+</div>
+</div>
+</section><section id="left-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="left-join">Left join</h4>
+<p>A left join combines two datasets returning every observation that exists in the left (or first) original datasets. Note that in the results, Mick’s instrument is missing.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT star.name,</span></span>
+<span><span class="st">                     star.band,</span></span>
+<span><span class="st">                      inst.plays</span></span>
+<span><span class="st">              FROM band_members AS star</span></span>
+<span><span class="st">              LEFT JOIN band_instruments AS inst </span></span>
+<span><span class="st">              ON star.name = inst.name"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  name    band  plays
+1 Mick  Stones   &lt;NA&gt;
+2 John Beatles guitar
+3 Paul Beatles   bass</code></pre>
+</div>
+</div>
+</section><section id="right-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="right-join">Right join</h4>
+<p>A right join combines two datasets returning every observation that exists in the right (or second) original datasets. Note that in the results, Keith’s band is missing.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT inst.name,</span></span>
+<span><span class="st">                     star.band,</span></span>
+<span><span class="st">                      inst.plays</span></span>
+<span><span class="st">              FROM band_members AS star</span></span>
+<span><span class="st">              RIGHT JOIN band_instruments AS inst </span></span>
+<span><span class="st">              ON star.name = inst.name"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   name    band  plays
+1  John Beatles guitar
+2  Paul Beatles   bass
+3 Keith    &lt;NA&gt; guitar</code></pre>
+</div>
+</div>
+</section></section><section id="join" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="join">
+<span class="header-section-number">4.2.2</span> <code>JOIN</code>
 </h3>
-<p>–&gt; to make the JOINs different, make the the tables something… either smaller or random sample or something. Maybe just one year? Do ther WHERE command before the JOIN command.</p>
-<p>In the <code>imdb</code> database, the <code>title</code> table includes information about the 4,626,322 titles in the database, including the <code>id</code>, <code>title</code>, <code>kind_id</code> (indicator for the kind of ID it is), and <code>production_year</code>. It does not, however, include the review of the title. See <a href="#tbl-title-glance">Table&nbsp;<span>4.3</span></a>.</p>
+<p>In the <code>imdb</code> database, the <code>title</code> table includes information about the 4,626,322 titles in the database, including the <code>id</code>, <code>title</code>, <code>kind_id</code> (indicator for the kind of ID it is), and <code>production_year</code>. It does not, however, include the review of the title. See <a href="#tbl-title-glance">Table&nbsp;<span>4.4</span></a>.</p>
 <div class="cell" data-output.var="title_glance" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> title <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> title <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-title-glance" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.3: SELECT to glance at the title table in the imdb database.</caption>
+<caption>Table&nbsp;4.4: SELECT to glance at the title table in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
@@ -648,15 +947,15 @@ for (let popover of popovers){
 
 </div>
 </div>
-<p>The <code>movie_info_idx</code> table does not contain much information about each particular film. It does, however, have an indicator for the movie ID (given by <code>movie_id</code>) as well as the rating (given by <code>info</code> where <code>type_id = 100</code>).</p>
+<p>The <code>movie_info_idx</code> table does not contain much information about each particular film. It does, however, have an indicator for the movie ID (given by <code>movie_id</code>) as well as the rating (given by <code>info</code> where <code>type_id = 100</code>). See <a href="#tbl-idx-glance">Table&nbsp;<span>4.5</span></a>.</p>
 <div class="cell" data-output.var="idx_glance" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> movie_info_idx <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> movie_info_idx <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-idx-glance" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.4: SELECT to glance at the movie_info_idx table in the imdb database.</caption>
+<caption>Table&nbsp;4.5: SELECT to glance at the movie_info_idx table in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">movie_id</th>
@@ -716,25 +1015,25 @@ for (let popover of popovers){
 </div>
 <p>Let’s say we want to combine the titles with the ratings so that each title with user rating is included. That is, only keep the titles that have a corresponding rating. And also, only keep the rating if there is an associated title (which means we use <code>INNER JOIN</code> or just plain <code>JOIN</code>).</p>
 <p>Remember that <code>WHERE</code> will work on the raw variables, and <code>HAVING</code> works on the results set.</p>
-<p>Some aspects of the query are worth pointing out: * The variables in the output are given in the <code>SELECT</code> clause. The <code>id</code> and <code>title</code> (both from the <code>title</code> table) and the <code>info</code> fromt he <code>movie_info_idx</code> which represents the number of IMDb votes. * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion. * The <code>JOIN</code> happens by linking the <code>id</code> variable in the <code>title</code> table with the <code>movie_id</code> variable in the <code>movie_info_idx</code> table. * The <code>LIMIT</code> wasn’t necessary (there are only 12 observations), but it’s good practice so that we don’t end up with unwieldy query results. * The <code>WHERE</code> clause happens before the <code>JOIN</code> action, despite being written after. * In the <code>WHERE</code> clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.</p>
+<p>Some aspects of the query are worth pointing out: * The variables in the output are given in the <code>SELECT</code> clause. The <code>id</code> and <code>title</code> (both from the <code>title</code> table) and the <code>info</code> from the <code>movie_info_idx</code> which represents the number of IMDb votes. * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion. * The <code>JOIN</code> happens by linking the <code>id</code> variable in the <code>title</code> table with the <code>movie_id</code> variable in the <code>movie_info_idx</code> table. * The <code>LIMIT</code> wasn’t necessary (there are only 12 observations), but it’s good practice so that we don’t end up with unwieldy query results. * The <code>WHERE</code> clause happens before the <code>JOIN</code> action, despite being written after. * In the <code>WHERE</code> clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.</p>
 <div class="cell" data-output.var="movie_join" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> title.<span class="kw">id</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>       title.title,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>       movie_info_idx.info</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">ON</span> title.<span class="kw">id</span> <span class="op">=</span> movie_info_idx.movie_id </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> title.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> title.kind_id <span class="op">=</span> <span class="dv">1</span>                  # movies <span class="kw">only</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> movie_info_idx.info <span class="kw">DESC</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> title.<span class="kw">id</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>       title.title,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>       movie_info_idx.info</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">ON</span> title.<span class="kw">id</span> <span class="op">=</span> movie_info_idx.movie_id </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> title.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> title.kind_id <span class="op">=</span> <span class="dv">1</span>                  # movies <span class="kw">only</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> movie_info_idx.info <span class="kw">DESC</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-movie-join" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.5: Movies from 2015 that have at least 150,000 votes in the imdb database.</caption>
+<caption>Table&nbsp;4.6: Movies from 2015 that have at least 150,000 votes in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
@@ -850,13 +1149,13 @@ for (let popover of popovers){
 </div>
 <p>Let’s say we also want to obtain information about the actors and actresses in each of the movies. In the <code>cast_info</code> table, there is a <code>person_id</code>, a <code>movie_id</code>, and <code>person_role_id</code> is <code>1</code> if actor and <code>2</code> if actress.</p>
 <div class="cell" data-output.var="cast_glance" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> cast_info <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> cast_info <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-cast-glance" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.6: SELECT to glance at the cast_info table in the imdb database.</caption>
+<caption>Table&nbsp;4.7: SELECT to glance at the cast_info table in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">person_id</th>
@@ -966,13 +1265,13 @@ for (let popover of popovers){
 </div>
 <p>We also want the name of the actress which is in the table <code>aka_name</code>. Note that there is no <em>movie</em> information in the <code>aka_name</code> table!</p>
 <div class="cell" data-output.var="name_glance" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> aka_name <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> aka_name <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-name-glance" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.7: SELECT to glance at the aka_name table in the imdb database.</caption>
+<caption>Table&nbsp;4.8: SELECT to glance at the aka_name table in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">person_id</th>
@@ -1094,27 +1393,27 @@ for (let popover of popovers){
 <p>Connecting the most popular movies of 2015 with the actresses in those movies requires a series of <code>JOIN</code>s. Note that to make the code less onerous, the <code>title</code> table has been aliased by <code>t</code>, the <code>movie_info_idx</code> table has been aliased by <code>idx</code>, the <code>cast_info</code> table has been aliased by <code>a</code>, and the <code>aka_name</code> table has been aliased by <code>n</code>.</p>
 <p>There is a lot of data cleaning to do as some of the <code>person_id</code> values are one to many!! That is, the <code>person_id</code> matches multiple names in the <code>aka_name</code> database.</p>
 <div class="cell" data-output.var="movie_join_actress" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> t.title,</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>       idx.info,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>       a.person_id,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> t.<span class="kw">id</span> <span class="op">=</span> idx.movie_id </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cast_info <span class="kw">AS</span> a <span class="kw">ON</span> idx.movie_id <span class="op">=</span> a.movie_id</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>           # movies <span class="kw">only</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> a.role_id <span class="op">=</span> <span class="dv">2</span>           # actresses <span class="kw">only</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">50</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> t.title,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>       idx.info,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       a.person_id,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> t.<span class="kw">id</span> <span class="op">=</span> idx.movie_id </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cast_info <span class="kw">AS</span> a <span class="kw">ON</span> idx.movie_id <span class="op">=</span> a.movie_id</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>           # movies <span class="kw">only</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> a.role_id <span class="op">=</span> <span class="dv">2</span>           # actresses <span class="kw">only</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">50</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-movie-join-actress" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.8: Movies from 2015 that have at least 150,000 votes in the imdb database with the actress name joined.</caption>
+<caption>Table&nbsp;4.9: Movies from 2015 that have at least 150,000 votes in the imdb database with the actress name joined.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">info</th>
@@ -1429,35 +1728,34 @@ for (let popover of popovers){
 
 </div>
 </div>
-</section><section id="other-joins" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="other-joins">
-<span class="header-section-number">4.2.2</span> Other <code>JOIN</code>s</h3>
-<p>first, do an example with the band members https://rpubs.com/will-kent/stds-vignette</p>
+</section><section id="other-joins" class="level3" data-number="4.2.3"><h3 data-number="4.2.3" class="anchored" data-anchor-id="other-joins">
+<span class="header-section-number">4.2.3</span> Other <code>JOIN</code>s</h3>
 <p>Consider the following two tables. The first has seven movies in it (from 2015 with at least 400,000 IMDb votes). The second consists of almost 3 million actresses (<code>person_role_id = 2</code>). In order to find a subset of actresses, the <code>person_id &gt; 3900000</code> was set arbitrarily (in order to have a smaller group with which to work).</p>
 <section id="movies" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="movies">movies:</h4>
 <div class="cell" data-output.var="top_movies" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       t.title,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>       idx.info,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>       (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>       <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>       <span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> row_count</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>             # movies <span class="kw">only</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>    # rating <span class="kw">is</span> votes</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>         # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>       t.title,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>       idx.info,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>       (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>       <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>       <span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> row_count</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>             # movies <span class="kw">only</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>    # rating <span class="kw">is</span> votes</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>         # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-top-movies" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.9: Movies from 2015 that have at least 400,000 votes in the imdb database.</caption>
+<caption>Table&nbsp;4.10: Movies from 2015 that have at least 400,000 votes in the imdb database.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
@@ -1516,25 +1814,25 @@ for (let popover of popovers){
 </div>
 </section><section id="actresses" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="actresses">actresses:</h4>
 <div class="cell" data-output.var="actresses" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>       n.name,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>       (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>       <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>       <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> a.person_role_id <span class="op">=</span> <span class="dv">2</span>  </span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">390000</span>) <span class="kw">AS</span> row_count</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> a.person_role_id <span class="op">=</span> <span class="dv">2</span>  </span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>       n.name,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       (<span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>       <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> a.person_role_id <span class="op">=</span> <span class="dv">2</span>  </span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">390000</span>) <span class="kw">AS</span> row_count</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>       <span class="kw">WHERE</span> a.person_role_id <span class="op">=</span> <span class="dv">2</span>  </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>             <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-actresses" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.10: Actresses whose <code>person_id</code> is greater than 400000. Note that some actresses have different spelling or phrasing of their names.</caption>
+<caption>Table&nbsp;4.11: Actresses whose <code>person_id</code> is greater than 400000. Note that some actresses have different spelling or phrasing of their names.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">person_id</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">movie_id</th>
@@ -1670,28 +1968,28 @@ for (let popover of popovers){
 </div>
 </div>
 <p>Using subqueries, we can <code>JOIN</code> the two datasets using different <code>JOIN</code> techniques.</p>
-</section><section id="inner-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="inner-join">Inner <code>JOIN</code>
+</section><section id="inner-join-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="inner-join-1">Inner <code>JOIN</code>
 </h4>
 <p>With an inner <code>JOIN</code>, there are 32 rows corresponding to all the actresses in the seven 2015 films with the most votes. Because the <code>JOIN</code> is an intersection of the two tables, only the actresses with <code>person_id</code> above 3900000 are included.</p>
 <div class="cell" data-output.var="inner_movie_actress" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tbl-inner-movie-actress" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="Inner `JOIN` of movies and actresses." data-fig.asp="0.618">
 <div class="panel-caption table-caption">
@@ -1700,32 +1998,32 @@ for (let popover of popovers){
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-86dc17bbd8304768193a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-86dc17bbd8304768193a">{"x":{"filter":"none","vertical":false,"data":[[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619],["Avengers: Age of Ultron","Inside Out","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","The Martian"],[3916648,4122876,3938423,3938423,3950111,4079047,4079047,4084626,4084626,4084626,4099458,3958614,3990819,3990819,4081131,4081131,3907812,3907812,3907812,3938795,3970637,3970637,3970637,3970637,3970637,3970637,3970637,3970637,4073883,4073883,4094732,4098918],[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619],["Smulders, Jacoba Francisca Maria","Kuzniar, Lennon Wynn","Norvell, Ingrid","Norvell, Ingrid","Sallaway, Seannon Jane","Washington, Kelly Lynn","Washington, Kelly Lynn","Weeks, Jency","Jenc","Little J","Curtis, Bonnie","Ness","Teron, Sharliz","Charlie","Lumb, Leanne","Watson, Leanne","Slade, Sandy","Sandy","Sandy Slade","Ryan, Karol Lesley","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Walter, Dame Harriet","Walter, Harriet Mary","White, Kelsey Marie","Wiig, Kristen Carroll"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9ac63b637de07b869efd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9ac63b637de07b869efd">{"x":{"filter":"none","vertical":false,"data":[[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619],["Avengers: Age of Ultron","Inside Out","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","The Martian"],[3916648,4122876,3938423,3938423,3950111,4079047,4079047,4084626,4084626,4084626,4099458,3958614,3990819,3990819,4081131,4081131,3907812,3907812,3907812,3938795,3970637,3970637,3970637,3970637,3970637,3970637,3970637,3970637,4073883,4073883,4094732,4098918],[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619],["Smulders, Jacoba Francisca Maria","Kuzniar, Lennon Wynn","Norvell, Ingrid","Norvell, Ingrid","Sallaway, Seannon Jane","Washington, Kelly Lynn","Washington, Kelly Lynn","Weeks, Jency","Jenc","Little J","Curtis, Bonnie","Ness","Teron, Sharliz","Charlie","Lumb, Leanne","Watson, Leanne","Slade, Sandy","Sandy","Sandy Slade","Ryan, Karol Lesley","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Walter, Dame Harriet","Walter, Harriet Mary","White, Kelsey Marie","Wiig, Kristen Carroll"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
-</section><section id="right-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="right-join"><code>RIGHT JOIN</code></h4>
+</section><section id="right-join-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="right-join-1"><code>RIGHT JOIN</code></h4>
 <p>With a <code>RIGHT JOIN</code>, there are more than 300 rows (the <code>LIMIT</code> clause keeps us from knowing how many rows, but there are a LOT!) corresponding to all the actresses whose <code>person_id</code> above 3900000 are included. Those actresses who acted in one of the seven top 2015 films are also included in the full results table, but they don’t happen to be in the truncated output here.</p>
 <div class="cell" data-output.var="right_movie_actress" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">RIGHT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="kw">RIGHT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tbl-right-movie-actress" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="`RIGHT JOIN` of movies and actresses." data-fig.asp="0.618">
 <div class="panel-caption table-caption">
@@ -1734,32 +2032,32 @@ for (let popover of popovers){
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-f50f63c007c2286b17b9" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-f50f63c007c2286b17b9">{"x":{"filter":"none","vertical":false,"data":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900006,3900006,3900006,3900006,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026],[3355298,3509490,3739780,3943329,165963,268249,268370,268406,268475,279082,279273,339664,675926,676205,677227,679656,775378,871147,989916,1083325,1083404,1108209,1129333,1153344,1233492,1393158,1405819,1512713,1630881,1630908,1630928,1660000,1666275,1666292,1666308,1666348,1666381,1791827,1791843,1791856,1930879,2147044,2186734,2186762,2186829,2186931,2186960,2186971,2186974,2186983,2187019,2187082,2187094,2187158,2223989,2388250,2508034,2508193,2938020,3073094,3169335,3177261,3355298,3509490,3739780,3943329,165963,268249,268370,268406,268475,279082,279273,339664,675926,676205,677227,679656,775378,871147,989916,1083325,1083404,1108209,1129333,1153344,1233492,1393158,1405819,1512713,1630881,1630908,1630928,1660000,1666275,1666292,1666308,1666348,1666381,1791827,1791843,1791856,1930879,2147044,2186734,2186762,2186829,2186931,2186960,2186971,2186974,2186983,2187019,2187082,2187094,2187158,2223989,2388250,2508034,2508193,2938020,3073094,3169335,3177261,3812588,1014440,3812588,1014440,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3519698,3760415,4109663,4171616,4176897,4294407,4494503,4534730,4589261,244167,1589238,2392628,2945406,3065023,3243621,3255682,3323673,3342584,3491112,3513296,3522540,3522876,3540195,3540281,3562030,3620780,3636370,3655139,3792993,3796326,3796751,3814077,3816391,3819665,3885945,3934589,3963515,4033695,4097163,4110770,4114028,4116601,4116602,4117811,4121499,4130771,4135167,4162264,4171619,4194161,4216755,4229825,4239244,4287425,4477961,4486269,4515670,4535627,4593087,451164,644655,662741,662771,861478,868199,868200,868201,1281504,1347728,1398927,1398928,1398931,2016596,2462087,3044932,3243621,3255682,3323673,3342584,3491112,3513296,3522540,3522876,3540195,3540281,3562030,3620780,3636370,3655139,3792993,3796326,3796751,3814077,3816391,3819665,3885945,3934589,3963515,4033695,4097163,4110770,4114028,4116601,4116602,4117811,4121499,4130771,4135167,4162264,4171619,4194161,4216755,4229825,4239244,4287425,4477961,4486269,4515670,4535627,4593087,451164,644655,662741,662771,861478,868199,868200,868201,1281504,1347728,1398927,1398928,1398931,2016596,2462087,3044932,3243621,3255682,3323673],["Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Simonna","Simonna","Milinyte, Simona","Milinyte, Simona","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Yevgeniya","Simonova, Yevgeniya","Simonova, Yevgeniya"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-64fb84ee507d258aeea6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-64fb84ee507d258aeea6">{"x":{"filter":"none","vertical":false,"data":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900001,3900006,3900006,3900006,3900006,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900023,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900025,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026,3900026],[3355298,3509490,3739780,3943329,165963,268249,268370,268406,268475,279082,279273,339664,675926,676205,677227,679656,775378,871147,989916,1083325,1083404,1108209,1129333,1153344,1233492,1393158,1405819,1512713,1630881,1630908,1630928,1660000,1666275,1666292,1666308,1666348,1666381,1791827,1791843,1791856,1930879,2147044,2186734,2186762,2186829,2186931,2186960,2186971,2186974,2186983,2187019,2187082,2187094,2187158,2223989,2388250,2508034,2508193,2938020,3073094,3169335,3177261,3355298,3509490,3739780,3943329,165963,268249,268370,268406,268475,279082,279273,339664,675926,676205,677227,679656,775378,871147,989916,1083325,1083404,1108209,1129333,1153344,1233492,1393158,1405819,1512713,1630881,1630908,1630928,1660000,1666275,1666292,1666308,1666348,1666381,1791827,1791843,1791856,1930879,2147044,2186734,2186762,2186829,2186931,2186960,2186971,2186974,2186983,2187019,2187082,2187094,2187158,2223989,2388250,2508034,2508193,2938020,3073094,3169335,3177261,3812588,1014440,3812588,1014440,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3816683,3911969,4033206,4109319,1385492,1385492,1530382,1530387,1530388,1530389,1722643,3519698,3760415,4109663,4171616,4176897,4294407,4494503,4534730,4589261,244167,1589238,2392628,2945406,3065023,3243621,3255682,3323673,3342584,3491112,3513296,3522540,3522876,3540195,3540281,3562030,3620780,3636370,3655139,3792993,3796326,3796751,3814077,3816391,3819665,3885945,3934589,3963515,4033695,4097163,4110770,4114028,4116601,4116602,4117811,4121499,4130771,4135167,4162264,4171619,4194161,4216755,4229825,4239244,4287425,4477961,4486269,4515670,4535627,4593087,451164,644655,662741,662771,861478,868199,868200,868201,1281504,1347728,1398927,1398928,1398931,2016596,2462087,3044932,3243621,3255682,3323673,3342584,3491112,3513296,3522540,3522876,3540195,3540281,3562030,3620780,3636370,3655139,3792993,3796326,3796751,3814077,3816391,3819665,3885945,3934589,3963515,4033695,4097163,4110770,4114028,4116601,4116602,4117811,4121499,4130771,4135167,4162264,4171619,4194161,4216755,4229825,4239244,4287425,4477961,4486269,4515670,4535627,4593087,451164,644655,662741,662771,861478,868199,868200,868201,1281504,1347728,1398927,1398928,1398931,2016596,2462087,3044932,3243621,3255682,3323673],["Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Simonis, Heidi","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Steinhardt, Heide","Simonna","Simonna","Milinyte, Simona","Milinyte, Simona","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, E.","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ekaterina","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Belikova, Ye.","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Bychkova, Elena","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Jevgenija","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Ye.","Simonova, Yevgeniya","Simonova, Yevgeniya","Simonova, Yevgeniya"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
-</section><section id="left-join" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="left-join"><code>LEFT JOIN</code></h4>
+</section><section id="left-join-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="left-join-1"><code>LEFT JOIN</code></h4>
 <p>With a <code>LEFT JOIN</code>, there are 33 rows corresponding to the actresses in the seven top 2015 movies. Only <strong>The Revenant</strong> did not have any actresses whose <code>person_id</code> is greater than 3900000.</p>
 <div class="cell" data-output.var="left_movie_actress" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">300</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tbl-left-movie-actress" class="cell tbl-parent quarto-layout-panel anchored" data-tbl-cap="`LEFT JOIN` of movies and actresses." data-fig.asp="0.618">
 <div class="panel-caption table-caption">
@@ -1768,38 +2066,38 @@ for (let popover of popovers){
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6a6eb478b7e198ca6fef" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-6a6eb478b7e198ca6fef">{"x":{"filter":"none","vertical":false,"data":[[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619,4414139],["Avengers: Age of Ultron","Inside Out","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","The Martian","The Revenant"],[3916648,4122876,3938423,3938423,3950111,4079047,4079047,4084626,4084626,4084626,4099458,3958614,3990819,3990819,4081131,4081131,3907812,3907812,3907812,3938795,3970637,3970637,3970637,3970637,3970637,3970637,3970637,3970637,4073883,4073883,4094732,4098918,null],[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619,null],["Smulders, Jacoba Francisca Maria","Kuzniar, Lennon Wynn","Norvell, Ingrid","Norvell, Ingrid","Sallaway, Seannon Jane","Washington, Kelly Lynn","Washington, Kelly Lynn","Weeks, Jency","Jenc","Little J","Curtis, Bonnie","Ness","Teron, Sharliz","Charlie","Lumb, Leanne","Watson, Leanne","Slade, Sandy","Sandy","Sandy Slade","Ryan, Karol Lesley","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Walter, Dame Harriet","Walter, Harriet Mary","White, Kelsey Marie","Wiig, Kristen Carroll",null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1e02d2f39f7a99e8186c" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1e02d2f39f7a99e8186c">{"x":{"filter":"none","vertical":false,"data":[[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619,4414139],["Avengers: Age of Ultron","Inside Out","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Jurassic World","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Mad Max: Fury Road","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","Star Wars: Episode VII - The Force Awakens","The Martian","The Revenant"],[3916648,4122876,3938423,3938423,3950111,4079047,4079047,4084626,4084626,4084626,4099458,3958614,3990819,3990819,4081131,4081131,3907812,3907812,3907812,3938795,3970637,3970637,3970637,3970637,3970637,3970637,3970637,3970637,4073883,4073883,4094732,4098918,null],[3313672,3752999,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3787790,3915213,3915213,3915213,3915213,3915213,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4260166,4389619,null],["Smulders, Jacoba Francisca Maria","Kuzniar, Lennon Wynn","Norvell, Ingrid","Norvell, Ingrid","Sallaway, Seannon Jane","Washington, Kelly Lynn","Washington, Kelly Lynn","Weeks, Jency","Jenc","Little J","Curtis, Bonnie","Ness","Teron, Sharliz","Charlie","Lumb, Leanne","Watson, Leanne","Slade, Sandy","Sandy","Sandy Slade","Ryan, Karol Lesley","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Stevens, Cat","Taber, Cat","Tabor, Cat","Cat","Walter, Dame Harriet","Walter, Harriet Mary","White, Kelsey Marie","Wiig, Kristen Carroll",null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>movie ID<\/th>\n      <th>movie title<\/th>\n      <th>actress ID<\/th>\n      <th>movie ID<\/th>\n      <th>actress<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"columnDefs":[{"className":"dt-right","targets":[0,2,3]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
 </section><section id="counting-repeat-actresses" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="counting-repeat-actresses">Counting repeat actresses</h4>
 <p>We might, for example, want to know how many names / spellings of a name with a specific <code>person_id</code> (above 3900000) exist for each <code>person_id</code> in each of the top voted seven films of 2015.</p>
 <div class="cell" data-output.var="num_repeat_names" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> acts.person_id, </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_repeat_names</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> acts.person_id;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> acts.person_id, </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_repeat_names</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>       t.title</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> acts.person_id;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-num-repeat-names" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.11: For each <code>person_id</code> (&gt; 3900000) in the seven top voted 2015 films, how many names / spellings are associated with the <code>person_id</code>?</caption>
+<caption>Table&nbsp;4.12: For each <code>person_id</code> (&gt; 3900000) in the seven top voted 2015 films, how many names / spellings are associated with the <code>person_id</code>?</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">person_id</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_repeat_names</th>
@@ -1879,31 +2177,31 @@ for (let popover of popovers){
 </section><section id="counting-number-of-actresses-per-film" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="counting-number-of-actresses-per-film">Counting number of actresses per film</h4>
 <p>We might, for example, want to know how many actresses with a specific <code>person_id</code> (above 3900000) are in each of the top voted seven films of 2015.</p>
 <div class="cell" data-output.var="num_actress" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> movs.<span class="kw">id</span>, </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>       movs.title,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_actress</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>       t.title</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>       n.name</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> movs.<span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> movs.<span class="kw">id</span>, </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>       movs.title,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_actress</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (<span class="kw">SELECT</span> t.<span class="kw">id</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>       t.title</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>       n.name</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> cast_info <span class="kw">AS</span> a</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> a.role_id <span class="op">=</span> <span class="dv">2</span>             # acresses <span class="kw">only</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span> a.person_id <span class="op">&gt;</span> <span class="dv">3900000</span>) <span class="kw">AS</span> acts <span class="kw">ON</span> acts.movie_id <span class="op">=</span> movs.<span class="kw">id</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> movs.<span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-num-actress" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.12: Number of actresses (with person_id &gt; 3900000) in each of the seven top voted films of 2015. Recall that The Revenant had no actresses with person_id &gt; 3900000, so there are only six movies listed.</caption>
+<caption>Table&nbsp;4.13: Number of actresses (with person_id &gt; 3900000) in each of the seven top voted films of 2015. Recall that The Revenant had no actresses with person_id &gt; 3900000, so there are only six movies listed.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
@@ -1947,9 +2245,9 @@ for (let popover of popovers){
 
 </div>
 </div>
-</section></section></section><section id="union" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="union">
-<span class="header-section-number">4.3</span> <code>UNION</code>
-</h2>
+</section></section></section><section id="unioning" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="unioning">
+<span class="header-section-number">4.3</span> <code>UNION</code>ing</h2>
+<p>In <strong>SQL</strong> a <code>UNION</code> clause combines two different tables by their rows (whereas <code>JOIN</code> combines two tables by columns). Think about <code>UNION</code> similarly to the <code>bind_rows()</code> command in <strong>R</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="fig-table-union" class="quarto-figure quarto-figure-center anchored">
@@ -1958,20 +2256,591 @@ for (let popover of popovers){
 </div>
 </div>
 </div>
-</section><section id="union-all" class="level2" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="union-all">
-<span class="header-section-number">4.4</span> <code>UNION ALL</code>
-</h2>
-<section id="full-outer-join" class="level3" data-number="4.4.1"><h3 data-number="4.4.1" class="anchored" data-anchor-id="full-outer-join">
-<span class="header-section-number">4.4.1</span> <code>FULL OUTER JOIN</code>
-</h3>
-<p><strong>MySQL</strong> doesn’t have a <code>FULL OUTER JOIN</code> (although other implementations of <strong>SQL</strong> do have full join functionality). However, we can mimick a full join using right and left joins with <code>UNION</code>.</p>
-<p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<section id="unions" class="level3" data-number="4.3.1"><h3 data-number="4.3.1" class="anchored" data-anchor-id="unions">
+<span class="header-section-number">4.3.1</span> <code>UNION</code>s</h3>
+<p><code>UNION</code> does not check the names of the columns to make sure they match. <code>UNION</code> requires that the number of columns be the same and that the variable type be the same for all columns in the two tables being combined.</p>
+<p><a href="#tbl-foo-bar">Table&nbsp;<span>4.14</span></a> contains a silly example. The first table has 1 as <code>bar</code> and the second table has 20 as <code>bar</code>. But when the tables are <code>UNION</code>ed, the <code>bar</code> column contains <code>c(1, 10)</code>. <strong>SQL</strong> took the column names from the first table and appended the second table without considering the variable names.</p>
+<div class="cell" data-output.var="foo_bar" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span> <span class="kw">AS</span> bar,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span> <span class="kw">AS</span> foo</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">10</span> <span class="kw">AS</span> foo,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">20</span> <span class="kw">AS</span> bar;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_imdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tbl-foo-bar" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.14: The variable names are chosen from the first table. The names and order of the variables in the second table are ignored when using <code>UNION</code>.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">bar</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">foo</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">20</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
-</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</div>
+</div>
+<p><code>UNION</code> is specifically designed to bind rows from two different <code>SELECT</code> queries where the variables have been selected in the same order. If the two <code>SELECT</code> clauses are done from the same table with the same order of variables, you do not need to worry about the order of the variables matching up in the <code>UNION</code>. If you are <code>UNION</code>ing two very different subqueries, you <em>do</em> need to worry about the variables and their order.</p>
+<section id="union" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="union"><code>UNION</code></h4>
+<p>Let’s say we want to combine the top voted movies from 2015 with the top voted movies from 2019. However, to account for time, we require the movies from 2015 to have more votes (400,000) than the movies from 2017 (200,000). That is, the <code>WHERE</code> clause is different for the two subqueries.</p>
+<div class="cell" data-output.var="union_years" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title, </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title, </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2017</span>  </span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">200000</span>)</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">100</span>;</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-union-years" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.15: The variable names are chosen from the first table. The names and order of the variables in the second table are ignored when using <code>UNION</code>.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">production_year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">num_votes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Avengers: Age of Ultron</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">540606</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Inside Out</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">443051</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jurassic World</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">471237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mad Max: Fury Road</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">666484</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Star Wars: Episode VII - The Force Awakens</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">691691</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Martian</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">583987</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Revenant</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">526189</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dunkirk</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">229089</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guardians of the Galaxy Vol. 2</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">281845</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Logan</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">397056</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Spider-Man: Homecoming</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">209930</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Wonder Woman</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">306611</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section><section id="union-all" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="union-all"><code>UNION ALL</code></h4>
+<p><code>UNION</code> does check, however, to see if any of the rows in the two tables are identical. If the goal is to include duplicates across two tables, use <code>UNION ALL</code> instead of <code>UNION</code>.</p>
+<p>Let’s say that the first table is all movies with production year after 2012 and number of votes greater than 500,000. The second table is movies with production year equal to 2015 and number of votes greater than 400,000. Even though the Martian would have been in both tables, the results table lists The Marian only once in <a href="#tbl-union-years-votes">Table&nbsp;<span>4.16</span></a>.</p>
+<div class="cell" data-output.var="union_years_votes" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">&gt;</span> <span class="dv">2012</span>  </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">500000</span>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title, </span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> production_year, num_votes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-union-years-votes" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.16: Using <code>UNION</code> to combine movies from table 1: later than 2012 and at least 500,000 votes with movies from table 2: 2015 and at least 400,000 votes.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">production_year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">num_votes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">12 Years a Slave</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">506640</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Now You See Me</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">507519</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">World War Z</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">509285</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Hobbit: The Desolation of Smaug</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">526001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Hunger Games: Catching Fire</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">537678</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Man of Steel</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">592427</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Iron Man Three</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">607323</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gravity</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">640900</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Wolf of Wall Street</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">900450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Interstellar</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">1102826</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Whiplash</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">507827</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Imitation Game</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">550521</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Grand Budapest Hotel</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">553558</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Captain America: The Winter Soldier</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">562419</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">X-Men: Days of Future Past</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">567780</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gone Girl</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">664035</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guardians of the Galaxy</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">795151</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Inside Out</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">443051</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jurassic World</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">471237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Revenant</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">526189</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Avengers: Age of Ultron</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">540606</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Martian</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">583987</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mad Max: Fury Road</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">666484</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Star Wars: Episode VII - The Force Awakens</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">691691</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Batman v Superman: Dawn of Justice</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">500037</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Deadpool</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">673887</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<p>When <code>UNION ALL</code> is applied int he same context, The Martian is listed twice in the results table given in <a href="#tbl-union-all-years-votes">Table&nbsp;<span>4.17</span></a>.</p>
+<div class="cell" data-output.var="union_all_years_votes" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">&gt;</span> <span class="dv">2012</span>  </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">500000</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span> <span class="kw">ALL</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> t.title, </span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>        t.production_year, </span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>        idx.info <span class="kw">AS</span> num_votes</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> title <span class="kw">AS</span> t</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               </span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      </span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>)</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> production_year, num_votes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-union-all-years-votes" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;4.17: Using <code>UNION ALL</code> to combine movies from table 1: later than 2012 and at least 500,000 votes with movies from table 2: 2015 and at least 400,000 votes.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">production_year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">num_votes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">12 Years a Slave</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">506640</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Now You See Me</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">507519</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">World War Z</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">509285</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Hobbit: The Desolation of Smaug</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">526001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Hunger Games: Catching Fire</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">537678</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Man of Steel</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">592427</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Iron Man Three</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">607323</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gravity</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">640900</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Wolf of Wall Street</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: left;">900450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Interstellar</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">1102826</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Whiplash</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">507827</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Imitation Game</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">550521</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Grand Budapest Hotel</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">553558</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Captain America: The Winter Soldier</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">562419</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">X-Men: Days of Future Past</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">567780</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gone Girl</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">664035</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guardians of the Galaxy</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: left;">795151</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Inside Out</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">443051</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jurassic World</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">471237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Revenant</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">526189</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Revenant</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">526189</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avengers: Age of Ultron</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">540606</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Avengers: Age of Ultron</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">540606</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Martian</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">583987</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The Martian</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">583987</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mad Max: Fury Road</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">666484</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mad Max: Fury Road</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">666484</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Star Wars: Episode VII - The Force Awakens</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">691691</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Star Wars: Episode VII - The Force Awakens</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">691691</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Batman v Superman: Dawn of Justice</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">500037</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Deadpool</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">673887</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section><section id="sec-full-union" class="level4" data-number="4.3.1.1"><h4 data-number="4.3.1.1" class="anchored" data-anchor-id="sec-full-union">
+<span class="header-section-number">4.3.1.1</span> <code>FULL OUTER JOIN</code> via <code>UNION</code>
+</h4>
+<p><strong>MySQL</strong> doesn’t have a <code>FULL OUTER JOIN</code> (although other implementations of <strong>SQL</strong> do have full join functionality). However, we can mimic a full join using right and left joins with <code>UNION</code>.</p>
+<p>Recall the ideas of <code>RIGHT JOIN</code> (which keeps all observations in the right table) and <code>LEFT JOIN</code> (which keeps all observations in the left table). By <code>UNION</code>ing the right and left joins, all of the observations are obtained (i.e., a full join). Using the function <code>sqldf()</code> in the <strong>sqldf</strong> <strong>R</strong> package, the full join will be demonstrated using the 1960s rock bands.</p>
+<p>Notice that in the <code>RIGHT JOIN</code> the <code>name</code> column must come from the <em>right</em> table (not the <em>left</em> table).</p>
+<p>Also notice that <code>UNION ALL</code> keeps the duplicate rows which is probably not what we want.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT star.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      LEFT JOIN band_instruments AS inst ON star.name = inst.name"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  name    band  plays
+1 Mick  Stones   &lt;NA&gt;
+2 John Beatles guitar
+3 Paul Beatles   bass</code></pre>
+</div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT inst.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      RIGHT JOIN band_instruments AS inst ON star.name = inst.name"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   name    band  plays
+1  John Beatles guitar
+2  Paul Beatles   bass
+3 Keith    &lt;NA&gt; guitar</code></pre>
+</div>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT star.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      LEFT JOIN band_instruments AS inst ON star.name = inst.name</span></span>
+<span><span class="st">UNION</span></span>
+<span><span class="st">      SELECT inst.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      RIGHT JOIN band_instruments AS inst ON star.name = inst.name "</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   name    band  plays
+1  John Beatles guitar
+2 Keith    &lt;NA&gt; guitar
+3  Mick  Stones   &lt;NA&gt;
+4  Paul Beatles   bass</code></pre>
+</div>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sqldf</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sqldf/man/sqldf.html">sqldf</a></span><span class="op">(</span><span class="st">"SELECT star.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      LEFT JOIN band_instruments AS inst ON star.name = inst.name</span></span>
+<span><span class="st">UNION ALL</span></span>
+<span><span class="st">      SELECT inst.name, star.band, inst.plays </span></span>
+<span><span class="st">      FROM band_members AS star</span></span>
+<span><span class="st">      RIGHT JOIN band_instruments AS inst ON star.name = inst.name "</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   name    band  plays
+1  Mick  Stones   &lt;NA&gt;
+2  John Beatles guitar
+3  Paul Beatles   bass
+4  John Beatles guitar
+5  Paul Beatles   bass
+6 Keith    &lt;NA&gt; guitar</code></pre>
+</div>
+</div>
+</section></section></section><section id="best-practice" class="level2" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="best-practice">
+<span class="header-section-number">4.4</span> Best practice</h2>
+<p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_imdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
