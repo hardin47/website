@@ -4,7 +4,6 @@
 #| include: false
 
 source("_common.R")
-library(tidyverse)
 ```
 
 
@@ -13,31 +12,32 @@ Beyond `SELECT` queries, the next most fundamental actions in **SQL** have to do
 The database we'll work with for learning how to combine tables is on Yelp reviews.  There are three tables: `businesses`, `reviews`, and `users`, see @tbl-yelp-tables.  From the `EXPLAIN` output [@tbl-bus-vars; @tbl-rev-vars; @tbl-user-vars], we can see that the tables match up by ID.  The variable `id` in the `businesses` table is the same as the variable `business_id` in the `reviews` table.  `user_id` is the same variable in both the `reviews` and `users` tables.  The connections across the tables will be important when performing `JOIN`s.
 
 ```{r}
-con_yelp <- DBI::dbConnect(
+con_imdb <- DBI::dbConnect(
   RMariaDB::MariaDB(),
-  dbname = "yelp",
+  dbname = "imdb",
   host = Sys.getenv("SMITH_HOST"),
   user = Sys.getenv("SMITH_USER"),
   password = Sys.getenv("SMITH_PWD")
 )
 ```
 
+As seen in @tbl-imdb-tables, there are 21 tables in the `imdb` database!  We won't go into details about what each one of them means, but it is a **huge** database with details on movies, TV series, video games, and more.  For our work, we are interested only in movies (and details within, like actors and ratings).
 
 ```{sql}
-#| connection: con_yelp
-#| label: yelp-tables
-#| output.var: "yelp_tables"
+#| connection: con_imdb
+#| label: imdb-tables
+#| output.var: "imdb_tables"
 
 SHOW TABLES;
 ```
 
 
 ```{r}
-#| label: tbl-yelp-tables
+#| label: tbl-imdb-tables
 #| echo: false
-#| tbl-cap: "SHOW all the TABLES in the yelp database."
+#| tbl-cap: "SHOW all the TABLES in the imdb database."
 
-yelp_tables |>
+imdb_tables |>
   kbl(linesep = "", booktabs = TRUE) |>
   kable_styling(bootstrap_options = c("striped", "condensed"), 
                 latex_options = c("striped", "hold_position"),
@@ -45,42 +45,24 @@ yelp_tables |>
 
 ```
 
+If you are curious about the database, you can glance through each of the tables separately using a `SELECT` command (don't forget to use `LIMIT`, especially on a table you haven't previously explored).
 
 ```{sql}
-#| connection: con_yelp
-#| label: bus-vars
-#| output.var: "bus_vars"
+#| connection: con_imdb
+#| label: select-kind
+#| output.var: "select_kind"
 
-EXPLAIN businesses;
+SELECT * FROM kind_type
+LIMIT 0, 10;
 ```
+
 
 ```{r}
-#| label: tbl-bus-vars
+#| label: tbl-select-kind
 #| echo: false
-#| tbl-cap: "EXPLAIN the variables in the businesses table."
+#| tbl-cap: "SELECT to glance at the kind_type table in the imdb database."
 
-bus_vars |>
-  kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
-```
-
-```{sql}
-#| connection: con_yelp
-#| label: rev-vars
-#| output.var: "rev_vars"
-
-EXPLAIN reviews;
-```
-
-```{r}
-#| label: tbl-rev-vars
-#| echo: false
-#| tbl-cap: "EXPLAIN the variables in the reviews table."
-
-rev_vars |>
+select_kind |>
   kbl(linesep = "", booktabs = TRUE) |>
   kable_styling(bootstrap_options = c("striped", "condensed"), 
                 latex_options = c("striped", "hold_position"),
@@ -89,30 +71,14 @@ rev_vars |>
 ```
 
 
-```{sql}
-#| connection: con_yelp
-#| label: user-vars
-#| output.var: "user_vars"
+## Subqueries
 
-EXPLAIN users;
-```
-
-```{r}
-#| label: tbl-user-vars
-#| echo: false
-#| tbl-cap: "EXPLAIN the variables in the users table."
-
-user_vars |>
-  kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
-```
+A **SQL** **subquery** is a query used as a data source in the `FROM` clause, instead of the usual table.  There was a subquery in @tbl-length-time2 when the task required a function of the *results set* within the `SELECT` clause.
 
 
 
-## `JOIN`
+
+## All the `JOIN`s
 
 Recall that **SQL** is a programming language that works on *relational databases*. One of its major strengths is being able to efficiently store information in separate tables that can be easily connected as needed.  The syntax for tying together information from multiple tables is done with a `JOIN` clause.  
 
@@ -128,7 +94,7 @@ Some types of `JOIN`s available in **MySQL** include the following, which are re
 * `JOIN`: include all of the rows that exist in both tables (similar to `inner_join()` in **R**, the intersection of the two tables).  `INNER JOIN` is alternative, and identical, function to `JOIN`.
 * `LEFT JOIN`: include all of the rows in the first table.  Connect them, as much as possible, to the rows in the second table.  Rows that have no match in the second table will have a value of `NULL` for the new "second table" variables.
 * `RIGHT JOIN`: include all of the rows in the second table.  Connect them, as much as possible, to the rows in the first table.  Rows that have no match in the first table will have a value of `NULL` for the new "first table" variables.  A `RIGHT JOIN` with the tables in the opposite order is the same as a `LEFT JOIN` with the tables in the original order.
-* `FULL OUTER JOIN`: include all rows in either table.  Rows that have no match in the other table will have a value of `NULL` for the other table variables.
+* `FULL OUTER JOIN`: include all rows in either table.  Rows that have no match in the other table will have a value of `NULL` for the other table variables. (similar to `full_join()` in **R**, the union of the two tables).  The functionality doesn't exist in **MySQL** but can be created using joins and `UNION`.
 * `CROSS JOIN`: match each row of the first table with each row in the second table. 
 
 
@@ -150,6 +116,506 @@ include_graphics("images/join-types.png")
 #| fig-alt: Mini data tables describing different types of JOINs.
 #| echo: false
 include_graphics("images/table-joins.png")
+```
+
+
+
+
+### `JOIN`
+
+--> to make the JOINs different, make the the tables something... either smaller or random sample or something.  Maybe just one year?  Do ther WHERE command before the JOIN command.
+
+In the `imdb` database, the `title` table includes information about the 4,626,322  titles in the database, including the `id`, `title`, `kind_id` (indicator for the kind of ID it is), and `production_year`.  It does not, however, include the review of the title.  See @tbl-title-glance.
+
+```{sql}
+#| connection: con_imdb
+#| label: title-glance
+#| output.var: "title_glance"
+
+SELECT * FROM title LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-title-glance
+#| echo: false
+#| tbl-cap: "SELECT to glance at the title table in the imdb database."
+
+title_glance |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the rating (given by `info` where `type_id = 100`).
+
+```{sql}
+#| connection: con_imdb
+#| label: idx-glance
+#| output.var: "idx_glance"
+
+SELECT * FROM movie_info_idx LIMIT 0, 6;
+```
+
+```{r}
+#| label: tbl-idx-glance
+#| echo: false
+#| tbl-cap: "SELECT to glance at the movie_info_idx table in the imdb database."
+
+idx_glance |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+Let's say we want to combine the titles with the ratings so that each title with user rating is included.  That is, only keep the titles that have a corresponding rating.  And also, only keep the rating if there is an associated title (which means we use `INNER JOIN` or just plain `JOIN`).
+
+Remember that `WHERE` will work on the raw variables, and `HAVING` works on the results set.  
+
+Some aspects of the query are worth pointing out:
+* The variables in the output are given in the `SELECT` clause.  The `id` and `title` (both from the `title` table) and the `info` fromt he `movie_info_idx` which represents the number of IMDb votes.
+* The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion.
+* The `JOIN` happens by linking the `id` variable in the `title` table with the `movie_id` variable in the `movie_info_idx` table.
+* The `LIMIT` wasn't necessary (there are only 12 observations), but it's good practice so that we don't end up with unwieldy query results.
+* The `WHERE` clause happens before the `JOIN` action, despite being written after.
+* In the `WHERE` clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.
+
+```{sql}
+#| connection: con_imdb
+#| label: movie-join
+#| output.var: "movie_join"
+
+SELECT title.id,
+       title.title,
+       movie_info_idx.info
+FROM title
+JOIN movie_info_idx ON title.id = movie_info_idx.movie_id 
+WHERE title.production_year = 2015 
+    AND title.kind_id = 1                  # movies only
+    AND movie_info_idx.info_type_id = 100  # rating is votes
+    AND movie_info_idx.info > 150000       # at least 150,000 votes
+ORDER BY movie_info_idx.info DESC
+LIMIT 0, 20;
+
+```
+
+
+```{r}
+#| label: tbl-movie-join
+#| echo: false
+#| tbl-cap: "Movies from 2015 that have at least 150,000 votes in the imdb database."
+
+movie_join |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Let's say we also want to obtain information about the actors and actresses in each of the movies.  In the `cast_info` table, there is a `person_id`, a `movie_id`, and `person_role_id` is `1` if actor and `2` if actress.
+
+```{sql}
+#| connection: con_imdb
+#| label: cast-glance
+#| output.var: "cast_glance"
+
+SELECT * FROM cast_info LIMIT 0, 10;
+
+```
+
+
+```{r}
+#| label: tbl-cast-glance
+#| echo: false
+#| tbl-cap: "SELECT to glance at the cast_info table in the imdb database."
+
+cast_glance |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+We also want the name of the actress which is in the table `aka_name`.  Note that there is no *movie* information in the `aka_name` table!
+
+```{sql}
+#| connection: con_imdb
+#| label: name-glance
+#| output.var: "name_glance"
+
+SELECT * FROM aka_name LIMIT 0, 10;
+
+```
+
+
+```{r}
+#| label: tbl-name-glance
+#| echo: false
+#| tbl-cap: "SELECT to glance at the aka_name table in the imdb database."
+
+name_glance |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Connecting the most popular movies of 2015 with the actresses in those movies requires a series of `JOIN`s. Note that to make the code less onerous, the `title` table has been aliased by `t`, the `movie_info_idx` table has been aliased by `idx`, the `cast_info` table has been aliased by `a`, and the `aka_name` table has been aliased by `n`.
+
+There is a lot of data cleaning to do as some of the `person_id` values are one to many!!  That is, the `person_id` matches multiple names in the `aka_name` database.
+
+
+```{sql}
+#| connection: con_imdb
+#| label: movie-join-actress
+#| output.var: "movie_join_actress"
+
+SELECT t.title,
+       idx.info,
+       a.person_id,
+       n.name
+FROM title AS t
+JOIN movie_info_idx AS idx ON t.id = idx.movie_id 
+JOIN cast_info AS a ON idx.movie_id = a.movie_id
+JOIN aka_name AS n ON a.person_id = n.person_id
+WHERE t.production_year = 2015 
+    AND t.kind_id = 1           # movies only
+    AND idx.info_type_id = 100  # rating is votes
+    AND idx.info > 150000       # at least 150,000 votes
+    AND a.role_id = 2           # actresses only
+ORDER BY idx.info DESC
+LIMIT 0, 50;
+```
+
+
+```{r}
+#| label: tbl-movie-join-actress
+#| echo: false
+#| tbl-cap: "Movies from 2015 that have at least 150,000 votes in the imdb database with the actress name joined."
+
+movie_join_actress |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+
+
+### Other `JOIN`s
+
+first, do an example with the band members https://rpubs.com/will-kent/stds-vignette
+
+
+Consider the following two tables.  The first has seven movies in it (from 2015 with at least 400,000 IMDb votes).  The second consists of almost 3 million actresses (`person_role_id = 2`).  In order to find a subset of actresses, the `person_id > 3900000` was set arbitrarily (in order to have a smaller group with which to work).
+
+
+
+#### movies: {-}
+
+```{sql}
+#| connection: con_imdb
+#| label: top-movies
+#| output.var: "top_movies"
+
+SELECT t.id,
+       t.title,
+       idx.info,
+       (SELECT COUNT(*)
+       FROM title AS t
+       JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+       WHERE t.production_year = 2015  
+             AND t.kind_id = 1
+             AND idx.info_type_id = 100
+             AND idx.info > 400000) AS row_count
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1             # movies only
+    AND idx.info_type_id = 100    # rating is votes
+    AND idx.info > 400000         # at least 400,000 votes
+ORDER BY idx.info DESC
+```
+```{r}
+#| label: tbl-top-movies
+#| echo: false
+#| tbl-cap: "Movies from 2015 that have at least 400,000 votes in the imdb database."
+
+top_movies |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+#### actresses: {-}
+
+```{sql}
+#| connection: con_imdb
+#| label: actresses
+#| output.var: "actresses"
+
+SELECT a.person_id,
+       a.movie_id,
+       n.name,
+       (SELECT COUNT(*)
+       FROM cast_info AS a
+       JOIN aka_name AS n ON a.person_id = n.person_id
+       WHERE a.person_role_id = 2  
+             AND a.person_id > 390000) AS row_count
+FROM cast_info AS a
+JOIN aka_name AS n ON a.person_id = n.person_id
+       WHERE a.person_role_id = 2  
+             AND a.person_id > 3900000
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-actresses
+#| echo: false
+#| tbl-cap: "Actresses whose `person_id` is greater than 400000.  Note that some actresses have different spelling or phrasing of their names."
+
+actresses |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+
+Using subqueries, we can `JOIN` the two datasets using different `JOIN` techniques.
+
+
+#### Inner `JOIN` {-}
+
+With an inner `JOIN`, there are 32 rows corresponding to all the actresses in the seven 2015 films with the most votes.  Because the `JOIN` is an intersection of the two tables, only the actresses with `person_id` above 3900000 are included.
+
+```{sql}
+#| connection: con_imdb
+#| label: inner-movie-actress
+#| output.var: "inner_movie_actress"
+
+
+SELECT * FROM
+(SELECT t.id,
+       t.title
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               # movies only
+    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info > 400000) AS movs  # at least 400,000 votes     
+INNER JOIN (SELECT a.person_id,
+       a.movie_id,
+       n.name
+    FROM cast_info AS a
+    JOIN aka_name AS n ON a.person_id = n.person_id
+    WHERE a.role_id = 2             # acresses only
+        AND a.person_id > 3900000) AS acts ON acts.movie_id = movs.id
+LIMIT 0, 300;
+
+```
+
+```{r}
+#| label: tbl-inner-movie-actress
+#| echo: false
+#| tbl-cap: "Inner `JOIN` of movies and actresses."
+
+DT::datatable(inner_movie_actress, escape = FALSE,
+              rownames = F,
+              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+              options = list(pageLength = 15))
+```
+
+#### `RIGHT JOIN` {-}
+
+With a `RIGHT JOIN`, there are more than 300 rows (the `LIMIT` clause keeps us from knowing how many rows, but there are a LOT!) corresponding to all the actresses whose `person_id` above 3900000 are included.  Those actresses who acted in one of the seven top 2015 films are also included in the full results table, but they don't happen to be in the truncated output here. 
+
+
+```{sql}
+#| connection: con_imdb
+#| label: right-movie-actress
+#| output.var: "right_movie_actress"
+
+
+SELECT * FROM
+(SELECT t.id,
+       t.title
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               # movies only
+    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info > 400000) AS movs  # at least 400,000 votes     
+RIGHT JOIN (SELECT a.person_id,
+       a.movie_id,
+       n.name
+    FROM cast_info AS a
+    JOIN aka_name AS n ON a.person_id = n.person_id
+    WHERE a.role_id = 2             # acresses only
+        AND a.person_id > 3900000) AS acts ON acts.movie_id = movs.id
+LIMIT 0, 300;
+
+```
+
+```{r}
+#| label: tbl-right-movie-actress
+#| echo: false
+#| tbl-cap: "`RIGHT JOIN` of movies and actresses."
+
+
+DT::datatable(right_movie_actress, escape = FALSE,
+              rownames = F,
+              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+              options = list(pageLength = 15))
+```
+
+
+
+#### `LEFT JOIN` {-}
+
+With a `LEFT JOIN`, there are 33 rows corresponding to the actresses in the seven top 2015 movies. Only **The Revenant** did not have any actresses whose `person_id` is greater than 3900000.
+
+
+```{sql}
+#| connection: con_imdb
+#| label: left-movie-actress
+#| output.var: "left_movie_actress"
+
+
+SELECT * FROM
+(SELECT t.id,
+       t.title
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               # movies only
+    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info > 400000) AS movs  # at least 400,000 votes     
+LEFT JOIN (SELECT a.person_id,
+       a.movie_id,
+       n.name
+    FROM cast_info AS a
+    JOIN aka_name AS n ON a.person_id = n.person_id
+    WHERE a.role_id = 2             # acresses only
+        AND a.person_id > 3900000) AS acts ON acts.movie_id = movs.id
+LIMIT 0, 300;
+
+```
+
+```{r}
+#| label: tbl-left-movie-actress
+#| echo: false
+#| tbl-cap: "`LEFT JOIN` of movies and actresses."
+
+
+DT::datatable(left_movie_actress, escape = FALSE,
+              rownames = F,
+              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+              options = list(pageLength = 15))
+```
+
+
+
+#### Counting repeat actresses {-}
+
+We might, for example, want to know how many names / spellings of a name with a specific `person_id` (above 3900000) exist for each `person_id` in each of the top voted seven films of 2015.  
+
+```{sql}
+#| connection: con_imdb
+#| label: num-repeat_names
+#| output.var: "num_repeat_names"
+
+SELECT acts.person_id, 
+       COUNT(*) AS num_repeat_names
+FROM (SELECT t.id,
+       t.title
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               # movies only
+    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info > 400000) AS movs  # at least 400,000 votes
+JOIN (SELECT a.person_id,
+       a.movie_id,
+       n.name
+    FROM cast_info AS a
+    JOIN aka_name AS n ON a.person_id = n.person_id
+    WHERE a.role_id = 2             # acresses only
+        AND a.person_id > 3900000) AS acts ON acts.movie_id = movs.id
+GROUP BY acts.person_id;
+```
+
+```{r}
+#| label: tbl-num-repeat-names
+#| echo: false
+#| tbl-cap: "For each `person_id` (> 3900000) in the seven top voted 2015 films, how many names / spellings are associated with the `person_id`?"
+
+num_repeat_names |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+      
+#### Counting number of actresses per film {-}
+
+We might, for example, want to know how many actresses with a specific `person_id` (above 3900000) are in each of the top voted seven films of 2015.  
+
+```{sql}
+#| connection: con_imdb
+#| label: num-actress
+#| output.var: "num_actress"
+
+SELECT movs.id, 
+       movs.title,
+       COUNT(*) AS num_actress
+FROM (SELECT t.id,
+       t.title
+FROM title AS t
+JOIN movie_info_idx AS idx ON idx.movie_id = t.id
+WHERE t.production_year = 2015  
+    AND t.kind_id = 1               # movies only
+    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info > 400000) AS movs  # at least 400,000 votes
+JOIN (SELECT a.person_id,
+       a.movie_id,
+       n.name
+    FROM cast_info AS a
+    JOIN aka_name AS n ON a.person_id = n.person_id
+    WHERE a.role_id = 2             # acresses only
+        AND a.person_id > 3900000) AS acts ON acts.movie_id = movs.id
+GROUP BY movs.id;
+```
+
+```{r}
+#| label: tbl-num-actress
+#| echo: false
+#| tbl-cap: "Number of actresses (with person_id > 3900000) in each of the seven top voted films of 2015.  Recall that The Revenant had no actresses with person_id > 3900000, so there are only six movies listed."
+
+num_actress |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
 ```
 
 
@@ -175,10 +641,17 @@ fig2 <- ggdraw() + draw_image(fig2_path)
 ggarrange(fig1, fig2, ncol = 1)
 ```
 
+## `UNION ALL`
 
-## Subqueries
+### `FULL OUTER JOIN`
 
-A **SQL** **subquery** is a query used as a data source in the `FROM` clause, instead of the usual table.  There was a subquery in @sec-select when the task required a function of the *results set* within the `SELECT` clause.
+**MySQL** doesn't have a `FULL OUTER JOIN` (although other implementations of **SQL** do have full join functionality).  However, we can mimick a full join using right and left joins with `UNION`.
+
+
+
+
+
+
 
 
 
@@ -186,5 +659,5 @@ A **SQL** **subquery** is a query used as a data source in the `FROM` clause, in
 It is always a good idea to terminate the **SQL** connection when you are done with it.
 
 ```{r}
-dbDisconnect(con_yelp)
+dbDisconnect(con_imdb)
 ```
