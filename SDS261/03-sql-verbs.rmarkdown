@@ -1,12 +1,14 @@
 # SQL clauses {#sec-sql-clauses}
 
 
+
 ```{r}
 #| include: false
 
 source("_common.R")
 fontawesome::fa_html_dependency()
 ```
+
 
 Most of this chapter will focus on the **SQL** commands needed to run queries of the database.  Much of the syntax is strikingly familiar to tidy verbs in **R**.  However, this chapter starts with a few **SQL** specific tools used to learn about the tables in any particular database.
 
@@ -17,6 +19,7 @@ Consider a database of taxi rides from the <a href = "https://en.wikipedia.org/w
 <!--
 Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
 -->
+
 
 ```{r}
 library(mdsr)
@@ -44,7 +47,9 @@ show |>
 
 ```
 
+
 There is only one table in the `nyctaxi` database, called `yellow_old`.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -53,8 +58,6 @@ There is only one table in the `nyctaxi` database, called `yellow_old`.
 
 EXPLAIN yellow_old;
 ```
-
-
 
 ```{r}
 #| label: tbl-select-explain
@@ -68,6 +71,7 @@ select_explain |>
                 full_width = FALSE) 
 
 ```
+
 
 
 The `EXPLAIN` command describes the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
@@ -96,11 +100,13 @@ A **SQL** query starts with a `SELECT` command and has a corresponding `FROM` to
 
 The shortest **SQL** query is the following `SELECT` command.  Do not run this command!!! The `yellow_old` table has 15 million rows, and we do not want to look at them simultaneously.
 
+
 ```{r}
 #| eval: false
 
 DO NOT RUN:  SELECT * FROM yellow_old;
 ```
+
 
 ::: {.callout-tip icon=false}
 
@@ -112,6 +118,7 @@ Do not run the following command unless you are **certain** that the table from 
 :::
 
 Instead, to look at the top of the table, `SELECT` the first few rows.  The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).
+
 
 ```{sql}
 #| connection: con_taxi
@@ -135,7 +142,9 @@ select_14 |>
 
 ```
 
+
 Speaking of which, how many rows are there in the `yellow_old` table?  That is, how many taxi rides are recorded?  Now `SELECT` is used with a summary function, `COUNT()`.  Instead of using a separate summary function (like `mutate()` or `summarize()`), all the work is done inside the `SELECT` call.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -158,10 +167,12 @@ select_count |>
 
 ```
 
+
 Yikes, more than 15 million taxi rides!!!!
 
 
 You might have noticed that the `yellow_old` table has two different datetime variables (one for pickup, the other for drop-off).  We can use the information to assess the length of each ride (in time, not distance).  However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they **look** like they are stored in a DateTime format!), see @tbl-select-explain.  Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
+
 
 ```{sql}
 #| connection: con_taxi
@@ -189,7 +200,9 @@ str_date |>
 
 ```
 
+
 Now that the variables are no longer strings, we can subtract them to figure out the number of minutes for each taxi ride.  Unfortunately, the following code won't run because neither of the variables `pickup` or `dropoff` are in the table `yellow_old`.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -205,7 +218,9 @@ SELECT
 ```
 
 
+
 Instead, we need two layers of `SELECT` commands so that the first `SELECT` (i.e., inside) layer creates the new variables, and the second `SELECT` (i.e., outside) layer subtracts the two times.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -238,7 +253,9 @@ length_time2 |>
 
 ```
 
+
 Alternatively, the `STR_TO_DATE()` function can be applied inside the `TIMEDIFF()` function so that the full (now only) `SELECT` command is being used only on variables that are in the original table.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -268,6 +285,7 @@ length_time3 |>
 ```
 
 
+
 Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `pickup_datetime` and `dropoff_datetime` are columns in the original table - they are written to disk on the **SQL** server.  The variables `pickup`, `dropoff`, and `length_time` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **RStudio** or **DBeaver**) and is not written to disk.
 
 
@@ -282,6 +300,7 @@ Keep in mind that there is a distinction between clauses that operate on the *va
 The `WHERE` clause is analogous to the `filter()` function in **dplyr**.  However, keep in mind that there are two **SQL** commands that resemble the **dplyr** `filter()` function. `WHERE` operates on the original data in the table and `HAVING` operates on the result set. See below for examples using `HAVING`.
 
 What was the fare for those taxi rides where the `tip_amount` was more than $10 and the person used cash? (Note that in **SQL** the equality logical is `=` and in **R** the equality logical is `==`.) 
+
 
 ```{sql}
 #| connection: con_taxi
@@ -310,7 +329,9 @@ select_10 |>
 ```
 
 
+
 `BETWEEN` can be used to specify a range of values for a numeric value.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -338,7 +359,9 @@ where_1012a |>
 
 ```
 
+
 `IN` is similar to the **dplyr** `%in%` function which specifies distinct values for the variable.
+
 
 
 ```{sql}
@@ -367,7 +390,9 @@ where_1012b |>
 
 ```
 
+
 The `WHERE` clause can be established by a number of logical commands combined using either `AND` or `OR`.  Usually it is important to use parentheses with `OR` logicals to make sure the desired query is return.  Consider the difference between the following queries.  In **SQL** (as in many programming languages), `AND` takes precedent over `OR` in the order of operations, when there are no parentheses.  (I was taught to remember order of operations using "please excuse my dear aunt Sally.")  The order of operations on the first query groups the second two conditions into one because `AND` take precedence over `OR` (as if the query was `tip_amount BETWEEN 10 and 12 OR (total_amount BETWEEN 100 and 112 AND payment_type = "CSH")`).
+
 
 ```{sql}
 #| connection: con_taxi
@@ -394,7 +419,6 @@ where_1012c |>
                 full_width = FALSE) 
 
 ```
-
 
 ```{sql}
 #| connection: con_taxi
@@ -424,6 +448,7 @@ where_1012d |>
 
 
 
+
 ## GROUP BY
 
 ::: {.callout-tip appearance="minimal"}
@@ -433,6 +458,7 @@ where_1012d |>
 :::
 
 The `GROUP BY` clause will direct **SQL** to carry out the query separately for each category in the grouped variable.  Using `GROUP BY` is particularly important when aggregating multiple rows into a single number.  Some <a href = "https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html" target = "_blank">aggregate functions</a> include `COUNT()`, `SUM()`, `MAX()`, `MIN()`, and `AVG()`.
+
 
 
 ```{sql}
@@ -461,7 +487,9 @@ group_pay |>
 
 ```
 
+
 For those people who tipped between $10 and $20, what was the lowest and highest fare for each of the types of payments?
+
 
 
 ```{sql}
@@ -492,7 +520,9 @@ group_pay2 |>
 ```
 
 
+
 `GROUP BY` will work applied to multiple columns.  Let's tabulate the same results, now broken down by `payment_type` and `year`.  Except that we don't have a `year` variable!  We need to convert the `pickup_datetime` variable to a DateTime object and then pull out the day of the week, using `DAYNAME`.  (Note: `DAYOFWEEK` will give you the day of the week as an integer.  Use your internet sleuthing skills if you are looking for functions that might help your desired query.)
+
 
 
 ```{sql}
@@ -525,6 +555,7 @@ group_wday |>
 
 
 
+
 ## ORDER BY
 
 ::: {.callout-tip appearance="minimal"}
@@ -533,6 +564,7 @@ group_wday |>
 :::
 
 The `ORDER BY` command can be used with or without the `GROUP BY` and aggregation commands.  It allows us to look at interesting aspects of the data by sorting the data.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -562,7 +594,9 @@ order_low |>
 
 ```
 
+
 WHAT?!?!!  How in the world was one of the fares -$612.40? It doesn't make any sense that a fare would be negative.  Some additional inquiry into the observation corresponding to a fare of -$612.40 is absolutely warranted.  If the observation is found to be a typo, it would need to be removed from the data set.  If the observation is somehow legitimate, it would need to be included in the analysis, with the information provided about its legitimacy.
+
 
 
 ```{sql}
@@ -593,7 +627,9 @@ order_high |>
 
 ```
 
+
 $950 is a lot to pay for a cab ride!  But in NYC, I'd believe it.
+
 
 
 ```{sql}
@@ -625,6 +661,7 @@ order_wday |>
 ```
 
 
+
 ::: {.callout-tip appearance="minimal"}
 
 Note that both `GROUP BY` and `ORDER BY` evaluate the data after it has been retrieved.  Therefore, the functions operate on the *results set*, not the original rows of the data. 
@@ -640,6 +677,7 @@ As above, we were able to `GROUP BY` and `ORDER BY` on the new variables we had 
 :::
 
 Recall that `WHERE` acts only on the original data.  If we are interested in rides that took place on `Friday`, we need to use the derived variable `wday` instead of the raw variable `pickup_datetime`.  Fortunately, `HAVING` works on the results set.  Note that **SQL** uses `''` for strings, not `""`.  In **SQL**, `""` is used to identify variables (not values of variables), like **R**'s `&grave;&grave;`.
+
 
 
 
@@ -671,6 +709,7 @@ having_fri |>
 
 ```
 
+
 While it worked out quite well for us that `HAVING` was able to filter the data based on the results set, the use of `HAVING` was quite onerous because the entire data set was considered before the filter was applied.  That is, if the filter can be done on the original data using `WHERE`, the query will be much faster and more efficient.
 
 Note: `HAVING` requires a `GROUP BY` clause.  And the variable(s) used in `HAVING` must also be part of the `GROUP BY` clause.
@@ -690,6 +729,7 @@ Whenever possible, use `WHERE` instead of `HAVING` to make your queries as effic
 :::
 
 As we've seen, `LIMIT` truncates the query to specified rows. The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).  The query below shows the last 10 rows of the entire data set.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -712,6 +752,7 @@ limit_last |>
                 full_width = FALSE) 
 
 ```
+
  
 
 
@@ -719,6 +760,7 @@ limit_last |>
 ## Saving **SQL** queries as **R** objects
 
 If you are working in **R** to run **SQL** commands, you may want to use the query output for further analysis or visualizations.  In that case, use `#|output.var: "name_of_variable"` inside the `{sql}` chunk.  The variable called `name_of_variable` will then be available to be used in the R environment.
+
 
 
 ```{sql}
@@ -755,8 +797,11 @@ new_table |>
   geom_point() 
 ```
 
+
 It is always a good idea to terminate the **SQL** connection when you are done with it.
+
 
 ```{r}
 dbDisconnect(con_taxi)
 ```
+
