@@ -5,17 +5,214 @@
 #| include: false
 
 source("_common.R")
-library(tidyverse)
 ```
 
 see 21.3.2 in R4DS  https://r4ds.hadley.nz/databases#sec-load-data
 
 
-For creating a new DB
+
+In order to practice creating and editing databases, you will need to install <a href = "https://duckdb.org/" target = "_blank">DuckDB</a> onto your own computer. Fortunately, you can do the installation using **R**! **DuckDB** is an in-process database management system that runs entirely on your own computer. Setting up a database on your own computer is a great way to work with large datasets where you are the only analyst.  The data then lives in your storage (instead of your memory), and you don't have to transfer queries or results over the internet.
+
+Using **DuckDB** suits our purposes because it allows us to create a local database that we can edit.  However, the **SQL** dialect used in **DuckDB** is slightly different from **MySQL**, which is important to recognize.  For example, we write `SELECT * FROM table 10;` instead of `SELECT * FROM table 0, 10;`.  In your future as a data scientist, you will find different dialects, depending on the **SQL** server.  Always be aware of the dialect you are using.
+
+```{r}
+#| eval: false
+
+install.packages("duckdb")  # only once, in the Console, not in the .qmd or .Rmd file
+library(duckdb)             # at the top of the .qmd or .Rmd file
+
+library(DBI)                # we also still need the DBI package
+```
+
+In order to create a database (on our own computer), we'll start by creating a connection to **DuckDB**. Note that the database has been stored to a database directory called `duck_datab` which lives in the current **R** project.  You won't be able to open it like a standard folder, but it is where **DuckDB** stores the database files.
+
+```{r}
+con_duckdb <- DBI::dbConnect(duckdb::duckdb(),
+                             dbdir = "duck_datab")
+```
+
  
-https://github.com/hhllcks/snldb/tree/master/output
+## Preparing to load data 
+
+The `duckdb` database is currently empty, so we need to load in some data.  The `duckdb_read_csv()` function in the **duckdb** R package allows us to load the .csv file (available on GitHub) directly into the database without being loaded as an **R** object first.
  
-SNL, lots of tables
- 
- 
+
+Recall that in @tbl-select-describe we used `DESCRIBE` to display the variable types of the database table(s).  The list includes the variable name (`Field`), its `Type`, whether there are `NULL` values allowed, and whether there are keys or indices defined on the variable.  See @tbl-casts-describe for the `DESCRIBE` output on the table we are about to import.
+
+Unlike **R**, when creating a new data table, **SQL** requires that you communicate each future variable (column) and that variable's type. Variable types are **not** automatically generated!   
+
+As an example, consider the Saturday Night Live datasets available on the <a href = "https://github.com/hhllcks/snldb/" target = "_blank">snldb GitHub repo</a>. Data is scraped from <a href = "http://www.snlarchives.net" target = "_blank">http://www.snlarchives.net</a> and <a href = "http://www.imdb.com/title/tt0072562" target = "_blank">http://www.imdb.com/title/tt0072562</a> by <a href = "https://github.com/hhllcks" target = "_blank">Hendrik Hilleckes</a> and <a href = "https://github.com/colinmorris" target = "_blank">Colin Morris</a>.  Notice that there are eleven .csv files available in the <a href = "https://github.com/hhllcks/snldb/tree/master/output" target = "_blank">output folder</a>.
+
+Specifically, let's consider the <a href = "https://raw.githubusercontent.com/hhllcks/snldb/master/output/actors.csv" target = "_blank">casts.csv</a> file.
+
+Before we get into loading data into a MySQL database, let's look at the casts file in **R**, so that we understand the data we want to load. `glimpse()` provides the variable names and the variables types.  The variables types are a mix of character strings, numeric, and logical.  Variable types are very important for inputting data into a **MySQL** server.
+
+```{r}
+#| echo: true
+casts <- readr::read_csv("https://raw.githubusercontent.com/hhllcks/snldb/master/output/casts.csv")
+glimpse(casts)
+```
+
+Now we are ready to import data into the database we've created. **MySQL** is not the default **SQL** dialect for DuckDB, so let's install and load the **MySQL** extension before committing to `USE` the `duck_datab` on our server connection. 
+
+```{sql}
+#| connection: con_duckdb
+
+INSTALL mysql;
+```
+
+```{sql}
+#| connection: con_duckdb
+
+LOAD mysql;
+```
+
+
+### Loading data
+
+Once the database is set up, you will be ready to import .csv files into the database as tables.  Importing .csv files as tables requires a series of steps:^[taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a>.]
+
+1. a `USE` statement that ensures we are in the right schema/database.
+2. a series of `DROP TABLE` statements that drop any old tables with the same names as the ones we are going to create.
+3. a series of `CREATE TABLE` statements that specify the table structures.
+4. a series of `COPY` statements that read the data from the .csv files into the appropriate tables.
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+DuckDB has its own dialect of **SQL**.  To load data into a **MySQL** server, the final statement would be `LOAD DATA` instead of `COPY`.  See <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a> for more information on loading data into a **MySQL** server.
+:::
+
+#### Loading step 1 {-}
+
+Use the local database that we've called `duck_datab`.
+
+```{sql}
+#| connection: con_duckdb
+
+USE duck_datab;
+```
+
+#### Loading step 2{-}
+
+Make sure to "refresh" the table, in case it already exists.  However, be very careful with the `DROP TABLE` statement, as it will **remove** the `casts` table.
+
+```{sql}
+#| connection: con_duckdb
+
+DROP TABLE IF EXISTS casts;
+```
+
+
+#### Loading step 3 {-}
+
+
+talk about the details of create table
+
+```{sql}
+#| connection: con_duckdb
+
+CREATE TABLE casts (
+  aid VARCHAR(255) NOT NULL DEFAULT '',
+  sid INTEGER NOT NULL DEFAULT 0,
+  featured BOOLEAN NOT NULL DEFAULT 'false',
+  first_epid INTEGER DEFAULT 0,
+  last_epid INTEGER DEFAULT 0,
+  update_anchor BOOLEAN NOT NULL DEFAULT 0,
+  n_episodes INTEGER NOT NULL DEFAULT 0,
+  season_fraction DECIMAL(21,20) NOT NULL DEFAULT 0,
+  PRIMARY KEY (sid, aid)
+);
+```
+
+
+#### Loading step 4 {-}
+
+from file.  difference between mysql and duckdb.
+
+```{sql}
+#| connection: con_duckdb
+
+COPY casts FROM 'data/casts.csv' HEADER;
+```
+
+```{sql}
+#| connection: con_duckdb
+#| label: select-casts
+#| output.var: "select_casts"
+
+SELECT * FROM casts LIMIT 8;
+```
+
+```{r}
+#| label: tbl-select-casts
+#| echo: false
+#| tbl-cap: "After `CREATE TABLE` where variable types are set, the `COPY` command pulls the data into the table.  `SELECT` shows us that the table is as expected."
+
+select_casts |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+#### Check
+
+Let's make sure that the database exists and that the tables in the database exist
+
+```{sql}
+#| connection: con_duckdb
+
+SHOW DATABASES;
+```
+
+
+```{sql}
+#| connection: con_duckdb
+
+SHOW TABLES;
+```
+```{sql}
+#| connection: con_duckdb
+#| label: casts-describe
+#| output.var: "casts_describe"
+
+DESCRIBE casts;
+```
+
+```{r}
+#| label: tbl-casts-describe
+#| echo: false
+#| tbl-cap: "DESCRIBE variables in the casts table."
+
+casts_describe |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+## Saving tables
+
+generally, the tables are saved, even when the connection is closed.  we can, however, save temporary tables that get deleted when the connection is closed.  see "temporary tables" https://duckdb.org/docs/sql/statements/create_table.html
+
+
+## Efficiencies
+
+keys, indices, partitioning
+
+
+## Best practice
+
+It is always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_duckdb, shutdown = TRUE)
+```
+
+
 

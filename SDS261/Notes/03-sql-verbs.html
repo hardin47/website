@@ -176,7 +176,7 @@ for (let popover of popovers){
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./02-sql-in-R.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">SQL in R</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">SQL in R and DBeaver</span></span></a>
   </div>
 </li>
       </ul>
@@ -259,7 +259,8 @@ for (let popover of popovers){
   <li><a href="#order-by" id="toc-order-by" class="nav-link" data-scroll-target="#order-by"><span class="header-section-number">3.5</span> ORDER BY</a></li>
   <li><a href="#having" id="toc-having" class="nav-link" data-scroll-target="#having"><span class="header-section-number">3.6</span> HAVING</a></li>
   <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">3.7</span> LIMIT</a></li>
-  <li><a href="#saving-sql-queries-as-r-objects" id="toc-saving-sql-queries-as-r-objects" class="nav-link" data-scroll-target="#saving-sql-queries-as-r-objects"><span class="header-section-number">4</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</a></li>
+  <li><a href="#saving-sql-queries-as-r-objects" id="toc-saving-sql-queries-as-r-objects" class="nav-link" data-scroll-target="#saving-sql-queries-as-r-objects"><span class="header-section-number">3.8</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</a></li>
+  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">3.9</span> Best practice</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -309,14 +310,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>There is only one table in the <code>nyctaxi</code> database, called <code>yellow_old</code>.</p>
-<div class="cell" data-output.var="select_explain" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> yellow_old;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-output.var="select_describe" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE yellow_old;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
-<div id="tbl-select-explain" class="anchored">
+<div id="tbl-select-describe" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.2: EXPLAIN variables in the yellow_old table.</caption>
+<caption>Table&nbsp;3.2: DESCRIBE variables in the yellow_old table.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Field</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">Type</th>
@@ -477,7 +478,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-<p>The <code>EXPLAIN</code> command describes the 18 field names (variables) in the <code>yellow_old</code> table. Some of the variables are characters (<code>text</code>) and some are numeric (either <code>double</code> or <code>bigint</code>)</p>
+<p>Similarly, the <code>DESCRIBE</code> command shows the 18 field names (variables) in the <code>yellow_old</code> table. Some of the variables are characters (<code>text</code>) and some are numeric (either <code>double</code> or <code>bigint</code>)</p>
 <p>Most engagements with SQL are don through queries. Queries in <strong>SQL</strong> start with the <code>SELECT</code> keyword and consist of several clauses, which must be written in the following order:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ul>
 <li>
@@ -487,7 +488,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <li>
 <code>JOIN</code> allows you to stitch together two or more tables using a key. This is analogous to the <code>inner_join()</code> and <code>left_join()</code> commands in <strong>dplyr</strong>. More details of <code>JOIN</code> are given in <a href="04-sql-joins.html"><span>Chapter&nbsp;4</span></a>.</li>
 <li>
-<code>WHERE</code> allows you to filter the records according to some criteria and is an analogous operation to the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> verb in <strong>dplyr</strong>.</li>
+<code>WHERE</code> allows you to filter the records according to some criteria and is an analogous operation to the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> verb in <strong>dplyr</strong>. Note, even though the <code>WHERE</code> clause is written after <code>SELECT</code> and <code>JOIN</code>, it is actually evaluated <em>before</em> the <code>SELECT</code> or <code>JOIN</code> clauses (which is why <code>WHERE</code> only works on the original data, not the results set).</li>
 <li>
 <code>GROUP BY</code> allows you to aggregate the records according to some shared value and is an analogous operation to the <code>group_by()</code> verb in <strong>dplyr</strong>.</li>
 <li>
@@ -866,7 +867,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>Yikes, more than 15 million taxi rides!!!!</p>
-<p>You might have noticed that the <code>yellow_old</code> table has two different datetime variables (one for pickup, the other for drop-off). We can use the information to assess the length of each ride (in time, not distance). However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they <strong>look</strong> like they are stored in a DateTime format!), see <a href="#tbl-select-explain">Table&nbsp;<span>3.2</span></a>. Fortunately for us, <strong>SQL</strong> has functionality to convert a <code>text</code> Type into <code>DateTime</code> type (POSIXct is a special type of DateTime formatting).</p>
+<p>You might have noticed that the <code>yellow_old</code> table has two different datetime variables (one for pickup, the other for drop-off). We can use the information to assess the length of each ride (in time, not distance). However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they <strong>look</strong> like they are stored in a DateTime format!), see <a href="#tbl-select-describe">Table&nbsp;<span>3.2</span></a>. Fortunately for us, <strong>SQL</strong> has functionality to convert a <code>text</code> Type into <code>DateTime</code> type (POSIXct is a special type of DateTime formatting).</p>
 <div class="cell" data-output.var="str_date" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>      pickup_datetime, dropoff_datetime,</span>
@@ -3291,8 +3292,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-</section><section id="saving-sql-queries-as-r-objects" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</h1>
+</section><section id="saving-sql-queries-as-r-objects" class="level2" data-number="3.8"><h2 data-number="3.8" class="anchored" data-anchor-id="saving-sql-queries-as-r-objects">
+<span class="header-section-number">3.8</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</h2>
 <p>If you are working in <strong>R</strong> to run <strong>SQL</strong> commands, you may want to use the query output for further analysis or visualizations. In that case, use <code>#|output.var: "name_of_variable"</code> inside the <code>{sql}</code> chunk. The variable called <code>name_of_variable</code> will then be available to be used in the R environment.</p>
 <div class="cell" data-output.var="new_table" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
@@ -3310,7 +3311,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <div class="cell-output-display">
 <div id="tbl-new-table" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;4.1: New data.frame saved to R called new_table.</caption>
+<caption>Table&nbsp;3.21: New data.frame saved to R called new_table.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">vendor_id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">pickup_datetime</th>
@@ -24351,6 +24352,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <p><img src="03-sql-verbs_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" style="width:90.0%"></p>
 </div>
 </div>
+</section><section id="best-practice" class="level2" data-number="3.9"><h2 data-number="3.9" class="anchored" data-anchor-id="best-practice">
+<span class="header-section-number">3.9</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

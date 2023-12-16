@@ -46,22 +46,22 @@ show |>
 
 There is only one table in the `nyctaxi` database, called `yellow_old`.
 
+
 ```{sql}
 #| connection: con_taxi
-#| label: select-explain
-#| output.var: "select_explain"
+#| label: select-describe
+#| output.var: "select_describe"
 
-EXPLAIN yellow_old;
+DESCRIBE yellow_old;
 ```
 
 
-
 ```{r}
-#| label: tbl-select-explain
+#| label: tbl-select-describe
 #| echo: false
-#| tbl-cap: "EXPLAIN variables in the yellow_old table."
+#| tbl-cap: "DESCRIBE variables in the yellow_old table."
 
-select_explain |>
+select_describe |>
   kbl(linesep = "", booktabs = TRUE) |>
   kable_styling(bootstrap_options = c("striped", "condensed"), 
                 latex_options = c("striped", "hold_position"),
@@ -70,7 +70,8 @@ select_explain |>
 ```
 
 
-The `EXPLAIN` command describes the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+Similarly, the `DESCRIBE` command shows the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+
 
 
 Most engagements with SQL are don through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
@@ -161,7 +162,7 @@ select_count |>
 Yikes, more than 15 million taxi rides!!!!
 
 
-You might have noticed that the `yellow_old` table has two different datetime variables (one for pickup, the other for drop-off).  We can use the information to assess the length of each ride (in time, not distance).  However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they **look** like they are stored in a DateTime format!), see @tbl-select-explain.  Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
+You might have noticed that the `yellow_old` table has two different datetime variables (one for pickup, the other for drop-off).  We can use the information to assess the length of each ride (in time, not distance).  However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they **look** like they are stored in a DateTime format!), see @tbl-select-describe.  Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
 
 ```{sql}
 #| connection: con_taxi
@@ -755,7 +756,11 @@ new_table |>
   geom_point() 
 ```
 
+
+## Best practice
+
 It is always a good idea to terminate the **SQL** connection when you are done with it.
+
 
 ```{r}
 dbDisconnect(con_taxi)
