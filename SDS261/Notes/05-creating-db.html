@@ -61,7 +61,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./06-const-change-db.html" rel="next">
+<link href="./06-change-db.html" rel="next">
 <link href="./p3-build-db.html" rel="prev">
 <link href="./images/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -219,8 +219,8 @@ for (let popover of popovers){
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./06-const-change-db.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Creating databases</span></span></a>
+  <a href="./06-change-db.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Changing databases</span></span></a>
   </div>
 </li>
       </ul>
@@ -253,10 +253,17 @@ for (let popover of popovers){
 <li>
 <a href="#preparing-to-load-data" id="toc-preparing-to-load-data" class="nav-link active" data-scroll-target="#preparing-to-load-data"><span class="header-section-number">5.1</span> Preparing to load data</a>
   <ul class="collapse">
-<li><a href="#loading-data" id="toc-loading-data" class="nav-link" data-scroll-target="#loading-data"><span class="header-section-number">5.1.1</span> Loading data</a></li>
+<li><a href="#sec-load-data" id="toc-sec-load-data" class="nav-link" data-scroll-target="#sec-load-data"><span class="header-section-number">5.1.1</span> Loading data</a></li>
   </ul>
 </li>
-  <li><a href="#saving-tables" id="toc-saving-tables" class="nav-link" data-scroll-target="#saving-tables"><span class="header-section-number">5.2</span> Saving tables</a></li>
+  <li>
+<a href="#efficiencies" id="toc-efficiencies" class="nav-link" data-scroll-target="#efficiencies"><span class="header-section-number">5.2</span> Efficiencies</a>
+  <ul class="collapse">
+<li><a href="#key" id="toc-key" class="nav-link" data-scroll-target="#key"><span class="header-section-number">5.2.1</span> Key</a></li>
+  <li><a href="#index" id="toc-index" class="nav-link" data-scroll-target="#index"><span class="header-section-number">5.2.2</span> Index</a></li>
+  <li><a href="#partitioning" id="toc-partitioning" class="nav-link" data-scroll-target="#partitioning"><span class="header-section-number">5.2.3</span> Partitioning</a></li>
+  </ul>
+</li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">5.3</span> Best practice</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -275,8 +282,7 @@ for (let popover of popovers){
   </div>
   
 
-</header><p>see 21.3.2 in R4DS https://r4ds.hadley.nz/databases#sec-load-data</p>
-<p>In order to practice creating and editing databases, you will need to install <a href="https://duckdb.org/" target="_blank">DuckDB</a> onto your own computer. Fortunately, you can do the installation using <strong>R</strong>! <strong>DuckDB</strong> is an in-process database management system that runs entirely on your own computer. Setting up a database on your own computer is a great way to work with large datasets where you are the only analyst. The data then lives in your storage (instead of your memory), and you don’t have to transfer queries or results over the internet.</p>
+</header><p>In order to practice creating and editing databases, you will need to install <a href="https://duckdb.org/" target="_blank">DuckDB</a> onto your own computer. Fortunately, you can do the installation using <strong>R</strong>! <strong>DuckDB</strong> is an in-process database management system that runs entirely on your own computer. Setting up a database on your own computer is a great way to work with large datasets where you are the only analyst. The data then lives in your storage (instead of your memory), and you don’t have to transfer queries or results over the internet.</p>
 <p>Using <strong>DuckDB</strong> suits our purposes because it allows us to create a local database that we can edit. However, the <strong>SQL</strong> dialect used in <strong>DuckDB</strong> is slightly different from <strong>MySQL</strong>, which is important to recognize. For example, we write <code>SELECT * FROM table 10;</code> instead of <code>SELECT * FROM table 0, 10;</code>. In your future as a data scientist, you will find different dialects, depending on the <strong>SQL</strong> server. Always be aware of the dialect you are using.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"duckdb"</span><span class="op">)</span>  <span class="co"># only once, in the Console, not in the .qmd or .Rmd file</span></span>
@@ -313,14 +319,7 @@ $ n_episodes      &lt;dbl&gt; 8, 20, 13, 20, 20, 20, 5, 11, 21, 21, 21, 18, 17, 
 $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0.524…</code></pre>
 </div>
 </div>
-<p>Now we are ready to import data into the database we’ve created. <strong>MySQL</strong> is not the default <strong>SQL</strong> dialect for DuckDB, so let’s install and load the <strong>MySQL</strong> extension before committing to <code>USE</code> the <code>duck_datab</code> on our server connection.</p>
-<div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>INSTALL mysql;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>LOAD mysql;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="loading-data" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="loading-data">
+<section id="sec-load-data" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="sec-load-data">
 <span class="header-section-number">5.1.1</span> Loading data</h3>
 <p>Once the database is set up, you will be ready to import .csv files into the database as tables. Importing .csv files as tables requires a series of steps:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ol type="1">
@@ -339,41 +338,42 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>DuckDB has its own dialect of <strong>SQL</strong>. To load data into a <strong>MySQL</strong> server, the final statement would be <code>LOAD DATA</code> instead of <code>COPY</code>. See <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a> for more information on loading data into a <strong>MySQL</strong> server.</p>
+<p><strong>DuckDB</strong> has its own dialect of <strong>SQL</strong>. To load data into a <strong>MySQL</strong> server, the final statement would be <code>LOAD DATA</code> instead of <code>COPY</code>. See <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a> for more information on loading data into a <strong>MySQL</strong> server.</p>
 </div>
 </div>
 <section id="loading-step-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-1">Loading step 1</h4>
 <p>Use the local database that we’ve called <code>duck_datab</code>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> duck_datab;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> duck_datab;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-2" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-2">Loading step 2</h4>
 <p>Make sure to “refresh” the table, in case it already exists. However, be very careful with the <code>DROP TABLE</code> statement, as it will <strong>remove</strong> the <code>casts</code> table.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-3" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-3">Loading step 3</h4>
-<p>talk about the details of create table</p>
+<p>Carefully define the variable types, whether or not they allow missing values, and what a default value is for that variable. Additionally, identify the key for accessing information.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> casts (</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  aid <span class="dt">VARCHAR</span>(<span class="dv">255</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">''</span>,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  sid <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  featured <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'false'</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  first_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  last_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  update_anchor <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  n_episodes <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  season_fraction <span class="dt">DECIMAL</span>(<span class="dv">21</span>,<span class="dv">20</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (sid, aid)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> casts (</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  aid <span class="dt">VARCHAR</span>(<span class="dv">255</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">''</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  sid <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  featured <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'false'</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  first_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  last_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  update_anchor <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  n_episodes <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  season_fraction <span class="dt">DECIMAL</span>(<span class="dv">21</span>,<span class="dv">20</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (sid, aid)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-4" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-4">Loading step 4</h4>
-<p>from file. difference between mysql and duckdb.</p>
+<p>The .csv file lives on my computer, so I load it in directly. Note that the statement to load in data is different in <strong>MySQL</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> casts <span class="kw">FROM</span> <span class="st">'data/casts.csv'</span> <span class="kw">HEADER</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> casts <span class="kw">FROM</span> <span class="st">'data/casts.csv'</span> <span class="kw">HEADER</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section><section id="checking-the-loading" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="checking-the-loading">Checking the loading</h4>
 <div class="cell" data-output.var="select_casts" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> casts <span class="kw">LIMIT</span> <span class="dv">8</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> casts <span class="kw">LIMIT</span> <span class="dv">8</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -478,11 +478,10 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 
 </div>
 </div>
-</section><section id="check" class="level4" data-number="5.1.1.1"><h4 data-number="5.1.1.1" class="anchored" data-anchor-id="check">
-<span class="header-section-number">5.1.1.1</span> Check</h4>
-<p>Let’s make sure that the database exists and that the tables in the database exist</p>
+</section><section id="check" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="check">Check</h4>
+<p>Let’s make sure that the database exists and that the table in the database exists.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>SHOW DATABASES;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>SHOW DATABASES;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -503,7 +502,7 @@ duck_datab
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -524,7 +523,7 @@ casts
 </div>
 </div>
 <div class="cell" data-output.var="casts_describe" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -611,14 +610,29 @@ casts
 
 </div>
 </div>
-</section></section></section><section id="saving-tables" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="saving-tables">
-<span class="header-section-number">5.2</span> Saving tables</h2>
-<p>generally, the tables are saved, even when the connection is closed. we can, however, save temporary tables that get deleted when the connection is closed. see “temporary tables” https://duckdb.org/docs/sql/statements/create_table.html</p>
-</section><section id="best-practice" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="best-practice">
+</section></section></section><section id="efficiencies" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="efficiencies">
+<span class="header-section-number">5.2</span> Efficiencies</h2>
+<p>It is worth pointing out a few aspects to loading data into <strong>SQL</strong> that we don’t have time to investigate: keys, indices, and partitioning.</p>
+<section id="key" class="level3" data-number="5.2.1"><h3 data-number="5.2.1" class="anchored" data-anchor-id="key">
+<span class="header-section-number">5.2.1</span> Key</h3>
+<p>Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables.</p>
+<ul>
+<li>
+<code>PRIMARY KEY</code> is a column or set of columns that uniquely identify each row. Primary keys cannot be <code>NULL</code>.</li>
+<li>
+<code>FOREIGN KEY</code> is a column or set of columns that reference a primary key in a different table.</li>
+</ul></section><section id="index" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="index">
+<span class="header-section-number">5.2.2</span> Index</h3>
+<p>Indices are the crux of why <strong>SQL</strong> is so much more efficient than, say, <strong>R</strong>. An index is a lookup table that helps <strong>SQL</strong> keep track of which records contain certain values. By indexing the rows, <strong>SQL</strong> is able to optimize sorting and joining tables. The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk. Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indices (disk space but fast wrangling) versus a few indices (slow wrangling but less space).</p>
+<p>In <strong>MySQL</strong> the commands <code>SHOW KEYS</code> and <code>SHOW INDEXES</code> provide information about the keys and indices for each table.</p>
+</section><section id="partitioning" class="level3" data-number="5.2.3"><h3 data-number="5.2.3" class="anchored" data-anchor-id="partitioning">
+<span class="header-section-number">5.2.3</span> Partitioning</h3>
+<p>Another way to speed up query retrievals is to partition the data tables. If, for example, the SNL queries were always done by year, then the <code>episodes</code> table could be partitioned such that they are stored as separate tables (one per <code>year</code>). The partitioning functions as an index on <code>year</code>. The user would not be able to tell the difference between the unpartitioned <code>episodes</code> table and the partitioned one. Queries done by <code>year</code> would be faster. Queries done grouped in another way would be slower.</p>
+</section></section><section id="best-practice" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">5.3</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
@@ -863,8 +877,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./06-const-change-db.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Creating databases</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./06-change-db.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Changing databases</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
