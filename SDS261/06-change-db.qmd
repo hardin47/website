@@ -5,20 +5,229 @@
 #| include: false
 
 source("_common.R")
+fontawesome::fa_html_dependency()
 ```
 
-
-from mdsr changing data (update) and adding data (insert, insert ignore, replace)
-
-
-ETL - extract transform load
-
-In order to create a database (on our own computer), we'll start by creating a connection to **DuckDB**. Note that the database has been stored to a database directory called `duck_datab` which lives in the current **R** project.  You won't be able to open it like a standard folder, but it is where **DuckDB** stores the database files.
+As in @sec-create-db, we will use **DuckDB** so that we have access to a server into which we can create and change data tables. Note that the database has been stored to a database directory called `duck_datab` which lives in the current **R** project.  You won't be able to open it like a standard folder, but it is where **DuckDB** stores the database files.
 
 ```{r}
 con_duckdb <- DBI::dbConnect(duckdb::duckdb(),
                              dbdir = "duck_datab")
 ```
+
+## Changing data
+
+The `UPDATE` function allows you to change a value in a table across all rows that match a certain criteria. The `impressions` table has a `name` column indicating the person being impersonated. Let's say, for whatever reason, that Ivanka Trump decides she doesn't want to be affiliated with the Trump name and she changes her name to her husband's name, becoming Ivanka Kushner.  You might want to `UPDATE` the file to indicate the impressions were of `Ivanka Kushner` instead of `Ivanka Trump`. (See @sec-load-duckdb for loading csv files into **DuckDB** directly.)
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS impressions;
+```
+
+```{r}
+duckdb_read_csv(con = con_duckdb, name = "impressions", files = "data/impressions.csv")
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: ivanka-trump
+#| output.var: "ivanka_trump"
+
+SELECT * FROM impressions 
+   WHERE name LIKE 'Ivanka%';
+```
+
+```{r}
+#| label: tbl-ivanka-trump
+#| echo: false
+#| tbl-cap: "Finding the impersonations of Ivanka Trump."
+
+ivanka_trump |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+We can use the `UPDATE` function to change the value of Ivanka's name to `Ivanka Kushner` throughout the database.  Note that all rows which match the `WHERE` clause get updated.
+
+```{sql}
+#| connection: con_duckdb
+
+UPDATE impressions
+   SET name = 'Ivanka Kushner'
+   WHERE name LIKE 'Ivanka%';
+```
+
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: ivanka-kushner
+#| output.var: "ivanka_kushner"
+
+SELECT * FROM impressions 
+   WHERE name LIKE 'Ivanka%';
+```
+
+```{r}
+#| label: tbl-ivanka-kushner
+#| echo: false
+#| tbl-cap: "Ivanka's last name has been `UPDATE`d to Kushner."
+
+ivanka_kushner |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+Be careful with `UPDATE`. A careless `UPDATE` could write over all of the data in your table.  There is no **undo** function.
+:::
+
+## Inserting data
+
+Let's say we want to include the more recent hosts in the `hosts` table.  First, we scrape the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a> which lists the episode id (the date) and the host.  The **R** package **rvest** allows us to pull out the appropriate html elements.  The `epid` and `aid` are joined together in a tibble, and `filter`ed to only include episodes which are not already in the `episodes` table. (See @sec-load-duckdb for loading csv files into **DuckDB** directly.)
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS hosts;
+```
+
+
+```{r}
+duckdb_read_csv(con = con_duckdb, name = "hosts", files = "data/hosts.csv")
+```
+
+By searching the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a>, we can see that the next host, chronologically was Elon Musk on May 8, 2021.
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-orig
+#| output.var: "hosts_orig"
+
+SELECT * FROM hosts
+    ORDER BY epid DESC
+    LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-orig
+#| echo: false
+#| tbl-cap: "Most recent hosts in the original `hosts` table."
+
+hosts_orig |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+`INSERT` allows us to add the relevant information associated with the episode of SNL that Elon Musk hosted.
+
+```{sql}
+#| connection: con_duckdb
+
+INSERT INTO hosts (epid, aid)
+   VALUES ('20210508', 'Elon Musk');
+```
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-elon
+#| output.var: "hosts_elon"
+
+SELECT * FROM hosts
+    ORDER BY epid DESC
+    LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-elon
+#| echo: false
+#| tbl-cap: "`hosts` table including the added observation from May 8, 2021."
+
+hosts_elon |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+It would be tedious to `INSERT` all of the most recent host information by hand.  Instead, we'll scrape the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a> using the **R** package **rvest**, which allows us to pull out the appropriate html elements.  The `epid` and `aid` are joined together in a tibble, and `filter`ed to only include episodes which are not already in the `episodes` table.
+
+
+```{r}
+library(rvest)
+
+recent_hosts <- read_html("http://www.snlarchives.net/Episodes/") |>
+  html_nodes("tr") |>
+  purrr::map_df( ~ tibble(
+    epid = .x |> html_node("a.ms-2.me-2") |>
+      html_attr("href") |>
+      str_extract("\\d+"),
+    aid = .x |> html_node("td:nth-child(2)") |>
+      html_text2() |>
+      str_extract("[\\w\\. \\w\\.]+(?=/|$)")
+  )) |>
+  filter(epid > 20210508)
+
+
+write_csv(recent_hosts, "data/recent_hosts.csv")
+
+```
+
+```{sql}
+#| connection: con_duckdb
+
+INSERT INTO hosts
+   SELECT *
+   FROM READ_CSV('data/recent_hosts.csv', AUTO_DETECT = TRUE);
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-update
+#| output.var: "hosts_update"
+
+SELECT * FROM hosts
+  ORDER BY epid DESC
+  LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-update
+#| echo: false
+#| tbl-cap: "The full `hosts` table, updated through December 16, 2023."
+
+hosts_update |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
 
 
 ## Temporary tables
@@ -34,11 +243,23 @@ Note that tables in **DuckDB** are saved (to disk), even when the connection is 
 The steps given in @sec-load-data are general to many **SQL** dialects and are important when working with most **SQL** clients.  It is important to have control over the variables configurations as they make up the **SQL** database.  However, using the **duckdb** package in **R** allows for shorthand entry of data from .csv files into the **DuckDB** database.  Here, we take advantage of working with the **DuckDB** functionality in R.
 
 
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS hosts;
+```
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS episodes;
+```
 
 ```{r}
-duckdb_read_csv(con = con_duckdb, name = "actors", files = "data/actors.csv")
-duckdb_read_csv(con = con_duckdb, name = "seasons", files = "data/seasons.csv")
-duckdb_read_csv(con = con_duckdb, name = "titles", files = "data/titles.csv")
 duckdb_read_csv(con = con_duckdb, name = "hosts", files = "data/hosts.csv")
 duckdb_read_csv(con = con_duckdb, name = "episodes", files = "data/episodes.csv")
 ```
@@ -56,25 +277,25 @@ Notice that most of the tables have some kind of ID which allows `JOIN`ing acros
 
 ```{sql}
 #| connection: con_duckdb
-#| label: select-actors
-#| output.var: "select_actors"
+#| label: select-hosts
+#| output.var: "select_hosts"
 
-SELECT * FROM actors LIMIT 10;
+SELECT * FROM hosts LIMIT 10;
 ```
 
-```{r}
-#| label: tbl-select-actors
-#| echo: false
-#| tbl-cap: "Note the aid identifier in the actors table."
 
-select_actors |>
+```{r}
+#| label: tbl-select-hosts
+#| echo: false
+#| tbl-cap: "Note the epid and aid identifiers in the hosts table."
+
+select_hosts |>
   kbl(linesep = "", booktabs = TRUE) |>
   kable_styling(bootstrap_options = c("striped", "condensed"), 
                 latex_options = c("striped", "hold_position"),
                 full_width = FALSE) 
 
 ```
-
 
 
 ```{sql}
@@ -100,49 +321,6 @@ select_episodes |>
 
 
 
-```{sql}
-#| connection: con_duckdb
-#| label: select-titles
-#| output.var: "select_titles"
-
-SELECT * FROM titles LIMIT 10;
-```
-
-```{r}
-#| label: tbl-select-titles
-#| echo: false
-#| tbl-cap: "Note the epid, tid, skid, and sid identifiers in the titles table."
-
-select_titles |>
-  kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
-```
-
-
-```{sql}
-#| connection: con_duckdb
-#| label: select-hosts
-#| output.var: "select_hosts"
-
-SELECT * FROM hosts LIMIT 10;
-```
-
-
-```{r}
-#| label: tbl-select-hosts
-#| echo: false
-#| tbl-cap: "Note the epid and aid identifiers in the hosts table."
-
-select_hosts |>
-  kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
-```
 
 ### Creating a temporary table
 

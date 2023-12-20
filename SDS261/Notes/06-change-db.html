@@ -109,6 +109,8 @@ for (let popover of popovers){
   }
 }
 </script><link rel="shortcut icon" href="figs/favicon.ico">
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
 <script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script><link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css2?family=Quicksand" type="text/css">
@@ -250,15 +252,17 @@ for (let popover of popovers){
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
-<li>
-<a href="#temporary-tables" id="toc-temporary-tables" class="nav-link active" data-scroll-target="#temporary-tables"><span class="header-section-number">6.1</span> Temporary tables</a>
+<li><a href="#changing-data" id="toc-changing-data" class="nav-link active" data-scroll-target="#changing-data"><span class="header-section-number">6.1</span> Changing data</a></li>
+  <li><a href="#inserting-data" id="toc-inserting-data" class="nav-link" data-scroll-target="#inserting-data"><span class="header-section-number">6.2</span> Inserting data</a></li>
+  <li>
+<a href="#temporary-tables" id="toc-temporary-tables" class="nav-link" data-scroll-target="#temporary-tables"><span class="header-section-number">6.3</span> Temporary tables</a>
   <ul class="collapse">
-<li><a href="#sec-load-duckdb" id="toc-sec-load-duckdb" class="nav-link" data-scroll-target="#sec-load-duckdb"><span class="header-section-number">6.1.1</span> Using <strong>DuckDB</strong> for loading data</a></li>
-  <li><a href="#creating-a-temporary-table" id="toc-creating-a-temporary-table" class="nav-link" data-scroll-target="#creating-a-temporary-table"><span class="header-section-number">6.1.2</span> Creating a temporary table</a></li>
-  <li><a href="#using-a-temporary-table" id="toc-using-a-temporary-table" class="nav-link" data-scroll-target="#using-a-temporary-table"><span class="header-section-number">6.1.3</span> Using a temporary table</a></li>
+<li><a href="#sec-load-duckdb" id="toc-sec-load-duckdb" class="nav-link" data-scroll-target="#sec-load-duckdb"><span class="header-section-number">6.3.1</span> Using <strong>DuckDB</strong> for loading data</a></li>
+  <li><a href="#creating-a-temporary-table" id="toc-creating-a-temporary-table" class="nav-link" data-scroll-target="#creating-a-temporary-table"><span class="header-section-number">6.3.2</span> Creating a temporary table</a></li>
+  <li><a href="#using-a-temporary-table" id="toc-using-a-temporary-table" class="nav-link" data-scroll-target="#using-a-temporary-table"><span class="header-section-number">6.3.3</span> Using a temporary table</a></li>
   </ul>
 </li>
-  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">6.2</span> Best practice</a></li>
+  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">6.4</span> Best practice</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -276,35 +280,371 @@ for (let popover of popovers){
   </div>
   
 
-</header><p>from mdsr changing data (update) and adding data (insert, insert ignore, replace)</p>
-<p>ETL - extract transform load</p>
-<p>In order to create a database (on our own computer), we’ll start by creating a connection to <strong>DuckDB</strong>. Note that the database has been stored to a database directory called <code>duck_datab</code> which lives in the current <strong>R</strong> project. You won’t be able to open it like a standard folder, but it is where <strong>DuckDB</strong> stores the database files.</p>
+</header><p>As in <a href="05-creating-db.html"><span>Chapter&nbsp;5</span></a>, we will use <strong>DuckDB</strong> so that we have access to a server into which we can create and change data tables. Note that the database has been stored to a database directory called <code>duck_datab</code> which lives in the current <strong>R</strong> project. You won’t be able to open it like a standard folder, but it is where <strong>DuckDB</strong> stores the database files.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_duckdb</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html">duckdb</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>                             dbdir <span class="op">=</span> <span class="st">"duck_datab"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="temporary-tables" class="level2" data-number="6.1"><h2 data-number="6.1" class="anchored" data-anchor-id="temporary-tables">
-<span class="header-section-number">6.1</span> Temporary tables</h2>
+<section id="changing-data" class="level2" data-number="6.1"><h2 data-number="6.1" class="anchored" data-anchor-id="changing-data">
+<span class="header-section-number">6.1</span> Changing data</h2>
+<p>The <code>UPDATE</code> function allows you to change a value in a table across all rows that match a certain criteria. The <code>impressions</code> table has a <code>name</code> column indicating the person being impersonated. Let’s say, for whatever reason, that Ivanka Trump decides she doesn’t want to be affiliated with the Trump name and she changes her name to her husband’s name, becoming Ivanka Kushner. You might want to <code>UPDATE</code> the file to indicate the impressions were of <code>Ivanka Kushner</code> instead of <code>Ivanka Trump</code>. (See <a href="#sec-load-duckdb"><span>Section&nbsp;6.3.1</span></a> for loading csv files into <strong>DuckDB</strong> directly.)</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"impressions"</span>, files <span class="op">=</span> <span class="st">"data/impressions.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-output.var="ivanka_trump" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> impressions </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Ivanka%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-ivanka-trump" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;6.1: Finding the impersonations of Ivanka Trump.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">impid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2598</td>
+<td style="text-align: left;">Scarlett Johansson</td>
+<td style="text-align: left;">Ivanka Trump</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3716</td>
+<td style="text-align: left;">Emily Blunt</td>
+<td style="text-align: left;">Ivanka Trump</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3694</td>
+<td style="text-align: left;">Margot Robbie</td>
+<td style="text-align: left;">Ivanka Trump</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3679</td>
+<td style="text-align: left;">Vanessa Bayer</td>
+<td style="text-align: left;">Ivanka Trump</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2340</td>
+<td style="text-align: left;">Maya Rudolph</td>
+<td style="text-align: left;">Ivanka Trump</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<p>We can use the <code>UPDATE</code> function to change the value of Ivanka’s name to <code>Ivanka Kushner</code> throughout the database. Note that all rows which match the <code>WHERE</code> clause get updated.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> impressions</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SET</span> name <span class="op">=</span> <span class="st">'Ivanka Kushner'</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Ivanka%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-output.var="ivanka_kushner" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> impressions </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Ivanka%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-ivanka-kushner" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;6.2: Ivanka’s last name has been <code>UPDATE</code>d to Kushner.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">impid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2598</td>
+<td style="text-align: left;">Scarlett Johansson</td>
+<td style="text-align: left;">Ivanka Kushner</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3716</td>
+<td style="text-align: left;">Emily Blunt</td>
+<td style="text-align: left;">Ivanka Kushner</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3694</td>
+<td style="text-align: left;">Margot Robbie</td>
+<td style="text-align: left;">Ivanka Kushner</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3679</td>
+<td style="text-align: left;">Vanessa Bayer</td>
+<td style="text-align: left;">Ivanka Kushner</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2340</td>
+<td style="text-align: left;">Maya Rudolph</td>
+<td style="text-align: left;">Ivanka Kushner</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<i class="fas fa-triangle-exclamation"></i> Watch out!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Be careful with <code>UPDATE</code>. A careless <code>UPDATE</code> could write over all of the data in your table. There is no <strong>undo</strong> function.</p>
+</div>
+</div>
+</section><section id="inserting-data" class="level2" data-number="6.2"><h2 data-number="6.2" class="anchored" data-anchor-id="inserting-data">
+<span class="header-section-number">6.2</span> Inserting data</h2>
+<p>Let’s say we want to include the more recent hosts in the <code>hosts</code> table. First, we scrape the <a href="http://www.snlarchives.net/Episodes/" target="_blank">SNL archives</a> which lists the episode id (the date) and the host. The <strong>R</strong> package <strong>rvest</strong> allows us to pull out the appropriate html elements. The <code>epid</code> and <code>aid</code> are joined together in a tibble, and <code>filter</code>ed to only include episodes which are not already in the <code>episodes</code> table. (See <a href="#sec-load-duckdb"><span>Section&nbsp;6.3.1</span></a> for loading csv files into <strong>DuckDB</strong> directly.)</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"hosts"</span>, files <span class="op">=</span> <span class="st">"data/hosts.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By searching the <a href="http://www.snlarchives.net/Episodes/" target="_blank">SNL archives</a>, we can see that the next host, chronologically was Elon Musk on May 8, 2021.</p>
+<div class="cell" data-output.var="hosts_orig" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> hosts</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> epid <span class="kw">DESC</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-hosts-orig" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;6.3: Most recent hosts in the original <code>hosts</code> table.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">20210410</td>
+<td style="text-align: left;">Carey Mulligan</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210403</td>
+<td style="text-align: left;">Daniel Kaluuya</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210327</td>
+<td style="text-align: left;">Maya Rudolph</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210227</td>
+<td style="text-align: left;">Nick Jonas</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210220</td>
+<td style="text-align: left;">Rege-Jean Page</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210213</td>
+<td style="text-align: left;">Regina King</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210206</td>
+<td style="text-align: left;">Dan Levy</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210130</td>
+<td style="text-align: left;">John Krasinski</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20201219</td>
+<td style="text-align: left;">Kristen Wiig</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20201212</td>
+<td style="text-align: left;">Timothee Chalamet</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<p><code>INSERT</code> allows us to add the relevant information associated with the episode of SNL that Elon Musk hosted.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> hosts (epid, aid)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">VALUES</span> (<span class="st">'20210508'</span>, <span class="st">'Elon Musk'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-output.var="hosts_elon" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> hosts</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> epid <span class="kw">DESC</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-hosts-elon" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;6.4: <code>hosts</code> table including the added observation from May 8, 2021.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">20210508</td>
+<td style="text-align: left;">Elon Musk</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210410</td>
+<td style="text-align: left;">Carey Mulligan</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210403</td>
+<td style="text-align: left;">Daniel Kaluuya</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210327</td>
+<td style="text-align: left;">Maya Rudolph</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210227</td>
+<td style="text-align: left;">Nick Jonas</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210220</td>
+<td style="text-align: left;">Rege-Jean Page</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210213</td>
+<td style="text-align: left;">Regina King</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210206</td>
+<td style="text-align: left;">Dan Levy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210130</td>
+<td style="text-align: left;">John Krasinski</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20201219</td>
+<td style="text-align: left;">Kristen Wiig</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<p>It would be tedious to <code>INSERT</code> all of the most recent host information by hand. Instead, we’ll scrape the <a href="http://www.snlarchives.net/Episodes/" target="_blank">SNL archives</a> using the <strong>R</strong> package <strong>rvest</strong>, which allows us to pull out the appropriate html elements. The <code>epid</code> and <code>aid</code> are joined together in a tibble, and <code>filter</code>ed to only include episodes which are not already in the <code>episodes</code> table.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rvest.tidyverse.org/">rvest</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">recent_hosts</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://xml2.r-lib.org/reference/read_xml.html">read_html</a></span><span class="op">(</span><span class="st">"http://www.snlarchives.net/Episodes/"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rvest.tidyverse.org/reference/rename.html">html_nodes</a></span><span class="op">(</span><span class="st">"tr"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html">map_df</a></span><span class="op">(</span> <span class="op">~</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<span>    epid <span class="op">=</span> <span class="va">.x</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rvest.tidyverse.org/reference/rename.html">html_node</a></span><span class="op">(</span><span class="st">"a.ms-2.me-2"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://rvest.tidyverse.org/reference/html_attr.html">html_attr</a></span><span class="op">(</span><span class="st">"href"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">str_extract</span><span class="op">(</span><span class="st">"\\d+"</span><span class="op">)</span>,</span>
+<span>    aid <span class="op">=</span> <span class="va">.x</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rvest.tidyverse.org/reference/rename.html">html_node</a></span><span class="op">(</span><span class="st">"td:nth-child(2)"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://rvest.tidyverse.org/reference/html_text.html">html_text2</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">str_extract</span><span class="op">(</span><span class="st">"[\\w\\. \\w\\.]+(?=/|$)"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">epid</span> <span class="op">&gt;</span> <span class="fl">20210508</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="fu">write_csv</span><span class="op">(</span><span class="va">recent_hosts</span>, <span class="st">"data/recent_hosts.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> hosts</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> READ_CSV(<span class="st">'data/recent_hosts.csv'</span>, AUTO_DETECT <span class="op">=</span> <span class="kw">TRUE</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-output.var="hosts_update" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> hosts</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> epid <span class="kw">DESC</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-hosts-update" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;6.5: The full <code>hosts</code> table, updated through December 16, 2023.</caption>
+<thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">20231216</td>
+<td style="text-align: left;">Kate McKinnon</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20231209</td>
+<td style="text-align: left;">Adam Driver</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20231202</td>
+<td style="text-align: left;">Emma Stone</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20231118</td>
+<td style="text-align: left;">Jason Momoa</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20231111</td>
+<td style="text-align: left;">Timothée Chalamet</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20231028</td>
+<td style="text-align: left;">Nate Bargatze</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20231021</td>
+<td style="text-align: left;">Bad Bunny</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20231014</td>
+<td style="text-align: left;">Pete Davidson</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20230415</td>
+<td style="text-align: left;">Ana de Armas</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20230408</td>
+<td style="text-align: left;">Molly Shannon</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section><section id="temporary-tables" class="level2" data-number="6.3"><h2 data-number="6.3" class="anchored" data-anchor-id="temporary-tables">
+<span class="header-section-number">6.3</span> Temporary tables</h2>
 <p>Temporary tables are used to break down complex queries into smaller, more manageable steps. For example, let’s say we want to <code>JOIN</code> two tables after each has been filtered using different <code>WHERE</code> clauses. The filtered tables can each be saved into their own temporary tables and then the temporary tables can be merged.</p>
 <p>Note that tables in <strong>DuckDB</strong> are saved (to disk), even when the connection is closed. However, temporary tables are saved in memory (instead of on disk) and are deleted when the connection is closed. Specific configuration of the temporary directory allows for <a href="https://duckdb.org/docs/sql/statements/create_table.html#temporary-tables" target="_blank">temporary tables to be saved</a>, even when the connection is closed.</p>
-<section id="sec-load-duckdb" class="level3" data-number="6.1.1"><h3 data-number="6.1.1" class="anchored" data-anchor-id="sec-load-duckdb">
-<span class="header-section-number">6.1.1</span> Using <strong>DuckDB</strong> for loading data</h3>
+<section id="sec-load-duckdb" class="level3" data-number="6.3.1"><h3 data-number="6.3.1" class="anchored" data-anchor-id="sec-load-duckdb">
+<span class="header-section-number">6.3.1</span> Using <strong>DuckDB</strong> for loading data</h3>
 <p>The steps given in <a href="05-creating-db.html#sec-load-data"><span>Section&nbsp;5.1.1</span></a> are general to many <strong>SQL</strong> dialects and are important when working with most <strong>SQL</strong> clients. It is important to have control over the variables configurations as they make up the <strong>SQL</strong> database. However, using the <strong>duckdb</strong> package in <strong>R</strong> allows for shorthand entry of data from .csv files into the <strong>DuckDB</strong> database. Here, we take advantage of working with the <strong>DuckDB</strong> functionality in R.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"actors"</span>, files <span class="op">=</span> <span class="st">"data/actors.csv"</span><span class="op">)</span></span>
-<span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"seasons"</span>, files <span class="op">=</span> <span class="st">"data/seasons.csv"</span><span class="op">)</span></span>
-<span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"titles"</span>, files <span class="op">=</span> <span class="st">"data/titles.csv"</span><span class="op">)</span></span>
-<span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"hosts"</span>, files <span class="op">=</span> <span class="st">"data/hosts.csv"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"hosts"</span>, files <span class="op">=</span> <span class="st">"data/hosts.csv"</span><span class="op">)</span></span>
 <span><span class="fu">duckdb_read_csv</span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"episodes"</span>, files <span class="op">=</span> <span class="st">"data/episodes.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="checking-the-loading" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="checking-the-loading">Checking the loading</h4>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
 <caption>
-6 records
+4 records
 </caption>
 <thead><tr>
 <th style="text-align:left;">
@@ -312,11 +652,6 @@ name
 </th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-actors
-</td>
-</tr>
 <tr>
 <td style="text-align:left;">
 casts
@@ -334,12 +669,7 @@ hosts
 </tr>
 <tr>
 <td style="text-align:left;">
-seasons
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-titles
+impressions
 </td>
 </tr>
 </tbody>
@@ -347,80 +677,58 @@ titles
 </div>
 </div>
 <p>Notice that most of the tables have some kind of ID which allows <code>JOIN</code>ing across tables.</p>
-<div class="cell" data-output.var="select_actors" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> actors <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-output.var="select_hosts" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> hosts <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
-<div id="tbl-select-actors" class="anchored">
+<div id="tbl-select-hosts" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.1: Note the aid identifier in the actors table.</caption>
+<caption>Table&nbsp;6.6: Note the epid and aid identifiers in the hosts table.</caption>
 <thead><tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">url</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">gender</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Kate McKinnon</td>
-<td style="text-align: left;">/Cast/?KaMc</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">female</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Alex Moffat</td>
-<td style="text-align: left;">/Cast/?AlMo</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">male</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Ego Nwodim</td>
-<td style="text-align: left;">/Cast/?EgNw</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">unknown</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Chris Redd</td>
-<td style="text-align: left;">/Cast/?ChRe</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">male</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Kenan Thompson</td>
-<td style="text-align: left;">/Cast/?KeTh</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">male</td>
-</tr>
-<tr class="even">
+<td style="text-align: right;">20210410</td>
 <td style="text-align: left;">Carey Mulligan</td>
-<td style="text-align: left;">/Guests/?3677</td>
-<td style="text-align: left;">guest</td>
-<td style="text-align: left;">andy</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Marcus Mumford</td>
-<td style="text-align: left;">/Guests/?3679</td>
-<td style="text-align: left;">guest</td>
-<td style="text-align: left;">male</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Aidy Bryant</td>
-<td style="text-align: left;">/Cast/?AiBr</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">female</td>
+<td style="text-align: right;">20210403</td>
+<td style="text-align: left;">Daniel Kaluuya</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Steve Higgins</td>
-<td style="text-align: left;">/Crew/?StHi</td>
-<td style="text-align: left;">crew</td>
-<td style="text-align: left;">male</td>
+<td style="text-align: right;">20210327</td>
+<td style="text-align: left;">Maya Rudolph</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Mikey Day</td>
-<td style="text-align: left;">/Cast/?MiDa</td>
-<td style="text-align: left;">cast</td>
-<td style="text-align: left;">male</td>
+<td style="text-align: right;">20210227</td>
+<td style="text-align: left;">Nick Jonas</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210220</td>
+<td style="text-align: left;">Rege-Jean Page</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210213</td>
+<td style="text-align: left;">Regina King</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20210206</td>
+<td style="text-align: left;">Dan Levy</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20210130</td>
+<td style="text-align: left;">John Krasinski</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20201219</td>
+<td style="text-align: left;">Kristen Wiig</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20201212</td>
+<td style="text-align: left;">Timothee Chalamet</td>
 </tr>
 </tbody>
 </table>
@@ -430,13 +738,13 @@ titles
 </div>
 </div>
 <div class="cell" data-output.var="select_episodes" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> episodes <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> episodes <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-select-episodes" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.2: Note the sid and epid identifiers in the episodes table.</caption>
+<caption>Table&nbsp;6.7: Note the sid and epid identifiers in the episodes table.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">sid</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
@@ -511,183 +819,8 @@ titles
 
 </div>
 </div>
-<div class="cell" data-output.var="select_titles" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> titles <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-fig.asp="0.618">
-<div class="cell-output-display">
-<div id="tbl-select-titles" class="anchored">
-<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.3: Note the epid, tid, skid, and sid identifiers in the titles table.</caption>
-<thead><tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">order</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">tid</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">category</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">skid</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">sid</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">Eye On Minnesota</td>
-<td style="text-align: left;">Cold Opening</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">Monologue</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">What's Wrong With This Picture</td>
-<td style="text-align: left;">Game Show</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">Tremfalta</td>
-<td style="text-align: left;">Commercial</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">Study Buddy</td>
-<td style="text-align: left;">Sketch</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">Weird Little Flute</td>
-<td style="text-align: left;">Music Video</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;">"Tequila Shots"</td>
-<td style="text-align: left;">Musical Performance</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">Weekend Update</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+08</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">In Memoriam</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">20210410</td>
-<td style="text-align: right;">2.02e+09</td>
-<td style="text-align: left;">Starcharter Andromeda</td>
-<td style="text-align: left;">Show</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">46</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-
-</div>
-</div>
-<div class="cell" data-output.var="select_hosts" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> hosts <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-fig.asp="0.618">
-<div class="cell-output-display">
-<div id="tbl-select-hosts" class="anchored">
-<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.4: Note the epid and aid identifiers in the hosts table.</caption>
-<thead><tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">20210410</td>
-<td style="text-align: left;">Carey Mulligan</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">20210403</td>
-<td style="text-align: left;">Daniel Kaluuya</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">20210327</td>
-<td style="text-align: left;">Maya Rudolph</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">20210227</td>
-<td style="text-align: left;">Nick Jonas</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">20210220</td>
-<td style="text-align: left;">Rege-Jean Page</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">20210213</td>
-<td style="text-align: left;">Regina King</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">20210206</td>
-<td style="text-align: left;">Dan Levy</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">20210130</td>
-<td style="text-align: left;">John Krasinski</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">20201219</td>
-<td style="text-align: left;">Kristen Wiig</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">20201212</td>
-<td style="text-align: left;">Timothee Chalamet</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-
-</div>
-</div>
-</section></section><section id="creating-a-temporary-table" class="level3" data-number="6.1.2"><h3 data-number="6.1.2" class="anchored" data-anchor-id="creating-a-temporary-table">
-<span class="header-section-number">6.1.2</span> Creating a temporary table</h3>
+</section></section><section id="creating-a-temporary-table" class="level3" data-number="6.3.2"><h3 data-number="6.3.2" class="anchored" data-anchor-id="creating-a-temporary-table">
+<span class="header-section-number">6.3.2</span> Creating a temporary table</h3>
 <p>The <code>episodes</code> table has an <code>aired</code> column which includes the data. Recall that if we create a new variable (e.g., <code>year</code>) using <code>aired</code>, we cannot use <code>year</code> in the <code>WHERE</code> clause (<code>WHERE</code> only works on the original table, not the results set).</p>
 <p>In <strong>MySQL</strong> the function <code>STR_TO_DATE</code> allowed us to create a datetime variable from which year could be extracted. However, in <strong>DuckDB</strong>, it is more complicated to convert the character string of “April 10, 2020” to “2020-04-10”. Don’t worry about the code too much, but note that we wouldn’t want to wrangle the character date string every time we wanted to filter for year.</p>
 <section id="what-does-position-do" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="what-does-position-do">What does <code>POSITION</code> do?</h4>
@@ -699,38 +832,38 @@ titles
 </ol>
 <p>In summary, the entire expression is extracting a substring from the original string <code>aired</code>, starting from two positions to the right of the first comma and continuing until the end of the string. This can be useful in scenarios where you want to remove or isolate part of a string based on the position of a specific character (in this case, the comma).</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> TEMP <span class="kw">TABLE</span> episodes_date <span class="kw">AS</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="op">*</span>, <span class="cf">CASE</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>             <span class="cf">WHEN</span> POSITION(<span class="st">','</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">EXTRACT</span>(<span class="dt">YEAR</span> <span class="kw">FROM</span> <span class="fu">CAST</span>(</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                SUBSTRING(aired, POSITION(<span class="st">','</span> <span class="kw">IN</span> aired) <span class="op">+</span> <span class="dv">2</span>) <span class="op">||</span> <span class="st">'-'</span> <span class="op">||</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">CASE</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'January'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'01'</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'February'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'02'</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'March'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'03'</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'April'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'04'</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'May'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'05'</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'June'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'06'</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'July'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'07'</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'August'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'08'</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'September'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'09'</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'October'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'10'</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'November'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'11'</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'December'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'12'</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">ELSE</span> <span class="st">'01'</span> <span class="co">-- Default to January if no month is found</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">END</span> <span class="op">||</span> <span class="st">'-'</span> <span class="op">||</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                SUBSTRING(aired, POSITION(<span class="st">' '</span> <span class="kw">IN</span> aired) <span class="op">+</span> <span class="dv">1</span>, <span class="dv">2</span>) <span class="kw">AS</span> <span class="dt">DATE</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>            ))</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">END</span> <span class="kw">AS</span> <span class="dt">year</span> <span class="kw">FROM</span> episodes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> TEMP <span class="kw">TABLE</span> episodes_date <span class="kw">AS</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="op">*</span>, <span class="cf">CASE</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>             <span class="cf">WHEN</span> POSITION(<span class="st">','</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">EXTRACT</span>(<span class="dt">YEAR</span> <span class="kw">FROM</span> <span class="fu">CAST</span>(</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                SUBSTRING(aired, POSITION(<span class="st">','</span> <span class="kw">IN</span> aired) <span class="op">+</span> <span class="dv">2</span>) <span class="op">||</span> <span class="st">'-'</span> <span class="op">||</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">CASE</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'January'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'01'</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'February'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'02'</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'March'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'03'</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'April'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'04'</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'May'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'05'</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'June'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'06'</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'July'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'07'</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'August'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'08'</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'September'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'09'</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'October'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'10'</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'November'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'11'</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">WHEN</span> POSITION(<span class="st">'December'</span> <span class="kw">IN</span> aired) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="st">'12'</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">ELSE</span> <span class="st">'01'</span> <span class="co">-- Default to January if no month is found</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">END</span> <span class="op">||</span> <span class="st">'-'</span> <span class="op">||</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>                SUBSTRING(aired, POSITION(<span class="st">' '</span> <span class="kw">IN</span> aired) <span class="op">+</span> <span class="dv">1</span>, <span class="dv">2</span>) <span class="kw">AS</span> <span class="dt">DATE</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>            ))</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">END</span> <span class="kw">AS</span> <span class="dt">year</span> <span class="kw">FROM</span> episodes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-output.var="episodes_date" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> episodes_date <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> episodes_date <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-episodes-date" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.5: The temporary table called <code>episodes_date</code> that has identifiers of sid, epid, and epno.</caption>
+<caption>Table&nbsp;6.8: The temporary table called <code>episodes_date</code> that has identifiers of sid, epid, and epno.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">sid</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">epid</th>
@@ -816,20 +949,20 @@ titles
 
 </div>
 </div>
-</section></section><section id="using-a-temporary-table" class="level3" data-number="6.1.3"><h3 data-number="6.1.3" class="anchored" data-anchor-id="using-a-temporary-table">
-<span class="header-section-number">6.1.3</span> Using a temporary table</h3>
+</section></section><section id="using-a-temporary-table" class="level3" data-number="6.3.3"><h3 data-number="6.3.3" class="anchored" data-anchor-id="using-a-temporary-table">
+<span class="header-section-number">6.3.3</span> Using a temporary table</h3>
 <p>Now that the <code>year</code> variable has been created in the new temporary table called <code>episodes_date</code>, we can use <code>episode_date</code> to query and find, for example, all of the hosts in 2019.</p>
 <div class="cell" data-output.var="hosts_2019" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> hosts.aid, ep.aired, ep.<span class="dt">year</span> <span class="kw">FROM</span> hosts </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> episodes_date <span class="kw">AS</span> ep <span class="kw">ON</span> hosts.epid <span class="op">=</span> ep.epid</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2019</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">25</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> hosts.aid, ep.aired, ep.<span class="dt">year</span> <span class="kw">FROM</span> hosts </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> episodes_date <span class="kw">AS</span> ep <span class="kw">ON</span> hosts.epid <span class="op">=</span> ep.epid</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2019</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">25</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-hosts-2019" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;6.6: SNL hosts in 2019.</caption>
+<caption>Table&nbsp;6.9: SNL hosts in 2019.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">aid</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">aired</th>
@@ -953,11 +1086,11 @@ titles
 
 </div>
 </div>
-</section></section><section id="best-practice" class="level2" data-number="6.2"><h2 data-number="6.2" class="anchored" data-anchor-id="best-practice">
-<span class="header-section-number">6.2</span> Best practice</h2>
+</section></section><section id="best-practice" class="level2" data-number="6.4"><h2 data-number="6.4" class="anchored" data-anchor-id="best-practice">
+<span class="header-section-number">6.4</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
