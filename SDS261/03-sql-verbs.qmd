@@ -20,7 +20,13 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 ```{r}
 library(mdsr)
-con_taxi <- dbConnect_scidb("nyctaxi")
+con_taxi <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "nyctaxi",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
 ```
 
 ```{sql}
@@ -74,7 +80,7 @@ Similarly, the `DESCRIBE` command shows the 18 field names (variables) in the `y
 
 
 
-Most engagements with SQL are don through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
+Most engagements with SQL are done through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
 
 * `SELECT` allows you to list the columns, or functions operating on columns, that you want to retrieve. This is an analogous operation to the `select()` verb in **dplyr**, potentially combined with `mutate()` or `summarize()`.
 * `FROM` specifies the table where the data are.
@@ -765,3 +771,11 @@ It is always a good idea to terminate the **SQL** connection when you are done w
 ```{r}
 dbDisconnect(con_taxi)
 ```
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. What is the difference between `WHERE` and `HAVING`?
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+

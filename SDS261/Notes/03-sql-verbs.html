@@ -261,6 +261,8 @@ for (let popover of popovers){
   <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">3.7</span> LIMIT</a></li>
   <li><a href="#saving-sql-queries-as-r-objects" id="toc-saving-sql-queries-as-r-objects" class="nav-link" data-scroll-target="#saving-sql-queries-as-r-objects"><span class="header-section-number">3.8</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</a></li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">3.9</span> Best practice</a></li>
+  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">3.10</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
+  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">3.11</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -287,7 +289,13 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 -->
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mdsr-book/mdsr">mdsr</a></span><span class="op">)</span></span>
-<span><span class="va">con_taxi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mdsr/man/src_scidb.html">dbConnect_scidb</a></span><span class="op">(</span><span class="st">"nyctaxi"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">con_taxi</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
+<span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dbname <span class="op">=</span> <span class="st">"nyctaxi"</span>,</span>
+<span>  host <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_HOST"</span><span class="op">)</span>,</span>
+<span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_USER"</span><span class="op">)</span>,</span>
+<span>  password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_PWD"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-output.var="show" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -479,7 +487,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>Similarly, the <code>DESCRIBE</code> command shows the 18 field names (variables) in the <code>yellow_old</code> table. Some of the variables are characters (<code>text</code>) and some are numeric (either <code>double</code> or <code>bigint</code>)</p>
-<p>Most engagements with SQL are don through queries. Queries in <strong>SQL</strong> start with the <code>SELECT</code> keyword and consist of several clauses, which must be written in the following order:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Most engagements with SQL are done through queries. Queries in <strong>SQL</strong> start with the <code>SELECT</code> keyword and consist of several clauses, which must be written in the following order:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ul>
 <li>
 <code>SELECT</code> allows you to list the columns, or functions operating on columns, that you want to retrieve. This is an analogous operation to the <code>select()</code> verb in <strong>dplyr</strong>, potentially combined with <code>mutate()</code> or <code>summarize()</code>.</li>
@@ -24358,6 +24366,12 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section><section id="reflection-questions" class="level2" data-number="3.10"><h2 data-number="3.10" class="anchored" data-anchor-id="reflection-questions">
+<span class="header-section-number">3.10</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
+<ol type="1">
+<li>What is the difference between <code>WHERE</code> and <code>HAVING</code>?</li>
+</ol></section><section id="ethics-considerations" class="level2" data-number="3.11"><h2 data-number="3.11" class="anchored" data-anchor-id="ethics-considerations">
+<span class="header-section-number">3.11</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
 
 
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>

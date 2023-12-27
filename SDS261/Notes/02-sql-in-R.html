@@ -250,7 +250,7 @@ for (let popover of popovers){
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
    
   <ul>
-<li><a href="#sec-dplyr-seq" id="toc-sec-dplyr-seq" class="nav-link active" data-scroll-target="#sec-dplyr-seq"><span class="header-section-number">2.1</span> Translating <strong>dplyr</strong> code into SQL</a></li>
+<li><a href="#sec-dplyr-seq" id="toc-sec-dplyr-seq" class="nav-link active" data-scroll-target="#sec-dplyr-seq"><span class="header-section-number">2.1</span> Translating <strong>dplyr</strong> code into <strong>SQL</strong></a></li>
   <li><a href="#sql-queries-through-the-dbi-package" id="toc-sql-queries-through-the-dbi-package" class="nav-link" data-scroll-target="#sql-queries-through-the-dbi-package"><span class="header-section-number">2.2</span> SQL queries through the <strong>DBI</strong> package</a></li>
   <li><a href="#direct-sql-queries-through-a-sql-chunk" id="toc-direct-sql-queries-through-a-sql-chunk" class="nav-link" data-scroll-target="#direct-sql-queries-through-a-sql-chunk"><span class="header-section-number">2.3</span> Direct <strong>SQL</strong> queries through a <code>sql</code> chunk</a></li>
   <li>
@@ -260,6 +260,8 @@ for (let popover of popovers){
   <li><a href="#writing-sql-queries" id="toc-writing-sql-queries" class="nav-link" data-scroll-target="#writing-sql-queries"><span class="header-section-number">2.4.2</span> Writing SQL queries</a></li>
   </ul>
 </li>
+  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">2.5</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
+  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">2.6</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -284,7 +286,8 @@ for (let popover of popovers){
 <li>Using a <code>sql</code> chunk, we can write actual <strong>SQL</strong> code inside a quarto document.</li>
 </ol>
 <section id="sec-dplyr-seq" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="sec-dplyr-seq">
-<span class="header-section-number">2.1</span> Translating <strong>dplyr</strong> code into SQL</h2>
+<span class="header-section-number">2.1</span> Translating <strong>dplyr</strong> code into <strong>SQL</strong>
+</h2>
 <p>Let’s go back to the <strong>airlines</strong> database to try out some things that we already know how to do in <strong>R</strong>. Recall that we need the <strong>DBI</strong> and <strong>RMariaDB</strong> packages to connect to <strong>R</strong>; we need the <strong>dbplyr</strong> package to translate <strong>SQL</strong> code into <strong>R</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org">DBI</a></span><span class="op">)</span></span>
@@ -294,9 +297,9 @@ for (let popover of popovers){
 <span><span class="va">con_air</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dbname <span class="op">=</span> <span class="st">"airlines"</span>,</span>
-<span>  host <span class="op">=</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
-<span>  user <span class="op">=</span> <span class="st">"mdsr_public"</span>,</span>
-<span>  password <span class="op">=</span> <span class="st">"ImhsmflMDSwR"</span></span>
+<span>  host <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_HOST"</span><span class="op">)</span>,</span>
+<span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_USER"</span><span class="op">)</span>,</span>
+<span>  password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"MDSR_PWD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The function <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables()</a></code> in the <strong>DBI</strong> package will tell us what tables exist in the <strong>airlines</strong> database.</p>
@@ -499,9 +502,9 @@ WHERE (`year` = 2012.0 AND ((`origin` = 'LAX' AND `dest` = 'BOS') OR (`origin` =
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>con_air <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  RMariaDB<span class="sc">::</span><span class="fu">MariaDB</span>(),</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dbname =</span> <span class="st">"airlines"</span>,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">host =</span> <span class="st">"mdsr.cdc7tgkkqd0n.us-east-1.rds.amazonaws.com"</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">user =</span> <span class="st">"mdsr_public"</span>,</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">password =</span> <span class="st">"ImhsmflMDSwR"</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">host =</span> <span class="fu">Sys.getenv</span>(<span class="st">"MDSR_HOST"</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">user =</span> <span class="fu">Sys.getenv</span>(<span class="st">"MDSR_USER"</span>),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">"MDSR_PWD"</span>)</span>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1237,9 +1240,13 @@ num_flights
 <p>Write <strong>SQL</strong> code. Click on the orange triangle to run the code.</p>
 <p>Each lab should be saved as a .sql files that can be turned in. The <strong>SQL</strong> queries (in the .sql file) should be able to be run by someone else. Use the hashtag (<code>#</code>) to comment out lines so that you can identify particular problems or comment on the query results.</p>
 <p>If you did not specify which database to use when you set up the connection, the database can be specified at the top of the .sql file as <code>USE database;</code> (for example, you might want <code>USE airlines;</code>).</p>
+</section></section><section id="reflection-questions" class="level2" data-number="2.5"><h2 data-number="2.5" class="anchored" data-anchor-id="reflection-questions">
+<span class="header-section-number">2.5</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
+</section><section id="ethics-considerations" class="level2" data-number="2.6"><h2 data-number="2.6" class="anchored" data-anchor-id="ethics-considerations">
+<span class="header-section-number">2.6</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
 
 
-</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");

@@ -4,7 +4,7 @@
 #| include: false
 
 source("_common.R")
-library(tidyverse)
+fontawesome::fa_html_dependency()
 ```
 
 
@@ -15,6 +15,8 @@ The main focus of the course will be on **SQL** (pronounced "sequel" by many peo
 
 
 ## What is a database? {#sec-what-db}
+
+A database is a structured collection of data that is organized in such a way that facilitates efficient storage, retrieval, and management of information.  They are particularly important for industries with exceptionally large amounts of data which can be partitioned into different tables.  Additionally, databases allow for multiple users to access the data simultaneously.
 
 You are likely already familiar with the concept of *tidy* data. (If you have never encountered tidy data, see <a href = "https://r4ds.hadley.nz/data-tidy" target = "_blank">Chapter 5 Data tidying</a> in **R for Data Science**.) Tidy data typically live in data frames or **tables**; where, importantly, they consist of columns of variables (where every column is the same type!) and the rows of observational units.
 
@@ -41,10 +43,26 @@ The `tbl()` function (in the **dplyr** package) maps the tables called `flights`
 ```{r}
 library(tidyverse)
 library(mdsr)
-db_air <- dbConnect_scidb("airlines")
-flights <- tbl(db_air, "flights")
-carriers <- tbl(db_air, "carriers")
+con_air <- mdsr::dbConnect_scidb("airlines")
+flights <- tbl(con_air, "flights")
+carriers <- tbl(con_air, "carriers")
 ```
+
+
+Alternatively, the **SQL** connection can be set up directly using information specific to the **mdsr** **R** package database.
+
+```{r}
+#| eval: false
+
+con_air <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
+```
+
 
 We can now use the objects `flights` and `carriers` as if they were data frames, but they are not actually the **R** version of `data.frame`.  Instead, they exist as a `tbl` which is a special object that behaves similarly to a `data.frame`.
 
@@ -94,7 +112,7 @@ Always a good idea to terminate the **SQL** connection when you are done with it
 
 ```{r}
 library(DBI)
-dbDisconnect(db_air)
+dbDisconnect(con_air)
 ```
 
 ## Engaging with a database
@@ -167,3 +185,16 @@ Always a good idea to terminate the **SQL** connection when you are done with it
 ```{r}
 dbDisconnect(con_duckdb)
 ```
+
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. Why is **SQL** such an important tool for data scientists?  That is, what are the characteristics that make it useful?
+
+2. (Maybe best to answer after learning a few more concepts.)  What are the main differences between working with a dataframe in **R** and a table in **SQL**?
+
+
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
