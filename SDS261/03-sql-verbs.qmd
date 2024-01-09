@@ -277,6 +277,56 @@ length_time3 |>
 
 Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `pickup_datetime` and `dropoff_datetime` are columns in the original table - they are written to disk on the **SQL** server.  The variables `pickup`, `dropoff`, and `length_time` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **RStudio** or **DBeaver**) and is not written to disk.
 
+## SELECT DISTINCT
+
+`SELECT DISTINCT` returns only unique rows.  That is, it filters out all the duplicates of a variable or a combination of variables.  Note that I have a larger limit on the query that I needed, just to make sure I got all the levels.
+
+```{sql}
+#| connection: con_taxi
+#| label: distinct1
+#| output.var: "distinct1"
+
+SELECT DISTINCT payment_type
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-distinct1
+#| echo: false
+#| tbl-cap: "The distinct values of payment types. `CRD` is credit card; `CSH` is cash; `NOC` is no charge; `DIS` is dispute."
+
+distinct1 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+```{sql}
+#| connection: con_taxi
+#| label: distinct2
+#| output.var: "distinct2"
+
+SELECT DISTINCT vendor_id, payment_type
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-distinct2
+#| echo: false
+#| tbl-cap: "The distinct values of vendor ID and payment types, combined. `VTS` is Verifone Transportation Systems and `CMT` is Mobile Knowledge Systems Inc. `CRD` is credit card; `CSH` is cash; `NOC` is no charge; `DIS` is dispute."
+
+distinct2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
 
 ## WHERE
 
@@ -428,6 +478,67 @@ where_1012d |>
                 full_width = FALSE) 
 
 ```
+
+
+### NULL in WHERE
+
+**SQL** considers `NULL` values to be unknown. Therefore, when searching for a `NULL` value, you need to ask **SQL** if the value is `NULL`.  Asking if the value is *equal* to `NULL` doesn't work because `NULL` values don't equal anything (they are unknown).
+
+To keep all values that are not `NULL` values, use `IS NOT NULL` in the `WHERE` clause.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-null1
+#| output.var: "where_null1"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE payment_type IS NULL
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-null1
+#| echo: false
+#| tbl-cap: "There is only one record with a NULL value for `payment_type`. Note that the way to find NULL values is via `IS NULL`."
+
+where_null1 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-null2
+#| output.var: "where_null2"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE payment_type = NULL
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-null2
+#| echo: false
+#| tbl-cap: "No rows are selected when the `WHERE` command is specified to indicate if the variable *equals* `NULL`."
+
+where_null2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
 
 
 

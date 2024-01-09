@@ -254,15 +254,21 @@ for (let popover of popovers){
   <ul>
 <li><a href="#looking-at-the-tables-in-the-database" id="toc-looking-at-the-tables-in-the-database" class="nav-link active" data-scroll-target="#looking-at-the-tables-in-the-database"><span class="header-section-number">3.1</span> Looking at the tables in the database</a></li>
   <li><a href="#sec-select" id="toc-sec-select" class="nav-link" data-scroll-target="#sec-select"><span class="header-section-number">3.2</span> SELECT … FROM</a></li>
-  <li><a href="#where" id="toc-where" class="nav-link" data-scroll-target="#where"><span class="header-section-number">3.3</span> WHERE</a></li>
-  <li><a href="#group-by" id="toc-group-by" class="nav-link" data-scroll-target="#group-by"><span class="header-section-number">3.4</span> GROUP BY</a></li>
-  <li><a href="#order-by" id="toc-order-by" class="nav-link" data-scroll-target="#order-by"><span class="header-section-number">3.5</span> ORDER BY</a></li>
-  <li><a href="#having" id="toc-having" class="nav-link" data-scroll-target="#having"><span class="header-section-number">3.6</span> HAVING</a></li>
-  <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">3.7</span> LIMIT</a></li>
-  <li><a href="#saving-sql-queries-as-r-objects" id="toc-saving-sql-queries-as-r-objects" class="nav-link" data-scroll-target="#saving-sql-queries-as-r-objects"><span class="header-section-number">3.8</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</a></li>
-  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">3.9</span> Best practice</a></li>
-  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">3.10</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
-  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">3.11</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
+  <li><a href="#select-distinct" id="toc-select-distinct" class="nav-link" data-scroll-target="#select-distinct"><span class="header-section-number">3.3</span> SELECT DISTINCT</a></li>
+  <li>
+<a href="#where" id="toc-where" class="nav-link" data-scroll-target="#where"><span class="header-section-number">3.4</span> WHERE</a>
+  <ul class="collapse">
+<li><a href="#null-in-where" id="toc-null-in-where" class="nav-link" data-scroll-target="#null-in-where"><span class="header-section-number">3.4.1</span> NULL in WHERE</a></li>
+  </ul>
+</li>
+  <li><a href="#group-by" id="toc-group-by" class="nav-link" data-scroll-target="#group-by"><span class="header-section-number">3.5</span> GROUP BY</a></li>
+  <li><a href="#order-by" id="toc-order-by" class="nav-link" data-scroll-target="#order-by"><span class="header-section-number">3.6</span> ORDER BY</a></li>
+  <li><a href="#having" id="toc-having" class="nav-link" data-scroll-target="#having"><span class="header-section-number">3.7</span> HAVING</a></li>
+  <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">3.8</span> LIMIT</a></li>
+  <li><a href="#saving-sql-queries-as-r-objects" id="toc-saving-sql-queries-as-r-objects" class="nav-link" data-scroll-target="#saving-sql-queries-as-r-objects"><span class="header-section-number">3.9</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</a></li>
+  <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">3.10</span> Best practice</a></li>
+  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">3.11</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
+  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">3.12</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -1234,8 +1240,104 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>Keep in mind that there is a distinction between clauses that operate on the <em>variables of the original table</em> versus those that operate on the <em>variables of the results set</em>. The variables <code>pickup_datetime</code> and <code>dropoff_datetime</code> are columns in the original table - they are written to disk on the <strong>SQL</strong> server. The variables <code>pickup</code>, <code>dropoff</code>, and <code>length_time</code> exist only in the results set, which is passed from the server (<strong>SQL</strong> server) to the client (e.g., <strong>RStudio</strong> or <strong>DBeaver</strong>) and is not written to disk.</p>
-</section><section id="where" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="where">
-<span class="header-section-number">3.3</span> WHERE</h2>
+</section><section id="select-distinct" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="select-distinct">
+<span class="header-section-number">3.3</span> SELECT DISTINCT</h2>
+<p><code>SELECT DISTINCT</code> returns only unique rows. That is, it filters out all the duplicates of a variable or a combination of variables. Note that I have a larger limit on the query that I needed, just to make sure I got all the levels.</p>
+<div class="cell" data-output.var="distinct1" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> payment_type</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-distinct1" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;3.8: The distinct values of payment types. <code>CRD</code> is credit card; <code>CSH</code> is cash; <code>NOC</code> is no charge; <code>DIS</code> is dispute.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CRD</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CSH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NOC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DIS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">UNK</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<div class="cell" data-output.var="distinct2" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> vendor_id, payment_type</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-distinct2" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;3.9: The distinct values of vendor ID and payment types, combined. <code>VTS</code> is Verifone Transportation Systems and <code>CMT</code> is Mobile Knowledge Systems Inc. <code>CRD</code> is credit card; <code>CSH</code> is cash; <code>NOC</code> is no charge; <code>DIS</code> is dispute.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">vendor_id</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CMT</td>
+<td style="text-align: left;">CRD</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CMT</td>
+<td style="text-align: left;">CSH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CMT</td>
+<td style="text-align: left;">NOC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CMT</td>
+<td style="text-align: left;">DIS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VTS</td>
+<td style="text-align: left;">CRD</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VTS</td>
+<td style="text-align: left;">CSH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VTS</td>
+<td style="text-align: left;">UNK</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section><section id="where" class="level2" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="where">
+<span class="header-section-number">3.4</span> WHERE</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -1249,17 +1351,17 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <p>The <code>WHERE</code> clause is analogous to the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function in <strong>dplyr</strong>. However, keep in mind that there are two <strong>SQL</strong> commands that resemble the <strong>dplyr</strong> <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function. <code>WHERE</code> operates on the original data in the table and <code>HAVING</code> operates on the result set. See below for examples using <code>HAVING</code>.</p>
 <p>What was the fare for those taxi rides where the <code>tip_amount</code> was more than $10 and the person used cash? (Note that in <strong>SQL</strong> the equality logical is <code>=</code> and in <strong>R</strong> the equality logical is <code>==</code>.)</p>
 <div class="cell" data-output.var="select_10" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="op">&gt;</span> <span class="dv">10</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="op">&gt;</span> <span class="dv">10</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-select-10" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.8: WHERE to subset the queried rows.</caption>
+<caption>Table&nbsp;3.10: WHERE to subset the queried rows.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1336,17 +1438,17 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p><code>BETWEEN</code> can be used to specify a range of values for a numeric value.</p>
 <div class="cell" data-output.var="where_1012a" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-1012a" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.9: BETWEEN in the WHERE clause.</caption>
+<caption>Table&nbsp;3.11: BETWEEN in the WHERE clause.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1423,17 +1525,17 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p><code>IN</code> is similar to the <strong>dplyr</strong> <code>%in%</code> function which specifies distinct values for the variable.</p>
 <div class="cell" data-output.var="where_1012b" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">IN</span> (<span class="dv">10</span>, <span class="dv">12</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">IN</span> (<span class="dv">10</span>, <span class="dv">12</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">AND</span> payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-1012b" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.10: IN in the WHERE clause.</caption>
+<caption>Table&nbsp;3.12: IN in the WHERE clause.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1510,18 +1612,18 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>The <code>WHERE</code> clause can be established by a number of logical commands combined using either <code>AND</code> or <code>OR</code>. Usually it is important to use parentheses with <code>OR</code> logicals to make sure the desired query is return. Consider the difference between the following queries. In <strong>SQL</strong> (as in many programming languages), <code>AND</code> takes precedent over <code>OR</code> in the order of operations, when there are no parentheses. (I was taught to remember order of operations using “please excuse my dear aunt Sally.”) The order of operations on the first query groups the second two conditions into one because <code>AND</code> take precedence over <code>OR</code> (as if the query was <code>tip_amount BETWEEN 10 and 12 OR (total_amount BETWEEN 100 and 112 AND payment_type = "CSH")</code>).</p>
 <div class="cell" data-output.var="where_1012c" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span> <span class="kw">OR</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      total_amount <span class="kw">BETWEEN</span> <span class="dv">100</span> <span class="kw">and</span> <span class="dv">112</span> <span class="kw">AND</span> </span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span> <span class="kw">OR</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      total_amount <span class="kw">BETWEEN</span> <span class="dv">100</span> <span class="kw">and</span> <span class="dv">112</span> <span class="kw">AND</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-1012c" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.11: OR and AND without parentheses.</caption>
+<caption>Table&nbsp;3.13: OR and AND without parentheses.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1597,18 +1699,18 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <div class="cell" data-output.var="where_1012d" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> (tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span> <span class="kw">OR</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>      total_amount <span class="kw">BETWEEN</span> <span class="dv">100</span> <span class="kw">and</span> <span class="dv">112</span> ) <span class="kw">AND</span> </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> (tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">12</span> <span class="kw">OR</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>      total_amount <span class="kw">BETWEEN</span> <span class="dv">100</span> <span class="kw">and</span> <span class="dv">112</span> ) <span class="kw">AND</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      payment_type <span class="op">=</span> <span class="ot">"CSH"</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-1012d" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.12: OR and AND with parentheses.</caption>
+<caption>Table&nbsp;3.14: OR and AND with parentheses.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1683,8 +1785,70 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-</section><section id="group-by" class="level2" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="group-by">
-<span class="header-section-number">3.4</span> GROUP BY</h2>
+<section id="null-in-where" class="level3" data-number="3.4.1"><h3 data-number="3.4.1" class="anchored" data-anchor-id="null-in-where">
+<span class="header-section-number">3.4.1</span> NULL in WHERE</h3>
+<p><strong>SQL</strong> considers <code>NULL</code> values to be unknown. Therefore, when searching for a <code>NULL</code> value, you need to ask <strong>SQL</strong> if the value is <code>NULL</code>. Asking if the value is <em>equal</em> to <code>NULL</code> doesn’t work because <code>NULL</code> values don’t equal anything (they are unknown).</p>
+<p>To keep all values that are not <code>NULL</code> values, use <code>IS NOT NULL</code> in the <code>WHERE</code> clause.</p>
+<div class="cell" data-output.var="where_null1" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="kw">IS</span> <span class="kw">NULL</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-where-null1" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;3.15: There is only one record with a NULL value for <code>payment_type</code>. Note that the way to find NULL values is via <code>IS NULL</code>.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tip_amount</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">total_amount</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr></tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<div class="cell" data-output.var="where_null2" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="op">=</span> <span class="kw">NULL</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="cell-output-display">
+<div id="tbl-where-null2" class="anchored">
+<table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
+<caption>Table&nbsp;3.16: No rows are selected when the <code>WHERE</code> command is specified to indicate if the variable <em>equals</em> <code>NULL</code>.</caption>
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tip_amount</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">total_amount</th>
+</tr></thead>
+<tbody><tr class="odd">
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr></tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section></section><section id="group-by" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="group-by">
+<span class="header-section-number">3.5</span> GROUP BY</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -1697,18 +1861,18 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>The <code>GROUP BY</code> clause will direct <strong>SQL</strong> to carry out the query separately for each category in the grouped variable. Using <code>GROUP BY</code> is particularly important when aggregating multiple rows into a single number. Some <a href="https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html" target="_blank">aggregate functions</a> include <code>COUNT()</code>, <code>SUM()</code>, <code>MAX()</code>, <code>MIN()</code>, and <code>AVG()</code>.</p>
 <div class="cell" data-output.var="group_pay" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">sum</span>(<span class="dv">1</span>) <span class="kw">as</span> num_transactions_also,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">sum</span>(<span class="dv">1</span>) <span class="kw">as</span> num_transactions_also,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-group-pay" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.13: GROUP BY on payment_type.</caption>
+<caption>Table&nbsp;3.17: GROUP BY on payment_type.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions_also</th>
@@ -1749,19 +1913,19 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>For those people who tipped between $10 and $20, what was the lowest and highest fare for each of the types of payments?</p>
 <div class="cell" data-output.var="group_pay2" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-group-pay2" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.14: GROUP BY with aggregate functions.</caption>
+<caption>Table&nbsp;3.18: GROUP BY with aggregate functions.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -1808,20 +1972,20 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p><code>GROUP BY</code> will work applied to multiple columns. Let’s tabulate the same results, now broken down by <code>payment_type</code> and day of week. Except that we don’t have a day of week variable! We need to convert the <code>pickup_datetime</code> variable to a DateTime object and then pull out the day of the week, using <code>DAYNAME</code>. (Note: <code>DAYOFWEEK</code> will give you the day of the week as an integer. Use your internet sleuthing skills if you are looking for functions that might help your desired query.)</p>
 <div class="cell" data-output.var="group_wday" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-group-wday" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.15: GROUP BY with payment_type and wday.</caption>
+<caption>Table&nbsp;3.19: GROUP BY with payment_type and wday.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -2089,8 +2253,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-</section><section id="order-by" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="order-by">
-<span class="header-section-number">3.5</span> ORDER BY</h2>
+</section><section id="order-by" class="level2" data-number="3.6"><h2 data-number="3.6" class="anchored" data-anchor-id="order-by">
+<span class="header-section-number">3.6</span> ORDER BY</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -2103,20 +2267,20 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>The <code>ORDER BY</code> command can be used with or without the <code>GROUP BY</code> and aggregation commands. It allows us to look at interesting aspects of the data by sorting the data.</p>
 <div class="cell" data-output.var="order_low" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> lowest_fare <span class="kw">ASC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> lowest_fare <span class="kw">ASC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-order-low" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.16: ORDER BY lowest_fare, ascending.</caption>
+<caption>Table&nbsp;3.20: ORDER BY lowest_fare, ascending.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -2386,20 +2550,20 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>WHAT?!?!! How in the world was one of the fares -$612.40? It doesn’t make any sense that a fare would be negative. Some additional inquiry into the observation corresponding to a fare of -$612.40 is absolutely warranted. If the observation is found to be a typo, it would need to be removed from the data set. If the observation is somehow legitimate, it would need to be included in the analysis, with the information provided about its legitimacy.</p>
 <div class="cell" data-output.var="order_high" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> highest_fare <span class="kw">DESC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> highest_fare <span class="kw">DESC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-order-high" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.17: ORDER BY highest_fare, descending</caption>
+<caption>Table&nbsp;3.21: ORDER BY highest_fare, descending</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -2669,20 +2833,20 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>$950 is a lot to pay for a cab ride! But in NYC, I’d believe it.</p>
 <div class="cell" data-output.var="order_wday" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> wday, payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> wday, payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-order-wday" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.18: ORDER BY wday and payment_type.</caption>
+<caption>Table&nbsp;3.22: ORDER BY wday and payment_type.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -2961,8 +3125,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>As above, we were able to <code>GROUP BY</code> and <code>ORDER BY</code> on the new variables we had created, <code>wday</code>.</p>
-</section><section id="having" class="level2" data-number="3.6"><h2 data-number="3.6" class="anchored" data-anchor-id="having">
-<span class="header-section-number">3.6</span> HAVING</h2>
+</section><section id="having" class="level2" data-number="3.7"><h2 data-number="3.7" class="anchored" data-anchor-id="having">
+<span class="header-section-number">3.7</span> HAVING</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -2975,20 +3139,20 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>Recall that <code>WHERE</code> acts only on the original data. If we are interested in rides that took place on <code>Friday</code>, we need to use the derived variable <code>wday</code> instead of the raw variable <code>pickup_datetime</code>. Fortunately, <code>HAVING</code> works on the results set. Note that <strong>SQL</strong> uses <code>''</code> for strings, not <code>""</code>. In <strong>SQL</strong>, <code>""</code> is used to identify variables (not values of variables), like <strong>R</strong>’s <code>&amp;grave;&amp;grave;</code>.</p>
 <div class="cell" data-output.var="having_fri" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> wday <span class="op">=</span> <span class="st">'Friday'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> wday <span class="op">=</span> <span class="st">'Friday'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-having-fri" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.19: HAVING to filter only Friday rides.</caption>
+<caption>Table&nbsp;3.23: HAVING to filter only Friday rides.</caption>
 <thead><tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">num_transactions</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">lowest_fare</th>
@@ -3051,8 +3215,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 </div>
-</section><section id="limit" class="level2" data-number="3.7"><h2 data-number="3.7" class="anchored" data-anchor-id="limit">
-<span class="header-section-number">3.7</span> LIMIT</h2>
+</section><section id="limit" class="level2" data-number="3.8"><h2 data-number="3.8" class="anchored" data-anchor-id="limit">
+<span class="header-section-number">3.8</span> LIMIT</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -3065,13 +3229,13 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>As we’ve seen, <code>LIMIT</code> truncates the query to specified rows. The <code>LIMIT</code> command specifies which rows to select: the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14). The query below shows the last 10 rows of the entire data set.</p>
 <div class="cell" data-output.var="limit_last" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> yellow_old <span class="kw">LIMIT</span> <span class="dv">15428118</span>, <span class="dv">15428128</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> yellow_old <span class="kw">LIMIT</span> <span class="dv">15428118</span>, <span class="dv">15428128</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-limit-last" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.20: LIMIT on the last 10 rows of the table.</caption>
+<caption>Table&nbsp;3.24: LIMIT on the last 10 rows of the table.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">vendor_id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">pickup_datetime</th>
@@ -3300,26 +3464,26 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-</section><section id="saving-sql-queries-as-r-objects" class="level2" data-number="3.8"><h2 data-number="3.8" class="anchored" data-anchor-id="saving-sql-queries-as-r-objects">
-<span class="header-section-number">3.8</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</h2>
+</section><section id="saving-sql-queries-as-r-objects" class="level2" data-number="3.9"><h2 data-number="3.9" class="anchored" data-anchor-id="saving-sql-queries-as-r-objects">
+<span class="header-section-number">3.9</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</h2>
 <p>If you are working in <strong>R</strong> to run <strong>SQL</strong> commands, you may want to use the query output for further analysis or visualizations. In that case, use <code>#|output.var: "name_of_variable"</code> inside the <code>{sql}</code> chunk. The variable called <code>name_of_variable</code> will then be available to be used in the R environment.</p>
 <div class="cell" data-output.var="new_table" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_taxi</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: new-table</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| output.var: "new_table"</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span>, <span class="fu">DAYNAME</span>(STR_TO_DATE(pickup_datetime, <span class="st">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old </span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">1000</span>;</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_taxi</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: new-table</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| output.var: "new_table"</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span>, <span class="fu">DAYNAME</span>(STR_TO_DATE(pickup_datetime, <span class="st">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">1000</span>;</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-new-table" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.21: New data.frame saved to R called new_table.</caption>
+<caption>Table&nbsp;3.25: New data.frame saved to R called new_table.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">vendor_id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">pickup_datetime</th>
@@ -3476,28 +3640,28 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>new_table <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(wday) <span class="sc">|&gt;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fare_amount, <span class="at">y =</span> tip_amount, <span class="at">color =</span> wday)) <span class="sc">+</span> </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>new_table <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(wday) <span class="sc">|&gt;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fare_amount, <span class="at">y =</span> tip_amount, <span class="at">color =</span> wday)) <span class="sc">+</span> </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="03-sql-verbs_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" style="width:90.0%"></p>
+<p><img src="03-sql-verbs_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid" style="width:90.0%"></p>
 </div>
 </div>
-</section><section id="best-practice" class="level2" data-number="3.9"><h2 data-number="3.9" class="anchored" data-anchor-id="best-practice">
-<span class="header-section-number">3.9</span> Best practice</h2>
+</section><section id="best-practice" class="level2" data-number="3.10"><h2 data-number="3.10" class="anchored" data-anchor-id="best-practice">
+<span class="header-section-number">3.10</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="reflection-questions" class="level2" data-number="3.10"><h2 data-number="3.10" class="anchored" data-anchor-id="reflection-questions">
-<span class="header-section-number">3.10</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
+</section><section id="reflection-questions" class="level2" data-number="3.11"><h2 data-number="3.11" class="anchored" data-anchor-id="reflection-questions">
+<span class="header-section-number">3.11</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
 <ol type="1">
 <li>What is the difference between <code>WHERE</code> and <code>HAVING</code>?</li>
-</ol></section><section id="ethics-considerations" class="level2" data-number="3.11"><h2 data-number="3.11" class="anchored" data-anchor-id="ethics-considerations">
-<span class="header-section-number">3.11</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
+</ol></section><section id="ethics-considerations" class="level2" data-number="3.12"><h2 data-number="3.12" class="anchored" data-anchor-id="ethics-considerations">
+<span class="header-section-number">3.12</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
 
 
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
