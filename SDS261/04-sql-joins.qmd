@@ -10,7 +10,7 @@ fontawesome::fa_html_dependency()
 
 Beyond `SELECT` queries, the next most fundamental actions in **SQL** have to do with working with two or more tables simultaneously.  If you have worked in **R**, you may be familiar with the `join_()` family of functions.  Moving beyond `JOIN`, we will also cover subqueries which create temporary tables inside a **SQL** statement.
 
-The database we'll work with for learning how to combine tables is on Yelp reviews.  There are three tables: `businesses`, `reviews`, and `users`, see @tbl-yelp-tables.  From the `EXPLAIN` output [@tbl-bus-vars; @tbl-rev-vars; @tbl-user-vars], we can see that the tables match up by ID.  The variable `id` in the `businesses` table is the same as the variable `business_id` in the `reviews` table.  `user_id` is the same variable in both the `reviews` and `users` tables.  The connections across the tables will be important when performing `JOIN`s.
+The database we'll work with for learning how to combine tables is on IMDb data.  There are **many** tables, see @tbl-imdb-tables.   @tbl-select-kind shows information on the `kind_type` table which describes each `kind`. Other tables contain ID variables which will be important when performing `JOIN`s.
 
 ```{r}
 con_imdb <- DBI::dbConnect(
@@ -242,7 +242,7 @@ title_glance |>
 ```
 
 
-The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the rating (given by `info` where `type_id = 100`).  See @tbl-idx-glance.
+The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the number of votes (given by `info` where `type_id = 100`).  See @tbl-idx-glance.
 
 ```{sql}
 #| connection: con_imdb
@@ -266,11 +266,11 @@ idx_glance |>
 ```
 
 
-Let's say we want to combine the titles with the ratings so that each title with user rating is included.  That is, only keep the titles that have a corresponding rating.  And also, only keep the rating if there is an associated title (which means we use `INNER JOIN` or just plain `JOIN`).
+Let's say we want to combine the titles with the number of votes so that each title with user votes is included.  That is, only keep the titles that have a corresponding votes.  And also, only keep the votes if there is an associated title (which means we use `INNER JOIN` or just plain `JOIN`).
 
 Remember that `WHERE` will work on the raw variables, and `HAVING` works on the results set.  
 
-Some aspects of the query are worth pointing out:
+Some aspects of the query are worth pointing out:  
 * The variables in the output are given in the `SELECT` clause.  The `id` and `title` (both from the `title` table) and the `info` from the `movie_info_idx` which represents the number of IMDb votes.
 * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion.
 * The `JOIN` happens by linking the `id` variable in the `title` table with the `movie_id` variable in the `movie_info_idx` table.
@@ -290,7 +290,7 @@ FROM title
 JOIN movie_info_idx ON title.id = movie_info_idx.movie_id 
 WHERE title.production_year = 2015 
     AND title.kind_id = 1                  # movies only
-    AND movie_info_idx.info_type_id = 100  # rating is votes
+    AND movie_info_idx.info_type_id = 100  # info_type is votes
     AND movie_info_idx.info > 150000       # at least 150,000 votes
 ORDER BY movie_info_idx.info DESC
 LIMIT 0, 20;
@@ -382,7 +382,7 @@ JOIN cast_info AS a ON idx.movie_id = a.movie_id
 JOIN aka_name AS n ON a.person_id = n.person_id
 WHERE t.production_year = 2015 
     AND t.kind_id = 1           # movies only
-    AND idx.info_type_id = 100  # rating is votes
+    AND idx.info_type_id = 100  # info_type is votes
     AND idx.info > 150000       # at least 150,000 votes
     AND a.role_id = 2           # actresses only
 ORDER BY idx.info DESC
@@ -435,7 +435,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1             # movies only
-    AND idx.info_type_id = 100    # rating is votes
+    AND idx.info_type_id = 100    # info_type is votes
     AND idx.info > 400000         # at least 400,000 votes
 ORDER BY idx.info DESC
 ```
@@ -510,7 +510,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1               # movies only
-    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info_type_id = 100      # info_type is votes
     AND idx.info > 400000) AS movs  # at least 400,000 votes     
 INNER JOIN (SELECT a.person_id,
        a.movie_id,
@@ -552,7 +552,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1               # movies only
-    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info_type_id = 100      # info_type is votes
     AND idx.info > 400000) AS movs  # at least 400,000 votes     
 RIGHT JOIN (SELECT a.person_id,
        a.movie_id,
@@ -597,7 +597,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1               # movies only
-    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info_type_id = 100      # info_type is votes
     AND idx.info > 400000) AS movs  # at least 400,000 votes     
 LEFT JOIN (SELECT a.person_id,
        a.movie_id,
@@ -628,6 +628,8 @@ DT::datatable(left_movie_actress, escape = FALSE,
 
 We might, for example, want to know how many names / spellings of a name with a specific `person_id` (above 3900000) exist for each `person_id` in each of the top voted seven films of 2015.  
 
+In @tbl-num-repeat-names why isn't there a column indicating the name of the actress?  (There can't be such a column. Why not?) 
+
 ```{sql}
 #| connection: con_imdb
 #| label: num-repeat_names
@@ -641,7 +643,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1               # movies only
-    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info_type_id = 100      # info_type is votes
     AND idx.info > 400000) AS movs  # at least 400,000 votes
 JOIN (SELECT a.person_id,
        a.movie_id,
@@ -684,7 +686,7 @@ FROM title AS t
 JOIN movie_info_idx AS idx ON idx.movie_id = t.id
 WHERE t.production_year = 2015  
     AND t.kind_id = 1               # movies only
-    AND idx.info_type_id = 100      # rating is votes
+    AND idx.info_type_id = 100      # info_type is votes
     AND idx.info > 400000) AS movs  # at least 400,000 votes
 JOIN (SELECT a.person_id,
        a.movie_id,
@@ -969,6 +971,16 @@ dbDisconnect(con_imdb)
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
+1. What are the different types of joins?  Which data from which table gets kept and which gets removed for each type of join?
+
+2. What is the difference between a join and a union?
+
+3. When working with multiple tables, how (and why) is a variable linked to its table?
+
+4. Consider a `RIGHT JOIN`.  If there are records in the right table that are not in the left table, what will the value of the left table variable be for those records? 
+
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
 
+1. What can happen if a `UNION` is done without carefully matching up the columns of the two tables being `UNION`ed?
 
+2. How will you know if `JOIN`ing removed some records?  What if the `JOIN` produced missing values for some of the variables?  How should we deal with missing data or arbitrarily removed records?

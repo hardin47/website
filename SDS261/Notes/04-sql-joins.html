@@ -292,7 +292,7 @@ for (let popover of popovers){
   
 
 </header><p>Beyond <code>SELECT</code> queries, the next most fundamental actions in <strong>SQL</strong> have to do with working with two or more tables simultaneously. If you have worked in <strong>R</strong>, you may be familiar with the <code>join_()</code> family of functions. Moving beyond <code>JOIN</code>, we will also cover subqueries which create temporary tables inside a <strong>SQL</strong> statement.</p>
-<p>The database we’ll work with for learning how to combine tables is on Yelp reviews. There are three tables: <code>businesses</code>, <code>reviews</code>, and <code>users</code>, see <span class="quarto-unresolved-ref">?tbl-yelp-tables</span>. From the <code>EXPLAIN</code> output <span class="quarto-unresolved-ref">?tbl-bus-vars</span>, <span class="quarto-unresolved-ref">?tbl-rev-vars</span>, <span class="quarto-unresolved-ref">?tbl-user-vars</span>, we can see that the tables match up by ID. The variable <code>id</code> in the <code>businesses</code> table is the same as the variable <code>business_id</code> in the <code>reviews</code> table. <code>user_id</code> is the same variable in both the <code>reviews</code> and <code>users</code> tables. The connections across the tables will be important when performing <code>JOIN</code>s.</p>
+<p>The database we’ll work with for learning how to combine tables is on IMDb data. There are <strong>many</strong> tables, see <a href="#tbl-imdb-tables">Table&nbsp;<span>4.1</span></a>. <a href="#tbl-select-kind">Table&nbsp;<span>4.2</span></a> shows information on the <code>kind_type</code> table which describes each <code>kind</code>. Other tables contain ID variables which will be important when performing <code>JOIN</code>s.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_imdb</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -951,7 +951,7 @@ for (let popover of popovers){
 
 </div>
 </div>
-<p>The <code>movie_info_idx</code> table does not contain much information about each particular film. It does, however, have an indicator for the movie ID (given by <code>movie_id</code>) as well as the rating (given by <code>info</code> where <code>type_id = 100</code>). See <a href="#tbl-idx-glance">Table&nbsp;<span>4.5</span></a>.</p>
+<p>The <code>movie_info_idx</code> table does not contain much information about each particular film. It does, however, have an indicator for the movie ID (given by <code>movie_id</code>) as well as the number of votes (given by <code>info</code> where <code>type_id = 100</code>). See <a href="#tbl-idx-glance">Table&nbsp;<span>4.5</span></a>.</p>
 <div class="cell" data-output.var="idx_glance" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> movie_info_idx <span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1017,9 +1017,10 @@ for (let popover of popovers){
 
 </div>
 </div>
-<p>Let’s say we want to combine the titles with the ratings so that each title with user rating is included. That is, only keep the titles that have a corresponding rating. And also, only keep the rating if there is an associated title (which means we use <code>INNER JOIN</code> or just plain <code>JOIN</code>).</p>
+<p>Let’s say we want to combine the titles with the number of votes so that each title with user votes is included. That is, only keep the titles that have a corresponding votes. And also, only keep the votes if there is an associated title (which means we use <code>INNER JOIN</code> or just plain <code>JOIN</code>).</p>
 <p>Remember that <code>WHERE</code> will work on the raw variables, and <code>HAVING</code> works on the results set.</p>
-<p>Some aspects of the query are worth pointing out: * The variables in the output are given in the <code>SELECT</code> clause. The <code>id</code> and <code>title</code> (both from the <code>title</code> table) and the <code>info</code> from the <code>movie_info_idx</code> which represents the number of IMDb votes. * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion. * The <code>JOIN</code> happens by linking the <code>id</code> variable in the <code>title</code> table with the <code>movie_id</code> variable in the <code>movie_info_idx</code> table. * The <code>LIMIT</code> wasn’t necessary (there are only 12 observations), but it’s good practice so that we don’t end up with unwieldy query results. * The <code>WHERE</code> clause happens before the <code>JOIN</code> action, despite being written after. * In the <code>WHERE</code> clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.</p>
+<p>Some aspects of the query are worth pointing out:<br>
+* The variables in the output are given in the <code>SELECT</code> clause. The <code>id</code> and <code>title</code> (both from the <code>title</code> table) and the <code>info</code> from the <code>movie_info_idx</code> which represents the number of IMDb votes. * The variables are preceded by the table from which they came. While not always necessary, it is good practice so as to avoid confusion. * The <code>JOIN</code> happens by linking the <code>id</code> variable in the <code>title</code> table with the <code>movie_id</code> variable in the <code>movie_info_idx</code> table. * The <code>LIMIT</code> wasn’t necessary (there are only 12 observations), but it’s good practice so that we don’t end up with unwieldy query results. * The <code>WHERE</code> clause happens before the <code>JOIN</code> action, despite being written after. * In the <code>WHERE</code> clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.</p>
 <div class="cell" data-output.var="movie_join" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> title.<span class="kw">id</span>,</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>       title.title,</span>
@@ -1028,7 +1029,7 @@ for (let popover of popovers){
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">ON</span> title.<span class="kw">id</span> <span class="op">=</span> movie_info_idx.movie_id </span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> title.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> title.kind_id <span class="op">=</span> <span class="dv">1</span>                  # movies <span class="kw">only</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # info_type <span class="kw">is</span> votes</span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> movie_info_idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> movie_info_idx.info <span class="kw">DESC</span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">20</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1407,7 +1408,7 @@ for (let popover of popovers){
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> aka_name <span class="kw">AS</span> n <span class="kw">ON</span> a.person_id <span class="op">=</span> n.person_id</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span> </span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>           # movies <span class="kw">only</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # rating <span class="kw">is</span> votes</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>  # info_type <span class="kw">is</span> votes</span>
 <span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">150000</span>       # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">150</span>,<span class="dv">000</span> votes</span>
 <span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> a.role_id <span class="op">=</span> <span class="dv">2</span>           # actresses <span class="kw">only</span></span>
 <span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span>
@@ -1751,7 +1752,7 @@ for (let popover of popovers){
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>             # movies <span class="kw">only</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>    # rating <span class="kw">is</span> votes</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>    # info_type <span class="kw">is</span> votes</span>
 <span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>         # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
 <span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> idx.info <span class="kw">DESC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1984,7 +1985,7 @@ for (let popover of popovers){
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # info_type <span class="kw">is</span> votes</span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
@@ -2018,7 +2019,7 @@ for (let popover of popovers){
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # info_type <span class="kw">is</span> votes</span>
 <span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
 <span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="kw">RIGHT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
@@ -2052,7 +2053,7 @@ for (let popover of popovers){
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # info_type <span class="kw">is</span> votes</span>
 <span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes     </span>
 <span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
 <span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
@@ -2077,6 +2078,7 @@ for (let popover of popovers){
 </div>
 </section><section id="counting-repeat-actresses" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="counting-repeat-actresses">Counting repeat actresses</h4>
 <p>We might, for example, want to know how many names / spellings of a name with a specific <code>person_id</code> (above 3900000) exist for each <code>person_id</code> in each of the top voted seven films of 2015.</p>
+<p>In <a href="#tbl-num-repeat-names">Table&nbsp;<span>4.12</span></a> why isn’t there a column indicating the name of the actress? (There can’t be such a column. Why not?)</p>
 <div class="cell" data-output.var="num_repeat_names" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> acts.person_id, </span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_repeat_names</span>
@@ -2086,7 +2088,7 @@ for (let popover of popovers){
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # info_type <span class="kw">is</span> votes</span>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
 <span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
@@ -2190,7 +2192,7 @@ for (let popover of popovers){
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> movie_info_idx <span class="kw">AS</span> idx <span class="kw">ON</span> idx.movie_id <span class="op">=</span> t.<span class="kw">id</span></span>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> t.production_year <span class="op">=</span> <span class="dv">2015</span>  </span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> t.kind_id <span class="op">=</span> <span class="dv">1</span>               # movies <span class="kw">only</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # rating <span class="kw">is</span> votes</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info_type_id <span class="op">=</span> <span class="dv">100</span>      # info_type <span class="kw">is</span> votes</span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> idx.info <span class="op">&gt;</span> <span class="dv">400000</span>) <span class="kw">AS</span> movs  # <span class="kw">at</span> <span class="fu">least</span> <span class="dv">400</span>,<span class="dv">000</span> votes</span>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> (<span class="kw">SELECT</span> a.person_id,</span>
 <span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>       a.movie_id,</span>
@@ -2844,8 +2846,17 @@ for (let popover of popovers){
 </div>
 </section><section id="reflection-questions" class="level2" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">4.5</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
-</section><section id="ethics-considerations" class="level2" data-number="4.6"><h2 data-number="4.6" class="anchored" data-anchor-id="ethics-considerations">
+<ol type="1">
+<li><p>What are the different types of joins? Which data from which table gets kept and which gets removed for each type of join?</p></li>
+<li><p>What is the difference between a join and a union?</p></li>
+<li><p>When working with multiple tables, how (and why) is a variable linked to its table?</p></li>
+<li><p>Consider a <code>RIGHT JOIN</code>. If there are records in the right table that are not in the left table, what will the value of the left table variable be for those records?</p></li>
+</ol></section><section id="ethics-considerations" class="level2" data-number="4.6"><h2 data-number="4.6" class="anchored" data-anchor-id="ethics-considerations">
 <span class="header-section-number">4.6</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
+<ol type="1">
+<li><p>What can happen if a <code>UNION</code> is done without carefully matching up the columns of the two tables being <code>UNION</code>ed?</p></li>
+<li><p>How will you know if <code>JOIN</code>ing removed some records? What if the <code>JOIN</code> produced missing values for some of the variables? How should we deal with missing data or arbitrarily removed records?</p></li>
+</ol>
 
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">

@@ -367,7 +367,7 @@ select_10 |>
 ```
 
 
-`BETWEEN` can be used to specify a range of values for a numeric value.
+`BETWEEN` can be used to specify a range of values for a numeric value. `BETWEEN` is inclusive.
 
 ```{sql}
 #| connection: con_taxi
@@ -552,6 +552,8 @@ where_null2 |>
 
 The `GROUP BY` clause will direct **SQL** to carry out the query separately for each category in the grouped variable.  Using `GROUP BY` is particularly important when aggregating multiple rows into a single number.  Some <a href = "https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html" target = "_blank">aggregate functions</a> include `COUNT()`, `SUM()`, `MAX()`, `MIN()`, and `AVG()`.
 
+Note that `SUM(1)` adds (sums) the number `1` for each row.  Which is the same as counting the number of rows.  `SUM(2)` adds (sums) the number `2` for each row which returns twice as many transactions.
+
 
 ```{sql}
 #| connection: con_taxi
@@ -559,7 +561,8 @@ The `GROUP BY` clause will direct **SQL** to carry out the query separately for 
 #| output.var: "group_pay"
 
 SELECT COUNT(*) AS num_transactions, 
-       sum(1) as num_transactions_also,
+       SUM(1) AS num_transactions_also,
+       SUM(2) AS double_transactions,
        payment_type 
 FROM yellow_old
 WHERE tip_amount BETWEEN 10 and 20
@@ -814,7 +817,7 @@ As we've seen, `LIMIT` truncates the query to specified rows. The `LIMIT` comman
 #| label: limit-last
 #| output.var: "limit_last"
 
-SELECT * FROM yellow_old LIMIT 15428118, 15428128;
+SELECT * FROM yellow_old LIMIT 15428118, 10;
 
 ```
 
