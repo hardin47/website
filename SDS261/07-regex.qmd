@@ -59,7 +59,7 @@ There are some special characters in R that cannot be directly coded in a string
 
 There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R escape sequences.        
 
-  * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `" ' "` in the previous example.        
+  * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `" ' "`.       
   * `\"`: double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. `' " '`.          
   * `\n`: newline.   
   * `\r`: carriage return.   
@@ -168,22 +168,47 @@ I have found that the best way to truly understand regular expressions is to wor
 * Match only the word `meter` in "The cemetery is 1 meter from the stop sign." Also match `Meter` in "The cemetery is 1 Meter from the stop sign."
 
 ```{r}
-string <- c("The cemetery is 1 meter from the stop sign.", "The cemetery is 1 Meter from the stop sign.")
+string <- c("The cemetery is 1 meter from the stop sign.", 
+            "The cemetery is 1 Meter from the stop sign.")
 
 str_extract(string, "(?i)\\bmeter\\b")
 ```
 
 ### Proper times and dates
 
-* Match dates like 01/15/24 and also like 01.15.24 and like 01-15-24.^[ "\\d\\d.\\d\\d.\\d\\d" will work, but it will also match 123456.  It is better to replace the dot with the characters of interest: "\\d\\d[/.\\-]\\d\\d[/.\\-]\\d\\d".  Remember that a dot inside a character class is just a dot. ]
+* Match dates like 01/15/24 and also like 01.15.24 and like 01-15-24.^[ `\d\d.\d\d.\d\d` will work, but it will also match 123456.  It is better to replace the dot with the characters of interest: `\d\d[/.\-]\d\d[/.\-]\d\d`.  Remember that a dot inside a character class is just a dot. ]
 
-* Match a time of day such as "9:17 am" or "12:30 pm".  Require that the time be a valid time (not "99:99 pm"). Assume no leading zeros (i.e., "09:17 am").^["(1[012]|[1-9]):[0-5][0-9] (am|pm)"]
+```{r}
+string <- c("01/15/24", "01.15.24", "01-15-24", "01 15 24", "011524", "January 15, 2024")
 
+str_extract(string, "\\d\\d.\\d\\d.\\d\\d")
+
+str_extract(string, "\\d\\d[/.\\-]\\d\\d[/.\\-]\\d\\d")
+
+str_extract(string, "\\d{2}[/.\\-]\\d{2}[/.\\-]\\d{2}")
+```
+
+
+* Match a time of day such as "9:17 am" or "12:30 pm".  Require that the time be a valid time (not "99:99 pm"). Assume no leading zeros (i.e., "09:17 am").^[`^(1[012]|[1-9]):[0-5][0-9] (am|pm)$`]
+
+```{r}
+string <- c("9:17 am", "12:30 pm", "99:99 pm", "09:17 am")
+
+str_extract(string, "(1[012]|[1-9]):[0-5][0-9] (am|pm)")
+str_extract(string, "^(1[012]|[1-9]):[0-5][0-9] (am|pm)$")
+```
 ### Alternation operator
 
 The "or" operator, `|` has the lowest precedence and parentheses have the highest precedence, which means that parentheses get evaluated before "or".
 
-* What is the difference between "\\bMary|Jane|Sue\\b" and "\\b(Mary|Jane|Sue)\\b"?^[In the former, the regex will search for "\\bMary" or "Jane" or "Sue\\b".  In the latter, the regex will search for "\\bMary\\b or "\\bJane\\b" or "\\bSue\\b".  That is, Janet will match the former but not the latter.]
+* What is the difference between `\bMary|Jane|Sue\b` and `\b(Mary|Jane|Sue)\b`?^[In the former, the regex will search for `\bMary` or `Jane` or `Sue\b`. In the latter, the regex will search for `\bMary\b` or `\bJane\b` or `\bSue\b`.  That is, Janet will match the former but not the latter.]
+
+```{r}
+string <- c("Mary", "Mar", "Janet", "jane", "Susan", "Sue")
+
+str_extract(string, "\\bMary|Jane|Sue\\b")
+str_extract(string, "\\b(Mary|Jane|Sue)\\b")
+```
 
 ### An example from my work 
 
@@ -622,11 +647,13 @@ results |>
 
 
 
-
-
-
-
-
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
+1. 
+
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1.
+
+
+
