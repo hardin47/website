@@ -84,13 +84,12 @@ Quantifiers specify how many repetitions of the pattern.
   * `{n,m}`: matches between n and m times.     
 
 ```{r}
-(strings <- c("a", "ab", "acb", "accb", "acccb", "accccb"))
+strings <- c("a", "ab", "acb", "accb", "acccb", "accccb")
 grep("ac*b", strings, value = TRUE)
 grep("ac*b", strings, value = FALSE)
 grep("ac+b", strings, value = TRUE)
 grep("ac?b", strings, value = TRUE)
 grep("ac{2}b", strings, value = TRUE)
-grep("ac{2}b", strings, value = FALSE)
 grep("ac{2,}b", strings, value = TRUE)
 grep("ac{2,3}b", strings, value = TRUE)
 ```
@@ -103,7 +102,7 @@ grep("ac{2,3}b", strings, value = TRUE)
   * `\B`: matches the empty string provided it is not at an edge of a word.    
 
 ```{r}
-(strings <- c("abcd", "cdab", "cabd", "c abd"))
+strings <- c("abcd", "cdab", "cabd", "c abd")
 grep("ab", strings, value = TRUE)
 grep("^ab", strings, value = TRUE)
 grep("ab$", strings, value = TRUE)
@@ -121,13 +120,15 @@ grep("\\bab", strings, value = TRUE)
   * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.    
 
 ```{r operators}
-(strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12"))
+strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12", "a|b")
 grep("ab.", strings, value = TRUE)
 grep("ab[c-e]", strings, value = TRUE)
 grep("ab[^c]", strings, value = TRUE)
 grep("^ab", strings, value = TRUE)
 grep("\\^ab", strings, value = TRUE)
 grep("abc|abd", strings, value = TRUE)
+grep("a[b|c]", strings, value = TRUE)
+str_extract(strings, "a[b|c]")
 ```
 
 
@@ -142,7 +143,7 @@ Character classes allow specifying entire classes of characters, such as numbers
   * `[:upper:]`: upper-case letters, equivalent to `[A-Z]`.  
   * `[:alpha:]`: alphabetic characters, equivalent to `[[:lower:][:upper:]]` or `[A-z]`.  
   * `[:alnum:]`: alphanumeric characters, equivalent to `[[:alpha:][:digit:]]` or `[A-z0-9]`.   
-  * `\w`: word characters, equivalent to `[[:alnum:]_]` or `[A-z0-9_]`.  
+  * `\w`: word characters, equivalent to `[[:alnum:]_]` or `[A-z0-9_]` (letter, number, or underscore). 
   * `\W`: not word, equivalent to `[^A-z0-9_]`.  
   * `[:xdigit:]`: hexadecimal digits (base 16), 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f, equivalent to `[0-9A-Fa-f]`.
   * `[:blank:]`: blank characters, i.e. space and tab.  
@@ -291,8 +292,8 @@ A lookaround specifies a **place** in the regular expression that will anchor th
 
 * "x(?=y)" – positive lookahead (matches 'x' when it is followed by 'y')
 * "x(?!y)" – negative lookahead (matches 'x' when it is not followed by 'y')
-* "x(?<=y)" – positive lookbehind (matches 'x' when it is preceded by 'y')
-* "x(?<!y)" – negative lookbehind (matches 'x' when it is not preceded by 'y')
+* "(?<=y)x" – positive lookbehind (matches 'x' when it is preceded by 'y')
+* "(?<!y)x" – negative lookbehind (matches 'x' when it is not preceded by 'y')
 
 Note that the lookaround specifies a **place** in the string which means it does not return the details of the lookaround.  Using lookarounds, you can test strings against patterns without including the lookaround pattern in the resulting match.
 
