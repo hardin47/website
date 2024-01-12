@@ -99,7 +99,7 @@ grep("ac{2,3}b", strings, value = TRUE)
 
   * `^`: matches the start of the string.   
   * `$`: matches the end of the string.   
-  * `\b`: matches the empty string at either edge of a _word_. Don't confuse it with `^ $` which marks the edge of a _string_.   
+  * `\b`: matches the boundary of a _word_. Don't confuse it with `^ $` which marks the edge of a _string_.   
   * `\B`: matches the empty string provided it is not at an edge of a word.    
 
 ```{r}
@@ -128,7 +128,6 @@ grep("ab[^c]", strings, value = TRUE)
 grep("^ab", strings, value = TRUE)
 grep("\\^ab", strings, value = TRUE)
 grep("abc|abd", strings, value = TRUE)
-gsub("(ab) 12", "\\1 34", strings)
 ```
 
 
@@ -645,6 +644,38 @@ results |>
                                     "\\)"))
 ```
 
+## Regular expressions and **SQL** 
+
+Back to the IMDb database... 
+
+```{r}
+#| echo: false
+
+con_imdb <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "imdb",
+  host = Sys.getenv("SMITH_HOST"),
+  user = Sys.getenv("SMITH_USER"),
+  password = Sys.getenv("SMITH_PWD")
+)
+```
+
+```{sql}
+#| connection: con_imdb
+
+SELECT production_year, title
+  FROM title
+  WHERE kind_id = 1 AND
+        title REGEXP '(?i)star'
+  LIMIT 0, 20;
+```
+
+
+
+```{r}
+#| echo: false
+DBI::dbDisconnect(con_imdb)
+```
 
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
