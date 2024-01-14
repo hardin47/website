@@ -114,6 +114,7 @@ for (let popover of popovers){
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
 <script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script><link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css2?family=Quicksand" type="text/css">
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 </head>
 <body class="nav-sidebar floating">
 
@@ -225,6 +226,12 @@ for (let popover of popovers){
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Changing databases</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-add-db.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expanding databases</span></span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -238,8 +245,8 @@ for (let popover of popovers){
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./07-regex.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regular Expressions</span></span></a>
+  <a href="./08-regex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regular Expressions</span></span></a>
   </div>
 </li>
       </ul>
@@ -493,6 +500,19 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <p>Similarly, the <code>DESCRIBE</code> command shows the 18 field names (variables) in the <code>yellow_old</code> table. Some of the variables are characters (<code>text</code>) and some are numeric (either <code>double</code> or <code>bigint</code>)</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<i class="fas fa-triangle-exclamation"></i> Watch out!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>SQL</strong> clauses must be written in the following order.</p>
+</div>
+</div>
 <p>Most engagements with SQL are done through queries. Queries in <strong>SQL</strong> start with the <code>SELECT</code> keyword and consist of several clauses, which must be written in the following order:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <ul>
 <li>
@@ -1787,19 +1807,181 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <section id="null-in-where" class="level3" data-number="3.4.1"><h3 data-number="3.4.1" class="anchored" data-anchor-id="null-in-where">
 <span class="header-section-number">3.4.1</span> NULL in WHERE</h3>
-<p><strong>SQL</strong> considers <code>NULL</code> values to be unknown. Therefore, when searching for a <code>NULL</code> value, you need to ask <strong>SQL</strong> if the value is <code>NULL</code>. Asking if the value is <em>equal</em> to <code>NULL</code> doesn’t work because <code>NULL</code> values don’t equal anything (they are unknown).</p>
-<p>To keep all values that are not <code>NULL</code> values, use <code>IS NOT NULL</code> in the <code>WHERE</code> clause.</p>
+<p><strong>SQL</strong> considers <code>NULL</code> values to be unknown. Therefore, when searching for a <code>NULL</code> value, you need to ask <strong>SQL</strong> if the value <code>IS NULL</code>. Asking if the value is <em>equal</em> to <code>NULL</code> doesn’t work because <code>NULL</code> values don’t equal anything (they are unknown). To keep all values that are not <code>NULL</code> values, use <code>IS NOT NULL</code> in the <code>WHERE</code> clause.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<i class="fas fa-triangle-exclamation"></i> Watch out!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In order to find the records that are <code>NULL</code> use <code>WHERE variable IS NULL</code>.</p>
+</div>
+</div>
+<section id="a-null-example" class="level4" data-number="3.4.1.1"><h4 data-number="3.4.1.1" class="anchored" data-anchor-id="a-null-example">
+<span class="header-section-number">3.4.1.1</span> A <code>NULL</code> example<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+</h4>
+<p>The logic of <code>NULL</code>:</p>
+<ul>
+<li>If you do anything with <code>NULL</code>, you’ll just get <code>NULL</code>. For instance if <span class="math inline">\(x\)</span> is <code>NULL</code>, then <span class="math inline">\(x &gt; 3\)</span>, <span class="math inline">\(1 = x\)</span>, and <span class="math inline">\(x + 4\)</span> all evaluate to <code>NULL</code>. Even <span class="math inline">\(x =\)</span> <code>NULL</code> evaluates to <code>NULL</code>! if you want to check whether <span class="math inline">\(x\)</span> is <code>NULL</code>, use <code>x IS NULL</code> or <code>x IS NOT NULL</code>.</li>
+<li>
+<code>NULL</code> short-circuits with boolean operators. That means a boolean expression involving <code>NULL</code> will evaluate to:
+<ul>
+<li>TRUE, if it’d evaluate to TRUE regardless of whether the <code>NULL</code> value is really TRUE or FALSE.</li>
+<li>FALSE, if it’d evaluate to FALSE regardless of whether the <code>NULL</code> value is really TRUE or FALSE.</li>
+<li>Or <code>NULL</code>, if it depends on the <code>NULL</code> value.</li>
+</ul>
+</li>
+</ul>
+<p>Consider the following table and <strong>SQL</strong> query:</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> (</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ace'</span> <span class="kw">AS</span> name, <span class="dv">20</span> <span class="kw">AS</span> age, <span class="dv">4</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ada'</span> <span class="kw">AS</span> name, <span class="kw">NULL</span> <span class="kw">AS</span> age, <span class="dv">3</span> <span class="kw">as</span> num_dogs   </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ben'</span> <span class="kw">AS</span> name, <span class="kw">NULL</span> <span class="kw">AS</span> age, <span class="kw">NULL</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Cho'</span> <span class="kw">AS</span> name, <span class="dv">27</span> <span class="kw">AS</span> age, <span class="kw">NULL</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>   ) <span class="kw">AS</span> temptable;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+4 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:right;">
+num_dogs
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ace
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ada
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ben
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cho
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> (</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ace'</span> <span class="kw">AS</span> name, <span class="dv">20</span> <span class="kw">AS</span> age, <span class="dv">4</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ada'</span> <span class="kw">AS</span> name, <span class="kw">NULL</span> <span class="kw">AS</span> age, <span class="dv">3</span> <span class="kw">as</span> num_dogs   </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Ben'</span> <span class="kw">AS</span> name, <span class="kw">NULL</span> <span class="kw">AS</span> age, <span class="kw">NULL</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>   <span class="kw">UNION</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> <span class="st">'Cho'</span> <span class="kw">AS</span> name, <span class="dv">27</span> <span class="kw">AS</span> age, <span class="kw">NULL</span> <span class="kw">as</span> num_dogs</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>   ) <span class="kw">AS</span> temptable</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> age <span class="op">&lt;=</span> <span class="dv">20</span> <span class="kw">OR</span> num_dogs <span class="op">=</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+2 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+age
+</th>
+<th style="text-align:right;">
+num_dogs
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ace
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ada
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Where does the <code>WHERE</code> clause do? It tells us that we only want to keep the rows satisfying the <code>age &lt;= 20</code> OR <code>num_dogs = 3</code>. Let’s consider each row one at a time:</p>
+<ul>
+<li>For Ace, <code>age &lt;= 20</code> evaluates to TRUE so the claim is satisfied.</li>
+<li>For Ada, <code>age &lt;= 20</code> evaluates to <code>NULL</code> but <code>num_dogs = 3</code> evaluates to TRUE so the claim is satisfied.</li>
+<li>For Ben, <code>age &lt;= 20</code> evaluates to <code>NULL</code> and <code>num_dogs = 3</code> evaluates to <code>NULL</code> so the overall expression is <code>NULL</code> which has a FALSE value.</li>
+<li>For Cho, <code>age &lt;= 20</code> evaluates to FALSE and <code>num_dogs = 3</code> evaluates to <code>NULL</code> so the overall expression evaluates to <code>NULL</code> (because it depends on the value of the <code>NULL</code>).</li>
+</ul>
+<p>Thus we keep only Ace and Ada.</p>
 <div class="cell" data-output.var="where_null1" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="kw">IS</span> <span class="kw">NULL</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="kw">IS</span> <span class="kw">NULL</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-null1" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.15: There is only one record with a NULL value for <code>payment_type</code>. Note that the way to find NULL values is via <code>IS NULL</code>.</caption>
+<caption>Table&nbsp;3.15: There is <strong>ONE</strong> record with a NULL value for <code>payment_type</code>. Note that the way to find NULL values is via <code>IS NULL</code>.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1819,16 +2001,16 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <div class="cell" data-output.var="where_null2" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="op">=</span> <span class="kw">NULL</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> payment_type, fare_amount, tip_amount, total_amount</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> payment_type <span class="op">=</span> <span class="kw">NULL</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
 <div id="tbl-where-null2" class="anchored">
 <table class="table table-striped table-condensed table-sm small" data-quarto-postprocess="true">
-<caption>Table&nbsp;3.16: No rows are selected when the <code>WHERE</code> command is specified to indicate if the variable <em>equals</em> <code>NULL</code>.</caption>
+<caption>Table&nbsp;3.16: <strong>NO</strong> rows are selected when the <code>WHERE</code> command is specified to indicate if the variable <em>equals</em> <code>NULL</code>.</caption>
 <thead><tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">payment_type</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">fare_amount</th>
@@ -1847,7 +2029,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 
 </div>
 </div>
-</section></section><section id="group-by" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="group-by">
+</section></section></section><section id="group-by" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="group-by">
 <span class="header-section-number">3.5</span> GROUP BY</h2>
 <div class="callout callout-style-simple callout-tip no-icon">
 <div class="callout-body d-flex">
@@ -1862,13 +2044,13 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <p>The <code>GROUP BY</code> clause will direct <strong>SQL</strong> to carry out the query separately for each category in the grouped variable. Using <code>GROUP BY</code> is particularly important when aggregating multiple rows into a single number. Some <a href="https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html" target="_blank">aggregate functions</a> include <code>COUNT()</code>, <code>SUM()</code>, <code>MAX()</code>, <code>MIN()</code>, and <code>AVG()</code>.</p>
 <p>Note that <code>SUM(1)</code> adds (sums) the number <code>1</code> for each row. Which is the same as counting the number of rows. <code>SUM(2)</code> adds (sums) the number <code>2</code> for each row which returns twice as many transactions.</p>
 <div class="cell" data-output.var="group_pay" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">SUM</span>(<span class="dv">1</span>) <span class="kw">AS</span> num_transactions_also,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">SUM</span>(<span class="dv">2</span>) <span class="kw">AS</span> double_transactions,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">SUM</span>(<span class="dv">1</span>) <span class="kw">AS</span> num_transactions_also,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">SUM</span>(<span class="dv">2</span>) <span class="kw">AS</span> double_transactions,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1921,13 +2103,13 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>For those people who tipped between $10 and $20, what was the lowest and highest fare for each of the types of payments?</p>
 <div class="cell" data-output.var="group_pay2" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>       payment_type </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> tip_amount <span class="kw">BETWEEN</span> <span class="dv">10</span> <span class="kw">and</span> <span class="dv">20</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1980,14 +2162,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p><code>GROUP BY</code> will work applied to multiple columns. Let’s tabulate the same results, now broken down by <code>payment_type</code> and day of week. Except that we don’t have a day of week variable! We need to convert the <code>pickup_datetime</code> variable to a DateTime object and then pull out the day of the week, using <code>DAYNAME</code>. (Note: <code>DAYOFWEEK</code> will give you the day of the week as an integer. Use your internet sleuthing skills if you are looking for functions that might help your desired query.)</p>
 <div class="cell" data-output.var="group_wday" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -2275,14 +2457,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>The <code>ORDER BY</code> command can be used with or without the <code>GROUP BY</code> and aggregation commands. It allows us to look at interesting aspects of the data by sorting the data.</p>
 <div class="cell" data-output.var="order_low" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> lowest_fare <span class="kw">ASC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> lowest_fare <span class="kw">ASC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -2558,14 +2740,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>WHAT?!?!! How in the world was one of the fares -$612.40? It doesn’t make any sense that a fare would be negative. Some additional inquiry into the observation corresponding to a fare of -$612.40 is absolutely warranted. If the observation is found to be a typo, it would need to be removed from the data set. If the observation is somehow legitimate, it would need to be included in the analysis, with the information provided about its legitimacy.</p>
 <div class="cell" data-output.var="order_high" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> highest_fare <span class="kw">DESC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> highest_fare <span class="kw">DESC</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -2841,14 +3023,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>$950 is a lot to pay for a cab ride! But in NYC, I’d believe it.</p>
 <div class="cell" data-output.var="order_wday" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> wday, payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> wday, payment_type;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -3147,14 +3329,14 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>Recall that <code>WHERE</code> acts only on the original data. If we are interested in rides that took place on <code>Friday</code>, we need to use the derived variable <code>wday</code> instead of the raw variable <code>pickup_datetime</code>. Fortunately, <code>HAVING</code> works on the results set. Note that <strong>SQL</strong> uses <code>''</code> for strings, not <code>""</code>. In <strong>SQL</strong>, <code>""</code> is used to identify variables (not values of variables), like <strong>R</strong>’s <code>&amp;grave;&amp;grave;</code>.</p>
 <div class="cell" data-output.var="having_fri" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> wday <span class="op">=</span> <span class="st">'Friday'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_transactions, </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MIN</span>(fare_amount) <span class="kw">AS</span> lowest_fare,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">MAX</span>(fare_amount) <span class="kw">AS</span> highest_fare,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>       payment_type,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>       DAYNAME(STR_TO_DATE(pickup_datetime, <span class="ot">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> payment_type, wday</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> wday <span class="op">=</span> <span class="st">'Friday'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -3237,7 +3419,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 <p>As we’ve seen, <code>LIMIT</code> truncates the query to specified rows. The <code>LIMIT</code> command specifies which rows to select: the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14). The query below shows the last 10 rows of the entire data set.</p>
 <div class="cell" data-output.var="limit_last" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> yellow_old <span class="kw">LIMIT</span> <span class="dv">15428118</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> yellow_old <span class="kw">LIMIT</span> <span class="dv">15428118</span>, <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -3476,16 +3658,16 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 <span class="header-section-number">3.9</span> Saving <strong>SQL</strong> queries as <strong>R</strong> objects</h2>
 <p>If you are working in <strong>R</strong> to run <strong>SQL</strong> commands, you may want to use the query output for further analysis or visualizations. In that case, use <code>#|output.var: "name_of_variable"</code> inside the <code>{sql}</code> chunk. The variable called <code>name_of_variable</code> will then be available to be used in the R environment.</p>
 <div class="cell" data-output.var="new_table" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_taxi</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: new-table</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| output.var: "new_table"</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span>, <span class="fu">DAYNAME</span>(STR_TO_DATE(pickup_datetime, <span class="st">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old </span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">1000</span>;</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{sql}</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| connection: con_taxi</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: new-table</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| output.var: "new_table"</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span>, <span class="fu">DAYNAME</span>(STR_TO_DATE(pickup_datetime, <span class="st">"%Y-%m-%d %T"</span>)) <span class="kw">AS</span> wday</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> yellow_old </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">0</span>, <span class="dv">1000</span>;</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -3648,21 +3830,21 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>new_table <span class="sc">|&gt;</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(wday) <span class="sc">|&gt;</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fare_amount, <span class="at">y =</span> tip_amount, <span class="at">color =</span> wday)) <span class="sc">+</span> </span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>new_table <span class="sc">|&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(wday) <span class="sc">|&gt;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fare_amount, <span class="at">y =</span> tip_amount, <span class="at">color =</span> wday)) <span class="sc">+</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="03-sql-verbs_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid" style="width:90.0%"></p>
+<p><img src="03-sql-verbs_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid" style="width:90.0%"></p>
 </div>
 </div>
 </section><section id="best-practice" class="level2" data-number="3.10"><h2 data-number="3.10" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">3.10</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_taxi</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reflection-questions" class="level2" data-number="3.11"><h2 data-number="3.11" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">3.11</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
@@ -3685,6 +3867,7 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
 <ol>
 <li id="fn1"><p>Taken directly from <a href="https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target="_blank">Modern Data Science with R</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>taken from: https://cs186berkeley.net/notes/note1/#filtering-null-values<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

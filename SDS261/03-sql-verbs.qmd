@@ -79,6 +79,12 @@ select_describe |>
 Similarly, the `DESCRIBE` command shows the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
 
 
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+**SQL** clauses must be written in the following order.
+:::
 
 Most engagements with SQL are done through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
 
@@ -482,9 +488,71 @@ where_1012d |>
 
 ### NULL in WHERE
 
-**SQL** considers `NULL` values to be unknown. Therefore, when searching for a `NULL` value, you need to ask **SQL** if the value is `NULL`.  Asking if the value is *equal* to `NULL` doesn't work because `NULL` values don't equal anything (they are unknown).
+**SQL** considers `NULL` values to be unknown. Therefore, when searching for a `NULL` value, you need to ask **SQL** if the value `IS NULL`.  Asking if the value is *equal* to `NULL` doesn't work because `NULL` values don't equal anything (they are unknown).  To keep all values that are not `NULL` values, use `IS NOT NULL` in the `WHERE` clause. 
 
-To keep all values that are not `NULL` values, use `IS NOT NULL` in the `WHERE` clause.
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+In order to find the records that are `NULL` use `WHERE variable IS NULL`.
+:::
+
+
+#### A `NULL` example^[taken from: https://cs186berkeley.net/notes/note1/#filtering-null-values]
+
+The logic of `NULL`:
+
+* If you do anything with `NULL`, you'll just get `NULL`. For instance if $x$ is `NULL`, then $x > 3$, $1 = x$, and $x + 4$ all evaluate to `NULL`. Even $x =$ `NULL` evaluates to `NULL`! if you want to check whether $x$ is `NULL`, use `x IS NULL` or `x IS NOT NULL`.
+* `NULL` short-circuits with boolean operators. That means a boolean expression involving `NULL` will evaluate to:
+   * TRUE, if it'd evaluate to TRUE regardless of whether the `NULL` value is really TRUE or FALSE.
+   * FALSE, if it'd evaluate to FALSE regardless of whether the `NULL` value is really TRUE or FALSE.
+   * Or `NULL`, if it depends on the `NULL` value.
+
+Consider the following table and **SQL** query:
+
+
+```{sql}
+#| connection: con_taxi
+
+SELECT * FROM (
+   SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
+   UNION
+   SELECT 'Ada' AS name, NULL AS age, 3 as num_dogs   
+   UNION
+   SELECT 'Ben' AS name, NULL AS age, NULL as num_dogs
+   UNION
+   SELECT 'Cho' AS name, 27 AS age, NULL as num_dogs
+   ) AS temptable;
+```
+
+
+```{sql}
+#| connection: con_taxi
+
+SELECT * FROM (
+   SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
+   UNION
+   SELECT 'Ada' AS name, NULL AS age, 3 as num_dogs   
+   UNION
+   SELECT 'Ben' AS name, NULL AS age, NULL as num_dogs
+   UNION
+   SELECT 'Cho' AS name, 27 AS age, NULL as num_dogs
+   ) AS temptable
+WHERE age <= 20 OR num_dogs = 3;
+```
+
+Where does the `WHERE` clause do? It tells us that we only want to keep the rows satisfying the `age <= 20` OR `num_dogs = 3`. Let’s consider each row one at a time:
+
+* For Ace, `age <= 20` evaluates to TRUE so the claim is satisfied.
+* For Ada, `age <= 20` evaluates to `NULL` but `num_dogs = 3` evaluates to TRUE so the claim is satisfied.
+* For Ben, `age <= 20` evaluates to `NULL` and `num_dogs = 3` evaluates to `NULL` so the overall expression is `NULL` which has a FALSE value.
+* For Cho, `age <= 20` evaluates to FALSE and `num_dogs = 3` evaluates to `NULL` so the overall expression evaluates to `NULL` (because it depends on the value of the `NULL`).
+
+Thus we keep only Ace and Ada.
+
+
+
 
 
 ```{sql}
@@ -501,7 +569,7 @@ LIMIT 0, 10;
 ```{r}
 #| label: tbl-where-null1
 #| echo: false
-#| tbl-cap: "There is only one record with a NULL value for `payment_type`. Note that the way to find NULL values is via `IS NULL`."
+#| tbl-cap: "There is **ONE** record with a NULL value for `payment_type`. Note that the way to find NULL values is via `IS NULL`."
 
 where_null1 |>
   kbl(linesep = "", booktabs = TRUE) |>
@@ -527,7 +595,7 @@ LIMIT 0, 10;
 ```{r}
 #| label: tbl-where-null2
 #| echo: false
-#| tbl-cap: "No rows are selected when the `WHERE` command is specified to indicate if the variable *equals* `NULL`."
+#| tbl-cap: "**NO** rows are selected when the `WHERE` command is specified to indicate if the variable *equals* `NULL`."
 
 where_null2 |>
   kbl(linesep = "", booktabs = TRUE) |>

@@ -35,7 +35,7 @@ con_duckdb <- DBI::dbConnect(duckdb::duckdb(),
 The `duckdb` database is currently empty, so we need to load in some data.  The `duckdb_read_csv()` function in the **duckdb** R package allows us to load the .csv file (available on GitHub) directly into the database without being loaded as an **R** object first.
  
 
-Recall that in @tbl-select-describe we used `DESCRIBE` to display the variable types of the database table(s).  The list includes the variable name (`Field`), its `Type`, whether there are `NULL` values allowed, and whether there are keys or indices defined on the variable.  See @tbl-casts-describe for the `DESCRIBE` output on the table we are about to import.
+Recall that in @tbl-select-describe we used `DESCRIBE` to display the variable types of the database table(s).  The list includes the variable name (`Field`), its `Type`, whether there are `NULL` values allowed, and whether there are keys or indexes defined on the variable.  See @tbl-casts-describe for the `DESCRIBE` output on the table we are about to import.
 
 Unlike **R**, when creating a new data table, **SQL** requires that you communicate each future variable (column) and that variable's type. Variable types are **not** automatically generated!   
 
@@ -43,7 +43,7 @@ As an example, consider the Saturday Night Live datasets available on the <a hre
 
 Specifically, let's consider the <a href = "https://raw.githubusercontent.com/hhllcks/snldb/master/output/actors.csv" target = "_blank">casts.csv</a> file.
 
-Before we get into loading data into a MySQL database, let's look at the casts file in **R**, so that we understand the data we want to load. `glimpse()` provides the variable names and the variables types.  The variables types are a mix of character strings, numeric, and logical.  Variable types are very important for inputting data into a **MySQL** server.
+Before we get into loading data into a **SQL** database, let's look at the casts file in **R**, so that we understand the data we want to load. `glimpse()` provides the variable names and the variables types.  The variables types are a mix of character strings, numeric, and logical.  Variable types are very important for inputting data into a **SQL** server.
 
 ```{r}
 #| echo: true
@@ -54,7 +54,7 @@ glimpse(casts)
 
 ### Loading data {#sec-load-data}
 
-Once the database is set up, you will be ready to import .csv files into the database as tables.  Importing .csv files as tables requires a series of steps:^[taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a>.]
+Once the database is set up, you will be ready to import .csv files into the database as tables.  Importing .csv files as tables requires a series of steps:^[taken from <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a>.]
 
 1. a `USE` statement that ensures we are in the right schema/database.
 2. a series of `DROP TABLE` statements that drop any old tables with the same names as the ones we are going to create.
@@ -65,7 +65,7 @@ Once the database is set up, you will be ready to import .csv files into the dat
 
 ## <i class="fas fa-triangle-exclamation"></i> Watch out!
 
-**DuckDB** has its own dialect of **SQL**.  To load data into a **MySQL** server, the final statement would be `LOAD DATA` instead of `COPY`.  See <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a> for more information on loading data into a **MySQL** server.
+**DuckDB** has its own dialect of **SQL**.  To load data into a **MySQL** server, the final statement would be `LOAD DATA` instead of `COPY`.  See <a href = "https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target = "_blank">MDSR</a> for more information on loading data into a remote **MySQL** server.
 :::
 
 #### Loading step 1 {-}
@@ -112,7 +112,7 @@ CREATE TABLE casts (
 
 #### Loading step 4 {-}
 
-The .csv file lives on my computer, so I load it in directly.  Note that the statement to load in data is different in **MySQL**.
+The .csv file lives on my computer, so I load it in directly.  Note that the statement to load in data is slightly different in **MySQL**.
 
 ```{sql}
 #| connection: con_duckdb
@@ -233,25 +233,41 @@ casts_describe |>
 
 ## Efficiencies
 
-It is worth pointing out a few aspects to loading data into **SQL** that we don't have time to investigate: keys, indices, and partitioning.
+It is worth pointing out a few aspects to loading data into **SQL**: keys, indexes, and partitioning.
+
+Before we get to the definitions, consider this analogy:
+
+> Each library (`database`) has books (`table`s). Each book (`table`) has pages (rows). Each page (row) has a unique page number to identify it (`key` value); to find a particular page, you sort through the page numbers (`key` values). But it isn't immediately obvious where the particular page of interest is, you might have to page through the book a little bit to find the page of interest.  It would be easier if you had several bookmarks throughout the book to anchor some of the page numbers.  For example, if you want page 1047 and you have a bookmark on page 1050, you only have to turn back three pages.  The bookmark is an `index`, it helps you find the desired rows much more quickly.^[Analogy taken from: https://www.quora.com/profile/Lara-Mazilu]
 
 
 ### Key
 
-Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables.
+Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables. A key is a pointer that identifies a record. In practice, a key is one or more columns that are earmarked to uniquely identify a record in a table. Keys serve two main purposes:
 
-* `PRIMARY KEY` is a column or set of columns that uniquely identify each row.  Primary keys cannot be `NULL`.
-* `FOREIGN KEY` is a column or set of columns that reference a primary key in a different table.  
+1. They provide constraints on the column such as that it can't store duplicate or null values.
+2. They are also used to generate relationships among different tables.
+
+* `PRIMARY KEY` is a column or set of columns that uniquely identify each row.  Primary keys cannot be `NULL`. Each table must always have one (and only one) PK. The PK can be made up of one column, but if that isn't enough to uniquely identify the row, more columns may be added. Sometimes it is easier to designate a numeric column (e.g., row number) to be the PK.
+* `FOREIGN KEY` is a column or set of columns that reference a primary key in a different table.  The FK linkes two tables together, and the link is called a relationship.
+
+(There are other keys such as: Super Key, Minimal Super Key, Candidate Key, Unique Key, Alternate Key, Composite Key, Natural Key, Surrogate Key.)
+
+
 
 ### Index
 
-Indices are the crux of why **SQL** is so much more efficient than, say, **R**.  An index is a lookup table that helps **SQL** keep track of which records contain certain values.  By indexing the rows, **SQL** is able to optimize sorting and joining tables.  The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk.  Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indices (disk space but fast wrangling) versus a few indices (slow wrangling but less space).
+Indexes are the crux of why **SQL** is so much more efficient than, say, **R**.  An index is a lookup table that helps **SQL** keep track of which records contain certain values.  By indexing the rows, **SQL** is able to optimize sorting and joining tables.  The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk.  Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indexes (disk space but fast wrangling) versus a few indexes (slow wrangling but less space).
 
-In **MySQL** the commands `SHOW KEYS` and `SHOW INDEXES` provide information about the keys and indices for each table.
+A table may have more than one index but you shouldn't add indexes to every column in a table, as these have to be updated for every addition/update/delete to the column. Rather, indexes should be added to columns that are frequently included in queries.
+
+Indexes may not make much difference for small databases, but, as tables grow in size, queries benefit more from indexes.
+
+In **MySQL** the commands `SHOW KEYS` and `SHOW INDEXES` provide information about the keys and indexes for each table.  (Neither operation is available in **DuckDB**.)
+
 
 ### Partitioning
 
-Another way to speed up query retrievals is to partition the data tables.  If, for example, the SNL queries were always done by year, then the `episodes` table could be partitioned such that they are stored as separate tables (one per `year`).  The partitioning functions as an index on `year`.  The user would not be able to tell the difference between the unpartitioned `episodes` table and the partitioned one.  Queries done by `year` would be faster.  Queries done grouped in another way would be slower.
+Another way to speed up query retrievals is to partition the data tables.  If, for example, the SNL queries were always done by year, then the `episodes` table could be partitioned such that they are stored as separate tables (one per `year`).  The partitioning functions as an index on `year`.  The user would not be able to tell the difference between the unpartitioned `episodes` table and the partitioned one.  However, queries done by `year` would be faster.  Queries done grouped in another way would be slower.
 
 
 ## Best practice

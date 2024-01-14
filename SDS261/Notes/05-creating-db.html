@@ -109,6 +109,8 @@ for (let popover of popovers){
   }
 }
 </script><link rel="shortcut icon" href="figs/favicon.ico">
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script><link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="site_libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
 <script src="site_libs/bsTable-3.3.7/bootstrapTable.js"></script><link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css2?family=Quicksand" type="text/css">
@@ -223,11 +225,17 @@ for (let popover of popovers){
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Changing databases</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-add-db.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Changing databases</span></span></a>
+  </div>
+</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./p4-reg-expr.html" class="sidebar-item-text sidebar-link">
+            <a href="./p4-regex.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Regular expressions</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -236,8 +244,8 @@ for (let popover of popovers){
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./07-reg-expr.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regular Expressions</span></span></a>
+  <a href="./08-regex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regular Expressions</span></span></a>
   </div>
 </li>
       </ul>
@@ -265,6 +273,8 @@ for (let popover of popovers){
   </ul>
 </li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">5.3</span> Best practice</a></li>
+  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">5.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
+  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">5.5</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -298,11 +308,11 @@ for (let popover of popovers){
 <section id="preparing-to-load-data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="preparing-to-load-data">
 <span class="header-section-number">5.1</span> Preparing to load data</h2>
 <p>The <code>duckdb</code> database is currently empty, so we need to load in some data. The <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv()</a></code> function in the <strong>duckdb</strong> R package allows us to load the .csv file (available on GitHub) directly into the database without being loaded as an <strong>R</strong> object first.</p>
-<p>Recall that in <a href="03-sql-verbs.html#tbl-select-describe">Table&nbsp;<span>3.2</span></a> we used <code>DESCRIBE</code> to display the variable types of the database table(s). The list includes the variable name (<code>Field</code>), its <code>Type</code>, whether there are <code>NULL</code> values allowed, and whether there are keys or indices defined on the variable. See <a href="#tbl-casts-describe">Table&nbsp;<span>5.2</span></a> for the <code>DESCRIBE</code> output on the table we are about to import.</p>
+<p>Recall that in <a href="03-sql-verbs.html#tbl-select-describe">Table&nbsp;<span>3.2</span></a> we used <code>DESCRIBE</code> to display the variable types of the database table(s). The list includes the variable name (<code>Field</code>), its <code>Type</code>, whether there are <code>NULL</code> values allowed, and whether there are keys or indexes defined on the variable. See <a href="#tbl-casts-describe">Table&nbsp;<span>5.2</span></a> for the <code>DESCRIBE</code> output on the table we are about to import.</p>
 <p>Unlike <strong>R</strong>, when creating a new data table, <strong>SQL</strong> requires that you communicate each future variable (column) and that variable’s type. Variable types are <strong>not</strong> automatically generated!</p>
 <p>As an example, consider the Saturday Night Live datasets available on the <a href="https://github.com/hhllcks/snldb/" target="_blank">snldb GitHub repo</a>. Data is scraped from <a href="http://www.snlarchives.net" target="_blank">http://www.snlarchives.net</a> and <a href="http://www.imdb.com/title/tt0072562" target="_blank">http://www.imdb.com/title/tt0072562</a> by <a href="https://github.com/hhllcks" target="_blank">Hendrik Hilleckes</a> and <a href="https://github.com/colinmorris" target="_blank">Colin Morris</a>. Notice that there are eleven .csv files available in the <a href="https://github.com/hhllcks/snldb/tree/master/output" target="_blank">output folder</a>.</p>
 <p>Specifically, let’s consider the <a href="https://raw.githubusercontent.com/hhllcks/snldb/master/output/actors.csv" target="_blank">casts.csv</a> file.</p>
-<p>Before we get into loading data into a MySQL database, let’s look at the casts file in <strong>R</strong>, so that we understand the data we want to load. <code>glimpse()</code> provides the variable names and the variables types. The variables types are a mix of character strings, numeric, and logical. Variable types are very important for inputting data into a <strong>MySQL</strong> server.</p>
+<p>Before we get into loading data into a <strong>SQL</strong> database, let’s look at the casts file in <strong>R</strong>, so that we understand the data we want to load. <code>glimpse()</code> provides the variable names and the variables types. The variables types are a mix of character strings, numeric, and logical. Variable types are very important for inputting data into a <strong>SQL</strong> server.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">casts</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/hhllcks/snldb/master/output/casts.csv"</span><span class="op">)</span></span>
 <span><span class="fu">glimpse</span><span class="op">(</span><span class="va">casts</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -338,7 +348,7 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>DuckDB</strong> has its own dialect of <strong>SQL</strong>. To load data into a <strong>MySQL</strong> server, the final statement would be <code>LOAD DATA</code> instead of <code>COPY</code>. See <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a> for more information on loading data into a <strong>MySQL</strong> server.</p>
+<p><strong>DuckDB</strong> has its own dialect of <strong>SQL</strong>. To load data into a <strong>MySQL</strong> server, the final statement would be <code>LOAD DATA</code> instead of <code>COPY</code>. See <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a> for more information on loading data into a remote <strong>MySQL</strong> server.</p>
 </div>
 </div>
 <section id="loading-step-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-1">Loading step 1</h4>
@@ -367,7 +377,7 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-4" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-4">Loading step 4</h4>
-<p>The .csv file lives on my computer, so I load it in directly. Note that the statement to load in data is different in <strong>MySQL</strong>.</p>
+<p>The .csv file lives on my computer, so I load it in directly. Note that the statement to load in data is slightly different in <strong>MySQL</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> casts <span class="kw">FROM</span> <span class="st">'data/casts.csv'</span> <span class="kw">HEADER</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -612,33 +622,50 @@ casts
 </div>
 </section></section></section><section id="efficiencies" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="efficiencies">
 <span class="header-section-number">5.2</span> Efficiencies</h2>
-<p>It is worth pointing out a few aspects to loading data into <strong>SQL</strong> that we don’t have time to investigate: keys, indices, and partitioning.</p>
+<p>It is worth pointing out a few aspects to loading data into <strong>SQL</strong>: keys, indexes, and partitioning.</p>
+<p>Before we get to the definitions, consider this analogy:</p>
+<blockquote class="blockquote">
+<p>Each library (<code>database</code>) has books (<code>table</code>s). Each book (<code>table</code>) has pages (rows). Each page (row) has a unique page number to identify it (<code>key</code> value); to find a particular page, you sort through the page numbers (<code>key</code> values). But it isn’t immediately obvious where the particular page of interest is, you might have to page through the book a little bit to find the page of interest. It would be easier if you had several bookmarks throughout the book to anchor some of the page numbers. For example, if you want page 1047 and you have a bookmark on page 1050, you only have to turn back three pages. The bookmark is an <code>index</code>, it helps you find the desired rows much more quickly.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+</blockquote>
 <section id="key" class="level3" data-number="5.2.1"><h3 data-number="5.2.1" class="anchored" data-anchor-id="key">
 <span class="header-section-number">5.2.1</span> Key</h3>
-<p>Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables.</p>
+<p>Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables. A key is a pointer that identifies a record. In practice, a key is one or more columns that are earmarked to uniquely identify a record in a table. Keys serve two main purposes:</p>
+<ol type="1">
+<li>They provide constraints on the column such as that it can’t store duplicate or null values.</li>
+<li>They are also used to generate relationships among different tables.</li>
+</ol>
 <ul>
 <li>
-<code>PRIMARY KEY</code> is a column or set of columns that uniquely identify each row. Primary keys cannot be <code>NULL</code>.</li>
+<code>PRIMARY KEY</code> is a column or set of columns that uniquely identify each row. Primary keys cannot be <code>NULL</code>. Each table must always have one (and only one) PK. The PK can be made up of one column, but if that isn’t enough to uniquely identify the row, more columns may be added. Sometimes it is easier to designate a numeric column (e.g., row number) to be the PK.</li>
 <li>
-<code>FOREIGN KEY</code> is a column or set of columns that reference a primary key in a different table.</li>
-</ul></section><section id="index" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="index">
+<code>FOREIGN KEY</code> is a column or set of columns that reference a primary key in a different table. The FK linkes two tables together, and the link is called a relationship.</li>
+</ul>
+<p>(There are other keys such as: Super Key, Minimal Super Key, Candidate Key, Unique Key, Alternate Key, Composite Key, Natural Key, Surrogate Key.)</p>
+</section><section id="index" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="index">
 <span class="header-section-number">5.2.2</span> Index</h3>
-<p>Indices are the crux of why <strong>SQL</strong> is so much more efficient than, say, <strong>R</strong>. An index is a lookup table that helps <strong>SQL</strong> keep track of which records contain certain values. By indexing the rows, <strong>SQL</strong> is able to optimize sorting and joining tables. The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk. Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indices (disk space but fast wrangling) versus a few indices (slow wrangling but less space).</p>
-<p>In <strong>MySQL</strong> the commands <code>SHOW KEYS</code> and <code>SHOW INDEXES</code> provide information about the keys and indices for each table.</p>
+<p>Indexes are the crux of why <strong>SQL</strong> is so much more efficient than, say, <strong>R</strong>. An index is a lookup table that helps <strong>SQL</strong> keep track of which records contain certain values. By indexing the rows, <strong>SQL</strong> is able to optimize sorting and joining tables. The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk. Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indexes (disk space but fast wrangling) versus a few indexes (slow wrangling but less space).</p>
+<p>A table may have more than one index but you shouldn’t add indexes to every column in a table, as these have to be updated for every addition/update/delete to the column. Rather, indexes should be added to columns that are frequently included in queries.</p>
+<p>Indexes may not make much difference for small databases, but, as tables grow in size, queries benefit more from indexes.</p>
+<p>In <strong>MySQL</strong> the commands <code>SHOW KEYS</code> and <code>SHOW INDEXES</code> provide information about the keys and indexes for each table. (Neither operation is available in <strong>DuckDB</strong>.)</p>
 </section><section id="partitioning" class="level3" data-number="5.2.3"><h3 data-number="5.2.3" class="anchored" data-anchor-id="partitioning">
 <span class="header-section-number">5.2.3</span> Partitioning</h3>
-<p>Another way to speed up query retrievals is to partition the data tables. If, for example, the SNL queries were always done by year, then the <code>episodes</code> table could be partitioned such that they are stored as separate tables (one per <code>year</code>). The partitioning functions as an index on <code>year</code>. The user would not be able to tell the difference between the unpartitioned <code>episodes</code> table and the partitioned one. Queries done by <code>year</code> would be faster. Queries done grouped in another way would be slower.</p>
+<p>Another way to speed up query retrievals is to partition the data tables. If, for example, the SNL queries were always done by year, then the <code>episodes</code> table could be partitioned such that they are stored as separate tables (one per <code>year</code>). The partitioning functions as an index on <code>year</code>. The user would not be able to tell the difference between the unpartitioned <code>episodes</code> table and the partitioned one. However, queries done by <code>year</code> would be faster. Queries done grouped in another way would be slower.</p>
 </section></section><section id="best-practice" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">5.3</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section><section id="reflection-questions" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="reflection-questions">
+<span class="header-section-number">5.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
+</section><section id="ethics-considerations" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="ethics-considerations">
+<span class="header-section-number">5.5</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
 
 
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
 <ol>
-<li id="fn1"><p>taken directly from <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>taken from <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Analogy taken from: https://www.quora.com/profile/Lara-Mazilu<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
