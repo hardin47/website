@@ -231,44 +231,6 @@ casts_describe |>
 ```
 
 
-## Efficiencies
-
-It is worth pointing out a few aspects to loading data into **SQL**: keys, indexes, and partitioning.
-
-Before we get to the definitions, consider this analogy:
-
-> Each library (`database`) has books (`table`s). Each book (`table`) has pages (rows). Each page (row) has a unique page number to identify it (`key` value); to find a particular page, you sort through the page numbers (`key` values). But it isn't immediately obvious where the particular page of interest is, you might have to page through the book a little bit to find the page of interest.  It would be easier if you had several bookmarks throughout the book to anchor some of the page numbers.  For example, if you want page 1047 and you have a bookmark on page 1050, you only have to turn back three pages.  The bookmark is an `index`, it helps you find the desired rows much more quickly.^[Analogy taken from: https://www.quora.com/profile/Lara-Mazilu]
-
-
-### Key
-
-Keys are unique identifiers for each row, used primarily for connecting tables. Keys are generally not helpful for efficiency, but they are important for data integrity and relationships between tables. A key is a pointer that identifies a record. In practice, a key is one or more columns that are earmarked to uniquely identify a record in a table. Keys serve two main purposes:
-
-1. They provide constraints on the column such as that it can't store duplicate or null values.
-2. They are also used to generate relationships among different tables.
-
-* `PRIMARY KEY` is a column or set of columns that uniquely identify each row.  Primary keys cannot be `NULL`. Each table must always have one (and only one) PK. The PK can be made up of one column, but if that isn't enough to uniquely identify the row, more columns may be added. Sometimes it is easier to designate a numeric column (e.g., row number) to be the PK.
-* `FOREIGN KEY` is a column or set of columns that reference a primary key in a different table.  The FK linkes two tables together, and the link is called a relationship.
-
-(There are other keys such as: Super Key, Minimal Super Key, Candidate Key, Unique Key, Alternate Key, Composite Key, Natural Key, Surrogate Key.)
-
-
-
-### Index
-
-Indexes are the crux of why **SQL** is so much more efficient than, say, **R**.  An index is a lookup table that helps **SQL** keep track of which records contain certain values.  By indexing the rows, **SQL** is able to optimize sorting and joining tables.  The index is created in advance (when the table is created) and saved to disk, which can take up substantial space on the disk.  Sometimes more than one variable is used to index the table. There are trade-offs to having a lot of indexes (disk space but fast wrangling) versus a few indexes (slow wrangling but less space).
-
-A table may have more than one index but you shouldn't add indexes to every column in a table, as these have to be updated for every addition/update/delete to the column. Rather, indexes should be added to columns that are frequently included in queries.
-
-Indexes may not make much difference for small databases, but, as tables grow in size, queries benefit more from indexes.
-
-In **MySQL** the commands `SHOW KEYS` and `SHOW INDEXES` provide information about the keys and indexes for each table.  (Neither operation is available in **DuckDB**.)
-
-
-### Partitioning
-
-Another way to speed up query retrievals is to partition the data tables.  If, for example, the SNL queries were always done by year, then the `episodes` table could be partitioned such that they are stored as separate tables (one per `year`).  The partitioning functions as an index on `year`.  The user would not be able to tell the difference between the unpartitioned `episodes` table and the partitioned one.  However, queries done by `year` would be faster.  Queries done grouped in another way would be slower.
-
 
 ## Best practice
 
