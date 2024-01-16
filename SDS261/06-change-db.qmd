@@ -265,14 +265,14 @@ hosts_delete |>
 
 ## Altering the table
 
-`ALTER TABLE` changes the structure of a table. For example, you can add or delete columns, create or destroy indexes, change the type of existing columns, or rename columns or the table itself.^[Information and examples in this section taken from https://dev.mysql.com/doc/refman/8.0/en/alter-table.html#alter-table-add-drop-column]
+`ALTER TABLE` changes the structure of a table. For example, you can add or delete columns, create or destroy indexes, change the type of existing columns, or rename columns or the table itself.  (Syntax below is for **MySQL**.  Unfortunately, **DuckDB** is finicky when `ALTER`ing tables, so the commands below may not work on the tables created using **DuckDB**.)^[Information and examples in this section taken from https://dev.mysql.com/doc/refman/8.0/en/alter-table.html#alter-table-add-drop-column]
 
 Multiple `ADD`, `ALTER`, `DROP`, and `CHANGE` clauses are permitted in a single `ALTER TABLE` statement, separated by commas. 
 
 ```{sql}
 #| eval: false
 
-ALTER TABLE table
+ALTER TABLE t1
 DROP COLUMN col1,
 DROP COLUMN col2;
 ```
@@ -341,40 +341,6 @@ Temporary tables are used to break down complex queries into smaller, more manag
 
 Note that tables in **DuckDB** are saved (to disk), even when the connection is closed.  However, temporary tables are saved in memory (instead of on disk) and are deleted when the connection is closed.   Specific configuration of the temporary directory allows for <a href = "https://duckdb.org/docs/sql/statements/create_table.html#temporary-tables" target = "_blank">temporary tables to be saved</a>, even when the connection is closed.
 
-
-###  Using **DuckDB** for loading data {#sec-load-duckdb}
-
-The steps given in @sec-load-data are general to many **SQL** dialects and are important when working with most **SQL** clients.  It is important to have control over the variables configurations as they make up the **SQL** database.  However, using the **duckdb** package in **R** allows for shorthand entry of data from .csv files into the **DuckDB** database.  Here, we take advantage of working with the **DuckDB** functionality in R.
-
-
-```{sql}
-#| connection: con_duckdb
-#| echo: false
-#| include: false
-
-DROP TABLE IF EXISTS hosts;
-```
-
-```{sql}
-#| connection: con_duckdb
-#| echo: false
-#| include: false
-
-DROP TABLE IF EXISTS episodes;
-```
-
-```{r}
-duckdb_read_csv(con = con_duckdb, name = "hosts", files = "data/hosts.csv")
-duckdb_read_csv(con = con_duckdb, name = "episodes", files = "data/episodes.csv")
-```
-
-#### Checking the loading {-}
-
-```{sql}
-#| connection: con_duckdb
-
-SHOW TABLES;
-```
 
 
 Notice that most of the tables have some kind of ID which allows `JOIN`ing across tables.

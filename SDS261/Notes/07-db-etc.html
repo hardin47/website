@@ -293,16 +293,7 @@ for (let popover of popovers){
   </div>
   
 
-</header><div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">con_air</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span></span>
-<span>  <span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  dbname <span class="op">=</span> <span class="st">"airlines"</span>,</span>
-<span>  host <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_HOST"</span><span class="op">)</span>,</span>
-<span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_USER"</span><span class="op">)</span>,</span>
-<span>  password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"SMITH_PWD"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="back-to-the-flights" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="back-to-the-flights">Back to the flights</h4>
+</header><section id="back-to-the-flights" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="back-to-the-flights">Back to the flights</h4>
 <p>The examples below use the <code>airlines</code> database, including the <code>flights</code>, <code>carriers</code>, <code>airports</code>, and <code>planes</code> tables.</p>
 </section><section id="efficiencies" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="efficiencies">
 <span class="header-section-number">7.1</span> Efficiencies</h2>
@@ -333,7 +324,7 @@ for (let popover of popovers){
 <p>In <strong>MySQL</strong> the commands <code>SHOW KEYS</code> and <code>SHOW INDEXES</code> provide information about the keys and indexes for each table (the two operations are synonymous in <strong>MySQL</strong>). Neither operation is available in <strong>DuckDB</strong>.</p>
 <p>Notice that the <code>planes</code> table has a single <code>PRIMARY</code> key. That primary key is used to index the table. The <code>flights</code> table has no <code>PRIMARY</code> key, but it does have six different indexes: <code>Year</code>, <code>Date</code>, <code>Origin</code>, <code>Dest</code>, <code>Carrier</code>, and <code>tailNum</code>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> planes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> planes;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -432,7 +423,7 @@ YES
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -848,7 +839,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 <p>Indexes are built to accommodate the specific queries that are most likely to be run. However, you might not know which queries are going to be run, so it isn’t always obiously how to index a table.</p>
 <p>For the flights table, it seems likely that many queries will involve searching for flights from a particular origin, or to a particular destination, or during a particular year (or range of years), or on a specific carrier, and so indexes have been built on each of those columns. There is also a Date index, since it seems likely that people would want to search for flights on a certain date. However, it does not seem so likely that people would search for flights in a specific month across all years, and thus we have not built an index on month alone. The Date index does contain the month column, but the index can only be used if year is also part of the query.</p>
 <div class="cell" data-output.var="show_index" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">INDEXES</span> <span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -938,7 +929,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 <section id="efficiencies-in-selecting" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="efficiencies-in-selecting">efficiencies in <code>SELECT</code>ing</h4>
 <p><strong>MySQL</strong> provides information about how it is going to perform a query using the <code>EXPLAIN</code> syntax. The information communicates how onerous the query is, without actually running it—saving you the time of having to wait for it to execute. <a href="#tbl-explain-query-dist">Table&nbsp;<span>7.2</span></a> provides output that reflects the query plan returned by the <strong>MySQL</strong> server.</p>
 <div class="cell" data-output.var="explain_query_dist" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> distance <span class="op">&gt;</span> <span class="dv">3000</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> distance <span class="op">&gt;</span> <span class="dv">3000</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -982,7 +973,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 <p>If we were to run a query for long flights using the <code>distance</code> column the server will have to inspect <strong>each</strong> of the 48 million rows, because <code>distance</code> is not indexed. A query on a non-indexed variable is the slowest possible search and is often called a table scan. The 48 million number that you see in the rows column is an estimate of the number of rows that <strong>MySQL</strong> will have to consult in order to process your query. In general, more rows mean a slower query.</p>
 <p>On the other hand, a search for recent flights using the <code>year</code> column, which has an index built on it, considers many fewer rows (about 6.3 million, those flights in 2013).</p>
 <div class="cell" data-output.var="explain_query_year" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2013</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2013</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1025,7 +1016,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </div>
 <p>In a search by <code>year</code> and <code>month</code>, <strong>SQL</strong> uses the <code>Date</code> index. Only 700,000 rows are searched, those in June of 2013.</p>
 <div class="cell" data-output.var="explain_query_date" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2013</span> <span class="kw">AND</span> <span class="dt">month</span> <span class="op">=</span> <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">year</span> <span class="op">=</span> <span class="dv">2013</span> <span class="kw">AND</span> <span class="dt">month</span> <span class="op">=</span> <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1068,7 +1059,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </div>
 <p>If we search for particular months across all years, the indexing does not help at all. The query results in a table scan.</p>
 <div class="cell" data-output.var="explain_query_month" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">month</span> <span class="op">=</span> <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> flights <span class="kw">WHERE</span> <span class="dt">month</span> <span class="op">=</span> <span class="dv">6</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1113,10 +1104,10 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </section><section id="efficiencies-in-joining" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="efficiencies-in-joining">efficiencies in <code>JOIN</code>ing</h4>
 <p>Using indexes is especially important for efficiency when performing <code>JOIN</code> operations on large tables. In the two examples below, both queries use indexes However, because the cardinality of the index on <code>tailnum</code> is larger that the cardinality of the index on <code>year</code> (see <a href="#tbl-show-index">Table&nbsp;<span>7.1</span></a>), the number of rows in <code>flights</code> associated with each unique value of <code>tailnum</code> is smaller than for each unique value of <code>year</code>. Thus, the first query runs faster.</p>
 <div class="cell" data-output.var="explain_join_tail" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> planes p </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> flights o <span class="kw">ON</span> p.tailnum <span class="op">=</span> o.TailNum</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> manufacturer <span class="op">=</span> <span class="st">'BOEING'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> planes p </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> flights o <span class="kw">ON</span> p.tailnum <span class="op">=</span> o.TailNum</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> manufacturer <span class="op">=</span> <span class="st">'BOEING'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1174,10 +1165,10 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </div>
 </div>
 <div class="cell" data-output.var="explain_join_year" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> planes p </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> flights o <span class="kw">ON</span> p.<span class="dt">Year</span> <span class="op">=</span> o.<span class="dt">Year</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> manufacturer <span class="op">=</span> <span class="st">'BOEING'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> planes p </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> flights o <span class="kw">ON</span> p.<span class="dt">Year</span> <span class="op">=</span> o.<span class="dt">Year</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> manufacturer <span class="op">=</span> <span class="st">'BOEING'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -1239,10 +1230,10 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </h2>
 <p>Let’s start with an example, calculating the median arrival delay in the flights table.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"flights"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"flights"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">summarize</span><span class="op">(</span>med_arr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">arr_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">show_query</span><span class="op">(</span><span class="va">median_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1253,7 +1244,7 @@ FROM `flights`</code></pre>
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">summarize</span><span class="op">(</span>med_arr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">arr_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1268,11 +1259,11 @@ GROUP BY `year`</code></pre>
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">NTILE</span>(<span class="dv">50</span>) <span class="kw">OVER</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">NTILE</span>(<span class="dv">50</span>) <span class="kw">OVER</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> version();</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> version();</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1295,15 +1286,19 @@ version()
 <section id="window-functions" class="level3" data-number="7.2.1"><h3 data-number="7.2.1" class="anchored" data-anchor-id="window-functions">
 <span class="header-section-number">7.2.1</span> Window functions</h3>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>translating dplyr code: https://r4ds.hadley.nz/databases#sec-sql-expressions What is distinct() translated to? How about head()?</p>
-</section></section><section id="best-practice" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="best-practice">
+<p>translating dplyr code: https://r4ds.hadley.nz/databases#sec-sql-expressions</p>
+<ol type="1">
+<li>windows function / median</li>
+<li>case_when</li>
+<li>distinct() / head()</li>
+</ol></section></section><section id="best-practice" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">7.3</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reflection-questions" class="level2" data-number="7.4"><h2 data-number="7.4" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">7.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>

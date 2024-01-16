@@ -10,6 +10,8 @@ fontawesome::fa_html_dependency()
 
 
 ```{r}
+#| echo: false
+
 con_air <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "airlines",
@@ -302,20 +304,17 @@ explain_join_year |>
 Let's start with an example, calculating the median arrival delay in the flights table.
 
 ```{r}
-flights <- tbl(con_air, "flights")
+airports <- tbl(con_air, "airports")
+
+head(airports)
 ```
 
 ```{r}
-median_query <- flights |>
-  summarize(med_arr = median(arr_delay, na.rm = TRUE))
+airports |>
+  summarize(med_lat = median(lat, na.rm = TRUE))
 
-show_query(median_query)
-```
-
-```{r}
-median_query <- flights |>
-  group_by(year) |>
-  summarize(med_arr = median(arr_delay, na.rm = TRUE))
+median_query <- airports |>
+  summarize(med_lat = median(lat, na.rm = TRUE))
 
 show_query(median_query)
 ```
@@ -323,10 +322,24 @@ show_query(median_query)
 
 ```{sql}
 #| connection: con_air
-#| eval: false
+
+SHOW TABLES;
+```
 
 SELECT NTILE(50) OVER (ORDER BY arr_delay) AS med_arr
 FROM flights;
+
+
+```{sql}
+#| connection: con_air
+#| eval: true
+
+SELECT lat,
+PERCENT_RANK() OVER w AS 'percent_rank',
+NTILE(10) OVER w AS 'ntile'
+FROM airports
+WINDOW w AS (ORDER BY lat);
+
 ```
 
 
@@ -348,9 +361,10 @@ FROM flights;
 
 
 translating dplyr code: https://r4ds.hadley.nz/databases#sec-sql-expressions
-What is distinct() translated to? How about head()?
 
-
+1. windows function / median
+2. case_when
+3. distinct() / head()
 
 ## Best practice
 

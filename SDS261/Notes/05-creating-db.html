@@ -261,12 +261,16 @@ for (let popover of popovers){
 <li>
 <a href="#preparing-to-load-data" id="toc-preparing-to-load-data" class="nav-link active" data-scroll-target="#preparing-to-load-data"><span class="header-section-number">5.1</span> Preparing to load data</a>
   <ul class="collapse">
-<li><a href="#sec-load-data" id="toc-sec-load-data" class="nav-link" data-scroll-target="#sec-load-data"><span class="header-section-number">5.1.1</span> Loading data</a></li>
+<li><a href="#variable-types" id="toc-variable-types" class="nav-link" data-scroll-target="#variable-types"><span class="header-section-number">5.1.1</span> Variable types</a></li>
+  <li><a href="#check-constraints" id="toc-check-constraints" class="nav-link" data-scroll-target="#check-constraints"><span class="header-section-number">5.1.2</span> <code>CHECK</code> constraints</a></li>
+  <li><a href="#sec-load-data" id="toc-sec-load-data" class="nav-link" data-scroll-target="#sec-load-data"><span class="header-section-number">5.1.3</span> Loading data</a></li>
+  <li><a href="#sec-load-duckdb" id="toc-sec-load-duckdb" class="nav-link" data-scroll-target="#sec-load-duckdb"><span class="header-section-number">5.1.4</span> Using <strong>DuckDB</strong> for loading data</a></li>
   </ul>
 </li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">5.2</span> Best practice</a></li>
-  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">5.3</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
-  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">5.4</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
+  <li><a href="#creating-indexes" id="toc-creating-indexes" class="nav-link" data-scroll-target="#creating-indexes"><span class="header-section-number">5.3</span> Creating <code>INDEX</code>es</a></li>
+  <li><a href="#reflection-questions" id="toc-reflection-questions" class="nav-link" data-scroll-target="#reflection-questions"><span class="header-section-number">5.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</a></li>
+  <li><a href="#ethics-considerations" id="toc-ethics-considerations" class="nav-link" data-scroll-target="#ethics-considerations"><span class="header-section-number">5.5</span> <i class="fas fa-balance-scale"></i> Ethics considerations</a></li>
   </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/hardin47/SDS261-SQL/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
@@ -299,7 +303,7 @@ for (let popover of popovers){
 </div>
 <section id="preparing-to-load-data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="preparing-to-load-data">
 <span class="header-section-number">5.1</span> Preparing to load data</h2>
-<p>The <code>duckdb</code> database is currently empty, so we need to load in some data. The <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv()</a></code> function in the <strong>duckdb</strong> R package allows us to load the .csv file (available on GitHub) directly into the database without being loaded as an <strong>R</strong> object first.</p>
+<p>The <code>duckdb</code> database is currently empty, so we need to load in some data. The <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv()</a></code> function in the <strong>duckdb</strong> R package allows us to load the .csv file (available on GitHub) directly into the database without being loaded as an <strong>R</strong> object first. The function, <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv()</a></code> does some of the work for us to find data types. However, we will first learn what data types are and how to use them, and most dialects of <strong>SQL</strong> require you to specify the data types before loading in data (usually done using <code>LOAD DATA</code> but using <code>COPY</code> in <strong>Duckdb</strong>).</p>
 <p>Recall that in <a href="03-sql-verbs.html#tbl-select-describe">Table&nbsp;<span>3.2</span></a> we used <code>DESCRIBE</code> to display the variable types of the database table(s). The list includes the variable name (<code>Field</code>), its <code>Type</code>, whether there are <code>NULL</code> values allowed, and whether there are keys or indexes defined on the variable. See <a href="#tbl-casts-describe">Table&nbsp;<span>5.2</span></a> for the <code>DESCRIBE</code> output on the table we are about to import.</p>
 <p>Unlike <strong>R</strong>, when creating a new data table, <strong>SQL</strong> requires that you communicate each future variable (column) and that variable’s type. Variable types are <strong>not</strong> automatically generated!</p>
 <p>As an example, consider the Saturday Night Live datasets available on the <a href="https://github.com/hhllcks/snldb/" target="_blank">snldb GitHub repo</a>. Data is scraped from <a href="http://www.snlarchives.net" target="_blank">http://www.snlarchives.net</a> and <a href="http://www.imdb.com/title/tt0072562" target="_blank">http://www.imdb.com/title/tt0072562</a> by <a href="https://github.com/hhllcks" target="_blank">Hendrik Hilleckes</a> and <a href="https://github.com/colinmorris" target="_blank">Colin Morris</a>. Notice that there are eleven .csv files available in the <a href="https://github.com/hhllcks/snldb/tree/master/output" target="_blank">output folder</a>.</p>
@@ -321,9 +325,64 @@ $ n_episodes      &lt;dbl&gt; 8, 20, 13, 20, 20, 20, 5, 11, 21, 21, 21, 18, 17, 
 $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0.524…</code></pre>
 </div>
 </div>
-<section id="sec-load-data" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="sec-load-data">
-<span class="header-section-number">5.1.1</span> Loading data</h3>
-<p>Once the database is set up, you will be ready to import .csv files into the database as tables. Importing .csv files as tables requires a series of steps:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<section id="variable-types" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="variable-types">
+<span class="header-section-number">5.1.1</span> Variable types</h3>
+<p>The <code>glance()</code> function indicates that there are different variables types, here <code>chr</code> (character string), <code>dbl</code> (numerical value with double precision), and <code>lgl</code> (logical value). What are the data types in <strong>SQL</strong>?<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<section id="numbers" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="numbers">Numbers</h4>
+<ul>
+<li>exact numeric data types (<code>INTEGER</code>, <code>SMALLINT</code>, <code>DECIMAL</code>, and <code>NUMERIC</code>)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+</li>
+<li>approximate numeric data types (<code>FLOAT</code>, <code>REAL</code>, and <code>DOUBLE PRECISION</code>)<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>
+</li>
+<li>integer types <code>INTEGER</code> (or <code>INT</code>) and <code>SMALLINT</code>, <code>TINYINT</code>, <code>MEDIUMINT</code>, and <code>BIGINT</code>
+</li>
+<li>
+<code>DECIMAL(precision, scale)</code>. For example, in <code>DECIMAL(5,2)</code> 5 is the precision and 2 is the scale. The precision represents the number of significant digits that are stored for values, and the scale represents the number of digits that can be stored following the decimal point. <code>DECIMAL(5,2)</code> must store any value with five digits and two decimals, so values that can be stored in the salary column range from -999.99 to 999.99. <code>DECIMAL(M)</code> is equivalent to <code>DECIMAL(M,0)</code>. Similarly, the syntax <code>DECIMAL</code> is equivalent to <code>DECIMAL(M,0)</code>, where the default value of <code>M</code> is 10. If the scale is 0, <code>DECIMAL</code> values contain no decimal point or fractional part.</li>
+</ul></section><section id="strings" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="strings">Strings</h4>
+<ul>
+<li>string data types are <code>CHAR</code>, <code>VARCHAR</code>, <code>BINARY</code>, <code>VARBINARY</code>, <code>BLOB</code>, <code>TEXT</code>, <code>ENUM</code>, and <code>SET</code>
+</li>
+<li>
+<code>CHAR</code> and <code>VARCHAR</code> types are similar, but differ in the way they are stored and retrieved. They also differ in maximum length and in whether trailing spaces are retained.</li>
+<li>
+<code>CHAR</code> and <code>VARCHAR</code> types are declared with a length that indicates the maximum number of characters you want to store. For example, <code>CHAR(30)</code> can hold up to 30 characters.</li>
+<li>The length of a <code>CHAR</code> column is fixed to the length that you declare when you create the table.</li>
+<li>Values in <code>VARCHAR</code> columns are variable-length strings. The length can be specified as a value from 0 to 65,535.</li>
+<li>
+<code>BINARY</code> and <code>VARBINARY</code> types are similar to <code>CHAR</code> and <code>VARCHAR</code>, except that they store binary strings rather than nonbinary strings. That is, they store byte strings rather than character strings.</li>
+<li>A <code>BLOB</code> is a binary large object that can hold a variable amount of data. The four <code>BLOB</code> types are <code>TINYBLOB</code>, <code>BLOB</code>, <code>MEDIUMBLOB</code>, and <code>LONGBLOB</code>. These differ only in the maximum length of the values they can hold. The four <code>TEXT</code> types are <code>TINYTEXT</code>, <code>TEXT</code>, <code>MEDIUMTEXT</code>, and <code>LONGTEXT</code>. These correspond to the four <code>BLOB</code> types and have the same maximum lengths and storage requirements.</li>
+</ul></section><section id="date" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="date">Date</h4>
+<ul>
+<li>date and time data types for representing temporal values are <code>DATE</code>, <code>TIME</code>, <code>DATETIME</code>, <code>TIMESTAMP</code>, and <code>YEAR</code>
+</li>
+<li>
+<code>DATE</code> type is used for values with a date part but no time part. <strong>MySQL</strong> retrieves and displays DATE values in ‘YYYY-MM-DD’ format. The supported range is ‘1000-01-01’ to ‘9999-12-31’.</li>
+<li>
+<code>DATETIME</code> type is used for values that contain both date and time parts. <strong>MySQL</strong> retrieves and displays <code>DATETIME</code> values in ‘YYYY-MM-DD hh:mm:ss’ format. The supported range is ‘1000-01-01 00:00:00’ to ‘9999-12-31 23:59:59’.</li>
+<li>
+<code>TIMESTAMP</code> data type is used for values that contain both date and time parts. <code>TIMESTAMP</code> has a range of ‘1970-01-01 00:00:01’ UTC to ‘2038-01-19 03:14:07’ UTC.</li>
+<li>
+<code>TIME</code> values in ‘hh:mm:ss’ format (or ‘hhh:mm:ss’ format for large hours values). <code>TIME</code> values may range from ‘-838:59:59’ to ‘838:59:59’. The hours part may be so large because the TIME type can be used not only to represent a time of day (which must be less than 24 hours), but also elapsed time or a time interval between two events (which may be much greater than 24 hours, or even negative).</li>
+<li>
+<code>YEAR</code> type is a 1-byte type used to represent year values with a display width of four characters.</li>
+</ul></section></section><section id="check-constraints" class="level3" data-number="5.1.2"><h3 data-number="5.1.2" class="anchored" data-anchor-id="check-constraints">
+<span class="header-section-number">5.1.2</span> <code>CHECK</code> constraints</h3>
+<p>While implementing <code>CREATE TABLE</code>, constraints can be added either to individual variables (<code>CountryPopulation &gt; 0</code>) or to the table as a whole (<code>LastCensus &lt; NextCensus</code>).<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<p>If an attempt is made to load data that violate the <code>CHECK</code> constraints, an error will be given.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> CountryListCensus (</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">Id</span> <span class="dt">INT</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    CountryName <span class="dt">VARCHAR</span>(<span class="dv">255</span>) <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    CountryPopulation <span class="dt">INT</span> <span class="kw">CHECK</span>(CountryPopulation <span class="op">&gt;</span> <span class="dv">0</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    LastCensus <span class="dt">DATE</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    NextCensus <span class="dt">DATE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">CHECK</span>(LastCensus<span class="op">&lt;</span>NextCensus),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (<span class="kw">Id</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="sec-load-data" class="level3" data-number="5.1.3"><h3 data-number="5.1.3" class="anchored" data-anchor-id="sec-load-data">
+<span class="header-section-number">5.1.3</span> Loading data</h3>
+<p>Once the database is set up, you will be ready to import .csv files into the database as tables. Importing .csv files as tables requires a series of steps:<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
 <ol type="1">
 <li>a <code>USE</code> statement that ensures we are in the right schema/database.</li>
 <li>a series of <code>DROP TABLE</code> statements that drop any old tables with the same names as the ones we are going to create.</li>
@@ -346,36 +405,37 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 <section id="loading-step-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-1">Loading step 1</h4>
 <p>Use the local database that we’ve called <code>duck_datab</code>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> duck_datab;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> duck_datab;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-2" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-2">Loading step 2</h4>
 <p>Make sure to “refresh” the table, in case it already exists. However, be very careful with the <code>DROP TABLE</code> statement, as it will <strong>remove</strong> the <code>casts</code> table.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-3" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-3">Loading step 3</h4>
 <p>Carefully define the variable types, whether or not they allow missing values, and what a default value is for that variable. Additionally, identify the key for accessing information.</p>
+<p><strong>MySQL</strong> doesn’t actually have a <code>BOOLEAN</code> datatype (you would use <code>TINYINT(1)</code> instead). But <strong>DuckDB</strong> <em>does</em> have a <code>BOOLEAN</code> datatype!</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> casts (</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  aid <span class="dt">VARCHAR</span>(<span class="dv">255</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">''</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  sid <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  featured <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'false'</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  first_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  last_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  update_anchor <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  n_episodes <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  season_fraction <span class="dt">DECIMAL</span>(<span class="dv">21</span>,<span class="dv">20</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (sid, aid)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> casts (</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  aid <span class="dt">VARCHAR</span>(<span class="dv">255</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">' '</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  sid <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  featured <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'false'</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  first_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  last_epid <span class="dt">INTEGER</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  update_anchor <span class="dt">BOOLEAN</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  n_episodes <span class="dt">INTEGER</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  season_fraction <span class="dt">DECIMAL</span>(<span class="dv">21</span>,<span class="dv">20</span>) <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (sid, aid)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="loading-step-4" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="loading-step-4">Loading step 4</h4>
 <p>The .csv file lives on my computer, so I load it in directly. Note that the statement to load in data is slightly different in <strong>MySQL</strong>.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> casts <span class="kw">FROM</span> <span class="st">'data/casts.csv'</span> <span class="kw">HEADER</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> casts <span class="kw">FROM</span> <span class="st">'data/casts.csv'</span> <span class="kw">HEADER</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="checking-the-loading" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="checking-the-loading">Checking the loading</h4>
 <div class="cell" data-output.var="select_casts" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> casts <span class="kw">LIMIT</span> <span class="dv">8</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> casts <span class="kw">LIMIT</span> <span class="dv">8</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -483,7 +543,7 @@ $ season_fraction &lt;dbl&gt; 0.444, 1.000, 1.000, 1.000, 1.000, 1.000, 0.250, 0
 </section><section id="check" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="check">Check</h4>
 <p>Let’s make sure that the database exists and that the table in the database exists.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>SHOW DATABASES;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SHOW DATABASES;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -504,7 +564,7 @@ duck_datab
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -525,7 +585,7 @@ casts
 </div>
 </div>
 <div class="cell" data-output.var="casts_describe" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE casts;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
 <div class="cell-output-display">
@@ -546,7 +606,7 @@ casts
 <td style="text-align: left;">VARCHAR</td>
 <td style="text-align: left;">NO</td>
 <td style="text-align: left;">PRI</td>
-<td style="text-align: left;">''</td>
+<td style="text-align: left;">' '</td>
 <td style="text-align: right;"></td>
 </tr>
 <tr class="even">
@@ -612,21 +672,75 @@ casts
 
 </div>
 </div>
+</section></section><section id="sec-load-duckdb" class="level3" data-number="5.1.4"><h3 data-number="5.1.4" class="anchored" data-anchor-id="sec-load-duckdb">
+<span class="header-section-number">5.1.4</span> Using <strong>DuckDB</strong> for loading data</h3>
+<p>The steps given in <a href="#sec-load-data"><span>Section&nbsp;5.1.3</span></a> are general to many <strong>SQL</strong> dialects and are important when working with most <strong>SQL</strong> clients. It is important to have control over the variables configurations as they make up the <strong>SQL</strong> database. However, using the <strong>duckdb</strong> package in <strong>R</strong> allows for shorthand entry of data from .csv files into the <strong>DuckDB</strong> database. Here, we take advantage of working with the <strong>DuckDB</strong> functionality in R.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv</a></span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"hosts"</span>, files <span class="op">=</span> <span class="st">"data/hosts.csv"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb_read_csv.html">duckdb_read_csv</a></span><span class="op">(</span>con <span class="op">=</span> <span class="va">con_duckdb</span>, name <span class="op">=</span> <span class="st">"episodes"</span>, files <span class="op">=</span> <span class="st">"data/episodes.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="checking-the-loading-1" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="checking-the-loading-1">Checking the loading</h4>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">TABLES</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+3 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+name
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+casts
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+episodes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hosts
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section></section></section><section id="best-practice" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">5.2</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con_duckdb</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="reflection-questions" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="reflection-questions">
-<span class="header-section-number">5.3</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
-</section><section id="ethics-considerations" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="ethics-considerations">
-<span class="header-section-number">5.4</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
+</section><section id="creating-indexes" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="creating-indexes">
+<span class="header-section-number">5.3</span> Creating <code>INDEX</code>es</h2>
+<p>Indexes can be created on one or more variable. A table does not need to have an <code>INDEX</code> (or a <code>KEY</code>).</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> name_of_index <span class="kw">ON</span> <span class="kw">table</span> (col1);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> name_of_index <span class="kw">ON</span> <span class="kw">table</span> (col1, col2);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="reflection-questions" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="reflection-questions">
+<span class="header-section-number">5.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
+</section><section id="ethics-considerations" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="ethics-considerations">
+<span class="header-section-number">5.5</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
 
 
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
 <ol>
-<li id="fn1"><p>taken from <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Taken from https://dev.mysql.com/doc/refman/8.0/en/data-types.html<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>The keyword <code>INT</code> is a synonym for <code>INTEGER</code>, and the keywords <code>DEC</code> and <code>FIXED</code> are synonyms for <code>DECIMAL</code><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p> <strong>MySQL</strong> treats <code>DOUBLE</code> as a synonym for <code>DOUBLE PRECISION</code>. <strong>MySQL</strong> also treats <code>REAL</code> as a synonym for <code>DOUBLE PRECISION</code>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Example from https://www.sqlshack.com/how-to-use-sql-check-constraints/<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>taken from <a href="https://mdsr-book.github.io/mdsr3e/16-sqlII.html#load-into-mysql-database" target="_blank">MDSR</a>.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
