@@ -270,7 +270,9 @@ for (let popover of popovers){
   <li>
 <a href="#sql-in-dbplyr" id="toc-sql-in-dbplyr" class="nav-link" data-scroll-target="#sql-in-dbplyr"><span class="header-section-number">7.2</span> <strong>SQL</strong> in <strong>dbplyr</strong></a>
   <ul class="collapse">
-<li><a href="#window-functions" id="toc-window-functions" class="nav-link" data-scroll-target="#window-functions"><span class="header-section-number">7.2.1</span> Window functions</a></li>
+<li><a href="#median" id="toc-median" class="nav-link" data-scroll-target="#median"><span class="header-section-number">7.2.1</span> Median</a></li>
+  <li><a href="#case_when" id="toc-case_when" class="nav-link" data-scroll-target="#case_when"><span class="header-section-number">7.2.2</span> <code>case_when()</code></a></li>
+  <li><a href="#other-functions" id="toc-other-functions" class="nav-link" data-scroll-target="#other-functions"><span class="header-section-number">7.2.3</span> Other functions</a></li>
   </ul>
 </li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">7.3</span> Best practice</a></li>
@@ -1228,42 +1230,60 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 </section></section></section><section id="sql-in-dbplyr" class="level2" data-number="7.2"><h2 data-number="7.2" class="anchored" data-anchor-id="sql-in-dbplyr">
 <span class="header-section-number">7.2</span> <strong>SQL</strong> in <strong>dbplyr</strong>
 </h2>
-<p>Let’s start with an example, calculating the median arrival delay in the flights table.</p>
+<section id="median" class="level3" data-number="7.2.1"><h3 data-number="7.2.1" class="anchored" data-anchor-id="median">
+<span class="header-section-number">7.2.1</span> Median</h3>
+<p>Let’s start with an example, calculating the median <code>alt</code>itude in the <code>airports</code> table. (Using <code>airports</code> instead of <code>flights</code> just because the <code>airports</code> table is so much smaller.)<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"flights"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">&lt;-</span> <span class="fu">tbl</span><span class="op">(</span><span class="va">con_air</span>, <span class="st">"airports"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">airports</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [6 x 9]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+  faa   name                           lat   lon   alt    tz dst   city  country
+  &lt;chr&gt; &lt;chr&gt;                        &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  
+1 04G   Lansdowne Airport             41.1 -80.6  1044    -5 A     Youn… United…
+2 06A   Moton Field Municipal Airpo…  32.5 -85.7   264    -6 A     Tusk… United…
+3 06C   Schaumburg Regional           42.0 -88.1   801    -6 A     Scha… United…
+4 06N   Randall Airport               41.4 -74.4   523    -5 A     Midd… United…
+5 09J   Jekyll Island Airport         31.1 -81.4    11    -5 A     Jeky… United…
+6 0A9   Elizabethton Municipal Airp…  36.4 -82.2  1593    -5 A     Eliz… United…</code></pre>
+</div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarize</span><span class="op">(</span>med_arr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">arr_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>med_alt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">alt</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">show_query</span><span class="op">(</span><span class="va">median_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;SQL&gt;
-SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `arr_delay`) AS `med_arr`
-FROM `flights`</code></pre>
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `alt`) AS `med_alt`
+FROM `airports`</code></pre>
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">flights</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarize</span><span class="op">(</span>med_arr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">arr_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">show_query</span><span class="op">(</span><span class="va">median_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&lt;SQL&gt;
-SELECT
-  `year`,
-  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `arr_delay`) AS `med_arr`
-FROM `flights`
-GROUP BY `year`</code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>med_lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">alt</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in `collect()`:
+! Failed to collect lazy table.
+Caused by error:
+! You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(ORDER BY `alt`) AS `med_lat`
+FROM `airports`
+LIMIT 7' at line 1 [1064]</code></pre>
 </div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">NTILE</span>(<span class="dv">50</span>) <span class="kw">OVER</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> version();</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1271,34 +1291,216 @@ GROUP BY `year`</code></pre>
 1 records
 </caption>
 <thead><tr>
-<th style="text-align:left;">
-version()
+<th style="text-align:right;">
+median_value
 </th>
 </tr></thead>
 <tbody><tr>
-<td style="text-align:left;">
-8.0.35-0ubuntu0.20.04.1
+<td style="text-align:right;">
+476
 </td>
 </tr></tbody>
 </table>
 </div>
 </div>
-<section id="window-functions" class="level3" data-number="7.2.1"><h3 data-number="7.2.1" class="anchored" data-anchor-id="window-functions">
-<span class="header-section-number">7.2.1</span> Window functions</h3>
+<p>But let’s break down what the code is doing… First, set the <code>row_index</code> to -1 and iterate through by adding +1 for each row. Then concatenate the <code>row_index</code> information onto our table of interest.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> arr_delay) <span class="kw">AS</span> med_arr</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>translating dplyr code: https://r4ds.hadley.nz/databases#sec-sql-expressions</p>
-<ol type="1">
-<li>windows function / median</li>
-<li>case_when</li>
-<li>distinct() / head()</li>
-</ol></section></section><section id="best-practice" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="best-practice">
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+Displaying records 1 - 10
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+row_index
+</th>
+<th style="text-align:right;">
+alt
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:right;">
+-54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+-42
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now the data need to be filtered to include only the middle row or two rows.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+2 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+row_index
+</th>
+<th style="text-align:right;">
+alt
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+728
+</td>
+<td style="text-align:right;">
+474
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+729
+</td>
+<td style="text-align:right;">
+477
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The last step is to average the middle row(s). If only one row is pulled out in the previous query, then only one row will be averaged (which the computer does happily).</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+1 records
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+median_value
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:right;">
+476
+</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+</section><section id="case_when" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="case_when">
+<span class="header-section-number">7.2.2</span> <code>case_when()</code>
+</h3>
+<p>The <strong>dplyr</strong> function <code>case_when()</code> is interesting to look at!<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+</section><section id="other-functions" class="level3" data-number="7.2.3"><h3 data-number="7.2.3" class="anchored" data-anchor-id="other-functions">
+<span class="header-section-number">7.2.3</span> Other functions</h3>
+<p>distinct() / head()</p>
+</section></section><section id="best-practice" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">7.3</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reflection-questions" class="level2" data-number="7.4"><h2 data-number="7.4" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">7.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
@@ -1310,6 +1512,8 @@ version()
 <ol>
 <li id="fn1"><p>Analogy taken from: https://www.quora.com/profile/Lara-Mazilu<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>Taken from: https://dev.mysql.com/doc/refman/8.0/en/show-index.html<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Example taken from: https://sebhastian.com/mysql-median/<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Example taken from: https://r4ds.hadley.nz/databases#sec-sql-expressions<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

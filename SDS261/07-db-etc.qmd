@@ -301,7 +301,10 @@ explain_join_year |>
 
 ## **SQL** in **dbplyr**
 
-Let's start with an example, calculating the median arrival delay in the flights table.
+
+### Median
+
+Let's start with an example, calculating the median `alt`itude in the `airports` table.  (Using `airports` instead of `flights` just because the `airports` table is so much smaller.)^[Example taken from: https://sebhastian.com/mysql-median/]
 
 ```{r}
 airports <- tbl(con_air, "airports")
@@ -310,61 +313,115 @@ head(airports)
 ```
 
 ```{r}
-airports |>
-  summarize(med_lat = median(lat, na.rm = TRUE))
-
 median_query <- airports |>
-  summarize(med_lat = median(lat, na.rm = TRUE))
+  summarize(med_alt = median(alt, na.rm = TRUE))
 
 show_query(median_query)
 ```
 
 
-```{sql}
-#| connection: con_air
+```{r}
+#| error: true
 
-SHOW TABLES;
+airports |>
+  summarize(med_lat = median(alt, na.rm = TRUE))
 ```
 
-SELECT NTILE(50) OVER (ORDER BY arr_delay) AS med_arr
-FROM flights;
 
 
-```{sql}
-#| connection: con_air
-#| eval: true
 
-SELECT lat,
-PERCENT_RANK() OVER w AS 'percent_rank',
-NTILE(10) OVER w AS 'ntile'
-FROM airports
-WINDOW w AS (ORDER BY lat);
 
-```
 
 
 ```{sql}
 #| connection: con_air
 
-SELECT version();
+SET @row_index := -1;
 ```
-
-### Window functions
 
 ```{sql}
 #| connection: con_air
-#| eval: false
 
-SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY arr_delay) AS med_arr
-FROM flights;
+SELECT AVG(subquery.alt) AS median_value
+FROM (
+SELECT @row_index:=@row_index + 1 AS row_index, alt
+  FROM airports
+  ORDER BY alt
+) AS subquery
+WHERE subquery.row_index IN (FLOOR(@row_index / 2), CEIL(@row_index / 2));
 ```
 
 
-translating dplyr code: https://r4ds.hadley.nz/databases#sec-sql-expressions
+But let's break down what the code is doing...  First, set the `row_index` to -1 and iterate through by adding +1 for each row.  Then concatenate the `row_index` information onto our table of interest.
 
-1. windows function / median
-2. case_when
-3. distinct() / head()
+
+```{sql}
+#| connection: con_air
+
+SET @row_index := -1;
+```
+
+```{sql}
+#| connection: con_air
+
+SELECT @row_index:=@row_index + 1 AS row_index, alt
+  FROM airports
+  ORDER BY alt
+  LIMIT 10;
+```
+
+
+Now the data need to be filtered to include only the middle row or two rows.
+
+```{sql}
+#| connection: con_air
+
+SET @row_index := -1;
+```
+
+```{sql}
+#| connection: con_air
+
+SELECT *
+FROM (
+SELECT @row_index:=@row_index + 1 AS row_index, alt
+  FROM airports
+  ORDER BY alt
+) AS subquery
+WHERE subquery.row_index IN (FLOOR(@row_index / 2), CEIL(@row_index / 2));
+```
+
+
+The last step is to average the middle row(s).  If only one row is pulled out in the previous query, then only one row will be averaged (which the computer does happily).
+
+```{sql}
+#| connection: con_air
+
+SET @row_index := -1;
+```
+
+```{sql}
+#| connection: con_air
+
+SELECT AVG(subquery.alt) AS median_value
+FROM (
+SELECT @row_index:=@row_index + 1 AS row_index, alt
+  FROM airports
+  ORDER BY alt
+) AS subquery
+WHERE subquery.row_index IN (FLOOR(@row_index / 2), CEIL(@row_index / 2));
+```
+
+
+### `case_when()`
+
+The **dplyr** function `case_when()` is interesting to look at!^[Example taken from: https://r4ds.hadley.nz/databases#sec-sql-expressions]
+
+
+### Other functions
+
+distinct() / head()
+
 
 ## Best practice
 
