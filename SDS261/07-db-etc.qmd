@@ -312,6 +312,8 @@ airports <- tbl(con_air, "airports")
 head(airports)
 ```
 
+It seems as though the **SQL** query to calculate the median should be reasonably straightforward.
+
 ```{r}
 median_query <- airports |>
   summarize(med_alt = median(alt, na.rm = TRUE))
@@ -319,6 +321,18 @@ median_query <- airports |>
 show_query(median_query)
 ```
 
+But when the **SQL** query is applied to the `airports` table, we get an error.
+
+```{sql}
+#| connection: con_air
+#| error: true
+
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `alt`) AS `med_alt`
+FROM `airports`;
+```
+
+
+Additionally, the **R** code itself doesn't run and gives the same error.  Huh, maybe calculating the median is actually harder than it seems (yes, it is).
 
 ```{r}
 #| error: true
@@ -329,9 +343,10 @@ airports |>
 
 
 
+One way to calculate the median is to use a row index on the sorted values.  Note that attaching a row index to the sorted values requires the values to be sorted (sorting can take a long time).
 
 
-
+Below is the full code to calculate the median.
 
 ```{sql}
 #| connection: con_air
@@ -413,14 +428,222 @@ WHERE subquery.row_index IN (FLOOR(@row_index / 2), CEIL(@row_index / 2));
 ```
 
 
-### `case_when()`
-
-The **dplyr** function `case_when()` is interesting to look at!^[Example taken from: https://r4ds.hadley.nz/databases#sec-sql-expressions]
 
 
-### Other functions
+### `CASE WHEN` 
 
-distinct() / head()
+Consider the various R functions that create new variables based on an original variable.  The `CASE WHEN` function in **SQL** plays the role of multiple R functions including `ifelse()`, `case_when()`, and `cut()`.  
+
+#### `ifelse()` {-}
+
+With `ifelse()` the **R** translates directly to `CASE WHEN` in **SQL**, and the **SQL** query runs easily.
+
+```{r}
+airports |>
+  mutate(sea = ifelse(alt > 500, "above sea", "near sea")) |>
+  head(5)
+```
+
+
+```{r}
+if_query <- airports |>
+  mutate(sea = ifelse(alt > 500, "above sea", "near sea"))
+
+show_query(if_query)
+```
+
+
+```{sql}
+#| connection: con_air
+
+SELECT *,
+CASE WHEN (`alt` > 500.0) THEN 'above sea' WHEN NOT (`alt` > 500.0) THEN 'near sea' END AS `sea`
+FROM `airports` 
+LIMIT 5;
+```
+
+
+#### `case_when()`
+
+With `case_when()` the **R** translates directly to `CASE WHEN` in **SQL**, and the **SQL** query runs easily.
+
+```{r}
+airports |>
+  mutate(sea = case_when(
+    alt < 500 ~ "near sea",
+    alt < 2000 ~ "low alt",
+    alt < 3000 ~ "mod alt",
+    alt < 5500 ~ "high alt",
+    alt > 5500 ~ "extreme alt")) |>
+  head(5)
+```
+
+
+
+```{r}
+cw_query <- airports |>
+  mutate(sea = case_when(
+    alt < 500 ~ "near sea",
+    alt < 2000 ~ "low alt",
+    alt < 3000 ~ "mod alt",
+    alt < 5500 ~ "high alt",
+    alt > 5500 ~ "extreme alt"))
+
+show_query(cw_query)
+```
+
+
+```{sql}
+#| connection: con_air
+
+SELECT
+  *,
+  CASE
+WHEN (`alt` < 500.0) THEN 'near sea'
+WHEN (`alt` < 2000.0) THEN 'low alt'
+WHEN (`alt` < 3000.0) THEN 'mod alt'
+WHEN (`alt` < 5500.0) THEN 'high alt'
+WHEN (`alt` > 5500.0) THEN 'extreme alt'
+END AS `sea`
+FROM `airports`
+LIMIT 5;
+```
+
+
+#### `cut()` {-}
+
+With `cut()` the **R** translates directly to `CASE WHEN` in **SQL**, and the **SQL** query runs easily.
+
+```{r}
+airports |>
+  mutate(sea = cut(
+    alt,
+    breaks = c(-Inf, 500, 2000, 3000, 5500, Inf),
+    labels = c("near sea", "low alt", "mod alt", "high alt", "extreme alt")
+  )
+)|>
+  head(5)
+```
+
+
+
+```{r}
+cw_query <- airports |>
+  mutate(sea = cut(
+    alt,
+    breaks = c(-Inf, 500, 2000, 3000, 5500, Inf),
+    labels = c("near sea", "low alt", "mod alt", "high alt", "extreme alt")
+  )
+)
+
+show_query(cw_query)
+```
+
+
+```{sql}
+#| connection: con_air
+
+SELECT
+  *,
+  CASE
+WHEN (`alt` <= 500.0) THEN 'near sea'
+WHEN (`alt` <= 2000.0) THEN 'low alt'
+WHEN (`alt` <= 3000.0) THEN 'mod alt'
+WHEN (`alt` <= 5500.0) THEN 'high alt'
+WHEN (`alt` > 5500.0) THEN 'extreme alt'
+END AS `sea`
+FROM `airports`
+LIMIT 5;
+```
+
+
+### `SELECT DISTINCT`
+
+How many distinct time zones are there in the `airports` table?  `distinct()` translates to `SELECT DISTINCT` which runs easily on our `tbl`.
+
+```{r}
+airports |>
+  select(tz) |>
+  distinct()
+```
+
+
+```{r}
+dist_query <- airports |>
+  select(tz) |>
+  distinct()
+
+show_query(dist_query)
+```
+
+
+
+```{sql}
+#| connection: con_air
+
+SELECT DISTINCT `tz`
+FROM `airports`;
+```
+
+
+
+
+### `LIMIT` 
+
+As expected, `head()` translates to `LIMIT` which we've already used many many times.
+
+```{r}
+airports |>
+  head(5)
+```
+
+
+```{r}
+head_query <- airports |>
+  head(5)
+
+show_query(head_query)
+```
+
+
+```{sql}
+#| connection: con_air
+
+SELECT *
+FROM `airports`
+LIMIT 5;
+```
+
+### Plotting (!?!?!)
+
+What if we want to plot the values in a `tbl`?  Seems like `ggplot()` will support using a `tbl` as input.
+
+```{r}
+airports |>
+  ggplot(aes(x = lon, y = lat)) +
+  geom_point()
+```
+
+Let's ignore the airports outside of the US.
+
+```{r}
+airports |>
+  filter(lon < 0) |>
+  ggplot(aes(x = lon, y = lat)) +
+  geom_point()
+```
+
+What does the `ggplot()` code translate to in **SQL**?  Of course there is an error!  **SQL** doesn't have any plotting mechanism, so there couldn't be any translation into **SQL**.  Which reminds us that different programming languages have different advantages and disadvantages.  The more we know about them, the better adept we will be at using the right language at the right time.
+
+```{r}
+#| error: true
+gg_query <- airports |>
+  filter(lon < 0) |>
+  ggplot(aes(x = lon, y = lat)) +
+  geom_point()
+
+show_query(gg_query)
+```
 
 
 ## Best practice
@@ -434,7 +657,14 @@ dbDisconnect(con_air, shutdown = TRUE)
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
+1. Why are there three functions in **R** (`ifelse()`, `case_when()`, and `cut()`) to do the job of a single function in **SQL** (`CASE WHEN`)?
+
+
+
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1. What types of tasks is **R** best suited for?  What types of tasks is **SQL** best suited for?  Does it matter which one you use if they can both accomplish the same goal?
+
 
 
 

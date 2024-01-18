@@ -271,8 +271,10 @@ for (let popover of popovers){
 <a href="#sql-in-dbplyr" id="toc-sql-in-dbplyr" class="nav-link" data-scroll-target="#sql-in-dbplyr"><span class="header-section-number">7.2</span> <strong>SQL</strong> in <strong>dbplyr</strong></a>
   <ul class="collapse">
 <li><a href="#median" id="toc-median" class="nav-link" data-scroll-target="#median"><span class="header-section-number">7.2.1</span> Median</a></li>
-  <li><a href="#case_when" id="toc-case_when" class="nav-link" data-scroll-target="#case_when"><span class="header-section-number">7.2.2</span> <code>case_when()</code></a></li>
-  <li><a href="#other-functions" id="toc-other-functions" class="nav-link" data-scroll-target="#other-functions"><span class="header-section-number">7.2.3</span> Other functions</a></li>
+  <li><a href="#case-when" id="toc-case-when" class="nav-link" data-scroll-target="#case-when"><span class="header-section-number">7.2.2</span> <code>CASE WHEN</code></a></li>
+  <li><a href="#select-distinct" id="toc-select-distinct" class="nav-link" data-scroll-target="#select-distinct"><span class="header-section-number">7.2.3</span> <code>SELECT DISTINCT</code></a></li>
+  <li><a href="#limit" id="toc-limit" class="nav-link" data-scroll-target="#limit"><span class="header-section-number">7.2.4</span> <code>LIMIT</code></a></li>
+  <li><a href="#plotting" id="toc-plotting" class="nav-link" data-scroll-target="#plotting"><span class="header-section-number">7.2.5</span> Plotting (!?!?!)</a></li>
   </ul>
 </li>
   <li><a href="#best-practice" id="toc-best-practice" class="nav-link" data-scroll-target="#best-practice"><span class="header-section-number">7.3</span> Best practice</a></li>
@@ -1250,6 +1252,7 @@ Cardinality is counted based on statistics stored as integers, so the value is n
 6 0A9   Elizabethton Municipal Airp…  36.4 -82.2  1593    -5 A     Eliz… United…</code></pre>
 </div>
 </div>
+<p>It seems as though the <strong>SQL</strong> query to calculate the median should be reasonably straightforward.</p>
 <div class="cell" data-fig.asp="0.618">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">median_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">summarize</span><span class="op">(</span>med_alt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">alt</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
@@ -1261,8 +1264,18 @@ SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `alt`) AS `med_alt`
 FROM `airports`</code></pre>
 </div>
 </div>
+<p>But when the <strong>SQL</strong> query is applied to the <code>airports</code> table, we get an error.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> `alt`) <span class="kw">AS</span> `med_alt`</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports`;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(ORDER BY `alt`) AS `med_alt`
+FROM `airports`' at line 1 [1064]</code></pre>
+</div>
+</div>
+<p>Additionally, the <strong>R</strong> code itself doesn’t run and gives the same error. Huh, maybe calculating the median is actually harder than it seems (yes, it is).</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">summarize</span><span class="op">(</span>med_lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">alt</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>Error in `collect()`:
@@ -1273,17 +1286,19 @@ FROM `airports`
 LIMIT 7' at line 1 [1064]</code></pre>
 </div>
 </div>
+<p>One way to calculate the median is to use a row index on the sorted values. Note that attaching a row index to the sorted values requires the values to be sorted (sorting can take a long time).</p>
+<p>Below is the full code to calculate the median.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1305,13 +1320,13 @@ median_value
 </div>
 <p>But let’s break down what the code is doing… First, set the <code>row_index</code> to -1 and iterate through by adding +1 for each row. Then concatenate the <code>row_index</code> information onto our table of interest.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1413,16 +1428,16 @@ alt
 </div>
 <p>Next, filter the data to include only the middle row or two rows.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1460,16 +1475,16 @@ alt
 </div>
 <p>The last step is to average the middle row(s). If only one row is pulled out in the previous query, then only one row will be averaged (which the computer does happily).</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> @row_index <span class="op">:=</span> <span class="op">-</span><span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(subquery.alt) <span class="kw">AS</span> median_value</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @row_index<span class="op">:=</span>@row_index <span class="op">+</span> <span class="dv">1</span> <span class="kw">AS</span> row_index, alt</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> airports</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> alt</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> subquery</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> subquery.row_index <span class="kw">IN</span> (<span class="fu">FLOOR</span>(@row_index <span class="op">/</span> <span class="dv">2</span>), <span class="fu">CEIL</span>(@row_index <span class="op">/</span> <span class="dv">2</span>));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 
 <table>
@@ -1489,23 +1504,1131 @@ median_value
 </table>
 </div>
 </div>
-</section><section id="case_when" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="case_when">
-<span class="header-section-number">7.2.2</span> <code>case_when()</code>
+</section><section id="case-when" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="case-when">
+<span class="header-section-number">7.2.2</span> <code>CASE WHEN</code>
 </h3>
-<p>The <strong>dplyr</strong> function <code>case_when()</code> is interesting to look at!<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
-</section><section id="other-functions" class="level3" data-number="7.2.3"><h3 data-number="7.2.3" class="anchored" data-anchor-id="other-functions">
-<span class="header-section-number">7.2.3</span> Other functions</h3>
-<p>distinct() / head()</p>
+<p>Consider the various R functions that create new variables based on an original variable. The <code>CASE WHEN</code> function in <strong>SQL</strong> plays the role of multiple R functions including <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>, <code>case_when()</code>, and <code><a href="https://rdrr.io/r/base/cut.html">cut()</a></code>.</p>
+<section id="ifelse" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="ifelse"><code>ifelse()</code></h4>
+<p>With <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> the <strong>R</strong> translates directly to <code>CASE WHEN</code> in <strong>SQL</strong>, and the <strong>SQL</strong> query runs easily.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">alt</span> <span class="op">&gt;</span> <span class="fl">500</span>, <span class="st">"above sea"</span>, <span class="st">"near sea"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [5 x 10]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+  faa   name                     lat   lon   alt    tz dst   city  country sea  
+  &lt;chr&gt; &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;
+1 04G   Lansdowne Airport       41.1 -80.6  1044    -5 A     Youn… United… abov…
+2 06A   Moton Field Municipal…  32.5 -85.7   264    -6 A     Tusk… United… near…
+3 06C   Schaumburg Regional     42.0 -88.1   801    -6 A     Scha… United… abov…
+4 06N   Randall Airport         41.4 -74.4   523    -5 A     Midd… United… abov…
+5 09J   Jekyll Island Airport   31.1 -81.4    11    -5 A     Jeky… United… near…</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">if_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">alt</span> <span class="op">&gt;</span> <span class="fl">500</span>, <span class="st">"above sea"</span>, <span class="st">"near sea"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">if_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT
+  *,
+  CASE WHEN (`alt` &gt; 500.0) THEN 'above sea' WHEN NOT (`alt` &gt; 500.0) THEN 'near sea' END AS `sea`
+FROM `airports`</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> <span class="cf">WHEN</span> (`alt` <span class="op">&gt;</span> <span class="fl">500.0</span>) <span class="cf">THEN</span> <span class="st">'above sea'</span> <span class="cf">WHEN</span> <span class="kw">NOT</span> (`alt` <span class="op">&gt;</span> <span class="fl">500.0</span>) <span class="cf">THEN</span> <span class="st">'near sea'</span> <span class="cf">END</span> <span class="kw">AS</span> `sea`</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports` </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+5 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+faa
+</th>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+lat
+</th>
+<th style="text-align:right;">
+lon
+</th>
+<th style="text-align:right;">
+alt
+</th>
+<th style="text-align:right;">
+tz
+</th>
+<th style="text-align:left;">
+dst
+</th>
+<th style="text-align:left;">
+city
+</th>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:left;">
+sea
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+04G
+</td>
+<td style="text-align:left;">
+Lansdowne Airport
+</td>
+<td style="text-align:right;">
+41.1
+</td>
+<td style="text-align:right;">
+-80.6
+</td>
+<td style="text-align:right;">
+1044
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Youngstown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+above sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06A
+</td>
+<td style="text-align:left;">
+Moton Field Municipal Airport
+</td>
+<td style="text-align:right;">
+32.5
+</td>
+<td style="text-align:right;">
+-85.7
+</td>
+<td style="text-align:right;">
+264
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Tuskegee
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06C
+</td>
+<td style="text-align:left;">
+Schaumburg Regional
+</td>
+<td style="text-align:right;">
+42.0
+</td>
+<td style="text-align:right;">
+-88.1
+</td>
+<td style="text-align:right;">
+801
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Schaumburg
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+above sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06N
+</td>
+<td style="text-align:left;">
+Randall Airport
+</td>
+<td style="text-align:right;">
+41.4
+</td>
+<td style="text-align:right;">
+-74.4
+</td>
+<td style="text-align:right;">
+523
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Middletown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+above sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+09J
+</td>
+<td style="text-align:left;">
+Jekyll Island Airport
+</td>
+<td style="text-align:right;">
+31.1
+</td>
+<td style="text-align:right;">
+-81.4
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Jekyll Island
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="case_when" class="level4" data-number="7.2.2.1"><h4 data-number="7.2.2.1" class="anchored" data-anchor-id="case_when">
+<span class="header-section-number">7.2.2.1</span> <code>case_when()</code>
+</h4>
+<p>With <code>case_when()</code> the <strong>R</strong> translates directly to <code>CASE WHEN</code> in <strong>SQL</strong>, and the <strong>SQL</strong> query runs easily.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">500</span> <span class="op">~</span> <span class="st">"near sea"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">2000</span> <span class="op">~</span> <span class="st">"low alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">3000</span> <span class="op">~</span> <span class="st">"mod alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">5500</span> <span class="op">~</span> <span class="st">"high alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&gt;</span> <span class="fl">5500</span> <span class="op">~</span> <span class="st">"extreme alt"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [5 x 10]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+  faa   name                     lat   lon   alt    tz dst   city  country sea  
+  &lt;chr&gt; &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;
+1 04G   Lansdowne Airport       41.1 -80.6  1044    -5 A     Youn… United… low …
+2 06A   Moton Field Municipal…  32.5 -85.7   264    -6 A     Tusk… United… near…
+3 06C   Schaumburg Regional     42.0 -88.1   801    -6 A     Scha… United… low …
+4 06N   Randall Airport         41.4 -74.4   523    -5 A     Midd… United… low …
+5 09J   Jekyll Island Airport   31.1 -81.4    11    -5 A     Jeky… United… near…</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cw_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">500</span> <span class="op">~</span> <span class="st">"near sea"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">2000</span> <span class="op">~</span> <span class="st">"low alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">3000</span> <span class="op">~</span> <span class="st">"mod alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&lt;</span> <span class="fl">5500</span> <span class="op">~</span> <span class="st">"high alt"</span>,</span>
+<span>    <span class="va">alt</span> <span class="op">&gt;</span> <span class="fl">5500</span> <span class="op">~</span> <span class="st">"extreme alt"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">cw_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT
+  *,
+  CASE
+WHEN (`alt` &lt; 500.0) THEN 'near sea'
+WHEN (`alt` &lt; 2000.0) THEN 'low alt'
+WHEN (`alt` &lt; 3000.0) THEN 'mod alt'
+WHEN (`alt` &lt; 5500.0) THEN 'high alt'
+WHEN (`alt` &gt; 5500.0) THEN 'extreme alt'
+END AS `sea`
+FROM `airports`</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;</span> <span class="fl">500.0</span>) <span class="cf">THEN</span> <span class="st">'near sea'</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;</span> <span class="fl">2000.0</span>) <span class="cf">THEN</span> <span class="st">'low alt'</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;</span> <span class="fl">3000.0</span>) <span class="cf">THEN</span> <span class="st">'mod alt'</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;</span> <span class="fl">5500.0</span>) <span class="cf">THEN</span> <span class="st">'high alt'</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&gt;</span> <span class="fl">5500.0</span>) <span class="cf">THEN</span> <span class="st">'extreme alt'</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="kw">AS</span> `sea`</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports`</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+5 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+faa
+</th>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+lat
+</th>
+<th style="text-align:right;">
+lon
+</th>
+<th style="text-align:right;">
+alt
+</th>
+<th style="text-align:right;">
+tz
+</th>
+<th style="text-align:left;">
+dst
+</th>
+<th style="text-align:left;">
+city
+</th>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:left;">
+sea
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+04G
+</td>
+<td style="text-align:left;">
+Lansdowne Airport
+</td>
+<td style="text-align:right;">
+41.1
+</td>
+<td style="text-align:right;">
+-80.6
+</td>
+<td style="text-align:right;">
+1044
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Youngstown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06A
+</td>
+<td style="text-align:left;">
+Moton Field Municipal Airport
+</td>
+<td style="text-align:right;">
+32.5
+</td>
+<td style="text-align:right;">
+-85.7
+</td>
+<td style="text-align:right;">
+264
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Tuskegee
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06C
+</td>
+<td style="text-align:left;">
+Schaumburg Regional
+</td>
+<td style="text-align:right;">
+42.0
+</td>
+<td style="text-align:right;">
+-88.1
+</td>
+<td style="text-align:right;">
+801
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Schaumburg
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06N
+</td>
+<td style="text-align:left;">
+Randall Airport
+</td>
+<td style="text-align:right;">
+41.4
+</td>
+<td style="text-align:right;">
+-74.4
+</td>
+<td style="text-align:right;">
+523
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Middletown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+09J
+</td>
+<td style="text-align:left;">
+Jekyll Island Airport
+</td>
+<td style="text-align:right;">
+31.1
+</td>
+<td style="text-align:right;">
+-81.4
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Jekyll Island
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="cut" class="level4 unnumbered"><h4 class="unnumbered anchored" data-anchor-id="cut"><code>cut()</code></h4>
+<p>With <code><a href="https://rdrr.io/r/base/cut.html">cut()</a></code> the <strong>R</strong> translates directly to <code>CASE WHEN</code> in <strong>SQL</strong>, and the <strong>SQL</strong> query runs easily.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span></span>
+<span>    <span class="va">alt</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">500</span>, <span class="fl">2000</span>, <span class="fl">3000</span>, <span class="fl">5500</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"near sea"</span>, <span class="st">"low alt"</span>, <span class="st">"mod alt"</span>, <span class="st">"high alt"</span>, <span class="st">"extreme alt"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [5 x 10]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+  faa   name                     lat   lon   alt    tz dst   city  country sea  
+  &lt;chr&gt; &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;
+1 04G   Lansdowne Airport       41.1 -80.6  1044    -5 A     Youn… United… low …
+2 06A   Moton Field Municipal…  32.5 -85.7   264    -6 A     Tusk… United… near…
+3 06C   Schaumburg Regional     42.0 -88.1   801    -6 A     Scha… United… low …
+4 06N   Randall Airport         41.4 -74.4   523    -5 A     Midd… United… low …
+5 09J   Jekyll Island Airport   31.1 -81.4    11    -5 A     Jeky… United… near…</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cw_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>sea <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html">cut</a></span><span class="op">(</span></span>
+<span>    <span class="va">alt</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">500</span>, <span class="fl">2000</span>, <span class="fl">3000</span>, <span class="fl">5500</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"near sea"</span>, <span class="st">"low alt"</span>, <span class="st">"mod alt"</span>, <span class="st">"high alt"</span>, <span class="st">"extreme alt"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">cw_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT
+  *,
+  CASE
+WHEN (`alt` &lt;= 500.0) THEN 'near sea'
+WHEN (`alt` &lt;= 2000.0) THEN 'low alt'
+WHEN (`alt` &lt;= 3000.0) THEN 'mod alt'
+WHEN (`alt` &lt;= 5500.0) THEN 'high alt'
+WHEN (`alt` &gt; 5500.0) THEN 'extreme alt'
+END AS `sea`
+FROM `airports`</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;=</span> <span class="fl">500.0</span>) <span class="cf">THEN</span> <span class="st">'near sea'</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;=</span> <span class="fl">2000.0</span>) <span class="cf">THEN</span> <span class="st">'low alt'</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;=</span> <span class="fl">3000.0</span>) <span class="cf">THEN</span> <span class="st">'mod alt'</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&lt;=</span> <span class="fl">5500.0</span>) <span class="cf">THEN</span> <span class="st">'high alt'</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="cf">WHEN</span> (`alt` <span class="op">&gt;</span> <span class="fl">5500.0</span>) <span class="cf">THEN</span> <span class="st">'extreme alt'</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="kw">AS</span> `sea`</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports`</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+5 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+faa
+</th>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+lat
+</th>
+<th style="text-align:right;">
+lon
+</th>
+<th style="text-align:right;">
+alt
+</th>
+<th style="text-align:right;">
+tz
+</th>
+<th style="text-align:left;">
+dst
+</th>
+<th style="text-align:left;">
+city
+</th>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:left;">
+sea
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+04G
+</td>
+<td style="text-align:left;">
+Lansdowne Airport
+</td>
+<td style="text-align:right;">
+41.1
+</td>
+<td style="text-align:right;">
+-80.6
+</td>
+<td style="text-align:right;">
+1044
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Youngstown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06A
+</td>
+<td style="text-align:left;">
+Moton Field Municipal Airport
+</td>
+<td style="text-align:right;">
+32.5
+</td>
+<td style="text-align:right;">
+-85.7
+</td>
+<td style="text-align:right;">
+264
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Tuskegee
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06C
+</td>
+<td style="text-align:left;">
+Schaumburg Regional
+</td>
+<td style="text-align:right;">
+42.0
+</td>
+<td style="text-align:right;">
+-88.1
+</td>
+<td style="text-align:right;">
+801
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Schaumburg
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06N
+</td>
+<td style="text-align:left;">
+Randall Airport
+</td>
+<td style="text-align:right;">
+41.4
+</td>
+<td style="text-align:right;">
+-74.4
+</td>
+<td style="text-align:right;">
+523
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Middletown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+low alt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+09J
+</td>
+<td style="text-align:left;">
+Jekyll Island Airport
+</td>
+<td style="text-align:right;">
+31.1
+</td>
+<td style="text-align:right;">
+-81.4
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Jekyll Island
+</td>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:left;">
+near sea
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section></section><section id="select-distinct" class="level3" data-number="7.2.3"><h3 data-number="7.2.3" class="anchored" data-anchor-id="select-distinct">
+<span class="header-section-number">7.2.3</span> <code>SELECT DISTINCT</code>
+</h3>
+<p>How many distinct time zones are there in the <code>airports</code> table? <code>distinct()</code> translates to <code>SELECT DISTINCT</code> which runs easily on our <code>tbl</code>.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">tz</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">distinct</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [?? x 1]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+     tz
+  &lt;int&gt;
+1    -5
+2    -6
+3    -8
+4    -7
+5    -9
+6   -10
+# ℹ more rows</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">dist_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">tz</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">distinct</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">dist_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT DISTINCT `tz`
+FROM `airports`</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> `tz`</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports`;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+7 records
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+tz
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+-5
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+-6
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+-8
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+-7
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+-9
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+-10
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="limit" class="level3" data-number="7.2.4"><h3 data-number="7.2.4" class="anchored" data-anchor-id="limit">
+<span class="header-section-number">7.2.4</span> <code>LIMIT</code>
+</h3>
+<p>As expected, <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> translates to <code>LIMIT</code> which we’ve already used many many times.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Source:   SQL [5 x 9]
+# Database: mysql  [sds192@scidb.smith.edu:NA/airlines]
+  faa   name                           lat   lon   alt    tz dst   city  country
+  &lt;chr&gt; &lt;chr&gt;                        &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  
+1 04G   Lansdowne Airport             41.1 -80.6  1044    -5 A     Youn… United…
+2 06A   Moton Field Municipal Airpo…  32.5 -85.7   264    -6 A     Tusk… United…
+3 06C   Schaumburg Regional           42.0 -88.1   801    -6 A     Scha… United…
+4 06N   Randall Airport               41.4 -74.4   523    -5 A     Midd… United…
+5 09J   Jekyll Island Airport         31.1 -81.4    11    -5 A     Jeky… United…</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">head_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">head_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;SQL&gt;
+SELECT *
+FROM `airports`
+LIMIT 5</code></pre>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `airports`</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+
+<table>
+<caption>
+5 records
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+faa
+</th>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:right;">
+lat
+</th>
+<th style="text-align:right;">
+lon
+</th>
+<th style="text-align:right;">
+alt
+</th>
+<th style="text-align:right;">
+tz
+</th>
+<th style="text-align:left;">
+dst
+</th>
+<th style="text-align:left;">
+city
+</th>
+<th style="text-align:left;">
+country
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+04G
+</td>
+<td style="text-align:left;">
+Lansdowne Airport
+</td>
+<td style="text-align:right;">
+41.1
+</td>
+<td style="text-align:right;">
+-80.6
+</td>
+<td style="text-align:right;">
+1044
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Youngstown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06A
+</td>
+<td style="text-align:left;">
+Moton Field Municipal Airport
+</td>
+<td style="text-align:right;">
+32.5
+</td>
+<td style="text-align:right;">
+-85.7
+</td>
+<td style="text-align:right;">
+264
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Tuskegee
+</td>
+<td style="text-align:left;">
+United States
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06C
+</td>
+<td style="text-align:left;">
+Schaumburg Regional
+</td>
+<td style="text-align:right;">
+42.0
+</td>
+<td style="text-align:right;">
+-88.1
+</td>
+<td style="text-align:right;">
+801
+</td>
+<td style="text-align:right;">
+-6
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Schaumburg
+</td>
+<td style="text-align:left;">
+United States
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06N
+</td>
+<td style="text-align:left;">
+Randall Airport
+</td>
+<td style="text-align:right;">
+41.4
+</td>
+<td style="text-align:right;">
+-74.4
+</td>
+<td style="text-align:right;">
+523
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Middletown
+</td>
+<td style="text-align:left;">
+United States
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+09J
+</td>
+<td style="text-align:left;">
+Jekyll Island Airport
+</td>
+<td style="text-align:right;">
+31.1
+</td>
+<td style="text-align:right;">
+-81.4
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+-5
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+Jekyll Island
+</td>
+<td style="text-align:left;">
+United States
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="plotting" class="level3" data-number="7.2.5"><h3 data-number="7.2.5" class="anchored" data-anchor-id="plotting">
+<span class="header-section-number">7.2.5</span> Plotting (!?!?!)</h3>
+<p>What if we want to plot the values in a <code>tbl</code>? Seems like <code>ggplot()</code> will support using a <code>tbl</code> as input.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="07-db-etc_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" style="width:90.0%"></p>
+</div>
+</div>
+<p>Let’s ignore the airports outside of the US.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">lon</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="07-db-etc_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" style="width:90.0%"></p>
+</div>
+</div>
+<p>What does the <code>ggplot()</code> code translate to in <strong>SQL</strong>? Of course there is an error! <strong>SQL</strong> doesn’t have any plotting mechanism, so there couldn’t be any translation into <strong>SQL</strong>. Which reminds us that different programming languages have different advantages and disadvantages. The more we know about them, the better adept we will be at using the right language at the right time.</p>
+<div class="cell" data-fig.asp="0.618">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gg_query</span> <span class="op">&lt;-</span> <span class="va">airports</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">lon</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">show_query</span><span class="op">(</span><span class="va">gg_query</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in UseMethod("show_query"): no applicable method for 'show_query' applied to an object of class "c('gg', 'ggplot')"</code></pre>
+</div>
+</div>
 </section></section><section id="best-practice" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="best-practice">
 <span class="header-section-number">7.3</span> Best practice</h2>
 <p>It is always a good idea to terminate the <strong>SQL</strong> connection when you are done with it.</p>
 <div class="cell" data-fig.asp="0.618">
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">con_air</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="reflection-questions" class="level2" data-number="7.4"><h2 data-number="7.4" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">7.4</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
-</section><section id="ethics-considerations" class="level2" data-number="7.5"><h2 data-number="7.5" class="anchored" data-anchor-id="ethics-considerations">
+<ol type="1">
+<li>Why are there three functions in <strong>R</strong> (<code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>, <code>case_when()</code>, and <code><a href="https://rdrr.io/r/base/cut.html">cut()</a></code>) to do the job of a single function in <strong>SQL</strong> (<code>CASE WHEN</code>)?</li>
+</ol></section><section id="ethics-considerations" class="level2" data-number="7.5"><h2 data-number="7.5" class="anchored" data-anchor-id="ethics-considerations">
 <span class="header-section-number">7.5</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
+<ol type="1">
+<li>What types of tasks is <strong>R</strong> best suited for? What types of tasks is <strong>SQL</strong> best suited for? Does it matter which one you use if they can both accomplish the same goal?</li>
+</ol>
 
 
 </section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
@@ -1513,7 +2636,6 @@ median_value
 <li id="fn1"><p>Analogy taken from: https://www.quora.com/profile/Lara-Mazilu<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>Taken from: https://dev.mysql.com/doc/refman/8.0/en/show-index.html<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>Example taken from: https://sebhastian.com/mysql-median/<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>Example taken from: https://r4ds.hadley.nz/databases#sec-sql-expressions<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
