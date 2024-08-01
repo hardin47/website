@@ -1,0 +1,789 @@
+# Regular Expressions {#sec-reg-expr}
+
+
+```{r}
+#| include: false
+
+source("_common.R")
+fontawesome::fa_html_dependency()
+```
+
+
+<!--
+* think about using regular expressions when scraping data from a website
+
+* use TidyTuesday from 11/29/23 to link Dr. Who rankings with IMDb rankings.-->
+
+> A regular expression ... is a sequence of characters that define a search pattern. Usually such patterns are used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique developed in theoretical computer science and formal language theory. [From https://en.wikipedia.org/wiki/Regular_expression]
+
+Regular expressions are composed of two types of characters:
+
+* special characters (like `*`) are called *metacharacters*
+* all other characters are called normal text characters or *literal* characters
+
+The metacharacters allow for advanced pattern matching in finding regular expressions.
+
+#### Main tasks in character matching: {-}
+1. basic string operations
+2. pattern matching (regular expressions)
+3. sentiment analysis
+
+
+Many of the ideas below are taken from <a href = "https://github.com/STAT545-UBC/STAT545-UBC-original-website/blob/master/block022_regular-expression.rmd" target = "_blank">Jenny Bryan's STAT545 class</a>. 
+
+## R packages to make your life easier 
+* [**stringr** package](https://stringr.tidyverse.org/) A core package in the **tidyverse**. It is installed via `install.packages("tidyverse")` and also loaded via `library(tidyverse)`. Of course, you can also install or load it individually.
+     * Many of the main functions start with `str_`. Auto-complete is your friend.
+     * Replacements for base functions re: string manipulation and regular expressions (see below).
+     * Main advantages over base functions: greater consistency about inputs and outputs. Outputs are more ready for your next analytical task.
+     * <a href = "https://github.com/rstudio/cheatsheets/raw/master/strings.pdf" target = "_blank">**stringr** cheat sheet</a>
+* [`tidyr` package](https://tidyr.tidyverse.org/) Especially useful for functions that split one character vector into many and vice versa: `separate()`, `unite()`, `extract()`.
+* Base functions: `nchar()`, `strsplit()`, `substr()`, `paste()`, `paste0()`.
+* The `glue` package is fantastic for string interpolation. If `stringr::str_interp()` doesn't get your job done, check out the `glue` package.
+
+#### String functions related to regular expression {-}
+Regular expression is a pattern that describes a specific set of strings with a common structure. It is heavily used for string matching / replacing in many programming languages, although specific syntax may differ a bit. It is truly the heart and soul for string operations. In R, many string functions in `base` R as well as in **stringr** package use regular expressions, even RStudio's search and replace allows regular expression:
+
+  * identify match to a pattern: `grep(..., value = FALSE)`, `grepl()`, `stringr::str_detect()`
+  * extract match to a pattern: `grep(..., value = TRUE)`, `stringr::str_extract()`, `stringr::str_extract_all()`     
+  * locate pattern within a string, i.e. give the start position of matched patterns. `regexpr()`, `gregexpr()`, `stringr::str_locate()`, `string::str_locate_all()`     
+  * replace a pattern: `sub()`, `gsub()`, `stringr::str_replace()`, `stringr::str_replace_all()`     
+  * split a string using a pattern: `strsplit()`, `stringr::str_split()`     
+
+Regular expressions typically specify characters (or character classes) to seek out, possibly with information about repeats and location within the string. This is accomplished with the help of metacharacters that have specific meaning: `$ * + . ? [ ] ^ { } | ( ) \`. We will use some small examples to introduce regular expression syntax and what these metacharacters mean. 
+
+
+`grep()` stands for "global regular expression print".  `grep()` returns a character vector containing the selected elements, `grepl()` returns a logical vector of TRUE/FALSE for whether or not there was a match.
+
+## Tools for characterizing a regular expression 
+### Escape sequences
+
+There are some special characters in R that cannot be directly coded in a string. For example, let's say you specify your pattern with single quotes and you want to find countries with the single quote `'`. You would have to "escape" the single quote in the pattern, by preceding it with `\`, so it is clear that it is not part of the string-specifying machinery.
+
+
+There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions. See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html) for a complete list of R escape sequences.        
+
+  * `\'`: single quote. You don't need to escape single quote inside a double-quoted string, so we can also use `" ' "`.       
+  * `\"`: double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. `' " '`.          
+  * `\n`: newline.   
+  * `\r`: carriage return.   
+  * `\t`: tab character.   
+
+> Note: `cat()` and `print()` handle escape sequences differently, if you want to print a string out with the interpretation of the sequences above, use `cat()`.      
+
+
+```{r}
+print("a\nb")
+cat("a\nb")
+```
+
+
+### Quantifiers
+
+Quantifiers specify how many repetitions of the pattern.   
+
+  * `*`: matches at least 0 times.   
+  * `+`: matches at least 1 times.     
+  * `?`: matches at most 1 times.    
+  * `{n}`: matches exactly n times.    
+  * `{n,}`: matches at least n times.    
+  * `{n,m}`: matches between n and m times.     
+
+
+```{r}
+strings <- c("a", "ab", "acb", "accb", "acccb", "accccb")
+grep("ac*b", strings, value = TRUE)
+grep("ac*b", strings, value = FALSE)
+grep("ac+b", strings, value = TRUE)
+grep("ac?b", strings, value = TRUE)
+grep("ac{2}b", strings, value = TRUE)
+grep("ac{2,}b", strings, value = TRUE)
+grep("ac{2,3}b", strings, value = TRUE)
+```
+
+
+### Position of pattern within the string
+
+  * `^`: matches the start of the string.   
+  * `$`: matches the end of the string.   
+  * `\b`: matches the boundary of a _word_. Don't confuse it with `^ $` which marks the edge of a _string_.   
+  * `\B`: matches the empty string provided it is not at an edge of a word.    
+
+
+```{r}
+strings <- c("abcd", "cdab", "cabd", "c abd")
+grep("ab", strings, value = TRUE)
+grep("^ab", strings, value = TRUE)
+grep("ab$", strings, value = TRUE)
+grep("\\bab", strings, value = TRUE)
+```
+
+
+
+### Operators
+
+  * `.`: matches any single character, as shown in the first example. 
+  * `[...]`: a character list, matches any one of the characters inside the square brackets. We can also use `-` inside the brackets to specify a range of characters.   
+  * `[^...]`: an inverted character list, similar to `[...]`, but matches any characters __except__ those inside the square brackets.  
+  * `\`: suppress the special meaning of metacharacters in regular expression, i.e. `$ * + . ? [ ] ^ { } | ( ) \`, similar to its usage in escape sequences. Since `\` itself needs to be escaped in R, we need to escape these metacharacters with double backslash like `\\$`.   
+  * `|`: an "or" operator, matches patterns on either side of the `|`.  
+  * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.    
+
+
+```{r operators}
+strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12", "a|b")
+grep("ab.", strings, value = TRUE)
+grep("ab[c-e]", strings, value = TRUE)
+grep("ab[^c]", strings, value = TRUE)
+grep("^ab", strings, value = TRUE)
+grep("\\^ab", strings, value = TRUE)
+grep("abc|abd", strings, value = TRUE)
+grep("a[b|c]", strings, value = TRUE)
+str_extract(strings, "a[b|c]")
+```
+
+
+
+### Character classes
+
+Character classes allow specifying entire classes of characters, such as numbers, letters, etc. There are two flavors of character classes, one uses `[:` and `:]` around a predefined name inside square brackets and the other uses `\` and a special character. They are sometimes interchangeable.   
+
+  * (?i) before the string indicates that the match should be case insensitive.
+  * `[:digit:]` or `\d`: digits, 0 1 2 3 4 5 6 7 8 9, equivalent to `[0-9]`.  
+  * `\D`: non-digits, equivalent to `[^0-9]`.  
+  * `[:lower:]`: lower-case letters, equivalent to `[a-z]`.  
+  * `[:upper:]`: upper-case letters, equivalent to `[A-Z]`.  
+  * `[:alpha:]`: alphabetic characters, equivalent to `[[:lower:][:upper:]]` or `[A-z]`.  
+  * `[:alnum:]`: alphanumeric characters, equivalent to `[[:alpha:][:digit:]]` or `[A-z0-9]`.   
+  * `\w`: word characters, equivalent to `[[:alnum:]_]` or `[A-z0-9_]` (letter, number, or underscore). 
+  * `\W`: not word, equivalent to `[^A-z0-9_]`.  
+  * `[:xdigit:]`: hexadecimal digits (base 16), 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f, equivalent to `[0-9A-Fa-f]`.
+  * `[:blank:]`: blank characters, i.e. space and tab.  
+  * `[:space:]`: space characters: tab, newline, vertical tab, form feed, carriage return, space.
+  * `\s`: space, ` `. Matches any whitespace (space, tab, newline, and carriage return). 
+  * `\S`: not space.  
+  * `[:punct:]`: punctuation characters, ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~.
+  * `[:graph:]`: graphical (human readable) characters: equivalent to `[[:alnum:][:punct:]]`.
+  * `[:print:]`: printable characters, equivalent to `[[:alnum:][:punct:]\\s]`.
+  * `[:cntrl:]`: control characters, like `\n` or `\r`, `[\x00-\x1F\x7F]`.  
+
+Note:       
+* `[:...:]` has to be used inside square brackets, e.g. `[[:digit:]]`.     
+* `\` itself is a special character that needs escape, e.g. `\\d`. Do not confuse these regular expressions with R escape sequences such as `\t`.      
+
+## Examples to work through
+
+I have found that the best way to truly understand regular expressions is to work through as many examples as possible (actually, maybe this is true about learning anything new!).  For the following examples, try to figure out the solution on your own before looking at the footnote which contains the solution.
+
+### Case insenstive
+
+* Match only the word `meter` in "The cemetery is 1 meter from the stop sign." Also match `Meter` in "The cemetery is 1 Meter from the stop sign."
+
+
+```{r}
+string <- c("The cemetery is 1 meter from the stop sign.", 
+            "The cemetery is 1 Meter from the stop sign.")
+
+str_extract(string, "(?i)\\bmeter\\b")
+```
+
+
+### Proper times and dates
+
+* Match dates like 01/15/24 and also like 01.15.24 and like 01-15-24.^[ `\d\d.\d\d.\d\d` will work, but it will also match 123456.  It is better to replace the dot with the characters of interest: `\d\d[/.\-]\d\d[/.\-]\d\d`.  Remember that a dot inside a character class is just a dot. ]
+
+
+```{r}
+string <- c("01/15/24", "01.15.24", "01-15-24", "01 15 24", "011524", "January 15, 2024")
+
+str_extract(string, "\\d\\d.\\d\\d.\\d\\d")
+
+str_extract(string, "\\d\\d[/.\\-]\\d\\d[/.\\-]\\d\\d")
+
+str_extract(string, "\\d{2}[/.\\-]\\d{2}[/.\\-]\\d{2}")
+```
+
+
+
+* Match a time of day such as "9:17 am" or "12:30 pm".  Require that the time be a valid time (not "99:99 pm"). Assume no leading zeros (i.e., "09:17 am").^[`^(1[012]|[1-9]):[0-5][0-9] (am|pm)$`]
+
+
+```{r}
+string <- c("9:17 am", "12:30 pm", "99:99 pm", "09:17 am")
+
+str_extract(string, "(1[012]|[1-9]):[0-5][0-9] (am|pm)")
+str_extract(string, "^(1[012]|[1-9]):[0-5][0-9] (am|pm)$")
+```
+
+### Alternation operator
+
+The "or" operator, `|` has the lowest precedence and parentheses have the highest precedence, which means that parentheses get evaluated before "or".
+
+* What is the difference between `\bMary|Jane|Sue\b` and `\b(Mary|Jane|Sue)\b`?^[In the former, the regex will search for `\bMary` or `Jane` or `Sue\b`. In the latter, the regex will search for `\bMary\b` or `\bJane\b` or `\bSue\b`.  That is, Janet will match the former but not the latter.]
+
+
+```{r}
+string <- c("Mary", "Mar", "Janet", "jane", "Susan", "Sue")
+
+str_extract(string, "\\bMary|Jane|Sue\\b")
+str_extract(string, "\\b(Mary|Jane|Sue)\\b")
+```
+
+
+### An example from my work 
+
+Below are a handful of string characters that represent genomic sequences which were measured in an RNA Sequencing dataset.  The task below is to find  intergenic regions (IGR) and identify which coding sequences (CDS) bookend the intergenic regions.  Note that IGRs do not code for proteins while CDSs do.  Additionally, AS refers to anti-sense which identifies the genomic sequence in the opposite orientation (e.g., CGGATCC  vs CCTAGGC).  [The code below was written by Madison Hobbs, Scripps '19.]
+
+#####  The names of the genomic pieces {-}
+
+```{r}
+allCounts <- data.frame(Geneid = c("CDS:b2743:pcm:L-isoaspartate_protein_carboxylmethyltransferase_type_II:cds2705:-:626:NC_000913.3",
+            "CDS:b2764:cysJ:sulfite_reductase2C_alpha_subunit2C_flavoprotein:cds2726:-:1799:NC_000913.3",
+            "IGR:(CDS,b1594,mlc,glucosamine_anaerobic_growth_regulon_transcriptional_repressor3B_autorepressor,cds1581,-,1220/CDS,b1595,ynfL,LysR_family_putative_transcriptional_regulator,cds1582,-,893):+:945:NC_000913.3",
+            "AS_IGR:(CDS,b0008,talB,transaldolase_B,cds7,+,953/CDS,b0009,mog,molybdochelatase_incorporating_molybdenum_into_molybdopterin,cds8,+,587):+:639:NC_000913.3",
+            "IGR:(CDS,b1808,yoaA,putative_ATP-dependent_helicase2C_DinG_family,cds1798,-,1910/CDS,b1809,yoaB,putative_reactive_intermediate_deaminase,cds1799,+,344):+:396:NC_000913.3"))
+
+allCounts$GeneidBackup = allCounts$Geneid
+```
+
+
+First, it is important to identify which are IGR, CDS, and anti-sense.
+
+
+```{r}
+allCounts <- allCounts |> tidyr::separate(Geneid, c("feature", "rest"), sep="[:]")
+allCounts
+```
+
+
+
+
+We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note, the separation comes at the backslash.
+
+```{r}
+igr <- allCounts |> filter(feature %in% c("IGR", "AS_IGR"))
+igr <- igr |> tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
+names(igr)
+igr
+```
+
+
+For each of the two bookend Genes, we need to separate out the feature from the rest.  Note that we write over feature1 in the second line of code below.  Both of the bookends for all sequences are CDS elements.
+
+
+```{r}
+igr$feature1 <- tidyr::separate(igr, Geneid1, c("feature1", "rest"), sep = "[,]")$feature1
+igr$feature1 <- tidyr::separate(igr, feature1, c("rest", "feature1"), sep = "[()]")$feature1
+igr$feature2 <- tidyr::separate(igr, Geneid2, c("feature2", "rest"), sep = "[,]")$feature2
+names(igr)
+igr
+```
+
+
+As CDS, it is now important to find the actual genenames for each of the IGR sequences.  We also keep each element's `bnum` which represents a unique gene identifier in *E. coli*.
+
+
+`bnum`, `genename`, `rna.name` act as place holders for the types of elements that we will need to identify the bookends of the IGRs.
+
+
+```{r}
+bnum = "b[0-9]{4}"
+bnum
+genename = ",[a-z]{3}[A-Z,]."
+rna.name = ",rna[0-9].."
+```
+
+```{r}
+igr$start.gene <- dplyr::case_when(
+  igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, genename),
+  TRUE ~ stringr::str_extract(igr$Geneid1, rna.name))
+igr$end.gene <- dplyr::case_when(
+  igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, genename),
+  TRUE ~ stringr::str_extract(igr$Geneid2, rna.name))
+igr$start.bnum <- dplyr::case_when(
+  igr$feature1 == "CDS" ~ stringr::str_extract(igr$Geneid1, bnum),
+  TRUE ~ "none")
+igr$end.bnum <- dplyr::case_when(
+  igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, bnum),
+  TRUE ~ "none")
+igr <- igr |> tidyr::separate(start.gene, into = c("comma", "start.gene"), sep = "[,]") |> 
+  dplyr::select(-comma) |> 
+  tidyr::separate(end.gene, into = c("comma", "end.gene"), sep = "[,]") |> 
+  dplyr::select(-comma)
+names(igr)
+igr
+```
+
+
+
+## Lookaround
+
+A lookaround specifies a **place** in the regular expression that will anchor the string you'd like to match.  There are four types of lookarounds: positive lookahead, positive lookbehind, negative lookahead, and negative lookbehind.
+
+* "x(?=y)" – positive lookahead (matches 'x' when it is followed by 'y')
+* "x(?!y)" – negative lookahead (matches 'x' when it is not followed by 'y')
+* "(?<=y)x" – positive lookbehind (matches 'x' when it is preceded by 'y')
+* "(?<!y)x" – negative lookbehind (matches 'x' when it is not preceded by 'y')
+
+Note that the lookaround specifies a **place** in the string which means it does not return the details of the lookaround.  Using lookarounds, you can test strings against patterns without including the lookaround pattern in the resulting match.
+
+
+```{r}
+#| label: fig-lookaround
+#| out.width: 70%
+#| fig-cap: 'Image credit: Stefan Judis https://www.stefanjudis.com/blog/a-regular-expression-lookahead-lookbehind-cheat-sheet/'
+#| fig-alt: 'The four different lookaround options: positive and negative lookahead and lookbehind. Each lookaround provides an anchor for where to start the regular expression matching.'
+#| echo: false
+include_graphics("images/lookaround.png")
+```
+
+
+
+## Example - Taskmaster
+
+In the following example, we will wrangle some data scraped from the wiki site for the TV series, Taskmaster.  We won't cover the html scraping here, but I include the code for completeness.
+
+
+
+```{r}
+#| label: fig-taskmaster
+#| out.width: 70%
+#| fig-cap: Taskmaster Wiki https://taskmaster.fandom.com/wiki/Series_11
+#| fig-alt: Screenshot of the wiki page for the Taskmaster TV series.
+#| echo: false
+include_graphics("images/taskmaster.jpg")
+```
+
+```{r, include=F}
+library(rvest)
+library(tidyverse)
+library(data.table)
+```
+
+
+
+### Scraping and wrangling Taskmaster
+
+Goal: to scrape the Taskmaster wiki into a data frame including task, description, episode, episode name, air date, contestant, score, and series.^[Thanks to Ciaran Evans at Wake Forest University for example and code,  https://sta279-f23.github.io/]
+
+
+```{r}
+results <- read_html("https://taskmaster.fandom.com/wiki/Series_11") |>
+  html_element(".tmtable") |> 
+  html_table() |>
+  mutate(episode = ifelse(startsWith(Task, "Episode"), Task, NA)) |>
+  fill(episode, .direction = "down") |>
+  filter(!startsWith(Task, "Episode"), 
+         !(Task %in% c("Total", "Grand Total"))) |>
+  pivot_longer(cols = -c(Task, Description, episode),
+               names_to = "contestant",
+               values_to = "score") |>
+  mutate(series = 11)
+```
+
+```{r}
+results |> 
+  select(Task, Description, episode, contestant, score, series) |>
+  head(10)
+```
+
+
+#### more succinct results {-}
+
+
+```{r, eval=F}
+   Task  Description         episode   contestant score series
+  1     Prize: Best thing…  Episode 1… Charlotte… 1         11
+  1     Prize: Best thing…  Episode 1… Jamali Ma… 2         11
+  1     Prize: Best thing…  Episode 1… Lee Mack   4         11
+  1     Prize: Best thing…  Episode 1… Mike Wozn… 5         11
+  1     Prize: Best thing…  Episode 1… Sarah Ken… 3         11
+  2     Do the most…        Episode 1… Charlotte… 2         11
+  2     Do the most…        Episode 1… Jamali Ma… 3[1]      11
+  2     Do the most…        Episode 1… Lee Mack   3         11
+  2     Do the most…        Episode 1… Mike Wozn… 5         11
+  2     Do the most…        Episode 1… Sarah Ken… 4         11
+```
+
+
+Currently, the episode column contains entries like
+
+
+```{r, eval=F}
+"Episode 1: It's not your fault. (18 March 2021)"
+```
+
+
+
+### Cleaning the score column
+
+
+
+```{r}
+table(results$score)
+```
+
+
+How *should* the scores be stored? What is the cleaning task?
+
+
+
+```{r}
+#| label: fig-taskmaster-scores
+#| out.width: 70%
+#| fig-cap: Taskmaster Wiki https://taskmaster.fandom.com/wiki/Series_11
+#| fig-alt: Screenshot of the scores for each contestand on each task. Note that many of the scores have footnotes which are recorded in the results table from scraping the wiki.
+#| echo: false
+include_graphics("images/taskmaster-scores.jpg")
+```
+
+
+#### Extracting numeric information {-}
+
+Suppose we have the following string:
+
+
+```{r, eval=F}
+"3[1]"
+```
+
+
+And we want to extract just the number "3":
+
+
+```{r}
+str_extract("3[1]", "3")
+```
+
+
+What if we don't know which number to extract?
+
+
+```{r}
+str_extract("3[1]", "\\d")
+```
+
+```{r}
+str_extract("4[1]", "\\d")
+```
+
+```{r}
+str_extract("10[1]", "\\d")
+```
+
+```{r}
+str_extract("10[1]", "\\d+")
+```
+
+```{r}
+str_extract("DQ", "\\d")
+```
+
+
+#### `str_extract()` {-}
+
+`str_extract()` is an **R** function in the **stringr** package which finds *regular expressions* in strings of text.
+
+
+```{r}
+str_extract("My cat is 3 years old", "cat")
+```
+
+```{r}
+str_extract("My cat is 3 years old", "3")
+```
+
+
+
+#### Matching multiple options {-}
+
+`str_extract()` returns the first match; `str_extract_all()` allows more than one match.  
+
+
+```{r}
+str_extract("My cat is 3 years old", "cat|dog")
+str_extract("My dog is 10 years old", "cat|dog")
+str_extract("My dog is 10 years old, my cat is 3 years old", 
+            "cat|dog")
+str_extract_all("My dog is 10 years old, my cat is 3 years old", 
+                "cat|dog")
+```
+
+
+#### Matching groups of characters {-}
+
+What if I want to extract a *number*?
+
+
+```{r}
+str_extract("My cat is 3 years old", "\\d")
+```
+
+
+What will the result be for the following code?
+
+
+```{r, eval=F}
+str_extract("My dog is 10 years old", "\\d")
+```
+
+```{r}
+str_extract("My dog is 10 years old", "\\d")
+```
+
+
+
+The `+` symbol in a regular expression means "repeated one or more times"
+
+
+```{r}
+str_extract("My dog is 10 years old", "\\d+")
+```
+
+
+#### Extracting from multiple strings {-}
+
+
+```{r}
+strings <- c("My cat is 3 years old", "My dog is 10 years old")
+str_extract(strings, "\\d+")
+```
+
+
+What if we have multiple instances across multiple strings?  We need to be careful working with lists (instead of vectors).
+
+
+```{r}
+strings <- c("My cat is 3 years old", "My dog is 10 years old")
+str_extract(strings, "\\w+")
+str_extract_all(strings, "\\w+")
+```
+
+
+## Extracting episode information
+
+Currently, the `episode` column contains entries like:
+
+
+```{r, eval=F}
+"Episode 2: The pie whisperer. (4 August 2015)"
+```
+
+
+How would I extract just the episode number?
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", "\\d+")
+```
+
+
+
+How would I extract the episode name?
+
+Goal: find a pattern to match: *anything* that starts with a `:`, ends with a `.`
+
+Let's break down that task into pieces.
+
+How can we find the period at the end of the sentence?  What does each of these lines of code return?
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", ".")
+```
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", ".+")
+```
+
+
+We use an *escape character* when we actually want to choose a period:
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", "\\.")
+```
+
+
+
+Recall the goal: find a pattern to match: *anything* that starts with a `:`, ends with a `.`
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            ":.+\\.")
+```
+
+
+## Lookaround (again)
+
+### Lookbehinds 
+
+`(?<=)` is a *positive lookbehind*. It is used to identify expressions which are *preceded* by a particular expression.
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            "(?<=: ).+")
+```
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            "(?<=\\. ).+")
+```
+
+
+### Lookaheads
+
+`(?=)` is a *positive lookahead*. It is used to identify expressions which are *followed* by a particular expression.
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            ".+(?=\\.)")
+```
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            ".+(?=:)")
+```
+
+
+#### Extracting episode information {-}
+
+Getting everything between the `:` and the `.`
+
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            "(?<=: ).+(?=\\.)")
+```
+
+
+#### Extracting air date {-}
+
+I want to extract just the air date. What pattern do I want to match?
+
+
+```{r, eval=F}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", ...)
+```
+
+```{r}
+str_extract("Episode 2: The pie whisperer. (4 August 2015)", 
+            "(?<=\\().+(?=\\))")
+```
+
+
+
+#### Wrangling the episode info {-}
+
+Currently:
+
+
+```{r, echo=F}
+results |>
+  select(episode)
+```
+
+
+
+One option:
+
+
+```{r}
+results |>
+  select(episode) |>
+  mutate(episode_name = str_extract(episode, "(?<=: ).+(?=\\.)"),
+         air_date = str_extract(episode, "(?<=\\().+(?=\\))"),
+         episode = str_extract(episode, "\\d+"))
+```
+
+
+
+Another option:
+
+
+```{r, eval=F}
+results |>
+  separate_wider_regex(episode, 
+                       patterns = c(".+ ", 
+                                    episode = "\\d+", 
+                                    ": ", 
+                                    episode_name = ".+", 
+                                    "\\. \\(", 
+                                    air_date = ".+", 
+                                    "\\)"))
+```
+
+```{r, echo=F}
+results |>
+  select(episode) |>
+  separate_wider_regex(episode, 
+                       patterns = c(".+ ", 
+                                    episode = "\\d+", 
+                                    ": ", 
+                                    episode_name = ".+", 
+                                    "\\. \\(", 
+                                    air_date = ".+", 
+                                    "\\)"))
+```
+
+
+## Regular expressions and **SQL** 
+
+Back to the IMDb database... 
+
+
+```{r}
+#| echo: false
+
+con_imdb <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "imdb",
+  host = Sys.getenv("SMITH_HOST"),
+  user = Sys.getenv("SMITH_USER"),
+  password = Sys.getenv("SMITH_PWD")
+)
+```
+
+```{sql}
+#| connection: con_imdb
+
+SELECT production_year, title
+  FROM title
+  WHERE kind_id = 1 AND
+        title REGEXP '(?i)star'
+  LIMIT 0, 20;
+```
+
+```{r}
+#| echo: false
+DBI::dbDisconnect(con_imdb, shutdown = TRUE)
+```
+
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. What is the difference between `[a|b]` and `(a|b)`?
+
+2. What is the main character which needs to be escaped inside `[...]`? Why?
+
+3. Why do we use lookarounds instead of just putting the location of interest inside our regular expression pattern?
+
+4. What are the differences between `*`, `+`, and `?` ?  How do the three metacharacters apply to a single character or a group of characters?
+
+5. How can you find a string between two patterns without picking up the bookending patterns themselves?
+
+6. Why does it make sense to write the regular expression pattern that matches the entire string of interest and not just a pattern which evaluates to TRUE?
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1. How can we use regular expressions to check for name mispellings or other similar data cleaning tasks?
+
+2. Name one thing that you noticed in the course materials (either in class or reading the notes, etc.) where you thought to yourself "Oh, I'll have to be really careful about **that**."  Why would you need to be careful?
+
+
+
+
