@@ -1,0 +1,527 @@
+# Changing databases {#sec-change-db}
+
+
+```{r}
+#| include: false
+
+source("_common.R")
+fontawesome::fa_html_dependency()
+```
+
+As in @sec-create-db, we will use **DuckDB** so that we have access to a server into which we can create and change data tables. Note that the database has been stored to a database directory called `duck_datab` which lives in the current **R** project.  You won't be able to open it like a standard folder, but it is where **DuckDB** stores the database files.
+
+```{r}
+con_duckdb <- DBI::dbConnect(duckdb::duckdb(),
+                             dbdir = "duck_datab")
+```
+
+## Changing data
+
+The `UPDATE` function allows you to change a value in a table across all rows that match a certain criteria. The `impressions` table has a `name` column indicating the person being impersonated. Let's say, for whatever reason, that Ivanka Trump decides she doesn't want to be affiliated with the Trump name and she changes her name to her husband's name, becoming Ivanka Kushner.  You might want to `UPDATE` the file to indicate the impressions were of `Ivanka Kushner` instead of `Ivanka Trump`. (See @sec-load-duckdb for loading csv files into **DuckDB** directly.)
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS impressions;
+```
+
+```{r}
+duckdb_read_csv(con = con_duckdb, name = "impressions", files = "data/impressions.csv")
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: ivanka-trump
+#| output.var: "ivanka_trump"
+
+SELECT * FROM impressions 
+   WHERE name LIKE 'Ivanka%';
+```
+
+```{r}
+#| label: tbl-ivanka-trump
+#| echo: false
+#| tbl-cap: "Finding the impersonations of Ivanka Trump."
+
+ivanka_trump |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+We can use the `UPDATE` function to change the value of Ivanka's name to `Ivanka Kushner` throughout the database.  Note that all rows which match the `WHERE` clause get updated.
+
+```{sql}
+#| connection: con_duckdb
+
+UPDATE impressions
+   SET name = 'Ivanka Kushner'
+   WHERE name LIKE 'Ivanka%';
+```
+
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: ivanka-kushner
+#| output.var: "ivanka_kushner"
+
+SELECT * FROM impressions 
+   WHERE name LIKE 'Ivanka%';
+```
+
+```{r}
+#| label: tbl-ivanka-kushner
+#| echo: false
+#| tbl-cap: "Ivanka's last name has been `UPDATE`d to Kushner."
+
+ivanka_kushner |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+Be careful with `UPDATE`. A careless `UPDATE` could write over all of the data in your table.  There is no **undo** function.
+:::
+
+## Inserting data
+
+Let's say we want to include the more recent hosts in the `hosts` table.  First, we scrape the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a> which lists the episode id (the date) and the host.  The **R** package **rvest** allows us to pull out the appropriate html elements.  The `epid` and `aid` are joined together in a tibble, and `filter`ed to only include episodes which are not already in the `episodes` table. (See @sec-load-duckdb for loading csv files into **DuckDB** directly.)
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS hosts;
+```
+
+
+```{r}
+duckdb_read_csv(con = con_duckdb, name = "hosts", files = "data/hosts.csv")
+```
+
+By searching the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a>, we can see that the next host, chronologically was Elon Musk on May 8, 2021.
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-orig
+#| output.var: "hosts_orig"
+
+SELECT * FROM hosts
+    ORDER BY epid DESC
+    LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-orig
+#| echo: false
+#| tbl-cap: "Most recent hosts in the original `hosts` table."
+
+hosts_orig |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+`INSERT` allows us to add the relevant information associated with the episode of SNL that Elon Musk hosted.
+
+```{sql}
+#| connection: con_duckdb
+
+INSERT INTO hosts (epid, aid)
+   VALUES ('20210508', 'Elon Musk');
+```
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-elon
+#| output.var: "hosts_elon"
+
+SELECT * FROM hosts
+    ORDER BY epid DESC
+    LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-elon
+#| echo: false
+#| tbl-cap: "`hosts` table including the added observation from May 8, 2021."
+
+hosts_elon |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+It would be tedious to `INSERT` all of the most recent host information by hand.  Instead, we'll scrape the <a href = "http://www.snlarchives.net/Episodes/" target = "_blank">SNL archives</a> using the **R** package **rvest**, which allows us to pull out the appropriate html elements.  The `epid` and `aid` are joined together in a tibble, and `filter`ed to only include episodes which are not already in the `episodes` table.
+
+
+```{r}
+library(rvest)
+
+recent_hosts <- read_html("http://www.snlarchives.net/Episodes/") |>
+  html_nodes("tr") |>
+  purrr::map_df( ~ tibble(
+    epid = .x |> html_node("a.ms-2.me-2") |>
+      html_attr("href") |>
+      str_extract("\\d+"),
+    aid = .x |> html_node("td:nth-child(2)") |>
+      html_text2() |>
+      str_extract("[\\w\\. \\w\\.]+(?=/|$)")
+  )) |>
+  filter(epid > 20210508)
+
+
+write_csv(recent_hosts, "data/recent_hosts.csv")
+
+```
+
+```{sql}
+#| connection: con_duckdb
+
+INSERT INTO hosts
+   SELECT *
+   FROM READ_CSV('data/recent_hosts.csv', AUTO_DETECT = TRUE);
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-update
+#| output.var: "hosts_update"
+
+SELECT * FROM hosts
+  ORDER BY epid DESC
+  LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-update
+#| echo: false
+#| tbl-cap: "The full `hosts` table, updated through December 16, 2023."
+
+hosts_update |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+## Deleting data
+
+You might change your mind and decide that you really only want hosts from years up to 2022. The `DELETE` function deletes any rows specified by the `WHERE` clause.
+
+```{sql}
+#| connection: con_duckdb
+
+DELETE FROM hosts
+   WHERE epid > 20221231
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-delete
+#| output.var: "hosts_delete"
+
+SELECT * FROM hosts
+  ORDER BY epid DESC
+  LIMIT 10;
+```
+
+```{r}
+#| label: tbl-hosts-delete
+#| echo: false
+#| tbl-cap: "The `hosts` table, after 2023 has been `DELETE`d."
+
+hosts_delete |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+## Altering the table
+
+`ALTER TABLE` changes the structure of a table. For example, you can add or delete columns, create or destroy indexes, change the type of existing columns, or rename columns or the table itself.  (Syntax below is for **MySQL**.  Unfortunately, **DuckDB** is finicky when `ALTER`ing tables, so the commands below may not work on the tables created using **DuckDB**.)^[Information and examples in this section taken from https://dev.mysql.com/doc/refman/8.0/en/alter-table.html#alter-table-add-drop-column]
+
+Multiple `ADD`, `ALTER`, `DROP`, and `CHANGE` clauses are permitted in a single `ALTER TABLE` statement, separated by commas. 
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1
+DROP COLUMN col1,
+DROP COLUMN col2;
+```
+
+
+To alter a column to change both its name and definition, use `CHANGE`, specifying the old and new names and the new definition. For example, to rename an `INT NOT NULL` column from `a` to `b`  and change its definition to use the `BIGINT` data type while retaining the `NOT NULL` attribute, do this:
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1 CHANGE a b BIGINT NOT NULL;
+```
+
+To change a column definition but not its name, use `CHANGE` or `MODIFY`. With `CHANGE`, the syntax requires two column names, so you must specify the same name twice to leave the name unchanged. For example, to change the definition of column `b`:
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1 CHANGE b b INT NOT NULL;
+```
+
+`MODIFY` is more convenient to change the definition without changing the name because it requires the column name only once:
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1 MODIFY b INT NOT NULL;
+```
+
+To change a column name but not its definition, use `CHANGE` or `RENAME COLUMN`. With `CHANGE`, the syntax requires a column definition, so to leave the definition unchanged, you must re-specify the definition the column currently has. For example, to rename an `INT NOT NULL` column from `b` to `a`:
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1 CHANGE b a INT NOT NULL;
+```
+
+`RENAME COLUMN` is more convenient to change the name without changing the definition because it requires only the old and new names:
+
+```{sql}
+#| eval: false
+
+ALTER TABLE t1 RENAME COLUMN b TO a;
+```
+
+In general, you cannot rename a column to a name that already exists in the table. However, this is sometimes not the case, such as when you swap names or move them through a cycle. If a table has columns named `a`, `b`, and `c`, the following are valid operations:
+
+```{sql}
+#| eval: false
+
+/* swap a and b */
+ALTER TABLE t1 RENAME COLUMN a TO b,
+               RENAME COLUMN b TO a;
+
+/* "rotate" a, b, c through a cycle */
+ALTER TABLE t1 RENAME COLUMN a TO b,
+               RENAME COLUMN b TO c,
+               RENAME COLUMN c TO a;
+```
+
+
+## Temporary tables
+
+Temporary tables are used to break down complex queries into smaller, more manageable steps. For example, let's say we want to `JOIN` two tables after each has been filtered using different `WHERE` clauses.  The filtered tables can each be saved into their own temporary tables and then the temporary tables can be merged.  
+
+
+Note that tables in **DuckDB** are saved (to disk), even when the connection is closed.  However, temporary tables are saved in memory (instead of on disk) and are deleted when the connection is closed.   Specific configuration of the temporary directory allows for <a href = "https://duckdb.org/docs/sql/statements/create_table.html#temporary-tables" target = "_blank">temporary tables to be saved</a>, even when the connection is closed.
+
+
+
+Notice that most of the tables have some kind of ID which allows `JOIN`ing across tables.
+
+```{sql}
+#| connection: con_duckdb
+#| label: select-hosts
+#| output.var: "select_hosts"
+
+SELECT * FROM hosts LIMIT 10;
+```
+
+
+```{r}
+#| label: tbl-select-hosts
+#| echo: false
+#| tbl-cap: "Note the epid and aid identifiers in the hosts table."
+
+select_hosts |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: select-episodes
+#| output.var: "select_episodes"
+
+SELECT * FROM episodes LIMIT 10;
+```
+
+```{r}
+#| label: tbl-select-episodes
+#| echo: false
+#| tbl-cap: "Note the sid and epid identifiers in the episodes table."
+
+select_episodes |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+
+### Creating a temporary table
+
+The `episodes` table has an `aired` column which includes the data.  Recall that if we create a new variable (e.g., `year`) using `aired`, we cannot use `year` in the `WHERE` clause (`WHERE` only works on the original table, not the results set). 
+
+In **MySQL** the function `STR_TO_DATE` allowed us to create a datetime variable from which year could be extracted.  However, in **DuckDB**, it is more complicated to convert the character string of "April 10, 2020" to "2020-04-10".  Don't worry about the code too much, but note that we wouldn't want to wrangle the character date string every time we wanted to filter for year.
+
+#### What does `POSITION` do?  {-}
+
+In case you are curious about the date wrangling code... consider `SUBSTRING(aired, POSITION(',' IN aired) + 2)`
+
+1. `POSITION(',' IN aired)`: This part of the expression uses the `POSITION` function to find the position of the first occurrence of the comma (`,`) in the string `aired`. The result is the index (position) of the comma within the string.
+
+2. `POSITION(',' IN aired) + 2`: This adds 2 to the index of the comma. The `+ 2` is used to move the starting point of the substring two positions to the right of the comma. This is done to exclude the comma itself and any following spaces.
+
+3. `SUBSTRING(aired, POSITION(',' IN aired) + 2)`: This part uses the SUBSTRING function to extract a substring from the string `aired`. The starting position of the substring is determined by `POSITION(',' IN aired) + 2`, and it goes until the end of the string. This effectively removes the part of the string that comes before and including the first comma.
+
+In summary, the entire expression is extracting a substring from the original string `aired`, starting from two positions to the right of the first comma and continuing until the end of the string. This can be useful in scenarios where you want to remove or isolate part of a string based on the position of a specific character (in this case, the comma).
+
+
+
+```{sql}
+#| connection: con_duckdb
+#| echo: false
+#| include: false
+
+DROP TABLE IF EXISTS episodes_date;
+```
+
+
+```{sql}
+#| connection: con_duckdb
+    
+CREATE TEMP TABLE episodes_date AS
+    SELECT *, CASE
+             WHEN POSITION(',' IN aired) > 0 THEN
+    EXTRACT(YEAR FROM CAST(
+                SUBSTRING(aired, POSITION(',' IN aired) + 2) || '-' ||
+                CASE
+                    WHEN POSITION('January' IN aired) > 0 THEN '01'
+                    WHEN POSITION('February' IN aired) > 0 THEN '02'
+                    WHEN POSITION('March' IN aired) > 0 THEN '03'
+                    WHEN POSITION('April' IN aired) > 0 THEN '04'
+                    WHEN POSITION('May' IN aired) > 0 THEN '05'
+                    WHEN POSITION('June' IN aired) > 0 THEN '06'
+                    WHEN POSITION('July' IN aired) > 0 THEN '07'
+                    WHEN POSITION('August' IN aired) > 0 THEN '08'
+                    WHEN POSITION('September' IN aired) > 0 THEN '09'
+                    WHEN POSITION('October' IN aired) > 0 THEN '10'
+                    WHEN POSITION('November' IN aired) > 0 THEN '11'
+                    WHEN POSITION('December' IN aired) > 0 THEN '12'
+                    ELSE '01' -- Default to January if no month is found
+                END || '-' ||
+                SUBSTRING(aired, POSITION(' ' IN aired) + 1, 2) AS DATE
+            ))
+            END AS year FROM episodes;
+```
+
+
+```{sql}
+#| connection: con_duckdb
+#| label: episodes-date
+#| output.var: "episodes_date"
+
+SELECT * FROM episodes_date LIMIT 10;
+```
+
+```{r}
+#| label: tbl-episodes-date
+#| echo: false
+#| tbl-cap: "The temporary table called `episodes_date` that has identifiers of sid, epid, and epno."
+
+episodes_date |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+### Using a temporary table
+
+Now that the `year` variable has been created in the new temporary table called `episodes_date`, we can use `episode_date` to query and find, for example, all of the hosts in 2019.
+
+```{sql}
+#| connection: con_duckdb
+#| label: hosts-2019
+#| output.var: "hosts_2019"
+
+SELECT hosts.aid, ep.aired, ep.year FROM hosts 
+JOIN episodes_date AS ep ON hosts.epid = ep.epid
+WHERE year = 2019
+LIMIT 25;
+```
+
+```{r}
+#| label: tbl-hosts-2019
+#| echo: false
+#| tbl-cap: "SNL hosts in 2019."
+
+hosts_2019 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+## Best practice
+
+It is always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_duckdb, shutdown = TRUE)
+```
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. How can you update the value of a particular variable?  What if you want to update a variable for many rows?
+
+2. Why/when would you use `CHANGE` instead of `RENAME COLUMN`?  Why/when would you use `CHANGE` instead of `MODIFY`?
+
+3. When are temporary tables useful? Can you always create temporary tables if you are working in **SQL**?  Explain the hierarchy of tables, temporary tables, and subqueries.
+
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1. Who should have the ability / access to insert, delete, or update tables?  Should everyone who accesses a table also have the ability to edit the table?  Why or why not?
+
+2. What can you do if you accidentally `DELETE` the wrong rows or `DROP` the wrong the columns?
+

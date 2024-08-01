@@ -1,0 +1,262 @@
+# SQL in R and DBeaver {#sec-sql-R}
+
+```{r}
+#| include: false
+
+source("_common.R")
+fontawesome::fa_html_dependency()
+```
+
+There are three ways to engage with SQL using R.  We will discuss each of them in this chapter, and we will expand on the third method in what follows (using interfaces like DBeaver, and RStudio, to run actual SQL code directly).
+
+1. Using the package **dbplyr** **R** will directly translate **dplyr** code into **SQL**.
+2. Using the **DBI** package, we can send **SQL** queries through an `r` chunk.
+3. Using a `sql` chunk, we can write actual **SQL** code inside a quarto document.
+
+
+
+## Translating **dplyr** code into **SQL** {#sec-dplyr-seq}
+
+Let's go back to the **airlines** database to try out some things that we already know how to do in **R**.  Recall that we need the **DBI** and **RMariaDB** packages to connect to **R**; we need the **dbplyr** package to translate **SQL** code into **R**.
+
+```{r}
+library(DBI)
+library(RMariaDB)
+library(dbplyr)
+
+con_air <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
+```
+
+The function `dbListTables()` in the **DBI** package will tell us what tables exist in the **airlines** database.
+
+```{r}
+DBI::dbListTables(con_air)
+flights <- tbl(con_air, "flights")
+carriers <- tbl(con_air, "carriers")
+```
+
+Let's ask a few questions about the data set using data wrangling techniques that should already be familiar.
+
+* Over what years is the `flights` data taken?
+
+To start, let's write the commands using tidy **dplyr** code.
+
+```{r}
+yrs <- flights |>
+  summarize(min_year = min(year), max_year = max(year))
+
+yrs
+```
+
+Because `flights` is not actually a `data.frame` in **R** (but instead a `tbl` in **SQL**), the work that was done above was actually performed in **SQL**.  To see the **SQL** code, we can use the function `show_query`.
+
+```{r}
+show_query(yrs)
+```
+
+Note the similarity between the **R** code and the **SQL** code.  We can see `SELECT` and `MIN` and `MAX` which are familiar.  The `AS` function is new, but maybe it that `AS` does the job of assigning a new name to the output columns.  `FROM` is also new and does the job of piping in a data set to use.
+
+* Create a data set containing only flights between `LAX` and `BOS` in 2012.
+
+```{r}
+la_bos <- flights |>
+  filter(year == 2012 & ((origin == "LAX" & dest == "BOS") | 
+           (origin == "BOS" & dest == "LAX"))) 
+
+
+la_bos
+```
+
+```{r}
+show_query(la_bos)
+```
+
+The `WHERE` function in **SQL** acts as `filter()` did in **R**; `&` has been translated to `AND`, and `|` has been translated to `OR`.
+
+
+As might be expected, **dbplyr** doesn't translate every **R** command into **SQL**.  After all, **SQL** is not a statistical software and doesn't, for example, have a mechanism for creating data visualizations.  To track which **R** commands are connected to **SQL** see the <a href = "https://dbplyr.tidyverse.org/reference/" target= "_blank">**dbplyr** reference sheet</a>.
+
+
+Because the data set has been subsetted substantially, we could pull it into **R** to create an **R** object.  Note that now **R** is aware of the size of the entire data frame (7064 rows and 21 columns).  The `la_bos` object now exists in the **R** environment and can be explored through the IDE.  
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+Be careful with `collect()`. Don't use `collect()` on large data frames that won't fit in an **R** environment.
+:::
+
+```{r}
+la_bos <- la_bos |>
+  collect()
+
+la_bos
+```
+
+@sec-sql-clauses will explore more **SQL** queries and using **SQL** verbs. For now, let's continue learning about the different ways **R** can talk to **SQL**.
+
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air, shutdown = TRUE)
+```
+
+## SQL queries through the **DBI** package
+
+Using **R** as a wrapper, we can send actual **SQL** code to query data from the connection.  It is okay if you aren't yet able to write **SQL** commands from scratch, but try to figure out what the command is asking for.  As mentioned above, we will start from scratch to learn **SQL** commands in @sec-sql-clauses.
+
+Start by setting up the **SQL** connection in the same way.
+
+```{r}
+con_air <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
+```
+
+
+* Look at the first few rows of the `flights` data.
+
+Because the `flights` data is not an **R** object, we can't open it in **R** to explore the variables.  If we want to see a small bit of the data, we can `SELECT` **everything** (i.e, `*`) from the `flights` table but `LIMIT` the query to only the first eight observations.  
+
+Note that the code in the `dbGetQuery()` **R** function is written in **SQL** not in **R**.  
+
+A semicolon (`;`) is typically used to indicate the termination of a **SQL** statement.  They are not always required (particularly when only one statement is being sent), however, it is good practice to use a semicolon at the end of each **SQL** statement.  (Indeed, some **SQL** dialects require the semicolon at the end of every statement, regardless of whether or not there are more statements following.)
+
+```{r}
+DBI::dbGetQuery(con_air,
+                "SELECT * FROM flights LIMIT 8;")
+```
+* How many flights per year are in the `flights` table?
+
+```{r}
+dbGetQuery(con_air, 
+  "SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights;")
+```
+
+Note that we've now `SELECT`ed two variables: `year` and `num_flights` (which we created along the way using `count(*)` which is written as `n()` in **R**) `FROM` the `flights` table.  Then we `GROUP BY` the `year` variable which retroactively acts on the `count(*)` function.  And last, we `ORDER BY` (which is similar to `arrange()`) the new `num_flights` variable.
+
+
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air, shutdown = TRUE)
+```
+
+
+## Direct **SQL** queries through a `sql` chunk
+
+Notice that the formatting of the next few chunks is slightly different. Instead of reporting only the inside / code of the chunk, the entire chunk is printed.  The **SQL** chunks are given by `{sql}` instead of `{r}` and each **SQL** chunk is required to connect to a particular database (through the `con_air` connection).
+
+The same queries have been run.
+
+Start by setting up the **SQL** connection in the same way.
+
+```{r}
+#| echo: fenced
+
+con_air <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "airlines",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
+```
+
+
+
+```{sql}
+#| connection: con_air
+#| echo: fenced
+
+SELECT * FROM flights LIMIT 8;
+```
+
+
+```{sql}
+#| connection: con_air
+#| echo: fenced
+
+SELECT year, count(*) AS num_flights FROM flights GROUP BY year ORDER BY num_flights;
+```
+
+
+Always a good idea to terminate the **SQL** connection when you are done with it.
+
+```{r}
+dbDisconnect(con_air, shutdown = TRUE)
+```
+
+## DBeaver
+
+DBeaver is a free SQL client that supports MySQL (as well as other dialects like MariaDB, PostgreSQL, and SQLite). While writing **SQL** code in **R** has some benefits (e.g., piping results tables into **ggplot2** for visualizations), using a **SQL** client that is designed for **SQL** queries has benefits as well.  In order to use DBeaver, <a href = "https://dbeaver.io/download/" target = "_blank">download the client</a> onto your computer and open it from your Applications.
+
+### New database connection
+
+Using the pull-down menus, navigate to a new database connection (Database -> New Database Connection).  Click on the MySQL icon (and click next).  You should see an image similar to @fig-dbeaver-connect.
+
+
+```{r}
+#| label: fig-dbeaver-connect
+#| out.width: 70%
+#| fig-cap: "Connection settings for a MySQL connection via DBeaver."
+#| fig-alt: The available options for setting up a MySQL connection in DBeaver.  In particular.
+#| echo: false
+include_graphics("images/dbeaver-connect.png")
+```
+
+1. Keep the `Host` radio button toggled (don't click on `URL`)
+2. Where currently it says `Server Host: localhost` change `localhost` to the URL for the MySQL server to which you want to connect.
+3. Change the `Username` to the appropriate username for the server.
+4. Change the `Password` to the appropriate password for the server.
+5. Optional: in the `Database:` box, include the database you will query.
+6. Click `Finish`.
+
+Once the connection is established, you should be able to navigate through the databases and their tables on the left side of the DBeaver window.
+
+### Writing SQL queries
+
+Pull up a **SQL** script by clicking ont he **SQL** button as seen in @fig-sql.
+
+
+```{r}
+#| label: fig-sql
+#| out.width: 70%
+#| fig-cap: "Click on SQL to initiate a SQL script."
+#| fig-alt: Image of the icon in DBeaver which produces an empty SQL script.
+#| echo: false
+include_graphics("images/sql.png")
+```
+
+Write **SQL** code.  Click on the orange triangle to run the code.
+
+Each lab should be saved as a .sql files that can be turned in.  The **SQL** queries (in the .sql file) should be able to be run by someone else.  Use the hashtag (`#`) to comment out lines so that you can identify particular problems or comment on the query results.
+
+If you did not specify which database to use when you set up the connection, the database can be specified at the top of the .sql file as `USE database;`  (for example, you might want `USE airlines;`, with the semi-colon, before running your lines of **SQL** code).
+
+To write text use `/* write text here ... */`, the slash and asterisk, for any commenting in the `.sql` file.
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. What are the three main ways to write a **SQL** query using the **R**Studio interface?
+
+2. How is DBeaver similar and/or different from writing queries using **R*?
+
+3. Why can't you use `collect()` to pull the `flights` data into your **R** session?
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1. How / why is `Sys.getenv()` used to protect the username and password for the **SQL** connection?
+
+2. If **SQL** databases are expensive to maintain, who will then have access to important data?  Does it matter?

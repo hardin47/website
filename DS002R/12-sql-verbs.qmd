@@ -1,0 +1,979 @@
+# SQL clauses {#sec-sql-clauses}
+
+
+```{r}
+#| include: false
+
+source("_common.R")
+fontawesome::fa_html_dependency()
+```
+
+Most of this chapter will focus on the **SQL** commands needed to run queries of the database.  Much of the syntax is strikingly familiar to tidy verbs in **R**.  However, this chapter starts with a few **SQL** specific tools used to learn about the tables in any particular database.
+
+## Looking at the tables in the database
+
+Consider a database of taxi rides from the <a href = "https://en.wikipedia.org/wiki/Yellow_Cab_Company" target = "_blank">Yellow Cab</a> company in NYC in March of 2014.
+
+<!--
+Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/packages/httr/vignettes/secrets.html
+-->
+
+```{r}
+library(mdsr)
+con_taxi <- DBI::dbConnect(
+  RMariaDB::MariaDB(),
+  dbname = "nyctaxi",
+  host = Sys.getenv("MDSR_HOST"),
+  user = Sys.getenv("MDSR_USER"),
+  password = Sys.getenv("MDSR_PWD")
+)
+```
+
+```{sql}
+#| connection: con_taxi
+#| label: show
+#| output.var: "show"
+
+SHOW TABLES;
+```
+
+```{r}
+#| label: tbl-show
+#| echo: false
+#| tbl-cap: "SHOW all the TABLES in the nyctaxi database."
+
+show |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+There is only one table in the `nyctaxi` database, called `yellow_old`.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: select-describe
+#| output.var: "select_describe"
+
+DESCRIBE yellow_old;
+```
+
+
+```{r}
+#| label: tbl-select-describe
+#| echo: false
+#| tbl-cap: "DESCRIBE variables in the yellow_old table."
+
+select_describe |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+Similarly, the `DESCRIBE` command shows the 18 field names (variables) in the `yellow_old` table.  Some of the variables are characters (`text`) and some are numeric (either `double` or `bigint`)
+
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+**SQL** clauses must be written in the following order.
+:::
+
+Most engagements with SQL are done through queries. Queries in **SQL** start with the `SELECT` keyword and consist of several clauses, which must be written in the following order:^[Taken directly from <a href = "https://mdsr-book.github.io/mdsr3e/15-sqlI.html#the-sql-data-manipulation-language" target = "_blank">Modern Data Science with R</a>]
+
+* `SELECT` allows you to list the columns, or functions operating on columns, that you want to retrieve. This is an analogous operation to the `select()` verb in **dplyr**, potentially combined with `mutate()` or `summarize()`.
+* `FROM` specifies the table where the data are.
+* `JOIN` allows you to stitch together two or more tables using a key. This is analogous to the `inner_join()` and `left_join()` commands in **dplyr**.  More details of `JOIN` are given in @sec-join.
+* `WHERE` allows you to filter the records according to some criteria and is an analogous operation to the `filter()` verb in **dplyr**.  Note, even though the `WHERE` clause is written after `SELECT` and `JOIN`, it is actually evaluated *before* the `SELECT` or `JOIN` clauses (which is why `WHERE` only works on the original data, not the results set).
+* `GROUP BY` allows you to aggregate the records according to some shared value and is an analogous operation to the `group_by()` verb in **dplyr**.
+* `HAVING` is like a `WHERE` clause that operates on the result set—not the records themselves and is analogous to applying a second `filter()` command in **dplyr**, after the rows have already been aggregated.
+* `ORDER BY` is exactly what it sounds like—it specifies a condition for ordering the rows of the result set and is analogous to the `arrange()` verb in **dplyr**.
+* `LIMIT` restricts the number of rows in the output and is similar to the **R** commands `head()` and `slice()`.
+
+## SELECT ... FROM {#sec-select}
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `select()`
+
+:::
+
+A **SQL** query starts with a `SELECT` command and has a corresponding `FROM` to indicate the table being queried.  Columns may be specified, or the `*` will indicate that every column in the table should be returned.
+
+The shortest **SQL** query is the following `SELECT` command.  Do not run this command!!! The `yellow_old` table has 15 million rows, and we do not want to look at them simultaneously.
+
+```{r}
+#| eval: false
+
+DO NOT RUN:  SELECT * FROM yellow_old;
+```
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+Do not run the following command unless you are **certain** that the table from which you are querying is small enough so that the query results fit easily into your memory.
+
+`SELECT` * `FROM` table;
+:::
+
+Instead, to look at the top of the table, `SELECT` the first few rows.  The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).
+
+```{sql}
+#| connection: con_taxi
+#| label: select-14
+#| output.var: "select_14"
+
+SELECT * FROM yellow_old LIMIT 0, 14;
+
+```
+
+```{r}
+#| label: tbl-select-14
+#| echo: false
+#| tbl-cap: "SELECT the first 14 rows of the table."
+
+select_14 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Speaking of which, how many rows are there in the `yellow_old` table?  That is, how many taxi rides are recorded?  Now `SELECT` is used with a summary function, `COUNT()`.  Instead of using a separate summary function (like `mutate()` or `summarize()`), all the work is done inside the `SELECT` call.
+
+```{sql}
+#| connection: con_taxi
+#| label: select-count
+#| output.var: "select_count"
+
+SELECT COUNT(*) FROM yellow_old;
+```
+
+```{r}
+#| label: tbl-select-count
+#| echo: false
+#| tbl-cap: "COUNT(*) the number of rows in the entire yellow_old table."
+
+select_count |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Yikes, more than 15 million taxi rides!!!!
+
+
+You might have noticed that the `yellow_old` table has two different datetime variables (one for pickup, the other for drop-off).  We can use the information to assess the length of each ride (in time, not distance).  However, the variables are stored in SQL as character strings instead of in a DateTime format (even though they **look** like they are stored in a DateTime format!), see @tbl-select-describe.  Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
+
+```{sql}
+#| connection: con_taxi
+#| label: str-date
+#| output.var: "str_date"
+
+SELECT
+      pickup_datetime, dropoff_datetime,
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff
+   FROM yellow_old
+   LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-str-date
+#| echo: false
+#| tbl-cap: "Convert the pickup and drop-off times to date objects using STR_TO_DATE."
+
+str_date |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Now that the variables are no longer strings, we can subtract them to figure out the number of minutes for each taxi ride.  Unfortunately, the following code won't run because neither of the variables `pickup` or `dropoff` are in the table `yellow_old`.
+
+```{sql}
+#| connection: con_taxi
+#| eval: false
+
+SELECT
+      pickup_datetime, dropoff_datetime,
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff.
+      TIMEDIFF(pickup, dropoff) AS length_time
+   FROM yellow_old
+   LIMIT 0, 10;
+```
+
+
+Instead, we need two layers of `SELECT` commands so that the first `SELECT` (i.e., inside) layer creates the new variables, and the second `SELECT` (i.e., outside) layer subtracts the two times.
+
+```{sql}
+#| connection: con_taxi
+#| label: length-time2
+#| output.var: "length_time2"
+
+SELECT 
+   pickup,
+   dropoff, 
+   TIMEDIFF(pickup, dropoff) AS length_time 
+FROM (
+   SELECT
+      STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T") AS pickup,
+      STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T") AS dropoff
+   FROM yellow_old)
+   AS subquery_table
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-length-time2
+#| echo: false
+#| tbl-cap: "Use TIMEDIFF to find the length (time) of the ride."
+
+length_time2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+Alternatively, the `STR_TO_DATE()` function can be applied inside the `TIMEDIFF()` function so that the full (now only) `SELECT` command is being used only on variables that are in the original table.
+
+```{sql}
+#| connection: con_taxi
+#| label: length-time3
+#| output.var: "length_time3"
+
+SELECT 
+   pickup_datetime,
+   dropoff_datetime, 
+   TIMEDIFF(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T"), 
+            STR_TO_DATE(dropoff_datetime, "%Y-%m-%d %T")) AS length_time 
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-length-time3
+#| echo: false
+#| tbl-cap: "Alternative method to find the length (time) of the ride."
+
+length_time3 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `pickup_datetime` and `dropoff_datetime` are columns in the original table - they are written to disk on the **SQL** server.  The variables `pickup`, `dropoff`, and `length_time` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **RStudio** or **DBeaver**) and is not written to disk.
+
+## SELECT DISTINCT
+
+`SELECT DISTINCT` returns only unique rows.  That is, it filters out all the duplicates of a variable or a combination of variables.  Note that I have a larger limit on the query that I needed, just to make sure I got all the levels.
+
+```{sql}
+#| connection: con_taxi
+#| label: distinct1
+#| output.var: "distinct1"
+
+SELECT DISTINCT payment_type
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-distinct1
+#| echo: false
+#| tbl-cap: "The distinct values of payment types. `CRD` is credit card; `CSH` is cash; `NOC` is no charge; `DIS` is dispute."
+
+distinct1 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+```{sql}
+#| connection: con_taxi
+#| label: distinct2
+#| output.var: "distinct2"
+
+SELECT DISTINCT vendor_id, payment_type
+FROM yellow_old
+LIMIT 0, 20;
+```
+
+```{r}
+#| label: tbl-distinct2
+#| echo: false
+#| tbl-cap: "The distinct values of vendor ID and payment types, combined. `VTS` is Verifone Transportation Systems and `CMT` is Mobile Knowledge Systems Inc. `CRD` is credit card; `CSH` is cash; `NOC` is no charge; `DIS` is dispute."
+
+distinct2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+## WHERE
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `filter()`
+
+:::
+
+The `WHERE` clause is analogous to the `filter()` function in **dplyr**.  However, keep in mind that there are two **SQL** commands that resemble the **dplyr** `filter()` function. `WHERE` operates on the original data in the table and `HAVING` operates on the result set. See below for examples using `HAVING`.
+
+What was the fare for those taxi rides where the `tip_amount` was more than $10 and the person used cash? (Note that in **SQL** the equality logical is `=` and in **R** the equality logical is `==`.) 
+
+```{sql}
+#| connection: con_taxi
+#| label: select-10
+#| output.var: "select_10"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount > 10
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+```{r}
+#| label: tbl-select-10
+#| echo: false
+#| tbl-cap: "WHERE to subset the queried rows."
+
+select_10 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+`BETWEEN` can be used to specify a range of values for a numeric value. `BETWEEN` is inclusive.
+
+```{sql}
+#| connection: con_taxi
+#| label: where-1012a
+#| output.var: "where_1012a"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount BETWEEN 10 and 12
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+```{r}
+#| label: tbl-where-1012a
+#| echo: false
+#| tbl-cap: "BETWEEN in the WHERE clause."
+
+where_1012a |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+`IN` is similar to the **dplyr** `%in%` function which specifies distinct values for the variable.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-1012b
+#| output.var: "where_1012b"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount IN (10, 12)
+   AND payment_type = "CSH"
+LIMIT 0, 10;
+
+```
+
+```{r}
+#| label: tbl-where-1012b
+#| echo: false
+#| tbl-cap: "IN in the WHERE clause."
+
+where_1012b |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+The `WHERE` clause can be established by a number of logical commands combined using either `AND` or `OR`.  Usually it is important to use parentheses with `OR` logicals to make sure the desired query is return.  Consider the difference between the following queries.  In **SQL** (as in many programming languages), `AND` takes precedent over `OR` in the order of operations, when there are no parentheses.  (I was taught to remember order of operations using "please excuse my dear aunt Sally.")  The order of operations on the first query groups the second two conditions into one because `AND` take precedence over `OR` (as if the query was `tip_amount BETWEEN 10 and 12 OR (total_amount BETWEEN 100 and 112 AND payment_type = "CSH")`).
+
+```{sql}
+#| connection: con_taxi
+#| label: where-1012c
+#| output.var: "where_1012c"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE tip_amount BETWEEN 10 and 12 OR 
+      total_amount BETWEEN 100 and 112 AND 
+      payment_type = "CSH"
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-1012c
+#| echo: false
+#| tbl-cap: "OR and AND without parentheses."
+
+where_1012c |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-1012d
+#| output.var: "where_1012d"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE (tip_amount BETWEEN 10 and 12 OR 
+      total_amount BETWEEN 100 and 112 ) AND 
+      payment_type = "CSH"
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-1012d
+#| echo: false
+#| tbl-cap: "OR and AND with parentheses."
+
+where_1012d |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+### NULL in WHERE
+
+**SQL** considers `NULL` values to be unknown. Therefore, when searching for a `NULL` value, you need to ask **SQL** if the value `IS NULL`.  Asking if the value is *equal* to `NULL` doesn't work because `NULL` values don't equal anything (they are unknown).  To keep all values that are not `NULL` values, use `IS NOT NULL` in the `WHERE` clause. 
+
+
+::: {.callout-tip icon=false}
+
+## <i class="fas fa-triangle-exclamation"></i> Watch out!
+
+In order to find the records that are `NULL` use `WHERE variable IS NULL`.
+:::
+
+
+#### A `NULL` example^[taken from: https://cs186berkeley.net/notes/note1/#filtering-null-values]
+
+The logic of `NULL`:
+
+* If you do anything with `NULL`, you'll just get `NULL`. For instance if $x$ is `NULL`, then $x > 3$, $1 = x$, and $x + 4$ all evaluate to `NULL`. Even $x =$ `NULL` evaluates to `NULL`! if you want to check whether $x$ is `NULL`, use `x IS NULL` or `x IS NOT NULL`.
+* `NULL` short-circuits with boolean operators. That means a boolean expression involving `NULL` will evaluate to:
+   * TRUE, if it'd evaluate to TRUE regardless of whether the `NULL` value is really TRUE or FALSE.
+   * FALSE, if it'd evaluate to FALSE regardless of whether the `NULL` value is really TRUE or FALSE.
+   * Or `NULL`, if it depends on the `NULL` value.
+
+Consider the following table and **SQL** query:
+
+
+```{sql}
+#| connection: con_taxi
+
+SELECT * FROM (
+   SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
+   UNION
+   SELECT 'Ada' AS name, NULL AS age, 3 as num_dogs   
+   UNION
+   SELECT 'Ben' AS name, NULL AS age, NULL as num_dogs
+   UNION
+   SELECT 'Cho' AS name, 27 AS age, NULL as num_dogs
+   ) AS temptable;
+```
+
+
+```{sql}
+#| connection: con_taxi
+
+SELECT * FROM (
+   SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
+   UNION
+   SELECT 'Ada' AS name, NULL AS age, 3 as num_dogs   
+   UNION
+   SELECT 'Ben' AS name, NULL AS age, NULL as num_dogs
+   UNION
+   SELECT 'Cho' AS name, 27 AS age, NULL as num_dogs
+   ) AS temptable
+WHERE age <= 20 OR num_dogs = 3;
+```
+
+Where does the `WHERE` clause do? It tells us that we only want to keep the rows satisfying the `age <= 20` OR `num_dogs = 3`. Let’s consider each row one at a time:
+
+* For Ace, `age <= 20` evaluates to TRUE so the claim is satisfied.
+* For Ada, `age <= 20` evaluates to `NULL` but `num_dogs = 3` evaluates to TRUE so the claim is satisfied.
+* For Ben, `age <= 20` evaluates to `NULL` and `num_dogs = 3` evaluates to `NULL` so the overall expression is `NULL` which has a FALSE value.
+* For Cho, `age <= 20` evaluates to FALSE and `num_dogs = 3` evaluates to `NULL` so the overall expression evaluates to `NULL` (because it depends on the value of the `NULL`).
+
+Thus we keep only Ace and Ada.
+
+
+
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-null1
+#| output.var: "where_null1"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE payment_type IS NULL
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-null1
+#| echo: false
+#| tbl-cap: "There is **ONE** record with a NULL value for `payment_type`. Note that the way to find NULL values is via `IS NULL`."
+
+where_null1 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+```{sql}
+#| connection: con_taxi
+#| label: where-null2
+#| output.var: "where_null2"
+
+SELECT payment_type, fare_amount, tip_amount, total_amount
+FROM yellow_old
+WHERE payment_type = NULL
+LIMIT 0, 10;
+```
+
+```{r}
+#| label: tbl-where-null2
+#| echo: false
+#| tbl-cap: "**NO** rows are selected when the `WHERE` command is specified to indicate if the variable *equals* `NULL`."
+
+where_null2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+
+
+
+## GROUP BY
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `group_by()`
+
+:::
+
+The `GROUP BY` clause will direct **SQL** to carry out the query separately for each category in the grouped variable.  Using `GROUP BY` is particularly important when aggregating multiple rows into a single number.  Some <a href = "https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html" target = "_blank">aggregate functions</a> include `COUNT()`, `SUM()`, `MAX()`, `MIN()`, and `AVG()`.
+
+Note that `SUM(1)` adds (sums) the number `1` for each row.  Which is the same as counting the number of rows.  `SUM(2)` adds (sums) the number `2` for each row which returns twice as many transactions.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: group-pay
+#| output.var: "group_pay"
+
+SELECT COUNT(*) AS num_transactions, 
+       SUM(1) AS num_transactions_also,
+       SUM(2) AS double_transactions,
+       payment_type 
+FROM yellow_old
+WHERE tip_amount BETWEEN 10 and 20
+GROUP BY payment_type;
+```
+
+```{r}
+#| label: tbl-group-pay
+#| echo: false
+#| tbl-cap: "GROUP BY on payment_type."
+
+group_pay |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+For those people who tipped between $10 and $20, what was the lowest and highest fare for each of the types of payments?
+
+
+```{sql}
+#| connection: con_taxi
+#| label: group-pay2
+#| output.var: "group_pay2"
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type 
+FROM yellow_old
+WHERE tip_amount BETWEEN 10 and 20
+GROUP BY payment_type;
+```
+
+```{r}
+#| label: tbl-group-pay2
+#| echo: false
+#| tbl-cap: "GROUP BY with aggregate functions."
+
+group_pay2 |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+`GROUP BY` will work applied to multiple columns.  Let's tabulate the same results, now broken down by `payment_type` and day of week.  Except that we don't have a day of week variable!  We need to convert the `pickup_datetime` variable to a DateTime object and then pull out the day of the week, using `DAYNAME`.  (Note: `DAYOFWEEK` will give you the day of the week as an integer.  Use your internet sleuthing skills if you are looking for functions that might help your desired query.)
+
+
+```{sql}
+#| connection: con_taxi
+#| label: group-wday
+#| output.var: "group_wday"
+
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type,
+       DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old
+GROUP BY payment_type, wday;
+```
+
+```{r}
+#| label: tbl-group-wday
+#| echo: false
+#| tbl-cap: "GROUP BY with payment_type and wday."
+
+group_wday |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+
+## ORDER BY
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `arrange()`
+:::
+
+The `ORDER BY` command can be used with or without the `GROUP BY` and aggregation commands.  It allows us to look at interesting aspects of the data by sorting the data.
+
+```{sql}
+#| connection: con_taxi
+#| label: order-low
+#| output.var: "order_low"
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type,
+       DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old
+GROUP BY payment_type, wday
+ORDER BY lowest_fare ASC;
+```
+
+```{r}
+#| label: tbl-order-low
+#| echo: false
+#| tbl-cap: "ORDER BY lowest_fare, ascending."
+
+order_low |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+WHAT?!?!!  How in the world was one of the fares -$612.40? It doesn't make any sense that a fare would be negative.  Some additional inquiry into the observation corresponding to a fare of -$612.40 is absolutely warranted.  If the observation is found to be a typo, it would need to be removed from the data set.  If the observation is somehow legitimate, it would need to be included in the analysis, with the information provided about its legitimacy.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: order-high
+#| output.var: "order_high"
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type,
+       DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old
+GROUP BY payment_type, wday
+ORDER BY highest_fare DESC;
+```
+
+```{r}
+#| label: tbl-order-high
+#| echo: false
+#| tbl-cap: "ORDER BY highest_fare, descending"
+
+order_high |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+$950 is a lot to pay for a cab ride!  But in NYC, I'd believe it.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: order-wday
+#| output.var: "order_wday"
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type,
+       DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old
+GROUP BY payment_type, wday
+ORDER BY wday, payment_type;
+```
+
+```{r}
+#| label: tbl-order-wday
+#| echo: false
+#| tbl-cap: "ORDER BY wday and payment_type."
+
+order_wday |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+
+::: {.callout-tip appearance="minimal"}
+
+Note that both `GROUP BY` and `ORDER BY` evaluate the data after it has been retrieved.  Therefore, the functions operate on the *results set*, not the original rows of the data. 
+:::
+
+As above, we were able to `GROUP BY` and `ORDER BY` on the new variables we had created, `wday`.
+
+## HAVING
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `filter()`
+:::
+
+Recall that `WHERE` acts only on the original data.  If we are interested in rides that took place on `Friday`, we need to use the derived variable `wday` instead of the raw variable `pickup_datetime`.  Fortunately, `HAVING` works on the results set.  Note that **SQL** uses `''` for strings, not `""`.  In **SQL**, `""` is used to identify variables (not values of variables), like **R**'s `&grave;&grave;`.
+
+
+
+```{sql}
+#| connection: con_taxi
+#| label: having-fri
+#| output.var: "having_fri"
+
+SELECT COUNT(*) AS num_transactions, 
+       MIN(fare_amount) AS lowest_fare,
+       MAX(fare_amount) AS highest_fare,
+       payment_type,
+       DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old
+GROUP BY payment_type, wday
+HAVING wday = 'Friday';
+```
+
+```{r}
+#| label: tbl-having-fri
+#| echo: false
+#| tbl-cap: "HAVING to filter only Friday rides."
+
+having_fri |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+While it worked out quite well for us that `HAVING` was able to filter the data based on the results set, the use of `HAVING` was quite onerous because the entire data set was considered before the filter was applied.  That is, if the filter can be done on the original data using `WHERE`, the query will be much faster and more efficient.
+
+Note: `HAVING` requires a `GROUP BY` clause.  And the variable(s) used in `HAVING` must also be part of the `GROUP BY` clause.
+
+
+::: {.callout-tip appearance="minimal"}
+
+Whenever possible, use `WHERE` instead of `HAVING` to make your queries as efficient as possible.
+:::
+
+
+## LIMIT
+
+::: {.callout-tip appearance="minimal"}
+
+**R** function: `head()` or `slice()`
+:::
+
+As we've seen, `LIMIT` truncates the query to specified rows. The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).  The query below shows the last 10 rows of the entire data set.
+
+```{sql}
+#| connection: con_taxi
+#| label: limit-last
+#| output.var: "limit_last"
+
+SELECT * FROM yellow_old LIMIT 15428118, 10;
+
+```
+
+```{r}
+#| label: tbl-limit-last
+#| echo: false
+#| tbl-cap: "LIMIT on the last 10 rows of the table."
+
+limit_last |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+ 
+
+
+
+## Saving **SQL** queries as **R** objects
+
+If you are working in **R** to run **SQL** commands, you may want to use the query output for further analysis or visualizations.  In that case, use `#|output.var: "name_of_variable"` inside the `{sql}` chunk.  The variable called `name_of_variable` will then be available to be used in the R environment.
+
+
+```{sql}
+#| connection: con_taxi
+#| label: new-table
+#| output.var: "new_table"
+#| echo: fenced
+
+SELECT *, DAYNAME(STR_TO_DATE(pickup_datetime, "%Y-%m-%d %T")) AS wday
+FROM yellow_old 
+LIMIT 0, 1000;
+
+```
+
+```{r}
+#| label: tbl-new-table
+#| echo: false
+#| tbl-cap: "New data.frame saved to R called new_table."
+
+new_table |>
+  head() |>
+  kbl(linesep = "", booktabs = TRUE) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), 
+                latex_options = c("striped", "hold_position"),
+                full_width = FALSE) 
+
+```
+
+```{r}
+#| echo: fenced
+
+new_table |>
+  drop_na(wday) |>
+  ggplot(aes(x = fare_amount, y = tip_amount, color = wday)) + 
+  geom_point() 
+```
+
+
+## Best practice
+
+It is always a good idea to terminate the **SQL** connection when you are done with it.
+
+
+```{r}
+dbDisconnect(con_taxi, shutdown = TRUE)
+```
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+1. Why don't we usually want to run the query: `SELECT * FROM table;`?
+
+2. What is the difference between the original table and the results set?
+
+3. In SQL does the `WHERE` clause use `=` or `==` to indicate equality?
+
+4. Does `BETWEEN` work only on numeric variables or also on character strings?
+
+5. What syntax is used to direct `ORDER BY` to sort by biggest to smallest or smallest to biggest?
+
+6. What is the difference between `WHERE` and `HAVING`?
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+1. What are different ways to look at the dataset to identify possible typos or rogue values?  
+
+2. Why are such tasks so much harder with large datasets (versus small datasets)?
+
+3. Why are such tasks to much more important with large datasets (versus small datasets)?
