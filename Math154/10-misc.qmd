@@ -158,9 +158,9 @@ The [RStudio `sparklyr` webpage](https://spark.rstudio.com/) provides a plethora
 
 Note, it is important to look at your data structures and variables names.  For example, when copying the local dataframe `iris_samps` to the remote data source called `iris_samps_tbl`, the variable `Petal.Length` was changed to `Petal_Length`.
 
-```{r eval=TRUE, error=FALSE, warning=FALSE}
+```{r eval=FALSE, error=FALSE, warning=FALSE}
 library(sparklyr)
-spark_install()
+sparklyr::spark_install()
 
 sc <- spark_connect(master = "local")
 
@@ -184,6 +184,8 @@ spark_disconnect(sc)
 For our particular application, the adept reader has probably noticed that the average of a variable using `group_by` is a very quick and easy task for `dplyr`.  Indeed, the use of `sparklyr` above is overkill and is presented only as a way to demonstrate using `sparklyr`.  If you are working with big datasets that require large computing infrastructure, the RStudio help pages on `sparklyr` are fantastic.  Additionally, there are many instances of working with `Spark` in the wild, and you might consider working through someone else's `Spark` analysis like this [fantastic example](https://livefreeordichotomize.com/2019/06/04/using_awk_and_r_to_parse_25tb/) on splitting up large amounts of raw DNA sequencing to get data for a given genetic location.
 
 ```{r}
+#| eval: FALSE
+
 iris_samps %>% dplyr::group_by(replicate) %>%
   dplyr::summarize(result = mean(Petal.Length)) %>%
   ggplot(aes(x = result)) + geom_histogram(bins = 25) + ggtitle("Histogram of 100 Bootstrapped Means using dplyr")
@@ -348,13 +350,14 @@ virtualenv_install("r-reticulate", "statsmodels")
 ```
 
 ```{r message=FALSE, warning=FALSE}
+#| eval: FALSE
 library(tidyverse)
 library(reticulate)
 use_virtualenv("r-reticulate")
 reticulate::import("statsmodels")
 ```
 
-#### I can run Python inside R?? {-}
+#### I can run Python inside Quarto?? {-}
 
 ```{r out.width='65%', fig.align="left",  echo=FALSE}
 knitr::include_graphics("figs/pychunk1.png")
@@ -381,6 +384,8 @@ flights = flights.dropna()
 A view of the Python chunk which is actually run:
 
 ```{python}
+#| eval: FALSE
+
 import pandas
 flights = pandas.read_csv("flights.csv")
 flights = flights[flights["dest"] == "ORD"]
@@ -402,6 +407,8 @@ flights.describe()
 
 
 ```{python}
+#| eval: FALSE
+
 flights.shape
 flights.head(3)
 flights.describe()
@@ -420,6 +427,8 @@ flights.groupby("carrier").mean()
 ````
 
 ```{python}
+#| eval: FALSE
+
 flights = pandas.read_csv("flights.csv")
 flights = flights[['carrier', 'dep_delay', 'arr_delay']]
 flights.groupby("carrier").mean()
@@ -434,6 +443,8 @@ flights.groupby("carrier").mean()
 
 
 ```{r}
+#| eval: FALSE
+
 library(ggplot2)
 ggplot(py$flights, 
        aes(x=carrier, 
@@ -446,6 +457,8 @@ ggplot(py$flights,
 #### From R chunk to Python chunk {-}
 
 ```{r}
+#| eval: FALSE
+
 data(diamonds)
 head(diamonds)
 ```
@@ -456,11 +469,15 @@ head(diamonds)
 Note that we're calling Python code on an R object.
 
 ```{python}
+#| eval: FALSE
+
 print(r.diamonds.describe())
 ```
 
 
 ```{python out.width = "20px"}
+#| eval: FALSE
+
 import statsmodels.formula.api as smf
 model = smf.ols('price ~ carat', data = r.diamonds).fit()
 print(model.summary())
