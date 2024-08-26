@@ -1,5 +1,11 @@
 # Introduction {#intro}
-  
+
+```{r}
+#| echo: false
+library(tidyverse)
+library(palmerpenguins)
+```
+
 ## Course Logistics
 
 **What is Data Science?**
@@ -54,6 +60,7 @@ It will help you frame the quantitative and computational aspects of the data sc
 There is one homework assignment per week, regular quizzes, and 5 mini-projects.  Many students report working about 8-10 hours per week on this class.   
 
 **What software will we use? Will there be any real world applications?  Will there be any mathematics?  Will there be any CS?**
+
 All of the work will be done in R (using RStudio as a front end, called an integrated development environment, IDE).  You will need to either download R and RStudio (both are free) onto your own computer or use them on Pomona's server.  All assignments will be posted to private repositories on GitHub.  The class is a mix of many real world applications and case studies, some statistics, programming, and communication skills.  The projects will allow you to be creative in answering questions of interest to you.
 
 
@@ -63,123 +70,174 @@ R is freely available at http://www.r-project.org/ and is already installed on c
 * All assignments should be turned in using Quarto compiled to pdf.
 
 
-```{r fig.cap = "Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim", fig.width = 7, fig.align='center', echo=FALSE}
+## Background
+
+
+Data Science includes the full pipeline for working with data. Some of the topics we will cover in DS 002R include:
+
+```{r}
+#| echo: false
+tribble(~`DS workflow`, ~`in DS002R`, ~`beyond DS002R`,
+       'data acquisition', 'web scraping, SQL', 'databases, APIs',
+       'data exploration', 'wranging, strings', 'natural language processing',
+       'data visualization', 'ggplot', 'animations',
+       'data conclusions', 'permutation tests, regular expressions', 'predictive modeling, machine learning, AI',
+       'data communication', 'yes!', 'yes!')  |>  
+  gt::gt() |> 
+  gt::fmt_markdown(columns = everything()) |> 
+    gt::cols_width(`DS workflow` ~ pct(30),
+                 everything() ~ pct(35))
+```
+
+
+
+### Data
+
+What are data?
+Oftentimes, the word **data** brings to mind a spreadsheet, like the one below, which is **tidy** and describes characteristics of a group of penguins.
+
+```{r}
+#| echo: false
+head(penguins) |> 
+  gt::gt()
+```
+
+
+::: {.callout-note}
+# tidy data
+
+* each row = a unit of observation (here, a penguin)
+* each column = a measure on some variable of interest, either quantitative (numbers with units) or categorical (discrete possibilities or categories)
+* each entry contains a single data value; no analysis, summaries, footnotes, comments, etc, and only one value per cell
+
+:::
+
+But the definition of **datum** can be much broader:
+
+```{r fig.cap = "Definition of datum from the [Oxford English Dictionary](https://www.oed.com/search/dictionary/?scope=Entries&q=datum)", fig.align='center', echo=FALSE}
+knitr::include_graphics("images/datum.png")
+```
+
+Each of the following can be thought of as **data**.  How would you wrangle such information into a tidy format?
+
+Data examples: 
+
+1. the emails in your inbox  
+2. social media texts  
+3. images  
+4. videos  
+5. audio files
+
+For each example, provide: 
+
+* the observational units (what does a row represent)  
+* at least 4 possible variables (what might we record for each observation)  
+* who might use such data?
+
+
+### Data Science in the Wild
+
+Data science extracts knowledge from within a particular domain of inquiry.  Examples from Pomona!
+
+* <a href = "https://www.shannonmburns.com/" target = "_blank">Shannon Burns</a> (Psychological Science and Neuroscience) uses data to understand brain processes of social communication.
+* <a href = "https://www.pomona.edu/directory/people/jun-lang" target = "_blank">Jun Lang</a> (Asian Languages and Literatures) uses data to analyze (1) the intersection of language, gender, and society, and (2) second language acquisition and pedagogy.
+* <a href = "https://magazine.pomona.edu/2020/winter/baseball-by-the-numbers/">Frank Pericolosi</a> (Physical Education) uses data to improve his team's chances on the field.
+* <a href = "https://www.pomona.edu/directory/people/ami-e-radunskaya" target = "_blank">Ami Radunskaya</a> (Mathematics) uses data to model tumor growth and treatment.
+
+
+
+
+## Tools
+
+### The reproducible data analysis process {-}
+
+* Scriptability $\rightarrow$ R
+* Literate programming $\rightarrow$ Quarto (via R Studio)
+* Version control $\rightarrow$ Git / GitHub
+
+ 
+### Scripting and literate programming {-}
+
+Donald Knuth "Literate Programming" (1983) 
+
+> Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer- what to do, let us concentrate rather on explaining to human beings- what we want a computer to do.
+
+* The ideas of literate programming have been around for many years!
+* and tools for putting them to practice have also been around
+* but they have never been as accessible as the current tools
+
+### Reproducibility checklist {-}
+
+* Are the tables and figures reproducible from the code and data?
+* Does the code actually do what you think it does?
+* In addition to what was done, is it clear why it was done? (e.g., how were parameter settings chosen?)
+* Can the code be used for other data?
+* Can you extend the code to do other things?
+
+### R and R Studio
+
+* You must use both R and R Studio software programs
+* R does the programming
+* R Studio brings everything together
+* You may use Pomona's server: https://rstudio.pomona.edu/
+
+
+```{r fig.cap = "Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim", fig.align='center', echo=FALSE}
 knitr::include_graphics("images/RRstudio.jpg")
 ```
 
-```{r fig.cap = "[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University", fig.width = 8, fig.align='center', echo=FALSE}
+```{r fig.cap = "[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University", fig.align='center', echo=FALSE}
 knitr::include_graphics("images/cookingRstudio.jpg")
 ```
 
-## Course Content
 
-### Topics
+### Git & GitHub
 
-Computational Statistics can be a very large umbrella for many ideas.  Indeed, sometimes the topics can seem somewhat disjointed.  Below, I've categorized the topics we will cover into four groups.  The four different broad topics all play different roles and can be more or less important depending on the problem at hand.  None of the topics should exist on their own, because only with the bigger focus on all topics will any sort of data analysis / interpretation be accurate and compelling.
-
-**Letting the computer help:**  R, RStudio, Git, GitHub, Reproducibility, Data Viz, Data Wrangling
-
-**Statistics:**  Simulating, Randomization / Permutation Tests, Bootstrapping, Ethics
-
-**Machine Learning:** Classification, Clustering, Regular Expressions
-
-**Mathematics:**  Support Vector Machines
+* You must submit your assignments via GitHub
+* Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
+* Class specific instructions at https://ds002r-fds.netlify.app/github
 
 
-### Vocabulary
-* A  **statistic** is a numerical measurement we get from the sample, a function of the data.
-* A  **parameter** is a numerical measurement of the population.  We never know the true value of the parameter.
-* An  **estimator** is a function of the unobserved data that tries to approximate the unknown parameter value.
-* An  **estimate** is the value of the estimator for a given set of data.  [Estimate and statistic can be used interchangeably.]
+Admittedly, there is a steep learning curve with Git.  However, it is among the tools which you are most likely to use in your future endeavors, so spending a little time focusing on the concepts now may pay off big time in the future.  Beyond practicing and working through http://happygitwithr.com/, you may want to read a little bit about what Git is doing behind the scenes.  This reference: [Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) is very good and accessible.
 
+#### Tools: a GitHub merge conflict (demo) {-}
 
-> One of my goals for this course was to convince students that there are two major kinds of skills one must have in order to be a successful data scientist: technical skills to actually do the analyses; and communication skills in order to present one's findings to a presumably non-technical audience.  [@Baumer15]
+* On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
+* Then, in RStudio also edit the README document with a different change.
+    * Commit your changes
+    * Try to push $\rightarrow$ you'll get an error!
+    * Try pulling
+    * Resolve the merge conflict and then commit and push
+* As you work in teams you will run into merge conflicts, learning how to resolve them properly will be very important.
 
-With thanks to Ben Baumer for perspective and sharing course materials. 
-
-
-### The Workflow
-
-
-```{r fig.cap = "A schematic of the typical workflow used in data analysis.  Most statistics classes focus only on the left side.  We will work to address all aspects (including those on the right side). [@Baumer15]", fig.width = 7, fig.align='center', echo=FALSE}
-knitr::include_graphics("images/AnalysisProcessBaumer.jpg")
+```{r fig.cap = "https://xkcd.com/1597/", fig.align='center', echo=FALSE}
+knitr::include_graphics("images/git_xkcd.png")
 ```
 
+#### Steps for weekly homework {-}
 
-```{r fig.cap = "[Stitch Fix Algorithms Tour](http://algorithms-tour.stitchfix.com/)", fig.width = 7, fig.align='center', echo=FALSE}
-knitr::include_graphics("images/SFalg.png")
-```
-
-### Principles for the Data Science Process tl;dr
-
-(Below are some very good thoughts on the DS Process, but you are not responsible for any of the content in this section.)
-
-Duncan Temple Lang, University of California, Davis 
-
-Duncan Temple-Lang is a leader in the area of combining computer science research concepts within the context of statistics and science more generally.  Recently, he was invited to participate in a workshop,  *Training Students to Extract Value from Big Data*.  The workshop was subsequently summarized in a manuscript of the same name and has been provided free of charge.  http://www.nap.edu/catalog.php?record_id=18981  [National Research Council.  *Training Students to Extract Value from Big Data: Summary of a Workshop*. Washington, DC: The National Academies Press, 2014.]
+1. You will get a link to the new assignment (clicking on the link will create a new private repo)  
+2. Use R (within R Studio)  
+    * New Project, version control, Git  
+    * Clone the repo using SSH  
+3. If it exists, rename the Rmd file to ds002r-hw#-lname-fname.Rmd  
+4.  Do the assignment  
+    *  `commit` and  `push` after every problem  
+5. All necessary files  *must* be in the same folder (e.g., data)  
 
 
 
-Duncan Temple Lang began by listing the core concepts of data science - items that will need to be taught: statistics and machine learning, computing and technologies, and domain knowledge of each problem. He stressed the importance of interpretation and reasoning - not only methods - in addressing data. Students who work in data science will have to have a broad set of skills - including knowledge of randomness and uncertainty, statistical methods, programming, and technology - and practical experience in them. Students tend to have had few computing and statistics classes on entering graduate school in a domain science.
 
-Temple Lang then described the data analysis pipeline, outlining the steps in one example of a data analysis and exploration process:
-
-
-1. Asking a general question.
-2. Refining the question, identifying data, and understanding data and metadata. Temple Lang noted that the data used are usually not collected for the specific question at hand, so the original experiment and data set should be understood.
-3. Access to data. This is unrelated to the science but does require computational skill.
-4. Transforming to data structures.
-5. Exploratory data analyses to understand the data and determine whether the results will scale.
-
-This is a critical step; Temple Lang noted that 80 percent of a data scientist's time can be spent in cleaning and preparing the data.
-6. Dimension reduction. Temple Lang stressed that it can be difficult or impossible to automate this step.
-7. Modeling and estimation. Temple Lang noted that computer and machine learning scientists tend to focus more on predictive models than on modeling of physical behavior or characteristics.
-8. Diagnostics. This helps to understand how well the model fits the data and identifies
-anomalies and aspects for further study. This step has similarities to exploratory data analysis.
-9. Quantifying uncertainty. Temple Lang indicated that quantifying uncertainty with statistical techniques is important for understanding and interpreting models and results.
-10. Conveying results.
-
-Temple Lang stressed that the data analysis process is highly interactive and iterative and requires the presence of a human in the loop. The next step in data processing is often not clear until the results of the current step are clear, and often something unexpected is uncovered. He also emphasized the importance of abstract skills and concepts and said that people need to be exposed to authentic data analyses, not only to the methods used. Data scientists also need to have a statistical understanding, and Temple Lang described the statistical concepts that should be taught to a student:
-
-* Mapping the general question to a statistical framework.
-* Understanding the scope of inference, sampling, biases, and limitations.
-* Exploratory data analyses, including missing values, data quality, cleaning, matching, and fusing.
-* Understanding randomness, variability, and uncertainty. Temple Lang noted that many
-students do not understand sampling variability.
-* Conditional dependence and heterogeneity.
-* Dimension reduction, variable selection, and sparsity.
-* Spurious relationships and multiple testing.
-* Parameter estimation versus "black box" prediction and classification.
-* Diagnostics, residuals, and comparing models.
-* Quantifying the uncertainty of a model.
-* Sampling structure and dependence for data reduction. Temple Lang noted that modeling of data becomes complicated when variables are not independent, identically distributed.
-* Statistical accuracy versus computational complexity and efficiency.
-
-Temple Lang then briefly discussed some of the practical aspects of computing, including the following:
-
-* Accessing data.
-* Manipulating raw data.
-* Data structures and storage, including correlated data.
-* Visualization at all stages (particularly in exploratory data analyses and conveying the results).
-* Parallel computing, which can be challenging for a new student.
-* Translating high-level descriptions to optimal programs.
-
-During the discussion, Temple Lang proposed computing statistics on visualizations to examine data rigorously in a statistical and automated way. He explained that "scagnostics" (from scatter plot diagnostics) is a data analysis technique for graphically exploring the relationships among variables. A small set of statistical measures can characterize scatter plots, and exploratory data analysis can be conducted on the residuals. [More information about scagnostics can be found in (Wilkinson et al., 2005, 2006).]
-
-A workshop participant noted the difference between a data error and a data blunder. A blunder is a large, easily noticeable mistake. The participant gave the example of shipboard observations of cloud cover; blunders, in that case, occur when the location of the ship observation is given to be on land rather than at sea. Another blunder would be a case of a ship's changing location too quickly. The participant speculated that such blunders could be generalized to detect problematic observations, although the tools would need to be scalable to be applied to large data sets.
-
-
- 
 ## Reproducibility {#repro}
 
 Reproducibility has long been considered an important topic for consideration in any research project.  However, recently there has been increased press and available examples for understanding the impact that non-reproducible science can have.  
 
-@reprobook provide a full textbook on the structure of reproducible research as well as dozens of case studies to help hone skills and consider different aspects of the reproducible pipeline.  Below are a handful of examples to get us started.
+@reprobook provide a full textbook on the structure of reproducible research as well as dozens of case studies to help hone skills and consider different aspects of the reproducible pipeline.  Below are a handful of examples to get us thinking about reproducibility.
 
 ### Need for Reproducibility
 
 
-```{r fig.cap = "slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016", fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.cap = "slide taken from Kellie Ottoboni https://github.com/kellieotto/useR2016", fig.align='center', echo=FALSE}
 knitr::include_graphics("images/reproducibility.jpg")
 ```
 
@@ -187,7 +245,7 @@ knitr::include_graphics("images/reproducibility.jpg")
 Science retracts gay marriage paper without agreement of lead author LaCour
 
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.align='center', echo=FALSE}
 knitr::include_graphics("images/lacour.jpg")
 ```
 
@@ -204,7 +262,7 @@ knitr::include_graphics("images/lacour.jpg")
 ### Example 2 {-}
 Seizure study retracted after authors realize data got "terribly mixed"
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.align='center', echo=FALSE}
 knitr::include_graphics("images/chakrabarti.jpg")
 ```
 
@@ -219,7 +277,7 @@ knitr::include_graphics("images/chakrabarti.jpg")
 Bad spreadsheet merge kills depression paper, quick fix resurrects it
 
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.align='center', echo=FALSE}
 knitr::include_graphics("images/kern.jpg")
 ```
 
@@ -239,88 +297,9 @@ PNAS paper retracted due to problems with figure and reproducibility (April 2016
 http://cardiobrief.org/2016/04/06/pnas-paper-by-prominent-cardiologist-and-dean-retracted/
 
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.align='center', echo=FALSE}
 knitr::include_graphics("images/goldschmidt.jpg")
 ```
-
-
-### The reproducible data analysis process
-
-* Scriptability $\rightarrow$ R
-* Literate programming $\rightarrow$ Quarto
-* Version control $\rightarrow$ Git / GitHub
-
- 
-#### Scripting and literate programming {-}
-
-Donald Knuth "Literate Programming" (1983) 
-
-> Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer- what to do, let us concentrate rather on explaining to human beings- what we want a computer to do.
-
-* The ideas of literate programming have been around for many years!
-* and tools for putting them to practice have also been around
-* but they have never been as accessible as the current tools
-
-#### Reproducibility checklist {-}
-
-* Are the tables and figures reproducible from the code and data?
-* Does the code actually do what you think it does?
-* In addition to what was done, is it clear why it was done? (e.g., how were parameter settings chosen?)
-* Can the code be used for other data?
-* Can you extend the code to do other things?
-
-#### Tools: R & R Studio {-}
-
-See this great video (less than 2 min) on a reproducible workflow: https://www.youtube.com/watch?v=s3JldKoA0zw&feature=youtu.be
-
-* You must use both R and RStudio software programs
-* R does the programming
-* R Studio brings everything together
-* You may use Pomona's server: https://rstudio.pomona.edu/
-* See course website for getting started: http://research.pomona.edu/johardin/math154f19/
-
-
-```{r fig.cap = "Taken from [Modern Drive: An introduction to statistical and data sciences via R](https://ismayc.github.io/moderndiver-book/), by Ismay and Kim", fig.width = 7, fig.align='center', echo=FALSE}
-knitr::include_graphics("images/RRstudio.jpg")
-```
-
-```{r fig.cap = "[Jessica Ward](https://jkrward.github.io/), PhD student at Newcastle University", fig.width = 8, fig.align='center', echo=FALSE}
-knitr::include_graphics("images/cookingRstudio.jpg")
-```
-
-#### Tools: Git & GitHub {-}
-
-* You must submit your assignments via GitHub
-* Follow Jenny Bryan's advice on how to get set-up: http://happygitwithr.com/
-* Class specific instructions at https://m154-comp-stats.netlify.app/github.html
-
-
-Admittedly, there is a steep learning curve with Git.  However, it is among the tools which you are most likely to use in your future endeavors, so spending a little time focusing on the concepts now may pay off big time in the future.  Beyond practicing and working through http://happygitwithr.com/, you may want to read a little bit about waht Git is doing behind the scences.  This reference: [Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) is very good and accessible.
-
-#### Tools: a GitHub merge conflict (demo) {-}
-
-* On GitHub (on the web) edit the README document and Commit it with a message describing what you did.
-* Then, in RStudio also edit the README document with a different change.
-    * Commit your changes
-    * Try to push $\rightarrow$ you'll get an error!
-    * Try pulling
-    * Resolve the merge conflict and then commit and push
-* As you work in teams you will run into merge conflicts, learning how to resolve them properly will be very important.
-
-```{r fig.cap = "https://xkcd.com/1597/", fig.width = 9, fig.align='center', echo=FALSE}
-knitr::include_graphics("images/git_xkcd.png")
-```
-
-#### Steps for weekly homework {-}
-
-1. You will get a link to the new assignment (clicking on the link will create a new private repo)  
-2. Use R (within R Studio)  
-    * New Project, version control, Git  
-    * Clone the repo using SSH  
-3. If it exists, rename the Rmd file to ma154-hw#-lname-fname.Rmd  
-4.  Do the assignment  
-    *  `commit` and  `push` after every problem  
-5. All necessary files  *must* be in the same folder (e.g., data)  
 
 
 ## Data Examples
@@ -406,7 +385,7 @@ Spend a few minutes reading the Rojas editorial and skimming the actual paper. B
 * editorial blog by Gelman: http://andrewgelman.com/2013/04/24/the-tweets-votes-curve/
 
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r fig.align='center', echo=FALSE}
 knitr::include_graphics("images/twitterscatter.jpg")
 knitr::include_graphics("images/twitterreg.jpg")
 ```
@@ -439,7 +418,7 @@ Identify all the steps necessary to conduct the study.  Could you do it given yo
 
 How much storage  *does* it take to download 3.5 billion tweets? = 2000+ Gb = 2+ Tb (your hard drive is likely 1Tb, unless you have a small computer).  Can you explain the billions of tweets stored at Indiana University?  How would you randomly sample from the database?  One tweet is about 2/3 of a Kb.
 
-```{r fig.width = 7, fig.align='center', echo=FALSE}
+```{r  fig.align='center', echo=FALSE}
 knitr::include_graphics("images/twitter_rojas.jpg")
 knitr::include_graphics("images/twitter_linkins.jpg")
 ```
