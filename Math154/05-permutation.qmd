@@ -291,22 +291,22 @@ clouds <- read_delim("figs/cloud-seeding.txt",
      "\t", escape_double = FALSE, trim_ws = TRUE) 
 
 names(clouds) <- c("unseeded", "seeded")
-clouds <- tidyr::pivot_longer(clouds, cols = 1:2, names_to = "seeding", values_to = "rainfall") %>%
+clouds <- tidyr::pivot_longer(clouds, cols = 1:2, names_to = "seeding", values_to = "rainfall") |>
   mutate(seeding = as.factor(seeding))
 
-clouds %>%
+clouds |>
   ggplot(aes(x=seeding, y=rainfall)) + geom_boxplot()
 
-clouds %>%
+clouds |>
   ggplot(aes(x=rainfall)) + geom_histogram(bins = 20) + facet_wrap(~seeding)
 ```
 
 
 ```{r}
-clouds %>%
+clouds |>
   ggplot(aes(x=seeding, y=rainfall)) + geom_boxplot() + scale_y_log10()
 
-clouds %>%
+clouds |>
   ggplot(aes(x=rainfall)) + geom_histogram(bins = 20) + facet_wrap(~seeding) + scale_x_log10()
 ```
 
@@ -314,21 +314,21 @@ clouds %>%
 **unlogged data:**
 
 ```{r}
-clouds %>%
-  mutate(lnrain = log(rainfall)) %>%
-  group_by(seeding) %>%
+clouds |>
+  mutate(lnrain = log(rainfall)) |>
+  group_by(seeding) |>
   summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain))
 
-clouds %>%
-  mutate(lnrain = log(rainfall)) %>%
-  group_by(seeding) %>%
-  summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain)) %>%
+clouds |>
+  mutate(lnrain = log(rainfall)) |>
+  group_by(seeding) |>
+  summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain)) |>
   summarize(diff(meanrain), diff(meanlnrain))
 
-raindiffs <- clouds %>%
-  mutate(lnrain = log(rainfall)) %>%
-  group_by(seeding) %>%
-  summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain)) %>%
+raindiffs <- clouds |>
+  mutate(lnrain = log(rainfall)) |>
+  group_by(seeding) |>
+  summarize(meanrain = mean(rainfall), meanlnrain = mean(lnrain)) |>
   summarize(diffrain = diff(meanrain), difflnrain = diff(meanlnrain))
 
 raindiffs
@@ -346,16 +346,16 @@ reps <- 1000
 permdiffs <- c()
 
 for(i in 1:reps){
-  onediff <- clouds %>%
-    mutate(permseed = sample(seeding)) %>%
-    group_by(permseed) %>%
-    summarize(meanrain = mean(rainfall)) %>%
-    summarize(diff(meanrain)) %>% pull()
+  onediff <- clouds |>
+    mutate(permseed = sample(seeding)) |>
+    group_by(permseed) |>
+    summarize(meanrain = mean(rainfall)) |>
+    summarize(diff(meanrain)) |> pull()
   
 permdiffs <- c(permdiffs, onediff)
 }
 
-permdiffs %>% data.frame() %>%
+permdiffs |> data.frame() |>
   ggplot(aes(x = permdiffs)) + geom_histogram(bins=30) + geom_vline(xintercept = raindiffs$diffrain, color = "red")
 
 ```
@@ -364,9 +364,9 @@ permdiffs %>% data.frame() %>%
 #####  Ratio of variances after permuting
 
 ```{r}
-rainvarratio <- clouds %>%
-    group_by(seeding) %>%
-    summarize(varrain = var(rainfall)) %>%
+rainvarratio <- clouds |>
+    group_by(seeding) |>
+    summarize(varrain = var(rainfall)) |>
     summarize(rainratio = varrain[1] / varrain[2])
 
 
@@ -374,16 +374,16 @@ reps <- 1000
 permvars <- c()
 
 for(i in 1:reps){
-  oneratio <- clouds %>%
-    mutate(permseed = sample(seeding)) %>%
-    group_by(permseed) %>%
-    summarize(varrain = var(rainfall)) %>%
-    summarize(varrain[1] / varrain[2]) %>% pull()
+  oneratio <- clouds |>
+    mutate(permseed = sample(seeding)) |>
+    group_by(permseed) |>
+    summarize(varrain = var(rainfall)) |>
+    summarize(varrain[1] / varrain[2]) |> pull()
   
 permvars <- c(permvars, oneratio)
 }
 
-permvars %>% data.frame() %>%
+permvars |> data.frame() |>
   ggplot(aes(x = permvars)) + geom_histogram(bins=30) + geom_vline(xintercept = rainvarratio$rainratio , color = "red")
 
 ```
@@ -422,10 +422,10 @@ where p is the proportion of simulated test statistics greater than or equal to 
 
 ```{r eval=FALSE}
 reps <- 1000
-raindiffs <- clouds %>%
-  mutate(lnrain = log(rainfall)) %>%
-  group_by(seeding) %>%
-  summarize(meanrain = mean(rainfall)) %>%
+raindiffs <- clouds |>
+  mutate(lnrain = log(rainfall)) |>
+  group_by(seeding) |>
+  summarize(meanrain = mean(rainfall)) |>
   summarize(diffrain = diff(meanrain))
 
 for(b in c(0,20,50,100,300,400,500,550,570,600)){
@@ -434,11 +434,11 @@ for(b in c(0,20,50,100,300,400,500,550,570,600)){
 permdiffs <- c()
 
 for(i in 1:reps){
-  onediff <- clouds %>%
-    mutate(permseed = sample(seeding)) %>%
-    group_by(permseed) %>%
-    summarize(meanrain = mean(rainfall)) %>%
-    summarize(diff(meanrain)) %>% pull()
+  onediff <- clouds |>
+    mutate(permseed = sample(seeding)) |>
+    group_by(permseed) |>
+    summarize(meanrain = mean(rainfall)) |>
+    summarize(diff(meanrain)) |> pull()
   
 permdiffs <- c(permdiffs, onediff)
 }
@@ -495,9 +495,9 @@ macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/m
 
 ```{r warning=FALSE, message=FALSE, fig.align="center"}
 library(ggridges)
-macnell %>% 
-  mutate(TAID = ifelse(taidgender==1, "male", "female")) %>%
-  mutate(TAGend = ifelse(tagender==1, "male", "female")) %>%
+macnell |> 
+  mutate(TAID = ifelse(taidgender==1, "male", "female")) |>
+  mutate(TAGend = ifelse(tagender==1, "male", "female")) |>
 ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID), 
            fill=TAID)) +
   geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), aes(color = TAID)) +
@@ -524,8 +524,8 @@ $$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
 #### MacNell Data without permutation
 
 ```{r}
-macnell %>%
-  select(overall, tagender, taidgender) %>% head(15)
+macnell |>
+  select(overall, tagender, taidgender) |> head(15)
 ```
 
 
@@ -538,8 +538,8 @@ Conceptually, there are two levels of randomization:
 2.  Of the $N_j$ assigned to instructor $j$, $N_{jm}$ are told that the instructor is male, and $N_{jf}$ are told that the instructor is female for $j=m,f$.
 
 ```{r}
-macnell %>%
-  group_by(tagender, taidgender) %>%
+macnell |>
+  group_by(tagender, taidgender) |>
   summarize(n())
 ```
 
@@ -550,43 +550,43 @@ macnell %>%
 
 
 ```{r mac1, eval=TRUE, include = TRUE}
-macnell %>% 
-  group_by(tagender) %>%
-  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
+macnell |> 
+  group_by(tagender) |>
+  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
   select(overall, tagender, taidgender, permTAID) 
 ```
 
 ```{r echo = FALSE, eval = FALSE}
-flair::decorate("mac1") %>%
+flair::decorate("mac1") |>
   flair::flair("group_by(tagender)") 
 ```
 
 
 ```{r mac2, eval=TRUE, include = TRUE}
-macnell %>% 
-  group_by(tagender) %>%
-  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
-  ungroup(tagender) %>%
-  group_by(permTAID) %>%
-  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+macnell |> 
+  group_by(tagender) |>
+  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
+  ungroup(tagender) |>
+  group_by(permTAID) |>
+  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
   summarize(diff(pmeans))
 ```
 
 ```{r echo = FALSE, eval = FALSE}
-decorate("mac2") %>%  
-  flair("group_by(tagender)") %>%
-  flair("group_by(permTAID)") %>%
+decorate("mac2") |>  
+  flair("group_by(tagender)") |>
+  flair("group_by(permTAID)") |>
   knit_print.with_flair()
 ```
 
 
 ```{r mac3}
 diff_means_func <- function(.x){
-  macnell %>% group_by(tagender) %>%
-  mutate(permTAID = sample(taidgender, replace=FALSE)) %>%
-  ungroup(tagender) %>%
-  group_by(permTAID) %>%
-  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+  macnell |> group_by(tagender) |>
+  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
+  ungroup(tagender) |>
+  group_by(permTAID) |>
+  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
   summarize(diff_mean = diff(pmeans))
   }
 
@@ -598,9 +598,9 @@ map_df(1:5, diff_means_func)
 
 ```{r}
 # observed
-macnell %>% 
-  group_by(taidgender) %>%
-  summarize(pmeans = mean(overall, na.rm=TRUE)) %>%
+macnell |> 
+  group_by(taidgender) |>
+  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
   summarize(diff_mean = diff(pmeans))
 ```
 
@@ -619,7 +619,7 @@ perm_diff_means <- map_df(1:reps, diff_means_func)
 
 .pull-left[
 ```{r echo=FALSE}
-perm_diff_means %>%
+perm_diff_means |>
   ggplot(aes(x = diff_mean)) +
   geom_histogram() +
   geom_vline(xintercept = 0.474, color = "red")
@@ -629,7 +629,7 @@ perm_diff_means %>%
 .pull-right[
 ```{r}
 # permutation p-value
-perm_diff_means %>%
+perm_diff_means |>
   summarize(p_val = 
       sum(diff_mean > 0.474) / 
       reps)
@@ -657,13 +657,13 @@ distr2 <- stratified_two_sample(response = macnell$overall,
 
 ```{r echo = FALSE, eval = FALSE, include = FALSE}
 
-macnell %>% group_by(taidgender) %>%
-  summarize(means = mean(overall, na.rm = TRUE)) %>%
+macnell |> group_by(taidgender) |>
+  summarize(means = mean(overall, na.rm = TRUE)) |>
   summarize(diff(means))
 
-macnell %>% group_by(taidgender) %>%
+macnell |> group_by(taidgender) |>
   summarize(means = mean(overall, na.rm=TRUE), 
-            vars = var(overall, na.rm=TRUE), ns = n() ) %>%
+            vars = var(overall, na.rm=TRUE), ns = n() ) |>
   summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
 
 ```
@@ -702,17 +702,17 @@ Consider the NHANES dataset.
 #### Summary of the variables of interest
 
 ```{r}
-NHANES %>% select(HealthGen) %>% table()
-NHANES %>% select(HHIncomeMid) %>% summary()
+NHANES |> select(HealthGen) |> table()
+NHANES |> select(HHIncomeMid) |> summary()
 ```
 
 
 #### Mean Income broken down by Health
 
 ```{r}
-NH.means <- NHANES %>% 
-  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
-  group_by(HealthGen) %>% 
+NH.means <- NHANES |> 
+  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) |> 
+  group_by(HealthGen) |> 
   summarize(IncMean = mean(HHIncomeMid, na.rm=TRUE), count=n())
 NH.means
 ```
@@ -721,7 +721,7 @@ Are the differences in means simply due to random chance??
 
 
 ```{r warning=FALSE}
-NHANES %>% filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>% 
+NHANES |> filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) |> 
 ggplot(aes(x=HealthGen, y=HHIncomeMid)) + 
   geom_boxplot() + 
   geom_jitter(width=0.1, alpha=.2)
@@ -754,7 +754,7 @@ $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 #### Creating a test statistic
 
 ```{r}
-NHANES %>% select(HHIncomeMid, HealthGen) %>% 
+NHANES |> select(HHIncomeMid, HealthGen) |> 
   filter(!is.na(HealthGen)& !is.na(HHIncomeMid))
 ```
 
@@ -777,17 +777,17 @@ NH.means$count * (NH.means$IncMean - GM)^2
 
 $$SumSqBtwn = \sum_i n_i(\overline{X}_{i\cdot} - \overline{X})^2$$
 ```{r}
-sum(NH.means %>% select(count) %>% pull() * 
-      (NH.means %>% select(IncMean) %>% pull() - GM)^2)
+sum(NH.means |> select(count) |> pull() * 
+      (NH.means |> select(IncMean) |> pull() - GM)^2)
 ```
 
 
 ####  Permuting the data 
 
 ```{r}
-NHANES %>% 
-  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
-  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
+NHANES |> 
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) |>
+  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) |>
   select(HealthGen, HHIncomeMid, IncomePerm) 
 ```
 
@@ -795,11 +795,11 @@ NHANES %>%
 ####  Permuting the data & a new test statistic
 
 ```{r}
-NHANES %>% 
-  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
-  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
-  group_by(HealthGen) %>% 
-  summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
+NHANES |> 
+  filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) |>
+  mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) |>
+  group_by(HealthGen) |> 
+  summarize(IncMeanP = mean(IncomePerm), count=n()) |>
   summarize(teststat = sum(count*(IncMeanP - GM)^2))
 
 ```
@@ -811,11 +811,11 @@ NHANES %>%
 reps <- 1000
 
 SSB_perm_func <- function(.x){
-  NHANES %>% 
-        filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) %>%
-        mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) %>%
-        group_by(HealthGen) %>% 
-        summarize(IncMeanP = mean(IncomePerm), count=n()) %>%
+  NHANES |> 
+        filter(!is.na(HealthGen)& !is.na(HHIncomeMid)) |>
+        mutate(IncomePerm = sample(HHIncomeMid, replace=FALSE)) |>
+        group_by(HealthGen) |> 
+        summarize(IncMeanP = mean(IncomePerm), count=n()) |>
         summarize(teststat = sum(count*(IncMeanP - GM)^2)) 
 }
 
@@ -829,18 +829,18 @@ SSB_perm_val
 
 
 ```{r}
-SSB_obs <- NHANES %>%
-  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) %>% 
-  group_by(HealthGen) %>% 
-  summarize(IncMean = mean(HHIncomeMid), count=n()) %>%
+SSB_obs <- NHANES |>
+  filter(!is.na(HealthGen) & !is.na(HHIncomeMid)) |> 
+  group_by(HealthGen) |> 
+  summarize(IncMean = mean(HHIncomeMid), count=n()) |>
   summarize(obs_teststat = sum(count*(IncMean - GM)^2)) 
 
 SSB_obs 
-sum(SSB_perm_val %>% pull() > SSB_obs %>% pull() ) / reps
+sum(SSB_perm_val |> pull() > SSB_obs |> pull() ) / reps
 ```
 
 ```{r}
-SSB_perm_val %>%
+SSB_perm_val |>
   ggplot(aes(x = teststat)) +
   geom_histogram() + 
   geom_vline(data = SSB_obs, aes(xintercept = obs_teststat), color = "red") +

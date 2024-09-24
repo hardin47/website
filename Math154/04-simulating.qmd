@@ -166,10 +166,10 @@ Using `map()`, the `sum_unif()` function is run `reps` number of times.  Note th
 set.seed(4747)
 reps <- 1000
  
-sim_k_max <- data.frame(row_id = seq(1, reps, 1)) %>%
-  mutate(max_for_EX = map(row_id, sum_unif)) %>%
-  unnest(max_for_EX) %>%
-  mutate(output = rep(c("k", "sum"), reps)) %>%
+sim_k_max <- data.frame(row_id = seq(1, reps, 1)) |>
+  mutate(max_for_EX = map(row_id, sum_unif)) |>
+  unnest(max_for_EX) |>
+  mutate(output = rep(c("k", "sum"), reps)) |>
   pivot_wider(id_cols = row_id, names_from = output, 
               values_from = max_for_EX) 
 
@@ -179,7 +179,7 @@ sim_k_max
 Last, approximate the expected value of $X$ using the law of large numbers... the sample average converges in probability to the expected value.
 
 ```{r}
-sim_k_max %>%
+sim_k_max |>
   summarize(EX = mean(k))
 ```
 
@@ -568,6 +568,7 @@ The example below is taken directly (and mostly verbatim) from a blog by Aaron R
 >But there is one difference: the Blues have a bit more money than the Reds, so they each take the SAT twice, and report only the highest of the two scores to the college. This results in a small but noticeable bump in their average SAT scores, compared to the Reds.
 
 ```{r}
+#| echo: false
 n_obs <- 100000
 n.red <- n_obs*0.99
 n.blue <- n_obs*0.01
@@ -600,25 +601,27 @@ ggplot(college.data, aes(x = grades, y = SAT, color = color)) +
 >So what is the effect of this when we use our reasonable inference procedure? First, lets consider what happens when we learn two different regression models: one for the Blues, and a different one for the Reds. We don't see much difference:
 
 ```{r}
-red.lm = college.data %>%
+#| echo: false
+red.lm = college.data |>
   dplyr::filter(color == "red") %>%
   lm(talent ~ SAT + grades, data = .)
 
-blue.lm = college.data %>%
+blue.lm = college.data |>
   dplyr::filter(color == "blue") %>%
   lm(talent ~ SAT + grades, data = .)
 
 global.lm = college.data %>%
   lm(talent ~ SAT + grades, data = .)
 
-red.lm %>% broom::tidy()
-blue.lm %>% broom::tidy()
-global.lm %>% broom::tidy()
+red.lm |> broom::tidy()
+blue.lm |> broom::tidy()
+global.lm |> broom::tidy()
 ```
 
 
 
 ```{r}
+#| echo: false
 new.reds <- rnorm(n.red, mean = 100, sd = 15)
 new.blues <- rnorm(n.blue, mean = 100, sd = 15)
 
@@ -644,7 +647,7 @@ new.blue.pred <- new.college.data %>%
   filter(color == "blue") %>%
   predict.lm(blue.lm, newdata = .)
 
-new.college.data <- new.college.data %>% 
+new.college.data <- new.college.data |> 
   cbind(predicted = c(new.red.pred, new.blue.pred))
 
 ggplot(new.college.data, aes(x = talent, y = predicted, color = color)) + 
@@ -655,13 +658,13 @@ ggplot(new.college.data, aes(x = talent, y = predicted, color = color)) +
                        guide = "legend")
 
 
-new.college.data <- new.college.data %>% 
+new.college.data <- new.college.data |> 
   mutate(fp = ifelse(talent < 115 & predicted > 115, 1, 0),
          tp = ifelse(talent > 115 & predicted > 115, 1, 0),
          fn = ifelse(talent > 115 & predicted < 115, 1, 0),
          tn = ifelse(talent < 115 & predicted < 115, 1, 0))
 
-error.rates <- new.college.data %>% group_by(color) %>%
+error.rates <- new.college.data |> group_by(color) |>
   summarize(tpr = sum(tp) / (sum(tp) + sum(fn)),
             fpr = sum(fp) / (sum(fp) + sum(tn)),
             fnr = sum(fn) / (sum(fn) + sum(tp)),
@@ -682,6 +685,8 @@ error.rates
 >But you might reasonably object: because we have learned separate models for the Blues and the Reds, we are explicitly making admissions decisions as a function of a student's color! This might sound like a form of discrimination, baked in by the algorithm designer --- and if the two populations represent e.g. racial groups, then its explicitly illegal in a number of settings, including lending.
 
 ```{r}
+#| echo: false
+
 new.pred <- new.college.data %>%
   predict.lm(global.lm, newdata = .)
 
@@ -698,13 +703,13 @@ ggplot(new.college.data, aes(x = talent,
                        guide = "legend")
 
 
-new.college.data <- new.college.data %>% 
+new.college.data <- new.college.data |> 
   mutate(fp = ifelse(talent < 115 & global.predicted > 115, 1, 0),
          tp = ifelse(talent > 115 & global.predicted > 115, 1, 0),
          fn = ifelse(talent > 115 & global.predicted < 115, 1, 0),
          tn = ifelse(talent < 115 & global.predicted < 115, 1, 0))
 
-error.rates <- new.college.data %>% group_by(color) %>%
+error.rates <- new.college.data |> group_by(color) |>
   summarize(tpr = sum(tp) / (sum(tp) + sum(fn)),
             fpr = sum(fp) / (sum(fp) + sum(tn)),
             fnr = sum(fn) / (sum(fn) + sum(tp)),
@@ -743,8 +748,8 @@ error.rates
 
 ```{r}
 t_test_pval <- function(df){
-  t.test(y ~ x1, data = df, var.equal = TRUE) %>%
-    tidy() %>%
+  t.test(y ~ x1, data = df, var.equal = TRUE) |>
+    tidy() |>
     select(estimate, p.value) 
 }
 ```
@@ -757,16 +762,16 @@ set.seed(470)
 reps <- 1000
 n_obs <- 20
 null_data_equal <- 
-  data.frame(row_id = seq(1, n_obs, 1)) %>%
-  slice(rep(row_id, each = reps)) %>%
+  data.frame(row_id = seq(1, n_obs, 1)) |>
+  slice(rep(row_id, each = reps)) |>
   mutate(
     sim_id = rep(1:reps, n_obs),
     x1 = rep(c("group1", "group2"), each = n()/2),
     y = rnorm(n(), mean = 10, 
                sd = rep(c(1,1), each = n()/2))
-  ) %>%
-  arrange(sim_id, row_id) %>%
-  group_by(sim_id) %>%
+  ) |>
+  arrange(sim_id, row_id) |>
+  group_by(sim_id) |>
   nest()
 ```
 
@@ -776,11 +781,11 @@ null_data_equal <-
 (Note: we rejected 4.5% of the null tests, close to 5%.)
 
 ```{r}
-null_data_equal %>% 
-  mutate(t_vals = map(data,t_test_pval)) %>%
-  select(t_vals) %>% 
-  unnest(t_vals) %>%
-  ungroup(sim_id) %>%
+null_data_equal |> 
+  mutate(t_vals = map(data,t_test_pval)) |>
+  select(t_vals) |> 
+  unnest(t_vals) |>
+  ungroup(sim_id) |>
   summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
 
@@ -806,16 +811,16 @@ set.seed(470)
 reps <- 1000
 n_obs <- 20
 null_data_unequal <- 
-  data.frame(row_id = seq(1, n_obs, 1)) %>%
-  slice(rep(row_id, each = reps)) %>%
+  data.frame(row_id = seq(1, n_obs, 1)) |>
+  slice(rep(row_id, each = reps)) |>
   mutate(
     sim_id = rep(1:reps, n_obs),
     x1 = rep(c("group1", "group2"), each = n()/2),
     y = rnorm(n(), mean = 10, 
                sd = rep(c(1,100), each = n()/2))
-  ) %>%
-  arrange(sim_id, row_id) %>%
-  group_by(sim_id) %>%
+  ) |>
+  arrange(sim_id, row_id) |>
+  group_by(sim_id) |>
   nest()
 ```
 
@@ -825,11 +830,11 @@ null_data_unequal <-
 (Note, we rejected 5.7% of the null tests, not too bad!)
 
 ```{r}
-null_data_unequal %>% 
-  mutate(t_vals = map(data,t_test_pval)) %>%
-  select(t_vals) %>% 
-  unnest(t_vals) %>%
-  ungroup(sim_id) %>%
+null_data_unequal |> 
+  mutate(t_vals = map(data,t_test_pval)) |>
+  select(t_vals) |> 
+  unnest(t_vals) |>
+  ungroup(sim_id) |>
   summarize(type1error_rate = sum(p.value < 0.05)/reps)
 ```
 
@@ -862,7 +867,7 @@ n_obs <- 100; reps <- 1000
   x2 <- runif(n_obs, min=-1, max=1)
   y <- beta0 + beta1*x1 + beta2*x2 + rnorm(n_obs, mean=0, sd = 1)
   
-data.frame(x1value = as.factor(x1),x2value = x2,yvalue = y) %>%
+data.frame(x1value = as.factor(x1),x2value = x2,yvalue = y) |>
   ggplot(aes(x=x2value, y = yvalue, color=x1value)) + 
   geom_point() +
   geom_smooth(method = "lm", se=FALSE) + 
@@ -876,12 +881,12 @@ data.frame(x1value = as.factor(x1),x2value = x2,yvalue = y) %>%
 Did we capture the true parameter in the CI?  YES!
 
 ```{r}
-CI <- lm(y~x1+x2) %>% tidy(conf.int=TRUE) %>% data.frame()
+CI <- lm(y~x1+x2) |> tidy(conf.int=TRUE) |> data.frame()
 CI
 
-CI %>%
-  filter(term == "x2") %>%
-  select(term, estimate, conf.low, conf.high) %>%
+CI |>
+  filter(term == "x2") |>
+  select(term, estimate, conf.low, conf.high) |>
   mutate(inside = between(beta2, conf.low, conf.high))
 ```
 
@@ -890,25 +895,25 @@ What if we want to repeat lots of times...
 **FUNCTION**
 ```{r}
 beta_coef <- function(df){
-  lm(y ~ x1 + x2, data = df) %>%
-    tidy(conf.int = TRUE) %>%
-    filter(term == "x2") %>%
+  lm(y ~ x1 + x2, data = df) |>
+    tidy(conf.int = TRUE) |>
+    filter(term == "x2") |>
     select(estimate, conf.low, conf.high, p.value) 
 }
 ```
 
 **DATA**
 ```{r}
-eqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
-  slice(rep(row_id, each = reps)) %>%
+eqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) |>
+  slice(rep(row_id, each = reps)) |>
   mutate(
     sim_id = rep(1:reps, n_obs),
     x1 = rep(c(0,1), each = n()/2),
     x2 = runif(n(), min = -1, max = 1),
     y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, sd = 1)
-  ) %>%
-  arrange(sim_id, row_id) %>%
-  group_by(sim_id) %>%
+  ) |>
+  arrange(sim_id, row_id) |>
+  group_by(sim_id) |>
   nest()
 
 eqvar_data
@@ -919,11 +924,11 @@ eqvar_data
 We captured the true slope parameter in 95.5% of the confidence intervals (i.e., 95.5% of the datasets created confidence intervals that captured the true parameter).
 
 ```{r}
-eqvar_data %>% 
-  mutate(b2_vals = map(data, beta_coef)) %>%
-  select(b2_vals) %>% 
-  unnest(b2_vals) %>%
-  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+eqvar_data |> 
+  mutate(b2_vals = map(data, beta_coef)) |>
+  select(b2_vals) |> 
+  unnest(b2_vals) |>
+  summarize(capture = between(beta2, conf.low, conf.high)) |>
   summarize(capture_rate = sum(capture)/reps)
 ```
 
@@ -946,7 +951,7 @@ reps <- 1000
   y <- beta0 + beta1*x1 + beta2*x2 + 
              rnorm(n_obs, mean=0, sd = 1 + x1 + 10*abs(x2))
 
-data.frame(x1value = as.factor(x1),x2value = x2,yvalue = y) %>%
+data.frame(x1value = as.factor(x1),x2value = x2,yvalue = y) |>
   ggplot(aes(x=x2value, y = yvalue, color=x1value)) + 
   geom_point() +
   geom_smooth(method = "lm", se=FALSE)
@@ -958,26 +963,26 @@ What if we want to repeat lots of times...
 **FUNCTION**
 ```{r}
 beta_coef <- function(df){
-  lm(y ~ x1 + x2, data = df) %>%
-    tidy(conf.int = TRUE) %>%
-    filter(term == "x2") %>%
+  lm(y ~ x1 + x2, data = df) |>
+    tidy(conf.int = TRUE) |>
+    filter(term == "x2") |>
     select(estimate, conf.low, conf.high, p.value) 
 }
 ```
 
 **DATA**
 ```{r}
-uneqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) %>%
-  slice(rep(row_id, each = reps)) %>%
+uneqvar_data <- data.frame(row_id = seq(1, n_obs, 1)) |>
+  slice(rep(row_id, each = reps)) |>
   mutate(
     sim_id = rep(1:reps, n_obs),
     x1 = rep(c(0,1), each = n()/2),
     x2 = runif(n(), min = -1, max = 1),
     y = beta0 + beta1*x1 + beta2*x2 + rnorm(n(), mean = 0, 
                                             sd = 1 + x1 + 10*abs(x2))
-  ) %>%
-  arrange(sim_id, row_id) %>%
-  group_by(sim_id) %>%
+  ) |>
+  arrange(sim_id, row_id) |>
+  group_by(sim_id) |>
   nest()
 
 uneqvar_data
@@ -988,11 +993,11 @@ uneqvar_data
 Using the data with unequal variability, we only captured the slope parameter about 88% of the time.
 
 ```{r}
-uneqvar_data %>% 
-  mutate(b2_vals = map(data, beta_coef)) %>%
-  select(b2_vals) %>% 
-  unnest(b2_vals) %>%
-  summarize(capture = between(beta2, conf.low, conf.high)) %>%
+uneqvar_data |> 
+  mutate(b2_vals = map(data, beta_coef)) |>
+  select(b2_vals) |> 
+  unnest(b2_vals) |>
+  summarize(capture = between(beta2, conf.low, conf.high)) |>
   summarize(capture_rate = sum(capture)/reps)
 ```
 
@@ -1030,10 +1035,10 @@ for(i in 1:reps){
 
 update_rv <- function(x){(a*x + b) %% m }
 
-rep(xval, reps) %>%
+rep(xval, reps) |>
   map(~ accumulate(., ~ ((a*.x + b) %% m))/m )
 
-data.frame(uniformRVs = unif.val) %>%
+data.frame(uniformRVs = unif.val) |>
   ggplot(aes(x = uniformRVs)) + geom_histogram(bins = 25)
 ```
 

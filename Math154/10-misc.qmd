@@ -103,7 +103,7 @@ func1 <- function(reps){
 }
 
 
-clusterApply(cl, rep(50,W), fun = func1) %>% head(3)
+clusterApply(cl, rep(50,W), fun = func1) |> head(3)
 
 stopCluster(cl)
 ```
@@ -117,7 +117,7 @@ cl <- parallel::makeCluster(P, setup_strategy = "sequential")
 doParallel::registerDoParallel(cl)
 foreach(reps = rep(50, 100), .combine = 'c') %dopar% {
   max(rcauchy(reps))
-       } %>% head(3)
+       } |> head(3)
 
 stopCluster(cl)
 ```
@@ -130,8 +130,8 @@ A slightly less embarrassingly parallel example comes with bootstrapping.  Below
 ```{r}
 data(iris)
 
-iris_bs <- iris %>%
-  filter(Species == "virginica") %>%
+iris_bs <- iris |>
+  filter(Species == "virginica") |>
   select(Petal.Length)
 ```
 
@@ -165,17 +165,17 @@ sparklyr::spark_install()
 sc <- spark_connect(master = "local")
 
 n_sim = 100
-iris_samps <- iris %>% dplyr::filter(Species == "virginica") %>%
-  sapply(rep.int, times=n_sim) %>% cbind(replicate = rep(1:n_sim, each = 50)) %>% 
-  data.frame() %>%
-  dplyr::group_by(replicate) %>%
+iris_samps <- iris |> dplyr::filter(Species == "virginica") |>
+  sapply(rep.int, times=n_sim) |> cbind(replicate = rep(1:n_sim, each = 50)) |> 
+  data.frame() |>
+  dplyr::group_by(replicate) |>
   dplyr::sample_n(50, replace = TRUE)
 
 iris_samps_tbl <- copy_to(sc, iris_samps)
 
-iris_samps_tbl %>% 
+iris_samps_tbl |> 
   spark_apply(function(x) {mean(x$Petal_Length)}, 
-    group_by = "replicate") %>%
+    group_by = "replicate") |>
   ggplot(aes(x = result)) + geom_histogram(bins = 20) + labs(title = "Histogram of 100 Bootstrapped Means using sparklyr")
 
 spark_disconnect(sc)
@@ -186,8 +186,8 @@ For our particular application, the adept reader has probably noticed that the a
 ```{r}
 #| eval: FALSE
 
-iris_samps %>% dplyr::group_by(replicate) %>%
-  dplyr::summarize(result = mean(Petal.Length)) %>%
+iris_samps |> dplyr::group_by(replicate) |>
+  dplyr::summarize(result = mean(Petal.Length)) |>
   ggplot(aes(x = result)) + geom_histogram(bins = 25) + labs(title = "Histogram of 100 Bootstrapped Means using dplyr")
 ```
 
@@ -310,16 +310,16 @@ glimpse(mostRevisions)
 ```
 
 ```{r}
-clean <- mostRevisions %>% 
-  filter(!grepl("Wikipedia|User|Template|Talk", title)) %>%
-  mutate(title = fct_reorder(title, n)) %>% #to sort levels
+clean <- mostRevisions |> 
+  filter(!grepl("Wikipedia|User|Template|Talk", title)) |>
+  mutate(title = fct_reorder(title, n)) |> #to sort levels
   glimpse()
 ```
 
 Let's plot the top 10 entries. 
 
 ```{r}
-ggplot(clean %>% head(10), aes(x = title, y = n, fill = n)) + 
+ggplot(clean |> head(10), aes(x = title, y = n, fill = n)) + 
   geom_bar(stat = "identity") + 
   labs(x = "Article Title",
        y = "Number of Revisions",
@@ -583,7 +583,7 @@ Subject <- tbl(con, "Subjects")
 We  explore the `PI_Info` table using the `collect()` function used to force computation on the database (and return the results).  One attractive aspect of database systems is that they feature [*lazy evaluation*](https://en.wikipedia.org/wiki/Lazy_evaluation), where computation is optimized and postponed as long as possible.  
 
 ```{r eval = FALSE}
-PI_Info %>% collect() %>% data.frame()   
+PI_Info |> collect() |> data.frame()   
 # be careful with collect() when dealing with large tables!
 ```
 
@@ -591,14 +591,14 @@ Note how the number of rows is unknown (`??` at the top of the output above) for
 
 Similarly, we can explore the `Subjects` table.
 ```{r eval = FALSE}
-#Subject  %>% summarise(total = n())
-Subject %>% collect()  # be careful with collect() with large tables!
+#Subject  |> summarise(total = n())
+Subject |> collect()  # be careful with collect() with large tables!
 ```
 
 Let's explore the `Measurements` table.
 ```{r eval = FALSE}
-#Measurements %>% summarise(total = n())
-Measurements %>% collect()
+#Measurements |> summarise(total = n())
+Measurements |> collect()
 ```
 
 There are more than a quarter million observations.  
@@ -609,9 +609,9 @@ Arbitrarily we choose to collect data from subject number three.
 
 ```{r eval = FALSE}
 onesubj <- 
-  Measurements %>% 
-  filter(Identifier == "Rosowski_2012", Sub_Number == 3) %>%
-  collect %>%
+  Measurements |> 
+  filter(Identifier == "Rosowski_2012", Sub_Number == 3) |>
+  collect |>
   mutate(SessionNum = as.factor(Session))
 head(onesubj)
 ```
@@ -802,13 +802,13 @@ In many cases, you will want to use the incredibly useful and tidy set of functi
 ```{r}
 library(Stat2Data)
 data(RailsTrails)
-RailsTrails <- RailsTrails %>% 
+RailsTrails <- RailsTrails |> 
   select(HouseNum, Bedrooms, Price2014, StreetName) 
-RailsTrails %>% head()
-RailsTrails %>%
-  mutate(first_piece = stringr::word(StreetName, start = 1)) %>% head()
-RailsTrails %>%
-  mutate(last_piece = stringr::word(StreetName, start = -1)) %>% head()
+RailsTrails |> head()
+RailsTrails |>
+  mutate(first_piece = stringr::word(StreetName, start = 1)) |> head()
+RailsTrails |>
+  mutate(last_piece = stringr::word(StreetName, start = -1)) |> head()
 ```
 
 #### An example from my work {-}
@@ -829,7 +829,7 @@ allCounts$GeneidBackup = allCounts$Geneid
 First, it is important to identify which are IGR, CDS, and anti-sense.
 
 ```{r}
-allCounts <- allCounts %>% tidyr::separate(Geneid, c("feature", "rest"), sep="[:]")
+allCounts <- allCounts |> tidyr::separate(Geneid, c("feature", "rest"), sep="[:]")
 allCounts
 ```
 
@@ -837,8 +837,8 @@ allCounts
 
 We keep only the IGR and AS_IGR strings, and we separate the two bookends.  Note, the separation comes at the backslash.
 ```{r}
-igr <- allCounts %>% filter(feature %in% c("IGR", "AS_IGR"))
-igr <- igr %>% tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
+igr <- allCounts |> filter(feature %in% c("IGR", "AS_IGR"))
+igr <- igr |> tidyr::separate(GeneidBackup, c("Geneid1", "Geneid2"), sep = "[/]")
 names(igr)
 igr
 ```
@@ -878,9 +878,9 @@ igr$start.bnum <- dplyr::case_when(
 igr$end.bnum <- dplyr::case_when(
   igr$feature2 == "CDS" ~ stringr::str_extract(igr$Geneid2, bnum),
   TRUE ~ "none")
-igr <- igr %>% tidyr::separate(start.gene, into = c("comma", "start.gene"), sep = "[,]") %>% 
-  dplyr::select(-comma) %>% 
-  tidyr::separate(end.gene, into = c("comma", "end.gene"), sep = "[,]") %>% 
+igr <- igr |> tidyr::separate(start.gene, into = c("comma", "start.gene"), sep = "[,]") |> 
+  dplyr::select(-comma) |> 
+  tidyr::separate(end.gene, into = c("comma", "end.gene"), sep = "[,]") |> 
   dplyr::select(-comma)
 names(igr)
 igr

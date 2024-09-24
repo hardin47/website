@@ -392,10 +392,10 @@ penguin_test <- testing(penguin_split)
 penguin_recipe <-
   recipe(body_mass_g ~ species + island + bill_length_mm + 
            bill_depth_mm + flipper_length_mm + sex + year,
-         data = penguin_train) %>%
-  step_mutate(year = as.factor(year)) %>%
-  step_unknown(sex, new_level = "unknown") %>%
-  step_relevel(sex, ref_level = "female") %>%
+         data = penguin_train) |>
+  step_mutate(year = as.factor(year)) |>
+  step_unknown(sex, new_level = "unknown") |>
+  step_relevel(sex, ref_level = "female") |>
   update_role(island, new_role = "id variable")
 ```
 
@@ -407,7 +407,7 @@ summary(penguin_recipe)
 #### 3. select a model {-}
 
 ```{r}
-penguin_lm <- linear_reg() %>%
+penguin_lm <- linear_reg() |>
   set_engine("lm")
 ```
 
@@ -418,8 +418,8 @@ penguin_lm
 #### 4. Create a workflow {-}
 
 ```{r}
-penguin_wflow <- workflow() %>%
-  add_model(penguin_lm) %>%
+penguin_wflow <- workflow() |>
+  add_model(penguin_lm) |>
   add_recipe(penguin_recipe)
 ```
 
@@ -430,13 +430,13 @@ penguin_wflow
 #### 5. Fit the model {-}
 
 ```{r}
-penguin_fit <- penguin_wflow %>%
+penguin_fit <- penguin_wflow |>
   fit(data = penguin_train)
 ```
 
 
 ```{r}
-penguin_fit %>% tidy()
+penguin_fit |> tidy()
 ```
 
 #### 6. Cross validation {-}
@@ -535,8 +535,8 @@ penguin_test <- testing(penguin_split)
 penguin_knn_recipe <-
   recipe(species ~ body_mass_g + island + bill_length_mm + 
            bill_depth_mm + flipper_length_mm,
-         data = penguin_train) %>%
-  update_role(island, new_role = "id variable") %>%
+         data = penguin_train) |>
+  update_role(island, new_role = "id variable") |>
   step_normalize(all_predictors())
 
 summary(penguin_knn_recipe)
@@ -546,8 +546,8 @@ summary(penguin_knn_recipe)
 
 (note that we've used the default number of neighbors (here $k=7$).)
 ```{r}
-penguin_knn <- nearest_neighbor() %>%
-  set_engine("kknn") %>%
+penguin_knn <- nearest_neighbor() |>
+  set_engine("kknn") |>
   set_mode("classification")
 
 penguin_knn
@@ -556,8 +556,8 @@ penguin_knn
 
 #### 4. Create a workflow {-}
 ```{r}
-penguin_knn_wflow <- workflow() %>%
-  add_model(penguin_knn) %>%
+penguin_knn_wflow <- workflow() |>
+  add_model(penguin_knn) |>
   add_recipe(penguin_knn_recipe)
 
 penguin_knn_wflow
@@ -567,16 +567,16 @@ penguin_knn_wflow
 #### 5. Fit (/ predict)  {-}
 
 ```{r}
-penguin_knn_fit <- penguin_knn_wflow %>%
+penguin_knn_fit <- penguin_knn_wflow |>
   fit(data = penguin_train)
 ```
 
 For the next R code chunk break it down into pieces -- that is, run each line one at a time.
 ```{r}
-penguin_knn_fit %>% 
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
-  metrics(truth = species, estimate = .pred_class) %>%
+penguin_knn_fit |> 
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
+  metrics(truth = species, estimate = .pred_class) |>
   filter(.metric == "accuracy")
 ```
 
@@ -614,8 +614,8 @@ penguin_vfold <- vfold_cv(penguin_train,
 
 Now the knn model uses `tune()` to indicate that we actually don't know how many neighbors to use.
 ```{r}
-penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
-  set_engine("kknn") %>%
+penguin_knn_tune <- nearest_neighbor(neighbors = tune()) |>
+  set_engine("kknn") |>
   set_mode("classification")
 ```
 
@@ -624,8 +624,8 @@ penguin_knn_tune <- nearest_neighbor(neighbors = tune()) %>%
 This time, use the model that has not set the number of neighbors.
 
 ```{r}
-penguin_knn_wflow_tune <- workflow() %>%
-  add_model(penguin_knn_tune) %>%
+penguin_knn_wflow_tune <- workflow() |>
+  add_model(penguin_knn_tune) |>
   add_recipe(penguin_knn_recipe)
 ```
 
@@ -638,10 +638,10 @@ The model is fit to all three of the folds created above for each value of $k$ i
 k_grid <- data.frame(neighbors = seq(1, 15, by = 4))
 k_grid
 
-penguin_knn_wflow_tune %>%
+penguin_knn_wflow_tune |>
   tune_grid(resamples = penguin_vfold, 
-           grid = k_grid) %>%
-  collect_metrics() %>%
+           grid = k_grid) |>
+  collect_metrics() |>
   filter(.metric == "accuracy")
 ```
 
@@ -654,8 +654,8 @@ Using $k$ = 9, the model is re-trained on the training data and tested on the te
 ##### 3. select a model {-}
 
 ```{r}
-penguin_knn_final <- nearest_neighbor(neighbors = 9) %>%
-  set_engine("kknn") %>%
+penguin_knn_final <- nearest_neighbor(neighbors = 9) |>
+  set_engine("kknn") |>
   set_mode("classification")
 
 penguin_knn_final
@@ -664,8 +664,8 @@ penguin_knn_final
 ##### 4. create a workflow {-}
 
 ```{r}
-penguin_knn_wflow_final <- workflow() %>%
-  add_model(penguin_knn_final) %>%
+penguin_knn_wflow_final <- workflow() |>
+  add_model(penguin_knn_final) |>
   add_recipe(penguin_knn_recipe)
 
 penguin_knn_wflow_final
@@ -673,17 +673,17 @@ penguin_knn_wflow_final
 
 ##### 5. fit the model {-}
 ```{r}
-penguin_knn_fit_final <- penguin_knn_wflow_final %>%
+penguin_knn_fit_final <- penguin_knn_wflow_final |>
   fit(data = penguin_train)
 ```
 
 
 ##### 6. validate the model {-}
 ```{r}
-penguin_knn_fit_final %>% 
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
-  metrics(truth = species, estimate = .pred_class) %>%
+penguin_knn_fit_final |> 
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
+  metrics(truth = species, estimate = .pred_class) |>
   filter(.metric == "accuracy")
 ```
 
@@ -930,7 +930,7 @@ For technical reasons (e.g., see [here](https://github.com/tidymodels/TMwR/issue
 
 ```{r}
 real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
-                          header=TRUE) %>%
+                          header=TRUE) |>
   mutate(logValue = log(MedianHouseValue))
 
 # partition
@@ -944,17 +944,17 @@ house_cart_recipe <-
   recipe(logValue ~ Longitude + Latitude ,
          data = house_train)
 # model
-house_cart <- decision_tree() %>%
-  set_engine("rpart") %>%
+house_cart <- decision_tree() |>
+  set_engine("rpart") |>
   set_mode("regression")
 
 # workflow
-house_cart_wflow <- workflow() %>%
-  add_model(house_cart) %>%
+house_cart_wflow <- workflow() |>
+  add_model(house_cart) |>
   add_recipe(house_cart_recipe)
 
 # fit
-house_cart_fit <- house_cart_wflow %>%
+house_cart_fit <- house_cart_wflow |>
   fit(data = house_train)
 ```
 
@@ -970,7 +970,7 @@ The following scatter plot can only be made when the CART is built using two num
 ```{r}
 #remotes::install_github("grantmcdermott/parttree")
 library(parttree)
-house_train %>%
+house_train |>
   ggplot(aes(y = Longitude, x = Latitude)) + 
   geom_parttree(data = house_cart_fit, alpha = 0.2) +
   geom_point(aes(color = MedianHouseValue)) 
@@ -983,9 +983,9 @@ house_train %>%
 As seen in the image above, there are only 12 region so there are only 12 predicted values.  The plot below seems a little odd at first glance, but it should make sense after careful consideration of what is the outcome measurement and what is the predicted value.
 
 ```{r}
-house_cart_fit %>%
-  predict(new_data = house_test) %>%
-  cbind(house_test) %>%
+house_cart_fit |>
+  predict(new_data = house_test) |>
+  cbind(house_test) |>
   ggplot() +
   geom_point(aes(x = logValue, y = .pred), alpha = 0.1)
 ```
@@ -1009,7 +1009,7 @@ Including all the variables, not only the latitude and longitude.  Note the pred
 
 ```{r}
 real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
-                          header=TRUE) %>%
+                          header=TRUE) |>
   mutate(logValue = log(MedianHouseValue))
 
 # partition
@@ -1021,28 +1021,28 @@ house_test <- testing(house_split)
 # recipe
 house_cart_full_recipe <-
   recipe(logValue ~ . ,
-         data = house_train) %>%
+         data = house_train) |>
   update_role(MedianHouseValue, new_role = "id variable")
 
 # model
-house_cart <- decision_tree() %>%
-  set_engine("rpart") %>%
+house_cart <- decision_tree() |>
+  set_engine("rpart") |>
   set_mode("regression")
 
 # workflow
-house_cart_full_wflow <- workflow() %>%
-  add_model(house_cart) %>%
+house_cart_full_wflow <- workflow() |>
+  add_model(house_cart) |>
   add_recipe(house_cart_full_recipe)
 
 # fit
-house_cart_full_fit <- house_cart_full_wflow %>%
+house_cart_full_fit <- house_cart_full_wflow |>
   fit(data = house_train)
 ```
 
 ```{r}
-house_cart_full_fit %>%
-  predict(new_data = house_test) %>%
-  cbind(house_test) %>%
+house_cart_full_fit |>
+  predict(new_data = house_test) |>
+  cbind(house_test) |>
   ggplot() +
   geom_point(aes(x = logValue, y = .pred), alpha = 0.01)
 ```
@@ -1052,7 +1052,7 @@ house_cart_full_fit %>%
 
 ```{r}
 real.estate <- read.table("http://pages.pomona.edu/~jsh04747/courses/math154/CA_housedata.txt", 
-                          header=TRUE) %>%
+                          header=TRUE) |>
   mutate(logValue = log(MedianHouseValue))
 
 # partition
@@ -1069,21 +1069,21 @@ cart_grid <- expand.grid(tree_depth = seq(2, 20, by = 2))
 # recipe
 house_cart_tune_recipe <-
   recipe(logValue ~ .,
-         data = house_train) %>%
+         data = house_train) |>
   update_role(MedianHouseValue, new_role = "id variable")
 
 # model
-house_cart_tune <- decision_tree(tree_depth = tune()) %>%
-  set_engine("rpart") %>%
+house_cart_tune <- decision_tree(tree_depth = tune()) |>
+  set_engine("rpart") |>
   set_mode("regression")
 
 # workflow
-house_cart_tune_wflow <- workflow() %>%
-  add_model(house_cart_tune) %>%
+house_cart_tune_wflow <- workflow() |>
+  add_model(house_cart_tune) |>
   add_recipe(house_cart_tune_recipe)
 
 # tuning / fit
-house_tuned <- house_cart_tune_wflow %>%
+house_tuned <- house_cart_tune_wflow |>
   tune_grid(resamples = house_vfold, 
            grid = cart_grid) 
 
@@ -1093,13 +1093,13 @@ house_tuned <- house_cart_tune_wflow %>%
 
 
 ```{r}
-house_tuned %>% collect_metrics() %>%
+house_tuned |> collect_metrics() |>
   filter()
 
-house_tuned %>%
+house_tuned |>
   autoplot(metric = "rmse")
 
-house_tuned %>% 
+house_tuned |> 
   select_best(metric = "rmse")
 ```
 **Final model + prediction on test data**
@@ -1111,21 +1111,21 @@ Turns out that the tree does "better" by being more complex -- why is that?  The
 # recipe
 house_cart_final_recipe <-
   recipe(logValue ~ .,
-         data = house_train) %>%
+         data = house_train) |>
   update_role(MedianHouseValue, new_role = "id variable")
 
 # model
-house_cart_final <- decision_tree(tree_depth = 6) %>%
-  set_engine("rpart") %>%
+house_cart_final <- decision_tree(tree_depth = 6) |>
+  set_engine("rpart") |>
   set_mode("regression")
 
 # workflow
-house_cart_final_wflow <- workflow() %>%
-  add_model(house_cart_final) %>%
+house_cart_final_wflow <- workflow() |>
+  add_model(house_cart_final) |>
   add_recipe(house_cart_final_recipe)
 
 # tuning / fit
-house_final <- house_cart_final_wflow %>%
+house_final <- house_cart_final_wflow |>
   fit(data = house_train)
 
 ```
@@ -1138,9 +1138,9 @@ house_final
 ```
 
 ```{r}
-house_final %>% 
-  predict(new_data = house_test) %>%
-  cbind(house_test) %>%
+house_final |> 
+  predict(new_data = house_test) |>
+  cbind(house_test) |>
   ggplot() +
   geom_point(aes(x = logValue, y = .pred), alpha = 0.1) + 
   labs(x = "log of the Median House Value",
@@ -1346,7 +1346,7 @@ library(tidymodels)
 library(palmerpenguins)
 data(penguins)
 
-penguins <- penguins %>%
+penguins <- penguins |>
   drop_na()
 
 # partition
@@ -1358,19 +1358,19 @@ penguin_test <- testing(penguin_split)
 # recipe
 penguin_rf_recipe <-
   recipe(body_mass_g ~ . ,
-         data = penguin_train) %>%
-  step_unknown(sex, new_level = "unknown") %>%
+         data = penguin_train) |>
+  step_unknown(sex, new_level = "unknown") |>
   step_mutate(year = as.factor(year)) 
 
 #model
 penguin_rf <- rand_forest(mtry = tune(),
-                           trees = tune()) %>%
-  set_engine("ranger", importance = "permutation") %>%
+                           trees = tune()) |>
+  set_engine("ranger", importance = "permutation") |>
   set_mode("regression")
 
 # workflow
-penguin_rf_wflow <- workflow() %>%
-  add_model(penguin_rf) %>%
+penguin_rf_wflow <- workflow() |>
+  add_model(penguin_rf) |>
   add_recipe(penguin_rf_recipe)
 
 # CV
@@ -1385,7 +1385,7 @@ penguin_grid <- grid_regular(mtry(range = c(2,7)),
 
 # tune
 penguin_rf_tune <- 
-  penguin_rf_wflow %>%
+  penguin_rf_wflow |>
   tune_grid(resamples = penguin_folds,
             grid = penguin_grid)
 
@@ -1395,9 +1395,9 @@ select_best(penguin_rf_tune, metric = "rmse")
 Which `mtry` and number of trees?
 
 ```{r}
-penguin_rf_tune %>%
-  collect_metrics() %>%
-  filter(.metric == "rmse") %>%
+penguin_rf_tune |>
+  collect_metrics() |>
+  filter(.metric == "rmse") |>
   ggplot() + 
   geom_line(aes(x = trees, y = mean, color = as.factor(mtry)))
 ```
@@ -1414,9 +1414,9 @@ penguin_rf_best
 
 
 penguin_rf_final <-
-  workflow() %>%
-  add_model(penguin_rf_best) %>%
-  add_recipe(penguin_rf_recipe) %>%
+  workflow() |>
+  add_model(penguin_rf_best) |>
+  add_recipe(penguin_rf_recipe) |>
   fit(data = penguin_train)
 
 penguin_rf_final
@@ -1426,9 +1426,9 @@ Predict the test data:
 
 
 ```{r}
-penguin_rf_final %>%
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
+penguin_rf_final |>
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
   ggplot() +
   geom_point(aes(x = body_mass_g, y = .pred)) + 
   geom_abline(intercept = 0, slope = 1)
@@ -1442,8 +1442,8 @@ In order to get the variable importance, you need to specify importance within t
 ```{r fig.height = 5}
 library(vip)
 
-penguin_rf_final %>%
-  extract_fit_parsnip() %>%
+penguin_rf_final |>
+  extract_fit_parsnip() |>
   vip(geom = "point")
 ```
 
@@ -1868,7 +1868,7 @@ We'll go back to the penguin data.  As a first pass, let's use SVM to distinguis
 library(tidymodels)
 library(palmerpenguins)
 
-penguins <- penguins %>%
+penguins <- penguins |>
   drop_na()
 
 set.seed(47)
@@ -1883,21 +1883,21 @@ penguin_test <- testing(penguin_split)
 # recipe
 penguin_svm_recipe <-
   recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
-           body_mass_g, data = penguin_train) %>%
+           body_mass_g, data = penguin_train) |>
   step_normalize(all_predictors())
 
 summary(penguin_svm_recipe)
 
 # model
-penguin_svm_lin <- svm_linear() %>%
-  set_engine("LiblineaR") %>%
+penguin_svm_lin <- svm_linear() |>
+  set_engine("LiblineaR") |>
   set_mode("classification")
 
 penguin_svm_lin
 
 # workflow
-penguin_svm_lin_wflow <- workflow() %>%
-  add_model(penguin_svm_lin) %>%
+penguin_svm_lin_wflow <- workflow() |>
+  add_model(penguin_svm_lin) |>
   add_recipe(penguin_svm_recipe)
 
 penguin_svm_lin_wflow
@@ -1905,7 +1905,7 @@ penguin_svm_lin_wflow
 
 # fit
 penguin_svm_lin_fit <- 
-  penguin_svm_lin_wflow %>%
+  penguin_svm_lin_wflow |>
   fit(data = penguin_train)
 
 penguin_svm_lin_fit 
@@ -1918,22 +1918,22 @@ penguin_svm_lin_fit
 # recipe
 penguin_svm_recipe <-
   recipe(sex ~ bill_length_mm + bill_depth_mm + flipper_length_mm +
-           body_mass_g, data = penguin_train) %>%
+           body_mass_g, data = penguin_train) |>
   step_normalize(all_predictors())
 
 summary(penguin_svm_recipe)
 
 # model
 penguin_svm_rbf <- svm_rbf(cost = tune(),
-                           rbf_sigma = tune()) %>%
-  set_engine("kernlab") %>%
+                           rbf_sigma = tune()) |>
+  set_engine("kernlab") |>
   set_mode("classification")
 
 penguin_svm_rbf
 
 # workflow
-penguin_svm_rbf_wflow <- workflow() %>%
-  add_model(penguin_svm_rbf) %>%
+penguin_svm_rbf_wflow <- workflow() |>
+  add_model(penguin_svm_rbf) |>
   add_recipe(penguin_svm_recipe)
 
 penguin_svm_rbf_wflow
@@ -1954,7 +1954,7 @@ penguin_grid
 # tune
 # this takes a few minutes
 penguin_svm_rbf_tune <- 
-  penguin_svm_rbf_wflow %>%
+  penguin_svm_rbf_wflow |>
   tune_grid(resamples = penguin_folds,
             grid = penguin_grid)
 
@@ -1964,16 +1964,16 @@ penguin_svm_rbf_tune
 ##### What is best? {-}
 
 ```{r}
-penguin_svm_rbf_tune %>%
-  collect_metrics() %>%
-  filter(.metric == "accuracy") %>%
+penguin_svm_rbf_tune |>
+  collect_metrics() |>
+  filter(.metric == "accuracy") |>
   ggplot() + 
   geom_line(aes(color = as.factor(cost), y = mean, x = rbf_sigma)) +
   labs(color = "Cost")
 ```
 
 ```{r}
-penguin_svm_rbf_tune %>%
+penguin_svm_rbf_tune |>
   autoplot()
 ```
 
@@ -1988,9 +1988,9 @@ penguin_svm_rbf_best
 
 
 penguin_svm_rbf_final <-
-  workflow() %>%
-  add_model(penguin_svm_rbf_best) %>%
-  add_recipe(penguin_svm_recipe) %>%
+  workflow() |>
+  add_model(penguin_svm_rbf_best) |>
+  add_recipe(penguin_svm_recipe) |>
   fit(data = penguin_train)
 ```
 
@@ -1999,24 +1999,24 @@ penguin_svm_rbf_final <-
 
 ```{r}
 library(yardstick)
-penguin_svm_rbf_final %>%
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
-  select(sex, .pred_class) %>%
+penguin_svm_rbf_final |>
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
+  select(sex, .pred_class) |>
   table()
 
-penguin_svm_rbf_final %>%
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
+penguin_svm_rbf_final |>
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
   conf_mat(sex, .pred_class)
 
 # https://yardstick.tidymodels.org/articles/metric-types.html
 class_metrics <- yardstick::metric_set(accuracy,sens,
                                        spec, f_meas)
 
-penguin_svm_rbf_final %>%
-  predict(new_data = penguin_test) %>%
-  cbind(penguin_test) %>%
+penguin_svm_rbf_final |>
+  predict(new_data = penguin_test) |>
+  cbind(penguin_test) |>
   class_metrics(truth = sex, estimate = .pred_class)
 ```
 

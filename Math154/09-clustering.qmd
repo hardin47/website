@@ -373,14 +373,14 @@ library(tidymodels)
 library(palmerpenguins)
 data(penguins)
 
-penguins_h <- penguins %>%
-  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+penguins_h <- penguins |>
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) |>
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) |>
   mutate(across(bill_length_mm:body_mass_g, scale))
 
 set.seed(47)
-penguin_hclust <- penguins_h %>%
-  dist() %>%
+penguin_hclust <- penguins_h |>
+  dist() |>
   hclust(method = "complete")
 
 penguin_hclust
@@ -519,17 +519,17 @@ norm_clust <- data.frame(
   x1 = rnorm(1000, 0, 15),
   x2 = c(rnorm(500, 5, 1), rnorm(500, 0, 1)))
 
-norm_clust %>%
-  kmeans(centers = 2) %>%
-  augment(norm_clust) %>%
+norm_clust |>
+  kmeans(centers = 2) |>
+  augment(norm_clust) |>
   ggplot() + 
   geom_point(aes(x = x1, y = x2, color = .cluster)) +
   ggtitle("k-means (k=2) on raw data")
 
-norm_clust %>%
-  mutate(across(everything(), scale)) %>%
-  kmeans(centers = 2) %>%
-  augment(norm_clust) %>%
+norm_clust |>
+  mutate(across(everything(), scale)) |>
+  kmeans(centers = 2) |>
+  augment(norm_clust) |>
   ggplot() + 
   geom_point(aes(x = x1, y = x2, color = .cluster)) +
   ggtitle("k-means (k=2) on normalized / scaled data")
@@ -559,13 +559,13 @@ library(tidymodels)
 library(palmerpenguins)
 data(penguins)
 
-penguins_km <- penguins %>%
-  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
+penguins_km <- penguins |>
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) |>
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) |>
   mutate(across(bill_length_mm:body_mass_g, scale))
 
 set.seed(47)
-penguin_kclust <- penguins_km %>%
+penguin_kclust <- penguins_km |>
   kmeans(centers = 3)
 
 penguin_kclust
@@ -574,19 +574,19 @@ penguin_kclust
 The function `augment` works at the observation level:
 
 ```{r}
-penguin_kclust %>% augment(penguins_km)
+penguin_kclust |> augment(penguins_km)
 ```
 
 The function `tidy()` works at the per-cluster level:
 
 ```{r}
-penguin_kclust %>% tidy()
+penguin_kclust |> tidy()
 ```
 
 The function `glance()` works at the per-model level:
 
 ```{r}
-penguin_kclust %>% glance()
+penguin_kclust |> glance()
 ```
 
 
@@ -596,7 +596,7 @@ penguin_kclust %>% glance()
 ```{r}
 kmax <- 9
 penguin_kclusts <- 
-  tibble(k = 1:kmax) %>%
+  tibble(k = 1:kmax) |>
   mutate(
     penguin_kclust = map(k, ~kmeans(penguins_km, .x)),
     tidied = map(penguin_kclust, tidy),
@@ -612,20 +612,20 @@ For each of the values of $k$ the `augment`ed, `tidy`ed, and `glance`d informati
 
 ```{r}
 clusters <- 
-  penguin_kclusts %>%
+  penguin_kclusts |>
   unnest(cols = c(tidied))
 
 assignments <- 
-  penguin_kclusts %>% 
+  penguin_kclusts |> 
   unnest(cols = c(augmented))
 
 clusterings <- 
-  penguin_kclusts %>%
+  penguin_kclusts |>
   unnest(cols = c(glanced))
 ```
 
 ```{r}
-clusterings %>%
+clusterings |>
   ggplot(aes(x = k, y = tot.withinss)) + 
   geom_line() + 
   geom_point() + ylab("") +
@@ -638,17 +638,17 @@ clusterings %>%
 Adding back the rest of the penguin information (`species`, `sex`, `island`, etc.) in order to determine if the unsupervised clusters align with any of the non-numeric information given in the dataframe.
 
 ```{r}
-assignments <- penguins %>%
-  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>%
-  select(species, island, sex, year) %>%
-  slice(rep(1:n(), times = kmax)) %>%
+assignments <- penguins |>
+  drop_na(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) |>
+  select(species, island, sex, year) |>
+  slice(rep(1:n(), times = kmax)) |>
   cbind(assignments)
 ```
 
 From the two variables `flipper_length_mm` and `bill_lengh_mm` it seems that two clusters is probably sufficient.  However, it would probably make sense to look at the cluster colorings across all four of the variables and in higher dimensional space (e.g., 3-D projections).
 
 ```{r}
-assignments %>%
+assignments |>
  ggplot(aes(x = flipper_length_mm, y = bill_length_mm)) +
   geom_point(aes(color = .cluster), alpha = 0.8) + 
   facet_wrap(~ k)
@@ -657,11 +657,11 @@ assignments %>%
 Based on `species`, the clustering ($k=2$) seems to separate out Gentoo, but it can't really differentiate Adelie and Chinstrap.  If we let $k=4$, we get an almost perfect partition of the three species.
 
 ```{r}
-assignments %>%
-  group_by(k) %>%
-  select(.cluster, species) %>%
-  table() %>%
-  as.data.frame() %>%
+assignments |>
+  group_by(k) |>
+  select(.cluster, species) |>
+  table() |>
+  as.data.frame() |>
     ggplot() +
     geom_tile(aes(x = .cluster, y = species, fill = Freq)) + 
   facet_wrap( ~ k) + ylab("") + 
@@ -672,11 +672,11 @@ assignments %>%
 For island, it seems like the clustering isn't able (really, at all!) to distinguish the penguins from the three islands.
 
 ```{r}
-assignments %>%
-  group_by(k) %>%
-  select(.cluster, island) %>%
-  table() %>%
-  as.data.frame() %>%
+assignments |>
+  group_by(k) |>
+  select(.cluster, island) |>
+  table() |>
+  as.data.frame() |>
     ggplot() +
     geom_tile(aes(x = .cluster, y = island, fill = Freq)) + 
   facet_wrap( ~ k) + ylab("") +
