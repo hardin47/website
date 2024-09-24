@@ -21,6 +21,41 @@ library(tidyverse)
 3. pivoting: https://tidyr.tidyverse.org/articles/pivot.html
 4. google what you need and include `R tidy` or `tidyverse`
 
+## Coding Style
+
+An important aspect of the data wrangling tools in this chapter includes best practices for writing code.
+The tidyverse style of coding allows you to implement code that is clean and communicates ideas easily.
+The more your code conforms to a style, the easier it will be to debug, and the fewer mistakes you will make.
+Understanding the rules of programming discourse is part of what makes excellent coders. [@soloway1984]
+
+> Good coding style is like correct punctuation: you can manage without it, butitsuremakesthingseasiertoread. <a href = "https://style.tidyverse.org/" target = "_blank">The tidyverse style guide</a>
+
+### Why do style and format matter?
+
+Consistency and communication are very important aspects of coding.
+While the computer does not usually care about code style, the computer is not the only entity working in the coding space.
+Humans play a huge role in making code work, and they absolutely do better in situations where style is consistent and clear.
+
+In chess, experienced players have excellent memories for recall of specific games and positions they have seen previously.  However, recall is substantially better for situations with regular patterns as opposed to remembering random positions. [@gobet1996] The related psychological idea, <a href = "https://en.wikipedia.org/wiki/Chunking_(psychology)" target = "_blank">chunking</a>, states that small pieces of information improve long-term retention of the material. When code is random or unwieldy, the coder has to use more brainpower to process the intent of the code.
+
+In particular, good code style:
+
+* highlights where the errors are.
+* makes it easier to fix errors.
+* focuses the reader's eye on what the code is doing (bad style obscures the information into the code itself).
+* helps the future reader of the code (which is likely you in the future!) understand what the code does.
+* follows the rules that specify conventions in programming.
+
+### Best practices for writing good code.
+
+A style guide is a set of rules and best practices that help coders write code.  There are no absolute *truths* when it comes to style, but consistency is important for being able to communicate your work.
+
+1. Use a style guide.  For example, try <a href = "https://style.tidyverse.org/" target = "_blank">The tidyverse style guide</a> 
+2. Use the same guide that your collaborators are using -- remember, communication is key!
+
+
+
+
 ## Structure of Data {#datastruc}
 
 For plotting, analyses, model building, etc., it's important that the data be structured in a very particular way.   Hadley Wickham provides a thorough discussion and advice for cleaning up the data in @Wickham14.
@@ -486,82 +521,6 @@ sum(is.na(litGDPfull$gdp))
 head(litGDPfull)
 ```
 
-
-### **lubridate**
-
-**lubridate** is a another R package meant for data wrangling [@lubridate].  In particular, **lubridate** makes it very easy to work with days, times, and dates.  The base idea is to start with dates in a `ymd` (year month day) format and transform the information into whatever you want.   The <a href = "https://rstudio.github.io/cheatsheets/html/lubridate.html" target = "_blank">**lubridate** cheatsheet</a> provides many of the basic functionality.
-
-Example from  https://lubridate.tidyverse.org/reference/lubridate-package.html
-
-#### If anyone drove a time machine, they would crash
-
-The length of months and years change so often that doing arithmetic with them can be unintuitive. Consider a simple operation, January 31st + one month. Should the answer be:
-
-
-1. February 31st (which doesn't exist)
-2. March 4th (31 days after January 31), or
-3. February 28th (assuming its not a leap year)
-
-A basic property of arithmetic is that a + b - b = a. Only solution 1 obeys the mathematical property, but it is an invalid date. Wickham wants to  make **lubridate** as consistent as possible by invoking the following rule: if adding or subtracting a month or a year creates an invalid date, **lubridate** will return an NA. 
-
-If you thought solution 2 or 3 was more useful, no problem. You can still get those results with clever arithmetic, or by using the special `%m+%` and `%m-%` operators. `%m+%` and `%m-%` automatically roll dates back to the last day of the month, should that be necessary.
-
-#### R examples, **lubridate**
-
-##### Some basics in **lubridate** {-}
-
-
-```{r}
-require(lubridate)
-rightnow <- now()
-
-day(rightnow)
-week(rightnow)
-month(rightnow, label=FALSE)
-month(rightnow, label=TRUE)
-year(rightnow)
-
-minute(rightnow)
-hour(rightnow)
-
-yday(rightnow)
-mday(rightnow)
-wday(rightnow, label=FALSE)
-wday(rightnow, label=TRUE)
-```
-
-##### But how do I create a date object? {-}
-
-```{r}
-jan31 <- ymd("2021-01-31")
-jan31 + months(0:11)
-
-floor_date(jan31, "month") + months(0:11) + days(31)
-jan31 + months(0:11) + days(31)
-
-jan31 %m+% months(0:11)
-```
-
-
-##### NYC flights {-}
-```{r}
-library(nycflights13)
-names(flights)
-flightsWK <- flights |> 
-   mutate(ymdday = ymd(paste(year, month,day, sep="-"))) |>
-   mutate(weekdy = wday(ymdday, label=TRUE), 
-          whichweek = week(ymdday))
-
-head(flightsWK)
-
-flightsWK <- flights |> 
-   mutate(ymdday = ymd(paste(year,"-", month,"-",day))) |>
-   mutate(weekdy = wday(ymdday, label=TRUE), whichweek = week(ymdday))
-
-flightsWK |> select(year, month, day, ymdday, weekdy, whichweek, dep_time, 
-                     arr_time, air_time) |>  
-   head()
-```
 
 
 <!--
