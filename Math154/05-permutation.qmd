@@ -498,10 +498,13 @@ library(ggridges)
 macnell |> 
   mutate(TAID = ifelse(taidgender==1, "male", "female")) |>
   mutate(TAGend = ifelse(tagender==1, "male", "female")) |>
-ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID), 
+ggplot(aes(y=TAGend, x=overall, 
+           group = interaction(TAGend, TAID), 
            fill=TAID)) +
-  geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), aes(color = TAID)) +
-  stat_summary(fun="mean", geom="crossbar", size=.3, width = 1,
+  geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), 
+             aes(color = TAID)) +
+  stat_summary(fun="mean", geom="crossbar", 
+               size=.3, width = 1,
                aes(color = TAID),
                position=position_dodge(width=0.4)) +
   stat_summary(fun="mean", geom="point", shape = "X",
@@ -509,7 +512,10 @@ ggplot(aes(y=TAGend, x=overall, group = interaction(TAGend, TAID),
                position=position_dodge(width=0.4)) +
   coord_flip() +
   labs(title = "Overall teaching effectiveness score",
-       x = "")
+       x = "",
+       y = "TA gender",
+       color = "TA identifier",
+       fill = "TA identifier")
 ```
 
 
@@ -549,20 +555,17 @@ macnell |>
 * Use difference in mean ratings for female-identified vs male-identified instructors.
 
 
-```{r mac1, eval=TRUE, include = TRUE}
+```{r mac1}
+#| code-line-numbers: "2"
 macnell |> 
   group_by(tagender) |>
   mutate(permTAID = sample(taidgender, replace=FALSE)) |>
   select(overall, tagender, taidgender, permTAID) 
 ```
 
-```{r echo = FALSE, eval = FALSE}
-flair::decorate("mac1") |>
-  flair::flair("group_by(tagender)") 
-```
 
-
-```{r mac2, eval=TRUE, include = TRUE}
+```{r mac2}
+#| code-line-numbers: "2,5"
 macnell |> 
   group_by(tagender) |>
   mutate(permTAID = sample(taidgender, replace=FALSE)) |>
@@ -572,12 +575,6 @@ macnell |>
   summarize(diff(pmeans))
 ```
 
-```{r echo = FALSE, eval = FALSE}
-decorate("mac2") |>  
-  flair("group_by(tagender)") |>
-  flair("group_by(permTAID)") |>
-  knit_print.with_flair()
-```
 
 
 ```{r mac3}
@@ -590,7 +587,8 @@ diff_means_func <- function(.x){
   summarize(diff_mean = diff(pmeans))
   }
 
-map_df(1:5, diff_means_func)
+map(1:5, diff_means_func) |> 
+  list_rbind()
 ```
 
 
@@ -609,7 +607,7 @@ macnell |>
 # permuted
 set.seed(47)
 reps = 1000
-perm_diff_means <- map_df(1:reps, diff_means_func)
+perm_diff_means <- map(1:reps, diff_means_func) |> list_rbind()
 ```
 
 
@@ -819,7 +817,7 @@ SSB_perm_func <- function(.x){
         summarize(teststat = sum(count*(IncMeanP - GM)^2)) 
 }
 
-SSB_perm_val <- map_dfr(1:reps, SSB_perm_func)
+SSB_perm_val <- map(1:reps, SSB_perm_func) |> list_rbind()
 
 SSB_perm_val
 ```
