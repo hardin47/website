@@ -1,4 +1,4 @@
-# Iteration {#sec-iteration}
+# Functions + iteration {#sec-iteration}
 
 ```{r}
 #| include: false
@@ -8,6 +8,357 @@ fontawesome::fa_html_dependency()
 ```
 
 
+## Learning goals:
+
+At the end of this section, you should be able to:
+
+* Identify the core components of a function definition and explain their role (the function() directive, arguments, argument defaults, function body, return value)
+* Describe the difference between argument matching by position and by name
+* Write if-else, if-else if-else statements to conditionally execute code
+* Write your own function to carry out a repeated task
+* Replicate your function multiple times using `map()`
+
+## Functions
+
+### Why functions?
+
+Getting really good at writing useful and reusable functions is one of the best ways to increase your expertise in data science. It requires a lot of practice.
+
+If you've copied and pasted code 3 or more times, it's time to write a function. Try to avoid repeating yourself.
+
+1. **Reducing errors:** Copy + paste + modify is prone to errors (e.g., forgetting to change a variable name)
+2. **Efficiency:** If you need to update code, you only need to do it one place. This allows reuse of code within and across projects.
+3. **Readability:** Encapsulating code within a function with a descriptive name makes code more readable.
+
+### An example
+
+Consider the following code.  What does it do?
+
+```{r}
+df <- tibble(
+  a = rnorm(5),
+  b = rnorm(5),
+  c = rnorm(5),
+  d = rnorm(5),
+)
+
+df |> mutate(
+  a = (a - min(a, na.rm = TRUE)) / 
+    (max(a, na.rm = TRUE) - min(a, na.rm = TRUE)),
+  b = (b - min(a, na.rm = TRUE)) / 
+    (max(b, na.rm = TRUE) - min(b, na.rm = TRUE)),
+  c = (c - min(c, na.rm = TRUE)) / 
+    (max(c, na.rm = TRUE) - min(c, na.rm = TRUE)),
+  d = (d - min(d, na.rm = TRUE)) / 
+    (max(d, na.rm = TRUE) - min(d, na.rm = TRUE)),
+)
+```
+
+You might be able to puzzle out that this rescales each column to have a range from 0 to 1. But did you spot the mistake? (Example from R4DS, and...) When Hadley wrote the code he made an error when copying-and-pasting and forgot to change an `a` to a `b`. Preventing exactly this type of mistake is one very good reason to learn how to write functions.
+
+The key to the work above is that we want to repeat a set of code multiple times. The code we want to replicate can be written as:
+
+```{r}
+#| eval: false
+(█ - min(█, na.rm = TRUE)) / (max(█, na.rm = TRUE) - min(█, na.rm = TRUE))
+
+```
+
+where █ represents the part of the code that changes each time the function is run.
+
+### Parts of a function
+
+To create a function you need three things:
+
+1. **A name**. Here we'll use `rescale01()` because this function rescales a vector to lie between 0 and 1.
+
+2. **The arguments**. The arguments are things that vary across calls and our analysis above tells us that we have just one. We'll call it x because this is the conventional name for a numeric vector.
+
+3. **The body**. The body is the code that's repeated across all the calls.
+
+Then you create a function by following the template:
+
+```{r}
+#| eval: false
+name <- function(arguments) {
+  body
+}
+```
+
+Which leads to the function:
+
+```{r}
+rescale01 <- function(x) {
+  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
+```
+
+At this point you might test with a few simple inputs to make sure you've captured the logic correctly:
+
+```{r}
+rescale01(c(-10, 0, 10))
+rescale01(c(1, 2, 3, NA, 5))
+```
+
+Then you can rewrite the call to `mutate()` as:
+
+```{r}
+df |> mutate(
+  a = rescale01(a),
+  b = rescale01(b),
+  c = rescale01(c),
+  d = rescale01(d),
+)
+```
+
+
+### Ordering and arguments
+
+When calling a function, if you don't name the arguments, R assumes that you passed them in the order defined inside the function.
+
+
+```{r}
+my_power <- function(x, y){
+  return(x^y)
+}
+
+my_power(x = 2, y = 3)
+my_power(y = 3, x = 2)
+my_power(2, 3)
+my_power(3, 2)
+```
+
+::: {.callout-idea}
+## Argument matching
+
+In general, it is safest to match arguments by name and position for your peace of mind. For functions that you are very familiar with (and know the argument order), it's okay to just use positional matching.
+:::
+
+#### Function defaults
+
+::: {.panel-tabset}
+
+## Function
+```{r}
+my_power <- function(x, y){
+  return(x^y)
+}
+```
+What will happen when I run the following code?
+
+```{r}
+#| error: false
+#| eval: false
+my_power(3)
+```
+
+## result
+```{r}
+#| error: true
+my_power(3)
+```
+:::
+
+
+::: {.panel-tabset}
+
+## Function
+```{r}
+my_power <- function(x, y = 2){
+  return(x^y)
+}
+```
+What will happen when I run the following code?
+
+```{r}
+#| eval: false
+my_power(3)
+```
+
+## result
+```{r}
+my_power(3)
+```
+:::
+
+
+
+::: {.panel-tabset}
+
+## Function
+```{r}
+my_power <- function(x, y = 2){
+  return(x^y)
+}
+```
+What will happen when I run the following code?
+
+```{r}
+#| eval: false
+my_power(2, 3)
+```
+
+## result
+```{r}
+my_power(2, 3)
+```
+:::
+
+
+::: {.panel-tabset}
+
+## Function
+```{r}
+my_power <- function(x = 2, y = 3){
+  return(x^y)
+}
+```
+What will happen when I run the following code?
+
+```{r}
+#| eval: false
+my_power()
+```
+
+## result
+```{r}
+my_power()
+```
+:::
+
+### Returning a value
+
+::: {.panel-tabset}
+
+## functions
+```{r}
+average1 <- function(x, remove_nas) {
+    sum(x, na.rm = remove_nas)/sum(!is.na(x))
+}
+
+average2 <- function(x, remove_nas) {
+    return(sum(x, na.rm = remove_nas)/sum(!is.na(x)))
+}
+
+average3 <- function(x, remove_nas = TRUE) {
+    return(sum(x, na.rm = remove_nas)/sum(!is.na(x)))
+    return(sum(x^2, na.rm = remove_nas)/sum(!is.na(x)))
+}
+```
+
+## results
+
+```{r}
+#| error: true
+
+some_data <- c(3, NA, 2, 13, 2, NA, 47)
+
+average1(some_data)
+average1(some_data, remove_nas = TRUE)
+average2(some_data)
+average2(some_data, remove_nas = TRUE)
+average3(some_data)
+```
+:::
+
+* **without** `return()`: the function returns the last value which gets computed and isn't stored as an object (using `<-`).
+
+* **with** `return()`: the function will return an object that is explicitly included in the `return()` call.  (Note: if you (accidentally?) have two `return()` calls, the function will return the object in the first `return()` call.) 
+
+## Control flow
+
+Often inside functions, you will want to execute code conditionally. In a programming language, control structures are parts of the language that allow you to control what code is executed. By far the most common is the `if-else if-else` structure.
+
+
+```{r}
+#| eval: false
+if (logical_condition) {
+    # some code
+} else if (other_logical_condition) {
+    # some other code
+} else {
+    # yet more code
+}
+```
+
+
+* Note that inside the curly else brackets, `{` `}`, you can have additional lines of code computing objects or conditions, or you can return desired objects.
+
+* You can include as many `} else if {` conditions as your problem calls for.
+
+::: {.panel-tabset}
+
+## function
+```{r}
+middle <- function(x) {
+    mean_x <- mean(x, na.rm = TRUE)
+    median_x <- median(x, na.rm = TRUE)
+    seems_skewed <- (mean_x > 1.5*median_x) | (mean_x < (1/1.5)*median_x)
+    if (seems_skewed) {
+        median_x
+    } else {
+        mean_x
+    }
+}
+```
+
+Note that `(mean_x > 1.5*median_x) | (mean_x < (1/1.5)*median_x)` is a TRUE or FALSE question.
+
+
+## result
+
+```{r}
+some_data <- c(3, NA, 2, 13, 2, NA, 47)
+
+mean(some_data, na.rm = TRUE)
+median(some_data, na.rm = TRUE)
+
+middle(some_data)
+```
+:::
+
+
+### Functions in the **tidyverse**
+
+Functions that return the *same number of rows* as the original data frame are good to use inside `mutate()` and `filter()`.  For example, you might want to capitalize the first word of every string:
+
+```{r}
+first_upper <- function(x) {
+  str_sub(x, 1, 1) <- str_to_upper(str_sub(x, 1, 1))
+  x
+}
+
+first_upper("hello")
+```
+
+Functions that *collapse into a single value* will work well in the `summarize()` step of the pipeline.  For example, you may want to calculate the coefficient of variation which is the standard deviation divided by the mean.
+
+```{r}
+cv <- function(x, na.rm = FALSE) {
+  sd(x, na.rm = na.rm) / mean(x, na.rm = na.rm)
+}
+
+cv(runif(100, min = 0, max = 50))
+cv(runif(100, min = 0, max = 500))
+```
+
+
+
+### Functions summary
+* Functions can be used to avoid repeating code
+* Arguments allow us specify the inputs when we call a function
+* If inputs are not named when calling the function, R uses the ordering from the function definition
+* All arguments must be specified when calling a function
+* Default arguments can be specified when the function is defined
+* The input to a function can be a function!
+
+
+
+
+
+
+
+## Iteration through `map()`
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 

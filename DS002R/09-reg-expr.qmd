@@ -140,7 +140,8 @@ grep("\\bab", strings, value = TRUE)
   * `[^...]`: an inverted character list, similar to `[...]`, but matches any characters __except__ those inside the square brackets.  
   * `\`: suppress the special meaning of metacharacters in regular expression, i.e. `$ * + . ? [ ] ^ { } | ( ) \`, similar to its usage in escape sequences. Since `\` itself needs to be escaped in R, we need to escape these metacharacters with double backslash like `\\$`.   
   * `|`: an "or" operator, matches patterns on either side of the `|`.  
-  * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can than be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.    
+  * `(...)`: grouping in regular expressions. This allows you to retrieve the bits that matched various parts of your regular expression so you can alter them or use them for building up a new string. Each group can then be refer using `\\N`, with N being the No. of `(...)` used. This is called __backreference__.   
+  * note: both `(ab|cde)` or `ab|cde` match either the string `ab` or the string `cde`.  However, `ab | cde` matches `ab cde` (and does not match either of `ab` or `cde`) because the "or" is now whitespace on either side of `|`.
 
 ```{r operators}
 strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12", "a|b")
@@ -159,7 +160,7 @@ str_extract(strings, "a[b|c]")
 
 Character classes allow specifying entire classes of characters, such as numbers, letters, etc. There are two flavors of character classes, one uses `[:` and `:]` around a predefined name inside square brackets and the other uses `\` and a special character. They are sometimes interchangeable.   
 
-  * (?i) before the string indicates that the match should be case insensitive.
+  * (?i) before the string indicates that the match should be case insensitive (will make the entire string case insensitive).
   * `[:digit:]` or `\d`: digits, 0 1 2 3 4 5 6 7 8 9, equivalent to `[0-9]`.  
   * `\D`: non-digits, equivalent to `[^0-9]`.  
   * `[:lower:]`: lower-case letters, equivalent to `[a-z]`.  
@@ -171,7 +172,7 @@ Character classes allow specifying entire classes of characters, such as numbers
   * `[:xdigit:]`: hexadecimal digits (base 16), 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f, equivalent to `[0-9A-Fa-f]`.
   * `[:blank:]`: blank characters, i.e. space and tab.  
   * `[:space:]`: space characters: tab, newline, vertical tab, form feed, carriage return, space.
-  * `\s`: space, ` `. Matches any whitespace (space, tab, newline, and carriage return). 
+  * `\s`: space, ` `. Matches any white space (space, tab, newline, and carriage return). 
   * `\S`: not space.  
   * `[:punct:]`: punctuation characters, ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~.
   * `[:graph:]`: graphical (human readable) characters: equivalent to `[[:alnum:][:punct:]]`.
@@ -181,6 +182,18 @@ Character classes allow specifying entire classes of characters, such as numbers
 Note:       
 * `[:...:]` has to be used inside square brackets, e.g. `[[:digit:]]`.     
 * `\` itself is a special character that needs escape, e.g. `\\d`. Do not confuse these regular expressions with R escape sequences such as `\t`.      
+#### Thoughts on characters and spaces
+
+* `.` matches **any** single character except a newline `\n`.
+* `.` does match whitespace (e.g., a space or tab)
+* `\s` matches any whitespace including: spaces, tabs, new lines, and carriage returns
+* `[ \t]` matches spaces and tabs only (not new lines or carriage returns)
+* `[^\s]` matches any character except whitespace (including spaces, tabs, and new lines)
+* `[^\s]` and `[\S]` are functionally equivalent
+* The pattern `[\s\S]` matches any character including newlines and tabs.
+* `\w` matches any single word character (including letters, digits, and the underscore character `_`)
+
+
 
 ## Examples to work through
 
@@ -188,11 +201,12 @@ I have found that the best way to truly understand regular expressions is to wor
 
 ### Case insenstive
 
-* Match only the word `meter` in "The cemetery is 1 meter from the stop sign." Also match `Meter` in "The cemetery is 1 Meter from the stop sign."
+* Match only the word `meter` in "The cemetery is 1 meter from the stop sign." Also match `Meter` and `meTer`.
 
 ```{r}
 string <- c("The cemetery is 1 meter from the stop sign.", 
-            "The cemetery is 1 Meter from the stop sign.")
+            "The cemetery is 1 Meter from the stop sign.",
+            "The cemetery is 1 meTer from the stop sign.")
 
 str_extract(string, "(?i)\\bmeter\\b")
 ```
@@ -413,7 +427,7 @@ How *should* the scores be stored? What is the cleaning task?
 #| label: fig-taskmaster-scores
 #| out.width: 70%
 #| fig-cap: Taskmaster Wiki https://taskmaster.fandom.com/wiki/Series_11
-#| fig-alt: Screenshot of the scores for each contestand on each task. Note that many of the scores have footnotes which are recorded in the results table from scraping the wiki.
+#| fig-alt: Screenshot of the scores for each contestant on each task. Note that many of the scores have footnotes which are recorded in the results table from scraping the wiki.
 #| echo: false
 include_graphics("images/taskmaster-scores.jpg")
 ```
@@ -668,6 +682,7 @@ results |>
                                     "\\)"))
 ```
 
+<!--
 ## Regular expressions and **SQL** 
 
 Back to the IMDb database... 
@@ -700,13 +715,13 @@ SELECT production_year, title
 #| echo: false
 DBI::dbDisconnect(con_imdb, shutdown = TRUE)
 ```
-
+-->
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
 1. What is the difference between `[a|b]` and `(a|b)`?
 
-2. What is the main character which needs to be escaped inside `[...]`? Why?
+2. What is the main character which needs to be escaped inside `[...]`? Why?^[The main metacharacter that we use inside the square brackets is the dash.  So to find a dash, `-`, you need to escape it inside the square brackets.  Additionally, the caret, `^`, and the closing bracket, `]` also need to be escaped.  The backslash doesn't need to be escaped, per se, but in R to get a backslash, you need a double backslash.]
 
 3. Why do we use lookarounds instead of just putting the location of interest inside our regular expression pattern?
 
@@ -718,7 +733,7 @@ DBI::dbDisconnect(con_imdb, shutdown = TRUE)
 
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
 
-1. How can we use regular expressions to check for name mispellings or other similar data cleaning tasks?
+1. How can we use regular expressions to check for name misspellings or other similar data cleaning tasks?
 
 2. Name one thing that you noticed in the course materials (either in class or reading the notes, etc.) where you thought to yourself "Oh, I'll have to be really careful about **that**."  Why would you need to be careful?
 
