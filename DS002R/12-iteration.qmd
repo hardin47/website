@@ -353,12 +353,105 @@ cv(runif(100, min = 0, max = 500))
 * The input to a function can be a function!
 
 
+## Iterating functions 
+
+There will be times when you will need to iterate a function multiple times.
+
+### **purrr** for functional programming {#sec-purrr}
+
+We will see the R package **purrr** in greater detail as we go, but for now, let's get a hint for how it works.  
+
+We are going to focus on the `map` family of functions which will just get us started.  Lots of other good **purrr** functions like `pluck()` and `accumulate()` and `across()` from **dplyr**.
+
+Much of below is taken from a [tutorial](https://www.rebeccabarter.com/blog/2019-08-19_purrr/) by Rebecca Barter.
 
 
+The `map` functions are *named* by the **output** the produce.  For example: 
+
+* `map(.x, .f)` is the main mapping function and returns a list
+
+* `map_df(.x, .f)` returns a data frame
+
+* `map_dbl(.x, .f)` returns a numeric (double) vector
+
+* `map_chr(.x, .f)` returns a character vector
+
+* `map_lgl(.x, .f)` returns a logical vector
+
+Note that the first argument is always the data object and the second object is always the function you want to iteratively apply to each element in the input object.
+
+The **input** to a `map` function is always either a *vector* (like a column), a *list* (which can be non-rectangular), or a *dataframe* (like a rectangle).
+
+A list is a way to hold things which might be very different in shape:
+
+```{r}
+a_list <- list(a_number = 5,
+                      a_vector = c("a", "b", "c"),
+                      a_dataframe = data.frame(a = 1:3, 
+                                               b = c("q", "b", "z"), 
+                                               c = c("bananas", "are", "so very great")))
+
+print(a_list)
+```
 
 
+Consider the following function:
 
-## Iteration through `map()`
+```{r}
+add_ten <- function(x) {
+  return(x + 10)
+  }
+```
+
+We can `map()` the `add_ten()` function across a vector.  Note that the output is a list (the default).
+
+```{r}
+library(purrr)
+map(.x = c(2, 5, 10),
+    .f = add_ten)
+```
+
+What if we use a different type of input?  The default behavior is to still return a list!
+
+```{r}
+data.frame(a = 2, b = 5, c = 10) |>
+  map(add_ten)
+```
+
+What if we want a different type of output?  We can combine the values in the list using a **row-bind**, `list_rbind()`.
+
+```{r}
+data.frame(a = 2, b = 5, c = 10) |>
+  map(add_ten) |> 
+  as.tibble()
+```
+
+
+Shorthand lets us get away from pre-defining the function (which will be useful).  Use the tilde `~` to indicate that you have a function: 
+
+```{r}
+data.frame(a = 2, b = 5, c = 10) |>
+  map_df(~{.x + 10})
+```
+
+Mostly, the tilde will be used for functions we already know but want to modify (if we don't modify, and it has a simple name, we don't use the tilde):
+
+```{r}
+library(palmerpenguins)
+library(broom)
+
+penguins_split <- split(penguins, penguins$species)
+penguins_split |>
+  map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
+  map(tidy) |>   # map(tidy)
+  list_rbind()
+
+penguins |>
+  group_by(species) |>
+  group_map(~lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
+  map(tidy)  # map_df(tidy)
+```
+
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
