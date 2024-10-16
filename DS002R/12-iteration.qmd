@@ -32,7 +32,7 @@ If you've copied and pasted code 3 or more times, it's time to write a function.
 
 ### An example
 
-Consider the following code.  What does it do?
+Consider the following code (taken from <a href = "https://r4ds.hadley.nz/iteration" target = "_blank">https://r4ds.hadley.nz/iteration</a>).  What does it do?
 
 ```{r}
 df <- tibble(
@@ -386,10 +386,10 @@ A list is a way to hold things which might be very different in shape:
 
 ```{r}
 a_list <- list(a_number = 5,
-                      a_vector = c("a", "b", "c"),
-                      a_dataframe = data.frame(a = 1:3, 
-                                               b = c("q", "b", "z"), 
-                                               c = c("bananas", "are", "so very great")))
+               a_vector = c("a", "b", "c"),
+               a_dataframe = data.frame(a = 1:3, 
+                                        b = c("q", "b", "z"), 
+                                        c = c("bananas", "are", "so very great")))
 
 print(a_list)
 ```
@@ -415,15 +415,41 @@ What if we use a different type of input?  The default behavior is to still retu
 
 ```{r}
 data.frame(a = 2, b = 5, c = 10) |>
-  map(add_ten)
+  purrr::map(add_ten)
 ```
 
-What if we want a different type of output?  We can combine the values in the list using a **row-bind**, `list_rbind()`.
+What if we want a different type of output?  If the function outputs a data frame, we can combine the values in the list using a **row-bind**, `list_rbind()`.
 
 ```{r}
+#| error: true
 data.frame(a = 2, b = 5, c = 10) |>
-  map(add_ten) |> 
-  as.tibble()
+  purrr::map(add_ten) |> 
+  list_rbind()
+```
+
+Darn!  We get an error because the output of the `add_ten()` function is a scalar, not a data frame. In order to use `list_rbind()` we need to edit the `add_ten()` function.
+
+```{r}
+add_ten_df <- function(x) {
+  return(data.frame(x + 10))
+}
+
+data.frame(a = 2, b = 5, c = 10) |>
+  purrr::map(add_ten_df) |> 
+  list_rbind()   # output bound by rows
+
+c(2, 5, 10) |>
+  purrr::map(add_ten_df) |> 
+  list_rbind()   # output bound by rows
+
+
+data.frame(a = 2, b = 5, c = 10) |>
+  purrr::map(add_ten_df) |> 
+  list_cbind()   # output bound by columns
+
+c(2, 5, 10) |>
+  purrr::map(add_ten_df) |> 
+  list_cbind()   # output bound by columns
 ```
 
 
@@ -431,7 +457,7 @@ Shorthand lets us get away from pre-defining the function (which will be useful)
 
 ```{r}
 data.frame(a = 2, b = 5, c = 10) |>
-  map_df(~{.x + 10})
+  purrr::map_df(~{.x + 10})
 ```
 
 Mostly, the tilde will be used for functions we already know but want to modify (if we don't modify, and it has a simple name, we don't use the tilde):
@@ -442,14 +468,14 @@ library(broom)
 
 penguins_split <- split(penguins, penguins$species)
 penguins_split |>
-  map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  map(tidy) |>   # map(tidy)
+  purrr::map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
+  purrr::map(tidy) |>   # map(tidy)
   list_rbind()
 
 penguins |>
   group_by(species) |>
   group_map(~lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  map(tidy)  # map_df(tidy)
+  purrr::map(tidy)  # map_df(tidy)
 ```
 
 
