@@ -407,7 +407,7 @@ We can `map()` the `add_ten()` function across a vector.  Note that the output i
 
 ```{r}
 library(purrr)
-map(.x = c(2, 5, 10),
+purrr::map(.x = c(2, 5, 10),
     .f = add_ten)
 ```
 
@@ -457,7 +457,8 @@ Shorthand lets us get away from pre-defining the function (which will be useful)
 
 ```{r}
 data.frame(a = 2, b = 5, c = 10) |>
-  purrr::map_df(~{.x + 10})
+  purrr::map(~{data.frame(.x + 10)}) |> 
+  list_cbind()
 ```
 
 Mostly, the tilde will be used for functions we already know but want to modify (if we don't modify, and it has a simple name, we don't use the tilde):
@@ -469,13 +470,13 @@ library(broom)
 penguins_split <- split(penguins, penguins$species)
 penguins_split |>
   purrr::map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  purrr::map(tidy) |>   # map(tidy)
+  purrr::map(tidy) |>  
   list_rbind()
 
 penguins |>
   group_by(species) |>
   group_map(~lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  purrr::map(tidy)  # map_df(tidy)
+  purrr::map(tidy)
 ```
 
 
