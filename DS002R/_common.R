@@ -14,7 +14,7 @@ suppressMessages(library(infer))
 suppressMessages(library(janitor))
 suppressMessages(library(knitr))
 suppressMessages(library(kableExtra))
-suppressMessages(library(maps))
+#suppressMessages(library(maps))
 suppressMessages(library(measurements))
 suppressMessages(library(openintro))
 suppressMessages(library(patchwork))
@@ -38,6 +38,8 @@ suppressMessages(library(DBI))
 suppressMessages(library(dbplyr))
 suppressMessages(library(RMariaDB))
 suppressMessages(library(duckdb))
+suppressMessages(library(purrr))
+
 
 # knitr chunk options ----------------------------------------------------------
 
