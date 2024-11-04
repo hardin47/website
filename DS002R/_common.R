@@ -39,6 +39,8 @@ suppressMessages(library(dbplyr))
 suppressMessages(library(RMariaDB))
 suppressMessages(library(duckdb))
 suppressMessages(library(purrr))
+suppressMessages(library(tidytext))
+suppressMessages(library(textdata))
 
 
 # knitr chunk options ----------------------------------------------------------

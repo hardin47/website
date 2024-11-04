@@ -247,7 +247,206 @@ How is the test interpreted given the different types of sampling which are poss
     * In a sample, consider the difference (or ratio) and ask "Is this difference so large it would rarely occur by chance in a particular sample constructed under the null setting?"
     * If the data come from a random sample, then the sample (or results from the sample) are probably consistent with the population [i.e., we can infer the results back to the larger population].
 
-### MacNell Teaching Evaluations (Stratified two-sample t-test)
+
+### Two sample permutation tests
+
+#### Statistics Without the Agonizing Pain {-}
+
+```{r, out.width="40%", fig.cap = "John Rauser of Pintrest (now Amazon), speaking at Strata + Hadoop 2014. https://blog.revolutionanalytics.com/2014/10/statistics-doesnt-have-to-be-that-hard.html", fig.alt = "Image of John Rauser who gave a keynote address  on permutation tests at the Strat + Hadoop conference in 2014.", echo=FALSE}
+knitr::include_graphics("images/rauser.png")
+``` 
+
+
+
+#### Logic of hypothesis tests {-}
+
+1. Choose a statistic that measures the effect. 
+
+2. Construct the sampling distribution under $H_0$.
+
+3. Locate the observed statistic in the null sampling distribution.
+
+4. **p-value**  is the probability of the observed data or more extreme if the null hypothesis is true
+
+#### Logic of permutation tests {-}
+
+1. Choose a test statistic.
+
+2. Shuffle the data (force the null hypothesis to be true).  Using the shuffled statistics, create a null sampling distribution of the test statistic (under $H_0$).
+
+4. Find the observed test statistic on the null sampling distribution.
+
+5. Compute the p-value (observed data or more extreme).  The p-value can be one or two-sided.
+
+#### Applet for two sample permutation tests {-}
+
+* <a href = "https://www.rossmanchance.com/applets/2021/anovashuffle/AnovaShuffle.htm?hideExtras=2" target = "_blank">permutation test for two samples</a> from Rossman Chance applets.
+
+#### High School & Beyond survey {-}
+
+
+Data: 200 randomly selected observations from the High School and Beyond survey, conducted on high school seniors by the National Center for Educational Statistics.
+
+Research Question:  in the population, do private school kids have a higher math score on average?
+
+$$H_0: \mu_{private} = \mu_{public}$$
+$$H_A: \mu_{private} > \mu_{public}$$
+
+$\mu$ is the average math score in the population.
+
+```{r}
+library(openintro)
+hsb2
+```
+
+
+
+#### Summary of the variables {-}
+
+```{r}
+hsb2 |> 
+  group_by(schtyp) |> 
+  summarize(ave_math = mean(math),
+            med_math = median(math))
+```
+
+#### Visualize the relationship of interest {-}
+
+```{r}
+hsb2 |> 
+  ggplot(aes(x = schtyp, y = math)) + 
+  geom_boxplot()
+```
+
+#### Calculate the observed statistic(s) {-}
+
+For fun, we are calculating both the difference in averages as well as the difference in medians.  That is, we have **two** different observed summary statistics to work with.
+
+```{r}
+hsb2 |> 
+  group_by(schtyp) |> 
+  summarize(ave_math = mean(math),
+            med_math = median(math))
+
+hsb2 |> 
+  group_by(schtyp) |> 
+  summarize(ave_math = mean(math),
+            med_math = median(math)) |> 
+  summarize(ave_diff = diff(ave_math),
+            med_diff = diff(med_math))
+
+```
+
+
+#### Generate a null sampling distribution. {-}
+
+```{r}
+perm_data <- function(rep, data){
+  data |> 
+    select(schtyp, math) |> 
+    mutate(math_perm = sample(math, replace = FALSE)) |> 
+    group_by(schtyp) |> 
+    summarize(obs_ave = mean(math),
+              obs_med = median(math),
+              perm_ave = mean(math_perm),
+              perm_med = median(math_perm)) |> 
+    summarize(obs_ave_diff = diff(obs_ave),
+              obs_med_diff = diff(obs_med),
+              perm_ave_diff = diff(perm_ave),
+              perm_med_diff = diff(perm_med),
+              rep = rep)
+}
+
+map(1:10, perm_data, data = hsb2) |> 
+  list_rbind()
+```
+
+
+#### Visualize the null sampling distribution (average) {-}
+
+```{r}
+set.seed(47)
+perm_stats <- 
+  map(1:500, perm_data, data = hsb2) |> 
+  list_rbind() 
+
+perm_stats |> 
+  ggplot(aes(x = perm_ave_diff)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = obs_ave_diff), color = "red")
+```
+
+
+#### Visualize the null sampling distribution (median) {-}
+
+```{r}
+perm_stats |> 
+  ggplot(aes(x = perm_med_diff)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = obs_med_diff), color = "red")
+```
+
+#### p-value {-}
+
+```{r}
+perm_stats |> 
+  summarize(p_val_ave = mean(perm_ave_diff > obs_ave_diff),
+            p_val_med = mean(perm_med_diff > obs_med_diff))
+```
+
+
+#### Conclusion {-}
+
+From these data, the observed differences seem to be consistent with the distribution of differences in the null sampling distribution.
+
+There is no evidence to reject the null hypothesis.
+
+We cannot claim that in the population the **average** math scores for private school kids is larger than the **average** math scores for public school kids (p-value = 0.086).
+
+We cannot claim that in the population the **median** math scores for private school kids is larger than the **median** math scores for public school kids (p-value = 0.27).
+
+#### Two-sided hypothesis test {-}
+
+$H_0: \mu_{private} = \mu_{public}$ and $H_A: \mu_{private} \ne \mu_{public}$
+
+```{r}
+#| echo: false
+#| fig-align: 'center'
+perm_stats |> 
+  ggplot(aes(x = perm_ave_diff)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = obs_ave_diff), color = "red")  +
+    geom_vline(aes(xintercept = -obs_ave_diff), color = "red")
+```
+
+#### Two-sided p-value {-}
+
+
+```{r}
+perm_stats |> 
+    summarize(p_val_ave = 
+                mean(perm_ave_diff > obs_ave_diff | 
+                       perm_ave_diff < -obs_ave_diff),
+              p_val_med = 
+              mean(perm_med_diff > obs_med_diff | 
+                     perm_med_diff < -obs_med_diff))
+```
+
+#### Two-sided conclusion {-}
+
+From these data, the observed differences seem to be consistent with the distribution of differences in the null sampling distribution.
+
+There is no evidence to reject the null hypothesis.
+
+We cannot claim that there is a **difference** in average math scores in the population (p-value = 0.154).
+
+We cannot claim that there is a **difference** in median math scores int he population (p-value = 0.534).
+
+
+
+### Stratified two-sample permutation test
+
+**MacNell Teaching Evaluations**
 
 Boring et al. (2016) reanalyze data from MacNell et al. (2014).  Students were randomized to 4 online sections of a course.  In two sections, the instructors swapped identities.  Was the instructor who identified as female rated lower on average? (https://www.math.upenn.edu/~pemantle/active-papers/Evals/stark2016.pdf)
 
