@@ -884,19 +884,537 @@ From <a href = "https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation" targe
 
 > In natural language processing, latent Dirichlet allocation (LDA) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. For example, if observations are words collected into documents, it posits that each document is a mixture of a small number of topics and that each word's creation is attributable to one of the document's topics.
 
-Here is an algorithm for finding words that represent $K$ topics (where $K$ is chosen in advance).
+### LDA Algorithm
 
+******
+**Algorithm**:  Latent Dirichlet Allocation
+
+******
 
 1. For each document in the training data, randomly assign each word to one of the $K$ topics.
 2. Each of the $K$ topics now has a set of words associated with it (albeit, that set of words is meaningless). To improve on the set of words associated with each topic.  For each word $w$ in document $d$:
     a. For each topic $t$, compute two things: 
-        * p(topic $t$ $|$ document $d$) = the proportion of words in document $d$ that are currently assigned to topic $t$.  Actually, we use:
-        $$P(z_i = t | z_{-i}, w_i, d_i) = \frac{\# \mbox{ words in $d$ with $t$} + \alpha}{\# \mbox{ words in $d$ with any topic} + k \cdot \alpha}$$
-        $z_i$ is the topic of the $i^{th}$ word; $z_{-i}$ is the topic of all the words except the $i^{th}$ word; $w_i$ is the $i^{th}$ word; $d_i$ is the document for the $i^{th}$ word; and $\alpha$ is a prior parameter.
+        * p(topic $t$ $|$ document $d$) = the proportion of words in document $d$ that are currently assigned to topic $t$.  
         * p(word $w$ $|$ topic $t$) = the proportion of assignments to topic $t$ over all documents that come from this word $w$. 
     b. Reassign $w$ to a new topic, where we choose topic $t$ with probability = p(topic $t$ $|$ document $d$) * p(word $w$ $|$ topic $t$) (according to our generative model, this is essentially the probability that topic $t$ generated word $w$, so it makes sense that we resample the current word's topic with this probability).
     c. In other words, in this step, we're assuming that all topic assignments except for the current word in question are correct, and then updating the assignment of the current word using our model of how documents are generated.
 2.  After repeating the previous steps a large number of times, the list of words in each topic will reach a steady state. The resulting assignments estimate the topic mixtures of each document (by counting the proportion of words assigned to each topic within that document) and the words associated to each topic (by counting the proportion of words assigned to each topic overall).
+
+******
+
+
+### Toy example of LDA
+
+How can we figure out (unsupervised!) the underlying topic of each of a set of documents?[^1]
+
+[^1]: Heavily inspired by Luis Serrano's <a href = "https://www.youtube.com/watch?v=BaM1uiCpj_E" target = "_blank">youtube video</a>.
+    Also note his other <a href = "https://serrano.academy/" target = "_blank">educational materials</a>
+
+#### Data {-}
+
+Start with documents that each contain words:
+
+```{r}
+#| echo: false
+# Data for rectangles
+
+xmin <- c(1, 5, 9, 13)
+xmax <- c(4, 8, 12, 16)
+ymin <- c(1, 1, 1, 1)
+ymax <- c(6, 6, 6, 6)
+
+rectangles <- data.frame(
+  xmin = xmin,
+  xmax = xmax,
+  ymin = ymin,
+  ymax = ymax,
+  group = c("Doc A", "Doc B", "Doc C", "Doc D"),
+  group1 = c("Sports", "Politics", "Science", "Science"),
+  group2 = c("80% Topic 3", "80% Topic 2", "80% Topic 1", "60% Topic 1"),
+  topic2 = c("T3", "T2", "T1", "T1"),
+  group3 = c("20% Topic 1", "20% Topic 1", "20% Topic 3", "20% Topic 2"),
+  topic3 = c("T1", "T1", "T3", "T2"),
+  group4 = c("", "", "", "20% Topic 3"),
+  topic4 = c("T1", "T1", "T3", "T3")
+)
+
+#<span style="color:#f47c70">Topic 1</span> , <span style="color:#14bc44">Topic 2</span>, <span style="color:#689cfc">Topic 3</span>
+
+# Data for words
+words <- data.frame(
+  group = rep(c("A", "B", "C", "D"), each = 5),
+  x = rep((xmin + xmax)/2, each = 5),  # Center of each rectangle
+  y = rep(seq(ymax[1] - 0.5, ymin[1] + 0.5, length.out = 5), 4),  # Adjust vertical positions for words
+  word = rep(c("ball", "ball", "ball", "planet", "galaxy",
+               "referendum", "planet", "planet", "referendum", "referendum",
+               "planet", "planet", "galaxy", "planet", "ball",
+               "planet", "galaxy", "referendum", "planet", "ball")),
+  gibberish = rep(c("fyntraq", "fyntraq", "fyntraq", "voblicht", "blythar",
+               "zorflan", "voblicht", "voblicht", "zorflan", "zorflan",
+               "voblicht", "voblicht", "blythar", "voblicht", "fyntraq",
+               "voblicht", "blythar", "zorflan", "voblicht", "fyntraq")),
+  topic1 = c("T3", "T3", "T3", "T1", "T3",
+              "T2", "T1", "T2", "T2", "T2",
+              "T1", "T1", "T1", "T1", "T3",
+              "T1", "T1", "T2", "T1", "T3"),
+  words2 = c(rep("planet", 8),
+             rep("referendum", 4),
+             rep("ball", 5),
+             rep("galaxy", 3)),
+  topic2 = c(rep("T3", 2), "T2", rep("T3",5),
+             rep("T2", 4),
+             rep("T1", 5),
+             "T1", rep("T3", 2)),
+  x2 = rep((xmin + xmax)/2, c(8, 4, 5, 3)),  # Center of each rectangle
+  y2 = c(seq(ymax[1] - 0.5, ymin[1] + 0.5, length.out = 8),
+         seq(ymax[1] - 0.5, ymin[1] + 0.5, length.out = 4),
+         seq(ymax[1] - 0.5, ymin[1] + 0.5, length.out = 5),
+         seq(ymax[1] - 0.5, ymin[1] + 0.5, length.out = 3)),
+  topic3 = c("T3", "T1", "T1", "T3", "T3",
+             "T2", "T3", "T3", "T2", "T3",
+             "T3", "T1", "T3", "T2", "T2",
+             "T3", "T1", "T2", "T3", "T1")
+)
+
+# Create the plot
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, aes(x = x, y = y, label = word), size = 8) +
+  geom_text(data = rectangles, aes(x = (xmin + xmax) / 2, y = ymax + 0.5,
+            label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void() 
+```
+
+#### Assign topics {-}
+
+As a human, assign topics: Science, Politics, Sports
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, aes(x = x, y = y, label = word), size = 8) +
+  geom_text(data = rectangles, aes(x = (xmin + xmax) / 2, y = ymax + 0.5,
+            label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void() 
+```
+
+#### One potential assignment: {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, aes(x = x, y = y, label = word), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymin - 0.5,
+                label = group1), size = 8)  + 
+  coord_fixed() +  
+  theme_void()
+```
+
+
+What if you don't have any idea what the words mean (i.e., what if you are the computer)?
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = gibberish), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void()
+```
+
+#### Computer assignment of topics {-}
+
+**without** using the definitions of the words:\
+[Topic 1]{style="color:#f47c70"} , [Topic 2]{style="color:#14bc44"}, [Topic 3]{style="color:#689cfc"}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void()  
+```
+
+#### Assign a topic to each word {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin-.5, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x + .2, y = y, 
+                label = word), size = 8) +
+  geom_text(data = words, 
+            aes(x = x - 1.5, y = y, 
+                label = topic1, color = topic1), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+but let's use colors to make it easier to track...
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word, color = topic1), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+#### How often do we see each topic? {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word, color = topic1), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) +
+  geom_text(data = rectangles,
+            aes(x = (xmin + xmax) / 2,
+                y = ymin - 0.5,
+                label = group2,
+                color = topic2), size = 8) + 
+  geom_text(data = rectangles,
+            aes(x = (xmin + xmax) / 2,
+                y = ymin - 1,
+                label = group3,
+                color = topic3), size = 8) + 
+  geom_text(data = rectangles,
+            aes(x = (xmin + xmax) / 2,
+                y = ymin - 1.5,
+                label = group4,
+                color = topic4), size = 8) + 
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+
+::: {.callout-important icon=false}
+Property 1: articles are as homogeneous as possible
+:::
+
+
+#### What about the words? {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_text(data = words, 
+            aes(x = x2, y = y2, 
+                label = words2, color = topic2), size = 8) +
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+
+::: {.callout-important icon=false}
+Property 2: words are as homogeneous as possible
+:::
+
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_text(data = words, 
+            aes(x = x2, y = y2, 
+                label = words2, color = topic2), size = 8) +
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+#### Goal of LDA: {-}
+
+Color each word with [red]{style="color:#f47c70"} , [green]{style="color:#14bc44"}, [blue]{style="color:#689cfc"} such that
+
+1.  articles are as homogeneous as possible
+2.  words are as homogeneous as possible
+
+#### Gibbs Sampling {-}
+
+Organize the words **one at a time**, trying to make the articles (Goal #1) and words (Goal #2) as consistent as possible.
+
+$\Rightarrow$ assume that all the other words are correct, and try to predict the topic of a given word.
+
+#### Predicting the word's topic {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word, color = topic3), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  geom_text(data = words,
+            aes(x = x[1], y = y[1]), 
+            label = "ball", color = "black", size = 8) +
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+Do we color **ball** [red]{style="color:#f47c70"} , [green]{style="color:#14bc44"}, or [blue]{style="color:#689cfc"}?
+
+#### Predicting the word's topic (Property #1) {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word, color = topic3), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  geom_text(data = words,
+            aes(x = x[1], y = y[1]), 
+            label = "ball", color = "black", size = 8) +
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+| [Topic 1]{style="color:#f47c70"} | [Topic 2]{style="color:#14bc44"} | [Topic 3]{style="color:#689cfc"} |
+|----|----|----|
+| Doc A: how many words in [Topic 1]{style="color:#f47c70"} | Doc A: how many words in [Topic 2]{style="color:#14bc44"} | Doc A: how many words in [Topic 3]{style="color:#689cfc"} |
+| [2]{style="color:#f47c70"} | [0]{style="color:#14bc44"} | [2]{style="color:#689cfc"} |
+
+
+
+
+#### Predicting the word's topic (Property #2) {-}
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words[c(1:3,15,20),], 
+            aes(x = x, y = y, 
+                label = word, color = topic3), size = 8) +
+  geom_text(data = words,
+            aes(x = x[1], y = y[1]), 
+            label = "ball", color = "black", size = 8) +  
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+| [Topic 1]{style="color:#f47c70"} | [Topic 2]{style="color:#14bc44"} | [Topic 3]{style="color:#689cfc"} |
+|----|----|----|
+|How often is **ball** in [Topic 1]{style="color:#f47c70"}  | How often is **ball** in [Topic 2]{style="color:#14bc44"} | How often is **ball** in [Topic 3]{style="color:#689cfc"}|
+| [3]{style="color:#f47c70"} | [1]{style="color:#14bc44"} | [0]{style="color:#689cfc"} |
+
+
+#### Data without first word {-}
+
+| [Topic 1]{style="color:#f47c70"} | [Topic 2]{style="color:#14bc44"} | [Topic 3]{style="color:#689cfc"} |
+|----|----|----|
+| Doc A: how many words in [Topic 1]{style="color:#f47c70"} | Doc A: how many words in [Topic 2]{style="color:#14bc44"} | Doc A: how many words in [Topic 3]{style="color:#689cfc"} |
+| [2]{style="color:#f47c70"} | [0]{style="color:#14bc44"} | [2]{style="color:#689cfc"} |
+|How often is **ball** in [Topic 1]{style="color:#f47c70"}  | How often is **ball** in [Topic 2]{style="color:#14bc44"} | How often is **ball** in [Topic 3]{style="color:#689cfc"}|
+| [3]{style="color:#f47c70"} | [1]{style="color:#14bc44"} | [0]{style="color:#689cfc"} |
+
+
+#### Probability of topic {-}
+
+$$
+\begin{align}P(z_i = k' | z_{-i}, W) \propto & \frac{\# \mbox{ words in $d_i$ with $k'$} + \alpha}{\# \mbox{ words in $d_i$ with any topic} + K \cdot \alpha} \cdot \\ 
+&\frac{\# \mbox{ times $i^{th}$ word is in topic $k'$} + \beta}{\# \mbox{ words in topic $k'$} + V \cdot \beta}
+\end{align}
+$$
+
+* $z_i$ is the topic of the $i^{th}$ word
+* $z_{-i}$ are the topics of all the words other than the $i^{th}$ word
+* $d_i$ is the document of $i^{th}$ word
+* $W$ represents all of the words
+* $K$ is the total number of topics
+* $V$ is the total number of words
+* $\alpha$ and $\beta$ are tuning parameter
+
+#### Probability that ball is in each topic {-}
+
+$$
+\begin{align}P(ball_1 = \mbox{Topic 1} | z_{-i}, W) \propto& \frac{2 + \alpha}{4 + 3 \cdot \alpha} \cdot \frac{3 + \beta}{9 + 4 \cdot \beta}
+\end{align}
+$$
+
+$$
+\begin{align}P(ball_1 = \mbox{Topic 2} | z_{-i}, W) \propto& \frac{0 + \alpha}{4 + 3 \cdot \alpha} \cdot \frac{1 + \beta}{9 + 4 \cdot \beta}
+\end{align}
+$$
+
+$$
+\begin{align}P(ball_1 = \mbox{Topic 3} | z_{-i}, W) \propto& \frac{2 + \alpha}{4 + 3 \cdot \alpha} \cdot \frac{0 + \beta}{9 + 4 \cdot \beta}
+\end{align}
+$$
+
+Here, we won't get into setting $\alpha$ and $\beta$, but for now assume that $\alpha = 0.3$ and $\beta = 0.25.$
+
+$$
+\require{cancel}
+\begin{align}P(ball_1 = \mbox{Topic 1} | z_{-i}, W) \propto& \frac{2 + \cancel{\alpha} \overset{0.3}{}}{4 + 3 \cdot \cancel{\alpha} \overset{0.3}{}} \cdot \frac{3 + \cancel{\beta} \overset{0.25}{}}{9 + 4 \cdot \cancel{\beta} \overset{0.25}{}} = 0.153
+\end{align}
+$$
+
+$$
+\begin{align}P(ball_1 = \mbox{Topic 2} | z_{-i}, W) \propto& \frac{0 + \cancel{\alpha} \overset{0.3}{}}{4 + 3 \cdot \cancel{\alpha} \overset{0.3}{}} \cdot \frac{1 + \cancel{\beta} \overset{0.25}{}}{9 + 4 \cdot \cancel{\beta} \overset{0.25}{}} = 0.008
+\end{align}
+$$
+
+$$
+\begin{align}P(ball_1 = \mbox{Topic 3} | z_{-i}, W) \propto& \frac{2 + \cancel{\alpha} \overset{0.3}{}}{4 + 3 \cdot \cancel{\alpha} \overset{0.3}{}} \cdot \frac{0 + \cancel{\beta} \overset{0.25}{}}{9 + 4 \cdot \cancel{\beta} \overset{0.25}{}} = 0.012
+\end{align}
+$$
+
+
+$\rightarrow$ assign [Topic 1]{style="color:#f47c70"}  to the first instance of **ball**
+
+#### Next step {-}
+
+Update the first instance of **[ball]{style="color:#f47c70"}** and move on to the second instance of **ball**.  Keep iterating through the words until the words have converged and they aren't changing topics any longer.  (The LDA Gibbs sampler will converge, but only to a local optimum.)
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_rect(data = rectangles, 
+            aes(xmin = xmin, xmax = xmax, 
+                ymin = ymin, ymax = ymax),
+            color = "black", fill = "white") +
+  geom_text(data = words, 
+            aes(x = x, y = y, 
+                label = word, color = topic3), size = 8) +
+  geom_text(data = rectangles, 
+            aes(x = (xmin + xmax) / 2, 
+                y = ymax + 0.5,
+                label = group), size = 12) + 
+  geom_text(data = words,
+            aes(x = x[1], y = y[1]), 
+            label = "ball", color = "#f47c70", size = 8) +
+    geom_text(data = words,
+            aes(x = x[2], y = y[2]), 
+            label = "ball", color = "black", size = 8) +
+  coord_fixed() +  
+  theme_void() + 
+  theme(legend.position = "none")
+```
+
+
+
+#### What is the topic of a training document? {-}
+
+If we have a document that has already been used to train the LDA, we know the topic allocations for each word in the document.
+
+$$\mbox{Topic}(d) = \mbox{arg} \max_k \theta_{d,k}$$
+
+where $\theta_{d,k}$ is the probability of topic $k$ for document $d$. 
+
+$\theta_{d,k}$ is estimated as the proportion of topic $k$ in document $d$.
+
+#### What is the topic of a test document? {-}
+
+For a new document, we do not have a topic allocation for each word in the document.
+
+* For each word in the document, you get a probability for each topic, based on the learned topic-word distribution 
+
+* The probability of a topic $k$ for the new document is essentially the weighted sum of the topic probabilities for all the words in the document, considering their relative importance.
+
+#### Example (from Math 154) {-}
+
 
 ::: {.callout-note icon=false}
 ## LDA on TSL
