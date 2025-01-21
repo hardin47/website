@@ -80,8 +80,8 @@ For the example used to consider feature engineering and cross validation, the d
 Instead of jumping into the predictions immediately, let's look at the data itself.  What wrangling can we do to the data in order to take advantage of all the information in the variables?  We'd also like to make the model accurate and easy to communicate.
 
 
-```r
-site_data <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv') %>%
+``` r
+site_data <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv') |>
   mutate(squirrels = as.factor(ifelse(squirrels, "squirrels", "no squirrels")))
 
 glimpse(site_data)
@@ -154,8 +154,8 @@ glimpse(site_data)
 It is a huge dataset, although it has a lot of missing information.
 
 
-```r
-site_data %>%
+``` r
+site_data |>
   count(squirrels)
 #> # A tibble: 3 × 2
 #>   squirrels         n
@@ -167,10 +167,10 @@ site_data %>%
 How are other characteristics of these sites related to the presence of squirrels?
 
 
-```r
-site_data %>%
-  filter(!is.na(squirrels)) %>%
-  group_by(squirrels) %>%
+``` r
+site_data |>
+  filter(!is.na(squirrels)) |>
+  group_by(squirrels) |>
   summarise(nearby_feeders = mean(nearby_feeders, na.rm = TRUE))
 #> # A tibble: 2 × 2
 #>   squirrels    nearby_feeders
@@ -181,13 +181,13 @@ site_data %>%
 What about some of the other variables like those describing the habitat?
 
 
-```r
-site_data %>%
-  filter(!is.na(squirrels)) %>%
-  group_by(squirrels) %>%
-  summarise(across(contains("hab"), mean, na.rm = TRUE)) %>%
-  pivot_longer(contains("hab")) %>%
-  mutate(name = str_remove(name, "hab_")) %>%
+``` r
+site_data |>
+  filter(!is.na(squirrels)) |>
+  group_by(squirrels) |>
+  summarise(across(contains("hab"), mean, na.rm = TRUE)) |>
+  pivot_longer(contains("hab")) |>
+  mutate(name = str_remove(name, "hab_")) |>
   ggplot(aes(value, fct_reorder(name, value), fill = squirrels)) +
   geom_col(alpha = 0.8, position = "dodge") +
   scale_x_continuous(labels = scales::percent) +
@@ -206,13 +206,13 @@ If the idea is to build a model which can predict squirrel activity, we need to 
 There is a little bit of work to do to use only the observations that recodered whether or not there was a squirrel and to remove a few variables which are not of interest.
 
 
-```r
+``` r
 library(tidymodels)
 
-site_data <- site_data %>%
-  filter(!is.na(squirrels)) %>%
-  select(where(~!all(is.na(.x)))) %>%
-  select(-loc_id, -proj_period_id, -fed_yr_round) %>%
+site_data <- site_data |>
+  filter(!is.na(squirrels)) |>
+  select(where(~!all(is.na(.x)))) |>
+  select(-loc_id, -proj_period_id, -fed_yr_round) |>
   select(squirrels, everything()) 
 ```
 
@@ -222,16 +222,16 @@ site_data <- site_data %>%
 **Step 1:** Create an initial split:
 
 
-```r
+``` r
 set.seed(470)
-feeder_split <- site_data %>%
+feeder_split <- site_data |>
   initial_split(strata = squirrels) # prop = 3/4 in each group, by default
 ```
 
 **Step 2:** Save training data
 
 
-```r
+``` r
 feeder_train <- training(feeder_split)
 dim(feeder_train)
 #> [1] 176763     59
@@ -240,7 +240,7 @@ dim(feeder_train)
 **Step 3:** Save testing data
 
 
-```r
+``` r
 feeder_test  <- testing(feeder_split)
 dim(feeder_test)
 #> [1] 58922    59
@@ -249,7 +249,7 @@ dim(feeder_test)
 #### Using the training data {-}
 
 
-```r
+``` r
 feeder_train
 #> # A tibble: 176,763 × 59
 #>   squirrels    yard_type_pavement yard_type_garden yard_type_landsca
@@ -298,8 +298,8 @@ Instead of using the `glm()` command, we're going to use the **tidymodels** fram
 Note that (above) I pulled in all of the relevant functions from the package using `library(tidymodels)`.
 
 
-```r
-feeder_spec <- logistic_reg() %>%
+``` r
+feeder_spec <- logistic_reg() |>
   set_engine("glm") 
 
 feeder_spec
@@ -310,7 +310,7 @@ feeder_spec
 
 ### Building a recipe
 
-The steps in building a recipe are done sequentially so that the format of each variable is as desired for the model.  As seen in Section (\@ref{sec:wflow}), the recipe steps can happen in sequence using the pipe (`%>%`) function.
+The steps in building a recipe are done sequentially so that the format of each variable is as desired for the model.  As seen in Section (\@ref{sec:wflow}), the recipe steps can happen in sequence using the pipe (`|>`) function.
 
 However, when you work with a single pipeline, the recipe effects on the data aren't seen, which can be unsettling.  You can look at what will happen when you ultimately apply the recipe to your data by using the functions `prep()` and `bake()`.
 
@@ -319,20 +319,13 @@ However, when you work with a single pipeline, the recipe effects on the data ar
 #### Initiate a recipe {-}
 
 
-```r
+``` r
 feeder_rec <- recipe(
   squirrels ~ .,    # formula
   data = feeder_train # data for cataloging names and types of variables
   )
 
 feeder_rec
-#> Recipe
-#> 
-#> Inputs:
-#> 
-#>       role #variables
-#>    outcome          1
-#>  predictor         58
 ```
 
 
@@ -344,32 +337,20 @@ Remove all predictors that contain only a single value.  "zero variance" means t
 > `step_nzv()` creates a specification of a recipe step that will remove variables that contain only a single value.
 
 
-```r
-feeder_rec <- feeder_rec %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+``` r
+feeder_rec <- feeder_rec |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 
 feeder_rec
-#> Recipe
-#> 
-#> Inputs:
-#> 
-#>       role #variables
-#>    outcome          1
-#>  predictor         58
-#> 
-#> Operations:
-#> 
-#> Mean imputation for all_numeric_predictors()
-#> Sparse, unbalanced variable filter on all_numeric_predictors()
 ```
 
 
-```r
+``` r
 feeder_rec_trained <- prep(feeder_rec)
 
-bake(feeder_rec_trained, feeder_train) %>%
-  glimpse
+bake(feeder_rec_trained, feeder_train) |>
+  glimpse()
 #> Rows: 176,763
 #> Columns: 59
 #> $ yard_type_pavement           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
@@ -438,57 +419,57 @@ bake(feeder_rec_trained, feeder_train) %>%
 For more information: https://recipes.tidymodels.org/reference/index.html
 
 
-```r
+``` r
 ls(pattern = '^step_', env = as.environment('package:recipes'))
 #>  [1] "step_arrange"            "step_bagimpute"         
 #>  [3] "step_bin2factor"         "step_BoxCox"            
 #>  [5] "step_bs"                 "step_center"            
-#>  [7] "step_classdist"          "step_corr"              
-#>  [9] "step_count"              "step_cut"               
-#> [11] "step_date"               "step_depth"             
-#> [13] "step_discretize"         "step_dummy"             
-#> [15] "step_dummy_extract"      "step_dummy_multi_choice"
-#> [17] "step_factor2string"      "step_filter"            
-#> [19] "step_filter_missing"     "step_geodist"           
-#> [21] "step_harmonic"           "step_holiday"           
-#> [23] "step_hyperbolic"         "step_ica"               
-#> [25] "step_impute_bag"         "step_impute_knn"        
-#> [27] "step_impute_linear"      "step_impute_lower"      
-#> [29] "step_impute_mean"        "step_impute_median"     
-#> [31] "step_impute_mode"        "step_impute_roll"       
-#> [33] "step_indicate_na"        "step_integer"           
-#> [35] "step_interact"           "step_intercept"         
-#> [37] "step_inverse"            "step_invlogit"          
-#> [39] "step_isomap"             "step_knnimpute"         
-#> [41] "step_kpca"               "step_kpca_poly"         
-#> [43] "step_kpca_rbf"           "step_lag"               
-#> [45] "step_lincomb"            "step_log"               
-#> [47] "step_logit"              "step_lowerimpute"       
-#> [49] "step_meanimpute"         "step_medianimpute"      
-#> [51] "step_modeimpute"         "step_mutate"            
-#> [53] "step_mutate_at"          "step_naomit"            
-#> [55] "step_nnmf"               "step_nnmf_sparse"       
-#> [57] "step_normalize"          "step_novel"             
-#> [59] "step_ns"                 "step_num2factor"        
-#> [61] "step_nzv"                "step_ordinalscore"      
-#> [63] "step_other"              "step_pca"               
-#> [65] "step_percentile"         "step_pls"               
-#> [67] "step_poly"               "step_poly_bernstein"    
-#> [69] "step_profile"            "step_range"             
-#> [71] "step_ratio"              "step_regex"             
-#> [73] "step_relevel"            "step_relu"              
-#> [75] "step_rename"             "step_rename_at"         
-#> [77] "step_rm"                 "step_rollimpute"        
-#> [79] "step_sample"             "step_scale"             
-#> [81] "step_select"             "step_shuffle"           
-#> [83] "step_slice"              "step_spatialsign"       
-#> [85] "step_spline_b"           "step_spline_convex"     
-#> [87] "step_spline_monotone"    "step_spline_natural"    
-#> [89] "step_spline_nonnegative" "step_sqrt"              
-#> [91] "step_string2factor"      "step_time"              
-#> [93] "step_unknown"            "step_unorder"           
-#> [95] "step_window"             "step_YeoJohnson"        
-#> [97] "step_zv"
+#>  [7] "step_classdist"          "step_classdist_shrunken"
+#>  [9] "step_corr"               "step_count"             
+#> [11] "step_cut"                "step_date"              
+#> [13] "step_depth"              "step_discretize"        
+#> [15] "step_dummy"              "step_dummy_extract"     
+#> [17] "step_dummy_multi_choice" "step_factor2string"     
+#> [19] "step_filter"             "step_filter_missing"    
+#> [21] "step_geodist"            "step_harmonic"          
+#> [23] "step_holiday"            "step_hyperbolic"        
+#> [25] "step_ica"                "step_impute_bag"        
+#> [27] "step_impute_knn"         "step_impute_linear"     
+#> [29] "step_impute_lower"       "step_impute_mean"       
+#> [31] "step_impute_median"      "step_impute_mode"       
+#> [33] "step_impute_roll"        "step_indicate_na"       
+#> [35] "step_integer"            "step_interact"          
+#> [37] "step_intercept"          "step_inverse"           
+#> [39] "step_invlogit"           "step_isomap"            
+#> [41] "step_knnimpute"          "step_kpca"              
+#> [43] "step_kpca_poly"          "step_kpca_rbf"          
+#> [45] "step_lag"                "step_lincomb"           
+#> [47] "step_log"                "step_logit"             
+#> [49] "step_lowerimpute"        "step_meanimpute"        
+#> [51] "step_medianimpute"       "step_modeimpute"        
+#> [53] "step_mutate"             "step_mutate_at"         
+#> [55] "step_naomit"             "step_nnmf"              
+#> [57] "step_nnmf_sparse"        "step_normalize"         
+#> [59] "step_novel"              "step_ns"                
+#> [61] "step_num2factor"         "step_nzv"               
+#> [63] "step_ordinalscore"       "step_other"             
+#> [65] "step_pca"                "step_percentile"        
+#> [67] "step_pls"                "step_poly"              
+#> [69] "step_poly_bernstein"     "step_profile"           
+#> [71] "step_range"              "step_ratio"             
+#> [73] "step_regex"              "step_relevel"           
+#> [75] "step_relu"               "step_rename"            
+#> [77] "step_rename_at"          "step_rm"                
+#> [79] "step_rollimpute"         "step_sample"            
+#> [81] "step_scale"              "step_select"            
+#> [83] "step_shuffle"            "step_slice"             
+#> [85] "step_spatialsign"        "step_spline_b"          
+#> [87] "step_spline_convex"      "step_spline_monotone"   
+#> [89] "step_spline_natural"     "step_spline_nonnegative"
+#> [91] "step_sqrt"               "step_string2factor"     
+#> [93] "step_time"               "step_unknown"           
+#> [95] "step_unorder"            "step_window"            
+#> [97] "step_YeoJohnson"         "step_zv"
 ```
 
 ### Building workflows
@@ -500,8 +481,8 @@ ls(pattern = '^step_', env = as.environment('package:recipes'))
 #### Specify model {-}
 
 
-```r
-feeder_spec <- logistic_reg() %>%
+``` r
+feeder_spec <- logistic_reg() |>
   set_engine("glm")
 
 feeder_spec
@@ -513,9 +494,9 @@ feeder_spec
 **The workflow:**  Notice that the two important parts to the workflows are the model specification and the feature engineering recipe information.
 
 
-```r
-feeder_wflow <- workflow() %>%
-  add_model(feeder_spec) %>%
+``` r
+feeder_wflow <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec)
 
 feeder_wflow
@@ -541,11 +522,11 @@ feeder_wflow
 With the workflow in hand, the model can now be fit to the training data.  Although, wow... there are *so many predictors*!
 
 
-```r
-feeder_fit <- feeder_wflow %>%
+``` r
+feeder_fit <- feeder_wflow |>
   fit(data = feeder_train)
 
-feeder_fit %>% tidy() %>% print(n = 21)
+feeder_fit |> tidy() |> print(n = 21)
 #> # A tibble: 59 × 5
 #>    term               estimate std.error statistic   p.value
 #>    <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
@@ -581,20 +562,20 @@ feeder_fit %>% tidy() %>% print(n = 21)
 #### Model assessment {-}
 
 
-```r
-feeder_train_pred <- predict(feeder_fit, feeder_train, type = "prob") %>%
+``` r
+feeder_train_pred <- predict(feeder_fit, feeder_train, type = "prob") |>
   mutate(.pred_class = as.factor(ifelse(.pred_squirrels >=0.5,
-                                        "squirrels", "no squirrels"))) %>%
-  bind_cols(feeder_train %>% select(squirrels))
+                                        "squirrels", "no squirrels"))) |>
+  bind_cols(feeder_train |> select(squirrels))
 
-feeder_train_pred %>% select(squirrels, .pred_class) %>% table()
+feeder_train_pred |> select(squirrels, .pred_class) |> table()
 #>               .pred_class
 #> squirrels      no squirrels squirrels
 #>   no squirrels         3448     30544
 #>   squirrels            2122    140649
 
-rbind(roc_auc(feeder_train_pred, truth = squirrels, 
-              estimate = .pred_squirrels, event_level = "second"),
+rbind(yardstick::roc_auc(data = feeder_train_pred, truth = squirrels, 
+              .pred_squirrels, event_level = "second"),
       accuracy(feeder_train_pred, truth = squirrels, 
                estimate = .pred_class),
       sensitivity(feeder_train_pred, truth = squirrels, 
@@ -610,7 +591,7 @@ rbind(roc_auc(feeder_train_pred, truth = squirrels,
 #> 3 sensitivity binary         0.985
 #> 4 specificity binary         0.101
 
-feeder_train_pred %>%
+feeder_train_pred |>
   ggplot() + 
   plotROC::geom_roc(aes(m = .pred_squirrels, d = squirrels)) + 
   geom_abline(intercept = 0, slope = 1, color = "blue")
@@ -627,11 +608,11 @@ But, really...
 ### Predictions for testing data {-}
 
 
-```r
-feeder_test_pred <- predict(feeder_fit, feeder_test) %>%
-  bind_cols(feeder_test %>% select(squirrels))
+``` r
+feeder_test_pred <- predict(feeder_fit, feeder_test) |>
+  bind_cols(feeder_test |> select(squirrels))
 
-feeder_test_pred %>% table()
+feeder_test_pred |> table()
 #>               squirrels
 #> .pred_class    no squirrels squirrels
 #>   no squirrels         1119       726
@@ -640,20 +621,20 @@ feeder_test_pred %>% table()
 
 
 
-```r
-feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") %>%
+``` r
+feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") |>
   mutate(.pred_class = as.factor(ifelse(.pred_squirrels >=0.5,
-                                        "squirrels", "no squirrels"))) %>%
-  bind_cols(feeder_test %>% select(squirrels))
+                                        "squirrels", "no squirrels"))) |>
+  bind_cols(feeder_test |> select(squirrels))
 
-feeder_test_pred %>% select(squirrels, .pred_class) %>% table()
+feeder_test_pred |> select(squirrels, .pred_class) |> table()
 #>               .pred_class
 #> squirrels      no squirrels squirrels
 #>   no squirrels         1119     10212
 #>   squirrels             726     46865
 
 rbind(roc_auc(feeder_test_pred, truth = squirrels, 
-              estimate = .pred_squirrels, event_level = "second"),
+              .pred_squirrels, event_level = "second"),
       accuracy(feeder_test_pred, truth = squirrels, 
                estimate = .pred_class),
       sensitivity(feeder_test_pred, truth = squirrels, 
@@ -669,7 +650,7 @@ rbind(roc_auc(feeder_test_pred, truth = squirrels,
 #> 3 sensitivity binary        0.985 
 #> 4 specificity binary        0.0988
 
-feeder_test_pred %>%
+feeder_test_pred |>
   ggplot() + 
   plotROC::geom_roc(aes(m = .pred_squirrels, d = squirrels)) + 
   geom_abline(intercept = 0, slope = 1, color = "blue")
@@ -698,21 +679,21 @@ For example, let's set up a scenario to compare two different models to predict 
 
 **Model 1:**
 
-```r
-feeder_rec1 <- recipe(squirrels ~ ., data = feeder_train) %>%
+``` r
+feeder_rec1 <- recipe(squirrels ~ ., data = feeder_train) |>
   # delete the habitat variables
-  step_rm(contains("hab")) %>%
+  step_rm(contains("hab")) |>
   # delete the tree/shrub info
-  step_rm(contains("atleast")) %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+  step_rm(contains("atleast")) |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 ```
 
 
 
-```r
-prep(feeder_rec1) %>%
-bake(feeder_train) %>%
+``` r
+prep(feeder_rec1) |>
+bake(feeder_train) |>
   glimpse()
 #> Rows: 176,763
 #> Columns: 34
@@ -755,21 +736,21 @@ bake(feeder_train) %>%
 
 **Model 2:**
 
-```r
-feeder_rec2 <- recipe(squirrels ~ ., data = feeder_train) %>%
+``` r
+feeder_rec2 <- recipe(squirrels ~ ., data = feeder_train) |>
   # delete the variables on when the birds were fed
-  step_rm(contains("fed")) %>%
+  step_rm(contains("fed")) |>
   # delete the variables about the bird feeders
-  step_rm(contains("feed")) %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+  step_rm(contains("feed")) |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 ```
 
 
 
-```r
-prep(feeder_rec2) %>%
-bake(feeder_train) %>%
+``` r
+prep(feeder_rec2) |>
+bake(feeder_train) |>
   glimpse()
 #> Rows: 176,763
 #> Columns: 35
@@ -817,9 +798,9 @@ Using each of the separate recipes, different workflows are set up:
 
 **Model 1:**
 
-```r
-feeder_wflow1 <- workflow() %>%
-  add_model(feeder_spec) %>%
+``` r
+feeder_wflow1 <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec1)
 
 feeder_wflow1
@@ -843,9 +824,9 @@ feeder_wflow1
 
 **Model 2:**
 
-```r
-feeder_wflow2 <- workflow() %>%
-  add_model(feeder_spec) %>%
+``` r
+feeder_wflow2 <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec2) 
 
 feeder_wflow2
@@ -989,7 +970,7 @@ Consider the example below where the **training** **data** are randomly split in
 
 
 
-```r
+``` r
 set.seed(4747)
 folds <- vfold_cv(feeder_train, v = 3, strata = squirrels)
 folds
@@ -1021,7 +1002,7 @@ After the data have been split into v (here 3) resamples, they can each be fit t
 Let's also make sure that we can get back all of the metrics we are interested in:
 
 
-```r
+``` r
 metrics_interest <- metric_set(accuracy, roc_auc, 
                               sensitivity, specificity)
 ```
@@ -1032,8 +1013,8 @@ metrics_interest <- metric_set(accuracy, roc_auc,
 > specificity = number of non-squirrels that are accurately predicted to be non-squirrels (true negative rate)
 
 
-```r
-feeder_train %>% select(squirrels) %>% table()
+``` r
+feeder_train |> select(squirrels) |> table()
 #> squirrels
 #> no squirrels    squirrels 
 #>        33992       142771
@@ -1042,8 +1023,8 @@ feeder_train %>% select(squirrels) %>% table()
 
 **Model 1:**
 
-```r
-feeder_fit_rs1 <- feeder_wflow1 %>%
+``` r
+feeder_fit_rs1 <- feeder_wflow1 |>
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
                 control = control_resamples(save_pred = TRUE,
@@ -1063,8 +1044,8 @@ feeder_fit_rs1
 
 **Model 2:**
 
-```r
-feeder_fit_rs2 <- feeder_wflow2 %>%
+``` r
+feeder_fit_rs2 <- feeder_wflow2 |>
   fit_resamples(resamples = folds,
                 metrics = metrics_interest,
                 control = control_resamples(save_pred = TRUE,
@@ -1090,7 +1071,7 @@ feeder_fit_rs2
 
 **Model 1:**
 
-```r
+``` r
 collect_metrics(feeder_fit_rs1)
 #> # A tibble: 4 × 6
 #>   .metric     .estimator   mean     n  std_err .config             
@@ -1102,10 +1083,10 @@ collect_metrics(feeder_fit_rs1)
 ```
 
 
-```r
-feeder_fit_rs1 %>% augment() %>%
-  select(squirrels, .pred_class) %>%
-  yardstick::conf_mat(squirrels, .pred_class) %>%
+``` r
+feeder_fit_rs1 |> augment() |>
+  select(squirrels, .pred_class) |>
+  yardstick::conf_mat(squirrels, .pred_class) |>
   autoplot(type = "heatmap") + 
   scale_fill_gradient(low="#D6EAF8", high="#2E86C1") 
 ```
@@ -1114,7 +1095,7 @@ feeder_fit_rs1 %>% augment() %>%
 
 **Model 2:**
 
-```r
+``` r
 collect_metrics(feeder_fit_rs2)
 #> # A tibble: 4 × 6
 #>   .metric     .estimator   mean     n  std_err .config             
@@ -1126,12 +1107,13 @@ collect_metrics(feeder_fit_rs2)
 ```
 
 
-```r
-feeder_fit_rs2 %>% augment() %>%
-  select(squirrels, .pred_class) %>%
-  yardstick::conf_mat(squirrels, .pred_class) %>%
+``` r
+feeder_fit_rs2 |> augment() |>
+  select(squirrels, .pred_class) |>
+  yardstick::conf_mat(squirrels, .pred_class) |>
   autoplot(type = "heatmap") + 
   scale_fill_gradient(low="#D6EAF8", high="#2E86C1") 
+
 ```
 
 <img src="05a-model_files/figure-html/unnamed-chunk-50-1.png" width="80%" style="display: block; margin: auto;" />
@@ -1140,7 +1122,7 @@ feeder_fit_rs2 %>% augment() %>%
 
 **Model 1:**
 
-```r
+``` r
 cv_metrics1 <- collect_metrics(feeder_fit_rs1, summarize = FALSE) 
 
 cv_metrics1
@@ -1158,7 +1140,7 @@ cv_metrics1
 
 **Model 2:**
 
-```r
+``` r
 cv_metrics2 <- collect_metrics(feeder_fit_rs2, summarize = FALSE) 
 
 cv_metrics2
@@ -1231,16 +1213,16 @@ Now that Model 2 has been chosen as the better model, the test data is **finally
 n.b. For whatever reason, `collect_metrics()` only works when multiple models have been run.  When a single model is run, the metrics need to be evaluated individually.
 
 
-```r
-feeder_preds2 <- feeder_wflow2 %>%
-  fit(data = feeder_train) %>%
-  predict(feeder_test, type = "prob") %>% 
+``` r
+feeder_preds2 <- feeder_wflow2 |>
+  fit(data = feeder_train) |>
+  predict(feeder_test, type = "prob") |> 
   mutate(.pred_class = as.factor(ifelse(.pred_squirrels >=0.5,
-                              "squirrels", "no squirrels"))) %>%
-  bind_cols(feeder_test %>% select(squirrels)) 
+                              "squirrels", "no squirrels"))) |>
+  bind_cols(feeder_test |> select(squirrels)) 
 
 rbind(roc_auc(feeder_preds2, truth = squirrels, 
-              estimate = .pred_squirrels, event_level = "second"),
+              .pred_squirrels, event_level = "second"),
       accuracy(feeder_preds2, truth = squirrels, 
                estimate = .pred_class, event_level = "second"),
       sensitivity(feeder_preds2, truth = squirrels, 
@@ -1269,9 +1251,9 @@ The following example uses **tidymodels** modeling to work through different asp
 Break the data into test and training sets.
 
 
-```r
+``` r
 set.seed(470)
-feeder_split <- site_data %>%
+feeder_split <- site_data |>
   initial_split(strata = squirrels) # prop = 3/4 in each group, by default
 feeder_train <- training(feeder_split)
 feeder_test <- testing(feeder_split)
@@ -1283,8 +1265,8 @@ feeder_test <- testing(feeder_split)
 Tell the computer to run logistic regression using the `glm()` function.
 
 
-```r
-feeder_spec <- logistic_reg() %>%
+``` r
+feeder_spec <- logistic_reg() |>
   set_engine("glm")
 ```
 
@@ -1293,29 +1275,29 @@ feeder_spec <- logistic_reg() %>%
 Set the variables of interest (in the formula) and perform any necessary feature engineering.
 
 
-```r
+``` r
 feeder_rec <- recipe(
   squirrels ~ .,    # formula
   data = feeder_train # data for cataloging names and types of variables
-  ) %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+  ) |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 
-feeder_rec1 <- recipe(squirrels ~ ., data = feeder_train) %>%
+feeder_rec1 <- recipe(squirrels ~ ., data = feeder_train) |>
   # delete the habitat variables
-  step_rm(contains("hab")) %>%
+  step_rm(contains("hab")) |>
   # delete the tree/shrub info
-  step_rm(contains("atleast")) %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+  step_rm(contains("atleast")) |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 
 
-feeder_rec2 <- recipe(squirrels ~ ., data = feeder_train) %>%
+feeder_rec2 <- recipe(squirrels ~ ., data = feeder_train) |>
   # delete the variables on when the birds were fed
-  step_rm(contains("fed")) %>%
+  step_rm(contains("fed")) |>
   # delete the variables about the bird feeders
-  step_rm(contains("feed")) %>%
-  step_impute_mean(all_numeric_predictors()) %>%
+  step_rm(contains("feed")) |>
+  step_impute_mean(all_numeric_predictors()) |>
   step_nzv(all_numeric_predictors())
 ```
 
@@ -1323,17 +1305,17 @@ feeder_rec2 <- recipe(squirrels ~ ., data = feeder_train) %>%
 ### The workflow(s)
 
 
-```r
-feeder_wflow <- workflow() %>%
-  add_model(feeder_spec) %>%
+``` r
+feeder_wflow <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec)
 
-feeder_wflow1 <- workflow() %>%
-  add_model(feeder_spec) %>%
+feeder_wflow1 <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec1)
 
-feeder_wflow2 <- workflow() %>%
-  add_model(feeder_spec) %>%
+feeder_wflow2 <- workflow() |>
+  add_model(feeder_spec) |>
   add_recipe(feeder_rec2)
 ```
 
@@ -1343,15 +1325,15 @@ feeder_wflow2 <- workflow() %>%
 #### Fit the model {-}
 
 
-```r
-feeder_fit <- feeder_wflow %>%
+``` r
+feeder_fit <- feeder_wflow |>
   fit(data = feeder_train)
 ```
 
 The fit object is the same as the output of `glm()` that you are used to working with:
 
-```r
-feeder_fit %>% tidy()
+``` r
+feeder_fit |> tidy()
 #> # A tibble: 59 × 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
@@ -1363,7 +1345,7 @@ feeder_fit %>% tidy()
 #> 6 yard_type_desert     -0.297    0.0789     -3.76 1.68e-  4
 #> # ℹ 53 more rows
 
-feeder_fit %>% glance()
+feeder_fit |> glance()
 #> # A tibble: 1 × 8
 #>   null.deviance df.null  logLik     AIC     BIC deviance df.residual   nobs
 #>           <dbl>   <int>   <dbl>   <dbl>   <dbl>    <dbl>       <int>  <int>
@@ -1377,17 +1359,17 @@ If cross validating, the model needs to be fit separately on each one of the hol
 Note that the objects are now similar to what you've worked with previously (output of `glm()`), but they contain a separate fit (i.e., linear model) for each of the CV folds.
 
 
-```r
+``` r
 set.seed(47)
 folds <- vfold_cv(feeder_train, v = 10)
 
-feeder_fit_rs1 <- feeder_wflow1 %>%
+feeder_fit_rs1 <- feeder_wflow1 |>
   fit_resamples(folds,
                 metrics = metrics_interest,
                 control = control_resamples(save_pred = TRUE,
                                             event_level = "second"))
 
-feeder_fit_rs2 <- feeder_wflow2 %>%
+feeder_fit_rs2 <- feeder_wflow2 |>
   fit_resamples(folds,
                 metrics = metrics_interest,
                 control = control_resamples(save_pred = TRUE,
@@ -1402,17 +1384,17 @@ Note that we should only assess the fit to the test data if we are done with the
 
 Accuracy, AUC, sensitivity, and specificity are all calculated.
 
-If the first few lines don't make sense, run the pieces.  That is, run `predict(feeder_fit, feeder_test)` and then run `feeder_test %>% select(imdb_rating, title)` and then think about what it would mean to **bind** those columns together.
+If the first few lines don't make sense, run the pieces.  That is, run `predict(feeder_fit, feeder_test)` and then run `feeder_test |> select(imdb_rating, title)` and then think about what it would mean to **bind** those columns together.
 
 
-```r
-feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") %>%
+``` r
+feeder_test_pred <- predict(feeder_fit, feeder_test, type = "prob") |>
   mutate(.pred_class = as.factor(ifelse(.pred_squirrels >=0.5,
-                                        "squirrels", "no squirrels"))) %>%
-  bind_cols(feeder_test %>% select(squirrels))
+                                        "squirrels", "no squirrels"))) |>
+  bind_cols(feeder_test |> select(squirrels))
 
 rbind(roc_auc(feeder_test_pred, truth = squirrels, 
-              estimate = .pred_squirrels, event_level = "second"),
+              .pred_squirrels, event_level = "second"),
       accuracy(feeder_test_pred, truth = squirrels, 
                estimate = .pred_class),
       sensitivity(feeder_test_pred, truth = squirrels, 
@@ -1428,7 +1410,7 @@ rbind(roc_auc(feeder_test_pred, truth = squirrels,
 #> 3 sensitivity binary        0.985 
 #> 4 specificity binary        0.0988
 
-feeder_test_pred %>%
+feeder_test_pred |>
   ggplot() + 
   plotROC::geom_roc(aes(m = .pred_squirrels, d = squirrels)) + 
   geom_abline(intercept = 0, slope = 1, color = "blue")
@@ -1441,8 +1423,8 @@ feeder_test_pred %>%
 Note the difference in the information.  If you want the values per fold, don't summarize.  If you want the overall information, do summarize.
 
 
-```r
-feeder_fit_rs1 %>% collect_metrics()
+``` r
+feeder_fit_rs1 |> collect_metrics()
 #> # A tibble: 4 × 6
 #>   .metric     .estimator   mean     n  std_err .config             
 #>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
@@ -1450,7 +1432,7 @@ feeder_fit_rs1 %>% collect_metrics()
 #> 2 roc_auc     binary     0.663     10 0.00183  Preprocessor1_Model1
 #> 3 sensitivity binary     0.996     10 0.000154 Preprocessor1_Model1
 #> 4 specificity binary     0.0269    10 0.000563 Preprocessor1_Model1
-feeder_fit_rs2 %>% collect_metrics()
+feeder_fit_rs2 |> collect_metrics()
 #> # A tibble: 4 × 6
 #>   .metric     .estimator   mean     n  std_err .config             
 #>   <chr>       <chr>       <dbl> <int>    <dbl> <chr>               
@@ -1459,7 +1441,7 @@ feeder_fit_rs2 %>% collect_metrics()
 #> 3 sensitivity binary     0.990     10 0.000367 Preprocessor1_Model1
 #> 4 specificity binary     0.0695    10 0.00156  Preprocessor1_Model1
 
-feeder_fit_rs1 %>% collect_metrics(summarize = FALSE)
+feeder_fit_rs1 |> collect_metrics(summarize = FALSE)
 #> # A tibble: 40 × 5
 #>   id     .metric     .estimator .estimate .config             
 #>   <chr>  <chr>       <chr>          <dbl> <chr>               
@@ -1470,7 +1452,7 @@ feeder_fit_rs1 %>% collect_metrics(summarize = FALSE)
 #> 5 Fold02 accuracy    binary        0.805  Preprocessor1_Model1
 #> 6 Fold02 sensitivity binary        0.996  Preprocessor1_Model1
 #> # ℹ 34 more rows
-feeder_fit_rs2 %>% collect_metrics(summarize = FALSE)
+feeder_fit_rs2 |> collect_metrics(summarize = FALSE)
 #> # A tibble: 40 × 5
 #>   id     .metric     .estimator .estimate .config             
 #>   <chr>  <chr>       <chr>          <dbl> <chr>               
@@ -1486,16 +1468,16 @@ feeder_fit_rs2 %>% collect_metrics(summarize = FALSE)
 Note that the variables in Model 2 perform better using cross validation than the variables in Model 1, we choose Model 2 to report out:
 
 
-```r
-feeder_test_pred_2 <- feeder_wflow2 %>%
-  fit(feeder_train) %>%
-  predict(feeder_test, type = "prob") %>%
+``` r
+feeder_test_pred_2 <- feeder_wflow2 |>
+  fit(feeder_train) |>
+  predict(feeder_test, type = "prob") |>
   mutate(.pred_class = as.factor(ifelse(.pred_squirrels >=0.5,
-                                        "squirrels", "no squirrels"))) %>%
-  bind_cols(feeder_test %>% select(squirrels))
+                                        "squirrels", "no squirrels"))) |>
+  bind_cols(feeder_test |> select(squirrels))
 
 rbind(roc_auc(feeder_test_pred_2, truth = squirrels, 
-              estimate = .pred_squirrels, event_level = "second"),
+              .pred_squirrels, event_level = "second"),
       accuracy(feeder_test_pred_2, truth = squirrels, 
                estimate = .pred_class),
       sensitivity(feeder_test_pred_2, truth = squirrels, 
@@ -1513,8 +1495,8 @@ rbind(roc_auc(feeder_test_pred_2, truth = squirrels,
 ```
 
 
-```r
-feeder_test_pred_2 %>%
+``` r
+feeder_test_pred_2 |>
   ggplot() + 
   plotROC::geom_roc(aes(m = .pred_squirrels, d = squirrels)) + 
   geom_abline(intercept = 0, slope = 1, color = "blue")

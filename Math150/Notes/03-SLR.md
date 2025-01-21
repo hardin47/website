@@ -269,7 +269,7 @@ The data below represents 10 different variables on health of a country measured
 
 ### Reading the data into R
 
-```r
+``` r
 happy <- read_delim("./data/happyPlanet.txt", delim="\t")
 glimpse(happy)  
 #> Rows: 143
@@ -291,10 +291,10 @@ glimpse(happy)
 ### Running the linear model (lm)
 
 
-```r
+``` r
 happy.lm = lm(LifeExpectancy ~ Happiness, data=happy) 
 
-happy.lm %>% tidy()
+happy.lm |> tidy()
 #> # A tibble: 2 × 5
 #>   term        estimate std.error statistic  p.value
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
@@ -306,8 +306,8 @@ happy.lm %>% tidy()
 
 Some analyses will need the residuals, fitted values, or coefficients individually.
 
-```r
-happy.lm %>% augment()
+``` r
+happy.lm |> augment()
 #> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>
@@ -323,13 +323,13 @@ happy.lm %>% augment()
 
 We can plot the main relationship, or we can plot the residuals (to check that technical conditions hold):
 ```
-happy %>%
+happy |>
          ggplot(aes(x=Happiness, y=LifeExpectancy)) + 
          geom_point() + 
          geom_smooth(method="lm", se=FALSE) 
 
-happy.lm %>% 
-         augment() %>% 
+happy.lm |> 
+         augment() |> 
          ggplot(aes(x = .fitted, y = .resid)) + 
          geom_point() + 
          geom_hline(yintercept=0)
@@ -340,7 +340,7 @@ happy.lm %>%
 
 Intervals of interest: mean response, individual response, and parameter(s).
 
-```r
+``` r
 predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("conf"), level=.95)
 #>    fit  lwr  upr
 #> 1 55.0 53.2 56.7
@@ -350,7 +350,7 @@ predict.lm(happy.lm, newdata=list(Happiness=c(4,7)),interval=c("pred"), level=.9
 #> 1 55.0 42.7 67.3
 #> 2 75.1 62.9 87.3
 
-happy.lm %>% tidy(conf.int = TRUE)
+happy.lm |> tidy(conf.int = TRUE)
 #> # A tibble: 2 × 7
 #>   term        estimate std.error statistic  p.value conf.low conf.high
 #>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
@@ -365,8 +365,8 @@ We skipped the residuals section, so you are not responsible for finding residua
   
 
 
-```r
-happy.lm %>% augment()
+``` r
+happy.lm |> augment()
 #> # A tibble: 143 × 8
 #>   LifeExpectancy Happiness .fitted  .resid    .hat .sigma   .cooksd .std.resid
 #>            <dbl>     <dbl>   <dbl>   <dbl>   <dbl>  <dbl>     <dbl>      <dbl>

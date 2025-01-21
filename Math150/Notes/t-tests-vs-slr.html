@@ -7,7 +7,7 @@
 <title>Chapter 3 t-tests vs SLR | Methods in Biostatistics</title>
 <meta name="author" content="Jo Hardin">
 <meta name="description" content="We are going to build on a very basic model of the following form: data = deterministic model + random error planned variability your experimental conditions, hopefully represented by an...">
-<meta name="generator" content="bookdown 0.31 with bs4_book()">
+<meta name="generator" content="bookdown 0.41 with bs4_book()">
 <meta property="og:title" content="Chapter 3 t-tests vs SLR | Methods in Biostatistics">
 <meta property="og:type" content="book">
 <meta property="og:description" content="We are going to build on a very basic model of the following form: data = deterministic model + random error planned variability your experimental conditions, hopefully represented by an...">
@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="We are going to build on a very basic model of the following form: data = deterministic model + random error planned variability your experimental conditions, hopefully represented by an...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
-<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.8.0/transition.js"></script><script src="libs/bs3compat-0.8.0/tabs.js"></script><script src="libs/bs3compat-0.8.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <link href="libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet">
 <script src="libs/bsTable-3.3.7/bootstrapTable.js"></script><script type="text/x-mathjax-config">
@@ -46,6 +46,7 @@
     div.csl-bib-body { }
     div.csl-entry {
       clear: both;
+          margin-bottom: 0em;
         }
     .hanging div.csl-entry {
       margin-left:2em;
@@ -115,11 +116,11 @@
 <h3>Surgery Timing<a class="anchor" aria-label="anchor" href="#surgery-timing"><i class="fas fa-link"></i></a>
 </h3>
 <p>The study, “Operation Timing and 30-Day Mortality After Elective General Surgery”, tested the hypotheses that the risk of 30-day mortality associated with elective general surgery: 1) increases from morning to evening throughout the routine workday; 2) increases from Monday to Friday through the workweek; and 3) is more frequent in July and August than during other months of the year. As a presumed negative control, the investigators also evaluated mortality as a function of the phase of the moon. Secondarily, they evaluated these hypotheses as they pertain to a composite in-hospital morbidity endpoint.</p>
-<p>The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from <span class="citation">(<a href="references.html#ref-Sessler2011" role="doc-biblioref">Sessler et al. 2011</a>)</span></p>
+<p>The related data set contains 32,001 elective general surgical patients. Age, gender, race, BMI, several comorbidities, several surgical risk indices, the surgical timing predictors (hour, day of week, month,moon phase) and the outcomes (30-day mortality and in-hospital complication) are provided. The dataset is cleaned and complete (no missing data except for BMI). There are no outliers or data problems. The data are from <span class="citation">(<a href="references.html#ref-Sessler2011">Sessler et al. 2011</a>)</span></p>
 <p>Note that in the example, mortality rates are compared for patients electing to have surgery in July August vs. other months of the year. We’d like to compare the average age of the participants from the July and August groups as compared to the rest of the year. Even if the mortality difference is significant, we can’t conclude causation (of the treatment) because it was an observational study. However, the more similar the groups are based on clinical variables (e.g., age), the more likely any differences in mortality are due to timing (i.e., the treatment). Let’s start by asking: how different are the groups based on clinical variables, here we assess age?</p>
 <div class="inline-table"><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-2">Table 3.1: </span>Varibles associated with the surgery data.
+<span id="tab:unnamed-chunk-2">Table 3.1: </span><span id="tab:unnamed-chunk-2">Table 3.2: </span>Varibles associated with the surgery data.
 </caption>
 <thead><tr>
 <th style="text-align:right;">
@@ -643,11 +644,11 @@ No
 </tbody>
 </table></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">|&gt;</span></span>
 <span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>summer <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
 <span>   <span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span> <span class="op">~</span> <span class="cn">TRUE</span>,</span>
-<span>   <span class="op">!</span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">summer</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>   <span class="op">!</span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">summer</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>age_mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, age_sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">age</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, age_n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
 <span><span class="co">#&gt;   summer age_mean age_sd age_n</span></span>
@@ -659,7 +660,7 @@ No
 <h2>
 <span class="header-section-number">3.1</span> t-test<a class="anchor" aria-label="anchor" href="#ttest"><i class="fas fa-link"></i></a>
 </h2>
-<p>(Section 2.1 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
+<p>(Section 2.1 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>.)</p>
 <p>A t-test is a test of means. For the surgery timing data, the groups would ideally have similar age distributions. Why? What are the advantages and disadvantages of running a retrospective cohort study?</p>
 <p>The two-sample t-test starts with the assumption that the population means of the two groups are equal, <span class="math inline">\(H_0: \mu_1 = \mu_2.\)</span> The sample means <span class="math inline">\(\overline{y}_1\)</span> and <span class="math inline">\(\overline{y}_2\)</span> will always be different. How different must the <span class="math inline">\(\overline{y}\)</span> values be in order to reject the null hypothesis?</p>
 <div id="model-1" class="section level5 unnumbered">
@@ -695,11 +696,12 @@ df &amp;= n_1 + n_2 -2\\
 </div>
 <p>The same analysis can be done in R (with and without tidying the output):</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">surgery</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>summer <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
 <span>    <span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span> <span class="op">~</span> <span class="cn">TRUE</span>,</span>
-<span>   <span class="op">!</span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">summer</span>, data <span class="op">=</span> <span class="va">.</span>, var.equal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>   <span class="op">!</span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> </span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">age</span> <span class="op">~</span> <span class="va">summer</span>, var.equal <span class="op">=</span> <span class="cn">TRUE</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Two Sample t-test</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -711,12 +713,7 @@ df &amp;= n_1 + n_2 -2\\
 <span><span class="co">#&gt; sample estimates:</span></span>
 <span><span class="co">#&gt; mean in group FALSE  mean in group TRUE </span></span>
 <span><span class="co">#&gt;                57.6                57.8</span></span>
-<span></span>
-<span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>summer <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
-<span>    <span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span> <span class="op">~</span> <span class="cn">TRUE</span>,</span>
-<span>   <span class="op">!</span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">summer</span>, data <span class="op">=</span> <span class="va">.</span>, var.equal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">age</span> <span class="op">~</span> <span class="va">summer</span>, var.equal <span class="op">=</span> <span class="cn">TRUE</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high</span></span>
@@ -729,7 +726,7 @@ df &amp;= n_1 + n_2 -2\\
 <li>Why do we use the t-distribution?</li>
 <li>Why is the <strong>big</strong> p-value important? (It’s a good thing!) How do we interpret the p-value?</li>
 <li>What can we conclude?</li>
-<li>applet from <span class="citation">(<a href="references.html#ref-iscam" role="doc-biblioref">Chance and Rossman 2018</a>)</span>: <a href="http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model" target="_blank">sampling from two populations</a>
+<li>applet from <span class="citation">(<a href="references.html#ref-iscam">Chance and Rossman 2018</a>)</span>: <a href="http://www.rossmanchance.com/applets/2021/twopopmodels/TwoPopModels.html?population=model" target="_blank">sampling from two populations</a>
 </li>
 <li>What are the model assumptions? (basically all the assumptions are given in the original linear model: independence between &amp; within groups, random sample, pop values don’t change, additive error, <span class="math inline">\(\epsilon_{i,j} \ \sim \ iid \  N(0, \sigma^2))\)</span>
 </li>
@@ -779,13 +776,13 @@ y_{2j} &amp;= \hat{\mu}_{2} + \epsilon_{2j} \ \ \ \ j=1, 2, \ldots, n_2\\
 <h2>
 <span class="header-section-number">3.2</span> ANOVA<a class="anchor" aria-label="anchor" href="#anova"><i class="fas fa-link"></i></a>
 </h2>
-<p>Skip ANOVA in your text (2.4 and part of 2.9 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>).</p>
+<p>Skip ANOVA in your text (2.4 and part of 2.9 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>).</p>
 </div>
 <div id="tslr" class="section level2" number="3.3">
 <h2>
 <span class="header-section-number">3.3</span> Simple Linear Regression<a class="anchor" aria-label="anchor" href="#tslr"><i class="fas fa-link"></i></a>
 </h2>
-<p>(Section 2.3 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
+<p>(Section 2.3 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>.)</p>
 <p>Simple Linear Regression is a model (hopefully discussed in introductory statistics) used for describing a <em>linear</em> relationship between two variables. It typically has the form of:</p>
 <p><span class="math display">\[\begin{align}
 y_i &amp;= \beta_0 + \beta_1 x_i + \epsilon_i  \ \ \ \ i = 1, 2, \ldots, n\\
@@ -837,9 +834,10 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 <p>That is, we are assuming that for each observation the true population <em>average</em> is fixed and an individual that is randomly selected will have some amount of <em>random error</em> away from the true population mean at their value for the explanatory variable, <span class="math inline">\(x_i.\)</span> Note that we have assumed that the variance is constant across any level of the explanatory variable. We have also assumed that there is independence across individuals. <strong>[Note: there are no assumptions about the distribution of the explanatory variable, <span class="math inline">\(X].\)</span></strong></p>
 <p>Note the similarity in running a <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> and a linear model (<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">surgery</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> </span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high</span></span>
@@ -847,9 +845,7 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 <span><span class="co">#&gt; 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31</span></span>
 <span><span class="co">#&gt; # ℹ 2 more variables: method &lt;chr&gt;, alternative &lt;chr&gt;</span></span>
 <span></span>
-<span><span class="va">surgery</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Jul"</span>, <span class="st">"Aug"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">age</span> <span class="op">~</span> <span class="va">month</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 5</span></span>
 <span><span class="co">#&gt;   term        estimate std.error statistic p.value</span></span>
@@ -880,7 +876,7 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 <h2>
 <span class="header-section-number">3.4</span> Confidence Intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"><i class="fas fa-link"></i></a>
 </h2>
-<p>(Section 2.11 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>.)</p>
+<p>(Section 2.11 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>.)</p>
 <p>A fantastic applet for visualizing what it means to have 95% confidence: [<a href="http://www.rossmanchance.com/applets/2021/confsim/ConfSim.html" class="uri">http://www.rossmanchance.com/applets/2021/confsim/ConfSim.html</a>]</p>
 <p>In general, the format of a confidence interval is give below… what is the interpretation? Remember, the interval is for a given parameter and the “coverage” happens in alternative universes with repeated sampling. We’re 95% confident that the interval captures the parameter.</p>
 <pre><code>estimate +/- critical value x standard error of the estimate</code></pre>
@@ -915,10 +911,10 @@ E[Y_i] &amp;= \beta_0 + \beta_1 x_i\\
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-7"></span>
 <img src="figs/randsampValloc.jpg" alt="Figure taken from [@iscam]" width="95%"><p class="caption">
-Figure 3.1: Figure taken from <span class="citation">(<a href="references.html#ref-iscam" role="doc-biblioref">Chance and Rossman 2018</a>)</span>
+Figure 3.1: Figure taken from <span class="citation">(<a href="references.html#ref-iscam">Chance and Rossman 2018</a>)</span>
 </p>
 </div>
-<p>Note: no ANOVA (section 2.4 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>) or normal probability plots (section 2.8 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar" role="doc-biblioref">2013</a>)</span>).</p>
+<p>Note: no ANOVA (section 2.4 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>) or normal probability plots (section 2.8 in <span class="citation">Kuiper and Sklar (<a href="references.html#ref-KuiperSklar">2013</a>)</span>).</p>
 
 </div>
 </div>
@@ -944,8 +940,8 @@ Figure 3.1: Figure taken from <span class="citation">(<a href="references.html#r
 
       <div class="book-extra">
         <ul class="list-unstyled">
-<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/02-ttest.Rmd">View source <i class="fab fa-github"></i></a></li>
-          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/02-ttest.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+<li><a id="book-source" href="https://github.com/hardin47/website/blob/master/02-ttest.qmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/hardin47/website/edit/master/02-ttest.qmd">Edit this page <i class="fab fa-github"></i></a></li>
         </ul>
 </div>
     </nav>
@@ -957,7 +953,7 @@ Figure 3.1: Figure taken from <span class="citation">(<a href="references.html#r
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2023-05-16.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2025-01-20.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

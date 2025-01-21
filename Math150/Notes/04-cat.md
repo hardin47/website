@@ -38,18 +38,18 @@ RR &=& 4.8
 
 
 
-```r
+``` r
 backpain <- data.frame(treatment = c(rep("placebo", 16), rep("Botox", 15)),
                      outcome = c(rep("reduction", 2), rep("no_reduction", 14), 
                                  rep("reduction", 9), rep("no_reduction", 6)))
-backpain %>%
+backpain |>
   table()
 #>          outcome
 #> treatment no_reduction reduction
 #>   Botox              6         9
 #>   placebo           14         2
 
-backpain %>% glimpse()
+backpain |> glimpse()
 #> Rows: 31
 #> Columns: 2
 #> $ treatment <chr> "placebo", "placebo", "placebo", "placebo", "placebo", "plac…
@@ -60,13 +60,13 @@ backpain %>% glimpse()
 Note that sometimes it makes sense for the y-axis to be count and sometimes it makes sense for the y-axis to be percent.  Probably doesn't matter much here, you should choose the bar plot that seems most informative to you.
 
 
-```r
-backpain %>%
+``` r
+backpain |>
   ggplot(aes(x = treatment)) + 
   geom_bar(aes(fill = outcome), position = "fill") +
   ylab("percentage")
 
-backpain %>%
+backpain |>
   ggplot(aes(x = treatment)) + 
   geom_bar(aes(fill = outcome))
 ```
@@ -138,34 +138,34 @@ Step 4. Calculate the p-value from the sampling distribution generated in Step 3
 
 
 
-```r
+``` r
 library(infer)
 
 # Step 1.
-diff_props <- backpain %>%
-  specify(outcome ~ treatment, success = "reduction") %>%
-  calculate(stat = "diff in props", order = c("Botox", "placebo")) %>%
+diff_props <- backpain |>
+  specify(outcome ~ treatment, success = "reduction") |>
+  calculate(stat = "diff in props", order = c("Botox", "placebo")) |>
   pull()
 
 diff_props  # print to screen to see the observed difference
 #> [1] 0.475
 
 # Step 2.
-nulldist <- backpain %>%
-  specify(outcome ~ treatment, success = "reduction") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+nulldist <- backpain |>
+  specify(outcome ~ treatment, success = "reduction") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("Botox", "placebo"))
 
 # Step 3.
-nulldist %>%
+nulldist |>
   ggplot(aes(x = stat)) + 
   geom_histogram() + 
   geom_vline(xintercept = diff_props, col = "red")
 
 # Step 4.
 # note that the average (mean) of TRUE and FALSE is a proportion
-nulldist %>%
+nulldist |>
   summarize(mean(stat >= diff_props))
 #> # A tibble: 1 × 1
 #>   `mean(stat >= diff_props)`
@@ -223,7 +223,7 @@ Note also that we get an exact probability with no conditions needed about the s
 
 ## Testing independence of two categorical variables {#chisq}
 
-(Sections 6.5, 6.6, 6.7 in @KuiperSklar.  We are skipping Chi-square tests in Spring 2023.)
+(Sections 6.5, 6.6, 6.7 in @KuiperSklar.)
 
 ### $\chi^2$ tests 
 
@@ -803,11 +803,11 @@ It turns out that the tests above (independence, homogeneity of proportions, hom
 ###  Entering and visualizing the data
 
 
-```r
+``` r
 backpain <- data.frame(treatment = c(rep("placebo", 16), rep("Botox", 15)),
                      outcome = c(rep("reduction", 2), rep("no reduction", 14), 
                                  rep("reduction", 9), rep("no reduction", 6)))
-backpain %>%
+backpain |>
   table()
 #>          outcome
 #> treatment no reduction reduction
@@ -816,11 +816,11 @@ backpain %>%
 
 
 
-backpain %>%
+backpain |>
   ggplot(aes(x = treatment)) + 
   geom_bar(aes(fill = outcome))
 
-backpain %>%
+backpain |>
   ggplot(aes(x = treatment)) + 
   geom_bar(aes(fill = outcome), position = "fill") +
   ylab("percentage")
@@ -831,34 +831,34 @@ backpain %>%
 ### Simulation of Fisher's Exact Test
 
 
-```r
+``` r
 library(infer)
 
 # Step 1.
-odds_ratio <- backpain %>%
-  specify(outcome ~ treatment, success = "reduction") %>%
-  calculate(stat = "odds ratio", order = c("Botox", "placebo")) %>%
+odds_ratio <- backpain |>
+  specify(outcome ~ treatment, success = "reduction") |>
+  calculate(stat = "odds ratio", order = c("Botox", "placebo")) |>
   pull()
 
 odds_ratio  # print to screen to see the observed difference
 #> [1] 10.5
 
 # Step 2.
-nulldist <- backpain %>%
-  specify(outcome ~ treatment, success = "reduction") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+nulldist <- backpain |>
+  specify(outcome ~ treatment, success = "reduction") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "odds ratio", order = c("Botox", "placebo"))
 
 # Step 3.
-nulldist %>%
+nulldist |>
   ggplot(aes(x = stat)) + 
   geom_histogram() + 
   geom_vline(xintercept = odds_ratio, col = "red")
 
 # Step 4.
 # note that the average (mean) of TRUE and FALSE is a proportion
-nulldist %>%
+nulldist |>
   summarize(mean(stat >= odds_ratio))
 #> # A tibble: 1 × 1
 #>   `mean(stat >= odds_ratio)`
@@ -874,14 +874,14 @@ nulldist %>%
 Note that the <a href = "https://stats.stackexchange.com/questions/409219/how-does-fisher-test-calculate-the-confidence-interval-for-the-odds-ratio-in-r" target = "_blank">method used</a> in `fisher.test()` to compute the CI is outside the scope of this class.
 
 
-```r
-backpain %>%
-  table() %>%
+``` r
+backpain |>
+  table() |>
   fisher.test()
 #> 
 #> 	Fisher's Exact Test for Count Data
 #> 
-#> data:  .
+#> data:  table(backpain)
 #> p-value = 0.009
 #> alternative hypothesis: true odds ratio is not equal to 1
 #> 95 percent confidence interval:
@@ -899,13 +899,13 @@ se.lnOR
 ### Chi-squared Analysis
 
 
-```r
-backpain %>%
-  table() %>%
+``` r
+backpain |>
+  table() |>
   chisq.test()
 #> 
 #> 	Pearson's Chi-squared test with Yates' continuity correction
 #> 
-#> data:  .
+#> data:  table(backpain)
 #> X-squared = 6, df = 1, p-value = 0.02
 ```

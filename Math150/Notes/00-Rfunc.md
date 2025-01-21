@@ -45,13 +45,13 @@ Always, it is important to understand the format of the data.  For example, how 
 
 ## Wrangling
 
-Data wrangling is used when working to change data in one format to another.  We have regularly used the pipe function (`%>%`) to layer commands.  Data wrangling will be an even bigger part of the data analysis pipeline when we start to work with continuous variables (e.g., height).
+Data wrangling is used when working to change data in one format to another.  We have regularly used the pipe function (`|>`) to layer commands.  Data wrangling will be an even bigger part of the data analysis pipeline when we start to work with continuous variables (e.g., height).
 
-The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the argument of a function.  The mapping goes to the first available argument in the function.  For example:
+The pipe syntax (`|>`) takes a data frame (or data table) and sends it to the argument of a function.  The mapping goes to the first available argument in the function.  For example:
 
-`x %>% f(y)` is the same as `f(x, y)`
+`x |> f(y)` is the same as `f(x, y)`
 
-` y %>% f(x, ., z)` is the same as `f(x,y,z)`
+` y |> f(x, ., z)` is the same as `f(x,y,z)`
 
 
 * A great source of help is the data wrangling cheatsheet here: https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
@@ -77,7 +77,7 @@ The pipe syntax (`%>%`) takes a data frame (or data table) and sends it to the a
 
 ## Plotting
 
-The R package ggplot2 will be used for all visualizations.  Remember that the layers of a plot are put together with the `+` symbol (instead of the `%>%` command).
+The R package ggplot2 will be used for all visualizations.  Remember that the layers of a plot are put together with the `+` symbol (instead of the `|>` command).
 
 
 * A great source of help is the data visualization cheatsheet here: https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
@@ -86,7 +86,7 @@ The R package ggplot2 will be used for all visualizations.  Remember that the la
 
 * Some things to notice:
 
-    * when layering graph pieces, use `+`.  (When layering data wrangling, use `%>%`.)
+    * when layering graph pieces, use `+`.  (When layering data wrangling, use `|>`.)
     * `geom_XXX()` will put the `XXX`-type-of-plot onto the graph.
     * `aes()` is the function which takes the **data columns** and puts them onto the graph.  `aes()` is used only with data columns and you *always* need it if you are working with data variables.
     * A full set of types of plots is given here: https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf (and in many other places online).
@@ -107,32 +107,32 @@ The main simulation tools we have used for creating null distributions come from
 <li>calculate the test statistic</li>
 
 ```
-teststat <- data %>%
-   specify(variable information) %>%
+teststat <- data |>
+   specify(variable information) |>
    calculate(the form of the statistic)
 ```
 
 <li>create the null values of the statistic</li>
 
 ```
-nullstats <- data %>%
-   specify(variable information) %>%
-   hypothesize(give information about the type of null hypothesis) %>%
-   generate(repeat the process, provide info about the process) %>%
+nullstats <- data |>
+   specify(variable information) |>
+   hypothesize(give information about the type of null hypothesis) |>
+   generate(repeat the process, provide info about the process) |>
    calculate(the form of the statistic)
 ```
 
 <li>visualize the null sampling distribution (of the statistic)</li>
 
 ```
-nullstats %>%
+nullstats |>
    visualize()
 ```
 
 <li>visualize the null sampling distribution with the observed statistic overlaid</li>
 
 ```
-nullstats %>%
+nullstats |>
    visualize() +
    shade_p_value(specify where the observed statistics is)
 ```
@@ -140,7 +140,7 @@ nullstats %>%
 <li>calculate the p-value</li>
 
 ```
-nullstats %>%
+nullstats |>
    get_p_value(specify the observed statistic and the direction of the test)
 ```
 

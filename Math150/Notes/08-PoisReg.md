@@ -8,7 +8,7 @@
 Consider the following example from @poole (described in @sleuth) on age and mating success (number of successful matings) in male African Elephants.
 
 
-```r
+``` r
 elephants <- readr::read_csv("elephants.csv")
 
 ggplot(elephants, aes(x=jitter(AGE), y=MATINGS)) + geom_point()
@@ -75,7 +75,7 @@ There are two main differences with the models.
 1. The first is to remember that the average (i.e., expected value) of the logs is not the log of the averages.  So in the Poisson model, the linear function measures the log of the average, and in the normal model, the linear function measures the average of the logs.
 
 
-```r
+``` r
 set.seed(47)
 example <- abs(rcauchy(10))
 example
@@ -136,10 +136,10 @@ $$\ln(\mu_i) = \beta_0 + \beta_1 X_i,$$
 which means we'd really like to plot $\mu_i$ as a function of the explanatory variable.  Unfortunately, $\mu_i$ is unknown, and so cannot be plotted.  We can, however, plot the log of the average value of the response for a group of x values which are close to one another.  In the plot below, we've grouped observations based on the age of the elephants being within 3 years of years of each other.   It is actually quite linear!  The points that don't follow the linear relationship are based on age groups with very few observations.
 
 
-```r
-matelogmean <- elephants %>%
-  dplyr::mutate(agecut = cut(AGE, breaks=seq(26.5,53.5,by=3))) %>%
-  group_by(agecut) %>%
+``` r
+matelogmean <- elephants |>
+  dplyr::mutate(agecut = cut(AGE, breaks=seq(26.5,53.5,by=3))) |>
+  group_by(agecut) |>
   summarize(meanmate = mean(MATINGS), logmate = log(mean(MATINGS)), n = n() )
 
 elephantsGRP <- cbind(matelogmean, age = c(seq(26.5,52.5,by=3)+1.5 ))
@@ -156,7 +156,8 @@ elephantsGRP
 #> 8 (47.5,50.5]     2.00   0.693  1  49
 #> 9 (50.5,53.5]     9.00   2.197  1  52
 
-elephantsGRP %>% ggplot(aes(x=age, y=logmate)) + geom_point()
+elephantsGRP |> ggplot(aes(x=age, y=logmate)) + geom_point()
+
 ```
 
 <img src="08-PoisReg_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" />
@@ -265,7 +266,7 @@ The drop-in-deviance test can also be adjusted for overdispersion:  $F_Q =  (D_{
 The R example is taken from data given in the textbook.  The scientific question relates to predicting the total number of observed `species` on the Galapagos archipelago related to island `area` (km$^2),$ `elevation` (m), distance (km) to the `nearest` neighbor and to the largest island (km$^2)$ in the archipelago Santa Cruz (`scruz`), and the area of the `adjacent` island (km$^2).$  We could also consider an additional response variable which is the island `endemic` species count.
 
 
-```r
+``` r
 galap <- readr::read_csv("Galapagos.csv")
 head(galap)
 #> # A tibble: 6 × 8
@@ -281,7 +282,7 @@ head(galap)
 
 
 
-```r
+``` r
 ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
 ```
 
@@ -290,9 +291,9 @@ ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
 ###  glm
 
 
-```r
+``` r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
-    data= galap, family="poisson") %>% tidy()
+    data= galap, family="poisson") |> tidy()
 #> # A tibble: 6 × 5
 #>   term            estimate std.error statistic  p.value
 #>   <chr>              <dbl>     <dbl>     <dbl>    <dbl>
@@ -309,16 +310,16 @@ glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent,
 It seems like we might not need either `log(elevation)` or `nearest`.  A drop in deviance test will help:
 
 
-```r
+``` r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
-    data= galap, family="poisson") %>% glance()
+    data= galap, family="poisson") |> glance()
 #> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1         3511.      29  -294.  600.  609.     427.          24    30
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="poisson") %>% glance()
+    data= galap, family="poisson") |> glance()
 #> # A tibble: 1 × 8
 #>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
 #>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
@@ -337,26 +338,26 @@ The relatively large p-value suggests that we do not need either of the variable
 Keep in mind that the expectation of a Poisson model is that the residuals will be more variable for larger predicted values.  The `broom` package provides `.resid`uals which are the observed value minus the fitted value.  I *think* that `.std.resid` is the Pearson residual.
 
 
-```r
+``` r
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="poisson") %>% augment() %>% head()
+    data= galap, family="poisson") |> augment() |> head()
 #> # A tibble: 6 × 10
-#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
-#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
-#> 1      58       3.22    0.6     1.84    4.61 -4.57      -4.83  0.105    4.04
-#> 2      31       0.215  26.3   572.      3.36  0.414      0.427 0.0605   4.15
-#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -4.05  0.0417   4.07
-#> 4      25      -2.30   47.4     0.18    2.55  3.01       3.08  0.0413   4.11
-#> 5       2      -3.00    1.9   904.      2.27 -3.01      -3.10  0.0559   4.11
-#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.986 0.0661   4.15
-#> # ℹ 1 more variable: .cooksd <dbl>
+#>   species `log(area)` scruz adjacent .fitted .resid   .hat .sigma .cooksd
+#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+#> 1      58       3.22    0.6     1.84    4.61 -4.57  0.105    4.04 0.581  
+#> 2      31       0.215  26.3   572.      3.36  0.414 0.0605   4.15 0.00301
+#> 3       3      -1.56   58.7     0.78    2.76 -3.96  0.0417   4.07 0.118  
+#> 4      25      -2.30   47.4     0.18    2.55  3.01  0.0413   4.11 0.131  
+#> 5       2      -3.00    1.9   904.      2.27 -3.01  0.0559   4.11 0.0959 
+#> 6      18      -1.08    8       1.84    3.11 -0.953 0.0661   4.15 0.0161 
+#> # ℹ 1 more variable: .std.resid <dbl>
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="poisson") %>% augment() %>%
+    data= galap, family="poisson") |> augment() |>
   ggplot(aes(x=.fitted, y=.resid)) + geom_point()
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="poisson") %>% augment() %>%
+    data= galap, family="poisson") |> augment() |>
   ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
 ```
 
@@ -368,9 +369,9 @@ glm(species ~ log(area) + scruz + adjacent,
 Note that all of the above analyses can be done using the overdispersed quasiPoisson model.
 
 
-```r
+``` r
 glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent, 
-    data= galap, family="quasipoisson") %>% tidy()
+    data= galap, family="quasipoisson") |> tidy()
 #> # A tibble: 6 × 5
 #>   term            estimate std.error statistic  p.value
 #>   <chr>              <dbl>     <dbl>     <dbl>    <dbl>
@@ -382,7 +383,7 @@ glm(species ~ log(area) + log(elevation) + nearest + scruz + adjacent,
 #> 6 adjacent       -0.000243  0.000120    -2.03  0.0532
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="quasipoisson") %>% tidy()
+    data= galap, family="quasipoisson") |> tidy()
 #> # A tibble: 4 × 5
 #>   term         estimate std.error statistic  p.value
 #>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
@@ -394,26 +395,26 @@ glm(species ~ log(area) + scruz + adjacent,
 
 
 
-```r
+``` r
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="quasipoisson") %>% augment() %>% head()
+    data= galap, family="quasipoisson") |> augment() |> head()
 #> # A tibble: 6 × 10
-#>   species `log(area)` scruz adjacent .fitted .resid .std.resid   .hat .sigma
-#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>      <dbl>  <dbl>  <dbl>
-#> 1      58       3.22    0.6     1.84    4.61 -4.57      -1.18  0.105    4.04
-#> 2      31       0.215  26.3   572.      3.36  0.414      0.104 0.0605   4.15
-#> 3       3      -1.56   58.7     0.78    2.76 -3.96      -0.989 0.0417   4.07
-#> 4      25      -2.30   47.4     0.18    2.55  3.01       0.752 0.0413   4.11
-#> 5       2      -3.00    1.9   904.      2.27 -3.01      -0.758 0.0559   4.11
-#> 6      18      -1.08    8       1.84    3.11 -0.953     -0.241 0.0661   4.15
-#> # ℹ 1 more variable: .cooksd <dbl>
+#>   species `log(area)` scruz adjacent .fitted .resid   .hat .sigma  .cooksd
+#>     <dbl>       <dbl> <dbl>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>    <dbl>
+#> 1      58       3.22    0.6     1.84    4.61 -4.57  0.105    4.04 0.0347  
+#> 2      31       0.215  26.3   572.      3.36  0.414 0.0605   4.15 0.000180
+#> 3       3      -1.56   58.7     0.78    2.76 -3.96  0.0417   4.07 0.00705 
+#> 4      25      -2.30   47.4     0.18    2.55  3.01  0.0413   4.11 0.00781 
+#> 5       2      -3.00    1.9   904.      2.27 -3.01  0.0559   4.11 0.00572 
+#> 6      18      -1.08    8       1.84    3.11 -0.953 0.0661   4.15 0.000958
+#> # ℹ 1 more variable: .std.resid <dbl>
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="quasipoisson") %>% augment() %>%
+    data= galap, family="quasipoisson") |> augment() |>
   ggplot(aes(x=.fitted, y=.resid)) + geom_point()
 
 glm(species ~ log(area) + scruz + adjacent, 
-    data= galap, family="quasipoisson") %>% augment() %>%
+    data= galap, family="quasipoisson") |> augment() |>
   ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
 ```
 

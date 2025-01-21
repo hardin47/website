@@ -505,7 +505,7 @@ $b$ is found using numerical methods (in the same way it was estimated when we w
 Consider the following data from a prostate cancer study. The study was performed as a randomized clinical trail to compare treatments for prostatic cancer, and was begun in 1967 by the Veteran's Administration Cooperative Urological Research Group. The trial was double blind and two of the treatments used were a placebo and 1.0 mg of diethylstilbestrol (DES). The time origin of the study is the date on which a patient was randomized to a treatment, and the end-point is the death of the patient from prostate cancer. The full data set is given in @AndHerz, but the data used in this example are from patients presenting with Stage III cancer and given in @Collett (page 8).
 
 
-```r
+``` r
 library(survival)
 prostate <- readr::read_csv("PROSTATE.csv")
 head(prostate)
@@ -529,12 +529,12 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate)
 #> Likelihood ratio test=5  on 1 df, p=0.03
 #> n= 38, number of events= 6
 
-coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% tidy()
+coxph(Surv(Time,Status) ~ Treatment, data = prostate) |> tidy()
 #> # A tibble: 1 × 5
 #>   term      estimate std.error statistic p.value
 #>   <chr>        <dbl>     <dbl>     <dbl>   <dbl>
 #> 1 Treatment    -1.98      1.10     -1.80  0.0717
-coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
+coxph(Surv(Time,Status) ~ Treatment, data = prostate) |> glance()
 #> # A tibble: 1 × 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
 #>   <int>  <dbl>         <dbl>       <dbl>        <dbl>      <dbl>          <dbl>
@@ -542,7 +542,7 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) %>% glance()
 #> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
 #> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> #   BIC <dbl>, nobs <dbl>
 ```
 
 -   **Note 1**: There is no intercept in the linear component of the model (i.e., there is no $\beta_0$ or $b_0).$ The baseline estimate (usually the role of the "intercept") is contained within the $h_0(t)$ parameter.
@@ -613,10 +613,10 @@ We look at the K-M survival curves broken down by diastolic blood pressure. The 
 :::
 
 
-```r
+``` r
 heart <- readr::read_csv("framingham.csv")
 
-heart <- heart %>% 
+heart <- heart |> 
   mutate(dbpf = case_when(
     dbp <= 60 ~ "under60",
     dbp <=70 ~ "60-70",
@@ -624,7 +624,7 @@ heart <- heart %>%
     dbp <=90 ~ "80-90",
     dbp <=100 ~ "90-100",
     dbp <=110 ~ "100-110",
-    TRUE ~ "over110")) %>%
+    TRUE ~ "over110")) |>
   mutate(dbpf = factor(dbpf,
                        levels = c("under60", "60-70", "70-80","80-90", "90-100","100-110","over110")),
          sex = case_when(
@@ -662,12 +662,12 @@ We can use the model with dbp as categorical to check whether dbp could be used 
 One reason, however, to keep the variable broken into groups is because of the way the results are nicely laid out for each group.
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
+``` r
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) |> tidy()
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-7)coefficients for Cox PH with dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-7)(\#tab:unnamed-chunk-7)coefficients for Cox PH with dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -724,13 +724,13 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% tidy()
 </table>
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy() 
+``` r
+coxph(Surv(followup,chdfate) ~ dbp, data = heart) |> tidy() 
 ```
 
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-9)coefficients for Cox PH with dpb numeric</caption>
+<caption>(\#tab:unnamed-chunk-9)(\#tab:unnamed-chunk-9)coefficients for Cox PH with dpb numeric</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -752,12 +752,12 @@ coxph(Surv(followup,chdfate) ~ dbp, data = heart) %>% tidy()
 </table>
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance() 
+``` r
+coxph(Surv(followup,chdfate) ~ dbpf, data = heart) |> glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-11)glance for Cox PH with dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-11)(\#tab:unnamed-chunk-11)glance for Cox PH with dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -799,7 +799,7 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
    <td style="text-align:right;"> -11724 </td>
    <td style="text-align:right;"> 23460 </td>
    <td style="text-align:right;"> 23492 </td>
-   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
   </tr>
 </tbody>
 </table>
@@ -821,14 +821,14 @@ coxph(Surv(followup,chdfate) ~ dbpf, data = heart) %>% glance()
     -   The change in deviance is 133 ($H_0: \gamma =0),$ so with one degree of freedom, the p-value is very small. We do not think that $\gamma=0,$ so we need gender in the model.
     
 
-```r
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) |> 
   tidy()
 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-14)coefficients for Cox PH with sex and dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-14)(\#tab:unnamed-chunk-14)coefficients for Cox PH with sex and dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -893,13 +893,13 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
 
 
 
-```r
-coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) |> 
   glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-16)glance for Cox PH with sex and dpb categorical.</caption>
+<caption>(\#tab:unnamed-chunk-16)(\#tab:unnamed-chunk-16)glance for Cox PH with sex and dpb categorical.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -941,7 +941,7 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
    <td style="text-align:right;"> -11657 </td>
    <td style="text-align:right;"> 23329 </td>
    <td style="text-align:right;"> 23366 </td>
-   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
   </tr>
 </tbody>
 </table>
@@ -967,14 +967,14 @@ coxph(Surv(followup,chdfate) ~ sex + dbpf, data = heart) %>%
 
 
 
-```r
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) |> 
   tidy()
 ```
 
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-19)coefficients for Cox PH with sex and dpb categorical interacting.</caption>
+<caption>(\#tab:unnamed-chunk-19)(\#tab:unnamed-chunk-19)coefficients for Cox PH with sex and dpb categorical interacting.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -1081,13 +1081,13 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>%
 
 
 
-```r
-coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) |> 
   glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-21)glance for Cox PH with sex and dpb categorical interacting.</caption>
+<caption>(\#tab:unnamed-chunk-21)(\#tab:unnamed-chunk-21)glance for Cox PH with sex and dpb categorical interacting.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -1129,7 +1129,7 @@ coxph(Surv(followup,chdfate) ~ sex*dbpf, data = heart) %>%
    <td style="text-align:right;"> -11647 </td>
    <td style="text-align:right;"> 23320 </td>
    <td style="text-align:right;"> 23388 </td>
-   <td style="text-align:right;"> 4699 </td>
+   <td style="text-align:right;"> 1473 </td>
   </tr>
 </tbody>
 </table>
@@ -1159,13 +1159,13 @@ When should we transform a continuous variable into a factor variable?
 -   **factor** If the relationship is not linear. Although keep in mind that there can be lots of coefficients to estimate when we make factor variables, so we lose df.
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) |> 
   tidy() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-24)coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+<caption>(\#tab:unnamed-chunk-24)(\#tab:unnamed-chunk-24)coefficients for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> term </th>
@@ -1292,13 +1292,13 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>%
 </table>
 
 
-```r
-coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>% 
+``` r
+coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) |> 
   glance() 
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-26)glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
+<caption>(\#tab:unnamed-chunk-26)(\#tab:unnamed-chunk-26)glance for Cox PH with sex and dpb categorical interacting PLUS age, bmi, and scl.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> n </th>
@@ -1340,7 +1340,7 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) %>%
    <td style="text-align:right;"> -11382 </td>
    <td style="text-align:right;"> 22796 </td>
    <td style="text-align:right;"> 22881 </td>
-   <td style="text-align:right;"> 4658 </td>
+   <td style="text-align:right;"> 1465 </td>
   </tr>
 </tbody>
 </table>
@@ -1632,74 +1632,75 @@ The data analysis is here: <https://www.propublica.org/article/how-we-analyzed-t
 The GitHub repo with data and code is here: <https://github.com/propublica/compas-analysis>
 
 
-```r
+``` r
 library(survival)
 recid <- readr::read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv")
 
-recid <- recid %>%
+recid <- recid |>
   dplyr::select(age, c_charge_degree, race, age_cat, score_text, sex, `priors_count...15`,
                 days_b_screening_arrest, `decile_score...12`, is_recid, two_year_recid, 
-                    c_jail_in, c_jail_out) %>% 
-  dplyr::rename(priors_count = `priors_count...15`, decile_score = `decile_score...12`) %>%
-        dplyr::filter(days_b_screening_arrest <= 30) %>%
-        dplyr::filter(days_b_screening_arrest >= -30) %>%
-        dplyr::filter(is_recid != -1) %>%
-        dplyr::filter(c_charge_degree != "O") %>%
+                    c_jail_in, c_jail_out) |> 
+  dplyr::rename(priors_count = `priors_count...15`, decile_score = `decile_score...12`) |>
+        dplyr::filter(days_b_screening_arrest <= 30) |>
+        dplyr::filter(days_b_screening_arrest >= -30) |>
+        dplyr::filter(is_recid != -1) |>
+        dplyr::filter(c_charge_degree != "O") |>
         dplyr::filter(score_text != 'N/A')
         
-recid <- recid %>% mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) %>%
-      mutate(crime_factor = factor(c_charge_degree)) %>%
-      mutate(age_factor = as.factor(age_cat)) %>%
-      within(age_factor <- relevel(age_factor, ref = 1)) %>%
+recid <- recid |> mutate(length_of_stay = as.numeric(as.Date(c_jail_out) - as.Date(c_jail_in))) |>
+      mutate(crime_factor = factor(c_charge_degree)) |>
+      mutate(age_factor = as.factor(age_cat)) |>
+      within(age_factor <- relevel(age_factor, ref = 1)) |>
       mutate(race_factor = factor(race,
                                   labels = c("African-American", 
                                              "Asian",
                                              "Caucasian", 
                                              "Hispanic", 
                                              "Native American",
-                                             "Other"))) %>%
-      within(race_factor <- relevel(race_factor, ref = 3)) %>%
-      mutate(gender_factor = factor(sex, labels= c("Female","Male"))) %>%
-      within(gender_factor <- relevel(gender_factor, ref = 2)) %>%
+                                             "Other"))) |>
+      within(race_factor <- relevel(race_factor, ref = 3)) |>
+      mutate(gender_factor = factor(sex, labels= c("Female","Male"))) |>
+      within(gender_factor <- relevel(gender_factor, ref = 2)) |>
       mutate(score_factor = factor(score_text != "Low", labels = c("LowScore","HighScore")))
       
 ```
 
 
-```r
-recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv"), score_text != "N/A"), end > start) %>%
+``` r
+recidKM <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-parsed.csv"), score_text != "N/A"), end > start) |>
         mutate(race_factor = factor(race,
                                   labels = c("African-American", 
                                              "Asian",
                                              "Caucasian", 
                                              "Hispanic", 
                                              "Native American",
-                                             "Other"))) %>%
-        within(race_factor <- relevel(race_factor, ref = 3)) %>%
-        mutate(score_factor = factor(score_text)) %>%
-        within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start) %>%
+                                             "Other"))) |>
+        within(race_factor <- relevel(race_factor, ref = 3)) |>
+        mutate(score_factor = factor(score_text)) |>
+        within(score_factor <- relevel(score_factor, ref=2)) |>
+        mutate(timefollow = end - start) |>
         filter(race %in% c("African-American", "Caucasian"))
 
-recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-violent-parsed.csv"), score_text != "N/A"), end > start) %>%
+recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica/compas-analysis/master/cox-violent-parsed.csv"), score_text != "N/A"), end > start) |>
         mutate(race_factor = factor(race,
                                   labels = c("African-American", 
                                              "Asian",
                                              "Caucasian", 
                                              "Hispanic", 
                                              "Native American",
-                                             "Other"))) %>%
-        within(race_factor <- relevel(race_factor, ref = 3)) %>%
-        mutate(score_factor = factor(score_text)) %>%
-        within(score_factor <- relevel(score_factor, ref=2)) %>%
-        mutate(timefollow = end - start) %>%
+                                             "Other"))) |>
+        within(race_factor <- relevel(race_factor, ref = 3)) |>
+        mutate(score_factor = factor(score_text)) |>
+        within(score_factor <- relevel(score_factor, ref=2)) |>
+        mutate(timefollow = end - start) |>
         filter(race %in% c("African-American", "Caucasian"))
+
 ```
 
 ### Kaplan-Meier survival curve
 
 
-```r
+``` r
 recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
 plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
 legend(10,.4, c("low", "high", "medium"),lty=2:4)
@@ -1710,7 +1711,7 @@ survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 <img src="06-surv_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-30-2.png" width="80%" style="display: block; margin: auto;" />
 
 
-```r
+``` r
 ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
 
 ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
@@ -1721,9 +1722,9 @@ ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 different options for CI
 
 
-```r
+``` r
 set.seed(4747)
-recidKM2 <- recidKM %>% sample_n(200)  # CI on a smaller random sample just to see the different CIs
+recidKM2 <- recidKM |> sample_n(200)  # CI on a smaller random sample just to see the different CIs
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
            censor=F, conf.int=F) + ggtitle("No CI")
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
@@ -1735,6 +1736,7 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
 
 ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
                  data=recidKM2, facet.by = "race")
+
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-32-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-2.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-3.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-4.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-32-5.png" width="80%" style="display: block; margin: auto;" />
@@ -1744,7 +1746,7 @@ ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
 General recidivism
 
 
-```r
+``` r
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 #> Call:
 #> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKM2, 
@@ -1777,15 +1779,16 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2),
 Violent recidivism
 
 
-```r
+``` r
 set.seed(4747)
-recidKMV2 <- recidKMV %>%
+recidKMV2 <- recidKMV |>
   sample_n(500)
 
-recidKMV2 %>% filter(race == "Caucasian") %>%
-  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+d <- recidKMV2 |> filter(race == "Caucasian")
+
+survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 #> Call:
-#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = d, 
 #>     rho = 0)
 #> 
 #>                       N Observed Expected (O-E)^2/E (O-E)^2/V
@@ -1795,10 +1798,10 @@ recidKMV2 %>% filter(race == "Caucasian") %>%
 #> 
 #>  Chisq= 1.6  on 2 degrees of freedom, p= 0.5
 
-recidKMV2 %>% filter(race == "African-American") %>%
-  survdiff(Surv(timefollow,event) ~ score_factor, data=., rho=0)
+d <- recidKMV2 |> filter(race == "African-American")
+survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 #> Call:
-#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = ., 
+#> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = d, 
 #>     rho = 0)
 #> 
 #>                       N Observed Expected (O-E)^2/E (O-E)^2/V
@@ -1827,9 +1830,9 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2),
                  data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
   ggtitle("Violent Recidivism")
 
-as.data.frame(recidKMV2) %>%  # must be a data.frame see "." below:
-ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .), 
-                 data = ., censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
+d <- as.data.frame(recidKMV2)
+ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data = d), 
+                 data = d, censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
   ggtitle("Violent Recidivism")
 ```
 
@@ -1838,16 +1841,16 @@ ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data= .),
 ### Cox Proportional Hazards models
 
 
-```r
+``` r
 # Just score_factor
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) |> 
   tidy()
 #> # A tibble: 2 × 5
 #>   term               estimate std.error statistic   p.value
 #>   <chr>                 <dbl>     <dbl>     <dbl>     <dbl>
 #> 1 score_factorHigh      1.08     0.0446      24.1 7.67e-129
 #> 2 score_factorMedium    0.704    0.0439      16.0 9.78e- 58
-coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) |> 
   glance()
 #> # A tibble: 1 × 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
@@ -1856,10 +1859,10 @@ coxph(Surv(timefollow,event) ~ score_factor, data=recidKM) %>%
 #> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
 #> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> #   BIC <dbl>, nobs <dbl>
 
 # score_factor and race
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) |> 
   tidy()
 #> # A tibble: 3 × 5
 #>   term               estimate std.error statistic   p.value
@@ -1867,7 +1870,7 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>%
 #> 1 score_factorHigh      1.03     0.0460     22.3  3.96e-110
 #> 2 score_factorMedium    0.674    0.0445     15.2  7.45e- 52
 #> 3 raceCaucasian        -0.170    0.0396     -4.29 1.78e-  5
-coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) |> 
   glance()
 #> # A tibble: 1 × 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
@@ -1876,10 +1879,10 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) %>%
 #> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
 #> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> #   BIC <dbl>, nobs <dbl>
 
 # score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
   tidy()
 #> # A tibble: 5 × 5
 #>   term               estimate std.error statistic  p.value
@@ -1889,7 +1892,7 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> 3 raceCaucasian       -0.120    0.0398      -3.01 2.63e- 3
 #> 4 age                 -0.0137   0.00175     -7.82 5.38e-15
 #> 5 sexMale              0.411    0.0502       8.19 2.53e-16
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>% 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
   glance()
 #> # A tibble: 1 × 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
@@ -1898,14 +1901,14 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) %>
 #> # ℹ 11 more variables: p.value.wald <dbl>, statistic.robust <dbl>,
 #> #   p.value.robust <dbl>, r.squared <dbl>, r.squared.max <dbl>,
 #> #   concordance <dbl>, std.error.concordance <dbl>, logLik <dbl>, AIC <dbl>,
-#> #   BIC <dbl>, nobs <int>
+#> #   BIC <dbl>, nobs <dbl>
 ```
 
 Using the rms package, we can plot CIs for each of the relevant HRs for the model at hand:
 
 
-```r
-recid.data <- recidKM %>%
+``` r
+recid.data <- recidKM |>
   select(timefollow, event, score_factor, race, age, sex)
 recid.final <- rms::cph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recid.data)
 ddist <- rms::datadist(recid.data)
@@ -1918,7 +1921,7 @@ plot(summary(recid.final), log = TRUE)
 The survminer packages also has the `ggforest()` function which makes a fantastic data viz.
 
 
-```r
+``` r
 #broken right now
 #survminer::ggforest(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) )
 ```
@@ -1926,7 +1929,7 @@ The survminer packages also has the `ggforest()` function which makes a fantasti
 ### Checking proportional hazards with the plot of $\ln(-\ln(S(t)))$
 
 
-```r
+``` r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
            censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
 ```
@@ -1938,7 +1941,7 @@ The cox.zph function will test proportionality of all the predictors in the mode
 ### Checking proportional hazards with cox.zph
 
 
-```r
+``` r
 cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
 #>              chisq df   p
 #> score_factor 0.457  2 0.8
@@ -1961,7 +1964,7 @@ Note the big p-values. We do not reject the null hypothesis, so we conclude that
 The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.
 
 
-```r
+``` r
 ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
 ```
 
@@ -1970,8 +1973,9 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 ### Cox PH diagnostics ... look into all the different arguments of the function!
 
 
-```r
+``` r
 ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-41-1.png" width="80%" style="display: block; margin: auto;" />

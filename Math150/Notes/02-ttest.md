@@ -20,7 +20,7 @@ The related data set contains 32,001 elective general surgical patients. Age, ge
 Note that in the example, mortality rates are compared for patients electing to have surgery in July August vs. other months of the year.  We'd like to compare the average age of the participants from the July and August groups as compared to the rest of the year.  Even if the mortality difference is significant, we can't conclude causation (of the treatment) because it was an observational study.  However, the more similar the groups are based on clinical variables (e.g., age), the more likely any differences in mortality are due to timing (i.e., the treatment).  Let's start by asking: how different are the groups based on clinical variables, here we assess age?
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
+<caption>(\#tab:unnamed-chunk-2)(\#tab:unnamed-chunk-2)Varibles associated with the surgery data.</caption>
  <thead>
   <tr>
    <th style="text-align:right;"> age </th>
@@ -211,12 +211,12 @@ Note that in the example, mortality rates are compared for patients electing to 
 
 
 
-```r
-surgery %>%
+``` r
+surgery |>
  dplyr::mutate(summer = case_when(
    month %in% c("Jul", "Aug") ~ TRUE,
-   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
- dplyr::group_by(summer) %>%
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) |>
+ dplyr::group_by(summer) |>
  dplyr::summarize(age_mean = mean(age, na.rm=TRUE), age_sd = sd(age, na.rm=TRUE), age_n = sum(!is.na(age)))
 #> # A tibble: 2 × 4
 #>   summer age_mean age_sd age_n
@@ -274,12 +274,13 @@ df &= n_1 + n_2 -2\\
 
 The same analysis can be done in R (with and without tidying the output):
 
-```r
-surgery %>%
+``` r
+d <- surgery |>
   dplyr::mutate(summer = case_when(
     month %in% c("Jul", "Aug") ~ TRUE,
-   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
-  t.test(age ~ summer, data = ., var.equal = TRUE)
+   !(month %in% c("Jul", "Aug")) ~ FALSE)) 
+
+  t.test(formula = age ~ summer, var.equal = TRUE, data = d)
 #> 
 #> 	Two Sample t-test
 #> 
@@ -291,12 +292,7 @@ surgery %>%
 #> sample estimates:
 #> mean in group FALSE  mean in group TRUE 
 #>                57.6                57.8
-
-surgery %>%
-  dplyr::mutate(summer = case_when(
-    month %in% c("Jul", "Aug") ~ TRUE,
-   !(month %in% c("Jul", "Aug")) ~ FALSE)) %>%
-  t.test(age ~ summer, data = ., var.equal = TRUE) %>%
+  t.test(formula = age ~ summer, var.equal = TRUE, data = d) |>
   tidy()
 #> # A tibble: 1 × 10
 #>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
@@ -426,10 +422,11 @@ That is, we are assuming that for each observation the true population *average*
 Note the similarity in running a `t.test()` and a linear model (`lm()`):
 
 
-```r
-surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  t.test(age ~ month, data = .) %>%
+``` r
+d <- surgery |>
+  dplyr::filter(month %in% c("Jul", "Aug")) 
+
+  t.test(formula = age ~ month, data = d) |>
   tidy()
 #> # A tibble: 1 × 10
 #>   estimate estimate1 estimate2 statistic p.value parameter conf.low conf.high
@@ -437,9 +434,7 @@ surgery %>%
 #> 1    0.486      58.1      57.6      1.16   0.247     4954.   -0.337      1.31
 #> # ℹ 2 more variables: method <chr>, alternative <chr>
 
-surgery %>%
-  dplyr::filter(month %in% c("Jul", "Aug")) %>%
-  lm(age ~ month, data = .) %>%
+  lm(formula = age ~ month, data = d) |>
   tidy()
 #> # A tibble: 2 × 5
 #>   term        estimate std.error statistic p.value
@@ -481,7 +476,7 @@ Age data:
 \end{align}
 
 
-```r
+``` r
 qt(.95, df = (26498-1))
 #> [1] 1.64
 qt(.99, df = (26498+5501-2))
