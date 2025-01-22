@@ -51,10 +51,10 @@ The pipe syntax (`|>`) takes a data frame (or data table) and sends it to the ar
 
 `x |> f(y)` is the same as `f(x, y)`
 
-` y |> f(x, ., z)` is the same as `f(x,y,z)`
+` y |> f(x, z)` is the same as `f(y, x, z)`
 
 
-* A great source of help is the data wrangling cheatsheet here: https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+* A great source of help is the data wrangling cheatsheet here: https://rstudio.github.io/cheatsheets/html/data-transformation.html
 
 * **Data verbs take data tables as input and give data tables as output (that's how we can use the chaining syntax!).**  The functions below are from the R package dplyr, and they will be used to do much of the data wrangling.  Below is a list of verbs which will be helpful in wrangling many different types of data.  
 
@@ -80,7 +80,7 @@ The pipe syntax (`|>`) takes a data frame (or data table) and sends it to the ar
 The R package ggplot2 will be used for all visualizations.  Remember that the layers of a plot are put together with the `+` symbol (instead of the `|>` command).
 
 
-* A great source of help is the data visualization cheatsheet here: https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+* A great source of help is the data visualization cheatsheet here: https://rstudio.github.io/cheatsheets/html/data-visualization.html
 
 * Each plot starts with `ggplot(data)` and then adds layers.  The minimal additional layer is a `geom_XXX()` layer which describes the geometry of the plot.
 
@@ -89,7 +89,7 @@ The R package ggplot2 will be used for all visualizations.  Remember that the la
     * when layering graph pieces, use `+`.  (When layering data wrangling, use `|>`.)
     * `geom_XXX()` will put the `XXX`-type-of-plot onto the graph.
     * `aes()` is the function which takes the **data columns** and puts them onto the graph.  `aes()` is used only with data columns and you *always* need it if you are working with data variables.
-    * A full set of types of plots is given here: https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf (and in many other places online).
+    * A full set of types of plots is given here: https://rstudio.github.io/cheatsheets/html/data-visualization.html (and in many other places online).
 
 * If you happen to be using a function that exists in the ggplot2 package and in a different package, you'll want to tell the computer where to find the appropriate function.  For example, `ggplot2::xlim()`.
 
