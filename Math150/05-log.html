@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>log</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="05-log_files/libs/clipboard/clipboard.min.js"></script>
+<script src="05-log_files/libs/quarto-html/quarto.js"></script>
+<script src="05-log_files/libs/quarto-html/popper.min.js"></script>
+<script src="05-log_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="05-log_files/libs/quarto-html/anchor.min.js"></script>
+<link href="05-log_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="05-log_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="05-log_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="05-log_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="05-log_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="logreg" class="level1">
+<h1>Logistic Regression</h1>
+<section id="logmodel" class="level2">
+<h2 class="anchored" data-anchor-id="logmodel">Motivation for Logistic Regression</h2>
+<p>During investigation of the US space shuttle <em>Challenger</em> disaster, it was learned that project managers had judged the probability of mission failure to be 0.00001, whereas engineers working on the project had estimated failure probability at 0.005. The difference between these two probabilities, 0.00499 was discounted as being too small to worry about. Is a different picture provided by considering odds? How is it interpreted?</p>
+<p>The logistic regression model is a <em>generalized</em> linear model. That is, a linear model as a function of the expected value of the response variable. We can now model binary response variables. <span class="math display">\[\begin{align}
+GLM: g(E[Y | X]) = \beta_0 + \beta_1 X
+\end{align}\]</span> where <span class="math inline">\(g(\cdot)\)</span> is the link function. For logistic regression, we use the logit link function: <span class="math display">\[\begin{align}
+\mbox{logit} (p) = \ln \bigg( \frac{p}{1-p} \bigg)
+\end{align}\]</span></p>
+<section id="ex:burnexamp" class="level4">
+<h4 class="anchored" data-anchor-id="ex:burnexamp">Surviving Third-degree Burns</h4>
+<p>These data refer to 435 adults who were treated for third-degree burns by the University of Southern California General Hospital Burn Center. The patients were grouped according to the area of third-degree burns on the body (measured in square cm). In the table below are recorded, for each midpoint of the groupings <code>log(area +1)</code>, the number of patients in the corresponding group who survived, and the number who died from the burns. <span class="citation" data-cites="burn">[@burn]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">log(area+1) midpoint</th>
+<th style="text-align: center;">survived</th>
+<th style="text-align: center;">died</th>
+<th style="text-align: center;">prop surv</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1.35</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1.60</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1.75</td>
+<td style="text-align: center;">67</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.971</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1.85</td>
+<td style="text-align: center;">45</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">0.900</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1.95</td>
+<td style="text-align: center;">71</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">0.899</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2.05</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">0.714</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2.15</td>
+<td style="text-align: center;">35</td>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">0.530</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2.25</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">49</td>
+<td style="text-align: center;">0.125</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2.35</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">0.077</td>
+</tr>
+</tbody>
+</table>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:95.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see that the logit transformation linearizes the relationship.</p>
+<p>A first idea might be to model the relationship between the probability of success (that the patient survives) and the explanatory variable <code>log(area +1)</code> as a simple linear regression model. However, the scatterplot of the proportions of patients surviving a third-degree burn against the explanatory variable shows a distinct curved relationship between the two variables, rather than a linear one. It seems that a transformation of the data is in place.</p>
+<p>The functional form relating x and the probability of success looks like it could be an <code>S</code> shape. But we’d have to do some work to figure out what the form of that <code>S</code> looks like. Below I’ve given some different relationships between x and the probability of success using <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> values that are yet to be defined. Regardless, we can see that by tuning the functional relationship of the <code>S</code> curve, we can get a good fit to the data.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:95.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>S-curves ( <code>y = exp(linear) / (1+exp(linear))</code> ) for a variety of different parameter settings. Note that the x-axis is some continuous variable <code>x</code> while the y-axis is the probability of success at that value of <code>x</code>. More on this as we move through this model.</p>
+<p>Why doesn’t linear regression work here?</p>
+<ul>
+<li>The response isn’t normal<br>
+</li>
+<li>The response isn’t linear (until we transform)<br>
+</li>
+<li>The predicted values go outside the bounds of (0,1)<br>
+</li>
+<li>Note: it <em>does</em> work to think about values inside (0,1) as probabilities</li>
+</ul>
+</section>
+<section id="the-logistic-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-logistic-model">The logistic model</h3>
+<p>Instead of trying to model the using <em>linear regression</em>, let’s say that we consider the relationship between the variable <span class="math inline">\(x\)</span> and the probability of success to be given by the following generalized linear model. (The logistic model is just one model, there isn’t anything magical about it. We do have good reasons for how we defined it, but that doesn’t mean there aren’t other good ways to model the relationship.)</p>
+<p><span class="math display">\[\begin{align}
+p(x) = \frac{e^{\beta_0 + \beta_1 x}}{1+e^{\beta_0 + \beta_1 x}}
+\end{align}\]</span> Where <span class="math inline">\(p(x)\)</span> is the probability of success (here surviving a burn). <span class="math inline">\(\beta_1\)</span> still determines the direction and <em>slope</em> of the line. <span class="math inline">\(\beta_0\)</span> now determines the location (median survival).</p>
+<ul>
+<li><p><strong>Note 1</strong> What is the probability of success for a patient with covariate of <span class="math inline">\(x = -\beta_0 / \beta_1\)</span>?<br>
+<span class="math display">\[\begin{align}
+x &amp;= - \beta_0 / \beta_1\\
+\beta_0 + \beta_1 x &amp;= 0\\
+e^{0} &amp;= 1\\
+p(-\beta_0 / \beta_1) &amp;= p(x) = 0.5
+\end{align}\]</span> (for a given <span class="math inline">\(\beta_1,\)</span> <span class="math inline">\(\beta_0\)</span> determines the median survival value)</p></li>
+<li><p><strong>Note 2</strong> If <span class="math inline">\(x=0,\)</span> <span class="math display">\[\begin{align}
+p(0) = \frac{e^{\beta_0}}{1+e^{\beta_0}}
+\end{align}\]</span> <span class="math inline">\(x=0\)</span> can often be thought of as the baseline condition, and the probability at <span class="math inline">\(x=0\)</span> takes the place of thinking about the intercept in a linear regression.</p></li>
+<li><p><strong>Note 3</strong><br>
+<span class="math display">\[\begin{align}
+1 - p(x) = \frac{1}{1+e^{\beta_0 + \beta_1 x}}
+\end{align}\]</span><br>
+gives the probability of failure. <span class="math display">\[\begin{align}
+\frac{p(x)}{1-p(x)} = e^{\beta_0 + \beta_1 x}
+\end{align}\]</span><br>
+gives the odds of success. <span class="math display">\[\begin{align}
+\ln \bigg( \frac{p(x)}{1-p(x)} \bigg) = \beta_0 + \beta_1 x
+\end{align}\]</span><br>
+gives the <span class="math inline">\(\ln\)</span> odds of success .</p></li>
+<li><p><strong>Note 4</strong> Every type of generalized linear model has a link function. Ours is called the <em>logit</em>. The link is the relationship between the response variable and the <em>linear</em> function in x. <span class="math display">\[\begin{align}
+\mbox{logit}(\star) = \ln \bigg( \frac{\star}{1-\star} \bigg) \ \ \ \ 0 &lt; \star &lt; 1
+\end{align}\]</span></p></li>
+</ul>
+<section id="model-conditions" class="level4">
+<h4 class="anchored" data-anchor-id="model-conditions">model conditions</h4>
+<p>Just like in linear regression, our <code>Y</code> response is the only random component.</p>
+<p><span class="math display">\[\begin{align}
+y &amp;= \begin{cases}
+1 &amp; \mbox{ died}\\
+0 &amp; \mbox{ survived}
+\end{cases}
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+Y &amp;\sim \mbox{Bernoulli}(p)\\
+P(Y=y) &amp;= p^y(1-p)^{1-y}
+\end{align}\]</span></p>
+<!--
+%\begin{align}
+%Y &\sim \mbox{Binomial}(m,p)\\
+%P(Y=y) &= {m \choose y}p^y(1-p)^{m-y}\\
+%E(Y/m) &= p\\
+%E(Y) &= m p\\
+%Var(Y) &= m p (1-p)
+%\end{align}
+-->
+<p>When each person is at risk for a different covariate (i.e., explanatory variable), they each end up with a different probability of success. <span class="math display">\[\begin{align}
+Y_i \sim \mbox{Bernoulli} \bigg( p(x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+ e^{\beta_0 + \beta_1 x_i}}\bigg)
+\end{align}\]</span></p>
+<ul>
+<li>independent trials<br>
+</li>
+<li>success / failure<br>
+</li>
+<li>probability of success is constant for a particular <span class="math inline">\(X.\)</span><br>
+</li>
+<li><span class="math inline">\(E[Y|x] = p(x)\)</span> is given by the logistic function</li>
+</ul>
+</section>
+<section id="interpreting-coefficients" class="level4">
+<h4 class="anchored" data-anchor-id="interpreting-coefficients">interpreting coefficients</h4>
+<p>Let’s say the log odds of survival for given observed (log) burn areas <span class="math inline">\(x\)</span> and <span class="math inline">\(x+1\)</span> are: <span class="math display">\[\begin{align}
+\mbox{logit}(p(x)) &amp;= \beta_0 + \beta_1 x\\
+\mbox{logit}(p(x+1)) &amp;= \beta_0 + \beta_1 (x+1)\\
+\beta_1 &amp;= \mbox{logit}(p(x+1)) - \mbox{logit}(p(x))\\
+&amp;= \ln \bigg(\frac{p(x+1)}{1-p(x+1)} \bigg) -  \ln \bigg(\frac{p(x)}{1-p(x)} \bigg)\\
+&amp;= \ln \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+e^{\beta_1} &amp;= \bigg( \frac{p(x+1) / [1-p(x+1)]}{p(x) / [1-p(x)]} \bigg)\\
+\end{align}\]</span></p>
+<p><span class="math inline">\(e^{\beta_1}\)</span> is the <em>odds ratio</em> for dying associated with a one unit increase in x. [<span class="math inline">\(\beta_1\)</span> is the change in log-odds associated with a one unit increase in x.</p>
+<p><span class="math display">\[\begin{align}
+\mbox{logit} (\hat{p}) = 22.708 - 10.662 \cdot \ln(\mbox{ area }+1).
+\end{align}\]</span></p>
+<p>(Suppose we are interested in comparing the odds of surviving third-degree burns for patients with burns corresponding to <code>log(area +1)= 1.90</code>, and patients with burns corresponding to <code>log(area +1)= 2.00</code>. The odds ratio <span class="math inline">\(\hat{OR}_{1.90, 2.00}\)</span> is given by <span class="math display">\[\begin{align}
+\hat{OR}_{1.90, 2.00} = e^{-10.662 \cdot (1.90-2.00)} = e^{1.0662} = 2.904
+\end{align}\]</span> That is, the odds of survival for a patient with <code>log(area+1)= 1.90</code> is 2.9 times higher than the odds of survival for a patient with <code>log(area+1)= 2.0</code>.)</p>
+<p>What about the RR (relative risk) or difference in risks? It won’t be constant for a given <span class="math inline">\(X,\)</span> so it must be calculated as a function of <span class="math inline">\(X.\)</span></p>
+</section>
+</section>
+<section id="constant-or-varying-rr" class="level3">
+<h3 class="anchored" data-anchor-id="constant-or-varying-rr">constant OR, varying RR</h3>
+<p>The previous model specifies that the OR is constant for any value of <span class="math inline">\(X\)</span> which is not true about RR. Using the burn data, convince yourself that the RR isn’t constant. Try computing the RR at 1.5 versus 2.5, then again at 1 versus 2. <span class="math display">\[\begin{align}
+\mbox{logit} (\hat{p}) &amp;= 22.708 - 10.662 \cdot \ln(\mbox{ area }+1)\\
+\hat{p}(x) &amp;= \frac{e^{22.708 - 10.662 x}}{1+e^{22.708 - 10.662 x}}\\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\hat{p}(1) &amp;= 0.9999941\\
+\hat{p}(1.5) &amp;= 0.9987889\\
+\hat{p}(2) &amp;= 0.7996326\\
+\hat{p}(2.5) &amp;= 0.01894664\\
+\hat{RR}_{1, 2} &amp;= 1.250567\\
+\hat{RR}_{1.5, 2.5} &amp;= 52.71587\\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\hat{RR} &amp;= \frac{\frac{e^{b_0 + b_1 x}}{1+e^{b_0 + b_1 x}}}{\frac{e^{b_0 + b_1 (x+1)}}{1+e^{b_0 + b_1 (x+1)}}}\\
+&amp;= \frac{\frac{e^{b_0}e^{b_1 x}}{1+e^{b_0}e^{b_1 x}}}{\frac{e^{b_0} e^{b_1 x} e^{b_1}}{1+e^{b_0}e^{b_1 x} e^{b_1}}}\\
+&amp;= \frac{1+e^{b_0}e^{b_1 x}e^{b_1}}{e^{b_1}(1+e^{b_0}e^{b_1 x})}\\
+\end{align}\]</span> (see log-linear model below, @ref(altmodels) )</p>
+<section id="altmodels" class="level4">
+<h4 class="anchored" data-anchor-id="altmodels">Alternative strategies for binary outcomes</h4>
+<p>It is quite common to have binary outcomes (response variable) in the medical literature. However, the logit link (logistic regression) is only one of a variety of models that we can use. We see above that the logistic model imposes a constant OR for any value of <span class="math inline">\(X\)</span> (and <em>not</em> a constant RR).</p>
+<ul>
+<li><strong>complementary log-log</strong><br>
+The complementary log-log model is used when you have a rate of, for example, infection, model by instances of contact (based on a Poisson model). <span class="math display">\[\begin{align}
+p(k) &amp;= 1-(1-\lambda)^k\\
+\ln[ - \ln (1-p(k))] &amp;= \ln[-\ln(1-\lambda)] + \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;= \beta_0 + 1 \cdot \ln(k)\\
+\ln[ - \ln (1-p(k))] &amp;= \beta_0 + \beta_1 x\\
+p(x) &amp;= 1 - \exp [ -\exp(\beta_0 + \beta_1 x) ]
+\end{align}\]</span></li>
+<li><strong>linear</strong><br>
+The excess (or additive) risk model can modeled by using simple linear regression: <span class="math display">\[\begin{align}
+p(x) &amp;= \beta_0 + \beta_1 x
+\end{align}\]</span> which we have already seen is problematic for a variety of reasons. However, any <strong>unit increase in <span class="math inline">\(x\)</span> gives a <span class="math inline">\(\beta_1\)</span> increase in the risk</strong> (for <em>all</em> values of <span class="math inline">\(x.)\)</span></li>
+<li><strong>log-linear</strong><br>
+As long as we do not have a case-control study, we can model the risk using a log-linear model. <span class="math display">\[\begin{align}
+\ln (p(x)) = \beta_0 + \beta_1 x
+\end{align}\]</span> The regression coefficient, <span class="math inline">\(\beta_1,\)</span> has the interpretation of the <strong>logarithm of the relative risk associated with a unit increase in <span class="math inline">\(x.\)</span></strong> Although many software programs will fit this model, it may present numerical difficulties because of the constraint that the sum of terms on the right-hand side must be no greater than zero for the results to make sense (due to the constraint that the outcome probability p(x) must be in the interval [0,1]). As a result, convergence of standard fitting algorithms may be unreliable in some cases.</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="logMLE" class="level2">
+<h2 class="anchored" data-anchor-id="logMLE">Estimating coefficients in logistic regression</h2>
+<section id="maximum-likelihood-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="maximum-likelihood-estimation">Maximum Likelihood Estimation</h3>
+<p>Recall how we estimated the coefficients for linear regression. The values of <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span> are those that minimize the residual sum of squares: <span class="math display">\[\begin{align}
+RSS &amp;= \sum_i (Y_i - \hat{Y}_i)^2\\
+&amp;= \sum_i (Y_i - (\beta_0 + \beta_1 X_i))^2
+\end{align}\]</span> That is, we take derivatives with respect to both <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1,\)</span> set them equal to zero (take second derivatives to ensure minimums), and solve to get <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1.\)</span> It turns out that we’ve also <em>maximized the normal likelihood</em>. <span class="math display">\[\begin{align}
+L(\underline{y} | \beta_0, \beta_1, \underline{x}) &amp;= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+&amp;= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+\end{align}\]</span></p>
+<p>What does that even mean? Likelihood? Maximizing the likelihood? WHY??? The likelihood is the probability distribution of the data given <em>specific</em> values of the unknown parameters.</p>
+<p>Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of <span class="math inline">\(p)\)</span> and get: failure, success, failure, failure (FSFF).</p>
+<p>Would you guess <span class="math inline">\(p=0.47??\)</span> No, you would guess <span class="math inline">\(p=0.25...\)</span> you <em>maximized</em> the likelihood of <strong>seeing your data</strong>. <span class="math display">\[\begin{align}
+P(FSFF| p) &amp;=  p^1 (1-p)^{4-1}\\
+P(FSFF | p = 0.90) &amp;= 0.0009 \\
+P(FSFF | p = 0.75) &amp;= 0.0117 \\
+P(FSFF | p = 0.50) &amp;= 0.0625\\
+P(FSFF | p = 0.47) &amp;= 0.070\\
+P(FSFF | p = 0.25) &amp;= 0.105\\
+P(FSFF | p = 0.15) &amp;= 0.092\\
+P(FSFF | p = 0.05) &amp;= 0.043\\
+\end{align}\]</span></p>
+<p>Think about the example as a set of independent binary responses, <span class="math inline">\(Y_1, Y_2, \ldots Y_n.\)</span> Since each observed response is independent and follows the Bernoulli distribution, the probability of a particular outcome can be found as: <span class="math display">\[\begin{align}
+P(Y_1=y_1, Y_2=y_2, \ldots, Y_n=y_n) &amp;= P(Y_1=y_1) P(Y_2 = y_2) \cdots P(Y_n = y_n)\\
+&amp;= p^{y_1}(1-p)^{1-y_1} p^{y_2}(1-p)^{1-y_2} \cdots p^{y_n}(1-p)^{1-y_n}\\
+&amp;= p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)}\\
+\end{align}\]</span> where <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> represents a particular observed series of 0 or 1 outcomes and <span class="math inline">\(p\)</span> is a probability <span class="math inline">\(0 \leq p \leq 1.\)</span> Once <span class="math inline">\(y_1, y_2, \ldots, y_n\)</span> have been observed, they are fixed values. Maximum likelihood estimates are functions of sample data that are derived by finding the value of <span class="math inline">\(p\)</span> that maximizes the likelihood functions.</p>
+<p>To maximize the likelihood, we use the natural log of the likelihood (because we know we’ll get the same answer): <span class="math display">\[\begin{align}
+\ln L(p) &amp;= \ln \Bigg(p^{\sum_i y_i} (1-p)^{\sum_i (1-y_i)} \Bigg)\\
+&amp;= \sum_i y_i \ln(p) + (n- \sum_i y_i) \ln (1-p)\\
+\frac{ \partial \ln L(p)}{\partial p} &amp;= \sum_i y_i \frac{1}{p} + (n - \sum_i y_i) \frac{-1}{(1-p)} = 0\\
+0 &amp;= (1-p) \sum_i y_i + p (n-\sum_i y_i) \\
+\hat{p} &amp;= \frac{ \sum_i y_i}{n}
+\end{align}\]</span></p>
+<p>Using the logistic regression model makes the likelihood substantially more complicated because the probability of success changes for each individual. Recall: <span class="math display">\[\begin{align}
+p_i = p(x_i) &amp;= \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}}
+\end{align}\]</span> which gives a likelihood of: <span class="math display">\[\begin{align}
+L(\beta_0,\beta_1) &amp;= \prod_i \Bigg( \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)^{y_i} \Bigg(1-\frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)^{(1- y_i)} \\
+\mbox{and a log likelihood of}: &amp;\\
+\ln L(\beta_0, \beta_1) &amp;= \sum_i y_i \ln\Bigg( \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg) + (1-  y_i) \ln \Bigg(1-\frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} \Bigg)\\
+\end{align}\]</span></p>
+<p>To find <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span> we actually use numerical optimization techniques to maximize <span class="math inline">\(L(\beta_0,\beta_1)\)</span> (…Because using calculus won’t provide closed form solutions. Try taking derivatives and setting them equal to zero. What happens?)</p>
+<p>Why use maximum likelihood estimates?</p>
+<ul>
+<li>Estimates are essentially unbiased.<br>
+</li>
+<li>We can estimate the SE (Wald estimates via Fisher Information).<br>
+</li>
+<li>The estimates have low variability.<br>
+</li>
+<li>The estimates have an approximately normal sampling distribution for large sample sizes because they are maximum likelihood estimates.<br>
+</li>
+<li>Though it is important to realize that we cannot find estimates in closed form.</li>
+</ul>
+</section>
+</section>
+<section id="loginf" class="level2">
+<h2 class="anchored" data-anchor-id="loginf">Formal Inference</h2>
+<section id="wald-tests-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="wald-tests-intervals">Wald Tests &amp; Intervals</h3>
+<p>Because we will use maximum likelihood parameter estimates, we can also use large sample theory to find the SEs and consider the estimates to have normal distributions (for large sample sizes). However, <span class="citation" data-cites="menard">[@menard]</span> warns that for large coefficients, standard error is inflated, lowering the Wald statistic (chi-square) value. <span class="citation" data-cites="agresti">[@agresti]</span> states that the likelihood-ratio test is more reliable for small sample sizes than the Wald test.</p>
+<p><span class="math display">\[\begin{align}
+z = \frac{b_1 - \beta_1}{SE(b_1)}
+\end{align}\]</span></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(burnresp<span class="sc">~</span>burnexpl, <span class="at">data =</span> burnglm, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)     22.7      2.27     10.0  1.23e-23
+2 burnexpl       -10.7      1.08     -9.85 6.95e-23</code></pre>
+</div>
+</div>
+<p><strong>Note:</strong> Although the model is a Bernoulli model and not really a binomial model (although the Bernoulli is a binomial with <span class="math inline">\(n=1),\)</span> the way to fit a logistic regression model in R is to use <code>family = "binomial"</code>. It just is what it is.</p>
+</section>
+<section id="likelihood-ratio-tests" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood-ratio-tests">Likelihood Ratio Tests</h3>
+<p><span class="math inline">\(\frac{L(p_0)}{L(\hat{p})}\)</span> gives us a sense of whether the null value or the observed value produces a higher likelihood. Recall: <span class="math display">\[\begin{align}
+L(\hat{\underline{p}}) &gt; L(p_0)
+\end{align}\]</span> always. [Where <span class="math inline">\(\hat{\underline{p}}\)</span> is the maximum likelihood estimate for the probability of success (here it will be a vector of probabilities, each based on the same MLE estimates of the linear parameters). ] The above inequality holds because <span class="math inline">\(\hat{\underline{p}}\)</span> maximizes the likelihood.</p>
+<p>We can show that if <span class="math inline">\(H_0\)</span> is true, <span class="math display">\[\begin{align}
+-2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) \sim \chi^2_1
+\end{align}\]</span> If we are testing only one parameter value. More generally, <span class="math display">\[\begin{align}
+-2 \ln \bigg( \frac{\max L_0}{\max L} \bigg) \sim \chi^2_\nu
+\end{align}\]</span> where <span class="math inline">\(\nu\)</span> is the number of extra parameters we estimate using the unconstrained likelihood (as compared to the constrained null likelihood).</p>
+<div class="example">
+<p>Consider a data set with 147 people. 49 got cancer and 98 didn’t. Let’s test whether the true proportion of people who get cancer is <span class="math inline">\(p=0.25.\)</span> <span class="math display">\[\begin{align}
+H_0:&amp; p=0.25\\
+H_a:&amp; p \ne 0.25\\
+\hat{p} &amp;= \frac{49}{147}\\
+-2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &amp;= -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
+&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
+&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{49} (0.75)^{98} \bigg) - \ln \Bigg( \bigg( \frac{1}{3} \bigg)^{49} \bigg( \frac{2}{3} \bigg)^{98} \Bigg) \Bigg]\\
+&amp;= -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
+P( \chi^2_1 \geq 5.11) &amp;= 0.0238
+\end{align}\]</span></p>
+</div>
+<p>But really, usually likelihood ratio tests are more interesting. In fact, usually, we use them to test whether the coefficients are zero:</p>
+<p><span class="math display">\[\begin{align}
+H_0: &amp; \beta_1 =0\\
+H_a: &amp; \beta_1 \ne 0\\
+p_0 &amp;= \frac{e^{\hat{b}_0}}{1 + e^{\hat{b}_0}}
+\end{align}\]</span> where <span class="math inline">\(\hat{b}_0\)</span> is the MLE from the logistic regression model which does not contain any explanatory variable, <span class="math inline">\(x.\)</span></p>
+<p><strong>Important note:</strong> <span class="math display">\[\begin{align}
+\mbox{deviance} = \mbox{constant} - 2 \ln(\mbox{likelihood})
+\end{align}\]</span> That is, the difference in log likelihoods will be the opposite difference in deviances: <span class="math display">\[\begin{align}
+\mbox{test stat} &amp;= \chi^2\\
+&amp;= -2 \ln \bigg( \frac{L(\mbox{null value(s)})}{L(MLEs)} \bigg)\\
+&amp;= -2 [ \ln(L(\mbox{null value(s)}) - \ln(L(MLEs)) ]\\
+&amp;= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{align}\]</span></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(burnresp<span class="sc">~</span>burnexpl, <span class="at">data =</span> burnglm, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glance</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+          &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+1          525.     434  -168.  339.  347.     335.         433   435</code></pre>
+</div>
+</div>
+<p><span class="math display">\[\begin{align}
+\mbox{test stat} &amp;= G\\
+&amp;= -2 \ln \bigg( \frac{L(\mbox{null value(s)})}{L(MLEs)} \bigg)\\
+&amp;= -2 [ \ln(L(\mbox{null value(s)}) - \ln(L(MLEs)) ]\\
+&amp;= \mbox{deviance}_0 - \mbox{deviance}_{model}\\
+&amp;= \mbox{deviance}_{null} - \mbox{deviance}_{residual}\\
+&amp;= \mbox{deviance}_{reduced} - \mbox{deviance}_{full}\\
+\end{align}\]</span></p>
+<p>So, the LRT here is (see columns of <code>null deviance</code> and <code>deviance</code>): <span class="math display">\[\begin{align}
+G &amp;= 525.39 - 335.23 = 190.16\\
+p-value &amp;= P(\chi^2_1 \geq 190.16) = 0
+\end{align}\]</span></p>
+<section id="modeling-categorical-predictors-with-multiple-levels" class="level4">
+<h4 class="anchored" data-anchor-id="modeling-categorical-predictors-with-multiple-levels">modeling categorical predictors with multiple levels</h4>
+<div class="example">
+<p><strong>Snoring</strong> A study was undertaken to investigate whether snoring is related to a heart disease. In the survey, 2484 people were classified according to their proneness to snoring (never, occasionally, often, always) and whether or not they had the heart disease.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 39%">
+<col style="width: 60%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>disease (response variable)</td>
+<td>Binary variable: having disease=1,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>not having disease=0</td>
+</tr>
+<tr class="odd">
+<td>snoring (explanatory variable)</td>
+<td>Categorical variable indicating level of snoring</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>(never=1, occasionally=2, often=3 and always=4)</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <span class="citation" data-cites="snoring">[@snoring]</span></p>
+<p><span class="math display">\[\begin{align}
+X_1 = \begin{cases}
+  1 &amp; \text{for occasionally} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_2 = \begin{cases}
+  1 &amp; \text{for often} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+X_3 = \begin{cases}
+  1 &amp; \text{for always} \\
+  0 &amp; \text{otherwise} \\
+\end{cases}
+\end{align}\]</span></p>
+<p>Our new model becomes: <span class="math display">\[\begin{align}
+\mbox{logit}(p) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3
+\end{align}\]</span></p>
+<p>We can use the drop-in-deviance test to test the effect of any or all of the parameters (of which there are now <em>four</em>) in the model.</p>
+</div>
+<p>See the birdnest example, @ref(birdexamp)</p>
+</section>
+</section>
+</section>
+<section id="multlog" class="level2">
+<h2 class="anchored" data-anchor-id="multlog">Multiple Logistic Regression</h2>
+<section id="interaction" class="level3">
+<h3 class="anchored" data-anchor-id="interaction">Interaction</h3>
+<p>Another worry when building models with multiple explanatory variables has to do with variables interacting. That is, for one level of a variable, the relationship of the main predictor on the response is different.</p>
+<div class="example">
+<p>Consider a simple linear regression model on number of hours studied and exam grade. Then add class year to the model. There would probably be a different slope for each class year in order to model the two variables most effectively. For simplicity, consider only first year students and seniors.</p>
+<p><span class="math display">\[\begin{align}
+E[\mbox{grade seniors}| \mbox{hours studied}] &amp;= \beta_{0s} + \beta_{1s} \mbox{hrs}\\
+E[\mbox{grade first years}| \mbox{hours studied}] &amp;= \beta_{0f} + \beta_{1f} \mbox{hrs}\\
+E[\mbox{grade}| \mbox{hours studied}] &amp;= \beta_{0} + \beta_{1} \mbox{hrs} + \beta_2 I(\mbox{year=senior}) + \beta_{3} \mbox{hrs} I(\mbox{year = senior})\\
+\beta_{0f} &amp;= \beta_{0}\\
+\beta_{0s} &amp;= \beta_0 + \beta_2\\
+\beta_{1f} &amp;= \beta_1\\
+\beta_{1s} &amp;= \beta_1 + \beta_3
+\end{align}\]</span></p>
+<p>Why do we need the <span class="math inline">\(I(\mbox{year=seniors})\)</span> variable?</p>
+</div>
+<div class="definition">
+<p><em>Interaction</em> means that the effect of an explanatory variable on the outcome differs according to the level of another explanatory variable. (Not the case with age on smoking and lung cancer above. With the smoking example, age is a significant variable, but it does not interact with lung cancer.)</p>
+</div>
+<!--
+Recall the homework assignment where APACHE score was a significant predictor of the odds of dying for treated black patients but not for untreated.  This is interaction.  The relationship between the explanatory variable (APACHE score) and the response (survival) changes depending on a 3rd variables (treated vs. untreated).
+-->
+<div class="example">
+<p>The <strong>Heart and Estrogen/progestin Replacement Study (HERS)</strong> is a randomized, double-blind, placebo-controlled trial designed to test the efficacy and safety of estrogen plus progestin therapy for prevention of recurrent coronary heart disease (CHD) events in women. The participants are postmenopausal women with a uterus and with CHD. Each woman was randomly assigned to receive one tablet containing 0.625 mg conjugated estrogens plus 2.5 mg medroxyprogesterone acetate daily or an identical placebo. The results of the first large randomized clinical trial to examine the effect of hormone replacement therapy (HRT) on women with heart disease appeared in JAMA in 1998 <span class="citation" data-cites="HERS">[@HERS]</span>.</p>
+<p>The Heart and Estrogen/Progestin Replacement Study (HERS) found that the use of estrogen plus progestin in postmenopausal women with heart disease did not prevent further heart attacks or death from coronary heart disease (CHD). This occurred despite the positive effect of treatment on lipoproteins: LDL (bad) cholesterol was reduced by 11 percent and HDL (good) cholesterol was increased by 10 percent.</p>
+<p>The hormone replacement regimen also increased the risk of clots in the veins (deep vein thrombosis) and lungs (pulmonary embolism). The results of HERS are surprising in light of previous observational studies, which found lower rates of CHD in women who take postmenopausal estrogen.</p>
+<p>Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls For now, we will try to predict whether the individuals had a pre-existing medical condition (other than CHD, self reported), <code>medcond</code>. We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.</p>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+2 age           0.0162   0.00597      2.71 0.00664  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age <span class="sc">+</span> weight, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept) -2.17      0.496       -4.37 0.0000124
+2 age          0.0189    0.00613      3.09 0.00203  
+3 weight       0.00528   0.00274      1.93 0.0542   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">+</span>diabetes, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic      p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+2 age           0.0185   0.00603      3.07 0.00217     
+3 diabetes      0.487    0.0882       5.52 0.0000000330</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">*</span>diabetes, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term         estimate std.error statistic     p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+2 age            0.0278   0.00707      3.93 0.0000844  
+3 diabetes       2.83     0.914        3.10 0.00192    
+4 age:diabetes  -0.0354   0.0137      -2.58 0.00986    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">*</span>drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term         estimate std.error statistic p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)  -0.991     0.511       -1.94  0.0526
+2 age           0.00885   0.00759      1.17  0.244 
+3 drinkany     -1.44      0.831       -1.73  0.0833
+4 age:drinkany  0.0168    0.0124       1.36  0.175 </code></pre>
+</div>
+</div>
+<p>Write out a few models <em>by hand</em>, does any of the significance change with respect to interaction? Does the interpretation change with interaction? In the last model, we might want to remove all the age information. Age seems to be less important than drinking status. How do we decide? How do we model?</p>
+</section>
+<section id="simpsons-paradox" class="level3">
+<h3 class="anchored" data-anchor-id="simpsons-paradox">Simpson’s Paradox</h3>
+<p><strong>Simpson’s paradox</strong> is when the association between two variables is opposite the partial association between the same two variables after controlling for one or more other variables.</p>
+<div class="example">
+<p>Back to linear regression to consider Simpson’s Paradox in the wild. Consider data on SAT scores across different states with information on educational expenditure. The correlation between SAT score and average teacher salary is negative with the combined data. However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam. The fewer students who take the exam, the higher the SAT score. That’s because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SAT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       state expend ratio salary frac verbal math  sat         fracgrp
+1    Alabama   4.41  17.2   31.1    8    491  538 1029    low fraction
+2     Alaska   8.96  17.6   48.0   47    445  489  934 medium fraction
+3    Arizona   4.78  19.3   32.2   27    448  496  944 medium fraction
+4   Arkansas   4.46  17.1   28.9    6    482  523 1005    low fraction
+5 California   4.99  24.0   41.1   45    417  485  902 medium fraction
+6   Colorado   5.44  18.4   34.6   29    462  518  980 medium fraction</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)  1159.       57.7      20.1  5.13e-25
+2 salary         -5.54      1.63     -3.39 1.39e- 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary <span class="sc">+</span> frac, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   988.      31.9       31.0  6.20e-33
+2 salary          2.18     1.03       2.12 3.94e- 2
+3 frac           -2.78     0.228    -12.2  4.00e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary <span class="sc">*</span> frac, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term         estimate std.error statistic  p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept) 1082.       54.4       19.9   3.00e-24
+2 salary        -0.720     1.70      -0.424 6.73e- 1
+3 frac          -5.03      1.09      -4.62  3.15e- 5
+4 salary:frac    0.0648    0.0308     2.11  4.05e- 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary <span class="sc">+</span> fracgrp, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term                   estimate std.error statistic  p.value
+  &lt;chr&gt;                     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)             1002.      31.8       31.5  8.55e-33
+2 salary                     1.09     0.988      1.10 2.76e- 1
+3 fracgrpmedium fraction  -112.      14.3       -7.82 5.46e-10
+4 fracgrphigh fraction    -150.      12.8      -11.7  2.09e-15</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary <span class="sc">*</span> fracgrp, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  term                           estimate std.error statistic  p.value
+  &lt;chr&gt;                             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)                   1012.         55.8    18.1    4.85e-22
+2 salary                           0.768       1.77    0.435  6.65e- 1
+3 fracgrpmedium fraction        -107.        103.     -1.04   3.03e- 1
+4 fracgrphigh fraction          -175.         79.2    -2.21   3.27e- 2
+5 salary:fracgrpmedium fraction   -0.0918      2.93   -0.0313 9.75e- 1
+6 salary:fracgrphigh fraction      0.692       2.28    0.303  7.63e- 1</code></pre>
+</div>
+</div>
+</div>
+<!--
+%Consider the following data on twenty-year vital status by smoking behavior: %(pgs 52-53 in VGSM)
+%\begin{center}
+%\begin{tabular}{r|cc|r}
+%& smoker & nonsmoker & total\\
+%\hline
+%cases & 139 & 230 & 369\\
+%non cases & 443 & 502 & 945\\
+%\hline
+%total & 582 & 502 & 1314
+%\end{tabular}
+%\end{center}
+
+%Just as we have before, we can calculate the OR of cancer given the person was a smoker.  We could also break down the relationship between smoking and cancer using the age variable.
+
+%\begin{center}
+%\begin{tabular}{lccc}
+%& OR & \multicolumn{2}{c}{CI}\\
+%overall & 0.685 & 0.439 & 0.931\\
+%18-44 & 1.777 & 0.873 & 3.615\\
+%45-64 & 1.320 & 0.873 & 1.997\\
+%65+ & 1.018 & 0.424 & 2.434\\
+%\end{tabular}
+%\end{center}
+
+%After *adjusting* for age, smoking is no longer significant.  But more importantly, age is a variable that changes the effect of smoking on cancer.  This is referred to as Simpson's Paradox.  The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.
+-->
+<div class="example">
+<p>Consider the example on smoking and 20-year mortality (case) from section 3.4 of <em>Regression Methods in Biostatistics</em>, pg 52-53. The study represents women participating in a health survey in Whickham, England in 1972-1972 with follow-up 20 years later <span class="citation" data-cites="Vanderpump95">[@Vanderpump95]</span>. Mortality was recorded as the response variable and self-reported smoking and age (both given in the original study) as the explanatory variables.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>age</th>
+<th>test</th>
+<th style="text-align: center;">smoker</th>
+<th style="text-align: center;">nonsmoker</th>
+<th style="text-align: center;">prob smoke</th>
+<th style="text-align: center;">odds smoke</th>
+<th style="text-align: center;">empirical OR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>all</td>
+<td>case</td>
+<td style="text-align: center;">139</td>
+<td style="text-align: center;">230</td>
+<td style="text-align: center;">0.377</td>
+<td style="text-align: center;">0.604</td>
+<td style="text-align: center;">0.685</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td style="text-align: center;">443</td>
+<td style="text-align: center;">502</td>
+<td style="text-align: center;">0.469</td>
+<td style="text-align: center;">0.882</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td>18-44</td>
+<td>case</td>
+<td style="text-align: center;">61</td>
+<td style="text-align: center;">32</td>
+<td style="text-align: center;">0.656</td>
+<td style="text-align: center;">1.906</td>
+<td style="text-align: center;">1.627</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td style="text-align: center;">375</td>
+<td style="text-align: center;">320</td>
+<td style="text-align: center;">0.540</td>
+<td style="text-align: center;">1.172</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td>45-64</td>
+<td>case</td>
+<td style="text-align: center;">34</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">0.340</td>
+<td style="text-align: center;">0.515</td>
+<td style="text-align: center;">1.308</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">127</td>
+<td style="text-align: center;">0.282</td>
+<td style="text-align: center;">0.394</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td>65+</td>
+<td>case</td>
+<td style="text-align: center;">44</td>
+<td style="text-align: center;">132</td>
+<td style="text-align: center;">0.250</td>
+<td style="text-align: center;">0.333</td>
+<td style="text-align: center;">1.019</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>control</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">55</td>
+<td style="text-align: center;">0.247</td>
+<td style="text-align: center;">0.327</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p>What we see is that the vast majority of the controls were young, and they had a high rate of smoking. A good chunk of the cases were older, and the rate of smoking was substantially lower in the oldest group. However, within each group, the cases were more likely to smoke than the controls.</p>
+<p>After <em>adjusting</em> for age, smoking is no longer significant. But more importantly, age is a variable that reverses the effect of smoking on cancer - Simpson’s Paradox. The effect is not due to the observational nature of the study, and so it is important to adjust for possible influential variables regardless of the study at hand.</p>
+<p>What would it mean to <em>adjust</em> for age in this context? It means that we have to include it in the model:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>( death <span class="sc">~</span> smoke, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
+2 smoke         -0.379    0.126      -3.01 2.59e- 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>( death <span class="sc">~</span> age, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.571     0.125     -4.56 5.01e- 6
+2 ageold         1.45      0.187      7.75 9.00e-15
+3 ageyoung      -1.44      0.167     -8.63 6.02e-18</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>( death <span class="sc">~</span> smoke <span class="sc">+</span> age, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.668     0.135     -4.96 7.03e- 7
+2 smoke          0.312     0.154      2.03 4.25e- 2
+3 ageold         1.47      0.188      7.84 4.59e-15
+4 ageyoung      -1.52      0.173     -8.81 1.26e-18</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>( death <span class="sc">~</span> smoke <span class="sc">*</span> age, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  term           estimate std.error statistic  p.value
+  &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)      -0.655     0.152    -4.31  1.61e- 5
+2 smoke             0.269     0.269     0.999 3.18e- 1
+3 ageold            1.53      0.221     6.93  4.29e-12
+4 ageyoung         -1.65      0.240    -6.88  6.00e-12
+5 smoke:ageold     -0.251     0.420    -0.596 5.51e- 1
+6 smoke:ageyoung    0.218     0.355     0.614 5.40e- 1</code></pre>
+</div>
+</div>
+<p>Using the additive model above: <span class="math display">\[\begin{align}
+\mbox{logit} (p(x_1, x_2) ) &amp;= \beta_0 + \beta_1 x_1 + \beta_2 x_2\\
+OR &amp;= \mbox{odds dying if } (x_1, x_2) / \mbox{odds dying if } (x_1^*, x_2^*) = \frac{e^{\beta_0 + \beta_1 x_1 + \beta_2 x_2}}{e^{\beta_0 + \beta_1 x_1^* + \beta_2 x_2^*}}\\
+x_1 &amp;= \begin{cases}
+0 &amp; \mbox{ don't smoke}\\
+1 &amp; \mbox{ smoke}\\
+\end{cases}\\
+x_2 &amp;= \begin{cases}
+\mbox{young} &amp; \mbox{18-44 years old}\\
+\mbox{middle} &amp; \mbox{45-64 years old}\\
+\mbox{old} &amp; \mbox{65+ years old}\\
+\end{cases}
+\end{align}\]</span> where we are modeling the probability of 20-year mortality using smoking status and age group.</p>
+<p><strong>Note 1:</strong> We can see from above that the coefficients for each variable are significantly different from zero. That is, the variables are important in predicting odds of survival.<br>
+<strong>Note 2:</strong> We can see that smoking becomes less significant as we add age into the model. That is because age and smoking status are so highly associated (think of the coin example).<br>
+<strong>Note 3:</strong> We can estimate any of the OR (of dying for smoke vs not smoke) from the given coefficients:<br>
+<span class="math display">\[\begin{align}
+\mbox{simple model} &amp;\\
+\mbox{overall OR} &amp;= e^{-0.37858 } = 0.6848332\\
+&amp; \\
+\mbox{additive model} &amp;\\
+\mbox{young, middle, old OR} &amp;= e^{ 0.3122} = 1.3664\\
+&amp; \\
+\mbox{interaction model} &amp;\\
+\mbox{young OR} &amp;= e^{0.2689 + 0.2177} = 1.626776\\
+\mbox{middle OR} &amp;= e^{0.2689} = 1.308524\\
+\mbox{old OR} &amp;= e^{0.2689 + -0.2505} = 1.018570\\
+\end{align}\]</span> What does it mean that the interaction terms are not significant in the last model?</p>
+</div>
+</section>
+</section>
+<section id="multicol" class="level2">
+<h2 class="anchored" data-anchor-id="multicol">Multicollinearity</h2>
+<p>Multicollinearity happens when the explanatory variables in a model are correlated. If explanatory variables are correlated, great care needs to be taken in interpreting the coefficients because the idea of “holding all other variables constant” does not make sense. The following example illustrates the point.</p>
+<div class="example">
+<p>Consider the following data set collected from church offering plates in 62 consecutive Sundays. Also noted is whether there was enough change to buy a candy bar for $1.25.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(Candy <span class="sc">~</span> Coins, <span class="at">data =</span> Offering, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+2 Coins          0.286    0.0772      3.70 0.000213 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(Candy <span class="sc">~</span> Small, <span class="at">data =</span> Offering, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+2 Small          0.184    0.0576      3.19 0.00142  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(Candy <span class="sc">~</span> Coins <span class="sc">+</span> Small, <span class="at">data =</span> Offering, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   -17.0       7.80     -2.18  0.0296
+2 Coins           3.49      1.75      1.99  0.0461
+3 Small          -3.04      1.57     -1.93  0.0531</code></pre>
+</div>
+</div>
+<p>Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total. Lesson of the story: be very very very careful interpreting coefficients when you have multiple explanatory variables.</p>
+</div>
+</section>
+<section id="logstep" class="level2">
+<h2 class="anchored" data-anchor-id="logstep">Model Building</h2>
+<div class="example">
+<p>Suppose that you have to take an exam that covers 100 different topics, and you do not know any of them. The rules, however, state that you can bring two classmates as consultants. Suppose also that you know which topics each of your classmates is familiar with. If you could bring only one consultant, it is easy to figure out who you would bring: it would be the one who knows the most topics (the variable most associated with the answer). Let’s say this is Sage who knows 85 topics. With two consultants you might choose Sage first, and for the second option, it seems reasonable to choose the second most knowledgeable classmate (the second most highly associated variable), for example Bruno, who knows 75 topics.</p>
+<p>The problem with this strategy is that it may be that the 75 subjects Bruno knows are already included in the 85 that Sage knows, and therefore, Bruno does not provide any knowledge beyond that of Sage.</p>
+<p>A better strategy is to select the second not by considering what they know regarding the entire agenda, but by looking for the person who knows more about the topics that the first does not know (the variable that best explains the residual of the equation with the variables entered). It may even happen that the best pair of consultants are not the most knowledgeable, as there may be two that complement each other perfectly in such a way that one knows 55 topics and the other knows the remaining 45, while the most knowledgeable does not complement anybody.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Individual</th>
+<th># topics</th>
+<th>Pair</th>
+<th># topics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sage</td>
+<td>85</td>
+<td>Sage &amp; Bruno</td>
+<td>95</td>
+</tr>
+<tr class="even">
+<td>Bruno</td>
+<td>80</td>
+<td>Sage &amp; Beta</td>
+<td>93</td>
+</tr>
+<tr class="odd">
+<td>Luna</td>
+<td>55</td>
+<td>Sage &amp; Luna</td>
+<td>92</td>
+</tr>
+<tr class="even">
+<td>Beta</td>
+<td>45</td>
+<td>Bruno &amp; Beta</td>
+<td>90</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Bruno &amp; Luna</td>
+<td>90</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td>Beta &amp; Luna</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p>With forward selection, which two are chosen?<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>With backward selection, which two are chosen?<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<!-- %(Taken from American Statistician article that I refereed, August 2012.) -->
+</div>
+<!--
+% added January 2019 ...  I need to read through, edit, etc.
+
+#### More thoughts on Model Selection...
+
+Question: Did females receive lower starting salaries than males?  @sleuth
+
+model:  y = log(salary), x's: seniority, age, experience, education, sex.
+
+In Sleuth, they first find a good model using only seniority, age, experience and education (including considerations of interactions/quadratics). Once they find a suitable model (Model 1), they then add the sex variable to this model to determine if it is significant. (H0: Model 1 vs HA: Model 1 + sex)  In other regression texts, the models considered would include the sex variable from the beginning, and work from there, but always keeping the sex variable in.  What are the pluses/minuses of these approaches?
+
+\begin{itemize}
+\item[Resp1]
+It seems possible, and even likely, that sex would be associated with some of these other variables, so depending how the model selection that starts with sex included were done, it would be entirely possible to choose a model that includes sex but not one or more of the other variables, and in which sex is significant. If however, those other variables were included, sex might not explain a significant amount of variation beyond those others. Whereas the model selection that doesn't start with sex would be more likely to include those associated covariates to start with.
+
+I do like both of those methods in that they both end up with sex in the model; one of my pet peeves is when a model selection procedure ends up removing the variable of interest and people then claim that the variable of interest doesn't matter.  But my preference is actually to try to avoid model selection as much as possible. What I tell the people I work with is that each model you build answers a different question, and so try to get them to decide ahead of time what question they are interested in. I also find Frank Harrell's comments on model selection (in his Regression Modeling Strategies book) to be particularly helpful.
+
+In this case I really think there are two questions of interest; are there differences at all (univariate model), and are there differences after accounting for the covariates (multivariate model)? If the differences get smaller after adjusting for the covariates, then that leads to the very interesting question of why that is, and whether those differences are also part of the sex discrimination. It bugs me when people try to explain away the wage gap between men and women by saying that men just go into higher-paying jobs, when really, that's part of the problem, that jobs that have more women in them pay less. :( The point, though, is that one model may not be sufficient for a particular situation, and looking for one "best" model can be misleading.
+\item[Resp2]
+If you know (or are willing to assume) the covariates that you want to adjust for and their form in the model (non-linearity, interactions) and you have enough data relative to the number of covariates, then you should not do any model selection, just compare the model with the variable of interest to the model without.  Which covariates are significant or not does not matter in this case.
+
+See here: https://stats.stackexchange.com/questions/37564/r-code-question-model-selection-based-on-individual-significance-in-regression/37609#37609 for simulation examples where screening/model selection can either include meaningless variables, or leave out important ones.
+\end{itemize}
+-->
+<section id="formal-model-building" class="level3">
+<h3 class="anchored" data-anchor-id="formal-model-building">Formal Model Building</h3>
+<p>We are going to discuss how to add (or subtract) variables from a model. Before we do that, we can define two criteria used for suggesting an optimal model.</p>
+<blockquote class="blockquote">
+<p>AIC: Akaike’s Information Criteria = <span class="math inline">\(-2 \ln\)</span> likelihood + <span class="math inline">\(2p\)</span><br>
+BIC: Bayesian Information Criteria = <span class="math inline">\(-2 \ln\)</span> likelihood <span class="math inline">\(+p \ln(n)\)</span></p>
+</blockquote>
+<p>Both techniques suggest choosing a model with the smallest AIC and BIC value; both adjust for the number of parameters in the model and are more likely to select models with fewer variables than the drop-in-deviance test.</p>
+<section id="stepwise-regression" class="level4">
+<h4 class="anchored" data-anchor-id="stepwise-regression">Stepwise Regression</h4>
+<p>As done previously, we can add and remove variables based on the deviance. Recall, when comparing two nested models, the differences in the deviances can be modeled by a <span class="math inline">\(\chi^2_\nu\)</span> variable where <span class="math inline">\(\nu = \Delta p.\)</span></p>
+<p>Consider the HERS data described in your book (page 30); variable description also given on the book website http://www.epibiostat.ucsf.edu/biostat/vgsm/data/hersdata.codebook.txt</p>
+<p>For now, we will try to predict whether the individuals had a medical condition, <code>medcond</code> (defined as a pre-existing and self-reported medical condition). We will use the variables <code>age</code>, <code>weight</code>, <code>diabetes</code> and <code>drinkany</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+2 age           0.0162   0.00597      2.71 0.00664  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age <span class="sc">+</span> weight, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept) -2.17      0.496       -4.37 0.0000124
+2 age          0.0189    0.00613      3.09 0.00203  
+3 weight       0.00528   0.00274      1.93 0.0542   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">+</span>diabetes, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic      p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+2 age           0.0185   0.00603      3.07 0.00217     
+3 diabetes      0.487    0.0882       5.52 0.0000000330</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">*</span>diabetes, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term         estimate std.error statistic     p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+2 age            0.0278   0.00707      3.93 0.0000844  
+3 diabetes       2.83     0.914        3.10 0.00192    
+4 age:diabetes  -0.0354   0.0137      -2.58 0.00986    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age<span class="sc">*</span>drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term         estimate std.error statistic p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)  -0.991     0.511       -1.94  0.0526
+2 age           0.00885   0.00759      1.17  0.244 
+3 drinkany     -1.44      0.831       -1.73  0.0833
+4 age:drinkany  0.0168    0.0124       1.36  0.175 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age <span class="sc">+</span> weight <span class="sc">+</span> diabetes <span class="sc">+</span> drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  term        estimate std.error statistic    p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+1 (Intercept) -1.87      0.505      -3.72  0.000203  
+2 age          0.0184    0.00620     2.96  0.00304   
+3 weight       0.00143   0.00285     0.500 0.617     
+4 diabetes     0.432     0.0924      4.68  0.00000288
+5 drinkany    -0.253     0.0835     -3.03  0.00248   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age , <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+2 age           0.0162   0.00597      2.71 0.00664  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> weight , <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept) -0.769     0.198       -3.88 0.000106
+2 weight       0.00339   0.00267      1.27 0.204   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> diabetes , <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+2 diabetes       0.468    0.0878      5.34 9.55e- 8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+2 drinkany      -0.330    0.0818     -4.04 5.46e- 5</code></pre>
+</div>
+</div>
+</section>
+<section id="forward-selection" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="forward-selection">Forward Selection</h4>
+<p>One idea is to start with an empty model and adding the best available variable at each iteration, checking for needs for transformations. We should also look at interactions which we might suspect. However, looking at all possible interactions (if only 2-way interactions, we could also consider 3-way interactions etc.), things can get out of hand quickly.</p>
+<ol type="1">
+<li>We start with the response variable versus all variables and find the best predictor. If there are too many, we might just look at the correlation matrix. However, we may miss out of variables that are good predictors but aren’t linearly related. Therefore, if its possible, a scatter plot matrix would be best.<br>
+</li>
+<li>We locate the best variable, and regress the response variable on it.<br>
+</li>
+<li>If the variable seems to be useful, we keep it and move on to looking for a second.<br>
+</li>
+<li>If not, we stop.</li>
+</ol>
+</section>
+<section id="forward-stepwise-selection" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="forward-stepwise-selection">Forward Stepwise Selection</h4>
+<p>This method follows in the same way as Forward Regression, but as each new variable enters the model, we check to see if any of the variables already in the model can now be removed. This is done by specifying two values, <span class="math inline">\(\alpha_e\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>enter</strong> the model, and <span class="math inline">\(\alpha_l\)</span> as the <span class="math inline">\(\alpha\)</span> level needed to <strong>leave</strong> the model. We require that <span class="math inline">\(\alpha_e&lt;\alpha_l,\)</span> otherwise, our algorithm could cycle, we add a variable, then immediately decide to delete it, continuing ad infinitum. This is bad.</p>
+<ol type="1">
+<li>We start with the empty model, and add the best predictor, assuming the p-value associated with it is smaller than <span class="math inline">\(\alpha_e.\)</span><br>
+</li>
+<li>Now, we find the best of the remaining variables, and add it if the p-value is smaller than <span class="math inline">\(\alpha_e.\)</span> If we add it, we also check to see if the first variable can be dropped, by calculating the p-value associated with it (which is different from the first time, because now there are two variables in the model). If its p-value is greater than <span class="math inline">\(\alpha_l,\)</span> we remove the variable.<br>
+</li>
+<li>We continue with this process until there are no more variables that meet either requirements. In many situations, this will help us from stopping at a less than desirable model.</li>
+</ol>
+<p>How do you choose the <span class="math inline">\(\alpha\)</span> values? If you set <span class="math inline">\(\alpha_e\)</span> to be very small, you might walk away with no variables in your model, or at least not many. If you set it to be large, you will wander around for a while, which is a good thing, because you will explore more models, but you may end up with variables in your model that aren’t necessary.</p>
+</section>
+<section id="backward-selection" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="backward-selection">Backward Selection</h4>
+<ol type="1">
+<li>Start with the full model including every term (and possibly every interaction, etc.).<br>
+</li>
+<li>Remove the variable that is <em>least</em> significant (biggest p-value) in the model.<br>
+</li>
+<li>Continue removing variables until all variables are significant at the chosen <span class="math inline">\(\alpha\)</span> level.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> (age <span class="sc">+</span> diabetes <span class="sc">+</span> weight <span class="sc">+</span> drinkany)<span class="sc">^</span><span class="dv">2</span>, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+          &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> weight <span class="sc">+</span> drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+          &lt;dbl&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(medcond <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> drinkany, <span class="at">data =</span> HERS, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic     p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
+2 age           0.0176   0.00605      2.90 0.00369    
+3 diabetes      0.442    0.0895       4.94 0.000000786
+4 drinkany     -0.252    0.0834      -3.01 0.00257    </code></pre>
+</div>
+</div>
+<ul>
+<li>The big model (with all of the interaction terms) has a deviance of 3585.7; the additive model has a deviance of 3594.8.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+G &amp;= 3594.8 - 3585.7= 9.1\\
+p-value &amp;= P(\chi^2_6 \geq 9.1)= 1 - pchisq(9.1, 6) = 0.1680318
+\end{align}\]</span> We cannot reject the null hypothesis, so we know that we don’t need the 6 interaction terms. Next we will check whether we need weight.</p>
+<ul>
+<li>The additive model has a deviance of 3594.8; the model without weight is 3597.3.</li>
+</ul>
+<p><span class="math display">\[\begin{align}
+G &amp;= 3597.3 - 3594.8 =2.5\\
+p-value &amp;= P(\chi^2_1 \geq 2.5)= 1 - pchisq(2.5, 1) = 0.1138463
+\end{align}\]</span> We cannot reject the null hypothesis, so we know that we don’t need the weight in the model either.</p>
+</section>
+</section>
+<section id="getting-the-model-right" class="level3">
+<h3 class="anchored" data-anchor-id="getting-the-model-right">Getting the Model Right</h3>
+<p>In terms of selecting the variables to model a particular response, four things can happen:</p>
+<ul>
+<li>The logistic regression model is correct!<br>
+</li>
+<li>The logistic regression model is underspecified.<br>
+</li>
+<li>The logistic regression model contains extraneous variables.<br>
+</li>
+<li>The logistic regression model is overspecified.</li>
+</ul>
+<section id="underspecified" class="level5 unnumbered">
+<h5 class="unnumbered anchored" data-anchor-id="underspecified">Underspecified</h5>
+<p>A regression model is underspecified if it is missing one or more important predictor variables. Being underspecified is the worst case scenario because the model ends up being biased and predictions are wrong for virtually every observation. (Think about Simpson’s Paradox and the need for interaction.)</p>
+</section>
+<section id="extraneous" class="level5 unnumbered">
+<h5 class="unnumbered anchored" data-anchor-id="extraneous">Extraneous</h5>
+<p>The third type of variable situation comes when extra variables are included in the model but the variables are neither related to the response nor are they correlated with the other explanatory variables. Generally, extraneous variables are not so problematic because they produce models with unbiased coefficient estimators, unbiased predictions, and unbiased variance estimates. The worst thing that happens is that the error degrees of freedom is lowered which makes confidence intervals wider and p-values bigger (lower power). Also problematic is that the model becomes unnecessarily complicated and harder to interpret.</p>
+</section>
+<section id="overspecified" class="level5 unnumbered">
+<h5 class="unnumbered anchored" data-anchor-id="overspecified">Overspecified</h5>
+<p>When a model is overspecified, there are one or more redundant variables. That is, the variables contain the same information as other variables (i.e., are correlated!). As we’ve seen, correlated variables cause trouble because they inflate the variance of the coefficient estimates. With correlated variables it is still possible to get unbiased prediction estimates, but the coefficients themselves are so variable that they cannot be interpreted (nor can inference be easily performed).</p>
+<p>Generally: the idea is to use a model building strategy with some criteria (<span class="math inline">\(\chi^2\)</span>-tests, AIC, BIC, ROC, AUC) to find the middle ground between an underspecified model and an overspecified model.</p>
+</section>
+<section id="one-model-building-strategy" class="level4">
+<h4 class="anchored" data-anchor-id="one-model-building-strategy">One Model Building Strategy</h4>
+<p>Taken from https://onlinecourses.science.psu.edu/stat501/node/332.</p>
+<p>Model building is definitely an “art.” Unsurprisingly, there are many approaches to model building, but here is one strategy, consisting of seven steps, that is commonly used when building a regression model.</p>
+</section>
+<section id="the-first-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-first-step">The first step</h4>
+<p>Decide on the type of model that is needed in order to achieve the goals of the study. In general, there are five reasons one might want to build a regression model. They are:</p>
+<ul>
+<li>For predictive reasons - that is, the model will be used to predict the response variable from a chosen set of predictors.<br>
+</li>
+<li>For theoretical reasons - that is, the researcher wants to estimate a model based on a known theoretical relationship between the response and predictors. For example, there may be a known physical relationship (with parameters to esimate) or a differential equation that models state changes.<br>
+</li>
+<li>For control purposes - that is, the model will be used to control a response variable by manipulating the values of the predictor variables.<br>
+</li>
+<li>For inferential reasons - that is, the model will be used to explore the strength of the relationships between the response and the predictors.<br>
+</li>
+<li>For data summary reasons - that is, the model will be used merely as a way to summarize a large set of data by a single equation.</li>
+</ul>
+</section>
+<section id="the-second-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-second-step">The second step</h4>
+<p>Decide which explanatory variables and response variable on which to collect the data. Collect the data.</p>
+</section>
+<section id="the-third-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-third-step">The third step</h4>
+<p>Explore the data. That is:</p>
+<ul>
+<li>On a univariate basis, check for outliers, gross data errors, and missing values.<br>
+</li>
+<li>Study bivariate relationships to reveal other outliers, to suggest possible transformations, and to identify possible multicollinearities.</li>
+</ul>
+<p>I can’t possibly over-emphasize the data exploration step. There’s not a data analyst out there who hasn’t made the mistake of skipping this step and later regretting it when a data point was found in error, thereby nullifying hours of work.</p>
+</section>
+<section id="the-fourth-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-fourth-step">The fourth step</h4>
+<p>(The fourth step is very good modeling practice. It gives you a sense of whether or not you’ve overfit the model in the building process.) Randomly divide the data into a training set and a test set:</p>
+<ul>
+<li>The training set, with at least 20 error degrees of freedom (the number of observations is more than 20 larger than the number of variables), is used to estimate the model.<br>
+</li>
+<li>The test set is used for validation of the fitted model.</li>
+</ul>
+</section>
+<section id="the-fifth-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-fifth-step">The fifth step</h4>
+<p>Using the training set, identify several candidate models:</p>
+<ul>
+<li>Use best subsets regression.<br>
+</li>
+<li>Use stepwise regression, forward or backward.</li>
+</ul>
+</section>
+<section id="the-sixth-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-sixth-step">The sixth step</h4>
+<p>Select and evaluate a few “good” models:</p>
+<ul>
+<li>Select the models based on the criteria we learned, as well as the number and nature of the predictors.<br>
+</li>
+<li>Evaluate the selected models for violation of the model conditions.<br>
+</li>
+<li>If none of the models provide a satisfactory fit, try something else, such as collecting more data, identifying different predictors, or formulating a different type of model.</li>
+</ul>
+<p>n.b., You could evaluate the few models based on cross-validation of the training data. It isn’t a terrible idea, but you must remind yourself that the training data as a whole were used in the stepwise regression steps, so the cross-validated folds are not independent arbiters of model accuracy.</p>
+</section>
+<section id="the-seventh-and-final-step" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="the-seventh-and-final-step">The seventh and final step</h4>
+<p>Select the final model:</p>
+<ul>
+<li>A large AUC on the test data is indicative of a good predictive model (for your population of interest).<br>
+</li>
+<li>Consider false positive rate, false negative rate, outliers, parsimony, relevance, and ease of measurement of predictors.</li>
+</ul>
+<p>And, most of all, don’t forget that there is not necessarily only one good model for a given set of data. There might be a few equally satisfactory models.</p>
+</section>
+<section id="another-model-building-strategy" class="level4">
+<h4 class="anchored" data-anchor-id="another-model-building-strategy">Another Model Building Strategy</h4>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/sleuthmodelbuild.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<figcaption>Another strategy for model building. Figure taken from <span class="citation" data-cites="sleuth">[@sleuth]</span>.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<!--
+% add a bit on stepwise regression??? add1, drop1 in R
+
+% use the binomial model for pearson residuals $\frac{Y_i - n_i \hat{p}_i}{\sqrt{n_i \hat{p}_i (1-\hat{p}_i)} and for chi-squared test goodness-of-fit
+
+% see notes from 2008 on yellow pad of paper
+-->
+</section>
+</section>
+</section>
+<section id="model-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="model-assessment">Model Assessment</h2>
+<section id="measures-of-association" class="level3">
+<h3 class="anchored" data-anchor-id="measures-of-association">Measures of Association</h3>
+<p>With logistic regression, we don’t have residuals, so we don’t have a value like <span class="math inline">\(R^2.\)</span> We can, however, measure whether or not the estimated model is consistent with the data. That is, is the model able to discriminate between successes and failures.</p>
+<p>We’d like to choose a model that produces high probabilities of success for those observations where success was recorded and low probabilities of success for those observation where failure was recorded. In other words, we want mostly <strong>concordant</strong> pairs.</p>
+<p>Given a particular pair of observations where one was a success and the other was a failure, if the observation corresponding to a success has a <em>higher</em> probability of success than the observation corresponding to a failure, we call the pair <em>concordant</em>. If the observation corresponding to a success has a <em>lower</em> probability of success than the observation corresponding to a failure, we call the pair <em>discordant</em>. Tied pairs occur when the observed success has the same estimated probability as the observed failure.</p>
+<section id="back-to-the-burn-data-refexburnexamp" class="level4">
+<h4 class="anchored" data-anchor-id="back-to-the-burn-data-refexburnexamp">Back to the burn data @ref(ex:burnexamp):</h4>
+<p>Consider looking at all the pairs of successes and failures in the burn data, we have 308 survivors and 127 deaths = 39,116 pairs of individuals.</p>
+<p>One pair of individuals has burn areas of 1.75 and 2.35. <span class="math display">\[\begin{align}
+p(x=1.75) &amp;= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087
+\end{align}\]</span> The pairs would be concordant if the first individual survived and the second didn’t. The pairs would be discordant if the first individual died and the second survived.</p>
+<p>Ideally the model chosen would have a large number of concordant pairs. The following metrics quantify the concordance across the entire model with respect to the observed data:</p>
+<ul>
+<li><span class="math inline">\(D_{xy}\)</span>: <strong>Somers’ D</strong> is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs.<br>
+</li>
+<li>gamma: <strong>Goodman-Kruskal gamma</strong> is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs excluding ties.<br>
+</li>
+<li>tau-a: <strong>Kendall’s tau-a</strong> is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("Hmisc", "rms"))</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rms)   <span class="co"># you need this line!!</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>burn.glm <span class="ot">&lt;-</span> <span class="fu">lrm</span>(burnresp<span class="sc">~</span>burnexpl, <span class="at">data =</span> burnglm)</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(burn.glm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logistic Regression Model
+
+lrm(formula = burnresp ~ burnexpl, data = burnglm)
+
+                       Model Likelihood      Discrimination    Rank Discrim.    
+                             Ratio Test             Indexes          Indexes    
+Obs           435    LR chi2     190.15      R2       0.505    C       0.877    
+ 0            127    d.f.             1      R2(1,435)0.353    Dxy     0.604    
+ 1            308    Pr(&gt; chi2) &lt;0.0001    R2(1,269.8)0.504    gamma   0.824    
+max |deriv| 6e-05                            Brier    0.121    tau-a   0.312    
+
+          Coef     S.E.   Wald Z Pr(&gt;|Z|)
+Intercept  22.7083 2.2661 10.02  &lt;0.0001 
+burnexpl  -10.6624 1.0826 -9.85  &lt;0.0001 </code></pre>
+</div>
+</div>
+<p>The summary contains the following elements:</p>
+<blockquote class="blockquote">
+<p>number of observations used in the fit, maximum absolute value of first derivative of log likelihood, model likelihood ratio chi2, d.f., P-value, <span class="math inline">\(c\)</span> index (area under ROC curve), Somers’ Dxy, Goodman-Kruskal gamma, Kendall’s tau-a rank correlations between predicted probabilities and observed response, the Nagelkerke <span class="math inline">\(R^2\)</span> index, the Brier score computed with respect to Y <span class="math inline">\(&gt;\)</span> its lowest level, the <span class="math inline">\(g\)</span>-index, <span class="math inline">\(gr\)</span> (the <span class="math inline">\(g\)</span>-index on the odds ratio scale), and <span class="math inline">\(gp\)</span> (the <span class="math inline">\(g\)</span>-index on the probability scale using the same cutoff used for the Brier score).</p>
+</blockquote>
+</section>
+</section>
+<section id="roc" class="level3">
+<h3 class="anchored" data-anchor-id="roc">Receiver Operating Characteristic Curves</h3>
+<p>Recall that logistic regression can be used to predict the outcome of a binary event (your response variable). A Receiver Operating Characteristic (ROC) Curve is a graphical representation of the relationship between</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 16%">
+<col style="width: 27%">
+<col style="width: 27%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th style="text-align: center;">Truth</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td style="text-align: center;">positive</td>
+<td style="text-align: center;">negative</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td>Predicted</td>
+<td>positive</td>
+<td style="text-align: center;">true positive</td>
+<td style="text-align: center;">false positive</td>
+<td style="text-align: center;"><span class="math inline">\(P'\)</span></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>negative</td>
+<td style="text-align: center;">false negative</td>
+<td style="text-align: center;">true negative</td>
+<td style="text-align: center;"><span class="math inline">\(N'\)</span></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td style="text-align: center;"><span class="math inline">\(P\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(N\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>type I error = FP<br>
+</li>
+<li>type II error = FN<br>
+</li>
+<li>sensitivity = power = true positive rate (TPR) = TP / P = TP / (TP+FN)<br>
+</li>
+<li>false positive rate (FPR) = FP / N = FP / (FP + TN)<br>
+</li>
+<li>specificity = 1 - FPR = TN / (FP + TN)<br>
+</li>
+<li>accuracy (acc) = (TP+TN) / (P+N)<br>
+</li>
+<li>positive predictive value (PPV) = precision = TP / (TP + FP)<br>
+</li>
+<li>negative predictive value (NPV) = TN / (TN + FN)<br>
+</li>
+<li>false discovery rate = 1 - PPV = FP / (FP + TP)</li>
+</ul>
+<div class="example">
+<p>For example: consider a pair of individuals with burn areas of 1.75 and 2.35. <span class="math display">\[\begin{align}
+p(x=1.75) &amp;= \frac{e^{22.7083-10.6624\cdot 1.75}}{1+e^{22.7083 -10.6624\cdot 1.75}} = 0.983\\
+p(x=2.35) &amp;= \frac{e^{22.7083-10.6624\cdot 2.35}}{1+e^{22.7083 -10.6624\cdot 2.35}} = 0.087\\
+x &amp;= \mbox{log area burned}
+\end{align}\]</span> What value would we assign to 1.75 or 2.35 or 15 for log(area) burned? By changing our cutoff, we can fit an entire curve. We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1). Notice that the color band represents the probability cutoff for predicting a ``success.”</p>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/ROCcurve_burn.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<figcaption>ROC curve. Color indicates the probability cutoff used to determine predictions.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A: Let’s say we use prob=0.25 as a cutoff:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th style="text-align: center;">truth</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td style="text-align: center;">300</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">61</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td style="text-align: center;">308</td>
+<td style="text-align: center;">127</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 300/308 = 0.974\\
+\mbox{specificity} &amp;= 61 / 127 = 0.480, \mbox{1 - specificity} =  FPR = 0.520\\
+\end{align}\]</span></p>
+<p>B: Let’s say we use prob=0.7 as a cutoff:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th style="text-align: center;">truth</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td style="text-align: center;">265</td>
+<td style="text-align: center;">35</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td style="text-align: center;">43</td>
+<td style="text-align: center;">92</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td style="text-align: center;">308</td>
+<td style="text-align: center;">127</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 265/308 = 0.860\\
+\mbox{specificity} &amp;= 92/127 = 0.724, \mbox{1 - specificity} = FPR = 0.276\\
+\end{align}\]</span></p>
+<p>C: Let’s say we use prob=0.9 as a cutoff:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th style="text-align: center;">truth</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr class="even">
+<td>predicted</td>
+<td>yes</td>
+<td style="text-align: center;">144</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>no</td>
+<td style="text-align: center;">164</td>
+<td style="text-align: center;">120</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td style="text-align: center;">308</td>
+<td style="text-align: center;">127</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[\begin{align}
+\mbox{sensitivity} &amp;= TPR = 144/308 = 0.467\\
+\mbox{specificity} &amp;= 120/127 = 0.945, \mbox{1 - specificity} = FPR = 0.055\\
+\end{align}\]</span></p>
+<p>D: all models will go through (0,0) <span class="math inline">\(\rightarrow\)</span> predict everything negative, prob=1 as your cutoff</p>
+<p>E: all models will go through (1,1) <span class="math inline">\(\rightarrow\)</span> predict everything positive, prob=0 as your cutoff</p>
+<p>F: you have a model that gives perfect sensitivity (no FN!) and specificity (no FP)</p>
+<p>G: random guessing. If classifier randomly guess, it should get half the positives correct and half the negatives correct. If it guesses 90% of the positives correctly, it will also guess 90% of the negatives to be positive.</p>
+<p>H: is worse than random guessing. Note that the opposite classifier to (H) might be quite good!</p>
+</section>
+</section>
+<section id="birdexamp" class="level2">
+<h2 class="anchored" data-anchor-id="birdexamp">R: Birdnest Example</h2>
+<p>The following example uses base R modeling to work through different aspects of the logistic regression model.</p>
+<p><strong>Length of Bird Nest</strong> This example is from problem E1 in your text and includes 99 species of N. American passerine birds. Recall that the response variable is binary and represents whether there is a small opening (<code>closed=1</code>) or a large opening (<code>closed=0</code>) for the nest. The explanatory variable of interest was the length of the bird.</p>
+<section id="drop-in-deviance-likelihood-ratio-test-lrt" class="level3">
+<h3 class="anchored" data-anchor-id="drop-in-deviance-likelihood-ratio-test-lrt">Drop-in-deviance (Likelihood Ratio Test, LRT)</h3>
+<p><span class="math inline">\(\chi^2\)</span>: The Likelihood ratio test also tests whether the response is explained by the explanatory variable. We can output the deviance ( = K - 2 * log-likelihood) for both the full (maximum likelihood!) and reduced (null) models. <span class="math display">\[\begin{align}
+G &amp;= 2 \cdot \ln(L(MLE)) - 2 \cdot \ln(L(null))\\
+&amp;= \mbox{null (restricted) deviance - residual (full model) deviance}\\
+G &amp;\sim \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
+\end{align}\]</span> where <span class="math inline">\(\nu\)</span> represents the difference in the number of parameters needed to estimate in the full model versus the null model.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   0.457     0.753      0.607   0.544
+2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print.data.frame</span>(<span class="at">digits=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+1       119.992      94 -58.4399 120.88 125.987   116.88          93   95</code></pre>
+</div>
+</div>
+</section>
+<section id="difference-between-tidy-and-augment-and-glance" class="level3">
+<h3 class="anchored" data-anchor-id="difference-between-tidy-and-augment-and-glance">Difference between <code>tidy</code> and <code>augment</code> and <code>glance</code></h3>
+<p>Note that <code>tidy</code> contains the same number of rows as the number of coefficients. <code>augment</code> contains the same number of rows as number of observations. <code>glance</code> always has one row (containing overall model information).</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   0.457     0.753      0.607   0.544
+2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">augment</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 95 × 9
+   .rownames `Closed?` Length .fitted .resid   .hat .sigma .cooksd .std.resid
+   &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+ 1 1                 0   20    -0.896 -0.827 0.0137   1.12 0.00288     -0.833
+ 2 2                 1   20    -0.896  1.57  0.0137   1.11 0.0173       1.58 
+ 3 4                 1   20    -0.896  1.57  0.0137   1.11 0.0173       1.58 
+ 4 5                 1   22.5  -1.07   1.65  0.0202   1.11 0.0305       1.67 
+ 5 6                 0   18.5  -0.795 -0.863 0.0116   1.12 0.00267     -0.868
+ 6 7                 1   17    -0.693  1.48  0.0110   1.12 0.0112       1.49 
+ 7 8                 0   17    -0.693 -0.900 0.0110   1.12 0.00280     -0.905
+ 8 9                 0   15    -0.558 -0.951 0.0130   1.12 0.00381     -0.958
+ 9 10                0   15    -0.558 -0.951 0.0130   1.12 0.00381     -0.958
+10 11                1   11    -0.287  1.30  0.0276   1.12 0.0194       1.32 
+# ℹ 85 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print.data.frame</span>(<span class="at">digits=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+1       119.992      94 -58.4399 120.88 125.987   116.88          93   95</code></pre>
+</div>
+</div>
+</section>
+<section id="looking-at-variables-in-a-few-different-ways." class="level3">
+<h3 class="anchored" data-anchor-id="looking-at-variables-in-a-few-different-ways.">Looking at variables in a few different ways.</h3>
+<p>Length as a continuous explanatory variable:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   0.457     0.753      0.607   0.544
+2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print.data.frame</span>(<span class="at">digits=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+1       119.992      94 -58.4399 120.88 125.987   116.88          93   95</code></pre>
+</div>
+</div>
+<p>Length as a categorical explanatory variables:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> <span class="fu">as.factor</span>(Length), <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 34 × 5
+   term                  estimate std.error statistic p.value
+   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+ 1 (Intercept)            1.96e+1    10754.  1.82e- 3   0.999
+ 2 as.factor(Length)10    9.92e-8    13171.  7.53e-12   1.00 
+ 3 as.factor(Length)10.5  9.11e-8    15208.  5.99e-12   1.00 
+ 4 as.factor(Length)11   -1.89e+1    10754. -1.75e- 3   0.999
+ 5 as.factor(Length)12   -2.12e+1    10754. -1.97e- 3   0.998
+ 6 as.factor(Length)12.5  9.85e-8    15208.  6.48e-12   1.00 
+ 7 as.factor(Length)13   -2.03e+1    10754. -1.88e- 3   0.998
+ 8 as.factor(Length)13.5 -2.07e+1    10754. -1.92e- 3   0.998
+ 9 as.factor(Length)14   -1.93e+1    10754. -1.79e- 3   0.999
+10 as.factor(Length)14.5 -3.91e+1    13171. -2.97e- 3   0.998
+# ℹ 24 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> <span class="fu">as.factor</span>(Length), <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print.data.frame</span>(<span class="at">digits=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95</code></pre>
+</div>
+</div>
+<p>Length plus a few other explanatory variables:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length <span class="sc">+</span> Incubate <span class="sc">+</span>  Color, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   -2.64     2.06      -1.28   0.201 
+2 Length        -0.114    0.0527    -2.17   0.0302
+3 Incubate       0.314    0.172      1.82   0.0684
+4 Color         -0.420    0.609     -0.690  0.490 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length <span class="sc">+</span> Incubate <span class="sc">+</span>  Color, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>) <span class="sc">|&gt;</span> <span class="fu">glance</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print.data.frame</span>(<span class="at">digits=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+1       110.086      87 -51.6633 111.327 121.236  103.327          84   88</code></pre>
+</div>
+</div>
+</section>
+<section id="predicting-response" class="level3">
+<h3 class="anchored" data-anchor-id="predicting-response">Predicting Response</h3>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>bird_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>bird_glm <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)   0.457     0.753      0.607   0.544
+2 Length       -0.0677    0.0425    -1.59    0.112</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predicting the linear part:</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a><span class="co"># reasonable to use the SE to create CIs</span></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(bird_glm, <span class="at">newdata =</span> <span class="fu">list</span>(<span class="at">Length =</span> <span class="dv">47</span>), <span class="at">se.fit =</span> <span class="cn">TRUE</span>, <span class="at">type =</span> <span class="st">"link"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$fit
+    1 
+-2.72 
+
+$se.fit
+[1] 1.3
+
+$residual.scale
+[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predicting the probability of success (on the `scale` of the response variable):</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="co"># do NOT use the SE to create a CI for the predicted value</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a><span class="co"># instead, use the SE from `type="link" ` and transform the interval</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(bird_glm, <span class="at">newdata =</span> <span class="fu">list</span>(<span class="at">Length =</span> <span class="dv">47</span>), <span class="at">se.fit =</span> <span class="cn">TRUE</span>, <span class="at">type =</span> <span class="st">"response"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$fit
+     1 
+0.0616 
+
+$se.fit
+     1 
+0.0751 
+
+$residual.scale
+[1] 1</code></pre>
+</div>
+</div>
+</section>
+<section id="measues-of-association" class="level3">
+<h3 class="anchored" data-anchor-id="measues-of-association">Measues of association</h3>
+</section>
+<section id="roc-curves" class="level3">
+<h3 class="anchored" data-anchor-id="roc-curves">ROC curves</h3>
+<p>ROC curve for the model on <code>Length</code> only, with no testing / training / cross validated data.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotROC)</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>nests <span class="ot">&lt;-</span> nests <span class="sc">|&gt;</span></span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Closed =</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"no"</span>, </span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">ifelse</span>(<span class="st">`</span><span class="at">Closed?</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"yes"</span>, <span class="st">`</span><span class="at">Closed?</span><span class="st">`</span>))))</span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>bird_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(Closed <span class="sc">~</span> Length, <span class="at">data =</span> nests, <span class="at">family=</span><span class="st">"binomial"</span>)</span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>bird_indiv <span class="ot">&lt;-</span> bird_glm <span class="sc">|&gt;</span> </span>
+<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">type.predict =</span> <span class="st">"response"</span>) </span>
+<span id="cb97-11"><a href="#cb97-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-12"><a href="#cb97-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bird_indiv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  .rownames Closed Length .fitted .resid   .hat .sigma .cooksd .std.resid
+  &lt;chr&gt;     &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+1 1         no       20     0.290 -0.827 0.0137   1.12 0.00288     -0.833
+2 2         yes      20     0.290  1.57  0.0137   1.11 0.0173       1.58 
+3 4         yes      20     0.290  1.57  0.0137   1.11 0.0173       1.58 
+4 5         yes      22.5   0.256  1.65  0.0202   1.11 0.0305       1.67 
+5 6         no       18.5   0.311 -0.863 0.0116   1.12 0.00267     -0.868
+6 7         yes      17     0.333  1.48  0.0110   1.12 0.0112       1.49 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>bird_indiv <span class="sc">|&gt;</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_roc</span>(<span class="fu">aes</span>(<span class="at">d =</span> Closed, <span class="at">m =</span> .fitted)) <span class="sc">+</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="cross-validation-on-nest-data" class="level3">
+<h3 class="anchored" data-anchor-id="cross-validation-on-nest-data">Cross Validation on nest data</h3>
+<p>Note that the syntax here is slightly different from what we’ve seen previously. From the <strong>tidymodels</strong> and <strong>plotROC</strong> packages. See the full explanation in Chapter @ref(process).</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotROC)</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>bird_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>)</span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>bird_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(</span>
+<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>  Closed <span class="sc">~</span> Length <span class="sc">+</span> Incubate <span class="sc">+</span> Nestling,    <span class="co"># formula</span></span>
+<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nests <span class="co"># data for cataloging names and types of variables</span></span>
+<span id="cb100-10"><a href="#cb100-10" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb100-11"><a href="#cb100-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-12"><a href="#cb100-12" aria-hidden="true" tabindex="-1"></a>bird_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb100-13"><a href="#cb100-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(bird_spec) <span class="sc">|&gt;</span></span>
+<span id="cb100-14"><a href="#cb100-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(bird_rec)</span>
+<span id="cb100-15"><a href="#cb100-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-16"><a href="#cb100-16" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">47</span>)</span>
+<span id="cb100-17"><a href="#cb100-17" aria-hidden="true" tabindex="-1"></a>bird_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(nests, <span class="at">v =</span> <span class="dv">3</span>)</span>
+<span id="cb100-18"><a href="#cb100-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-19"><a href="#cb100-19" aria-hidden="true" tabindex="-1"></a>metrics_interest <span class="ot">&lt;-</span> yardstick<span class="sc">::</span><span class="fu">metric_set</span>(accuracy, roc_auc, </span>
+<span id="cb100-20"><a href="#cb100-20" aria-hidden="true" tabindex="-1"></a>                              sensitivity, specificity)</span>
+<span id="cb100-21"><a href="#cb100-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-22"><a href="#cb100-22" aria-hidden="true" tabindex="-1"></a>bird_fit_rs <span class="ot">&lt;-</span> bird_wflow <span class="sc">|&gt;</span></span>
+<span id="cb100-23"><a href="#cb100-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(bird_folds,</span>
+<span id="cb100-24"><a href="#cb100-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">metrics =</span> metrics_interest,</span>
+<span id="cb100-25"><a href="#cb100-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb100-26"><a href="#cb100-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-27"><a href="#cb100-27" aria-hidden="true" tabindex="-1"></a>bird_fit_rs <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 6
+  .metric     .estimator  mean     n std_err .config             
+  &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary     0.755     3 0.00766 Preprocessor1_Model1
+2 roc_auc     binary     0.815     3 0.00964 Preprocessor1_Model1
+3 sensitivity binary     0.842     3 0.0313  Preprocessor1_Model1
+4 specificity binary     0.559     3 0.0926  Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>bird_fit_rs <span class="sc">|&gt;</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> .predictions) <span class="sc">|&gt;</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  plotROC<span class="sc">::</span><span class="fu">geom_roc</span>(<span class="fu">aes</span>(<span class="at">m =</span> .pred_yes, <span class="at">d =</span> Closed,</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color =</span> id)) <span class="sc">+</span> </span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We might try the whole thing over using a model with only one variable. Do the CV values and accuracy get better? No, everything gets worse. But it’s the specificity that we should really pay attention to because it is terrible in the single variable model!</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>bird_rec_1 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  Closed <span class="sc">~</span> Length,    <span class="co"># formula</span></span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nests <span class="co"># data for cataloging names and types of variables</span></span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>bird_wflow_1 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(bird_spec) <span class="sc">|&gt;</span></span>
+<span id="cb103-8"><a href="#cb103-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(bird_rec_1)</span>
+<span id="cb103-9"><a href="#cb103-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb103-10"><a href="#cb103-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb103-11"><a href="#cb103-11" aria-hidden="true" tabindex="-1"></a>bird_fit_rs_1 <span class="ot">&lt;-</span> bird_wflow_1 <span class="sc">|&gt;</span></span>
+<span id="cb103-12"><a href="#cb103-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(bird_folds,</span>
+<span id="cb103-13"><a href="#cb103-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">metrics =</span> metrics_interest,</span>
+<span id="cb103-14"><a href="#cb103-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb103-15"><a href="#cb103-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb103-16"><a href="#cb103-16" aria-hidden="true" tabindex="-1"></a>bird_fit_rs_1 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 6
+  .metric     .estimator   mean     n std_err .config             
+  &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary     0.684      3  0.0563 Preprocessor1_Model1
+2 roc_auc     binary     0.639      3  0.0622 Preprocessor1_Model1
+3 sensitivity binary     0.986      3  0.0145 Preprocessor1_Model1
+4 specificity binary     0.0833     3  0.0833 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>bird_fit_rs_1 <span class="sc">|&gt;</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> .predictions) <span class="sc">|&gt;</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  plotROC<span class="sc">::</span><span class="fu">geom_roc</span>(<span class="fu">aes</span>(<span class="at">m =</span> .pred_yes, <span class="at">d =</span> Closed,</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color =</span> id)) <span class="sc">+</span> </span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="05-log_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Sage &amp; Bruno<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Beta &amp; Luna<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

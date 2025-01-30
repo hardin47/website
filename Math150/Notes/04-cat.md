@@ -331,7 +331,7 @@ How do we know if our test statistic is a big number or not?  Well, it turns out
 
 When there are only two populations, the $\chi^2$ procedure is equivalent to the two-sided z-test for proportions.  The chi-squared test statistic is the square of the z-test statistic.  That is, the chi-squared test is exactly the same as the two-sided alternative for the z-test.
 
-use chi-square if you have multiple populations
+use chi-squared test if you have multiple populations
 
 use z-test if you want one-sided tests or confidence intervals.
 
@@ -898,14 +898,25 @@ se.lnOR
 
 ### Chi-squared Analysis
 
+Note that we can `tidy()` the Chi-square
+
 
 ``` r
 backpain |>
   table() |>
-  chisq.test()
+  chisq.test() 
 #> 
 #> 	Pearson's Chi-squared test with Yates' continuity correction
 #> 
 #> data:  table(backpain)
 #> X-squared = 6, df = 1, p-value = 0.02
+
+backpain |>
+  table() |>
+  chisq.test() |> 
+  tidy()
+#> # A tibble: 1 × 4
+#>   statistic p.value parameter method                                            
+#>       <dbl>   <dbl>     <int> <chr>                                             
+#> 1      5.70  0.0170         1 Pearson's Chi-squared test with Yates' continuity…
 ```
