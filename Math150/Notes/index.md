@@ -1,7 +1,7 @@
 --- 
 title: "Methods in Biostatistics"
 author: "Jo Hardin"
-date: "2025-02-04"
+date: "2025-02-12"
 knit: bookdown::render_book
 site: bookdown::bookdown_site
 output:

@@ -233,8 +233,8 @@ RSS &= \sum_i (Y_i - \hat{Y}_i)^2\\
 \end{align}
 That is, we take derivatives with respect to both $\beta_0$ and $\beta_1,$ set them equal to zero (take second derivatives to ensure minimums), and solve to get $b_0$ and $b_1.$  It turns out that we've also *maximized the normal likelihood*.
 \begin{align}
-L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
-&= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+L(\underline{y} | \beta_0, \beta_1, \underline{x}) &= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma^2}\\
+&= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma^2}\\
 \end{align}
 
 
