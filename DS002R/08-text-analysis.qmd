@@ -18,8 +18,9 @@ Some new variable types:
 * character strings
 * factor variables
 * dates
-* numeric
-* logical
+* numeric (decimal)
+* integer
+* logical (Boolean)
 
 A variable's type determines the values that the variable can take on and the operations that can be performed on it.  Specifying variable types ensures the dataset's integrity and increases performance. 
 
@@ -129,17 +130,24 @@ str_detect(fruits, "a")
 
 ```{r}
 starwars |> 
-  select(name, films) |> 
-  str() 
+  select(name, films) 
 ```
 
-## filtered data
+## unnested data
+
+```{r}
+starwars |> 
+  select(name, films) |> 
+  unnest_wider(films, names_sep = "")
+```
+
+## filtered unnested data
 
 ```{r}
 starwars |> 
   filter(str_detect(films, "Empire")) |> 
   select(name, films) |> 
-  str()
+  unnest_wider(films, names_sep = "")
 ```
 :::
 
@@ -152,6 +160,7 @@ The **stringr** package within tidyverse contains lots of functions to help proc
 
 tribble(
   ~`str function`, ~arguments, ~returns,
+"`str_c()", " ..., `sep`, `collapse`", "a new concatenated string",
 "`str_replace()`",	"`x`, `pattern`, `replacement`",	"a modified string",
 "`str_replace_all()`",	"`x`, `pattern`, `replacement`", "a modified string",
 "`str_to_lower()`",	"`x`", "a modified string",
@@ -196,7 +205,7 @@ dream |>
 ```{r}
 dream |> 
   select(ideology) |> 
-  pull() |>  # levels() works only on vectors, not data frames
+  pull() |>  # because levels() works only on vectors, not data frames
   levels()
 ```
 
@@ -389,9 +398,21 @@ flightsWK |> select(year, month, day, ymdday, weekdy, whichweek, dep_time,
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
-
+* What is the difference between character strings, factor variables, dates, numeric variables, integer variables, and logical variables?
+* What are the different `str_` functions? What do they do?
+* What are the different `fct_` functions? What do they do?
+* What does the `all` do in functions like `str_replace_all()` (as compared with `str_replace()`)?
+* Are the `str_` functions case sensitive?
+* Can `str_` functions take variables that aren't strings?
+* Can `fct_` functions take variables that aren't factors?
+* Can **lubridate** functions take variables that aren't time or data objects?
+* How do the `str_` functions work inside the tidy pipeline?
 
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
 
-
+* Why is the calculation of `January 31 + one month` interesting and/or an ethical consideration?
+* Why is it often important to relevel your factor variables when making a data visualization?
+* Why are timezones important to pay attention to?
+* What does this mean: If x is a string it can take any value. If x is a factor it can only take a values from a list of all levels. ?
+* Name one thing that you noticed about types of variables in the course materials (either in class or reading the notes, etc.) where you thought to yourself "Oh, I'll have to be really careful about **that**."  Why would you need to be careful?
 
