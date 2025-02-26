@@ -568,26 +568,24 @@ Back to linear regression to consider Simpson's Paradox in the wild.  Consider d
 
 ```{r echo=FALSE}
 require(mosaic); require(mosaicData)
-trellis.par.set(theme=col.mosaic(bw=TRUE)); options(digits=3)
-
-mod1 = lm(sat ~ salary, data=SAT)
-#confint(mod1)
-#summary(mod1)$r.squared
-
-mod2 = lm(sat ~ salary + frac, data=SAT)
-#confint(mod2)
-#summary(mod2)$r.squared
 
 SAT = transform(SAT, fracgrp = cut(frac, breaks=c(0, 22, 49, 81),
                                    labels=c("low fraction", "medium fraction", "high fraction")))
 
-xyplot(sat ~ salary, type=c("r", "p"),
-               xlab="Average teacher salary",
-               ylab="State average SAT", data=SAT)
+SAT |> 
+  ggplot(aes(x = salary, y = sat)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE, color = "black", method = "lm")
 
-xyplot(sat ~ salary, groups=fracgrp, auto.key=TRUE, 
-        type=c("p", "r"), xlab="Average teacher salary",
-       ylab="State average SAT",data=SAT)
+
+SAT |> 
+  ggplot(aes(x = salary, y = sat)) + 
+  geom_point(aes(pch = fracgrp)) + 
+  geom_smooth(aes(lty = fracgrp),
+              se = FALSE, color = "black", method = "lm", fullrange=TRUE) + 
+  theme(legend.position="bottom") + 
+  labs(lty = "Fraction of students taking SAT",
+       pch = "Fraction of students taking SAT")
 ```
 
 ```{r}

@@ -359,8 +359,8 @@ As long as we do not have a case-control study, we can model the risk using a lo
 RSS &amp;= \sum_i (Y_i - \hat{Y}_i)^2\\
 &amp;= \sum_i (Y_i - (\beta_0 + \beta_1 X_i))^2
 \end{align}\]</span> That is, we take derivatives with respect to both <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1,\)</span> set them equal to zero (take second derivatives to ensure minimums), and solve to get <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1.\)</span> It turns out that we’ve also <em>maximized the normal likelihood</em>. <span class="math display">\[\begin{align}
-L(\underline{y} | \beta_0, \beta_1, \underline{x}) &amp;= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
-&amp;= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma}\\
+L(\underline{y} | \beta_0, \beta_1, \underline{x}) &amp;= \prod_i \frac{1}{\sqrt{2 \pi \sigma^2}} e^{(y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma^2}\\
+&amp;= \bigg( \frac{1}{2 \pi \sigma^2} \bigg)^{n/2} e^{\sum_i (y_i - \beta_0 - \beta_1 x_i)^2 / 2 \sigma^2}\\
 \end{align}\]</span></p>
 <p>What does that even mean? Likelihood? Maximizing the likelihood? WHY??? The likelihood is the probability distribution of the data given <em>specific</em> values of the unknown parameters.</p>
 <p>Consider a toy example where you take a sample of size 4 from a binary population (e.g., flipping a coin that has probability heads of <span class="math inline">\(p)\)</span> and get: failure, success, failure, failure (FSFF).</p>
@@ -445,7 +445,7 @@ H_0:&amp; p=0.25\\
 H_a:&amp; p \ne 0.25\\
 \hat{p} &amp;= \frac{49}{147}\\
 -2 \ln \bigg( \frac{L(p_0)}{L(\hat{p})} \bigg) &amp;= -2 [ \ln (L(p_0)) - \ln(L(\hat{p}))]\\
-&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{y} (0.75)^{n-y} \bigg) - \ln \Bigg( \bigg( \frac{y}{n} \bigg)^{y} \bigg( \frac{(n-y)}{n} \bigg)^{n-y} \Bigg) \Bigg]\\
+&amp;= -2 \Bigg[ \ln \bigg( (0.25)^{\sum y_i} (0.75)^{n-\sum y_i} \bigg) - \ln \Bigg( \bigg( \frac{\sum y_i}{n} \bigg)^{\sum y_i} \bigg( \frac{(n-\sum y_i)}{n} \bigg)^{n-\sum y_i} \Bigg) \Bigg]\\
 &amp;= -2 \Bigg[ \ln \bigg( (0.25)^{49} (0.75)^{98} \bigg) - \ln \Bigg( \bigg( \frac{1}{3} \bigg)^{49} \bigg( \frac{2}{3} \bigg)^{98} \Bigg) \Bigg]\\
 &amp;= -2 [ \ln(0.0054) - \ln(0.0697) ] = 5.11\\
 P( \chi^2_1 \geq 5.11) &amp;= 0.0238
@@ -652,12 +652,12 @@ Recall the homework assignment where APACHE score was a significant predictor of
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(SAT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       state expend ratio salary frac verbal math  sat         fracgrp
-1    Alabama   4.41  17.2   31.1    8    491  538 1029    low fraction
-2     Alaska   8.96  17.6   48.0   47    445  489  934 medium fraction
-3    Arizona   4.78  19.3   32.2   27    448  496  944 medium fraction
-4   Arkansas   4.46  17.1   28.9    6    482  523 1005    low fraction
-5 California   4.99  24.0   41.1   45    417  485  902 medium fraction
-6   Colorado   5.44  18.4   34.6   29    462  518  980 medium fraction</code></pre>
+1    Alabama  4.405  17.2 31.144    8    491  538 1029    low fraction
+2     Alaska  8.963  17.6 47.951   47    445  489  934 medium fraction
+3    Arizona  4.778  19.3 32.175   27    448  496  944 medium fraction
+4   Arkansas  4.459  17.1 28.934    6    482  523 1005    low fraction
+5 California  4.992  24.0 41.078   45    417  485  902 medium fraction
+6   Colorado  5.443  18.4 34.571   29    462  518  980 medium fraction</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(sat <span class="sc">~</span> salary, <span class="at">data=</span>SAT) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1753,11 +1753,11 @@ G &amp;\sim \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 <span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(bird_glm, <span class="at">newdata =</span> <span class="fu">list</span>(<span class="at">Length =</span> <span class="dv">47</span>), <span class="at">se.fit =</span> <span class="cn">TRUE</span>, <span class="at">type =</span> <span class="st">"link"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$fit
-    1 
--2.72 
+        1 
+-2.723208 
 
 $se.fit
-[1] 1.3
+[1] 1.299147
 
 $residual.scale
 [1] 1</code></pre>
@@ -1768,12 +1768,12 @@ $residual.scale
 <span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(bird_glm, <span class="at">newdata =</span> <span class="fu">list</span>(<span class="at">Length =</span> <span class="dv">47</span>), <span class="at">se.fit =</span> <span class="cn">TRUE</span>, <span class="at">type =</span> <span class="st">"response"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$fit
-     1 
-0.0616 
+        1 
+0.0616177 
 
 $se.fit
-     1 
-0.0751 
+         1 
+0.07511794 
 
 $residual.scale
 [1] 1</code></pre>
