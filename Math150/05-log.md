@@ -1,13 +1,6 @@
 # Logistic Regression {#logreg}
 
-```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.height=3, fig.width=5, 
-                      fig.align = "center")
 
-library(tidyverse)
-library(broom)
-library(survival)
-```
 
 
 ## Motivation for Logistic Regression {#logmodel}
@@ -43,31 +36,7 @@ These data refer to 435 adults who were treated for third-degree burns by the Un
 
 
 
-```{r echo=FALSE, fig.height=10, warning=FALSE, message=FALSE, fig.show = "hold", out.width = '95%'}
-burndata <- data.frame(rbind(c(1.35,13,0,1), c(1.6,19,0,1),c(1.75,67,2,0.971014493),
-c(1.85,45,5,0.9),c(1.95,71,8,0.898734177), c(2.05,50,20,0.714285714),c(2.15,35,31,0.53030303),
-c(2.25,7,49,0.125),c(2.35,1,12,0.076923077)))
-names(burndata) <- c("logarea","surv","died","propsurv")
-
-burndata <- burndata |>
-  mutate(logitsurv = log(propsurv / (1-propsurv)))
-
-expl <- rep(burndata$logarea, burndata$surv+burndata$died)
-resp <- c()
-for(i in 1:9){
-  resp<-c(resp,rep(0,burndata$died[i]),rep(1,burndata$surv[i]))}
-
-burnglm <- data.frame(burnexpl = expl, burnresp = resp)
-
-p3 <- ggplot(burndata, aes(x = logarea, y = propsurv)) + geom_point() + 
-  xlab("log area burned") + ylab("prop who survived")
-p4 <- burndata |> dplyr::filter(logitsurv < 4) |> 
-  ggplot(aes(x = logarea, y = logitsurv)) + geom_point() + 
-  xlab("log area burned") + ylab("logit of prop who survived") + ylim(c(-3,4))
-
-library(ggpubr)
-ggarrange(p3, p4, ncol = 2)
-```
+<img src="05-log_files/figure-html/unnamed-chunk-2-1.png" width="95%" style="display: block; margin: auto;" />
 
 We can see that the logit transformation linearizes the relationship.
 
@@ -77,45 +46,7 @@ A first idea might be to model the relationship between the probability of succe
 
 The functional form relating x and the probability of success looks like it could be an `S` shape.  But we'd have to do some work to figure out what the form of that `S` looks like.  Below I've given some different relationships between x and the probability of success using $\beta_0$ and $\beta_1$ values that are yet to be defined.  Regardless, we can see that by tuning the functional relationship of the `S` curve, we can get a good fit to the data.
 
-```{r echo=FALSE, fig.height=10, warning=FALSE, message=FALSE, out.width='95%'}
-sfunc <- function(beta0, beta1){
-  x <- seq(-5,5,.25)
-  y <- exp(beta0 + beta1 * x) / (1 + exp(beta0 + beta1*x) )
-	y}
-
-x <- seq(-5,5,.25)
-
-beta0 <- -0.2
-beta1 <- -1
-b1 <- data.frame(x = x,  y = sfunc(beta0, beta1)) |>
-  ggplot() +
-  geom_line(aes(x = x, y = y)) +
-  xlab(paste("beta0=",beta0,"   beta1=", beta1,sep="")) +
-  ylab("")
-beta0 <- -0.2
-beta1 <- 0.4
-b2 <- data.frame(x = x,  y = sfunc(beta0, beta1)) |>
-  ggplot() +
-  geom_line(aes(x = x, y = y)) +
-  xlab(paste("beta0=",beta0,"   beta1=", beta1,sep="")) +
-  ylab("")
-beta0 <- -0.3
-beta1 <- 1.8
-b3 <- data.frame(x = x,  y = sfunc(beta0, beta1)) |>
-  ggplot() +
-  geom_line(aes(x = x, y = y)) +
-  xlab(paste("beta0=",beta0,"   beta1=", beta1,sep="")) +
-  ylab("")
-beta0 <- -1
-beta1 <- 7
-b4 <- data.frame(x = x,  y = sfunc(beta0, beta1)) |>
-  ggplot() +
-  geom_line(aes(x = x, y = y)) +
-  xlab(paste("beta0=",beta0,"   beta1=", beta1,sep="")) +
-  ylab("")
-
-ggarrange(b1, b2, b3, b4, ncol = 2, nrow = 2, common.legend = TRUE)
-```
+<img src="05-log_files/figure-html/unnamed-chunk-3-1.png" width="95%" style="display: block; margin: auto;" />
 
 
 
@@ -371,9 +302,15 @@ Because we will use maximum likelihood parameter estimates, we can also use larg
 z = \frac{b_1 - \beta_1}{SE(b_1)}
 \end{align}
 
-```{r, echo = TRUE, message=FALSE, warning=FALSE}
+
+``` r
 glm(burnresp~burnexpl, data = burnglm, family="binomial") |> 
   tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)     22.7      2.27     10.0  1.23e-23
+#> 2 burnexpl       -10.7      1.08     -9.85 6.95e-23
 ```
 
 **Note:**  Although the model is a Bernoulli model and not really a binomial model (although the Bernoulli is a binomial with $n=1),$ the way to fit a logistic regression model in R is to use `family = "binomial"`.  It just is what it is.
@@ -436,9 +373,14 @@ That is, the difference in log likelihoods will be the opposite difference in de
 \end{align}
 
 
-```{r}
+
+``` r
 glm(burnresp~burnexpl, data = burnglm, family="binomial") |> 
   glance() 
+#> # A tibble: 1 × 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1          525.     434  -168.  339.  347.     335.         433   435
 ```
 
 \begin{align}
@@ -542,18 +484,47 @@ Data available at: http://www.biostat.ucsf.edu/vgsm/data/excel/hersdata.xls  For
 :::
 
 
-```{r include = FALSE, warning=FALSE, message=FALSE}
-HERS <- read.table("./data/HERS.csv", 
-                   sep=",", header=T, na.strings=".")
-```
 
 
-```{r}
+
+
+``` r
 glm(medcond ~ age, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
 glm(medcond ~ age + weight, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+#> 2 age          0.0189    0.00613      3.09 0.00203  
+#> 3 weight       0.00528   0.00274      1.93 0.0542
 glm(medcond ~ age+diabetes, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic      p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
+#> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+#> 2 age           0.0185   0.00603      3.07 0.00217     
+#> 3 diabetes      0.487    0.0882       5.52 0.0000000330
 glm(medcond ~ age*diabetes, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic     p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+#> 2 age            0.0278   0.00707      3.93 0.0000844  
+#> 3 diabetes       2.83     0.914        3.10 0.00192    
+#> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
 glm(medcond ~ age*drinkany, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+#> 2 age           0.00885   0.00759      1.17  0.244 
+#> 3 drinkany     -1.44      0.831       -1.73  0.0833
+#> 4 age:drinkany  0.0168    0.0124       1.36  0.175
 ```
 
 Write out a few models *by hand*, does any of the significance change with respect to interaction?  Does the interpretation change with interaction?  In the last model, we might want to remove all the age information.  Age seems to be less important than drinking status. How do we decide?  How do we model?
@@ -566,38 +537,57 @@ Write out a few models *by hand*, does any of the significance change with respe
 Back to linear regression to consider Simpson's Paradox in the wild.  Consider data on SAT scores across different states with information on educational expenditure.  The correlation between SAT score and average teacher salary is negative with the combined data.  However, SAT score and average teacher salary is positive after controlling for the fraction of students who take the exam.  The fewer students who take the exam, the higher the SAT score.  That's because states whose public universities encourage the ACT have SAT-takers who are leaving the state for college (with their higher SAT scores).
 
 
-```{r echo=FALSE}
-require(mosaic); require(mosaicData)
-
-SAT = transform(SAT, fracgrp = cut(frac, breaks=c(0, 22, 49, 81),
-                                   labels=c("low fraction", "medium fraction", "high fraction")))
-
-SAT |> 
-  ggplot(aes(x = salary, y = sat)) + 
-  geom_point() + 
-  geom_smooth(se = FALSE, color = "black", method = "lm")
+<img src="05-log_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /><img src="05-log_files/figure-html/unnamed-chunk-8-2.png" width="80%" style="display: block; margin: auto;" />
 
 
-SAT |> 
-  ggplot(aes(x = salary, y = sat)) + 
-  geom_point(aes(pch = fracgrp)) + 
-  geom_smooth(aes(lty = fracgrp),
-              se = FALSE, color = "black", method = "lm", fullrange=TRUE) + 
-  theme(legend.position="bottom",
-        legend.text=element_text(size=7)) + 
-  guides(lty = guide_legend(title.position = "top"),
-         pch = guide_legend(title.position = "top")) +
-  labs(lty = "Fraction of students taking SAT",
-       pch = "Fraction of students taking SAT")
-```
-
-```{r}
+``` r
 head(SAT)
+#>        state expend ratio salary frac verbal math  sat         fracgrp
+#> 1    Alabama   4.41  17.2   31.1    8    491  538 1029    low fraction
+#> 2     Alaska   8.96  17.6   48.0   47    445  489  934 medium fraction
+#> 3    Arizona   4.78  19.3   32.2   27    448  496  944 medium fraction
+#> 4   Arkansas   4.46  17.1   28.9    6    482  523 1005    low fraction
+#> 5 California   4.99  24.0   41.1   45    417  485  902 medium fraction
+#> 6   Colorado   5.44  18.4   34.6   29    462  518  980 medium fraction
 lm(sat ~ salary, data=SAT) |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)  1159.       57.7      20.1  5.13e-25
+#> 2 salary         -5.54      1.63     -3.39 1.39e- 3
 lm(sat ~ salary + frac, data=SAT) |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   988.      31.9       31.0  6.20e-33
+#> 2 salary          2.18     1.03       2.12 3.94e- 2
+#> 3 frac           -2.78     0.228    -12.2  4.00e-16
 lm(sat ~ salary * frac, data=SAT) |> tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic  p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept) 1082.       54.4       19.9   3.00e-24
+#> 2 salary        -0.720     1.70      -0.424 6.73e- 1
+#> 3 frac          -5.03      1.09      -4.62  3.15e- 5
+#> 4 salary:frac    0.0648    0.0308     2.11  4.05e- 2
 lm(sat ~ salary + fracgrp, data=SAT) |> tidy()
+#> # A tibble: 4 × 5
+#>   term                   estimate std.error statistic  p.value
+#>   <chr>                     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)             1002.      31.8       31.5  8.55e-33
+#> 2 salary                     1.09     0.988      1.10 2.76e- 1
+#> 3 fracgrpmedium fraction  -112.      14.3       -7.82 5.46e-10
+#> 4 fracgrphigh fraction    -150.      12.8      -11.7  2.09e-15
 lm(sat ~ salary * fracgrp, data=SAT) |> tidy()
+#> # A tibble: 6 × 5
+#>   term                           estimate std.error statistic  p.value
+#>   <chr>                             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)                   1012.         55.8    18.1    4.85e-22
+#> 2 salary                           0.768       1.77    0.435  6.65e- 1
+#> 3 fracgrpmedium fraction        -107.        103.     -1.04   3.03e- 1
+#> 4 fracgrphigh fraction          -175.         79.2    -2.21   3.27e- 2
+#> 5 salary:fracgrpmedium fraction   -0.0918      2.93   -0.0313 9.75e- 1
+#> 6 salary:fracgrphigh fraction      0.692       2.28    0.303  7.63e- 1
 ```
 :::
 
@@ -650,20 +640,44 @@ After *adjusting* for age, smoking is no longer significant.  But more important
 What would it mean to *adjust* for age in this context?  It means that we have to include it in the model:
 
 
-```{r echo = FALSE}
-death <- c(rep(1,93),rep(0,695), rep(1,100),rep(0,177), rep(1,176), rep(0,73))
-smoke <- c(rep(1,61), rep(0,32), rep(1,375), rep(0,320), rep(1,34), rep(0,66), rep(1,50), rep(0,127), rep(1,44), rep(0,132), rep(1,18), rep(0,55))
-age <- c(rep("young", 788), rep("middle", 277), rep("old", 249) )
-```
 
-```{r}
+
+
+``` r
 glm( death ~ smoke, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.781    0.0796     -9.80 1.10e-22
+#> 2 smoke         -0.379    0.126      -3.01 2.59e- 3
 
 glm( death ~ age, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.571     0.125     -4.56 5.01e- 6
+#> 2 ageold         1.45      0.187      7.75 9.00e-15
+#> 3 ageyoung      -1.44      0.167     -8.63 6.02e-18
 
 glm( death ~ smoke + age, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.668     0.135     -4.96 7.03e- 7
+#> 2 smoke          0.312     0.154      2.03 4.25e- 2
+#> 3 ageold         1.47      0.188      7.84 4.59e-15
+#> 4 ageyoung      -1.52      0.173     -8.81 1.26e-18
 
 glm( death ~ smoke * age, family="binomial") |> tidy()
+#> # A tibble: 6 × 5
+#>   term           estimate std.error statistic  p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)      -0.655     0.152    -4.31  1.61e- 5
+#> 2 smoke             0.269     0.269     0.999 3.18e- 1
+#> 3 ageold            1.53      0.221     6.93  4.29e-12
+#> 4 ageyoung         -1.65      0.240    -6.88  6.00e-12
+#> 5 smoke:ageold     -0.251     0.420    -0.596 5.51e- 1
+#> 6 smoke:ageyoung    0.218     0.355     0.614 5.40e- 1
 ```
 
 
@@ -710,23 +724,31 @@ Multicollinearity happens when the explanatory variables in a model are correlat
 ::: {.example}
 Consider the following data set collected from church offering plates in 62 consecutive Sundays.    Also noted is whether there was enough change to buy a candy bar for \$1.25.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-library(GGally)
-Offering <- read_csv("./data/coins.csv")
+<img src="05-log_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" />
 
-Offering <- Offering |>
-  mutate(Small= Dimes + Nickels + Pennies) |>
-  mutate(Candy = as.factor(ifelse(Dollars > 1.25, "yes", "no")))
 
-ggpairs(Offering[,c(1,2,7,8)])
-```
-
-```{r warning=FALSE, message=FALSE}
+``` r
 glm(Candy ~ Coins, data = Offering, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)   -4.14     0.996      -4.16 0.0000321
+#> 2 Coins          0.286    0.0772      3.70 0.000213
 
 glm(Candy ~ Small, data = Offering, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)   -2.33     0.585      -3.98 0.0000693
+#> 2 Small          0.184    0.0576      3.19 0.00142
 
 glm(Candy ~ Coins + Small, data = Offering, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   -17.0       7.80     -2.18  0.0296
+#> 2 Coins           3.49      1.75      1.99  0.0461
+#> 3 Small          -3.04      1.57     -1.93  0.0531
 ```
 
 Notice that the directionality of the low coins changes when it is included in the model that already contains the number of coins total.  Lesson of the story:  be very very very careful interpreting coefficients when you have multiple explanatory variables.
@@ -751,12 +773,7 @@ A better strategy is to select the second not by considering what they  know reg
 |              |           |     Bruno & Luna    |     90     |
 |              |           |     Beta & Luna     |     100    |
 
-```{r echo = FALSE, eval = FALSE, include = FALSE}
-beta <- c(1:45)
-luna <- c(46:100)
-sage <- c(1:40, 46:90)
-bruno <- c(6:40, 56:100)
-```
+
 
 With forward selection, which two are chosen?^[Sage & Bruno]
 
@@ -810,24 +827,81 @@ Consider the HERS data described in your book (page 30); variable description al
 
 For now, we will try to predict whether the individuals had a medical condition, `medcond` (defined as a pre-existing and self-reported medical condition).  We will use the variables `age`, `weight`, `diabetes` and `drinkany`.
 
-```{r echo = FALSE}
-HERS <- read.table("./data/HERS.csv", 
-                   sep=",", header=T, na.strings=".")
-```
 
-```{r}
+
+
+``` r
 glm(medcond ~ age, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
 glm(medcond ~ age + weight, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept) -2.17      0.496       -4.37 0.0000124
+#> 2 age          0.0189    0.00613      3.09 0.00203  
+#> 3 weight       0.00528   0.00274      1.93 0.0542
 glm(medcond ~ age+diabetes, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 3 × 5
+#>   term        estimate std.error statistic      p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>        <dbl>
+#> 1 (Intercept)  -1.89     0.408       -4.64 0.00000349  
+#> 2 age           0.0185   0.00603      3.07 0.00217     
+#> 3 diabetes      0.487    0.0882       5.52 0.0000000330
 glm(medcond ~ age*diabetes, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic     p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)   -2.52     0.478       -5.26 0.000000141
+#> 2 age            0.0278   0.00707      3.93 0.0000844  
+#> 3 diabetes       2.83     0.914        3.10 0.00192    
+#> 4 age:diabetes  -0.0354   0.0137      -2.58 0.00986
 glm(medcond ~ age*drinkany, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term         estimate std.error statistic p.value
+#>   <chr>           <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)  -0.991     0.511       -1.94  0.0526
+#> 2 age           0.00885   0.00759      1.17  0.244 
+#> 3 drinkany     -1.44      0.831       -1.73  0.0833
+#> 4 age:drinkany  0.0168    0.0124       1.36  0.175
 
 
 glm(medcond ~ age + weight + diabetes + drinkany, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 5 × 5
+#>   term        estimate std.error statistic    p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>      <dbl>
+#> 1 (Intercept) -1.87      0.505      -3.72  0.000203  
+#> 2 age          0.0184    0.00620     2.96  0.00304   
+#> 3 weight       0.00143   0.00285     0.500 0.617     
+#> 4 diabetes     0.432     0.0924      4.68  0.00000288
+#> 5 drinkany    -0.253     0.0835     -3.03  0.00248
 glm(medcond ~ age , data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic   p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>     <dbl>
+#> 1 (Intercept)  -1.60     0.401       -4.00 0.0000624
+#> 2 age           0.0162   0.00597      2.71 0.00664
 glm(medcond ~ weight , data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept) -0.769     0.198       -3.88 0.000106
+#> 2 weight       0.00339   0.00267      1.27 0.204
 glm(medcond ~ diabetes , data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.652    0.0467    -13.9  3.18e-44
+#> 2 diabetes       0.468    0.0878      5.34 9.55e- 8
 glm(medcond ~ drinkany, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic  p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)   -0.398    0.0498     -8.00 1.26e-15
+#> 2 drinkany      -0.330    0.0818     -4.04 5.46e- 5
 ```
 
 
@@ -855,10 +929,26 @@ How do you choose the $\alpha$ values?  If you set $\alpha_e$ to be very small, 
 2. Remove the variable that is *least* significant (biggest p-value) in the model.  
 3. Continue removing variables until all variables are significant at the chosen $\alpha$ level.  
 
-```{r}
+
+``` r
 glm(medcond ~ (age + diabetes + weight + drinkany)^2, data = HERS, family="binomial") |> glance()
+#> # A tibble: 1 × 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1         3643.    2758 -1793. 3608. 3673.    3586.        2748  2759
 glm(medcond ~ age + diabetes + weight + drinkany, data = HERS, family="binomial") |> glance()
+#> # A tibble: 1 × 8
+#>   null.deviance df.null logLik   AIC   BIC deviance df.residual  nobs
+#>           <dbl>   <int>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1         3643.    2758 -1797. 3605. 3634.    3595.        2754  2759
 glm(medcond ~ age + diabetes + drinkany, data = HERS, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term        estimate std.error statistic     p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>       <dbl>
+#> 1 (Intercept)  -1.72     0.413       -4.17 0.0000300  
+#> 2 age           0.0176   0.00605      2.90 0.00369    
+#> 3 diabetes      0.442    0.0895       4.94 0.000000786
+#> 4 drinkany     -0.252    0.0834      -3.01 0.00257
 ```
 
 
@@ -976,9 +1066,10 @@ And, most of all, don't forget that there is not necessarily only one good model
 #### Another Model Building Strategy
 
 
-```{r fig.cap = "Another strategy for model building. Figure taken from [@sleuth].", out.width = "90%", fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/sleuthmodelbuild.png")
-```
+<div class="figure" style="text-align: center">
+<img src="figs/sleuthmodelbuild.png" alt="Another strategy for model building. Figure taken from [@sleuth]." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-18)Another strategy for model building. Figure taken from [@sleuth].</p>
+</div>
 
 
 <!--
@@ -1016,12 +1107,27 @@ Ideally the model chosen would have a large number of concordant pairs.  The fol
 * tau-a: **Kendall's tau-a** is the number of concordant pairs minus the number of discordant pairs divided by the total number of pairs of people (including pairs who both survived or both died).
 
 
-```{r}
+
+``` r
 # install.packages(c("Hmisc", "rms"))
 
 library(rms)   # you need this line!!
 burn.glm <- lrm(burnresp~burnexpl, data = burnglm)
 print(burn.glm)
+#> Logistic Regression Model
+#> 
+#> lrm(formula = burnresp ~ burnexpl, data = burnglm)
+#> 
+#>                        Model Likelihood      Discrimination    Rank Discrim.    
+#>                              Ratio Test             Indexes          Indexes    
+#> Obs           435    LR chi2     190.15      R2       0.505    C       0.877    
+#>  0            127    d.f.             1      R2(1,435)0.353    Dxy     0.604    
+#>  1            308    Pr(> chi2) <0.0001    R2(1,269.8)0.504    gamma   0.824    
+#> max |deriv| 6e-05                            Brier    0.121    tau-a   0.312    
+#> 
+#>           Coef     S.E.   Wald Z Pr(>|Z|)
+#> Intercept  22.7083 2.2661 10.02  <0.0001 
+#> burnexpl  -10.6624 1.0826 -9.85  <0.0001
 ```
 
 The summary contains the following elements:
@@ -1069,9 +1175,10 @@ x &= \mbox{log area burned}
 What value would we assign to 1.75 or 2.35 or 15 for log(area) burned?  By changing our cutoff, we can fit an entire curve.  We want the curve to be as far in the upper left corner as possible (sensitivity = 1, specificity = 1).  Notice that the color band represents the probability cutoff for predicting a ``success."
 :::
 
-```{r fig.cap = "ROC curve.  Color indicates the probability cutoff used to determine predictions.", out.width = "90%", fig.align='center', echo=FALSE}
-knitr::include_graphics("figs/ROCcurve_burn.png")
-```
+<div class="figure" style="text-align: center">
+<img src="figs/ROCcurve_burn.png" alt="ROC curve.  Color indicates the probability cutoff used to determine predictions." width="90%" />
+<p class="caption">(\#fig:unnamed-chunk-20)ROC curve.  Color indicates the probability cutoff used to determine predictions.</p>
+</div>
 
 
 A: Let's say we use prob=0.25 as a cutoff: 
@@ -1136,10 +1243,7 @@ The following example uses base R modeling to work through different aspects of 
 
 **Length of Bird Nest**  This example is from problem E1 in your text and includes 99 species of N. American passerine birds.  Recall that the response variable is binary and represents whether there is a small opening (`closed=1`) or a large opening (`closed=0`) for the nest.  The explanatory variable of interest was the length of the bird.
 
-```{r message=FALSE, warning=FALSE, echo = FALSE}
-nests <- readr::read_csv("./data/C7 Birdnest.csv",
-                  na="*")
-```
+
 
 
 ### Drop-in-deviance (Likelihood Ratio Test, LRT)
@@ -1152,21 +1256,47 @@ G &\sim \chi^2_{\nu} \ \ \ \mbox{when the null hypothesis is true}
 \end{align}
 where $\nu$ represents the difference in the number of parameters needed to estimate in the full model versus the null model.
 
-```{r}
+
+``` r
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> glance() |> 
   print.data.frame(digits=6)
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 ###  Difference between `tidy` and `augment` and `glance`
 
 Note that `tidy` contains the same number of rows as the number of coefficients.  `augment` contains the same number of rows as number of observations.  `glance` always has one row (containing overall model information).
 
-```{r}
+
+``` r
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> augment()
+#> # A tibble: 95 × 9
+#>   .rownames `Closed?` Length .fitted .resid   .hat .sigma .cooksd .std.resid
+#>   <chr>         <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>      <dbl>
+#> 1 1                 0   20    -0.896 -0.827 0.0137   1.12 0.00288     -0.833
+#> 2 2                 1   20    -0.896  1.57  0.0137   1.11 0.0173       1.58 
+#> 3 4                 1   20    -0.896  1.57  0.0137   1.11 0.0173       1.58 
+#> 4 5                 1   22.5  -1.07   1.65  0.0202   1.11 0.0305       1.67 
+#> 5 6                 0   18.5  -0.795 -0.863 0.0116   1.12 0.00267     -0.868
+#> 6 7                 1   17    -0.693  1.48  0.0110   1.12 0.0112       1.49 
+#> # ℹ 89 more rows
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> glance() |> 
   print.data.frame(digits=6)
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
@@ -1175,43 +1305,99 @@ glm(`Closed?` ~ Length, data = nests, family="binomial") |> glance() |>
 
 Length as a continuous explanatory variable:
 
-```{r}
+
+``` r
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
 glm(`Closed?` ~ Length, data = nests, family="binomial") |> glance() |>
   print.data.frame(digits=6)
+#>   null.deviance df.null   logLik    AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -58.4399 120.88 125.987   116.88          93   95
 ```
 
 
 Length as a categorical explanatory variables:
 
-```{r}
+
+``` r
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") |> tidy()
+#> # A tibble: 34 × 5
+#>   term                  estimate std.error statistic p.value
+#>   <chr>                    <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)            1.96e+1    10754.  1.82e- 3   0.999
+#> 2 as.factor(Length)10    9.92e-8    13171.  7.53e-12   1.00 
+#> 3 as.factor(Length)10.5  9.11e-8    15208.  5.99e-12   1.00 
+#> 4 as.factor(Length)11   -1.89e+1    10754. -1.75e- 3   0.999
+#> 5 as.factor(Length)12   -2.12e+1    10754. -1.97e- 3   0.998
+#> 6 as.factor(Length)12.5  9.85e-8    15208.  6.48e-12   1.00 
+#> # ℹ 28 more rows
 glm(`Closed?` ~ as.factor(Length), data = nests, family="binomial") |> glance() |>
   print.data.frame(digits=6)
+#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+#> 1       119.992      94 -36.8776 141.755 228.587  73.7552          61   95
 ```
 
 Length plus a few other explanatory variables:
-```{r}
+
+``` r
 glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") |> tidy()
+#> # A tibble: 4 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   -2.64     2.06      -1.28   0.201 
+#> 2 Length        -0.114    0.0527    -2.17   0.0302
+#> 3 Incubate       0.314    0.172      1.82   0.0684
+#> 4 Color         -0.420    0.609     -0.690  0.490
 glm(`Closed?` ~ Length + Incubate +  Color, data = nests, family="binomial") |> glance() |> 
   print.data.frame(digits=6)
+#>   null.deviance df.null   logLik     AIC     BIC deviance df.residual nobs
+#> 1       110.086      87 -51.6633 111.327 121.236  103.327          84   88
 ```
 
 ### Predicting Response
 
 
-```{r}
+
+``` r
 bird_glm <- glm(`Closed?` ~ Length, data = nests, family="binomial")
 bird_glm |> tidy()
+#> # A tibble: 2 × 5
+#>   term        estimate std.error statistic p.value
+#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#> 1 (Intercept)   0.457     0.753      0.607   0.544
+#> 2 Length       -0.0677    0.0425    -1.59    0.112
 
 # predicting the linear part:
 # reasonable to use the SE to create CIs
 predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "link")
+#> $fit
+#>     1 
+#> -2.72 
+#> 
+#> $se.fit
+#> [1] 1.3
+#> 
+#> $residual.scale
+#> [1] 1
 
 # predicting the probability of success (on the `scale` of the response variable):
 # do NOT use the SE to create a CI for the predicted value
 # instead, use the SE from `type="link" ` and transform the interval
 predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
+#> $fit
+#>      1 
+#> 0.0616 
+#> 
+#> $se.fit
+#>      1 
+#> 0.0751 
+#> 
+#> $residual.scale
+#> [1] 1
 ```
 
 ### Measues of association
@@ -1221,7 +1407,8 @@ predict(bird_glm, newdata = list(Length = 47), se.fit = TRUE, type = "response")
 
 ROC curve for the model on `Length` only, with no testing / training / cross validated data.
 
-```{r}
+
+``` r
 library(plotROC)
 
 nests <- nests |>
@@ -1234,6 +1421,15 @@ bird_indiv <- bird_glm |>
   augment(type.predict = "response") 
 
 head(bird_indiv)
+#> # A tibble: 6 × 9
+#>   .rownames Closed Length .fitted .resid   .hat .sigma .cooksd .std.resid
+#>   <chr>     <fct>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl>   <dbl>      <dbl>
+#> 1 1         no       20     0.290 -0.827 0.0137   1.12 0.00288     -0.833
+#> 2 2         yes      20     0.290  1.57  0.0137   1.11 0.0173       1.58 
+#> 3 4         yes      20     0.290  1.57  0.0137   1.11 0.0173       1.58 
+#> 4 5         yes      22.5   0.256  1.65  0.0202   1.11 0.0305       1.67 
+#> 5 6         no       18.5   0.311 -0.863 0.0116   1.12 0.00267     -0.868
+#> 6 7         yes      17     0.333  1.48  0.0110   1.12 0.0112       1.49
 
 bird_indiv |>
   ggplot() + 
@@ -1242,12 +1438,15 @@ bird_indiv |>
 
 ```
 
+<img src="05-log_files/figure-html/unnamed-chunk-28-1.png" width="80%" style="display: block; margin: auto;" />
+
 ### Cross Validation on nest data
 
 Note that the syntax here is slightly different from what we've seen previously.  From the **tidymodels** and **plotROC** packages.  See the full explanation in Chapter \@ref(process).
 
 
-```{r}
+
+``` r
 library(tidymodels)
 library(plotROC)
 
@@ -1275,6 +1474,13 @@ bird_fit_rs <- bird_wflow |>
                 control = control_resamples(save_pred = TRUE))
 
 bird_fit_rs |> collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator  mean     n std_err .config             
+#>   <chr>       <chr>      <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.755     3 0.00766 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.815     3 0.00964 Preprocessor1_Model1
+#> 3 sensitivity binary     0.842     3 0.0313  Preprocessor1_Model1
+#> 4 specificity binary     0.559     3 0.0926  Preprocessor1_Model1
 
 bird_fit_rs |>
   unnest(cols = .predictions) |>
@@ -1284,10 +1490,13 @@ bird_fit_rs |>
   geom_abline(intercept = 0, slope = 1, color = "black")
 ```
 
+<img src="05-log_files/figure-html/unnamed-chunk-29-1.png" width="80%" style="display: block; margin: auto;" />
+
 
 We might try the whole thing over using a model with only one variable.  Do the CV values and accuracy get better? No, everything gets worse.  But it's the specificity that we should really pay attention to because it is terrible in the single variable model!
 
-```{r}
+
+``` r
 bird_rec_1 <- recipe(
   Closed ~ Length,    # formula
   data = nests # data for cataloging names and types of variables
@@ -1304,6 +1513,13 @@ bird_fit_rs_1 <- bird_wflow_1 |>
                 control = control_resamples(save_pred = TRUE))
 
 bird_fit_rs_1 |> collect_metrics()
+#> # A tibble: 4 × 6
+#>   .metric     .estimator   mean     n std_err .config             
+#>   <chr>       <chr>       <dbl> <int>   <dbl> <chr>               
+#> 1 accuracy    binary     0.684      3  0.0563 Preprocessor1_Model1
+#> 2 roc_auc     binary     0.639      3  0.0622 Preprocessor1_Model1
+#> 3 sensitivity binary     0.986      3  0.0145 Preprocessor1_Model1
+#> 4 specificity binary     0.0833     3  0.0833 Preprocessor1_Model1
 
 bird_fit_rs_1 |>
   unnest(cols = .predictions) |>
@@ -1312,12 +1528,9 @@ bird_fit_rs_1 |>
                         color = id)) + 
   geom_abline(intercept = 0, slope = 1, color = "black")
 
-
 ```
 
-```{r eval = FALSE, echo = FALSE}
-### Drawing interactions
+<img src="05-log_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" />
 
-https://interactions.jacob-long.com/index.html
-```
+
 
