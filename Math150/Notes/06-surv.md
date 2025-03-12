@@ -44,7 +44,7 @@ Possible responses:
 
 -   **response** fate *and* length of follow-up\
 
--   **data** suppose we are following n patients\
+-   **as a function of $t$** suppose we are following $n$ patients\
     $$
     \begin{align*}
     t_i &= \mbox{time the } i^{th} \mbox{ has event of interest}\\
@@ -88,13 +88,17 @@ Said differently: within any subgroup of interest, the subjects who are censored
 
 -   Not independent
 
-    -   Subjects who drop out because they are extremely ill
-    -   Subjects who drop out because of adverse effects of the treatment regimen
+    -   Subject drops out because they are extremely ill
+    -   Subject drops out because of adverse effects of the treatment regimen
+    -   Device reliability: machine is removed from service because it malfunctions
+    -   Subject is discharged early from the hospital because they recover quickly
 
 -   Independent
 
-    -   Subjects who drop out because the study ends
-    -   Subjects who drop out because they move away
+    -   Subject drops out because the study ends
+    -   Subjects drops out because they move away
+    -   Random technical issues prevent data from being collected
+    
     
 Additionally, if someone, for example, dies in a car accident while enrolled in a clinical trial (where the event of interest is death), the person is considered dead, not censored.  The rationale is that dying of any cause is likely related to the underlying disease, so we don't try to parse out the death reason. In some trials a cause of death is assigned, and competing risks models used, but assigning cause can be dicey.
 
