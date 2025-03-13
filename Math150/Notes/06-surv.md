@@ -78,13 +78,25 @@ $$
 
 #### censoring
 
--   **right** censoring: when the observation on an individual begins at a defined starting time and ends before the outcome of interest happens (this is the censoring for our model)\
--   **left** censoring: when the outcome of interest is known to have occurred before the study begins (infection of a disease, learning to count). Note that the event of interest *has happened*, unlike in right censoring where the event of interest has not happened.\
+-   **right** censoring: when the observation on an individual begins at a defined starting time and ends before the outcome of interest happens (this is the censoring for our model)
+-   **left** censoring: when the outcome of interest is known to have occurred before the study begins (infection of a disease, learning to count). Note that the event of interest *has happened*, unlike in right censoring where the event of interest has not happened.
 -   **interval** censoring; when the event of interest is only known to have occurred between two time points, but the precise time is not known.
 
 **Important Assumption**: survival time must be independent of any mechanism which causes censoring (called non-informative censoring). Censoring should be random: a person who is censored has the same probability of dying as non-censored people at given explanatory variables $\underline{X}.$
 
 Said differently: within any subgroup of interest, the subjects who are censored at time $t$ should be representative of all the subjects in that subgroup who remained at risk at time $t$ with respect to their survival experience.
+
+Mathematically we can describe independent censoring by consider $C$ a censoring random variable in addition to $T$ the event time random variable. Every patient will have (theoretically) a value for both $T$ and $C$. However, in our study we only get to observe *exactly one* of either $T$ or $C$. $C$ and $T$ are independent if:
+
+$$P(C > t | T = t, \mbox{covariates}) = P(C > t | \mbox{covariates}).$$
+
+In words, the censoring *time* (and whether it is larger than $t$) is independent of the event time. The left side calculates probabilities associated with censoring given some information about $T$ (that is, for patients that die at time $t$). The right side calculates the same probabilities associated with censoring without any information about $T$ (for all patients, regardless of when they die).^[Note that the independence equation could have been written in any variety of ways...  $P(C \leq t | T = t, \mbox{covariates}) = P(C \leq t | \mbox{covariates})$ or $P(C \leq t | T \leq t, \mbox{covariates}) = P(C \leq t | \mbox{covariates})$] 
+
+We are not saying that censoring happens uniformly across time. One more way to think about it is that, for a given patient, $C$ and $T$ are independently drawn from their respective distributions (that is the censoring time and the event time are independent). **However**, the act of cesoring will happen only when $C < T$, an indicator value which *does* depend on the value of $T$.
+
+The independence says that the reasoning for censoring does not depend on the patient's likelihood of survival.
+
+
 
 -   Not independent
 
