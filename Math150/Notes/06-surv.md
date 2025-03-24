@@ -585,14 +585,18 @@ coxph(Surv(Time,Status) ~ Treatment, data = prostate) |> glance()
 
 Extending the simple proportional hazards model to include multiple covariates.
 
-Let $x_{i1}, x_{i2}, \ldots, x_{iq}$ be the $q$ covariates for person $i.$ We define the baseline hazard as: $$
+Let $x_{i1}, x_{i2}, \ldots, x_{iq}$ be the $q$ covariates for person $i.$ We define the baseline hazard as: 
+
+$$
 \begin{align*}
 h_0(t) &= \mbox{hazard for patients with covariates }
 x_{i1}=x_{i2}=\cdots=x_{iq} = 0\\
 h_i(t) &= h_0(t) e^{\beta_1 x_{i1} + \beta_2 x_{i2} + \cdots +
 \beta_q x_{iq}}\\
 \end{align*}
-$$ is the hazard function for the $i^{th}$ patient.
+$$ 
+
+is the hazard function for the $i^{th}$ patient.
 
 As before, we can consider nested models and compare their likelihoods.
 
@@ -1367,6 +1371,12 @@ coxph(Surv(followup,chdfate) ~ dbpf * sex + age + bmi + scl, data = heart) |>
 <p class="caption">(\#fig:unnamed-chunk-27)Table 7.4 from @Dupont.</p>
 </div>
 
+
+#### Extending the Cox PH Multiple Regression Model
+
+Noah Simon (PO '08) has worked on better ways of estimating the COX PH coefficients. Consider @tarkhan2022, whose abstract is (boldface mine):
+
+>In many biomedical applications, outcome is measured as a "time-to-event" (e.g., disease progression or death). To assess the connection between features of a patient and this outcome, it is common to assume a proportional hazards model and fit a proportional hazards regression (or Cox regression). To fit this model, a log-concave objective function known as the "partial likelihood" is maximized. For moderate-sized data sets, an efficient Newton–Raphson algorithm that leverages the structure of the objective function can be employed. However, in large data sets this approach has two issues: (i) The computational tricks that leverage structure can also lead to computational instability; (ii) The objective function does not naturally decouple: Thus, if the data set does not fit in memory, the model can be computationally expensive to fit. This additionally means that the objective is not directly amenable to stochastic gradient-based optimization methods. To overcome these issues, we propose a simple, new framing of proportional hazards regression: This results in an **objective function that is amenable to stochastic gradient descent. We show that this simple modification allows us to efficiently fit survival models with very large data sets. This also facilitates training complex, for example, neural-network-based, models with survival data.**
 
 ### Testing Proportional Hazards {#testingph}
 
