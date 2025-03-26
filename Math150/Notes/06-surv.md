@@ -281,7 +281,7 @@ That is, if and only if $\bigg(ll\hat{S}(t) - 1.96 \hat{\sigma}(t), ll\hat{S}(t)
 
 > Mean survival time is estimated as the area under the survival curve. The estimator is based upon the entire range of data. Some software uses only the data up to the last observed event, @SurvHL point out that this biases the estimate of the mean downwards, and they recommend that the entire range of data be used. A large sample method is used to estimate the variance of the mean survival time and thus to construct a confidence interval [@Andersen]. [@KMmean]
 
-In some ways, it is easier to conceptualize the mean as the average under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths. 
+In some ways, it is easier to conceptualize the mean as the area under the curve by thinking about calculating average as horizontal bars instead of vertical bars. The jumps along the y-axis are approximately 1/n, so each horizontal bar represents one of the individual deaths. 
 
 $$
 \begin{align*}
@@ -323,8 +323,7 @@ As before, we'd like to know if two treatments produce the same probability of s
 
 $$
 \begin{align*}
-H_0: & S_1(t) = S_2(t) \ \ \ \ \ \forall t \mbox{
-parameters!}\\
+H_0: & S_1(t) = S_2(t) \ \ \ \ \ \forall t \\
 H_a: & S_1(t) \ne S_2(t) \ \ \ \ \ \mbox{ for some } t\\
 \end{align*}
 $$
