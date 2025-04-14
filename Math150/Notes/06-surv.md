@@ -1728,7 +1728,7 @@ recidKMV <- filter(filter(read_csv("https://raw.githubusercontent.com/propublica
 ``` r
 recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
 plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
-legend(10,.4, c("low", "high", "medium"),lty=2:4)
+legend(10,.4, c("low", "high", "medium"), lty=2:4)
 
 survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
 ```
@@ -1836,7 +1836,7 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 #> 
 #>  Chisq= 2  on 2 degrees of freedom, p= 0.4
 
-survdiff(Surv(timefollow,event) ~ score_factor, data=recidKMV2, rho=1)
+survdiff(Surv(timefollow,event) ~ score_factor, data = recidKMV2, rho=1)
 #> Call:
 #> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = recidKMV2, 
 #>     rho = 1)
