@@ -672,7 +672,7 @@ $$
     Using a proportional hazards model for estimating the hazard ratio associated with each blood pressure group, we get: $$
     \begin{align*}
     h_i(t) &= h_0(t) \exp \bigg\{ \beta_2 dbp_{i2} + \beta_3 dbp_{i3} + \beta_4 dbp_{i4} + \beta_5 dbp_{i5} + \beta_6 dbp_{i6} + \beta_7 dbp_{i7} \bigg\}\\ 
-    h_i(t) &= h0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\} 
+    h_i(t) &= h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\} 
     \end{align*}
     $$
 
@@ -1407,7 +1407,7 @@ $$
 
 ##### Test 1 for PH {-}
 
-Therefore, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta.$
+Therefore, the $\ln (- \ln$ survival curves) should be "parallel" and differ only by a y-intercept constant of $\beta.$ (I put quotes around "parallel" because two quadratic functions might be different only by a shift of $\beta$, and they wouldn't really be parallel, but that's what we mean here by "parallel".)
 
 $h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta),$ then
 
@@ -1730,14 +1730,16 @@ recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
 plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
 legend(10,.4, c("low", "high", "medium"), lty=2:4)
 
-survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
+survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + 
+  ggtitle("Overall")
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" /><img src="06-surv_files/figure-html/unnamed-chunk-30-2.png" width="80%" style="display: block; margin: auto;" />
 
 
 ``` r
-ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
+ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + 
+  ggtitle("Low Only")
 
 ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 ```
@@ -1796,7 +1798,8 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 #>  Chisq= 12.6  on 2 degrees of freedom, p= 0.002
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
+           censor=F, conf.int=F, pval=TRUE) + 
+  ggtitle("No CI")
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-33-1.png" width="80%" style="display: block; margin: auto;" />
@@ -1823,7 +1826,8 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 #> 
 #>  Chisq= 1.6  on 2 degrees of freedom, p= 0.5
 
-d <- recidKMV2 |> filter(race == "African-American")
+d <- recidKMV2 |> 
+  filter(race == "African-American")
 survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 #> Call:
 #> survdiff(formula = Surv(timefollow, event) ~ score_factor, data = d, 
@@ -1849,7 +1853,8 @@ survdiff(Surv(timefollow,event) ~ score_factor, data = recidKMV2, rho=1)
 #>  Chisq= 2.7  on 2 degrees of freedom, p= 0.3
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-           censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
+           censor=F, conf.int=T, pval=TRUE) + 
+  ggtitle("Violent Recidivism")
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
                  data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
@@ -1907,7 +1912,8 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) |>
 #> #   BIC <dbl>, nobs <dbl>
 
 # score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+      data=recidKM) |> 
   tidy()
 #> # A tibble: 5 × 5
 #>   term               estimate std.error statistic  p.value
@@ -1917,7 +1923,8 @@ coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |>
 #> 3 raceCaucasian       -0.120    0.0398      -3.01 2.63e- 3
 #> 4 age                 -0.0137   0.00175     -7.82 5.38e-15
 #> 5 sexMale              0.411    0.0502       8.19 2.53e-16
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+      data=recidKM) |> 
   glance()
 #> # A tibble: 1 × 18
 #>       n nevent statistic.log p.value.log statistic.sc p.value.sc statistic.wald
@@ -1956,7 +1963,8 @@ The survminer packages also has the `ggforest()` function which makes a fantasti
 
 ``` r
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
-           censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
+           censor=F, conf.int=T, fun="cloglog") + 
+  ggtitle("Complementary Log-Log")
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-38-1.png" width="80%" style="display: block; margin: auto;" />
@@ -1967,15 +1975,18 @@ The cox.zph function will test proportionality of all the predictors in the mode
 
 
 ``` r
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, 
+              data=recidKM))
 #>              chisq df   p
 #> score_factor 0.457  2 0.8
 #> GLOBAL       0.457  2 0.8
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="log")
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, 
+              data=recidKM), transform="log")
 #>              chisq df    p
 #> score_factor  3.04  2 0.22
 #> GLOBAL        3.04  2 0.22
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+              data=recidKM))
 #>                chisq df      p
 #> score_factor  0.5254  2 0.7690
 #> race          7.6193  1 0.0058
@@ -1990,7 +2001,8 @@ The function cox.zph creates a cox.zph object that contains a list of the scaled
 
 
 ``` r
-ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
+ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+                       data=recidKM))) 
 ```
 
 <img src="06-surv_files/figure-html/unnamed-chunk-40-1.png" width="80%" style="display: block; margin: auto;" />
@@ -1999,7 +2011,8 @@ ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex,
 
 
 ``` r
-ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+                       data=recidKM))
 
 ```
 

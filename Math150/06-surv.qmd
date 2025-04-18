@@ -683,7 +683,7 @@ $$
     Using a proportional hazards model for estimating the hazard ratio associated with each blood pressure group, we get: $$
     \begin{align*}
     h_i(t) &= h_0(t) \exp \bigg\{ \beta_2 dbp_{i2} + \beta_3 dbp_{i3} + \beta_4 dbp_{i4} + \beta_5 dbp_{i5} + \beta_6 dbp_{i6} + \beta_7 dbp_{i7} \bigg\}\\ 
-    h_i(t) &= h0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\} 
+    h_i(t) &= h_0(t) \exp \bigg\{ \sum_{j=2}^7 \beta_j dbp_{ij} \bigg\} 
     \end{align*}
     $$
 
@@ -935,7 +935,7 @@ $$
 
 ##### Test 1 for PH {-}
 
-Therefore, the $\ln (- \ln$ survival curves) should be parallel and differ only by a y-intercept constant of $\beta.$
+Therefore, the $\ln (- \ln$ survival curves) should be "parallel" and differ only by a y-intercept constant of $\beta.$ (I put quotes around "parallel" because two quadratic functions might be different only by a shift of $\beta$, and they wouldn't really be parallel, but that's what we mean here by "parallel".)
 
 $h_0(t)$ is a constant (i.e., $h_i(t) = e^\beta),$ then
 
@@ -1255,11 +1255,13 @@ recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
 plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
 legend(10,.4, c("low", "high", "medium"), lty=2:4)
 
-survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + ggtitle("Overall")
+survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + 
+  ggtitle("Overall")
 ```
 
 ```{r}
-ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + ggtitle("Low Only")
+ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + 
+  ggtitle("Low Only")
 
 ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
 ```
@@ -1292,7 +1294,8 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F, pval=TRUE) + ggtitle("No CI")
+           censor=F, conf.int=F, pval=TRUE) + 
+  ggtitle("No CI")
 ```
 
 Violent recidivism
@@ -1306,13 +1309,15 @@ d <- recidKMV2 |> filter(race == "Caucasian")
 
 survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 
-d <- recidKMV2 |> filter(race == "African-American")
+d <- recidKMV2 |> 
+  filter(race == "African-American")
 survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 
 survdiff(Surv(timefollow,event) ~ score_factor, data = recidKMV2, rho=1)
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-           censor=F, conf.int=T, pval=TRUE) + ggtitle("Violent Recidivism")
+           censor=F, conf.int=T, pval=TRUE) + 
+  ggtitle("Violent Recidivism")
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
                  data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
@@ -1340,9 +1345,11 @@ coxph(Surv(timefollow,event) ~ score_factor + race, data=recidKM) |>
   glance()
 
 # score_factor, race, age, sex
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+      data=recidKM) |> 
   tidy()
-coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM) |> 
+coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+      data=recidKM) |> 
   glance()
 ```
 
@@ -1368,7 +1375,8 @@ The survminer packages also has the `ggforest()` function which makes a fantasti
 
 ```{r}
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
-           censor=F, conf.int=T, fun="cloglog") + ggtitle("Complementary Log-Log")
+           censor=F, conf.int=T, fun="cloglog") + 
+  ggtitle("Complementary Log-Log")
 ```
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
@@ -1376,9 +1384,12 @@ The cox.zph function will test proportionality of all the predictors in the mode
 ### Checking proportional hazards with cox.zph
 
 ```{r}
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM))
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor, data=recidKM), transform="log")
-cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, 
+              data=recidKM))
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor, 
+              data=recidKM), transform="log")
+cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+              data=recidKM))
 ```
 
 Note the big p-values. We do not reject the null hypothesis, so we conclude that there is no evidence of non-proportional hazards. If for example, the model seemed to be non-proportional on time but proportional on log(time), you might consider transforming the time variable (i.e., taking the natural log) in your original model.
@@ -1386,12 +1397,14 @@ Note the big p-values. We do not reject the null hypothesis, so we conclude that
 The function cox.zph creates a cox.zph object that contains a list of the scaled Schoenfeld residuals. The ordering of the residuals in the list is the same order as the predictors were entered in the cox model. So, the first element of the list corresponds to the scaled Schoenfeld residuals for married, the second element corresponds to the scaled Schoenfeld residuals for person, and so forth. The cox.zph object can be used in a plot function. By specifying a particular element of the list it is possible to generate plots of residuals for individual predictors. Leaving out the list number results in plots for all the predictors being generated at one time. In the plots a non-zero slope is evidence against proportionality. The horizontal line at y=0 has been added for reference.
 
 ```{r}
-ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))) 
+ggcoxzph(cox.zph(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+                       data=recidKM))) 
 ```
 
 ### Cox PH diagnostics ... look into all the different arguments of the function!
 
 ```{r}
-ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, data=recidKM))
+ggcoxdiagnostics(coxph(Surv(timefollow,event) ~ score_factor + race + age + sex, 
+                       data=recidKM))
 
 ```
