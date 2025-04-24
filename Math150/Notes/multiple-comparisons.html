@@ -728,7 +728,8 @@ Figure 2.2: Different <span class="math inline">\(\alpha^*\)</span> values for t
 <div id="pocock" class="section level4 unnumbered">
 <h4>Pocock<a class="anchor" aria-label="anchor" href="#pocock"><i class="fas fa-link"></i></a>
 </h4>
-<p>The Pocock boundary</p>
+<p>The Pocock boundary uses the same alpha value for each test in the interim analysis. Pocock approximated (numerically, no closed form) the probability of a type I error.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Note, there is only one research question here because we want to know, for example, if the treatment works. We have multiple p-values because we assess the same research question multiple times. But there is only one “type I error” or not.&lt;/p&gt;"><sup>5</sup></a> Which is to say, if the null hypothesis is true, Pocock controls the probability of rejecting at time 1 or time 2 or … or time <span class="math inline">\(k\)</span>.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Beyond the scope of this class, but the calculation is done with the understanding of the correlation between each test. That is, the information at time 1 is contained in the information at time 2. So we can calculate the covariance between the test statistic at time 1 and the test statistic at time 2.&lt;/p&gt;"><sup>6</sup></a></p>
+<p>Because there is no closed form soluction for the Pocock interim analysis cutoff, we use previously calculated tables of cutoffs.</p>
 <p>Advantages:</p>
 <ul>
 <li>simple</li>
@@ -737,11 +738,33 @@ Figure 2.2: Different <span class="math inline">\(\alpha^*\)</span> values for t
 <p>Disadvantage:</p>
 <ul>
 <li>low power and therefore large maximum sample size (when the effect size is small)</li>
+<li>is based on the test statistic of interest being normally distributed</li>
+</ul>
+</div>
+<div id="peto" class="section level4 unnumbered">
+<h4>Peto<a class="anchor" aria-label="anchor" href="#peto"><i class="fas fa-link"></i></a>
+</h4>
+<p>Peto is not a formal stopping rule which controls the alpha spending. Indeed, the probability of committing a type I error is larger than <span class="math inline">\(\alpha\)</span> (because <span class="math inline">\(\alpha\)</span> is used at the final look of the data). However, the overall probability of a type I eror is not substantially larger than <span class="math inline">\(\alpha\)</span> because of the strict boundary at the earlier stopping times (which are usually set to 0.0001 or so).</p>
+<p>Advantages:</p>
+<ul>
+<li>simple to implement.</li>
+<li>conservative early stopping prevents stopping early unless overwhelming evidence</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>doesn’t control the type I error rate at <span class="math inline">\(\alpha\)</span>
+</li>
+<li>result in delay of efficacy or harm</li>
 </ul>
 </div>
 <div id="obrien-fleming" class="section level4 unnumbered">
 <h4>O’Brien-Fleming<a class="anchor" aria-label="anchor" href="#obrien-fleming"><i class="fas fa-link"></i></a>
 </h4>
+<p>The O’Brien-Fleming boundary is extremely strict at early stopping times and close to the overall alpha rate at the final analysis time point. The approximate formula for the cutoff point is:</p>
+<p><span class="math display">\[z_k \approx \Phi^{-1}\bigg(1  - \frac{\alpha}{2} \cdot \frac{K}{k}\bigg)\]</span></p>
+<p>for the <span class="math inline">\(k^{th}\)</span> of <span class="math inline">\(K\)</span> looks at the data.</p>
+<p>The alpha value for the <span class="math inline">\(k^{th}\)</span> look at the data would then be:</p>
+<p><span class="math display">\[\alpha_k \approx 2 \cdot(1 - \Phi(z_k)).\]</span></p>
 <p>Advantages:</p>
 <ul>
 <li>final <span class="math inline">\(\alpha\)</span> is close to desired <span class="math inline">\(\alpha\)</span>
@@ -751,6 +774,7 @@ Figure 2.2: Different <span class="math inline">\(\alpha^*\)</span> values for t
 <p>Disadvantage:</p>
 <ul>
 <li>less likely to stop early, so larger expected sample size</li>
+<li>is based on the test statistic of interest being normally distributed</li>
 </ul>
 </div>
 </div>
@@ -797,8 +821,8 @@ Figure 2.2: Different <span class="math inline">\(\alpha^*\)</span> values for t
 #&gt; 1 0.048</code></pre>
 <div class="inline-figure"><img src="07-MC_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></div>
 </div>
-<div id="peto" class="section level4 unnumbered">
-<h4>Peto<a class="anchor" aria-label="anchor" href="#peto"><i class="fas fa-link"></i></a>
+<div id="peto-1" class="section level4 unnumbered">
+<h4>Peto<a class="anchor" aria-label="anchor" href="#peto-1"><i class="fas fa-link"></i></a>
 </h4>
 <p>Note that the horizontal black line is at 0.001 for the first three weeks and 0.05 for the fourth week. There is a gray horizontal line at 0.05. The simulated type 1 error rate (proportion of purple lines out of 1000 lines) is (note that we expect the type 1 error rate to be above 5%):</p>
 <pre><code>#&gt; # A tibble: 1 × 1
@@ -964,6 +988,7 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 </div>
 </div>
 </div>
+
   <div class="chapter-nav">
 <div class="prev"><a href="survival-analysis.html"><span class="header-section-number">8</span> Survival Analysis</a></div>
 <div class="next"><a href="poisson-regression.html"><span class="header-section-number">10</span> Poisson Regression</a></div>
@@ -1009,7 +1034,7 @@ data rigorously in a statistical and automated way. He explained that “scagnos
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2025-04-17.</p>
+    <p>"<strong>Methods in Biostatistics</strong>" was written by Jo Hardin. It was last built on 2025-04-23.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
