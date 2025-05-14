@@ -1486,11 +1486,17 @@ $$
 Using the weights above, we can calculate the average value for the $l^{th}$ covariate (i.e., explanatory variable): $$\bar{x}_l (\beta,t_j) = \sum_{k: t_k \geq t_j} x_{kl}
 w_j(\beta, t_j)$$
 
-The Schoenfeld Residual for $x_l$ ($l^{th}$ covariate) and any subject $i$ who is still alive at time $t_i,$ is the *difference* between the covariate $x_{il}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_i = x_{il} - \bar{x}_l(\beta, t_i)$$ Note that the calculation is for the $i^{th}$ subject which means there was a death at time $t_i.$
+The Schoenfeld Residual for $x_l$ ($l^{th}$ covariate) and any subject $j$ who is still alive at time $t_j,$ is the *difference* between the covariate $x_{jl}$ for that subject and the weighted average of the covariates in the risk set: $$\mbox{Schoenfeld resid }_j = x_{jl} - \bar{x}_l(\beta, t_j)$$ Note that the calculation is for the $j^{th}$ subject which means there was a death at time $t_j.$
 
 ##### Test 3 for PH {-}
 
-The idea is for the residual plot of (Schoenfeld residual wrt a particular covariate on the y-axis, time on the x-axis)to be flat. What if there is a strong linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is very positively linearly associated with time. If $t_i > >$ then $x_i$ is much bigger than expected; if $t_i < <$ then $x_i$ is much smaller than expected. That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+The idea is for the residual plot of (Schoenfeld residual wrt a particular covariate on the y-axis, time on the x-axis) to be flat (not necessarily centered at zero). What if there is a positive linear trend for the residuals? What would that say about the time dependency? Imagine a scatterplot where the residual is positively linearly associated with time. 
+
+If $t_j > >$ then $x_j$ is bigger than expected (for example, the covariate age is bigger than expected); if $t_j < <$ then $x_j$ is smaller than expected (for example, the covariate age is smaller than expected). That is, the covariate of interest changes over time and its effect on the risk of survival does, too.
+
+The key is that early on, younger people are dying more than expected, and later on, older people are dying more than expected. If the impact of age on survival is constant over time (i.e., the hazard for age is not a function of time), this shouldn't happen.
+
+Schoenfeld residuals that show a systematic trend over time (e.g., increasing, decreasing, or curved) indicate that the covariate's effect on the hazard is changing over time (i.e., violating the proportional hazards assumption).
 
 #### Solutions to violations of PH
 
