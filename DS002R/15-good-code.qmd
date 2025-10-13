@@ -1,0 +1,173 @@
+# Writing good code {#sec-good-code}
+
+
+```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
+                      fig.height=3, fig.width=5,  
+                      cache=TRUE, fig.align = "center")
+```
+
+```{r}
+#| include: false
+
+source("_common.R")
+fontawesome::fa_html_dependency()
+```
+
+
+
+## Code style
+
+> Good coding style is like correct punctuation: you can manage without it, butitsuremakesthingseasiertoread.^[https://style.tidyverse.org/]
+
+All of the following examples are taken from the <a href = "https://style.tidyverse.org/" target = "_blank">Tidyverse style guide</a>.
+
+### Object names
+
+> There are only two hard things in Computer Science: cache invalidation and naming things.
+
+> -- Phil Karlton
+
+
+Variable and function names should use only lowercase letters, numbers, and `_`. Use underscores (`_`) (so called snake case) to separate words within a name.
+
+```{r}
+#| eval: false
+# Good
+day_one
+day_1
+
+# Bad
+DayOne
+dayone
+
+# Really bad
+T <- FALSE
+c <- 10
+mean <- function(x) sum(x)
+```
+
+
+### Spacing
+
+Do not put spaces inside or outside parentheses for regular function calls.
+
+```{r}
+#| eval: false
+# Good
+mean(x, na.rm = TRUE)
+
+# Bad
+mean (x, na.rm = TRUE)
+mean( x, na.rm = TRUE )
+```
+
+
+### Infix operators
+
+Most infix operators (`==`, `+`, `-`, `<-`, etc.) should always be surrounded by spaces:
+
+```{r}
+#| eval: false
+# Good
+height <- (feet * 12) + inches
+mean(x, na.rm = TRUE)
+
+# Bad
+height<-feet*12+inches
+mean(x, na.rm=TRUE)
+```
+
+Fun note: many languages have infixes that naturally change the meaning of a word. In English we have many prefixes and suffixes, for example, unhappy ("un" is the prefix) or hopeless ("less" is the suffix). There is only one infix in the English language: "friggin" (and its derivatives), as in: unfrigginbelievable.
+
+### Long function calls
+
+If a function call is too long to fit on a single line, use one line each for the function name, each argument, and the closing ). This makes the code easier to read and to change later.
+
+```{r}
+#| eval: false
+# Good
+do_something_very_complicated(
+  something = "that",
+  requires = many,
+  arguments = "some of which may be long"
+)
+
+# Bad
+do_something_very_complicated("that", requires, many, arguments,
+                              "some of which may be long"
+                              )
+```
+
+
+### Long lines (piping)
+
+If the arguments to a function don't all fit on one line, put each argument on its own line and indent:^[The last one isn't great because it is hard to distinguish the data frame from the other arguments (which play very different roles in the `summarize()` function).]
+
+```{r}
+#| eval: false
+# Good
+iris |>
+  summarise(
+    Sepal.Length = mean(Sepal.Length),
+    Sepal.Width = mean(Sepal.Width),
+    .by = Species
+  )
+
+# Bad
+iris |>
+  summarise(Sepal.Length = mean(Sepal.Length), Sepal.Width = mean(Sepal.Width), .by = Species)
+
+# Also bad
+summarise(
+  iris,
+  Sepal.Length = mean(Sepal.Length),
+  Sepal.Width = mean(Sepal.Width),
+  .by = Species
+)
+```
+
+### Short lines (piping)
+
+Sometimes it's useful to include a short pipe as an argument to a function in a longer pipe. Carefully consider whether the code is more readable with a short inline pipe or if it's better to move the code outside the pipe and give it an evocative name.
+
+```{r}
+#| eval: false
+# Good
+x |>
+  semi_join(y |> filter(is_valid))
+
+# Ok
+x |>
+  select(a, b, w) |>
+  left_join(y |> select(a, b, v), join_by(a, b))
+
+# Better
+x_join <- x |> select(a, b, w)
+y_join <- y |> select(a, b, v)
+left_join(x_join, y_join, join_by(a, b))
+```
+
+### Style
+
+* The point is that coding happens in community.  
+* Not only do you want your code to run well, but you want other people to be able to understand it and use it. 
+* The more that you and others use the same syntax, the better the communication will be.
+
+
+
+
+
+## <i class="fas fa-lightbulb"></i> Reflection questions  
+
+* What are some of the general rules for writing clear code?
+
+* Give one reason why piping into a data verb is preferred to using the data frame as the first argument.
+
+## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+* What could go wrong if your code style doesn't match what is expected by your collaborator? Or if it is hard to read by your collaborator?
+
+* Why is good communication important in data science?
+
+
