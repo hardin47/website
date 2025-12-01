@@ -5223,7 +5223,7 @@ window.Quarto = {
 <ol type="1">
 <li><p>It calls <code><a href="https://shiny.posit.co/">library(shiny)</a></code> to load the shiny package.</p></li>
 <li><p>It defines the user interface, the HTML webpage that humans interact with. In this case, it’s a page containing the words “Hello, world!”.</p></li>
-<li><p>It specifies the behaviour of our app by defining a server function. It’s currently empty, so our app doesn’t do anything, but we’ll be back to revisit this shortly.</p></li>
+<li><p>It specifies the behaviour of our app by defining a server function. It’s currently empty, so our app doesn’t do anything, but we’ll be back to revisit it shortly.</p></li>
 <li><p>It executes <code>shinyApp(ui, server)</code> to construct and start a Shiny application from UI and server.</p></li>
 </ol></section><section id="how-to-run-a-shiny-app" class="level3" data-number="12.1.4"><h3 data-number="12.1.4" class="anchored" data-anchor-id="how-to-run-a-shiny-app">
 <span class="header-section-number">12.1.4</span> How to run a Shiny App?</h3>
@@ -5270,14 +5270,14 @@ To run Shiny
 <pre><code>Listening on http://127.0.0.1:7521</code></pre>
 <p>R is busy! It is running your Shiny App. You can’t do anything in R because the processes are engaged with the Shiny App.</p>
 </section><section id="why-cant-my-shiny-app-run-in-my-quarto-doc" class="level3 unnumbered"><h3 class="unnumbered anchored" data-anchor-id="why-cant-my-shiny-app-run-in-my-quarto-doc">Why can’t my Shiny App run in my Quarto doc?</h3>
-<p>Shiny interactions occur on the server-side. This means that you can write interactive apps without knowing JavaScript, but you need a server to run them on. This introduces a logistical issue: Shiny apps need a Shiny server to be run online. When you run Shiny apps on your own computer, Shiny automatically sets up a Shiny server for you, but you need a public-facing Shiny server if you want to publish this sort of interactivity online. That’s the fundamental trade-off of shiny: you can do anything in a shiny document that you can do in R, but it requires someone to be running R.</p>
+<p>Shiny interactions occur on the server-side, which means that you can write interactive apps without knowing JavaScript, but you need a server to run them on. You might notice a logistical issue: Shiny apps need a Shiny server to be run online. When you run Shiny apps on your own computer, Shiny automatically sets up a Shiny server for you, but you need a public-facing Shiny server if you want to publish interactivity online. That’s the fundamental trade-off of shiny: you can do anything in a shiny document that you can do in R, but it requires someone to be running R.</p>
 </section></section><section id="deconstructing-shiny" class="level2" data-number="12.2"><h2 data-number="12.2" class="anchored" data-anchor-id="deconstructing-shiny">
 <span class="header-section-number">12.2</span> Deconstructing Shiny</h2>
 <section id="pieces" class="level3" data-number="12.2.1"><h3 data-number="12.2.1" class="anchored" data-anchor-id="pieces">
 <span class="header-section-number">12.2.1</span> Pieces</h3>
 <p>Shiny applications will be contained in one <code>app.R</code> file. The file contains two key components:</p>
 <p><code>ui</code>: code for the user interface. The user interface is the webpage that your user will interact with. Don’t worry, you don’t need to know how to write html! The app will do that for you! (Although if you want to, there are opportunities to incorporate that knowledge into a Shiny app.)</p>
-<p><code>server</code>: code for the computer part. What should the computer/server do with your inputs as the user changes them. This section will have R code in it, more like we’re used to … sort of.</p>
+<p><code>server</code>: code for the computer part. What the computer/server should do with your inputs as the user changes them. This section will have R code in it, more like we’re used to … sort of.</p>
 <p>I always keep these names as the default. The last chunk of code at the bottom, <code>shinyApp(ui = ui, server = server)</code>, will compile everything together to result in the interactive webpage.</p>
 <p>Press Run App at the top of RStudio and see what happens!</p>
 <div class="cell">
@@ -5338,14 +5338,15 @@ To run Shiny
 <span><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
 <span>    <span class="va">output</span><span class="op">$</span><span class="va">distPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/renderPlot.html">renderPlot</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>        <span class="co"># generate bins based on input$bins from ui.R</span></span>
-<span>        <span class="va">x</span>    <span class="op">&lt;-</span> <span class="va">faithful</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
-<span>        <span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="va">input</span><span class="op">$</span><span class="va">bins</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span>        <span class="co"># draw the histogram with the specified number of bins</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">x</span>, breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="st">'darkgray'</span>, border <span class="op">=</span> <span class="st">'white'</span>,</span>
-<span>             xlab <span class="op">=</span> <span class="st">'Waiting time to next eruption (in mins)'</span>,</span>
-<span>             main <span class="op">=</span> <span class="st">'Histogram of waiting times'</span><span class="op">)</span></span>
+<span>        <span class="va">faithful</span> <span class="op">|&gt;</span> </span>
+<span>           <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">waiting</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>              <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="va">input</span><span class="op">$</span><span class="va">bins</span>,</span>
+<span>                             fill <span class="op">=</span> <span class="st">"darkgrey"</span>,</span>
+<span>                             color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>  <span class="op">+</span></span>
+<span>              <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Waiting time to next eruption (in mins)"</span>,</span>
+<span>                   title <span class="op">=</span> <span class="st">"Histogram of waiting times"</span>,</span>
+<span>                   y <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>              <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="op">}</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
@@ -5376,8 +5377,18 @@ To run Shiny
 <p>See the <a href="https://github.com/hardin47/ds002r-fds/tree/main/Shiny_weather" target="_blank">files on GitHub</a> to walk through the example on your own.</p>
 </section></section><section id="reflection-questions" class="level2" data-number="12.3"><h2 data-number="12.3" class="anchored" data-anchor-id="reflection-questions">
 <span class="header-section-number">12.3</span> <i class="fas fa-lightbulb"></i> Reflection questions</h2>
-</section><section id="ethics-considerations" class="level2" data-number="12.4"><h2 data-number="12.4" class="anchored" data-anchor-id="ethics-considerations">
+<ul>
+<li>What does it mean to say that the Shiny App “takes over” your R session?</li>
+<li>What is the difference between the <code>ui()</code> function and the <code>server()</code> function?</li>
+<li>How does the user engage with the app?</li>
+<li>What is the role of <code>input$</code> and <code>output$</code>?</li>
+<li>How do you publish the Shiny App so that someone can use it using a public URL?</li>
+</ul></section><section id="ethics-considerations" class="level2" data-number="12.4"><h2 data-number="12.4" class="anchored" data-anchor-id="ethics-considerations">
 <span class="header-section-number">12.4</span> <i class="fas fa-balance-scale"></i> Ethics considerations</h2>
+<ul>
+<li>Why are SQL databases usually password protected?</li>
+<li>What is the difference between doing a SQL query and updating a SQL database?</li>
+</ul>
 
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">

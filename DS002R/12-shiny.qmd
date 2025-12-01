@@ -51,9 +51,9 @@ Looking closely at the code above, the `app.R` does four things:
 
 1. It calls `library(shiny)` to load the shiny package.
 
-2. It defines the user interface, the HTML webpage that humans interact with. In this case, it’s a page containing the words "Hello, world!".
+2. It defines the user interface, the HTML webpage that humans interact with. In this case, it's a page containing the words "Hello, world!".
 
-3. It specifies the behaviour of our app by defining a server function. It’s currently empty, so our app doesn’t do anything, but we’ll be back to revisit this shortly.
+3. It specifies the behaviour of our app by defining a server function. It's currently empty, so our app doesn't do anything, but we'll be back to revisit it shortly.
 
 4. It executes `shinyApp(ui, server)` to construct and start a Shiny application from UI and server.
 
@@ -96,7 +96,7 @@ R is busy!  It is running your Shiny App.  You can't do anything in R because th
 
 ### Why can't my Shiny App run in my Quarto doc? {-}
 
-Shiny interactions occur on the server-side. This means that you can write interactive apps without knowing JavaScript, but you need a server to run them on. This introduces a logistical issue: Shiny apps need a Shiny server to be run online. When you run Shiny apps on your own computer, Shiny automatically sets up a Shiny server for you, but you need a public-facing Shiny server if you want to publish this sort of interactivity online. That’s the fundamental trade-off of shiny: you can do anything in a shiny document that you can do in R, but it requires someone to be running R.
+Shiny interactions occur on the server-side, which means that you can write interactive apps without knowing JavaScript, but you need a server to run them on. You might notice a logistical issue: Shiny apps need a Shiny server to be run online. When you run Shiny apps on your own computer, Shiny automatically sets up a Shiny server for you, but you need a public-facing Shiny server if you want to publish interactivity online. That's the fundamental trade-off of shiny: you can do anything in a shiny document that you can do in R, but it requires someone to be running R.
 
 ## Deconstructing Shiny
 
@@ -104,9 +104,9 @@ Shiny interactions occur on the server-side. This means that you can write inter
 
 Shiny applications will be contained in one `app.R` file. The file contains two key components:
 
-`ui`: code for the user interface. The user interface is the webpage that your user will interact with. Don’t worry, you don’t need to know how to write html! The app will do that for you! (Although if you want to, there are opportunities to incorporate that knowledge into a Shiny app.)
+`ui`: code for the user interface. The user interface is the webpage that your user will interact with. Don't worry, you don't need to know how to write html! The app will do that for you! (Although if you want to, there are opportunities to incorporate that knowledge into a Shiny app.)
 
-`server`: code for the computer part. What should the computer/server do with your inputs as the user changes them. This section will have R code in it, more like we’re used to … sort of.
+`server`: code for the computer part. What the computer/server should do with your inputs as the user changes them. This section will have R code in it, more like we're used to ... sort of.
 
 I always keep these names as the default. The last chunk of code at the bottom, `shinyApp(ui = ui, server = server)`, will compile everything together to result in the interactive webpage.
 
@@ -177,15 +177,17 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+    output$distPlot <- renderPlot({
+        faithful |> 
+           ggplot(aes(x = waiting)) + 
+              geom_histogram(bins = input$bins,
+                             fill = "darkgrey",
+                             color = "white")  +
+              labs(x = "Waiting time to next eruption (in mins)",
+                   title = "Histogram of waiting times",
+                   y = "") + 
+              theme_minimal()
     })
 }
 
@@ -224,6 +226,14 @@ See the <a href = "https://github.com/hardin47/ds002r-fds/tree/main/Shiny_weathe
 
 ## <i class="fas fa-lightbulb"></i> Reflection questions  
 
+* What does it mean to say that the Shiny App "takes over" your R session?
+* What is the difference between the `ui()` function and the `server()` function?
+* How does the user engage with the app?
+* What is the role of `input$` and `output$`?
+* How do you publish the Shiny App so that someone can use it using a public URL?
 
 ## <i class="fas fa-balance-scale"></i> Ethics considerations 
+
+* Why are SQL databases usually password protected?
+* What is the difference between doing a SQL query and updating a SQL database?
 
