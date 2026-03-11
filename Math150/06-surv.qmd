@@ -1261,15 +1261,15 @@ recid.surv <- survfit(Surv(timefollow,event) ~ score_factor, data=recidKM)
 plot(recid.surv, lty=2:4, xlab="time", ylab="survival function")
 legend(10,.4, c("low", "high", "medium"), lty=2:4)
 
-survminer::ggsurvplot(recid.surv, conf.int=TRUE, censor=F) + 
-  ggtitle("Overall")
+survminer::ggsurvplot(recid.surv, censor=F,
+                      title = "Overall")
 ```
 
 ```{r}
-ggsurvplot(recid.surv[1], conf.int=TRUE, censor=FALSE) + 
-  ggtitle("Low Only")
+ggsurvplot(recid.surv[1],  censor=FALSE,
+           title = "Low Only")
 
-ggsurvplot(recid.surv, conf.int=TRUE, censor=FALSE, risk.table = TRUE)
+ggsurvplot(recid.surv, censor=FALSE, risk.table = TRUE)
 ```
 
 different options for CI
@@ -1278,13 +1278,16 @@ different options for CI
 set.seed(4747)
 recidKM2 <- recidKM |> sample_n(200)  # CI on a smaller random sample just to see the different CIs
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F) + ggtitle("No CI")
+           censor=F, title = "No CI")
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="log"), censor=F, conf.int=T) + ggtitle("Log CI")
+                   conf.type="log"), censor=F, conf.int = T, conf.int.style = "step",
+           title = "Log CI")
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="log-log"), censor=F, conf.int=T) + ggtitle("Log-Log CI")
+                   conf.type="log-log"), censor=F, conf.int = T, conf.int.style = "step",
+           title = "Log-Log CI")
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2,
-                   conf.type="plain"), censor=F, conf.int=T) + ggtitle("Plain CI")
+                   conf.type="plain"), censor=F, conf.int = T, conf.int.style = "step",
+           title = "Plain CI")
 
 ggsurvplot_facet(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
                  data=recidKM2, facet.by = "race")
@@ -1300,8 +1303,8 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=0)
 survdiff(Surv(timefollow,event) ~ score_factor, data=recidKM2, rho=1)
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM2), 
-           censor=F, conf.int=F, pval=TRUE) + 
-  ggtitle("No CI")
+           censor=F, pval=TRUE,
+           title = "No CI")
 ```
 
 Violent recidivism
@@ -1322,17 +1325,17 @@ survdiff(Surv(timefollow,event) ~ score_factor, data=d, rho=0)
 survdiff(Surv(timefollow,event) ~ score_factor, data = recidKMV2, rho=1)
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-           censor=F, conf.int=T, pval=TRUE) + 
-  ggtitle("Violent Recidivism")
+           censor=F, pval=TRUE,
+           title = "Violent Recidivism")
 
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKMV2), 
-                 data=recidKMV, censor = FALSE, conf.int = TRUE, facet.by = "race") + 
-  ggtitle("Violent Recidivism")
+                 data=recidKMV, censor = F, facet.by = "race",
+           title = "Violent Recidivism")
 
 d <- as.data.frame(recidKMV2)
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data = d), 
-                 data = d, censor = FALSE, conf.int = TRUE, pval=TRUE, facet.by = "race") + 
-  ggtitle("Violent Recidivism")
+                 data = d, censor = F, pval=TRUE, facet.by = "race",
+           title = "Violent Recidivism")
 ```
 
 ### Cox Proportional Hazards models
@@ -1381,8 +1384,8 @@ The survminer packages also has the `ggforest()` function which makes a fantasti
 
 ```{r}
 ggsurvplot(survfit(Surv(timefollow,event) ~ score_factor, data=recidKM), 
-           censor=F, conf.int=T, fun="cloglog") + 
-  ggtitle("Complementary Log-Log")
+           censor=F, fun="cloglog",
+           title = "Complementary Log-Log")
 ```
 
 The cox.zph function will test proportionality of all the predictors in the model by creating interactions with time using the transformation of time specified in the transform option. In this example we are testing proportionality by looking at the interactions with log(time). The column rho is the Pearson product-moment correlation between the scaled Schoenfeld residuals and log(time) for each covariate. The last row contains the global test for all the interactions tested at once. A p-value less than 0.05 indicates a violation of the proportionality assumption.
