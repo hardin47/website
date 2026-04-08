@@ -951,6 +951,61 @@ $$
 
 Which is to say that if $ln(- ln S(t))$ is linear in $\ln(t),$ then $h_0(t)$ is not only PH but also constant for all $t.$
 
+
+Consider a data frame containing remission survival times of 42 leukemia patients enrolled in a placebo-controlled randomized controlled trial (RCT). The dataset includes information on the time to remission, patient status, sex, white blood cell count (log-transformed), and treatment regimen. [@kleinbaum2012]
+
+- time: survival time in weeks
+- status: censoring status (1 = failure 0 = censored)
+- sex: sex (0 = Female 1 = Male)
+- logWBC: log white blood cell count
+- rx: treatment status (1 = control 0 = treatment)
+
+
+```{r}
+library(OncoDataSets)
+anderson <- OncoDataSets::LeukemiaSurvival_df
+```
+
+The `rx` (treatment) variable does not seem to violate proportional hazards:
+
+```{r}
+#| fig-cap: "Assessing the proportional hazards assumption for treatment using a complementary log-log plot: the curves should be approximately parallel if the PH assumption is reasonable."
+km_fit_rx <- survfit(Surv(time, status == 1) ~ rx, data = anderson)
+km_fit_rx |>
+  ggsurvfit::ggsurvfit(type = "cloglog", linetype_aes = TRUE) +
+  scale_color_brewer(palette = "Set1")
+```
+
+But the `sex` variable absolutely violates proportional hazards!
+
+```{r}
+#| fig-cap: "Assessing the proportional hazards assumption for sex using a complementary log-log plot: the curves should be approximately parallel if the PH assumption is reasonable."
+km_fit_sex <- survfit(Surv(time, status == 1) ~ sex, data = anderson)
+km_fit_sex |>
+  ggsurvfit::ggsurvfit(type = "cloglog", linetype_aes = TRUE) +
+  scale_color_brewer(palette = "Set1")
+```
+
+If we know that the effect of `sex` changes over time (i.e., `sex` and `time` interact in terms of predicting survival), then we might want to fit the model separately for each `sex`:
+
+$$h_i(t) = h_{0,g} e^{\beta_1 \mbox{logWBC}_i + \beta_2 \mbox{rx}_i}$$
+
+That is, the baseline now is able to change for each `sex` (although we still don't actually calculate $h_0(t)$ for either `sex`). The process for calculating coefficients is done using maximum likelihood, as before.  But now the likelihood is split into two separate products (one for male, one for female), and then multiplied together to get the full likelihood.
+
+$$L(\beta) = \prod_{i=1, females}^{r_f} \frac{e^{\beta x_i}}{\sum_{k, females:t_k
+\geq t_i} e^{\beta x_k}} \cdot \prod_{i=1, males}^{r_m} \frac{e^{\beta x_i}}{\sum_{k, males:t_k \geq t_i} e^{\beta x_k}}$$
+
+
+Note that there is no coefficient for the `sex` variable because it isn't in the model any longer!
+
+```{r}
+coxph(
+  Surv(time, status == 1) ~ logWBC + rx + strata(sex), 
+  data = anderson
+)
+```
+
+
 #### Proportional Hazards via a test for time dependent covariates
 
 If the PH assumption is violated, then we have:
