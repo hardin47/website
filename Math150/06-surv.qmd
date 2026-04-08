@@ -986,11 +986,66 @@ If $\beta_2 < 0,$ the relative hazard decreases with time. If $\beta_2 > 0,$ the
 
 ##### Test 2 for PH {-}
 
-The PH test of interest will be: $$H_0: \beta_2 = 0$$ It isn't a Wald test, but it is the same general idea (in R: `cox.zph`). [The variable in the denominator of the likelihood (for calculating the MLE) will have different values at different times.] An alternative form of the test is to call: $x_{i2} = t \ \ \forall t$ and let $$h_i(t) = e^{\beta_1 x_{i1} + \beta_2 x_{i1} x_{i2}} h_0(t).$$
+The PH test of interest will be: $$H_0: \beta_2 = 0.$$  Note that the test is really asking about whether the time dependency is on $t$  (as opposed, for example, to $\ln(t)$). Testing $\beta_2$ requires that we commit to a particular functional form for the time dependency.
 
-If there is time dependency in the model, then the `coxph` analysis won't be accurate.
+From the example below, it seems as though there might be some time dependency on the effect of sex in the lung dataset (available in the **survival** package). But we've had to think carefully about the functional form of the time dependency, and it still isn't clear that we understand it!
 
-@therneau:2021 have written an accessible vignette about using time dependent covariates and how to do so with the survival R package.  [Using Time Dependent Covariates in the Cox Model](https://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf).
+```{r}
+lung <- lung |>
+  mutate(event = ifelse(status == 2, 1, 0))
+```
+
+If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x t}:$
+
+```{r}
+coxph(
+  Surv(time, event) ~ sex + tt(sex),
+  data = lung,
+  tt = function(x, t, ...) x * t
+)
+```
+
+If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x \ln(t)}:$
+```{r}
+coxph(
+  Surv(time, event) ~ sex + tt(sex),
+  data = lung,
+  tt = function(x, t, ...) x * log(t)
+)
+```
+
+
+If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x t^2}:$
+
+```{r}
+coxph(
+  Surv(time, event) ~ sex + tt(sex),
+  data = lung,
+  tt = function(x, t, ...) x * t^2
+)
+```
+
+If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x \sqrt{t}}:$
+
+```{r}
+coxph(
+  Surv(time, event) ~ sex + tt(sex),
+  data = lung,
+  tt = function(x, t, ...) x * sqrt(t)
+)
+```
+
+
+If we agree that the correct model is $HR(t) = e^{\beta_1 x  + \beta_2 x t}$, we might want a CI for $\beta(t) = \beta_1 + \beta_2 t$.
+
+$$Var(\beta(t)) = Var(\beta_1) + t^2 \cdot Var(\beta_2) + 2 \cdot t \cdot Cov(\beta_1, \beta_2)$$
+
+$$SE(\beta(t)) = \widehat{Var}(\beta_1) + t^2 \cdot \widehat{Var}(\beta_2) + 2 \cdot t \cdot \widehat{Cov}(\beta_1, \beta_2)$$
+
+CI for $\beta(t)$: $b_1 + b_2 \cdot t \ \pm \ z* SE(\beta(t))$
+
+Notice here that both the statistic (the estimate of the parameter) and the SE are both functions of $t$!
+
 
 #### Proportional Hazards via Schoenfeld Residuals
 
@@ -1025,6 +1080,13 @@ If $t_j > >$ then $x_j$ is bigger than expected (for example, the covariate age 
 The key is that early on, younger people are dying more than expected, and later on, older people are dying more than expected. If the impact of age on survival is constant over time (i.e., the hazard for age is not a function of time), this shouldn't happen.
 
 Schoenfeld residuals that show a systematic trend over time (e.g., increasing, decreasing, or curved) indicate that the covariate's effect on the hazard is changing over time (i.e., violating the proportional hazards assumption).
+
+
+##### Test 4 for PH {-}
+
+In R, `cox.zph()` tests whether the effect of $x$ varies in some way with respect to time.  The test is whether $\beta (t) = \beta$  (i.e., is it constant over time). `cox.zph()` formally assesses the Schoenfeld residuals.
+
+@therneau:2021 have written an accessible vignette about using time dependent covariates and how to do so with the survival R package.  [Using Time Dependent Covariates in the Cox Model](https://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf).
 
 #### Solutions to violations of PH
 
