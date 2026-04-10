@@ -1014,16 +1014,10 @@ $$\frac{h_i(t)}{h_0(t)} = g(t)$$ some function of $t.$ Consider the following mo
 
 $$
 \begin{align*}
-x_{i1}  &= \left\{
+x_{i}  &= \left\{
 \begin{array}{ll}
 1 & treatment\\
 0 & control
-\end{array}
-\right.\\
-x_{i2} &= \left\{
-\begin{array}{ll}
-t & treatment\\
-0 & control\\
 \end{array}
 \right.\\
 \end{align*}
@@ -1032,7 +1026,7 @@ $$
 The relative hazard becomes: 
 $$
 \begin{align*}
-h_i(t) &= e^{\beta_1 x_{i1} + \beta_2 x_{i2}} h_0(t)\\
+h_i(t) &= h_0(t) e^{\beta_1 \cdot x_{i} + \beta_2 \cdot x_{i} \cdot t}\\
 \frac{h_1(t)}{h_0(t)} &= e^{\beta_1 +\beta_2 t}\\
 \end{align*}
 $$
@@ -1045,17 +1039,12 @@ The PH test of interest will be: $$H_0: \beta_2 = 0.$$  Note that the test is re
 
 From the example below, it seems as though there might be some time dependency on the effect of sex in the lung dataset (available in the **survival** package). But we've had to think carefully about the functional form of the time dependency, and it still isn't clear that we understand it!
 
-```{r}
-lung <- lung |>
-  mutate(event = ifelse(status == 2, 1, 0))
-```
-
 If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x t}:$
 
 ```{r}
 coxph(
-  Surv(time, event) ~ sex + tt(sex),
-  data = lung,
+  Surv(time, status) ~ logWBC + rx + sex + tt(sex), 
+  data = anderson,
   tt = function(x, t, ...) x * t
 )
 ```
@@ -1063,8 +1052,8 @@ coxph(
 If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x \ln(t)}:$
 ```{r}
 coxph(
-  Surv(time, event) ~ sex + tt(sex),
-  data = lung,
+  Surv(time, status) ~ logWBC + rx + sex + tt(sex), 
+  data = anderson,
   tt = function(x, t, ...) x * log(t)
 )
 ```
@@ -1074,8 +1063,8 @@ If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x t^2}:$
 
 ```{r}
 coxph(
-  Surv(time, event) ~ sex + tt(sex),
-  data = lung,
+  Surv(time, status) ~ logWBC + rx + sex + tt(sex), 
+  data = anderson,
   tt = function(x, t, ...) x * t^2
 )
 ```
@@ -1084,23 +1073,38 @@ If the test of interest is $HR(t) = e^{\beta_1 x  + \beta_2 x \sqrt{t}}:$
 
 ```{r}
 coxph(
-  Surv(time, event) ~ sex + tt(sex),
-  data = lung,
+  Surv(time, status) ~ logWBC + rx + sex + tt(sex), 
+  data = anderson,
   tt = function(x, t, ...) x * sqrt(t)
 )
 ```
 
 
-If we agree that the correct model is $HR(t) = e^{\beta_1 x  + \beta_2 x t}$, we might want a CI for $\beta(t) = \beta_1 + \beta_2 t$.
+If we agree that the correct model is $HR(t) = e^{\beta_1 x  + \beta_2 x t}$, we might want a CI for $\beta(t) = \beta_1 + \beta_2 t$ 
+
+(Note that $e^{\beta(t)}$ is the HR for the treatment versus control, or here the sex variable. Although it isn't clear if it is hazard of men vs. women or hazard of women vs. men.  `?OncoDataSets::LeukemiaSurvival_df` says that the `sex` variable is "Gender of the patient (numeric, 1 for male, 2 for female)." ... which is **not** how the data are coded!)
 
 $$Var(\beta(t)) = Var(\beta_1) + t^2 \cdot Var(\beta_2) + 2 \cdot t \cdot Cov(\beta_1, \beta_2)$$
 
-$$SE(\beta(t)) = \widehat{Var}(\beta_1) + t^2 \cdot \widehat{Var}(\beta_2) + 2 \cdot t \cdot \widehat{Cov}(\beta_1, \beta_2)$$
+$$SE(\beta(t)) = \sqrt{\widehat{Var}(\beta_1) + t^2 \cdot \widehat{Var}(\beta_2) + 2 \cdot t \cdot \widehat{Cov}(\beta_1, \beta_2)}$$
 
 CI for $\beta(t)$: $b_1 + b_2 \cdot t \ \pm \ z* SE(\beta(t))$
 
-Notice here that both the statistic (the estimate of the parameter) and the SE are both functions of $t$!
+Notice that both the statistic (the estimate of the parameter) and the SE are both functions of $t$!
 
+The variance-covariance matrix for the $\beta$ coefficients can be obtained using:
+
+```{r}
+coxph(
+  Surv(time, status) ~ logWBC + rx + sex + tt(sex), 
+  data = anderson,
+  tt = function(x, t, ...) x * sqrt(t)
+) |>
+  vcov()
+```
+
+
+$$SE(\beta(t)) = \sqrt{3.0 + t^2 \cdot 0.35 + 2 \cdot t \cdot (-0.98)}$$
 
 #### Proportional Hazards via Schoenfeld Residuals
 
@@ -1139,7 +1143,10 @@ Schoenfeld residuals that show a systematic trend over time (e.g., increasing, d
 
 ##### Test 4 for PH {-}
 
-In R, `cox.zph()` tests whether the effect of $x$ varies in some way with respect to time.  The test is whether $\beta (t) = \beta$  (i.e., is it constant over time). `cox.zph()` formally assesses the Schoenfeld residuals.
+In R, `cox.zph()` tests whether the effect of $x$ varies in some way with respect to time.  The test is whether $\beta (t) = \beta$  (i.e., is it constant over time?). `cox.zph()` formally assesses the Schoenfeld residuals.
+
+$$H_0: \mbox{The effect of X on the hazard is constant over time}$$
+$$H_A: \mbox{The effect of X on the hazard changes over time}$$  
 
 @therneau:2021 have written an accessible vignette about using time dependent covariates and how to do so with the survival R package.  [Using Time Dependent Covariates in the Cox Model](https://cran.r-project.org/web/packages/survival/vignettes/timedep.pdf).
 
@@ -1153,6 +1160,7 @@ In R, `cox.zph()` tests whether the effect of $x$ varies in some way with respec
 3.  Fit different models for before $t^*$ and after $t^*.$
 4.  Fit a model with a time dependent covariate.
 5.  Creative analysis: instead of tumor size, use % change over a set period of time.
+6.  Stratify on the variable that violates PH (i.e., fit models separately)
 
 -   **examples** of PH violations
 
