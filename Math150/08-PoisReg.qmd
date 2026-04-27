@@ -112,21 +112,37 @@ Just as with linear regression we used scatterplots to give a sense of whether o
 
 **Technical Condition 3, Poisson:** Let's first look at the response variable.  A histogram of the number of successful matings shows a right skew which is typically not acceptable for normal errors regression (although, remember, the value of the response variable is dependent on the value of the explanatory variable!)
 ```{r echo=FALSE}
-ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30)
+ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30) +
+  scale_x_continuous(breaks = seq(min(elephants$MATINGS), 
+                                  max(elephants$MATINGS), by = 1)) + 
+    labs(x = "number of matings", y = "count")
 ```
 
-Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables.  Because the sample size is limited, we group the age variable into 5 year increments.  Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean.  It might also be good to find the sample mean per group and plot the Poisson probabilities onto each bar.
+Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables.  Because the sample size is limited, we group the age variable into 5 year increments.  Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean.  
+
+The red dots on each plot correspond to the expected count under the Poisson model given by the average number of matings and total count of elephants (in each age group).
 
 ```{r echo=FALSE}
 elephants <- elephants |> 
   mutate(AGEgroups = case_when(
     AGE <=30 ~ "(20,30]",
     AGE <=40 ~ "(30,40]",
-    TRUE ~ "(40,55]"))
+    TRUE ~ "(40,55]")) |>
+  group_by(AGEgroups) |>
+  mutate(ave_mate = mean(MATINGS, na.rm = TRUE),
+         n_group = n(),
+         exp_val = n_group * dpois(MATINGS, lambda = ave_mate))
 
-ggplot(elephants, aes(x=MATINGS)) + 
-  geom_histogram(bins=30) + 
-  facet_grid(~AGEgroups)
+
+
+ggplot(elephants) + 
+  geom_histogram(aes(x=MATINGS), bins=30) +
+  geom_point(aes(x = MATINGS, y = exp_val), color = "red") +
+  facet_grid(~AGEgroups) + 
+  scale_x_continuous(breaks = seq(min(elephants$MATINGS), 
+                                  max(elephants$MATINGS), by = 1)) + 
+  labs(x = "number of matings", y = "count vs. expected value",
+       title = "faceted by age of elephant")
 ```
 
 **Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in @sec-overdis.
@@ -139,7 +155,7 @@ elephants |> group_by(AGEgroups) |>
 **Technical Condition 1, Line:** The Poisson model implies that the log of the mean will be a linear function of the explanatory variable:
 
 $$\ln(\mu_i) = \beta_0 + \beta_1 X_i,$$
-which means we'd really like to plot $\mu_i$ as a function of the explanatory variable.  Unfortunately, $\mu_i$ is unknown, and so cannot be plotted.  We can, however, plot the log of the average value of the response for a group of x values which are close to one another.  In the plot below, we've grouped observations based on the age of the elephants being within 3 years of years of each other.   It is actually quite linear!  The points that don't follow the linear relationship are based on age groups with very few observations.
+which means we'd really like to plot $ln(\mu_i)$ as a function of the explanatory variable.  Unfortunately, $\mu_i$ is unknown, and so cannot be plotted.  We can, however, plot the log of the average value of the response for a group of x values which are close to one another.  In the plot below, we've grouped observations based on the age of the elephants being within 3 years of years of each other. It is actually quite linear!  The points that don't follow the linear relationship are based on age groups with very few observations.
 
 ```{r}
 matelogmean <- elephants |>
@@ -151,7 +167,8 @@ elephantsGRP <- cbind(matelogmean, age = c(seq(26.5,52.5,by=3)+1.5 ))
 
 elephantsGRP
 
-elephantsGRP |> ggplot(aes(x=age, y=logmate)) + geom_point()
+elephantsGRP |> ggplot(aes(x=age, y=logmate)) + geom_point() + 
+  labs(y = "ln of average number of matings")
 
 ```
 
