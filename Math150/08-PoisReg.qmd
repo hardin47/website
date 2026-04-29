@@ -18,7 +18,14 @@ Consider the following example from @poole (described in @sleuth) on age and mat
 ```{r}
 elephants <- readr::read_csv("elephants.csv")
 
-ggplot(elephants, aes(x=jitter(AGE), y=MATINGS)) + geom_point()
+ggplot(elephants, aes(x=AGE, y=MATINGS)) +
+  geom_point() + 
+  theme_minimal() + 
+  scale_y_continuous(breaks = pretty(c(0, 10), n = 5)) +
+  labs(x = "elehant's age",
+       y = "number of matings")
+
+
 ```
 
 While it does seem like there is an increasing trend in the two variables, there are some concerns with directly applying linear regression.  Indeed, the example above acts as a proxy for many regression examples where the response variable is a count with particular properties:
@@ -115,7 +122,8 @@ Just as with linear regression we used scatterplots to give a sense of whether o
 ggplot(elephants, aes(x=MATINGS)) + geom_histogram(bins=30) +
   scale_x_continuous(breaks = seq(min(elephants$MATINGS), 
                                   max(elephants$MATINGS), by = 1)) + 
-    labs(x = "number of matings", y = "count")
+    labs(x = "number of matings", y = "count") + 
+  theme_minimal()
 ```
 
 Likely, it makes more sense to look at the distribution of the response variable at each value of the explanatory variables.  Because the sample size is limited, we group the age variable into 5 year increments.  Looking at the plot below, again it seems as though, even when conditioning on the explanatory variable, the response is right skewed with variance dependent on the mean.  
@@ -142,7 +150,8 @@ ggplot(elephants) +
   scale_x_continuous(breaks = seq(min(elephants$MATINGS), 
                                   max(elephants$MATINGS), by = 1)) + 
   labs(x = "number of matings", y = "count vs. expected value",
-       title = "faceted by age of elephant")
+       title = "faceted by age of elephant") + 
+  theme_minimal()
 ```
 
 **Technical Condition 4, Error:** To check whether the mean and variance are similar, we can calculate the values per group  (with more data we would probably have more groups of the explanatory variable, and the following analysis would be done with a scatterplot of means on the x-axis and variance on the y-axis).  Note that the mean and variance are reasonably similar!  When the "mean=variance" condition is violated, it is almost always violated in such that the variance is even *bigger* than would have been expected by the Poisson model.  Large variance is called overdispersion, and methods for measuring and accounting for overdispersion are given in @sec-overdis.
@@ -168,7 +177,8 @@ elephantsGRP <- cbind(matelogmean, age = c(seq(26.5,52.5,by=3)+1.5 ))
 elephantsGRP
 
 elephantsGRP |> ggplot(aes(x=age, y=logmate)) + geom_point() + 
-  labs(y = "ln of average number of matings")
+  labs(y = "ln of average number of matings") + 
+  theme_minimal()
 
 ```
 
@@ -282,7 +292,8 @@ head(galap)
 
 
 ```{r}
-ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point()
+ggplot(galap, aes(y=species, x = log(area), color = adjacent)) + geom_point() + 
+  theme_minimal()
 ```
 
 ###  glm
@@ -319,11 +330,13 @@ glm(species ~ log(area) + scruz + adjacent,
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") |> augment() |>
-  ggplot(aes(x=.fitted, y=.resid)) + geom_point()
+  ggplot(aes(x=.fitted, y=.resid)) + geom_point() + 
+  theme_minimal()
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="poisson") |> augment() |>
-  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
+  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point() + 
+  theme_minimal()
 ```
 
 
@@ -346,10 +359,12 @@ glm(species ~ log(area) + scruz + adjacent,
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") |> augment() |>
-  ggplot(aes(x=.fitted, y=.resid)) + geom_point()
+  ggplot(aes(x=.fitted, y=.resid)) + geom_point() + 
+  theme_minimal()
 
 glm(species ~ log(area) + scruz + adjacent, 
     data= galap, family="quasipoisson") |> augment() |>
-  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point()
+  ggplot(aes(x=.fitted, y=.std.resid)) + geom_point() + 
+  theme_minimal()
 ```
 

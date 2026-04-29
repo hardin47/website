@@ -140,7 +140,7 @@ As in section @sec-ls, the slope is calculated by using least squares.
 SE(b_1) &=& \sqrt{\frac{MSE}{\sum_i (x_i - \overline{x})^2}} = \sqrt{\frac{MSE}{(n-1)s_x^2}} = = \sqrt{\frac{\frac{\sum_i (Y_i - \hat{Y}_i)^2}{n-2}}{(n-1)s_x^2}}\\
 \end{eqnarray*}
 
-Where $MSE = \frac{\sum_i(Y_i - \hat{Y}_i)^2}{n-2}$ (with one explanatory variable, divide by $n-p$ when there ae $p-1$ explanatory variables).
+Where $MSE = \frac{\sum_i(Y_i - \hat{Y}_i)^2}{n-2}$ (with one explanatory variable, divide by $n-p$ when there are $p-1$ explanatory variables).
 
 Just like any other statistic, the value of $b_1$ can be calculated for every sample.  The manner in which $b_1$ varies from sample to sample becomes the sampling distribution of the sample slope.  The SE of the slope will be the standard deviation associated with the sampling distribution of the slope.  The resulting inference theory is very similar to that which we saw with the mean.  The CLT describes $b_1$ to have a normal distribution, and estimating the $SE(b_1)$ induces extra variability which leads to a t score test statistic with a t-distribution with df = $n-2.$
 
@@ -218,7 +218,7 @@ knitr::include_graphics("figs/predint.png")
 
 #### Confidence Interval for average response {-}
 
-Recall, $MSE = \frac{\sum_i(Y_i - \hat{Y}_i)^2}{n-2}$ (with one explanatory variable, divide by $n-p$ when there ae $p-1$ explanatory variables).
+Recall, $MSE = \frac{\sum_i(Y_i - \hat{Y}_i)^2}{n-2}$ (with one explanatory variable, divide by $n-p$ when there are $p-1$ explanatory variables).
 
 The standard error of the **average** response value $x_h$ is given by:
 
@@ -245,7 +245,7 @@ $\hat{Y}_h = b_0 + b_1 \cdot x_h$$
 $$\hat{Y}_h \pm t^*_{1-\alpha/2, n-2} \cdot \sqrt{MSE \cdot\bigg(1 + \frac{1}{n} + \frac{(x_h - \overline{x})^2}{\sum_{i}(x_i - \overline{x})^2}\bigg)}$$
 
 
-## Multiple Linear Regression {#MLR}
+## Multiple Linear Regression {#sec-MLR}
 
 As with simple linear regression, consider $n$ observations.  The response variable for the $i^{th}$ individual is denoted by $Y_i,$ as before. The variation remaining in $Y_i$ that isn't explained by our predictors will also remain the same, denoted by $\epsilon_i$ and called the random error.  Since we now have more than one explanatory variable, we will need to add an additional subscript on $X,$ denoting the value of the $k^{th}$ predictor variable for the $i^{th}$ individual by $X_{ik}.$  Thus our model is now 
 
@@ -260,6 +260,195 @@ Y_i&=&b_0+b_1X_{i1}+b_2X_{i2}+ \cdots + b_{p-1}X_{i,p-1} + e_i\\
 To estimate the coefficients, use the same principle as before, that of least squares.  That is, minimize
 $$\sum_{i=1}^n(Y_i-(b_0+b_1X_{i1}+b_2X_{i2} + \cdots + b_{p-1}X_{i,p-1}))^2$$
 We are interested in finding the least squares estimates ($b_i$) of the parameters of the model $\beta_i.$  
+
+### Variable interpretation
+
+#### Multicollinearity {-}
+
+When two explanatory variables are highly correlated, odd things can happen with the coefficients. For example, consider the following data of information from homes on sale in Los Angeles in 2010.
+
+```{r}
+library(openintro)
+data(LAhomes)
+```
+
+
+Think carefully about the following task to predict the price of a home (in $\ln$ units) using the square feet of the home (in $\ln$ units) and the number of bedrooms.  Below are three different models.  For each model, provide the sign (either positive or negative) of the coefficient with a one sentence explanation.
+
+**Model 1:** Is $\beta_1$ positive or negative, why?
+$$\ln (\texttt{price}) = \beta_0 + \beta_1 \ln (\texttt{square feet})$$
+
+**Model 2:** Is $\beta_1$ positive or negative, why?
+$$\ln (\texttt{price}) = \beta_0 + \beta_1  \texttt{bedrooms}$$
+
+**Model 3:** Is $\beta_1$ positive or negative, why?  Is $\beta_2$ positive or negative, why?
+$$\ln (\texttt{price}) = \beta_0 + \beta_1 \ln (\texttt{square feet}) + \beta_2  \texttt{bedrooms}$$
+
+
+
+**Model 1:**
+$\beta_1$ is positive because the larger the home, the more expensive it is.
+
+**Model 2:**
+$\beta_1$ is positive because the more bedrooms the home has, the more expensive it is.
+
+**Model 3:**
+$\beta_1$ is positive because, for a fixed number of bedrooms, the larger the home, the more expensive it is.
+
+$\beta_2$ is **negative!!!** because, for a fixed square footage, the more bedrooms actually makes the house wonky and *less* expensive.
+
+
+**Model 1:**
+```{r}
+lm(log(price) ~ log(sqft), data = LAhomes) |>
+  tidy()
+```
+
+
+**Model 2:**
+```{r}
+lm(log(price) ~ bed, data = LAhomes) |>
+  tidy()
+```
+
+**Model 3:**
+```{r}
+lm(log(price) ~ log(sqft) + bed, data = LAhomes) |>
+  tidy()
+```
+
+
+
+```{r}
+#| echo: false
+#| fig.cap: For a given (log) sqft, the more bedrooms, the lower the predicted log(price).
+
+LAhomes |>
+  ggplot(aes(x = log(sqft), y = log(price),
+             color = as.factor(bed))) + 
+  geom_point(size = 0.5) + 
+  moderndive::geom_parallel_slopes(se = FALSE) + 
+  #geom_smooth(method = "lm", se = FALSE) + 
+  theme_minimal() + 
+  labs(color = "\n # bedrooms")
+```
+
+It is important to interpret coefficients carefully when the explanatory variables are correlated. Number of `bed`rooms and `log(sqft)` are very correlated, which is why the `bed` coefficient changed from positive to negative when `log(sqft)` was included in the model.
+
+```{r}
+#| fig.cap: The two explanatory / predictor variables (log) sqft and bedrooms are highly correlated.
+
+LAhomes |>
+  ggplot(aes(y = log(sqft), x = bed)) + 
+  geom_point(size = 0.5) + 
+  theme_minimal()  
+```
+
+However, multicollinearity does not cause trouble with predictions. If the goal is only to predict the price (or log(price)) of the home, correlated variables do not cause trouble.
+
+
+#### Interaction {-}
+
+> Interaction happens when the relationship between $X_1$ and $Y$ changes for different levels of $X_2$. 
+
+Consider only the homes that have 3 or fewer bedrooms.  We see that the linear model on `log(sqft)` is really different (i.e., different **slope**) for those homes that have 0 or 1 bedrooms as compared to homes that have 2 or 3 bedrooms. The different slopes indicate that there is interaction!
+
+```{r}
+#| echo: false
+#| fig.cap: For a given (log) sqft, the more bedrooms, the lower the predicted log(price).
+
+LAhomes |>
+  filter(bed <= 3) |>
+  ggplot(aes(x = log(sqft), y = log(price),
+             color = as.factor(bed))) + 
+  geom_point(size = 0.5) + 
+  #moderndive::geom_parallel_slopes(se = FALSE) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  theme_minimal() + 
+  labs(color = "\n # bedrooms")
+```
+
+Let's check to see if `log(sqft)` interacts with `pool` when predicting `log(price)`!
+
+The way to model interaction is by letting `pool` be a binary variable (1 = yes pool; 0 = no pool).  Then the model becomes:
+
+$$\widehat{\log(price)} = b_0 + b_1 \cdot \log(sqft) + b_2 \cdot pool + b_3 \cdot \log(sqft) \cdot pool$$
+
+Note that the multiplication with pool can happen because pool is binary!
+
+The model above can be separated into two separate models, one for homes that don't have a pool and one for homes that do have a pool:
+
+Pool no: $\widehat{\log(price)} = b_0 + b_1 \cdot \log(sqft) + b_2 \cdot 0 + b_3 \cdot \log(sqft) \cdot 0 = b_0 + b_1 \cdot \log(sqft)$
+
+Pool yes: $\widehat{\log(price)} = b_0 + b_1 \cdot \log(sqft) + b_2 \cdot 1 + b_3 \cdot \log(sqft) \cdot 1 = (b_0 + b_2)+ (b_1 + b_3) \cdot \log(sqft)$
+
+Notice that the two lines have different intercepts and different slopes.  
+
+If we allow for full interaction, the estimates of the coefficients are the following (we model interaction by multiplying the explanatory variables in the `lm()` function):
+
+```{r}
+lm(log(price) ~ log(sqft)*pool, data = LAhomes) |>
+  tidy()
+```
+
+The hypothesis tests for both $\beta_2$ and $\beta_3$ seem to not be discernible. We will dig into that next. The full interaction model can be plotted as:
+
+```{r}
+LAhomes |>
+  ggplot(aes(x = log(sqft), y = log(price),
+             color = pool)) + 
+  geom_point(size = 0.5) + 
+  #moderndive::geom_parallel_slopes(se = FALSE) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  theme_minimal() + 
+  labs(color = "pool")
+```
+
+##### The test on $\beta_3$ {-}
+
+The test on $\beta_3$ asks if it is important that the lines have different slopes (i.e., $H_0: \beta_3 = 0$).  If the lines are parallel, we get the following plot. Notice that it actually doesn't look much different from the full interaction model.
+
+**Important** The test on $\beta_3$ is done *with all the other variables in the model*. That is, when we run the test of $H_0: \beta_3 = 0$, we are assuming that $\beta_2$ is non zero and estimated in the model (i.e, that the intercepts are different for the two models.)
+
+
+```{r}
+LAhomes |>
+  ggplot(aes(x = log(sqft), y = log(price),
+             color = pool)) + 
+  geom_point(size = 0.5) + 
+  moderndive::geom_parallel_slopes(se = FALSE) + 
+  #geom_smooth(method = "lm", se = FALSE) + 
+  theme_minimal() + 
+  labs(color = "pool")
+```
+
+##### The test on $\beta_2$ {-}
+
+The test on $\beta_2$ asks if it is important that the lines have different intercepts (i.e., $H_0: \beta_2 = 0$).  If the lines have the same intercepts, we get the following plot. The plot looks a little bit different from the full interaction model, but forcing the same intercept and allowing for different slopes, does allow for a bit of the line difference that we see in the full interaction plot.
+
+**Important** The test on $\beta_2$ is done *with all the other variables in the model*. That is, when we run the test of $H_0: \beta_2 = 0$, we are assuming that $\beta_3$ is non zero and estimated in the model (i.e, that the slopes are different for the two models.)
+
+```{r}
+ggplot(LAhomes, aes(x = log(sqft), y = log(price), 
+                    color = pool)) +
+  geom_point() +
+  geom_smooth(method = "lm",
+              formula = y ~ 0 + x,   # fit per group with zero intercept
+              se = FALSE) +
+    theme_minimal() 
+```
+
+##### Which variables do we keep? {-}
+
+At a first glance, we might think that we don't need either $\beta_2$ or $\beta_3$ in the model.  But that is not true!  Instead, we don't need $\beta_2$ **if $\beta_3$ is in the model**.  And we don't need $\beta_3$ **if $\beta_2$ is in the model**.  Which is to say, we need at least one of them.
+
+To keep the model as simple as possible, we decide to remove the interaction term and keep the additive effect of pool. Notice that the p-value on `pool` is now *tiny*!  We keep both `log(sqft)` and `pool` in the model that is predicting `log(price)`.
+
+```{r}
+lm(log(price) ~ log(sqft) + pool, data = LAhomes) |>
+  tidy()
+```
+
 
 
 
@@ -358,6 +547,7 @@ SSE is "sum of squared errors".  So, $SSE(\overline{Y})$ is the amount the respo
 R^2 &=& \frac{SSE(\overline{Y}) - SSE(\mbox{least-squares})}{SSE(\overline{Y})} \\
  &=& \frac{Var(Y_i) - Var(e_i)}{Var(Y_i)} \\
  &=& 1 - \frac{Var(e_i)}{Var(Y_i)}\\
+ &=& 1 - \frac{\sum_{i=1}^n (Y_i - \hat{Y}_i)^2}{\sum_{i=1}^n (Y_i - \bar{Y})^2}
 \end{eqnarray*}
 
 Recall that $e_i$ is the distance from the observed response variable to the prediction on the line: $$e_i = Y_i - \hat{Y}_i$$ 
@@ -367,25 +557,40 @@ $R^2$ can be used even in models with many explanatory variables.  As such, the 
 
 With many variables, $R^2$ can be a biased estimate of the true percent of variability (i.e., the parameter value) explained in the response.  That's because for each new variable added to the linear model the $R^2$ value will always increase.  A solution to the problem of adding too many explanatory variables is to penalize the measure of model fit.  As seen in the equation below, the Adjusted $R^2$ will be lower than the raw $R^2$ and will be slightly penalized with many explanatory variables.
 
-$$R^2_{adj} =  1 - \frac{Var(e_i) / (n - p - 1)}{Var(Y_i) / (n - 1)}$$
+$$R^2_{adj} =  1 - \frac{Var(e_i) / (n - p - 1)}{Var(Y_i) / (n - 1)} = 1 - \frac{\sum_{i=1}^n (Y_i - \hat{Y}_i)^2 / (n - p - 1)}{\sum_{i=1}^n (Y_i - \bar{Y})^2 / (n - 1)}$$
 
 Where $n$ is the number of observational units and $p$ is the number of coefficients estimated in the linear model.  (Remember with one categorical variable, sometimes it is necessary to estimate multiple coefficients.)
+
+Consider comparing the following two models.
+
+Model 1: predict `ln_price` using `sqft`, `baths`, and `bedrooms`
+
+Model 2: predict `ln_price` using `sqft` only
+
+
+```{r}
+lm(ln_price ~  sqft + baths + bedrooms, data=house) |>
+  glance()
+
+lm(ln_price ~  sqft, data=house) |>
+  glance()
+```
+
+
 
 ## R code for regression 
 
 
-### Example: Cat Jumping^[@iscam, Inv 5.6 & 5.13] (Correlation & SLR) {#sec-cat2}
+### Example: Cat Jumping (Correlation & SLR) {#sec-cat2}
 
-
-
-Consider the cat data given in Investigations 5.6 and 5.13.  The idea is to understand cat jumping velocity as a function of body characteristics. Note that the correlation $r=-0.496$  between bodymass and velocity.
+Consider the cat data given in Investigations 5.6 and 5.13 of @iscam.  The idea is to understand cat jumping `velocity` as a function of body characteristics. Note that the correlation $r = -0.496$  between `bodymass` and `velocity`.^[@iscam, Inv 5.6 & 5.13]
 
 
 
 ```{r}
 cats <- read_table2("http://www.rossmanchance.com/iscam2/data/CatJumping.txt")
 
-ggplot(cats, aes(x=bodymass, y = velocity)) +
+ggplot(cats, aes(x = bodymass, y = velocity)) +
   geom_point() +
   geom_smooth(method = "lm", se=FALSE)
 ```
@@ -467,14 +672,72 @@ lm(velocity ~ bodymass, data = cats) |>
 ```{r}
 lm(velocity ~ bodymass, data = cats) |>
   augment(interval = "prediction") |>
-  ggplot(aes(x=bodymass)) + 
-  geom_point(aes(y=velocity)) + 
-  geom_line(aes(y=.fitted)) +
-  geom_ribbon(aes(ymin=.lower, ymax=.upper), fill="blue", alpha=0.2)
+  ggplot(aes(x = bodymass)) + 
+  geom_point(aes(y = velocity)) + 
+  geom_line(aes(y = .fitted)) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), fill="blue", alpha=0.2)
 ```
 
 
-### Example: Housing Prices^[@iscam, Inv 5.14]  (SLR & MLR & Prediction) {#sec-houses2}
+#### Multiple linear regression {-}
+
+There are many other variables collected with the cat data:
+
+```{r}
+names(cats)
+```
+
+Let's consider a model where we are trying to predict the jumping `velocity` using `bodymass`, `musclemass`, and `hindlimb`. It turns out that all three variables are discernible.  
+
+```{r}
+lm(velocity ~ bodymass + musclemass + hindlimb,
+   data = cats) |>
+  tidy()
+```
+
+In the multiple regression setting, we can still find confidence and prediction intervals for a specific cat. However, we need to specify values for all three of the explanatory variables of interest.
+
+Find a CI for cats who weigh 4700 grams, with a muscle mass of 60 grams and hindlimb of 27 mm.
+
+Find a PI interval for cats who weigh 4000 grams, with a muscle mass of 80 grams and hindlimb of 30 mm.
+
+
+Before looking at the confidence and prediction intervals, ask yourself the following questions:
+
+1. Are the two intervals above centered at the same place or at different places?  If different, explain.
+
+2. Are the two intervals above the same width or different widths?  If different, explain.
+
+3. Do the two intervals above rely on the same technical conditions or different technical conditions?  If different, explain.
+
+```{r}
+lm(velocity ~ bodymass + musclemass + hindlimb,
+   data = cats) |>
+  augment(newdata = data.frame(bodymass = 4700,
+                               musclemass = 60,
+                               hindlimb = 27), 
+          interval = "confidence")
+
+lm(velocity ~ bodymass + musclemass + hindlimb,
+   data = cats)  |>
+  augment(newdata = data.frame(bodymass = 4000,
+                               musclemass = 80,
+                               hindlimb = 30), 
+          interval = "prediction")
+```
+
+**Solution:**
+
+1. Different:  the first is centered at $b_0 + b_1 \cdot 4700 + b_1 \cdot 60 + b_2 \cdot 27$ and the second is centered at $b_0 + b_1 \cdot 4000 + b_1 \cdot 80 + b_2 \cdot 30.$
+
+2. Different: the first interval will be much more narrow than the second interval.
+
+3. Different:  while both intervals require independence, linearity, and equal variability, the mean confidence interval does not require normality (with large enough sample sizes) and the individual prediction interval always requires normality.
+
+
+### Example: Housing Prices (SLR & MLR & Prediction) {#sec-houses2}
+
+Note: the work here is from a different dataset^[@iscam, Inv 5.14], but it has similar questions and analysis as the work in @sec-MLR.
 
 ```{r message=FALSE, warning=FALSE}
 library(GGally)
@@ -674,9 +937,9 @@ lm(ln_price ~ sqft + bedrooms + baths, data=house) |>
 Again, because we needed to use the `ln` transformation on `price`, it is hard to back-transform the prediction for the **average** (we end up thinking about it as a median), but we can back-transform the interval of individual prices.  95% of homes with 2000 sqft, 3 bedrooms, and 2 baths cost between $164,312 and $1,011,356.
 
 
-### Example: 1918-19 Flu and Excess Deaths^[thanks to Laura Ring Kapitula at Grand Valley State University] {#ex:1819flu}
+### Example: 1918-19 Flu and Excess Deaths {#ex:1819flu}
 
-As we are coming to know, measuring the impact of COVID-19 is difficult.  A 2020 NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.
+As we are coming to know, measuring the impact of COVID-19 is difficult.  A 2020 NYTimes article compares total deaths in 2020 as compared with 2015-2019 for 8 different regions.^[thanks to Laura Ring Kapitula at Grand Valley State University for this example]
 
 ```{r fig.cap = "US Death Toll 2020, NY Times, April 28, 2020, https://www.nytimes.com/interactive/2020/04/28/us/coronavirus-death-toll-total.html", fig.align='center', echo=FALSE}
 knitr::include_graphics("figs/covid_excess.png")
