@@ -67,7 +67,7 @@ tsl_opinion_titles <- read_csv("data/tsl.csv")
 #| label: tsl-common-words
 #| echo: false
 #| message: false
-data(stop_words)  # from tidytext
+data(stop_words) # from tidytext
 tsl_opinion_titles |>
   tidytext::unnest_tokens(word, title) |>
   anti_join(stop_words) |>
@@ -108,11 +108,11 @@ Using the first paragraph of each opinion article, we can see which others have 
 #| fig-asp: 0.75
 #| fig-width: 7
 #| fig-align: center
-afinn_sentiments <- get_sentiments("afinn")  # need tidytext and textdata
+afinn_sentiments <- get_sentiments("afinn") # need tidytext and textdata
 tsl_opinion_titles |>
   tidytext::unnest_tokens(word, first_p) |>
   anti_join(stop_words) |>
-  left_join(afinn_sentiments) |> 
+  left_join(afinn_sentiments) |>
   group_by(authors, title) |>
   summarize(total_sentiment = sum(value, na.rm = TRUE), .groups = "drop") |>
   group_by(authors) |>
@@ -132,13 +132,13 @@ tsl_opinion_titles |>
   geom_col(aes(fill = neg_pos), show.legend = FALSE) +
   geom_text(
     aes(x = label_position, label = authors, color = neg_pos),
-    hjust = c(rep(1,10), rep(0, 10)),
+    hjust = c(rep(1, 10), rep(0, 10)),
     show.legend = FALSE,
     fontface = "bold"
   ) +
   geom_text(
     aes(label = round(avg_sentiment, 1)),
-    hjust = c(rep(1.25,10), rep(-0.25, 10)),
+    hjust = c(rep(1.25, 10), rep(-0.25, 10)),
     color = "white",
     fontface = "bold"
   ) +
@@ -157,7 +157,10 @@ tsl_opinion_titles |>
   theme_void(base_size = 16) +
   theme(
     plot.title = element_text(hjust = 0.5),
-    plot.subtitle = element_text(hjust = 0.5, margin = unit(c(0.5, 0, 1, 0), "lines")),
+    plot.subtitle = element_text(
+      hjust = 0.5,
+      margin = unit(c(0.5, 0, 1, 0), "lines")
+    ),
     axis.text.y = element_blank(),
     plot.caption = element_text(color = "gray30")
   )
@@ -299,8 +302,8 @@ Core functions:
 #### html, rvest, & xml2 {.smaller} {-}
 
 ```{r}
-html <- 
-'<html>
+html <-
+  '<html>
   <head>
     <title>This is a title</title>
   </head>
@@ -413,7 +416,7 @@ read_html(html) |> html_elements("#first")
 ### Text with `html_text()` vs. `html_text2()`
 
 ```{r}
-html = read_html(
+html <- read_html(
   "<p>  
     First sentence in the paragraph.
     Second sentence that follows a literal line break. <br>Third sentence will start on a new line in the rendered html, but doesn't have a line break as part of the code.
@@ -435,8 +438,8 @@ html |> html_text2()
 ### HTML tables with `html_table()` {.smaller}
 
 ```{r}
-html_table = 
-'<html>
+html_table <-
+  '<html>
   <head>
     <title>This is a title</title>
   </head>
@@ -455,7 +458,7 @@ html_table =
 
 ```{r}
 read_html(html_table) |>
-  html_elements("table") |> 
+  html_elements("table") |>
   html_table()
 ```
 
@@ -502,20 +505,20 @@ class(tsl_page)
 ### Scrape title and save as `title`
 
 ```{r}
-tsl_page |> 
-html_elements(".entry-title a") 
+tsl_page |>
+  html_elements(".entry-title a")
 ```
 
 
 
 ```{r}
-title <- tsl_page |> 
-html_elements(".entry-title a") |> 
-html_text()
+title <- tsl_page |>
+  html_elements(".entry-title a") |>
+  html_text()
 title
 
-title <- title |> 
-str_remove("OPINION: ")
+title <- title |>
+  str_remove("OPINION: ")
 
 title
 ```
@@ -523,24 +526,24 @@ title
 ### Scrape author and save as `author`
 
 ```{r}
-author <- tsl_page |> 
-html_elements(".author") |> 
-html_text()
+author <- tsl_page |>
+  html_elements(".author") |>
+  html_text()
 author
 ```
 
 
 ```{r}
-author <- tsl_page |> 
-html_elements(".author") |> 
-html_text() |> 
-tibble() |> 
-set_names(nm = "authors") |> 
-filter(str_detect(authors, "By "))
-author 
+author <- tsl_page |>
+  html_elements(".author") |>
+  html_text() |>
+  tibble() |>
+  set_names(nm = "authors") |>
+  filter(str_detect(authors, "By "))
+author
 
-author <- author |> 
-mutate(authors = str_replace(authors, "By ", "")) 
+author <- author |>
+  mutate(authors = str_replace(authors, "By ", ""))
 
 author
 ```
@@ -549,13 +552,13 @@ author
 ### Scrape date and save as `date`
 
 ```{r}
-date <- tsl_page |> 
-html_elements(".published") |> 
-html_text()
+date <- tsl_page |>
+  html_elements(".published") |>
+  html_text()
 date
 
-date <- date |> 
-lubridate::mdy_hm(tz = "America/Los_Angeles")
+date <- date |>
+  lubridate::mdy_hm(tz = "America/Los_Angeles")
 date
 ```
 
@@ -564,9 +567,9 @@ date
 
 ```{r}
 tsl_opinion <- tibble(
-    title,
-    author,
-    date
+  title,
+  author,
+  date
 )
 
 tsl_opinion
@@ -577,42 +580,41 @@ tsl_opinion
 
 ```{r}
 #| eval: false
-tsl_opinions <- function(i){
-tsl_page <- read_html(paste0("https://tsl.news/category/opinions/page/",i))
-  
-title <- tsl_page |> 
-html_elements(".entry-title a") |> 
-html_text() |> 
-str_remove("OPINION: ")
-  
-author <- tsl_page |> 
-html_elements(".author") |> 
-html_text() |> 
-tibble() |> 
-set_names(nm = "authors") |> 
-filter(str_detect(authors, "By ")) |> 
-mutate(authors = str_replace(authors, "By ", "")) 
-  
-date <- tsl_page |> 
-html_elements(".published") |> 
-html_text() |> 
-lubridate::mdy_hm(tz = "America/Los_Angeles")
+tsl_opinions <- function(i) {
+  tsl_page <- read_html(paste0("https://tsl.news/category/opinions/page/", i))
 
-first_p <- tsl_page |> 
-  html_elements(".entry-content p") |> 
-  html_text() |> 
-  tolower()
-  
-tibble(
+  title <- tsl_page |>
+    html_elements(".entry-title a") |>
+    html_text() |>
+    str_remove("OPINION: ")
+
+  author <- tsl_page |>
+    html_elements(".author") |>
+    html_text() |>
+    tibble() |>
+    set_names(nm = "authors") |>
+    filter(str_detect(authors, "By ")) |>
+    mutate(authors = str_replace(authors, "By ", ""))
+
+  date <- tsl_page |>
+    html_elements(".published") |>
+    html_text() |>
+    lubridate::mdy_hm(tz = "America/Los_Angeles")
+
+  first_p <- tsl_page |>
+    html_elements(".entry-content p") |>
+    html_text() |>
+    tolower()
+
+  tibble(
     title,
     author,
     date,
     first_p
-)  
+  )
 }
 
-tsl_opinion_titles <- 1:50 |> purrr::map(tsl_opinions) |> 
-list_rbind()
+tsl_opinion_titles <- 1:50 |> purrr::map(tsl_opinions) |> list_rbind()
 ```
 
 ```{r}
@@ -692,4 +694,6 @@ Source: Brian Resnick, [Researchers just released profile data on 70,000 OkCupid
 * Are the functions described above always sure-fire? That is, when can they go wrong? What do you need to be aware of?
 * If data are "public" (i.e., possible to be scraped), what harm could be done by doing the scraping, compiling the information into one place, and posting the data frame on a website like kaggle?
 
+
+## References
 

@@ -13,6 +13,8 @@ Beyond `SELECT` queries, the next most fundamental actions in **SQL** have to do
 The database we'll work with for learning how to combine tables is on IMDb data.  There are **many** tables, see @tbl-imdb-tables.   @tbl-select-kind shows information on the `kind_type` table which describes each `kind`. Other tables contain ID variables which will be important when performing `JOIN`s.
 
 ```{r}
+Sys.setenv(MARIADB_TLS_DISABLE_PEER_VERIFICATION = 1)
+
 con_imdb <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "imdb",
@@ -25,9 +27,9 @@ con_imdb <- DBI::dbConnect(
 As seen in @tbl-imdb-tables, there are 21 tables in the `imdb` database!  We won't go into details about what each one of them means, but it is a **huge** database with details on movies, TV series, video games, and more.  For our work, we are interested only in movies (and details within, like actors and ratings).
 
 ```{sql}
-#| connection: con_imdb
-#| label: imdb-tables
-#| output.var: "imdb_tables"
+--| connection: con_imdb
+--| label: imdb-tables
+--| output.var: "imdb_tables"
 
 SHOW TABLES;
 ```
@@ -40,18 +42,19 @@ SHOW TABLES;
 
 imdb_tables |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 If you are curious about the database, you can glance through each of the tables separately using a `SELECT` command (don't forget to use `LIMIT`, especially on a table you haven't previously explored).
 
 ```{sql}
-#| connection: con_imdb
-#| label: select-kind
-#| output.var: "select_kind"
+--| connection: con_imdb
+--| label: select-kind
+--| output.var: "select_kind"
 
 SELECT * FROM kind_type
 LIMIT 0, 10;
@@ -65,10 +68,11 @@ LIMIT 0, 10;
 
 select_kind |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -82,9 +86,9 @@ We could do something similar if we wanted to transform the variables in the sel
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: act-names
-#| output.var: "act_names"
+--| connection: con_imdb
+--| label: act-names
+--| output.var: "act_names"
 
 SELECT name,
        name_clean,
@@ -107,10 +111,11 @@ LIMIT 0, 30;
 
 act_names |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -170,11 +175,13 @@ band_instruments
 An inner join combines two datasets returning only the observations that exist in both of the original datasets.
 
 ```{r}
-sqldf::sqldf("SELECT star.name,
+sqldf::sqldf(
+  "SELECT star.name,
                      star.band,
                      inst.plays
               FROM band_members AS star
-              JOIN band_instruments AS inst ON star.name = inst.name")
+              JOIN band_instruments AS inst ON star.name = inst.name"
+)
 ```
 
 
@@ -194,12 +201,14 @@ band_members |>
 A left join combines two datasets returning every observation that exists in the left (or first) original dataset.  Note that in the results, Mick's instrument is missing.
 
 ```{r}
-sqldf::sqldf("SELECT star.name,
+sqldf::sqldf(
+  "SELECT star.name,
                      star.band,
                       inst.plays
               FROM band_members AS star
               LEFT JOIN band_instruments AS inst 
-              ON star.name = inst.name")
+              ON star.name = inst.name"
+)
 ```
 
 
@@ -208,12 +217,14 @@ sqldf::sqldf("SELECT star.name,
 A right join combines two datasets returning every observation that exists in the right (or second) original dataset. Note that in the results, Keith's band is missing.
 
 ```{r}
-sqldf::sqldf("SELECT inst.name,
+sqldf::sqldf(
+  "SELECT inst.name,
                      star.band,
                       inst.plays
               FROM band_members AS star
               RIGHT JOIN band_instruments AS inst 
-              ON star.name = inst.name")
+              ON star.name = inst.name"
+)
 ```
 
 ### `JOIN`
@@ -221,9 +232,9 @@ sqldf::sqldf("SELECT inst.name,
 In the `imdb` database, the `title` table includes information about the 4,626,322  titles in the database, including the `id`, `title`, `kind_id` (indicator for the kind of ID it is), and `production_year`.  It does not, however, include the review of the title.  See @tbl-title-glance.
 
 ```{sql}
-#| connection: con_imdb
-#| label: title-glance
-#| output.var: "title_glance"
+--| connection: con_imdb
+--| label: title-glance
+--| output.var: "title_glance"
 
 SELECT * FROM title LIMIT 0, 10;
 ```
@@ -235,19 +246,20 @@ SELECT * FROM title LIMIT 0, 10;
 
 title_glance |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
 The `movie_info_idx` table does not contain much information about each particular film.  It does, however, have an indicator for the movie ID (given by `movie_id`) as well as the number of votes (given by `info` where `type_id = 100`).  See @tbl-idx-glance.
 
 ```{sql}
-#| connection: con_imdb
-#| label: idx-glance
-#| output.var: "idx_glance"
+--| connection: con_imdb
+--| label: idx-glance
+--| output.var: "idx_glance"
 
 SELECT * FROM movie_info_idx LIMIT 0, 6;
 ```
@@ -259,10 +271,11 @@ SELECT * FROM movie_info_idx LIMIT 0, 6;
 
 idx_glance |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -279,9 +292,9 @@ Some aspects of the query are worth pointing out:
 * In the `WHERE` clause, we keep only movies, only 2015 production year, and only at least 150,000 votes.
 
 ```{sql}
-#| connection: con_imdb
-#| label: movie-join
-#| output.var: "movie_join"
+--| connection: con_imdb
+--| label: movie-join
+--| output.var: "movie_join"
 
 SELECT title.id,
        title.title,
@@ -305,18 +318,19 @@ LIMIT 0, 20;
 
 movie_join |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Let's say we also want to obtain information about the actors and actresses in each of the movies.  In the `cast_info` table, there is a `person_id`, a `movie_id`, and `person_role_id` is `1` if actor and `2` if actress.
 
 ```{sql}
-#| connection: con_imdb
-#| label: cast-glance
-#| output.var: "cast_glance"
+--| connection: con_imdb
+--| label: cast-glance
+--| output.var: "cast_glance"
 
 SELECT * FROM cast_info LIMIT 0, 10;
 
@@ -330,19 +344,20 @@ SELECT * FROM cast_info LIMIT 0, 10;
 
 cast_glance |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
 We also want the name of the actress which is in the table `aka_name`.  Note that there is no *movie* information in the `aka_name` table!
 
 ```{sql}
-#| connection: con_imdb
-#| label: name-glance
-#| output.var: "name_glance"
+--| connection: con_imdb
+--| label: name-glance
+--| output.var: "name_glance"
 
 SELECT * FROM aka_name LIMIT 0, 10;
 
@@ -356,10 +371,11 @@ SELECT * FROM aka_name LIMIT 0, 10;
 
 name_glance |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Connecting the most popular movies of 2015 with the actresses in those movies requires a series of `JOIN`s. Note that to make the code less onerous, the `title` table has been aliased by `t`, the `movie_info_idx` table has been aliased by `idx`, the `cast_info` table has been aliased by `a`, and the `aka_name` table has been aliased by `n`.
@@ -368,9 +384,9 @@ There is a lot of data cleaning to do as some of the `person_id` values are one 
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: movie-join-actress
-#| output.var: "movie_join_actress"
+--| connection: con_imdb
+--| label: movie-join-actress
+--| output.var: "movie_join_actress"
 
 SELECT t.title,
        idx.info,
@@ -397,10 +413,11 @@ LIMIT 0, 50;
 
 movie_join_actress |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -417,9 +434,9 @@ Consider the following two tables.  The first has seven movies in it (from 2015 
 #### movies: {-}
 
 ```{sql}
-#| connection: con_imdb
-#| label: top-movies
-#| output.var: "top_movies"
+--| connection: con_imdb
+--| label: top-movies
+--| output.var: "top_movies"
 
 SELECT t.id,
        t.title,
@@ -446,18 +463,19 @@ ORDER BY idx.info DESC
 
 top_movies |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 #### actresses: {-}
 
 ```{sql}
-#| connection: con_imdb
-#| label: actresses
-#| output.var: "actresses"
+--| connection: con_imdb
+--| label: actresses
+--| output.var: "actresses"
 
 SELECT DISTINCT a.person_id,
        a.movie_id,
@@ -481,10 +499,11 @@ LIMIT 0, 20;
 
 actresses |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -498,9 +517,9 @@ Using subqueries, we can `JOIN` the two datasets using different `JOIN` techniqu
 With an inner `JOIN`, there are 32 rows corresponding to all the actresses in the seven 2015 films with the most votes.  Because the `JOIN` is an intersection of the two tables, only the actresses with `person_id` above 3900000 are included.
 
 ```{sql}
-#| connection: con_imdb
-#| label: inner-movie-actress
-#| output.var: "inner_movie_actress"
+--| connection: con_imdb
+--| label: inner-movie-actress
+--| output.var: "inner_movie_actress"
 
 
 SELECT * FROM
@@ -528,10 +547,13 @@ LIMIT 0, 300;
 #| echo: false
 #| tbl-cap: "Inner `JOIN` of movies and actresses."
 
-DT::datatable(inner_movie_actress, escape = FALSE,
-              rownames = F,
-              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
-              options = list(pageLength = 15))
+DT::datatable(
+  inner_movie_actress,
+  escape = FALSE,
+  rownames = F,
+  colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+  options = list(pageLength = 15)
+)
 ```
 
 #### `RIGHT JOIN` {-}
@@ -540,9 +562,9 @@ With a `RIGHT JOIN`, there are more than 300 rows (the `LIMIT` clause keeps us f
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: right-movie-actress
-#| output.var: "right_movie_actress"
+--| connection: con_imdb
+--| label: right-movie-actress
+--| output.var: "right_movie_actress"
 
 
 SELECT * FROM
@@ -570,11 +592,13 @@ LIMIT 0, 300;
 #| echo: false
 #| tbl-cap: "`RIGHT JOIN` of movies and actresses."
 
-
-DT::datatable(right_movie_actress, escape = FALSE,
-              rownames = F,
-              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
-              options = list(pageLength = 15))
+DT::datatable(
+  right_movie_actress,
+  escape = FALSE,
+  rownames = F,
+  colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+  options = list(pageLength = 15)
+)
 ```
 
 
@@ -585,9 +609,9 @@ With a `LEFT JOIN`, there are 33 rows corresponding to the actresses in the seve
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: left-movie-actress
-#| output.var: "left_movie_actress"
+--| connection: con_imdb
+--| label: left-movie-actress
+--| output.var: "left_movie_actress"
 
 
 SELECT * FROM
@@ -615,11 +639,13 @@ LIMIT 0, 300;
 #| echo: false
 #| tbl-cap: "`LEFT JOIN` of movies and actresses."
 
-
-DT::datatable(left_movie_actress, escape = FALSE,
-              rownames = F,
-              colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
-              options = list(pageLength = 15))
+DT::datatable(
+  left_movie_actress,
+  escape = FALSE,
+  rownames = F,
+  colnames = c("movie ID", "movie title", "actress ID", "movie ID", "actress"),
+  options = list(pageLength = 15)
+)
 ```
 
 
@@ -631,9 +657,9 @@ We might, for example, want to know how many names / spellings of a name with a 
 In @tbl-num-repeat-names why isn't there a column indicating the name of the actress?  (There can't be such a column. Why not?) 
 
 ```{sql}
-#| connection: con_imdb
-#| label: num-repeat_names
-#| output.var: "num_repeat_names"
+--| connection: con_imdb
+--| label: num-repeat_names
+--| output.var: "num_repeat_names"
 
 SELECT acts.person_id, 
        COUNT(*) AS num_repeat_names
@@ -662,10 +688,11 @@ GROUP BY acts.person_id;
 
 num_repeat_names |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
       
 #### Counting number of actresses per film {-}
@@ -673,9 +700,9 @@ num_repeat_names |>
 We might, for example, want to know how many actresses with a specific `person_id` (above 3900000) are in each of the top voted seven films of 2015.  
 
 ```{sql}
-#| connection: con_imdb
-#| label: num-actress
-#| output.var: "num_actress"
+--| connection: con_imdb
+--| label: num-actress
+--| output.var: "num_actress"
 
 SELECT movs.id, 
        movs.title,
@@ -705,10 +732,11 @@ GROUP BY movs.id;
 
 num_actress |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -742,9 +770,9 @@ ggarrange(fig1, fig2, ncol = 1)
 @tbl-foo-bar contains a silly example.  The first table has 1 as `bar` and the second table has 20 as `bar`.  But when the tables are `UNION`ed, the `bar` column contains `c(1, 10)`. **SQL** took the column names from the first table and appended the second table without considering the variable names.
 
 ```{sql}
-#| connection: con_imdb
-#| label: foo-bar
-#| output.var: "foo_bar"
+--| connection: con_imdb
+--| label: foo-bar
+--| output.var: "foo_bar"
 
 SELECT 
     1 AS bar,
@@ -764,10 +792,11 @@ SELECT
 
 foo_bar |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -780,9 +809,9 @@ Let's say we want to combine the top voted movies from 2015 with the top voted m
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: union-years
-#| output.var: "union_years"
+--| connection: con_imdb
+--| label: union-years
+--| output.var: "union_years"
 
 (SELECT t.title, 
         t.production_year, 
@@ -817,10 +846,11 @@ LIMIT 0, 100;
 
 union_years |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -833,9 +863,9 @@ Let's say that the first table is all movies with production year after 2012 and
 
 
 ```{sql}
-#| connection: con_imdb
-#| label: union-years-votes
-#| output.var: "union_years_votes"
+--| connection: con_imdb
+--| label: union-years-votes
+--| output.var: "union_years_votes"
 
 (SELECT t.title,
         t.production_year, 
@@ -869,18 +899,19 @@ ORDER BY production_year DESC, num_votes;
 
 union_years_votes |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 When `UNION ALL` is applied in the same context, The Martian is listed twice in the results table given in @tbl-union-all-years-votes.
 
 ```{sql}
-#| connection: con_imdb
-#| label: union-all-years-votes
-#| output.var: "union_all_years_votes"
+--| connection: con_imdb
+--| label: union-all-years-votes
+--| output.var: "union_all_years_votes"
 
 (SELECT t.title,
         t.production_year, 
@@ -914,10 +945,11 @@ ORDER BY production_year DESC, num_votes;
 
 union_all_years_votes |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -934,29 +966,36 @@ Also notice that `UNION ALL` keeps the duplicate rows which is probably not what
 
 ```{r}
 
-sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+sqldf::sqldf(
+  "SELECT star.name, star.band, inst.plays 
       FROM band_members AS star
-      LEFT JOIN band_instruments AS inst ON star.name = inst.name")
-sqldf::sqldf("SELECT inst.name, star.band, inst.plays 
+      LEFT JOIN band_instruments AS inst ON star.name = inst.name"
+)
+sqldf::sqldf(
+  "SELECT inst.name, star.band, inst.plays 
       FROM band_members AS star
-      RIGHT JOIN band_instruments AS inst ON star.name = inst.name")
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name"
+)
 
-sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+sqldf::sqldf(
+  "SELECT star.name, star.band, inst.plays 
       FROM band_members AS star
       LEFT JOIN band_instruments AS inst ON star.name = inst.name
 UNION
       SELECT inst.name, star.band, inst.plays 
       FROM band_members AS star
-      RIGHT JOIN band_instruments AS inst ON star.name = inst.name ")
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name "
+)
 
-sqldf::sqldf("SELECT star.name, star.band, inst.plays 
+sqldf::sqldf(
+  "SELECT star.name, star.band, inst.plays 
       FROM band_members AS star
       LEFT JOIN band_instruments AS inst ON star.name = inst.name
 UNION ALL
       SELECT inst.name, star.band, inst.plays 
       FROM band_members AS star
-      RIGHT JOIN band_instruments AS inst ON star.name = inst.name ")
-
+      RIGHT JOIN band_instruments AS inst ON star.name = inst.name "
+)
 ```
 
 
@@ -984,3 +1023,7 @@ dbDisconnect(con_imdb, shutdown = TRUE)
 1. What can happen if a `UNION` is done without carefully matching up the columns of the two tables being `UNION`ed?
 
 2. How will you know if `JOIN`ing removed some records?  What if the `JOIN` produced missing values for some of the variables?  How should we deal with missing data or arbitrarily removed records?
+
+
+## References
+

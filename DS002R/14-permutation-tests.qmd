@@ -59,17 +59,21 @@ set.seed(47)
 Infants <- read.delim("http://www.rossmanchance.com/iscam3/data/InfantData.txt")
 
 # find the observed number of babies who chose the helper
-help_obs <- Infants |> 
-  summarize(prop_help = mean(choice == "helper")) |> 
+help_obs <- Infants |>
+  summarize(prop_help = mean(choice == "helper")) |>
   pull()
 help_obs
 
-# write a function to simulate a set of infants who are 
+# write a function to simulate a set of infants who are
 # equally likely to choose the helper or the hinderer
 
-random_choice <- function(rep, num_babies){
-  choice = sample(c("helper", "hinderer"), size = num_babies,
-                  replace = TRUE, prob = c(0.5, 0.5))
+random_choice <- function(rep, num_babies) {
+  choice <- sample(
+    c("helper", "hinderer"),
+    size = num_babies,
+    replace = TRUE,
+    prob = c(0.5, 0.5)
+  )
   return(mean(choice == "helper"))
 }
 
@@ -77,22 +81,22 @@ random_choice <- function(rep, num_babies){
 map_dbl(1:10, random_choice, num_babies = 16)
 
 num_exper <- 5000
-help_random <- map_dbl(1:num_exper, random_choice, 
-                            num_babies = 16)
+help_random <- map_dbl(1:num_exper, random_choice, num_babies = 16)
 
 # the p-value!
 sum(help_random >= help_obs) / num_exper
 
 # visualize null sampling distribution
-help_random |> 
-  data.frame() |> 
-  ggplot(aes(x = help_random)) + 
-  geom_histogram() + 
-  geom_vline(xintercept = help_obs, color = "red") + 
-  labs(x = "proportion of babies who chose the helper",
-       title = "sampling distribution when null hypothesis is true",
-       subtitle = "that is, no inherent preference for helper or hinderer")
-
+help_random |>
+  data.frame() |>
+  ggplot(aes(x = help_random)) +
+  geom_histogram() +
+  geom_vline(xintercept = help_obs, color = "red") +
+  labs(
+    x = "proportion of babies who chose the helper",
+    title = "sampling distribution when null hypothesis is true",
+    subtitle = "that is, no inherent preference for helper or hinderer"
+  )
 ```
 
 #### Logic for what we believe {-}
@@ -334,17 +338,16 @@ hsb2
 #### Summary of the variables {-}
 
 ```{r}
-hsb2 |> 
-  group_by(schtyp) |> 
-  summarize(ave_math = mean(math),
-            med_math = median(math))
+hsb2 |>
+  group_by(schtyp) |>
+  summarize(ave_math = mean(math), med_math = median(math))
 ```
 
 #### Visualize the relationship of interest {-}
 
 ```{r}
-hsb2 |> 
-  ggplot(aes(x = schtyp, y = math)) + 
+hsb2 |>
+  ggplot(aes(x = schtyp, y = math)) +
   geom_boxplot()
 ```
 
@@ -353,41 +356,41 @@ hsb2 |>
 For fun, we are calculating both the difference in averages as well as the difference in medians.  That is, we have **two** different observed summary statistics to work with.
 
 ```{r}
-hsb2 |> 
-  group_by(schtyp) |> 
-  summarize(ave_math = mean(math),
-            med_math = median(math))
+hsb2 |>
+  group_by(schtyp) |>
+  summarize(ave_math = mean(math), med_math = median(math))
 
-hsb2 |> 
-  group_by(schtyp) |> 
-  summarize(ave_math = mean(math),
-            med_math = median(math)) |> 
-  summarize(ave_diff = diff(ave_math),
-            med_diff = diff(med_math))
-
+hsb2 |>
+  group_by(schtyp) |>
+  summarize(ave_math = mean(math), med_math = median(math)) |>
+  summarize(ave_diff = diff(ave_math), med_diff = diff(med_math))
 ```
 
 
 #### Generate a null sampling distribution. {-}
 
 ```{r}
-perm_data <- function(rep, data){
-  data |> 
-    select(schtyp, math) |> 
-    mutate(math_perm = sample(math, replace = FALSE)) |> 
-    group_by(schtyp) |> 
-    summarize(obs_ave = mean(math),
-              obs_med = median(math),
-              perm_ave = mean(math_perm),
-              perm_med = median(math_perm)) |> 
-    summarize(obs_ave_diff = diff(obs_ave),
-              obs_med_diff = diff(obs_med),
-              perm_ave_diff = diff(perm_ave),
-              perm_med_diff = diff(perm_med),
-              rep = rep)
+perm_data <- function(rep, data) {
+  data |>
+    select(schtyp, math) |>
+    mutate(math_perm = sample(math, replace = FALSE)) |>
+    group_by(schtyp) |>
+    summarize(
+      obs_ave = mean(math),
+      obs_med = median(math),
+      perm_ave = mean(math_perm),
+      perm_med = median(math_perm)
+    ) |>
+    summarize(
+      obs_ave_diff = diff(obs_ave),
+      obs_med_diff = diff(obs_med),
+      perm_ave_diff = diff(perm_ave),
+      perm_med_diff = diff(perm_med),
+      rep = rep
+    )
 }
 
-map(1:10, perm_data, data = hsb2) |> 
+map(1:10, perm_data, data = hsb2) |>
   list_rbind()
 ```
 
@@ -396,13 +399,13 @@ map(1:10, perm_data, data = hsb2) |>
 
 ```{r}
 set.seed(47)
-perm_stats <- 
-  map(1:500, perm_data, data = hsb2) |> 
-  list_rbind() 
+perm_stats <-
+  map(1:500, perm_data, data = hsb2) |>
+  list_rbind()
 
-perm_stats |> 
-  ggplot(aes(x = perm_ave_diff)) + 
-  geom_histogram() + 
+perm_stats |>
+  ggplot(aes(x = perm_ave_diff)) +
+  geom_histogram() +
   geom_vline(aes(xintercept = obs_ave_diff), color = "red")
 ```
 
@@ -410,18 +413,20 @@ perm_stats |>
 #### Visualize the null sampling distribution (median) {-}
 
 ```{r}
-perm_stats |> 
-  ggplot(aes(x = perm_med_diff)) + 
-  geom_histogram() + 
+perm_stats |>
+  ggplot(aes(x = perm_med_diff)) +
+  geom_histogram() +
   geom_vline(aes(xintercept = obs_med_diff), color = "red")
 ```
 
 #### p-value {-}
 
 ```{r}
-perm_stats |> 
-  summarize(p_val_ave = mean(perm_ave_diff > obs_ave_diff),
-            p_val_med = mean(perm_med_diff > obs_med_diff))
+perm_stats |>
+  summarize(
+    p_val_ave = mean(perm_ave_diff > obs_ave_diff),
+    p_val_med = mean(perm_med_diff > obs_med_diff)
+  )
 ```
 
 
@@ -442,24 +447,28 @@ $H_0: \mu_{private} = \mu_{public}$ and $H_A: \mu_{private} \ne \mu_{public}$
 ```{r}
 #| echo: false
 #| fig-align: 'center'
-perm_stats |> 
-  ggplot(aes(x = perm_ave_diff)) + 
-  geom_histogram() + 
-  geom_vline(aes(xintercept = obs_ave_diff), color = "red")  +
-    geom_vline(aes(xintercept = -obs_ave_diff), color = "red")
+perm_stats |>
+  ggplot(aes(x = perm_ave_diff)) +
+  geom_histogram() +
+  geom_vline(aes(xintercept = obs_ave_diff), color = "red") +
+  geom_vline(aes(xintercept = -obs_ave_diff), color = "red")
 ```
 
 #### Two-sided p-value {-}
 
 
 ```{r}
-perm_stats |> 
-    summarize(p_val_ave = 
-                mean(perm_ave_diff > obs_ave_diff | 
-                       perm_ave_diff < -obs_ave_diff),
-              p_val_med = 
-              mean(perm_med_diff > obs_med_diff | 
-                     perm_med_diff < -obs_med_diff))
+perm_stats |>
+  summarize(
+    p_val_ave = mean(
+      perm_ave_diff > obs_ave_diff |
+        perm_ave_diff < -obs_ave_diff
+    ),
+    p_val_med = mean(
+      perm_med_diff > obs_med_diff |
+        perm_med_diff < -obs_med_diff
+    )
+  )
 ```
 
 #### Two-sided conclusion {-}
@@ -487,7 +496,6 @@ knitr::include_graphics(c("images/genderbias2a.png", "images/genderbias2b.png"))
 
 ```{r out.width='100%', fig.align="center",  echo=FALSE, fig.cap = "@genderbias1"}
 knitr::include_graphics("images/genderbias.png")
-
 ```
 
 ```{r out.width='100%', fig.align="center", echo=FALSE, fig.cap = "@genderbias2"}
@@ -500,7 +508,9 @@ knitr::include_graphics(c("images/genderbias3a.png", "images/genderbias3b.png"))
 
 ```{r}
 # The data come from `permuter` which is no longer kept up as a package
-macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv")
+macnell <- readr::read_csv(
+  "https://raw.githubusercontent.com/statlab/permuter/master/data-raw/macnell.csv"
+)
 #library(permuter)
 #data(macnell)
 ```
@@ -508,27 +518,47 @@ macnell <- readr::read_csv("https://raw.githubusercontent.com/statlab/permuter/m
 
 ```{r warning=FALSE, message=FALSE, fig.align="center"}
 library(ggridges)
-macnell |> 
-  mutate(TAID = ifelse(taidgender==1, "male", "female")) |>
-  mutate(TAGend = ifelse(tagender==1, "male", "female")) |>
-ggplot(aes(y=TAGend, x=overall, 
-           group = interaction(TAGend, TAID), 
-           fill=TAID)) +
-  geom_point(position=position_jitterdodge(jitter.height=0.3, jitter.width = 0, dodge.width = 0.4), 
-             aes(color = TAID)) +
-  stat_summary(fun="mean", geom="crossbar", 
-               size=.3, width = 1,
-               aes(color = TAID),
-               position=position_dodge(width=0.4)) +
-  stat_summary(fun="mean", geom="point", shape = "X",
-               size=5, aes(color = TAID),
-               position=position_dodge(width=0.4)) +
+macnell |>
+  mutate(TAID = ifelse(taidgender == 1, "male", "female")) |>
+  mutate(TAGend = ifelse(tagender == 1, "male", "female")) |>
+  ggplot(aes(
+    y = TAGend,
+    x = overall,
+    group = interaction(TAGend, TAID),
+    fill = TAID
+  )) +
+  geom_point(
+    position = position_jitterdodge(
+      jitter.height = 0.3,
+      jitter.width = 0,
+      dodge.width = 0.4
+    ),
+    aes(color = TAID)
+  ) +
+  stat_summary(
+    fun = "mean",
+    geom = "crossbar",
+    size = .3,
+    width = 1,
+    aes(color = TAID),
+    position = position_dodge(width = 0.4)
+  ) +
+  stat_summary(
+    fun = "mean",
+    geom = "point",
+    shape = "X",
+    size = 5,
+    aes(color = TAID),
+    position = position_dodge(width = 0.4)
+  ) +
   coord_flip() +
-  labs(title = "Overall teaching effectiveness score",
-       x = "",
-       y = "TA gender",
-       color = "TA identifier",
-       fill = "TA identifier")
+  labs(
+    title = "Overall teaching effectiveness score",
+    x = "",
+    y = "TA gender",
+    color = "TA identifier",
+    fill = "TA identifier"
+  )
 ```
 
 
@@ -544,7 +574,8 @@ $$H_0:  \mu_{ID.Female} = \mu_{ID.Male}$$
 
 ```{r}
 macnell |>
-  select(overall, tagender, taidgender) |> head(15)
+  select(overall, tagender, taidgender) |>
+  head(15)
 ```
 
 
@@ -570,37 +601,38 @@ macnell |>
 
 ```{r mac1}
 #| code-line-numbers: "2"
-macnell |> 
+macnell |>
   group_by(tagender) |>
-  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
-  select(overall, tagender, taidgender, permTAID) 
+  mutate(permTAID = sample(taidgender, replace = FALSE)) |>
+  select(overall, tagender, taidgender, permTAID)
 ```
 
 
 ```{r mac2}
 #| code-line-numbers: "2,5"
-macnell |> 
+macnell |>
   group_by(tagender) |>
-  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
+  mutate(permTAID = sample(taidgender, replace = FALSE)) |>
   ungroup(tagender) |>
   group_by(permTAID) |>
-  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
+  summarize(pmeans = mean(overall, na.rm = TRUE)) |>
   summarize(diff(pmeans))
 ```
 
 
 
 ```{r mac3}
-diff_means_func <- function(.x){
-  macnell |> group_by(tagender) |>
-  mutate(permTAID = sample(taidgender, replace=FALSE)) |>
-  ungroup(tagender) |>
-  group_by(permTAID) |>
-  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
-  summarize(diff_mean = diff(pmeans))
-  }
+diff_means_func <- function(.x) {
+  macnell |>
+    group_by(tagender) |>
+    mutate(permTAID = sample(taidgender, replace = FALSE)) |>
+    ungroup(tagender) |>
+    group_by(permTAID) |>
+    summarize(pmeans = mean(overall, na.rm = TRUE)) |>
+    summarize(diff_mean = diff(pmeans))
+}
 
-map(1:5, diff_means_func) |> 
+map(1:5, diff_means_func) |>
   list_rbind()
 ```
 
@@ -609,9 +641,9 @@ map(1:5, diff_means_func) |>
 
 ```{r}
 # observed
-macnell |> 
+macnell |>
   group_by(taidgender) |>
-  summarize(pmeans = mean(overall, na.rm=TRUE)) |>
+  summarize(pmeans = mean(overall, na.rm = TRUE)) |>
   summarize(diff_mean = diff(pmeans))
 ```
 
@@ -619,7 +651,7 @@ macnell |>
 ```{r}
 # permuted
 set.seed(47)
-reps = 1000
+reps <- 1000
 perm_diff_means <- map(1:reps, diff_means_func) |> list_rbind()
 ```
 
@@ -641,9 +673,10 @@ perm_diff_means |>
 ```{r}
 # permutation p-value
 perm_diff_means |>
-  summarize(p_val = 
-      sum(diff_mean > 0.474) / 
-      reps)
+  summarize(
+    p_val = sum(diff_mean > 0.474) /
+      reps
+  )
 ```
 ]
 
@@ -655,40 +688,49 @@ perm_diff_means |>
 
 #The `permuter` package contains functions for a variety of different permutation tests, including one with stratification.
 
-distr1 <- stratified_two_sample(response = macnell$overall,
-                               group =  macnell$taidgender,
-                               stratum = macnell$tagender,
-                               stat = "mean", reps=reps)
+distr1 <- stratified_two_sample(
+  response = macnell$overall,
+  group = macnell$taidgender,
+  stratum = macnell$tagender,
+  stat = "mean",
+  reps = reps
+)
 
-distr2 <- stratified_two_sample(response = macnell$overall,
-                               group =  macnell$taidgender,
-                               stratum = macnell$tagender,
-                               stat = "t", reps=reps)
+distr2 <- stratified_two_sample(
+  response = macnell$overall,
+  group = macnell$taidgender,
+  stratum = macnell$tagender,
+  stat = "t",
+  reps = reps
+)
 ```
 
 ```{r echo = FALSE, eval = FALSE, include = FALSE}
 
-macnell |> group_by(taidgender) |>
+macnell |>
+  group_by(taidgender) |>
   summarize(means = mean(overall, na.rm = TRUE)) |>
   summarize(diff(means))
 
-macnell |> group_by(taidgender) |>
-  summarize(means = mean(overall, na.rm=TRUE), 
-            vars = var(overall, na.rm=TRUE), ns = n() ) |>
-  summarize((means[1] - means[2])/ sqrt(vars[1]/ns[1] + vars[2]/ns[2]))
-
+macnell |>
+  group_by(taidgender) |>
+  summarize(
+    means = mean(overall, na.rm = TRUE),
+    vars = var(overall, na.rm = TRUE),
+    ns = n()
+  ) |>
+  summarize((means[1] - means[2]) / sqrt(vars[1] / ns[1] + vars[2] / ns[2]))
 ```
 
 ```{r echo = FALSE, eval = FALSE, include = FALSE}
 # brute force permutation
-2*sum(ov.stats > 0.47) / reps
+2 * sum(ov.stats > 0.47) / reps
 
 # mean(x) - mean(y)
-t2p(0.47, distr1, alternative="two-sided")
+t2p(0.47, distr1, alternative = "two-sided")
 
 # t permutation
-t2p(-1.56, distr2, alternative="two-sided")
-
+t2p(-1.56, distr2, alternative = "two-sided")
 ```
 
 
@@ -748,3 +790,4 @@ Depending on the data, hypotheses, and original data collection structure (e.g.,
 
 * When is it acceptable to claim that the resulting "discernable" (i.e., "significant") outcome is actually a causal relationship (and not just an association)?
 
+## References

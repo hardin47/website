@@ -25,6 +25,8 @@ Hadley Wickham discusses how to use Sys.getenv: https://cran.r-project.org/web/p
 -->
 
 ```{r}
+Sys.setenv(MARIADB_TLS_DISABLE_PEER_VERIFICATION = 1)
+
 con_traffic <- DBI::dbConnect(
   RMariaDB::MariaDB(),
   dbname = "traffic",
@@ -35,10 +37,10 @@ con_traffic <- DBI::dbConnect(
 ```
 
 ```{sql}
-#| connection: con_traffic
-#| label: show
-#| output.var: "show"
-#| eval: false
+--| connection: con_traffic
+--| label: show
+--| output.var: "show"
+--| eval: false
 
 SHOW TABLES;
 ```
@@ -51,20 +53,21 @@ SHOW TABLES;
 
 show |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 There are 88 tables in the `traffic` database.
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: select-describe
-#| output.var: "select_describe"
-#| eval: false
+--| connection: con_traffic
+--| label: select-describe
+--| output.var: "select_describe"
+--| eval: false
 
 DESCRIBE ca_los_angeles_2020_04_01;
 ```
@@ -78,10 +81,11 @@ DESCRIBE ca_los_angeles_2020_04_01;
 
 select_describe |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 The `DESCRIBE` command shows the 10 field names (variables) in the `ca_los_angeles_2020_04_01` table.  Some of the variables are characters (`text`) and some are `date` or `time`.
@@ -134,7 +138,10 @@ The shortest **SQL** query is the following `SELECT` command.  Do not run this c
 ```{r}
 #| eval: false
 
-DO NOT RUN:  SELECT * FROM ca_los_angeles_2020_04_01;
+DO
+NOT
+RUN:SELECT * FROM
+ca_los_angeles_2020_04_01
 ```
 
 ::: {.callout-tip icon=false}
@@ -149,10 +156,10 @@ Do not run the following command unless you are **certain** that the table from 
 Instead, to look at the top of the table, `SELECT` the first few rows.  The `LIMIT` command specifies which rows to select:  the first number is the number of rows to skip (0 rows skipped), the second number is the number of rows to print up to (up to row 14).
 
 ```{sql}
-#| connection: con_traffic
-#| label: select-14
-#| output.var: "select_14"
-#| eval: false
+--| connection: con_traffic
+--| label: select-14
+--| output.var: "select_14"
+--| eval: false
 
 SELECT * FROM ca_los_angeles_2020_04_01 LIMIT 0, 14;
 
@@ -166,19 +173,20 @@ SELECT * FROM ca_los_angeles_2020_04_01 LIMIT 0, 14;
 
 select_14 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Speaking of which, how many rows are there in the `ca_los_angeles_2020_04_01` table?  That is, how many taxi rides are recorded?  Now `SELECT` is used with a summary function, `COUNT()`.  Instead of using a separate summary function (like `mutate()` or `summarize()`), all the work is done inside the `SELECT` call.
 
 ```{sql}
-#| connection: con_traffic
-#| label: select-count
-#| output.var: "select_count"
-#| eval: false
+--| connection: con_traffic
+--| label: select-count
+--| output.var: "select_count"
+--| eval: false
 
 SELECT COUNT(*) FROM ca_los_angeles_2020_04_01;
 ```
@@ -191,10 +199,11 @@ SELECT COUNT(*) FROM ca_los_angeles_2020_04_01;
 
 select_count |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Yikes, more than 5.4 million traffic stops!
@@ -205,10 +214,10 @@ Unfortunately, `date` is saved as a date variable, and `vehicle_year` is saved a
 Fortunately for us, **SQL** has functionality to convert a `text` Type into `DateTime` type (POSIXct is a special type of DateTime formatting).
 
 ```{sql}
-#| connection: con_traffic
-#| label: str-date
-#| output.var: "str_date"
-#| eval: false
+--| connection: con_traffic
+--| label: str-date
+--| output.var: "str_date"
+--| eval: false
 
 SELECT
       date, vehicle_year,
@@ -225,17 +234,18 @@ SELECT
 
 str_date |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Now that the variables are no longer strings, we can subtract them to figure out the number of minutes for each taxi ride.  Unfortunately, the following code won't run because the variables `vehicle_date` is not in the table `la_new_orleans_2020_04_01`.
 
 ```{sql}
-#| connection: con_traffic
-#| eval: false
+--| connection: con_traffic
+--| eval: false
 
 SELECT
       date, vehicle_year,
@@ -249,10 +259,10 @@ SELECT
 Instead, we need two layers of `SELECT` commands so that the first `SELECT` (i.e., inside) layer creates the new variables, and the second `SELECT` (i.e., outside) layer subtracts the two times.
 
 ```{sql}
-#| connection: con_traffic
-#| label: length-time2
-#| output.var: "length_time2"
-#| eval: false
+--| connection: con_traffic
+--| label: length-time2
+--| output.var: "length_time2"
+--| eval: false
 
 SELECT 
    date,
@@ -275,19 +285,20 @@ LIMIT 0, 10;
 
 length_time2 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 Alternatively, the `STR_TO_DATE()` function can be applied inside the `TIMESTAMPDIFF()` function so that the full (now only) `SELECT` command is being used only on variables that are in the original table.
 
 ```{sql}
-#| connection: con_traffic
-#| label: length-time3
-#| output.var: "length_time3"
-#| eval: false
+--| connection: con_traffic
+--| label: length-time3
+--| output.var: "length_time3"
+--| eval: false
 
 SELECT 
    date,
@@ -307,24 +318,25 @@ LIMIT 0, 10;
 
 length_time3 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
-Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `date` and `vehicle_year` are columns in the original table - they are written to disk on the **SQL** server.  The variable `car_age` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **RStudio** or **DBeaver**) and is not written to disk.
+Keep in mind that there is a distinction between clauses that operate on the *variables of the original table* versus those that operate on the *variables of the results set*.  The variables `date` and `vehicle_year` are columns in the original table - they are written to disk on the **SQL** server.  The variable `car_age` exist only in the results set, which is passed from the server (**SQL** server) to the client (e.g., **Positron** or **DBeaver**) and is not written to disk.
 
 ## SELECT DISTINCT
 
 `SELECT DISTINCT` returns only unique rows.  That is, it filters out all the duplicates of a variable or a combination of variables.
 
 ```{sql}
-#| connection: con_traffic
-#| label: distinct1
-#| output.var: "distinct1"
-#| eval: false
+--| connection: con_traffic
+--| label: distinct1
+--| output.var: "distinct1"
+--| eval: false
 
 SELECT DISTINCT raw_actions_taken
 FROM la_new_orleans_2020_04_01
@@ -339,17 +351,18 @@ LIMIT 0, 50;
 
 distinct1 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 ```{sql}
-#| connection: con_traffic
-#| label: distinct2
-#| output.var: "distinct2"
-#| eval: false
+--| connection: con_traffic
+--| label: distinct2
+--| output.var: "distinct2"
+--| eval: false
 
 SELECT DISTINCT vehicle_make, vehicle_color
 FROM la_new_orleans_2020_04_01
@@ -364,10 +377,11 @@ LIMIT 0, 50;
 
 distinct2 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -386,10 +400,10 @@ What was the time of day for those traffic stops `search_conducted` was true and
 Note that in **SQL** the equality logical is `=` and in **R** the equality logical is `==`.  Note also that the WHERE command is case-insensitive!
 
 ```{sql}
-#| connection: con_traffic
-#| label: select-10
-#| output.var: "select_10"
-#| eval: false
+--| connection: con_traffic
+--| label: select-10
+--| output.var: "select_10"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -407,20 +421,21 @@ LIMIT 0, 10;
 
 select_10 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
 `BETWEEN` can be used to specify a range of values for a numeric value. `BETWEEN` is inclusive.
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-1012a
-#| output.var: "where_1012a"
-#| eval: false
+--| connection: con_traffic
+--| label: where-1012a
+--| output.var: "where_1012a"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -438,20 +453,21 @@ LIMIT 0, 10;
 
 where_1012a |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 `IN` is similar to the **dplyr** `%in%` function which specifies distinct values for the variable.
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-1012b
-#| output.var: "where_1012b"
-#| eval: false
+--| connection: con_traffic
+--| label: where-1012b
+--| output.var: "where_1012b"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -469,19 +485,20 @@ LIMIT 0, 10;
 
 where_1012b |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 The `WHERE` clause can be established by a number of logical commands combined using either `AND` or `OR`.  Usually it is important to use parentheses with `OR` logicals to make sure the desired query is return.  Consider the difference between the following queries.  In **SQL** (as in many programming languages), `AND` takes precedent over `OR` in the order of operations, when there are no parentheses.  (I was taught to remember order of operations using "please excuse my dear aunt Sally.")  The order of operations on the first query groups the second two conditions into one because `AND` take precedence over `OR` (as if the query was `vehicle_year BETWEEN 1970 and 1999 OR (vehicle_make IN ("Subaru", "Dodge") AND search_conducted = 1)`).
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-1012c
-#| output.var: "where_1012c"
-#| eval: false
+--| connection: con_traffic
+--| label: where-1012c
+--| output.var: "where_1012c"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -499,18 +516,19 @@ LIMIT 0, 10;
 
 where_1012c |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-1012d
-#| output.var: "where_1012d"
-#| eval: false
+--| connection: con_traffic
+--| label: where-1012d
+--| output.var: "where_1012d"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -528,10 +546,11 @@ LIMIT 0, 10;
 
 where_1012d |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -562,8 +581,8 @@ Consider the following table and **SQL** query:
 
 
 ```{sql}
-#| connection: con_traffic
-#| eval: false
+--| connection: con_traffic
+--| eval: false
 
 SELECT * FROM (
    SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
@@ -578,8 +597,8 @@ SELECT * FROM (
 
 
 ```{sql}
-#| connection: con_traffic
-#| eval: false
+--| connection: con_traffic
+--| eval: false
 
 SELECT * FROM (
    SELECT 'Ace' AS name, 20 AS age, 4 as num_dogs
@@ -607,10 +626,10 @@ Thus we keep only Ace and Ada.
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-null1
-#| output.var: "where_null1"
-#| eval: false
+--| connection: con_traffic
+--| label: where-null1
+--| output.var: "where_null1"
+--| eval: false
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -626,20 +645,21 @@ LIMIT 0, 10;
 
 where_null1 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: where-null2
-#| output.var: "where_null2"
-#| eval: false
-#| error: true
+--| connection: con_traffic
+--| label: where-null2
+--| output.var: "where_null2"
+--| eval: false
+--| error: true
 
 SELECT time, search_conducted, vehicle_year, vehicle_make
 FROM la_new_orleans_2020_04_01
@@ -656,10 +676,11 @@ LIMIT 0, 10;
 
 where_null2 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -681,10 +702,10 @@ Note that `SUM(1)` adds (sums) the number `1` for each row.  Which is the same a
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: group-pay
-#| output.var: "group_pay"
-#| eval: false
+--| connection: con_traffic
+--| label: group-pay
+--| output.var: "group_pay"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -703,19 +724,20 @@ GROUP BY subject_race;
 
 group_pay |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 For those people whose cars are between 1970 and 1999, how old is the youngest and oldest person for each `subject_race`?
 
 ```{sql}
-#| connection: con_traffic
-#| label: group-pay2
-#| output.var: "group_pay2"
-#| eval: false
+--| connection: con_traffic
+--| label: group-pay2
+--| output.var: "group_pay2"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -735,10 +757,11 @@ GROUP BY subject_race;
 
 group_pay2 |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -746,10 +769,10 @@ group_pay2 |>
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: group-wday
-#| output.var: "group_wday"
-#| eval: false
+--| connection: con_traffic
+--| label: group-wday
+--| output.var: "group_wday"
+--| eval: false
 
 
 SELECT subject_race,
@@ -769,10 +792,11 @@ GROUP BY subject_race, wday;
 
 group_wday |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -787,10 +811,10 @@ group_wday |>
 The `ORDER BY` command can be used with or without the `GROUP BY` and aggregation commands.  It allows us to look at interesting aspects of the data by sorting the data.
 
 ```{sql}
-#| connection: con_traffic
-#| label: order-low
-#| output.var: "order_low"
-#| eval: false
+--| connection: con_traffic
+--| label: order-low
+--| output.var: "order_low"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -810,20 +834,21 @@ ORDER BY min_age ASC;
 
 order_low |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 WHAT?!?!!  How are 10 year olds getting pulled over for traffic stops? If the observation is found to be a typo, it would need to be removed from the data set.  If the observation is somehow legitimate, it would need to be included in the analysis, with the information provided about its legitimacy.
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: order-high
-#| output.var: "order_high"
-#| eval: false
+--| connection: con_traffic
+--| label: order-high
+--| output.var: "order_high"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -843,20 +868,21 @@ ORDER BY max_age DESC;
 
 order_high |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 So many people over 100 years old...  the data seem fishy!
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: order-wday
-#| output.var: "order_wday"
-#| eval: false
+--| connection: con_traffic
+--| label: order-wday
+--| output.var: "order_wday"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -876,10 +902,11 @@ ORDER BY wday, subject_race;
 
 order_wday |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 
@@ -902,10 +929,10 @@ Recall that `WHERE` acts only on the original data.  If we are interested in tra
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: having-fri
-#| output.var: "having_fri"
-#| eval: false
+--| connection: con_traffic
+--| label: having-fri
+--| output.var: "having_fri"
+--| eval: false
 
 SELECT subject_race,
        COUNT(*) AS num_stops, 
@@ -925,10 +952,11 @@ HAVING wday = 'Friday';
 
 having_fri |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 While it worked out quite well for us that `HAVING` was able to filter the data based on the results set, the use of `HAVING` was quite onerous because the entire data set was considered before the filter was applied.  That is, if the filter can be done on the original data using `WHERE`, the query will be much faster and more efficient.
@@ -952,10 +980,10 @@ Whenever possible, use `WHERE` instead of `HAVING` to make your queries as effic
 As we've seen, `LIMIT` truncates the query to specified rows.  The first number is the offset (i.e., the number of rows to skip), the second number is the (maximum) number of rows to return.  Here, we return rows 154219 through 154228.
 
 ```{sql}
-#| connection: con_traffic
-#| label: limit-last
-#| output.var: "limit_last"
-#| eval: false
+--| connection: con_traffic
+--| label: limit-last
+--| output.var: "limit_last"
+--| eval: false
 
 SELECT * FROM la_new_orleans_2020_04_01 LIMIT 154218, 10;
 
@@ -969,10 +997,11 @@ SELECT * FROM la_new_orleans_2020_04_01 LIMIT 154218, 10;
 
 limit_last |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
  
 
@@ -984,10 +1013,10 @@ If you are working in **R** to run **SQL** commands, you may want to use the que
 
 
 ```{sql}
-#| connection: con_traffic
-#| label: new-table
-#| output.var: "new_table"
-#| echo: fenced
+--| connection: con_traffic
+--| label: new-table
+--| output.var: "new_table"
+--| echo: fenced
 
 SELECT *, DAYNAME(date) AS wday
 FROM la_new_orleans_2020_04_01
@@ -1003,10 +1032,11 @@ LIMIT 0, 1000;
 new_table |>
   head() |>
   kbl(linesep = "", booktabs = TRUE) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                latex_options = c("striped", "hold_position"),
-                full_width = FALSE) 
-
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
 ```
 
 ```{r}
@@ -1014,7 +1044,7 @@ new_table |>
 
 new_table |>
   drop_na(wday) |>
-  ggplot(aes(x = vehicle_year, y = subject_age, color = wday)) + 
+  ggplot(aes(x = vehicle_year, y = subject_age, color = wday)) +
   geom_point() +
   xlim(1985, 2025)
 ```
@@ -1053,3 +1083,7 @@ dbDisconnect(con_traffic, shutdown = TRUE)
 2. Why are such tasks so much harder with large datasets (versus small datasets)?
 
 3. Why are such tasks to much more important with large datasets (versus small datasets)?
+
+
+## References
+
