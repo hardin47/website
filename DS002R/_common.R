@@ -7,15 +7,12 @@ options(digits = 3)
 suppressMessages(library(tidymodels))
 suppressMessages(library(gghighlight))
 suppressMessages(library(glue))
-suppressMessages(library(ggmosaic))
 suppressMessages(library(ggridges))
 suppressMessages(library(gridExtra))
 suppressMessages(library(infer))
 suppressMessages(library(janitor))
 suppressMessages(library(knitr))
 suppressMessages(library(kableExtra))
-#suppressMessages(library(maps))
-suppressMessages(library(measurements))
 suppressMessages(library(openintro))
 suppressMessages(library(patchwork))
 suppressMessages(library(quantreg))
@@ -25,7 +22,6 @@ suppressMessages(library(skimr))
 suppressMessages(library(caret))
 suppressMessages(library(palmerpenguins))
 suppressMessages(library(survival))
-suppressMessages(library(waffle))
 suppressMessages(library(ggrepel))
 suppressMessages(library(ggpubr))
 suppressMessages(library(unvotes))
@@ -90,9 +86,10 @@ if (knitr::is_html_output()) {
 # function: caption helper -----------------------------------------------------
 
 caption_helper <- function(txt) {
-  if (knitr::is_latex_output())
+  if (knitr::is_latex_output()) {
     stringr::str_replace_all(txt, "([^`]*)`(.*?)`", "\\1\\\\texttt{\\2}") %>%
-    stringr::str_replace_all("_", "\\\\_")
-  else
+      stringr::str_replace_all("_", "\\\\_")
+  } else {
     txt
+  }
 }

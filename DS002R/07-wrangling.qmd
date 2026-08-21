@@ -4,10 +4,14 @@ As with data visualization, data wrangling is a fundamental part of being able t
 
 
 ```{r, include=FALSE, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, 
-                      fig.height=3, fig.width=5,  
-                      cache=TRUE, fig.align = "center")
-
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.height = 3,
+  fig.width = 5,
+  cache = TRUE,
+  fig.align = "center"
+)
 ```
 
 
@@ -166,12 +170,12 @@ The `babynames` data table in the `babynames` package comes from the Social Secu
  * `head()`  grab the first few rows
  * `tail()` grab the last few rows
  * `filter()`  removes unwanted *cases*
- *  `arrange()` reorders the cases
- *  `select()` removes unwanted *variables*   (and `rename()` )
- *  `distinct()` returns the unique values in a table
+ * `arrange()` reorders the cases
+ * `select()` removes unwanted *variables*   (and `rename()` )
+ * `distinct()` returns the unique values in a table
  * `mutate()` transforms the variable (and `transmute()` like mutate, returns only new variables)
- *  `group_by()` tells R that SUCCESSIVE functions keep in mind that there are groups of items.  So `group_by()` only makes sense with verbs later on (like `summarize()`).
- *  `summarize()`  collapses a data frame to a single row.  Some functions that are used within `summarize()` include:
+ * `group_by()` tells R that SUCCESSIVE functions keep in mind that there are groups of items.  So `group_by()` only makes sense with verbs later on (like `summarize()`).
+ * `summarize()`  collapses a data frame to a single row.  Some functions that are used within `summarize()` include:
 
      * `min(), max(), mean(), sum(), sd(), median()`, and `IQR()`
      * `n()`: number of observations in the current group
@@ -207,13 +211,37 @@ babynames |> names()
 babynames |> glimpse()
 babynames |> head()
 babynames |> tail()
-babynames |> sample_n(size=5)
+babynames |> sample_n(size = 5)
 ```
+
+#### Order matters!
+
+Notice below that the value of `mean_delay` is different for the two queries.
+
+##### Order 1: filter first, then summarize {-}
+```{r}
+library(nycflights13)
+flights |>
+  filter(dep_delay > 500) |>
+  group_by(carrier) |>
+  mutate(mean_delay = mean(dep_delay, na.rm = TRUE)) |>
+  select(year, month, day, dep_delay, mean_delay, origin, dest, carrier)
+```
+
+##### Order 2: summarize first, then filter {-}
+```{r}
+flights |>
+  group_by(carrier) |>
+  mutate(mean_delay = mean(dep_delay, na.rm = TRUE)) |>
+  filter(dep_delay > 500) |>
+  select(year, month, day, dep_delay, mean_delay, origin, dest, carrier)
+```
+
 
 
 ### Data Verbs
 
-Taken from the dplyr tutorial: http://dplyr.tidyverse.org/
+Taken from the dplyr tutorial: <a href = "https://dplyr.tidyverse.org/" target = "_blank">https://dplyr.tidyverse.org/</a>
 
 #### Starwars
 ```{r}
@@ -223,19 +251,19 @@ starwars |> dim()
 starwars |> names()
 starwars |> head()
 
-starwars |> 
+starwars |>
   dplyr::filter(species == "Droid")
 
 
-starwars |> 
+starwars |>
   dplyr::select(name, ends_with("color"))
 
 
-starwars |> 
-  dplyr::mutate(name, bmi = mass / ((height / 100)  ^ 2)) |>
+starwars |>
+  dplyr::mutate(name, bmi = mass / ((height / 100)^2)) |>
   dplyr::select(name:mass, bmi)
 
-starwars |> 
+starwars |>
   dplyr::arrange(desc(mass))
 
 
@@ -251,26 +279,44 @@ starwars |>
 
 #### NHANES
 ```{r}
-require(NHANES)
+#| fig-width: 10
+#| fig-height: 5
+#| out-width: 100%
+
+library(NHANES)
 names(NHANES)
 
 # find the sleep variables
-NHANESsleep <- NHANES |> select(Gender, Age, Weight, Race1, Race3, 
-                                 Education, SleepTrouble, SleepHrsNight, 
-                                 TVHrsDay, TVHrsDayChild, PhysActive)
+NHANESsleep <- NHANES |>
+  select(
+    Gender,
+    Age,
+    Weight,
+    Race1,
+    Race3,
+    Education,
+    SleepTrouble,
+    SleepHrsNight,
+    TVHrsDay,
+    TVHrsDayChild,
+    PhysActive
+  )
 names(NHANESsleep)
 dim(NHANESsleep)
 
 # subset for college students
-NHANESsleep <- NHANESsleep |> filter(Age %in% c(18:22)) |> 
-  mutate(Weightlb = Weight*2.2)
+NHANESsleep <- NHANESsleep |>
+  filter(Age %in% c(18:22)) |>
+  mutate(Weightlb = Weight * 2.2)
 
 names(NHANESsleep)
 dim(NHANESsleep)
 
-NHANESsleep |> ggplot(aes(x=Age, y=SleepHrsNight, color=Gender)) + 
-  geom_point(position=position_jitter(width=.25, height=0) ) + 
-  facet_grid(SleepTrouble ~ TVHrsDay) 
+NHANESsleep |>
+  ggplot(aes(x = Age, y = SleepHrsNight, color = Gender)) +
+  geom_point(position = position_jitter(width = .25, height = 0)) +
+  facet_grid(SleepTrouble ~ TVHrsDay) +
+  theme_minimal()
 ```
   
 ### `summarize` and `group_by`
@@ -279,10 +325,14 @@ NHANESsleep |> ggplot(aes(x=Age, y=SleepHrsNight, color=Gender)) +
 NHANES |> summarize(n())
 
 # total weight of all the people in NHANES (silly)
-NHANES |> mutate(Weightlb = Weight*2.2) |> summarize(sum(Weightlb, na.rm=TRUE))
+NHANES |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(sum(Weightlb, na.rm = TRUE))
 
 # mean weight of all the people in NHANES
-NHANES |> mutate(Weightlb = Weight*2.2) |> summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 
 
 # repeat the above but for groups
@@ -290,58 +340,75 @@ NHANES |> mutate(Weightlb = Weight*2.2) |> summarize(mean(Weightlb, na.rm=TRUE))
 # males versus females
 NHANES |> group_by(Gender) |> summarize(n())
 
-NHANES |> group_by(Gender) |> mutate(Weightlb = Weight*2.2) |> 
-  summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  group_by(Gender) |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 
 
 # smokers and non-smokers
 NHANES |> group_by(SmokeNow) |> summarize(n())
-NHANES |> group_by(SmokeNow) |> mutate(Weightlb = Weight*2.2) |> 
-  summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  group_by(SmokeNow) |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 
 # people with and without diabetes
 NHANES |> group_by(Diabetes) |> summarize(n())
-NHANES |> group_by(Diabetes) |> mutate(Weightlb = Weight*2.2) |> 
-  summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  group_by(Diabetes) |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 
 # break down the smokers versus non-smokers further, by sex
 NHANES |> group_by(SmokeNow, Gender) |> summarize(n())
-NHANES |> group_by(SmokeNow, Gender) |> mutate(Weightlb = Weight*2.2) |> 
-  summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  group_by(SmokeNow, Gender) |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 
 # break down the people with diabetes further, by smoking
 NHANES |> group_by(Diabetes, SmokeNow) |> summarize(n())
-NHANES |> group_by(Diabetes, SmokeNow) |> mutate(Weightlb = Weight*2.2) |> 
-  summarize(mean(Weightlb, na.rm=TRUE))
+NHANES |>
+  group_by(Diabetes, SmokeNow) |>
+  mutate(Weightlb = Weight * 2.2) |>
+  summarize(mean(Weightlb, na.rm = TRUE))
 ```
   
 ### babynames
 
 ```{r}  
-babynames |> group_by(sex) |>
-  summarize(total=sum(n))
+babynames |> group_by(sex) |> summarize(total = sum(n))
 
-babynames |> group_by(year, sex) |>
-  summarize(name_count = n_distinct(name)) |> head()
+babynames |>
+  group_by(year, sex) |>
+  summarize(name_count = n_distinct(name)) |>
+  head()
 
-babynames |> group_by(year, sex) |>
-  summarize(name_count = n_distinct(name)) |> tail()
+babynames |>
+  group_by(year, sex) |>
+  summarize(name_count = n_distinct(name)) |>
+  tail()
 
-babysamp <- babynames |> sample_n(size=50)
+babysamp <- babynames |> sample_n(size = 50)
 babysamp |> select(year) |> distinct() |> table()
 babysamp |> distinct() |> select(year) |> table()
 
 
 Frances <- babynames |>
-  filter(name== "Frances") |>
+  filter(name == "Frances") |>
   group_by(year, sex) |>
   summarize(yrTot = sum(n))
 
-Frances |> ggplot(aes(x=year, y=yrTot)) +
-  geom_point(aes(color=sex)) + 
-  geom_vline(xintercept=2006) + scale_y_log10() +
-  labs(y = "Yearly total on log10 scale",
-       title = "Number of babies named Frances, over time")
+Frances |>
+  ggplot(aes(x = year, y = yrTot)) +
+  geom_point(aes(color = sex)) +
+  geom_vline(xintercept = 2006) +
+  scale_y_log10() +
+  labs(
+    y = "Yearly total on log10 scale",
+    title = "Number of babies named Frances, over time"
+  )
 ```
   
 
@@ -391,77 +458,98 @@ If you are familiar with `spread` and `gather`, you should acquaint yourself wit
 library(googlesheets4)
 gs4_deauth()
 
-navy_gs = read_sheet("https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408", 
-                     col_types = "ccnnnnnnnnnnnnnnn")
+navy_gs <- read_sheet(
+  "https://docs.google.com/spreadsheets/d/1Ow6Cm4z-Z1Yybk3i352msulYCEDOUaOghmo9ALajyHo/edit#gid=1877566408",
+  col_types = "ccnnnnnnnnnnnnnnn"
+)
 ```
 
 ```{r}
 glimpse(navy_gs)
-names(navy_gs) = c("X","pay.grade", "male.sing.wo", "female.sing.wo",
-                   "tot.sing.wo", "male.sing.w", "female.sing.w", 
-                   "tot.sing.w", "male.joint.NA", "female.joint.NA",
-                   "tot.joint.NA", "male.civ.NA", "female.civ.NA",
-                   "tot.civ.NA", "male.tot.NA", "female.tot.NA", 
-                   "tot.tot.NA")
-navy = navy_gs[-c(1:8), -1]
+names(navy_gs) <- c(
+  "X",
+  "pay.grade",
+  "male.sing.wo",
+  "female.sing.wo",
+  "tot.sing.wo",
+  "male.sing.w",
+  "female.sing.w",
+  "tot.sing.w",
+  "male.joint.NA",
+  "female.joint.NA",
+  "tot.joint.NA",
+  "male.civ.NA",
+  "female.civ.NA",
+  "tot.civ.NA",
+  "male.tot.NA",
+  "female.tot.NA",
+  "tot.tot.NA"
+)
+navy <- navy_gs[-c(1:8), -1]
 dplyr::glimpse(navy)
 
 # get rid of total columns & rows:
 
-navyWR = navy |> select(-contains("tot")) |>
-   filter(substr(pay.grade, 1, 5) != "TOTAL" & 
-                   substr(pay.grade, 1, 5) != "GRAND" ) |>
-   pivot_longer(-pay.grade, 
-                       values_to = "numPeople", 
-                       names_to = "status") |>
-   separate(status, into = c("sex", "marital", "kids"))
+navyWR <- navy |>
+  select(-contains("tot")) |>
+  filter(
+    substr(pay.grade, 1, 5) != "TOTAL" &
+      substr(pay.grade, 1, 5) != "GRAND"
+  ) |>
+  pivot_longer(-pay.grade, values_to = "numPeople", names_to = "status") |>
+  separate(status, into = c("sex", "marital", "kids"))
 
 navyWR |> head()
 ```
 
 Does a graph tell us if we did it right?  what if we had done it wrong...?
 ```{r}
-navyWR |> ggplot(aes(x=pay.grade, y=numPeople, color=sex)) + 
-  geom_point()  + 
+navyWR |>
+  ggplot(aes(x = pay.grade, y = numPeople, color = sex)) +
+  geom_point() +
   facet_grid(kids ~ marital) +
   theme_minimal() +
   scale_color_viridis_d() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   hjust = 1, size = rel(.5)))
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = rel(.5))
+  )
 ```
 
 
 Notice the difference between `facet_grid()` and `facet_wrap()`.
 
 ```{r}
-navyWR |> ggplot(aes(x=pay.grade, y=numPeople, color=sex)) + 
-  geom_point()  + 
+navyWR |>
+  ggplot(aes(x = pay.grade, y = numPeople, color = sex)) +
+  geom_point() +
   facet_wrap(kids ~ marital) +
   theme_minimal() +
   scale_color_viridis_d() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   hjust = 1, size = rel(.5)))
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = rel(.5))
+  )
 ```
 
 ### `pivot_wider`
 
 ```{r}
 library(babynames)
-babynames |> dplyr::select(-prop) |>
-   tidyr::pivot_wider(names_from = sex, values_from = n) 
+babynames |>
+  dplyr::select(-prop) |>
+  tidyr::pivot_wider(names_from = sex, values_from = n)
 ```
 
 
 ```{r}
-babynames |> 
-  select(-prop) |> 
+babynames |>
+  select(-prop) |>
   pivot_wider(names_from = sex, values_from = n) |>
   filter(!is.na(F) & !is.na(M)) |>
   arrange(desc(year), desc(M))
 ```
 
 ```{r}
-babynames |> 
+babynames |>
   pivot_wider(names_from = sex, values_from = n) |>
   filter(!is.na(F) & !is.na(M)) |>
   arrange(desc(prop))
@@ -475,26 +563,26 @@ Both of the following datasets come from GapMinder.  The first represents countr
 
 ```{r}
 gs4_deauth()
-litF = read_sheet("https://docs.google.com/spreadsheets/d/1hDinTIRHQIaZg1RUn6Z_6mo12PtKwEPFIz_mJVF6P5I/pub?gid=0")
+litF <- read_sheet(
+  "https://docs.google.com/spreadsheets/d/1hDinTIRHQIaZg1RUn6Z_6mo12PtKwEPFIz_mJVF6P5I/pub?gid=0"
+)
 
-litF = litF |> select(country=starts_with("Adult"), 
-                              starts_with("1"), starts_with("2")) |>
-  pivot_longer(-country, 
-                      names_to = "year", 
-                      values_to = "litRateF") |>
+litF <- litF |>
+  select(country = starts_with("Adult"), starts_with("1"), starts_with("2")) |>
+  pivot_longer(-country, names_to = "year", values_to = "litRateF") |>
   filter(!is.na(litRateF))
 ```
 
 
 ```{r}
 gs4_deauth()
-GDP = read_sheet("https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0")
+GDP <- read_sheet(
+  "https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0"
+)
 
-GDP = GDP |> select(country = starts_with("Income"), 
-                            starts_with("1"), starts_with("2")) |>
-  pivot_longer(-country, 
-                      names_to = "year", 
-                      values_to = "gdp") |>
+GDP <- GDP |>
+  select(country = starts_with("Income"), starts_with("1"), starts_with("2")) |>
+  pivot_longer(-country, names_to = "year", values_to = "gdp") |>
   filter(!is.na(gdp))
 ```
   
@@ -503,25 +591,25 @@ head(litF)
 head(GDP)
 
 # left
-litGDPleft = left_join(litF, GDP, by=c("country", "year"))
+litGDPleft <- left_join(litF, GDP, by = c("country", "year"))
 dim(litGDPleft)
 sum(is.na(litGDPleft$gdp))
 head(litGDPleft)
 
 # right
-litGDPright = right_join(litF, GDP, by=c("country", "year"))
+litGDPright <- right_join(litF, GDP, by = c("country", "year"))
 dim(litGDPright)
 sum(is.na(litGDPright$gdp))
 head(litGDPright)
 
 # inner
-litGDPinner = inner_join(litF, GDP, by=c("country", "year"))
+litGDPinner <- inner_join(litF, GDP, by = c("country", "year"))
 dim(litGDPinner)
 sum(is.na(litGDPinner$gdp))
 head(litGDPinner)
 
 # full
-litGDPfull = full_join(litF, GDP, by=c("country", "year"))
+litGDPfull <- full_join(litF, GDP, by = c("country", "year"))
 dim(litGDPfull)
 sum(is.na(litGDPfull$gdp))
 head(litGDPfull)
@@ -569,11 +657,15 @@ The **input** to a `map` function is always either a *vector* (like a column), a
 A list is a way to hold things which might be very different in shape:
 
 ```{r}
-a_list <- list(a_number = 5,
-                      a_vector = c("a", "b", "c"),
-                      a_dataframe = data.frame(a = 1:3, 
-                                               b = c("q", "b", "z"), 
-                                               c = c("bananas", "are", "so very great")))
+a_list <- list(
+  a_number = 5,
+  a_vector = c("a", "b", "c"),
+  a_dataframe = data.frame(
+    a = 1:3,
+    b = c("q", "b", "z"),
+    c = c("bananas", "are", "so very great")
+  )
+)
 
 print(a_list)
 ```
@@ -584,15 +676,14 @@ Consider the following function:
 ```{r}
 add_ten <- function(x) {
   return(x + 10)
-  }
+}
 ```
 
 We can `map()` the `add_ten()` function across a vector.  Note that the output is a list (the default).
 
 ```{r}
 library(tidyverse)
-map(.x = c(2, 5, 10),
-    .f = add_ten)
+map(.x = c(2, 5, 10), .f = add_ten)
 ```
 
 What if we use a different type of input?  The default behavior is to still return a list!
@@ -610,14 +701,14 @@ data.frame(a = 2, b = 5, c = 10) |>
 ```
 
 
-Shorthand lets us get away from pre-defining the function (which will be useful).  Use the tilde `~` to indicate that you have a function: 
+Shorthand lets us get away from pre-defining the function (which will be useful).  Use the backslash `\` to indicate that you have a function: 
 
 ```{r}
 data.frame(a = 2, b = 5, c = 10) |>
-  map_df(~{.x + 10})
+  map_df(\(x) x + 10)
 ```
 
-Mostly, the tilde will be used for functions we already know:
+Mostly, the backslash will be used for functions we already know:
 
 ```{r}
 library(palmerpenguins)
@@ -625,13 +716,15 @@ library(broom)
 
 penguins_split <- split(penguins, penguins$species)
 penguins_split |>
-  map(~ lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  map_df(tidy)  # map(tidy)
+  map(\(mydata) lm(body_mass_g ~ flipper_length_mm, data = mydata)) |>
+  map_df(tidy) # map(tidy)
 
 penguins |>
   group_by(species) |>
-  group_map(~lm(body_mass_g ~ flipper_length_mm, data = .x)) |>
-  map(tidy)  # map_df(tidy)
+  group_map(\(mydata, ...) {
+    lm(body_mass_g ~ flipper_length_mm, data = mydata)
+  }) |>
+  map(tidy) # map_df(tidy)
 ```
 
 
